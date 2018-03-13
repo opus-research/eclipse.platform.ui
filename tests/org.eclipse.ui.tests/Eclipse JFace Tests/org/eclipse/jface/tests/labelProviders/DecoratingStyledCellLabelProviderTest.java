@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -195,7 +194,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
-			public void inputChanged(Viewer<? extends Object> viewer,
+			public void inputChanged(org.eclipse.jface.viewers.Viewer<Object> viewer,
 					Object oldInput, Object newInput) {
 			}
 
