@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
+import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -489,7 +490,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return wbwShell;
 			}
 		});
-		localContext.set(ISaveHandler.class, new ISaveHandler() {
+		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
@@ -517,7 +518,9 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 				return response;
 			}
-		});
+		};
+		saveHandler.logger = logger;
+		localContext.set(ISaveHandler.class, saveHandler);
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
@@ -621,16 +624,7 @@ public class WBWRenderer extends SWTPartRenderer {
 					} else if (parentME == null) {
 						parentME = (MUIElement) ((EObject) w).eContainer();
 						if (parentME instanceof MContext) {
-							MPart ap = (MPart) w.getContext().get(
-									IServiceConstants.ACTIVE_PART);
-							if (ap != null) {
-								System.out.println("ap: " + ap.getLabel()); //$NON-NLS-1$
-								EPartService ps = w.getContext().get(
-										EPartService.class);
-								ps.activate(ap, true);
-							} else {
-								w.getContext().activate();
-							}
+							w.getContext().activate();
 						}
 					}
 				}
