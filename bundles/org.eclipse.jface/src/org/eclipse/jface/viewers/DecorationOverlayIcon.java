@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -136,8 +136,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof DecorationOverlayIcon)) {
 			return false;
 		}
@@ -149,8 +148,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         int code = System.identityHashCode(base);
         for (int i = 0; i < overlays.length; i++) {
             if (overlays[i] != null) {
@@ -163,8 +161,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
      */
-    @Override
-	protected void drawCompositeImage(int width, int height) {
+    protected void drawCompositeImage(int width, int height) {
     	if (overlays.length > IDecoration.UNDERLAY) {
 	        ImageDescriptor underlay = overlays[IDecoration.UNDERLAY];
 	        if (underlay != null) {
@@ -182,16 +179,14 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
      */
-    @Override
-	protected Point getSize() {
+    protected Point getSize() {
         return size;
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.CompositeImageDescriptor#getTransparentPixel()
      */
-    @Override
-	protected int getTransparentPixel() {
+    protected int getTransparentPixel() {
     	return base.getImageData().transparentPixel;
     }
 
