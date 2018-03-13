@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,9 +40,9 @@ import org.eclipse.ui.views.markers.MarkerField;
 /**
  * The ProblemFilterRegistryReader is the registry reader for declarative
  * problem filters. See the org.eclipse.ui.markerSupport extension point.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
@@ -60,7 +60,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	private static final Object WARNING = "WARNING";//$NON-NLS-1$
 
 	private static final String MARKER_ID = "markerId"; //$NON-NLS-1$
-	
+
 	/**
 	 * Filter enablement : A zero/negative integer implies that the limit is
 	 * disabled.
@@ -153,7 +153,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 */
 	public static final String PROBLEMS_GENERATOR = "org.eclipse.ui.ide.problemsGenerator"; //$NON-NLS-1$
 
-	
+
 	/**
 	 * The all markers generator.
 	 */
@@ -168,39 +168,32 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	private static MarkerSupportRegistry singleton;
 
-	// Create a lock so that initialisation happens in one thread
-	private static Object creationLock = new Object();
 
 	/**
 	 * Get the instance of the registry.
-	 * 
+	 *
 	 * @return MarkerSupportRegistry
 	 */
-	public static MarkerSupportRegistry getInstance() {
+	public static synchronized MarkerSupportRegistry getInstance() {
 		if (singleton == null) {
-			synchronized (creationLock) {
-				if (singleton == null) {
-					// thread
-					singleton = new MarkerSupportRegistry();
-				}
-			}
+			singleton = new MarkerSupportRegistry();
 		}
 		return singleton;
 	}
 
-	private Map registeredFilters = new HashMap();
+	private final Map registeredFilters = new HashMap();
 
-	private Map markerGroups = new HashMap();
+	private final Map markerGroups = new HashMap();
 
-	private HashMap categories = new HashMap();
+	private final HashMap categories = new HashMap();
 
-	private HashMap hierarchyOrders = new HashMap();
+	private final HashMap hierarchyOrders = new HashMap();
 
 	private MarkerType rootType;
 
-	private HashMap generators = new HashMap();
+	private final HashMap generators = new HashMap();
 
-	private HashMap fields = new HashMap();
+	private final HashMap fields = new HashMap();
 
 	/**
 	 * Create a new instance of the receiver and read the registry.
@@ -236,7 +229,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	 * Process the extension and register the result with the tracker. Fill the
 	 * map of groupingEntries and attribueMappings processed for post
 	 * processing.
-	 * 
+	 *
 	 * @param tracker
 	 * @param extension
 	 * @param groupIDsToEntries
@@ -334,7 +327,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 					extensionCollection = (Collection) generatorExtensions.get(generatorName);
 				else
 					extensionCollection = new ArrayList();
-				
+
 				extensionCollection.add(element);
 				generatorExtensions.put(generatorName, extensionCollection);
 				tracker.registerObject(extension, element,
@@ -364,7 +357,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Create a table of MarkerFields
-	 * 
+	 *
 	 * @param tracker
 	 * @param extension
 	 * @param element
@@ -388,7 +381,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Process the cross references after all of the extensions have been read.
-	 * 
+	 *
 	 * @param groupIDsToEntries
 	 *            Mapping of group names to the markerGroupingEntries registered
 	 *            for them
@@ -409,7 +402,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Set up the fields and filters
-	 * 
+	 *
 	 * @param generatorExtensions
 	 *            the extensions to the generators,
 	 */
@@ -428,7 +421,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Process the grouping entries into thier required grouping entries.
-	 * 
+	 *
 	 * @param groupingEntries
 	 */
 	private void processGroupingEntries(Map groupingEntries) {
@@ -461,7 +454,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Process the attribute mappings into thier required grouping entries.
-	 * 
+	 *
 	 * @param entryIDsToEntries
 	 * @param attributeMappings
 	 */
@@ -508,7 +501,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the markerTypes defined in element.
-	 * 
+	 *
 	 * @param element
 	 * @return String[]
 	 */
@@ -524,7 +517,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
 	 *      org.eclipse.core.runtime.IExtension)
 	 */
@@ -541,7 +534,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the collection of currently registered filters.
-	 * 
+	 *
 	 * @return Collection of ProblemFilter
 	 */
 	public Collection getRegisteredFilters() {
@@ -560,7 +553,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the constant for scope from element. Return -1 if there is no value.
-	 * 
+	 *
 	 * @param element
 	 * @return int one of MarkerView#ON_ANY MarkerView#ON_SELECTED_ONLY
 	 *         MarkerView#ON_SELECTED_AND_CHILDREN
@@ -589,7 +582,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the constant for scope from element. Return -1 if there is no value.
-	 * 
+	 *
 	 * @param element
 	 * @return int one of MarkerView#ON_ANY MarkerView#ON_SELECTED_ONLY
 	 *         MarkerView#ON_SELECTED_AND_CHILDREN
@@ -615,7 +608,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Read the problem filters in the receiver.
-	 * 
+	 *
 	 * @param element
 	 *            the filter element
 	 * @return ProblemFilter
@@ -688,7 +681,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
 	 *      java.lang.Object[])
 	 */
@@ -748,7 +741,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	/**
 	 * Remove the value from all of the collection sets in cache. If the
 	 * collection is empty remove the key as well.
-	 * 
+	 *
 	 * @param value
 	 * @param cache
 	 */
@@ -782,7 +775,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	/**
 	 * Get the category associated with marker. Return <code>null</code> if
 	 * there are none.
-	 * 
+	 *
 	 * @param marker
 	 * @return String or <code>null</code>
 	 */
@@ -798,7 +791,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	/**
 	 * Get the category associated with markerType. Return <code>null</code>
 	 * if there are none.
-	 * 
+	 *
 	 * @param markerType
 	 * @return String or <code>null</code>
 	 */
@@ -811,7 +804,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the TableSorter that corresponds to type.
-	 * 
+	 *
 	 * @param type
 	 * @return TableSorter
 	 */
@@ -829,7 +822,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the list of root marker types.
-	 * 
+	 *
 	 * @return List of MarkerType.
 	 */
 	private MarkerType getRootType() {
@@ -843,7 +836,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 	/**
 	 * Find the best match sorter for typeName in the children. If it cannot be
 	 * found then return <code>null</code>.
-	 * 
+	 *
 	 * @param typeName
 	 * @param type
 	 * @return TableSorter or <code>null</code>.
@@ -873,7 +866,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the FieldMarkerGroups in the receiver.
-	 * 
+	 *
 	 * @return Collection of {@link MarkerGroup}
 	 */
 	public Collection getMarkerGroups() {
@@ -882,7 +875,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the default groupfield.
-	 * 
+	 *
 	 * @return IField
 	 */
 	IField getDefaultGroupField() {
@@ -892,7 +885,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the generator descriptor for id
-	 * 
+	 *
 	 * @param id
 	 * @return ContentGeneratorDescriptor or <code>null</code>.
 	 */
@@ -904,7 +897,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the default content generator descriptor.
-	 * 
+	 *
 	 * @return ContentGeneratorDescriptor
 	 */
 	public ContentGeneratorDescriptor getDefaultContentGenDescriptor () {
@@ -913,7 +906,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Get the markerGroup associated with categoryName
-	 * 
+	 *
 	 * @param categoryName
 	 * @return FieldMarkerGroup or <code>null</code>
 	 */
@@ -925,7 +918,7 @@ public class MarkerSupportRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Return the field that maps to id.
-	 * 
+	 *
 	 * @param id
 	 * @return {@link MarkerField} or <code>null</code>
 	 */
