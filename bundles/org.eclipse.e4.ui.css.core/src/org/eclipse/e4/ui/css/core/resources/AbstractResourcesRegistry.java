@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,9 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.resources;
 
-import java.util.Collection;
-
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,10 +17,10 @@ import java.util.Set;
 
 /**
  * Abstract class resources registry which implement basic cache with Map.
- * 
+ *
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- * 
+ *
  */
 public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 
@@ -32,7 +28,7 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#getResource(java.lang.Object,
 	 *      java.lang.Object)
 	 */
@@ -47,7 +43,7 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#registerResource(java.lang.Object,
 	 *      java.lang.Object, java.lang.Object)
 	 */
@@ -61,20 +57,10 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 		}
 		resourcesMap.put(key, resource);
 	}
-	
-	protected Collection getResourceByType(Object type) {
-		if (allResourcesMap != null) {
-			Map resourcesMap = (Map) allResourcesMap.get(type);
-			if (resourcesMap != null) {
-				return resourcesMap.values();
-			}
-		}
-		return Collections.EMPTY_LIST;
-	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#unregisterResource(java.lang.Object,
 	 *      java.lang.Object)
 	 */
@@ -98,14 +84,14 @@ public abstract class AbstractResourcesRegistry implements IResourcesRegistry {
 			}
 		}
 	}
-	
+
 	public Object getResourceType(Object resource) {
 		return resource.getClass();
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.resources.IResourcesRegistry#dispose()
 	 */
 	public void dispose() {

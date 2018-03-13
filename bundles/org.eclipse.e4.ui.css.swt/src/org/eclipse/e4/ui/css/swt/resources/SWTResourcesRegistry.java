@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,10 +10,6 @@
  *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.resources;
-
-import java.util.ArrayList;
-import java.util.List;
-import org.eclipse.swt.graphics.Resource;
 
 import org.eclipse.e4.ui.css.core.resources.AbstractResourcesRegistry;
 import org.eclipse.swt.SWT;
@@ -30,7 +26,6 @@ import org.eclipse.swt.widgets.Listener;
  * dispose it.
  */
 public class SWTResourcesRegistry extends AbstractResourcesRegistry {
-	private List<Resource> unusedResources = new ArrayList<Resource>();
 
 	public SWTResourcesRegistry(Display display) {
 		if (display == null)
@@ -39,7 +34,6 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		// into cache will be dispose it too.
 		display.addListener(SWT.Dispose, new Listener() {
 			public void handleEvent(Event event) {
-				disposeUnusedResources();
 				dispose();
 			}
 		});
@@ -83,6 +77,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 //			System.out.println("Cache" + hit + "SWT Image key=" + key);
 //		} else
 //			System.out.println("Cache" + hit + "Resource key=" + key);
+			
 		super.registerResource(type, key, resource);
 	}
 
@@ -114,10 +109,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 			//TODO replace with eclipse logging
 //			if (logger.isDebugEnabled())
 //				logger.debug("Dispose SWT Image key=" + key);
-		} else if (resource instanceof VolatileResource && 
-				((VolatileResource<?>) resource).getResource() != null) {	
-			((VolatileResource<?>) resource).getResource().dispose();
-		}
+		} 
 		//TODO replace with eclipse logging
 //		else if (logger.isDebugEnabled())
 //			logger.debug("Dispose Resource key=" + key);
@@ -132,35 +124,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 			return ((Image) resource).isDisposed();
 		} else if (resource instanceof Cursor) {
 			return ((Cursor) resource).isDisposed();
-		} else if (resource instanceof VolatileResource && 
-				((VolatileResource<?>) resource).getResource() != null) {
-			return ((VolatileResource<?>) resource).getResource().isDisposed();
 		}
 		return false;
-	}
-	
-	public void invalidateResources(Class<?>... clsToInvalidate) {		
-		for (Class<?> cls: clsToInvalidate) {
-			for (Object obj: getResourceByType(cls)) {
-				if (obj instanceof VolatileResource<?>) {	
-					((VolatileResource<?>) obj).setValid(false);
-				}
-			}
-		}
-	}
-	
-	public void addUnusedResource(Resource resource) {
-		unusedResources.add(resource);
-	}
-	
-	public void disposeUnusedResources() {
-		if (!unusedResources.isEmpty()) {
-			for (Resource resource: unusedResources) {
-				if (resource != null && !resource.isDisposed()) {
-					resource.dispose();
-				}
-			}
-			unusedResources.clear();
-		}
 	}
 }

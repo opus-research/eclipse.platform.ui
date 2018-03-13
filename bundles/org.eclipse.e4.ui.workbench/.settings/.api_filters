@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.e4.ui.workbench" version="2">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.e4.ui.workbench" version="2">
     <resource path="META-INF/MANIFEST.MF">
         <filter comment="Bug 411257 - .api_description files in Kepler release do not contain @noreference" id="923795461">
             <message_arguments>
@@ -12,12 +13,6 @@
             <message_arguments>
                 <message_argument value="org.eclipse.e4.ui.workbench.UIEvents.UILifeCycle"/>
                 <message_argument value="THEME_CHANGED"/>
-            </message_arguments>
-        </filter>
-        <filter id="403767336">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.workbench.UIEvents.UILifeCycle"/>
-                <message_argument value="THEME_DEFINITION_CHANGED"/>
             </message_arguments>
         </filter>
     </resource>

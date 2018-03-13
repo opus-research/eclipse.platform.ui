@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.converters;
 
-import static org.eclipse.e4.ui.css.swt.helpers.ThemeElementDefinitionHelper.normalizeId;
-
 import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.AbstractCSSValueConverter;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverter;
@@ -20,7 +18,6 @@ import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterCo
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.exceptions.DOMExceptionImpl;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
-import org.eclipse.e4.ui.css.swt.resources.ColorByDefinition;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.DOMException;
@@ -42,17 +39,13 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 		super(Color.class);
 	}
 
-	public Object convert(CSSValue value, CSSEngine engine, Object context)
+	public Color convert(CSSValue value, CSSEngine engine, Object context)
 			throws DOMException {
 		Display display = (Display) context;
 		Color color = CSSSWTColorHelper.getSWTColor(value, display);
-		if (color == null) {
+		if (color == null)
 			throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR,
 					DOMExceptionImpl.RGBCOLOR_ERROR);
-		}
-		if (CSSSWTColorHelper.hasColorDefinitionAsValue(value)) {
-			return new ColorByDefinition(normalizeId(value.getCssText().substring(1)), color);
-		}
 
 		return color;
 	}
