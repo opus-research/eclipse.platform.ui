@@ -1605,8 +1605,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 			modelService.removePerspectiveModel(persp, window);
 			modelToPerspectiveMapping.remove(persp);
-
-			legacyWindow.firePerspectiveClosed(this, desc);
 		}
 	}
 
@@ -3682,7 +3680,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		modelPerspective.getContext().activate();
 
-		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
 	}
 

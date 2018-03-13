@@ -926,8 +926,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		IEclipseContext lclContext = ctxt.getContext();
 		if (lclContext != null) {
 			IEclipseContext parentContext = lclContext.getParent();
-			IEclipseContext child = parentContext != null ? parentContext
-					.getActiveChild() : null;
+			IEclipseContext child = parentContext.getActiveChild();
 			if (child == lclContext) {
 				child.deactivate();
 			}
