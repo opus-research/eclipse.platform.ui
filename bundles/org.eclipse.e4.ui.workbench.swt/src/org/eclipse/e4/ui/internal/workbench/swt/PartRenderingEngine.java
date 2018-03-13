@@ -122,10 +122,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// If the parent isn't displayed who cares?
 			if (!(parent instanceof MApplication)
-					&& (parent == null || parent.getWidget() == null || menuChild))
+					&& (parent == null || menuChild))
 				return;
 
-			if (changedElement.isToBeRendered()) {
+			if (changedElement.isToBeRendered() && parent.getWidget() != null) {
 				Activator.trace(Policy.DEBUG_RENDERER, "visible -> true", null); //$NON-NLS-1$
 
 				// Note that the 'createGui' protocol calls 'childAdded'
@@ -142,12 +142,14 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (parent.getSelectedElement() == changedElement)
 					parent.setSelectedElement(null);
 
-				// Un-maximize the element before tearing it down
-				if (changedElement.getTags().contains(MAXIMIZED))
-					changedElement.getTags().remove(MAXIMIZED);
+				if (parent.getWidget() != null) {
+					// Un-maximize the element before tearing it down
+					if (changedElement.getTags().contains(MAXIMIZED))
+						changedElement.getTags().remove(MAXIMIZED);
 
-				// Note that the 'removeGui' protocol calls 'childRemoved'
-				removeGui(changedElement);
+					// Note that the 'removeGui' protocol calls 'childRemoved'
+					removeGui(changedElement);
+				}
 			}
 
 		}
