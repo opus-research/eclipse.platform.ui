@@ -845,10 +845,11 @@
                values="org.eclipse.ui.internal.registry.WizardParameterValues$Export"/>
       </command>
       <command
-            name="%command.save.name"
-            description="%command.save.description"
             categoryId="org.eclipse.ui.category.file"
-            id="org.eclipse.ui.file.save" />
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
+            description="%command.save.description"
+            id="org.eclipse.ui.file.save"
+            name="%command.save.name"/>
       <command
             name="%command.saveAs.name"
             description="%command.saveAs.description"
@@ -856,10 +857,11 @@
             categoryId="org.eclipse.ui.category.file"
             id="org.eclipse.ui.file.saveAs" />
       <command
-            name="%command.saveAll.name"
-            description="%command.saveAll.description"
             categoryId="org.eclipse.ui.category.file"
-            id="org.eclipse.ui.file.saveAll" />
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveAllHandler"
+            description="%command.saveAll.description"
+            id="org.eclipse.ui.file.saveAll"
+            name="%command.saveAll.name"/>
       <command
             name="%command.print.name"
             description="%command.print.description"
