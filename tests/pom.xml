@@ -34,6 +34,11 @@
     <module>org.eclipse.e4.ui.menu.tests.p4</module>
     <module>org.eclipse.ui.tests.browser</module>
     -->
+    <module>org.eclipse.e4.ui.bindings.tests</module>
+    <module>org.eclipse.e4.core.commands.tests</module>
+    <module>org.eclipse.e4.ui.tests</module>
+    <module>org.eclipse.e4.ui.tests.css.core</module>
+    <module>org.eclipse.e4.ui.tests.css.swt</module>
     <module>org.eclipse.jface.tests.databinding</module>
     <module>org.eclipse.jface.tests.databinding.conformance</module>
     <module>org.eclipse.ui.tests</module>
@@ -43,11 +48,6 @@
     <module>org.eclipse.ui.tests.performance</module>
     <module>org.eclipse.ui.tests.rcp</module>
     <module>org.eclipse.ui.tests.views.properties.tabbed</module>
-    <module>org.eclipse.e4.ui.bindings.tests</module>
-    <module>org.eclipse.e4.core.commands.tests</module>
-    <module>org.eclipse.e4.ui.tests</module>
-    <module>org.eclipse.e4.ui.tests.css.core</module>
-    <module>org.eclipse.e4.ui.tests.css.swt</module>
   </modules>
   <properties>
     <code.ignoredWarnings>${tests.ignoredWarnings}</code.ignoredWarnings>
