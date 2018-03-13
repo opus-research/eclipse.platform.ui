@@ -41,6 +41,7 @@ public class SplitDropAgent extends DropAgent {
 	private MPartStack dropStack;
 	private CTabFolder dropCTF;
 	private Rectangle clientBounds;
+	private String weight;
 
 	private Rectangle ctfBounds;
 
@@ -93,6 +94,7 @@ public class SplitDropAgent extends DropAgent {
 		if (dragParent == dropStack && dropStack.getChildren().size() == 2)
 			return false;
 
+		weight = dropStack.getContainerData();
 		dropCTF = (CTabFolder) dropStack.getWidget();
 
 		return true;
@@ -369,7 +371,13 @@ public class SplitDropAgent extends DropAgent {
 		}
 
 		float pct = (float) (onEdge ? 0.34 : 0.50);
+		MUIElement relToParent = relTo.getParent();
 		dndManager.getModelService().insert(toInsert, relTo, where, pct);
+
+		// Force the new sash to have the same weight as the original element
+		if (relTo.getParent() != relToParent && !onEdge)
+			relTo.getParent().setContainerData(weight);
+		dndManager.update();
 
 		return true;
 	}

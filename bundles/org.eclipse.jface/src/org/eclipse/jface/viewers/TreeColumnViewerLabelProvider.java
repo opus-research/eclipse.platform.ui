@@ -50,7 +50,7 @@ public class TreeColumnViewerLabelProvider<E,I> extends
 		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
-		public void addListener(ILabelProviderListener<E> listener) {
+		public void addListener(ILabelProviderListener listener) {
 			// Do nothing by default
 
 		}
@@ -60,7 +60,7 @@ public class TreeColumnViewerLabelProvider<E,I> extends
 		 *
 		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 		 */
-		public void removeListener(ILabelProviderListener<E> listener) {
+		public void removeListener(ILabelProviderListener listener) {
 			// Do nothing by default
 
 		}

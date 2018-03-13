@@ -80,7 +80,7 @@ public abstract class CellLabelProvider<E,I> extends BaseLabelProvider<E> {
 	 * @return {@link Image} or <code>null</code> if there is not image.
 	 */
 
-	public Image getToolTipImage(E object) {
+	public Image getToolTipImage(Object object) {
 		return null;
 	}
 

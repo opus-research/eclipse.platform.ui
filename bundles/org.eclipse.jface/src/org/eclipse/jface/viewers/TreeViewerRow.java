@@ -343,19 +343,17 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public TreePath<E> getTreePath() {
+	public TreePath getTreePath() {
 		TreeItem tItem = item;
 		LinkedList<E> segments = new LinkedList<E>();
 		while (tItem != null) {
-			@SuppressWarnings("unchecked")
 			E segment = (E) tItem.getData();
 			Assert.isNotNull(segment);
 			segments.addFirst(segment);
 			tItem = tItem.getParentItem();
 		}
-		@SuppressWarnings("unchecked")
-		E[] segmentsArray = (E[]) segments.toArray();
-		return new TreePath<E>(segmentsArray);
+
+		return new TreePath<E>((E[]) segments.toArray());
 	}
 
 	void setItem(TreeItem item) {
@@ -369,9 +367,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 
 	@Override
 	public E getElement() {
-		@SuppressWarnings("unchecked")
-		E element = (E) item.getData();
-		return element;
+		return (E) item.getData();
 	}
 
 	@Override
