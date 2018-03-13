@@ -353,10 +353,12 @@ public final class BidiUtils {
 			}
 		}
 		
-		if (control instanceof Text && (auto || textDir != 0)) {
-			applyBidiProcessing((Text) control, textDirection);
-		} else if (control instanceof StyledText && (auto || textDir != 0)) {
-			applyBidiProcessing((StyledText) control, textDirection);
+		if (auto) {
+			if (control instanceof Text) {
+				applyBidiProcessing((Text) control, AUTO);
+			} else if (control instanceof StyledText) {
+				applyBidiProcessing((StyledText) control, AUTO);
+			}
 		} else if (textDir != 0) {
 			control.setTextDirection(textDir);
 		}

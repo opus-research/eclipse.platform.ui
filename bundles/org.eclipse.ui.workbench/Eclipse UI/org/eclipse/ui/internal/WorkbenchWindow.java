@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Zhongwei Zhao - Bug 379495 - Two "Run" on top menu
- *     Patrick Chuong - Bug 391481 - Contributing perspectiveExtension, hiddenMenuItem 
- *     								 removes a menu from multiple perspectives
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -88,7 +86,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.StatusLineManager;
-import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.internal.provisional.action.CoolBarManager2;
@@ -413,27 +410,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	@PostConstruct
 	public void setup() {
-		// Initialize a previous 'saved' state if applicable. We no longer
-		// update the
-		// preference store.
-		if (getModel().getPersistedState().containsKey(IPreferenceConstants.COOLBAR_VISIBLE)) {
-			this.coolBarVisible = Boolean.parseBoolean(getModel().getPersistedState().get(
-					IPreferenceConstants.COOLBAR_VISIBLE));
-		} else {
-			this.coolBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
-					IPreferenceConstants.COOLBAR_VISIBLE);
-			getModel().getPersistedState().put(IPreferenceConstants.COOLBAR_VISIBLE,
-					Boolean.toString(this.coolBarVisible));
-		}
-		if (getModel().getPersistedState().containsKey(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE)) {
-			this.perspectiveBarVisible = Boolean.parseBoolean(getModel().getPersistedState().get(
-					IPreferenceConstants.PERSPECTIVEBAR_VISIBLE));
-		} else {
-			this.perspectiveBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
-					IPreferenceConstants.PERSPECTIVEBAR_VISIBLE);
-			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
-					Boolean.toString(this.perspectiveBarVisible));
-		}
+		// Initialize a previous 'saved' state if applicable.
+		this.coolBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
+				IPreferenceConstants.COOLBAR_VISIBLE);
+		this.perspectiveBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
+				IPreferenceConstants.PERSPECTIVEBAR_VISIBLE);
 
 		final IEclipseContext windowContext = model.getContext();
 		IServiceLocatorCreator slc = (IServiceLocatorCreator) workbench
@@ -1277,31 +1258,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
-	 * Mark contributions dirty for future update.
-	 */
-	private void allowUpdates(IMenuManager menuManager) {
-		menuManager.markDirty();
-		final IContributionItem[] items = menuManager.getItems();
-		for (int i = 0; i < items.length; i++) {
-			if (items[i] instanceof IMenuManager) {
-				allowUpdates((IMenuManager) items[i]);
-			} else if (items[i] instanceof SubContributionItem) {
-				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
-				if (innerItem instanceof IMenuManager) {
-					allowUpdates((IMenuManager) innerItem);
-				}
-			}
-		}
-	}
-
-	/**
 	 * Fires perspective activated
 	 */
 	void firePerspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
-		IMenuManager windowManager = ((WorkbenchPage) page).getActionBars().getMenuManager();
-		allowUpdates(windowManager);
-		windowManager.update(false);
-
 		UIListenerLogging.logPerspectiveEvent(this, page, perspective,
 				UIListenerLogging.PLE_PERSP_ACTIVATED);
 		perspectiveListeners.firePerspectiveActivated(page, perspective);
@@ -2139,8 +2098,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = coolBarVisible;
 		coolBarVisible = visible;
 		if (oldValue != coolBarVisible) {
-			getModel().getPersistedState().put(IPreferenceConstants.COOLBAR_VISIBLE,
-					Boolean.toString(visible));
 			updateLayoutDataForContents();
 			firePropertyChanged(PROP_COOLBAR_VISIBLE, oldValue ? Boolean.TRUE : Boolean.FALSE,
 					coolBarVisible ? Boolean.TRUE : Boolean.FALSE);
@@ -2180,8 +2137,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = perspectiveBarVisible;
 		perspectiveBarVisible = visible;
 		if (oldValue != perspectiveBarVisible) {
-			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
-					Boolean.toString(visible));
 			updateLayoutDataForContents();
 			firePropertyChanged(PROP_PERSPECTIVEBAR_VISIBLE, oldValue ? Boolean.TRUE
 					: Boolean.FALSE, perspectiveBarVisible ? Boolean.TRUE : Boolean.FALSE);
@@ -2238,9 +2193,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = statusLineVisible;
 		statusLineVisible = visible;
 		if (oldValue != statusLineVisible) {
-			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
-					Boolean.toString(visible));
-			updateLayoutDataForContents();
+
 			firePropertyChanged(PROP_STATUS_LINE_VISIBLE, oldValue ? Boolean.TRUE : Boolean.FALSE,
 					statusLineVisible ? Boolean.TRUE : Boolean.FALSE);
 		}
@@ -2417,14 +2370,17 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public void toggleToolbarVisibility() {
 		boolean coolbarVisible = getCoolBarVisible();
 		boolean perspectivebarVisible = getPerspectiveBarVisible();
+		IPreferenceStore prefs = PrefUtil.getInternalPreferenceStore();
 
 		// only toggle the visibility of the components that
 		// were on initially
 		if (getWindowConfigurer().getShowCoolBar()) {
 			setCoolBarVisible(!coolbarVisible);
+			prefs.setValue(IPreferenceConstants.COOLBAR_VISIBLE, !coolbarVisible);
 		}
 		if (getWindowConfigurer().getShowPerspectiveBar()) {
 			setPerspectiveBarVisible(!perspectivebarVisible);
+			prefs.setValue(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE, !perspectivebarVisible);
 		}
 		ICommandService commandService = (ICommandService) getService(ICommandService.class);
 		Map filter = new HashMap();

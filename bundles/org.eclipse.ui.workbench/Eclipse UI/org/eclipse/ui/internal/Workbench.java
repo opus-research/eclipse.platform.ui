@@ -568,6 +568,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
 							display);
+					IEclipseContext workbenchContext = e4Workbench.getContext();
+					workbenchContext.set(Display.class, display);
 
 					// create the workbench instance
 					Workbench workbench = new Workbench(display, advisor, e4Workbench
@@ -1183,9 +1185,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 					res.save(null);
 				} catch (IOException e) {
 					// Just auto-save, we don't really care
-				} finally {
-					res.unload();
-					res.getResourceSet().getResources().remove(res);
 				}
 				return Status.OK_STATUS;
 			}
