@@ -881,7 +881,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         }
         updateMenuItem();
     }
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
      */
@@ -1009,5 +1009,21 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 			return v.booleanValue();
 		}
 		return item.isVisible();
+	}
+
+	/**
+	 * @param menuText The menuText to set.
+	 * @since 3.10
+	 */
+	public void setMenuText(String menuText) {
+		this.menuText = menuText;
+	}
+
+	/**
+	 * @param image The image to set.
+	 * @since 3.10
+	 */
+	public void setImage(ImageDescriptor image) {
+		this.image = image;
 	}
 }
