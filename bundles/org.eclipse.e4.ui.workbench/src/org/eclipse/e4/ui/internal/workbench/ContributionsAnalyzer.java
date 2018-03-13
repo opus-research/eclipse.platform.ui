@@ -20,8 +20,7 @@ import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
-import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -247,15 +246,11 @@ public final class ContributionsAnalyzer {
 		}
 		final boolean[] ret = new boolean[1];
 		ret[0] = false;
-		SafeRunner.run(new ISafeRunnable() {
-			public void run() throws Exception {
-				ret[0] = ref.evaluate(eContext) != EvaluationResult.FALSE;
-			}
-
-			public void handleException(Throwable exception) {
-				trace("isVisible exception", exception); //$NON-NLS-1$
-			}
-		});
+		try {
+			ret[0] = ref.evaluate(eContext) != EvaluationResult.FALSE;
+		} catch (CoreException e) {
+			trace("isVisible exception", e); //$NON-NLS-1$
+		}
 		return ret[0];
 	}
 
