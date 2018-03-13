@@ -11,14 +11,13 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -54,7 +53,6 @@ import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.part.IShowInSource;
@@ -130,23 +128,32 @@ public class ShowInMenu extends ContributionItem implements
 		}
 
 		if (currentManager!=null && currentManager.getSize() > 0) {
-			IMenuService service = (IMenuService) locator
-					.getService(IMenuService.class);
-			service.releaseContributions(currentManager);
+			// IMenuService service = (IMenuService) locator
+			// .getService(IMenuService.class);
+			// service.releaseContributions(currentManager);
 			currentManager.removeAll();
 		}
 
 		currentManager = new MenuManager();
 		fillMenu(currentManager);
+		int itemCount = menu.getItemCount();
 		IContributionItem[] items = currentManager.getItems();
 		if (items.length == 0) {
-			MenuItem item = new MenuItem(menu, SWT.NONE, index++);
+			MenuItem item = new MenuItem(menu, SWT.NONE, index == -1 ? itemCount : index);
 			item.setText(NO_TARGETS_MSG);
 			item.setEnabled(false);
 		} else {
 			for (int i = 0; i < items.length; i++) {
-				if (items[i].isVisible()) {
-					items[i].fill(menu, index++);
+				IContributionItem item = items[i];
+				if (item.isVisible()) {
+					if (index == -1) {
+						item.fill(menu, -1);
+					} else {
+						item.fill(menu, index);
+						int newItemCount = menu.getItemCount();
+						index += newItemCount - itemCount;
+						itemCount = newItemCount;
+					}
 				}
 			}
 		}
@@ -414,11 +421,11 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	public void dispose() {
 		if (currentManager != null && currentManager.getSize() > 0) {
-			IMenuService service = (IMenuService) locator
-					.getService(IMenuService.class);
-			if (service != null) {
-				service.releaseContributions(currentManager);
-			}
+			// IMenuService service = (IMenuService) locator
+			// .getService(IMenuService.class);
+			// if (service != null) {
+			// service.releaseContributions(currentManager);
+			// }
 			currentManager.removeAll();
 			currentManager = null;
 		}

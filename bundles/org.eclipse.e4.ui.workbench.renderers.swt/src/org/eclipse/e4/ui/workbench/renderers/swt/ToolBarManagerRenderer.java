@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,8 +33,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
@@ -46,7 +44,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
@@ -90,8 +87,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@Inject
 	private MApplication application;
-	@Inject
-	private EModelService modelService;
 
 	@Inject
 	IEventBroker eventBroker;
@@ -263,7 +258,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final MToolBar toolbarModel = (MToolBar) element;
 		ToolBar newTB = createToolbar(toolbarModel, (Composite) parent);
 		bindWidget(element, newTB);
-		processContribution(toolbarModel);
+		processContribution(toolbarModel, toolbarModel.getElementId());
 
 		Control renderedCtrl = newTB;
 		MUIElement parentElement = element.getParent();
@@ -291,35 +286,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	/**
 	 * @param element
 	 */
-	private void processContribution(MToolBar toolbarModel) {
-		HashSet<String> existingToolbarIds = getExistingToolbarIds((MTrimmedWindow) modelService
-				.getTopLevelWindowFor(toolbarModel));
-
+	public void processContribution(MToolBar toolbarModel, String elementId) {
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
-				application.getToolBarContributions(),
-				toolbarModel.getElementId(), toContribute, existingToolbarIds);
+				application.getToolBarContributions(), elementId, toContribute);
 		generateContributions(toolbarModel, toContribute);
-	}
-
-	private HashSet<String> getExistingToolbarIds(MTrimmedWindow topWin) {
-		HashSet<String> result = new HashSet<String>();
-		for (MTrimBar bar : topWin.getTrimBars()) {
-			for (MTrimElement trimElem : bar.getChildren()) {
-				if (trimElem.getElementId() != null) {
-					result.add(trimElem.getElementId());
-				}
-				if (trimElem instanceof MToolBar) {
-					for (MToolBarElement toolElem : ((MToolBar) trimElem)
-							.getChildren()) {
-						if (toolElem.getElementId() != null) {
-							result.add(toolElem.getElementId());
-						}
-					}
-				}
-			}
-		}
-		return result;
 	}
 
 	/**
@@ -364,8 +335,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			return false;
 		}
 		if (record.anyVisibleWhen()) {
-			final IEclipseContext parentContext = modelService
-					.getContainingContext(toolbarModel);
+			final IEclipseContext parentContext = getContext(toolbarModel);
 			parentContext.runAndTrack(new RunAndTrack() {
 				@Override
 				public boolean changed(IEclipseContext context) {

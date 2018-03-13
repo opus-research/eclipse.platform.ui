@@ -78,6 +78,7 @@ import org.osgi.service.event.EventHandler;
  * Create a contribute part.
  */
 public class MenuManagerRenderer extends SWTPartRenderer {
+	public static final String VISIBILITY_IDENTIFIER = "IIdentifier"; //$NON-NLS-1$
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
 
@@ -323,7 +324,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			newMenu.setData(menuManager);
 		}
 		if (!menuManager.getRemoveAllWhenShown()) {
-			processContributions(menuModel, menuBar,
+			processContributions(menuModel, menuModel.getElementId(), menuBar,
 					menuModel instanceof MPopupMenu);
 		}
 		if (newMenu != null) {
@@ -396,19 +397,20 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	 * @param isMenuBar
 	 * @param isPopup
 	 */
-	public void processContributions(MMenu menuModel, boolean isMenuBar,
-			boolean isPopup) {
-		if (menuModel.getElementId() == null) {
+	public void processContributions(MMenu menuModel, String elementId,
+			boolean isMenuBar, boolean isPopup) {
+		if (elementId == null) {
 			return;
 		}
 		final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
 		ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
-				application.getMenuContributions(), menuModel.getElementId(),
-				toContribute, null, isPopup);
+				application.getMenuContributions(), elementId, toContribute,
+				null, isPopup);
 		generateContributions(menuModel, toContribute, isMenuBar);
 		for (MMenuElement element : menuModel.getChildren()) {
 			if (element instanceof MMenu) {
-				processContributions((MMenu) element, false, isPopup);
+				processContributions((MMenu) element, element.getElementId(),
+						false, isPopup);
 			}
 		}
 	}
@@ -468,8 +470,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			return false;
 		}
 		if (menuBar || isPartMenu(menuModel)) {
-			final IEclipseContext parentContext = modelService
-					.getContainingContext(menuModel);
+			final IEclipseContext parentContext = getContext(menuModel);
 			parentContext.runAndTrack(new RunAndTrack() {
 				@Override
 				public boolean changed(IEclipseContext context) {
@@ -965,13 +966,25 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	 */
 	public static void updateVisibility(MenuManager menuManager,
 			MMenuElement element, ExpressionContext evalContext) {
-		if (!(element.getVisibleWhen() instanceof MCoreExpression)) {
-			return;
+		boolean current = element.isVisible();
+		boolean visible = true;
+		boolean evaluated = false;
+		if (element.getPersistedState().get(VISIBILITY_IDENTIFIER) != null) {
+			evaluated = true;
+			String identifier = element.getPersistedState().get(
+					VISIBILITY_IDENTIFIER);
+			Object rc = evalContext.eclipseContext.get(identifier);
+			if (rc instanceof Boolean) {
+				visible = ((Boolean) rc).booleanValue();
+			}
 		}
-		boolean val = ContributionsAnalyzer.isVisible(
-				(MCoreExpression) element.getVisibleWhen(), evalContext);
-		if (val != element.isVisible()) {
-			element.setVisible(val);
+		if (visible && (element.getVisibleWhen() instanceof MCoreExpression)) {
+			evaluated = true;
+			visible = ContributionsAnalyzer.isVisible(
+					(MCoreExpression) element.getVisibleWhen(), evalContext);
+		}
+		if (evaluated && visible != current) {
+			element.setVisible(visible);
 			menuManager.markDirty();
 		}
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.internal.workbench;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +23,6 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -78,39 +79,18 @@ public final class ContributionsAnalyzer {
 
 	public static void XXXgatherToolBarContributions(final MToolBar toolbarModel,
 			final List<MToolBarContribution> toolbarContributionList, final String id,
-			final ArrayList<MToolBarContribution> toContribute, HashSet<String> existingToolbarIds) {
+			final ArrayList<MToolBarContribution> toContribute) {
 		if (id == null || id.length() == 0) {
 			return;
 		}
-
 		for (MToolBarContribution toolBarContribution : toolbarContributionList) {
 			String parentID = toolBarContribution.getParentId();
-			boolean filtered = isFiltered(toolBarContribution, existingToolbarIds);
+			boolean filtered = isFiltered(toolbarModel, toolBarContribution);
 			if (filtered || !id.equals(parentID) || !toolBarContribution.isToBeRendered()) {
 				continue;
 			}
 			toContribute.add(toolBarContribution);
 		}
-	}
-
-	static boolean isFiltered(MToolBarContribution toolBarContribution,
-			HashSet<String> existingToolbarIds) {
-		String elemId = toolBarContribution.getElementId();
-		if (elemId != null) {
-			if (existingToolbarIds.contains(elemId)) {
-				return true;
-			}
-
-			// filter out the action contribution added by the 'org.eclipse.ui.editorActions'
-			// extension point that is deprecated API. See the bug 384354 for more details
-			String[] elemIdParts = elemId.split("/"); //$NON-NLS-1$ 
-			if (elemIdParts.length == 2
-					&& (existingToolbarIds.contains(elemIdParts[0]) || existingToolbarIds
-							.contains(elemIdParts[1]))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public static void gatherToolBarContributions(final MToolBar toolbarModel,
