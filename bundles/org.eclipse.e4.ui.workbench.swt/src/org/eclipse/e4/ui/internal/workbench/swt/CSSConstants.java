@@ -15,8 +15,4 @@ public class CSSConstants {
 	public static final String CSS_BUSY_CLASS = "busy";
 
 	public static final String CSS_ACTIVE_CLASS = "active";
-
-	public static final String CSS_HIGHLIGHTED_CLASS = "highlighted";
-
-	public static final String CSS_CONTENT_CHANGED_CLASS = "contentChanged";
 }

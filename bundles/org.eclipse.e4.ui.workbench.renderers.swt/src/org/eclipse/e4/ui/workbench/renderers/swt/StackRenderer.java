@@ -498,47 +498,29 @@ public class StackRenderer extends LazyStackRenderer {
 				Object oldValue = event
 						.getProperty(UIEvents.EventTags.OLD_VALUE);
 
-				System.err.println(event
-						.getProperty(UIEvents.EventTags.ATTNAME)
-						+ " - " + newValue + "/" + oldValue); //$NON-NLS-1$ //$NON-NLS-2$
-
 				if (!(element instanceof MPart)
-						|| !isAnyOfTagsModified(oldValue, newValue,
-								CSSConstants.CSS_BUSY_CLASS,
-								CSSConstants.CSS_CONTENT_CHANGED_CLASS)) {
+						|| !isBusyTagModified(oldValue, newValue)) {
 					return;
 				}
 
 				MPart part = (MPart) element;
 				CTabItem cti = findItemForPart(part);
-				if (cti == null) {
-					return;
-				}
+				if (cti != null) {
+					setCSSInfo(part, cti);
+					reapplyStyles(cti);
 
-				if (CSSConstants.CSS_CONTENT_CHANGED_CLASS.equals(newValue)
-				// && cti != cti.getParent().getSelection()
-				) {
-					System.err.println("AAAAAAAAA"); //$NON-NLS-1$
-					part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 				}
-
-				setCSSInfo(part, cti);
-				reapplyStyles(cti);
 			}
 		};
 		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
 				tagsChangeHandler);
 	}
 
-	private boolean isAnyOfTagsModified(Object oldValue, Object newValue,
-			String... tagNames) {
-		for (String tagName : tagNames) {
-			if ((newValue == null && tagName.equals(oldValue))
-					|| (oldValue == null && tagName.equals(newValue))) {
-				return true;
-			}
-		}
-		return false;
+	private boolean isBusyTagModified(Object oldValue, Object newValue) {
+		return (newValue == null && CSSConstants.CSS_BUSY_CLASS
+				.equals(oldValue))
+				|| (oldValue == null && CSSConstants.CSS_BUSY_CLASS
+						.equals(newValue));
 	}
 
 	/**
