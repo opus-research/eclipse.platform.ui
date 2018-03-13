@@ -1664,9 +1664,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
-				ThemeElementHelper.populateRegistry(getThemeManager().getTheme(
-						IThemeManager.DEFAULT_THEME), colorDefinitions, PrefUtil
-						.getInternalPreferenceStore());
+				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
+						colorDefinitions, PrefUtil.getInternalPreferenceStore());
 			}
 		});
 	}
@@ -2821,7 +2820,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
