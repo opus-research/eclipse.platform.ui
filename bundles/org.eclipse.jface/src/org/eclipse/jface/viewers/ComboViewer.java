@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,13 +29,11 @@ import org.eclipse.swt.widgets.Control;
  * and configured with a domain-specific content provider, label provider, element
  * filter (optional), and element sorter (optional).
  * </p>
- * @param <E> Type of an element of the model
- * @param <T> Type of Input
  * 
  * @see org.eclipse.jface.viewers.ListViewer
  * @since 3.0 (made non-final in 3.4)
  */
-public class ComboViewer<E,T> extends AbstractListViewer<E,T> {
+public class ComboViewer extends AbstractListViewer {
 
     /**
      * This viewer's list control if this viewer is instantiated with a combo control; otherwise

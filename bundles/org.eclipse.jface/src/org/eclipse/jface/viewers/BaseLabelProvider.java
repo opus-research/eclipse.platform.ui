@@ -17,12 +17,11 @@ import org.eclipse.jface.util.SafeRunnable;
 /**
  * BaseLabelProvider is a default concrete implementation of
  * {@link IBaseLabelProvider} 
- * @param <E> Type of an element of the model
  * 
  * @since 3.3
  * 
  */
-public class BaseLabelProvider<E> extends EventManager implements IBaseLabelProvider<E> {
+public class BaseLabelProvider extends EventManager implements IBaseLabelProvider {
 	
 	/* (non-Javadoc)
      * Method declared on IBaseLabelProvider.
