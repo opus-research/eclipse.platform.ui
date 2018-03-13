@@ -111,16 +111,6 @@ public class ToolBarContributionRecord {
 			}
 		}
 		if (currentVisibility
-				&& item.getPersistedState().get(
-						MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
-			String identifier = item.getPersistedState().get(
-					MenuManagerRenderer.VISIBILITY_IDENTIFIER);
-			Object rc = exprContext.eclipseContext.get(identifier);
-			if (rc instanceof Boolean) {
-				currentVisibility = ((Boolean) rc).booleanValue();
-			}
-		}
-		if (currentVisibility
 				&& item.getVisibleWhen() instanceof MCoreExpression) {
 			boolean val = ContributionsAnalyzer.isVisible(
 					(MCoreExpression) item.getVisibleWhen(), exprContext);
@@ -134,9 +124,7 @@ public class ToolBarContributionRecord {
 			return true;
 		}
 		for (MToolBarElement child : toolbarContribution.getChildren()) {
-			if (child.getVisibleWhen() != null
-					|| child.getPersistedState().get(
-							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
+			if (child.getVisibleWhen() != null) {
 				return true;
 			}
 		}
