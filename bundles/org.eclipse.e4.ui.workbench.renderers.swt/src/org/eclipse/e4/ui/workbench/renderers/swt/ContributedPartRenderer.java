@@ -15,6 +15,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersActivator;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -109,16 +110,16 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 					}
 				}
 
-				if (logger != null) {
+				if (SWTRenderersActivator
+						.isTracing(SWTRenderersActivator.TRACE_PARTS)) {
 					String id = part.getElementId();
-					if (id == null) {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part " //$NON-NLS-1$
-										+ id);
-					} else {
-						logger.warn(new IllegalStateException(),
-								"Blocked recursive attempt to activate part"); //$NON-NLS-1$
+					String msg = "Blocked recursive attempt to activate part "; //$NON-NLS-1$
+					if (id != null) {
+						msg += id;
 					}
+					SWTRenderersActivator.trace(
+							SWTRenderersActivator.TRACE_PARTS, msg,
+							new IllegalStateException());
 				}
 
 				// already being focused, likely some strange recursive call,

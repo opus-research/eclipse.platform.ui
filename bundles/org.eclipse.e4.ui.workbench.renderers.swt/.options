@@ -1,0 +1,2 @@
+org.eclipse.e4.ui.workbench.renderers.swt/debug = false
+org.eclipse.e4.ui.workbench.renderers.swt/trace/parts = false
