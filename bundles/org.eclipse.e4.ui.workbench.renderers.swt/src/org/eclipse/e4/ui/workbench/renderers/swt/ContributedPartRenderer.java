@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,6 +106,18 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 					} finally {
 						// we are done, unset our flag
 						beingFocused = false;
+					}
+				}
+
+				if (logger != null) {
+					String id = part.getElementId();
+					if (id == null) {
+						logger.warn(new IllegalStateException(),
+								"Blocked recursive attempt to activate part " //$NON-NLS-1$
+										+ id);
+					} else {
+						logger.warn(new IllegalStateException(),
+								"Blocked recursive attempt to activate part"); //$NON-NLS-1$
 					}
 				}
 

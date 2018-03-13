@@ -109,8 +109,7 @@ public class StructuredSelection implements IStructuredSelection {
      * @param o the other object
      * @return <code>true</code> if they are equal, and <code>false</code> otherwise
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -199,8 +198,7 @@ public class StructuredSelection implements IStructuredSelection {
      *
      * @return debug string
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return isEmpty() ? JFaceResources.getString("<empty_selection>") : toList().toString(); //$NON-NLS-1$
     }
 }

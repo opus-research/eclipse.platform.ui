@@ -55,8 +55,7 @@ public class DeviceResourceException extends RuntimeException {
      * @return the cause or <code>null</code>
      * @since 3.1
      */
-    @Override
-	public Throwable getCause() {
+    public Throwable getCause() {
         return cause;
     }
     

@@ -85,7 +85,6 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 	public void partClosed(IWorkbenchPart part) {
 		if (part instanceof ISaveablePart) {
 			part.removePropertyListener(this);
-			update();
 		}
 	}
 

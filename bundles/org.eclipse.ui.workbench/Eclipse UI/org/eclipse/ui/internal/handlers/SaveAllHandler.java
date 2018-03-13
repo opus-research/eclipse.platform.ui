@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.handlers;
 
+import org.eclipse.ui.internal.InternalHandlerUtil;
+import org.eclipse.ui.internal.SaveablesList;
+import org.eclipse.ui.internal.WorkbenchPage;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -20,9 +24,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.internal.InternalHandlerUtil;
-import org.eclipse.ui.internal.SaveablesList;
-import org.eclipse.ui.internal.WorkbenchPage;
 
 /**
  * Saves all active editors
@@ -44,7 +45,7 @@ public class SaveAllHandler extends AbstractSaveHandler {
 				.getActiveWorkbenchWindowChecked(event);
 		IWorkbenchPage page = window.getActivePage();
 		if (page != null) {
-			((WorkbenchPage) page).saveAllEditors(false, false, true);
+			((WorkbenchPage) page).saveAllEditors(false, false);
 		}
 
 		return null;

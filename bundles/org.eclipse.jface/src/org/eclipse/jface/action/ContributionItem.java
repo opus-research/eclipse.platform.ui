@@ -183,8 +183,7 @@ public abstract class ContributionItem implements IContributionItem {
      * Returns a string representation of this contribution item 
      * suitable only for debugging.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return getClass().getName() + "(id=" + getId() + ")";//$NON-NLS-2$//$NON-NLS-1$
     }
 

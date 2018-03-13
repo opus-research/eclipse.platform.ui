@@ -68,8 +68,7 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see ResourceManager#create(DeviceResourceDescriptor)
      */
-    @Override
-	public final Object create(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
+    public final Object create(DeviceResourceDescriptor descriptor) throws DeviceResourceException {
 
         // Lazily allocate the map
         if (map == null) {
@@ -97,8 +96,7 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see ResourceManager#destroy(DeviceResourceDescriptor)
      */
-    @Override
-	public final void destroy(DeviceResourceDescriptor descriptor) {
+    public final void destroy(DeviceResourceDescriptor descriptor) {
         // If the map is empty (null) then there are no resources to dispose
         if (map == null) {
             return;
@@ -128,8 +126,7 @@ abstract class AbstractResourceManager extends ResourceManager {
      * 
      * @since 3.1 
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         
         if (map == null) {
@@ -153,8 +150,7 @@ abstract class AbstractResourceManager extends ResourceManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ResourceManager#find(org.eclipse.jface.resource.DeviceResourceDescriptor)
      */
-    @Override
-	public Object find(DeviceResourceDescriptor descriptor) {
+    public Object find(DeviceResourceDescriptor descriptor) {
         if (map == null) {
             return null;
         }

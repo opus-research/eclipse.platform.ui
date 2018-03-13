@@ -18,8 +18,10 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is a mix in that will be used for UI Elements that are capable of showing label
- * information in the GUI (e.g. Parts, Menus / Toolbars, Persepectives...)
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->
@@ -43,10 +45,11 @@ public interface MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The label to display for this element. If the label is expected to be internationalized
-	 * then the label may be set to a 'key' value to be used by the translation service.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @since 1.0
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Label</em>' attribute.
 	 * @see #setLabel(String)
@@ -71,10 +74,11 @@ public interface MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This field contains a fully qualified URL defining the path to an Image to display
-	 * for this element.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @since 1.0
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Icon URI</em>' attribute.
 	 * @see #setIconURI(String)
@@ -99,10 +103,11 @@ public interface MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The tooltip to display for this element. If the tooltip is expected to be internationalized
-	 * then the tooltip may be set to a 'key' value to be used by the translation service.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @since 1.0
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Tooltip</em>' attribute.
 	 * @see #setTooltip(String)
@@ -126,10 +131,11 @@ public interface MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is a method that will retrieve the internationalized label by using the current
-	 * value of the label itself and some translation service.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @since 1.0
 	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
@@ -141,10 +147,11 @@ public interface MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is a method that will retrieve the internationalized tooltip by using the current
-	 * value of the label itself and some translation service.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @since 1.0
 	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated

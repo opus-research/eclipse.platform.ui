@@ -90,16 +90,14 @@ public abstract class ColorDescriptor extends DeviceResourceDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#createResource(org.eclipse.swt.graphics.Device)
      */
-    @Override
-	public final Object createResource(Device device) throws DeviceResourceException {
+    public final Object createResource(Device device) throws DeviceResourceException {
         return createColor(device);
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#destroyResource(java.lang.Object)
      */
-    @Override
-	public final void destroyResource(Object previouslyCreatedObject) {
+    public final void destroyResource(Object previouslyCreatedObject) {
         destroyColor((Color)previouslyCreatedObject);
     }
 }

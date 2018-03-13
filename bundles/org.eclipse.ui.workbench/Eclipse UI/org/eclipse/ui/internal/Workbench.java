@@ -591,11 +591,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
-									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
-
 					IProgressMonitor progressMonitor = null;
-					if (handler != null && showProgress) {
+					if (handler != null) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -1286,7 +1283,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
-				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing, false)) {
+				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing)) {
 					return false;
 				}
 			}

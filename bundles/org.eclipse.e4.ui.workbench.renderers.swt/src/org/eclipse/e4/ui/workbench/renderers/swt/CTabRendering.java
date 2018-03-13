@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -773,10 +773,6 @@ public class CTabRendering extends CTabFolderRenderer {
 	}
 
 	void createShadow(final Display display) {
-		if (shadowImage != null) {
-			shadowImage.dispose();
-			shadowImage = null;
-		}
 		ImageData data = new ImageData(60, 60, 32, new PaletteData(0xFF0000,
 				0xFF00, 0xFF));
 		Image tmpImage = shadowImage = new Image(display, data);

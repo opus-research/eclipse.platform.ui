@@ -99,7 +99,6 @@ public abstract class TriggerSequence {
 		return Util.endsWith(triggers, triggerSequence.triggers, equals);
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		// Check if they're the same.
 		if (object == this) {
@@ -159,7 +158,6 @@ public abstract class TriggerSequence {
      * 
      * @see java.lang.Object#hashCode()
 	 */
-	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL;

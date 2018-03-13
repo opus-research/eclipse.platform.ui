@@ -53,6 +53,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.osgi.util.NLS;
@@ -155,7 +156,15 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			activate(p, true, true);
+			MPart lastActivePart = activePart;
+			activePart = p;
+
+			// no need to do anything if we have no listeners
+			if (constructed && !listeners.isEmpty()) {
+				if (lastActivePart != null && lastActivePart != activePart) {
+					firePartDeactivated(lastActivePart);
+				}
+			}
 		}
 	}
 
@@ -540,14 +549,6 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void activate(MPart part, boolean requiresFocus, boolean activateBranch) {
-		if (part == null) {
-			if (constructed && activePart != null) {
-				firePartDeactivated(activePart);
-			}
-			activePart = part;
-			return;
-		}
-
 		// only activate parts that is under our control
 		if (!isInContainer(part)) {
 			return;
@@ -566,14 +567,6 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
-
-		MPart lastActivePart = activePart;
-		activePart = part;
-
-		if (constructed && lastActivePart != null && lastActivePart != activePart) {
-			firePartDeactivated(lastActivePart);
-		}
-
 		try {
 			// record any sibling into the activation history if necessary, this will allow it to be
 			// reselected again in the future as it will be an activation candidate in the future,
@@ -676,7 +669,6 @@ public class PartServiceImpl implements EPartService {
 		part.setTooltip(descriptor.getTooltip());
 		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
 		part.getTags().addAll(descriptor.getTags());
-		part.getPersistedState().putAll(descriptor.getPersistedState());
 		part.getBindingContexts().addAll(descriptor.getBindingContexts());
 		return part;
 	}
@@ -1207,8 +1199,15 @@ public class PartServiceImpl implements EPartService {
 			return true;
 		}
 
-		if (saveHandler != null) {
-			return saveHandler.save(part, confirm);
+		if (confirm && saveHandler != null) {
+			switch (saveHandler.promptToSave(part)) {
+			case NO:
+				return true;
+			case CANCEL:
+				return false;
+			case YES:
+				break;
+			}
 		}
 
 		Object client = part.getObject();
@@ -1231,8 +1230,25 @@ public class PartServiceImpl implements EPartService {
 		if (dirtyParts.isEmpty()) {
 			return true;
 		}
-		if (saveHandler != null) {
-			return saveHandler.saveParts(dirtyParts, confirm);
+
+		if (confirm && saveHandler != null) {
+			List<MPart> dirtyPartsList = Collections.unmodifiableList(new ArrayList<MPart>(
+					dirtyParts));
+			Save[] decisions = saveHandler.promptToSave(dirtyPartsList);
+			for (Save decision : decisions) {
+				if (decision == Save.CANCEL) {
+					return false;
+				}
+			}
+
+			for (int i = 0; i < decisions.length; i++) {
+				if (decisions[i] == Save.YES) {
+					if (!savePart(dirtyPartsList.get(i), false)) {
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 
 		for (MPart dirtyPart : dirtyParts) {
