@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -294,12 +294,8 @@ public class StackDropAgent extends DropAgent {
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
 		if (dndManager.getFeedbackStyle() != DnDManager.HOSTED) {
 			int dropIndex = getDropIndex(info);
-			if (dropIndex != -1) {
-				MUIElement toActivate = dragElement instanceof MPartStack ? ((MPartStack) dragElement)
-						.getSelectedElement() : dragElement;
+			if (dropIndex != -1)
 				dock(dragElement, dropIndex);
-				reactivatePart(toActivate);
-			}
 		}
 		return true;
 	}
