@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -29,8 +28,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -108,13 +107,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         		// the task bar and without these calls you'd have the default icon 
         		// with no message.
         		shell.setText(ChooseWorkspaceDialog.getWindowTitle());
-        		shell.setImages(Window.getDefaultImages());
+        		shell.setImages(Dialog.getDefaultImages());
         	}
            
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
-                appContext.applicationRunning();
+                Platform.endSplash();
                 return instanceLocationCheck;
             }
 
@@ -248,7 +247,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             try {
                 // the operation will fail if the url is not a valid
                 // instance data area, so other checking is unneeded
-                if (instanceLoc.set(workspaceUrl, true)) {
+                if (instanceLoc.setURL(workspaceUrl, true)) {
                     launchData.writePersistedData();
                     writeWorkspaceVersion();
                     return null;
@@ -260,13 +259,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                                 IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
                                 IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
                 return EXIT_OK;
-            } catch (IOException e) {
-            	  MessageDialog
-                  .openError(
-                          shell,
-                          IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
-                          IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
-			}
+            }
 
             // by this point it has been determined that the workspace is
             // already in use -- force the user to choose again
