@@ -732,7 +732,7 @@ public class StackRenderer extends LazyStackRenderer {
 		return null;
 	}
 
-	protected CTabItem findItemForPart(MPart part) {
+	public CTabItem findItemForPart(MPart part) {
 		// is this a direct child of the stack?
 		if (part.getParent() != null
 				&& part.getParent().getRenderer() == StackRenderer.this) {
@@ -983,7 +983,7 @@ public class StackRenderer extends LazyStackRenderer {
 		IEclipseContext ctxt = getContext(stack);
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
-				ctxt.get(EPartService.class), stack,
+				ctxt.get(EPartService.class), stack, this,
 				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
@@ -1494,8 +1494,7 @@ public class StackRenderer extends LazyStackRenderer {
 	@SuppressWarnings("javadoc")
 	public class TabStateHandler implements EventHandler {
 		public void handleEvent(Event event) {
-			MUIElement element = (MUIElement) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
 
@@ -1527,7 +1526,7 @@ public class StackRenderer extends LazyStackRenderer {
 			reapplyStyles(cti.getParent());
 		}
 
-		public boolean validateElement(MUIElement element) {
+		public boolean validateElement(Object element) {
 			return element instanceof MPart || element instanceof MPartStack;
 		}
 

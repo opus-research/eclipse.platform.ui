@@ -44,7 +44,10 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.di.InjectionException;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -109,6 +112,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -208,6 +212,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	@Inject
 	private IEventBroker eventBroker;
+
+	@Inject
+	@Optional
+	private Logger logger;
 
 	@Inject
 	private IExtensionRegistry extensionRegistry;
@@ -468,7 +476,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		});
 
 		final ISaveHandler defaultSaveHandler = windowContext.get(ISaveHandler.class);
-		windowContext.set(ISaveHandler.class, new ISaveHandler() {
+		final PartServiceSaveHandler localSaveHandler = new PartServiceSaveHandler() {
 			public Save promptToSave(MPart dirtyPart) {
 				Object object = dirtyPart.getObject();
 				if (object instanceof CompatibilityPart) {
@@ -514,7 +522,39 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				}
 				return retSaves;
 			}
-		});
+
+			public boolean save(MPart dirtyPart, boolean confirm) {
+				Object object = dirtyPart.getObject();
+				if (object instanceof CompatibilityPart) {
+					IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
+					if (workbenchPart instanceof ISaveablePart) {
+						ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
+						return page.saveSaveable(saveablePart, workbenchPart, confirm, false);
+					}
+				}
+				return super.save(dirtyPart, confirm);
+			}
+
+			public boolean saveParts(Collection<MPart> dirtyParts, boolean confirm) {
+				ArrayList<ISaveablePart> saveables = new ArrayList<ISaveablePart>();
+				for (MPart part : dirtyParts) {
+					Object object = part.getObject();
+					if (object instanceof CompatibilityPart) {
+						IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
+						if (workbenchPart instanceof ISaveablePart) {
+							saveables.add((ISaveablePart) workbenchPart);
+						}
+					}
+				}
+				if (saveables.isEmpty()) {
+					return super.saveParts(dirtyParts, confirm);
+				}
+				return WorkbenchPage.saveAll(saveables, confirm, false, true, WorkbenchWindow.this,
+						WorkbenchWindow.this);
+			}
+		};
+		localSaveHandler.logger = logger;
+		windowContext.set(ISaveHandler.class, localSaveHandler);
 
 		windowContext.set(IWorkbenchWindow.class.getName(), this);
 		windowContext.set(IPageService.class, this);
@@ -1600,7 +1640,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (!getWorkbenchImpl().isClosing()) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				return ((WorkbenchPage) page).saveAllEditors(true, true);
+				return ((WorkbenchPage) page).saveAllEditors(true, true, true);
 			}
 		}
 		return true;
@@ -1712,12 +1752,18 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (manager == null || progressHack) {
 			runnable.run(new NullProgressMonitor());
 		} else {
+			EPartService partService = model.getContext().get(EPartService.class);
+			final MPart curActive = partService.getActivePart();
 			boolean wasCancelEnabled = manager.isCancelEnabled();
 			boolean enableMainMenu = false;
 			
 			IBindingService bs = model.getContext().get(IBindingService.class);
 			boolean keyFilterEnabled = bs.isKeyFilterEnabled();
 			List<Control> toEnable = new ArrayList<Control>();
+			Shell theShell = getShell();
+			Display display = theShell.getDisplay();
+			Control currentFocus = display.getFocusControl();
+
 			try {
 				Menu mainMenu = (Menu) model.getMainMenu().getWidget();
 				if (mainMenu != null && !mainMenu.isDisposed() && mainMenu.isEnabled()) {
@@ -1728,12 +1774,14 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				if (keyFilterEnabled)
 					bs.setKeyFilterEnabled(false);
 				
-				// disable child shells
-				Shell theShell = getShell();
-				for (Shell childShell : theShell.getShells()) {
-					disableControl(childShell, toEnable);
+				// disable all other shells
+				for (Shell childShell : display.getShells()) {
+					if (childShell != theShell) {
+						disableControl(childShell, toEnable);
+					}
 				}
 				
+
 				//Disable the presentation (except the bottom trim)
 				TrimmedPartLayout tpl = (TrimmedPartLayout) getShell().getLayout();
 				disableControl(tpl.clientArea, toEnable);
@@ -1792,8 +1840,22 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 				// Re-enable any disabled controls
 				for (Control ctrl : toEnable) {
-					if (!ctrl.isDisposed())
+					if (!ctrl.isDisposed() && !ctrl.isEnabled())
 						ctrl.setEnabled(true);
+				}
+
+				MPart activePart = partService.getActivePart();
+				if (curActive != activePart && activePart != null) {
+					engine.focusGui(activePart);
+				} else if (currentFocus != null && !currentFocus.isDisposed()) {
+					// It's necessary to restore focus after reenabling the
+					// controls
+					// because disabling them causes focus to jump elsewhere.
+					// Use forceFocus rather than setFocus to avoid SWT's
+					// search for children which can take focus, so focus
+					// ends up back on the actual control that previously had
+					// it.
+					currentFocus.forceFocus();
 				}
 			}
 		}
