@@ -47,7 +47,6 @@ import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -112,8 +111,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
@@ -532,7 +529,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
 					if (workbenchPart instanceof ISaveablePart) {
 						ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-						return page.saveSaveable(saveablePart, workbenchPart, confirm, false);
+						return page.saveSaveable(saveablePart, workbenchPart, confirm, true);
 					}
 				}
 				return super.save(dirtyPart, confirm);
@@ -569,13 +566,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 		cs.getActiveContextIds();
 
+		configureShell(getShell(), windowContext);
 
 		initializeDefaultServices();
 
 		// register with the tracker
 
 		fireWindowOpening();
-		configureShell(getShell(), windowContext);
 
 		try {
 			page = new WorkbenchPage(this, input);
@@ -701,7 +698,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
 
 		getShell().setData(this);
-		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 		trackShellActivation();
 	}
 
@@ -714,15 +710,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		IContextService contextService = context.get(IContextService.class);
 		contextService.registerShell(shell, IContextService.TYPE_WINDOW);
-		if (model.getContext().get(E4Workbench.NO_SAVED_MODEL_FOUND) != null) {
-			Point initialSize = getWindowConfigurer().getInitialSize();
-			Rectangle bounds = shell.getBounds();
-			// actually set the shell size, so that setting the
-			// menuBar on the shell doesn't override the model changes.
-			bounds.width = initialSize.x;
-			bounds.height = initialSize.y;
-			shell.setBounds(bounds);
-		}
 	}
 	
 	private boolean manageChanges = true;
