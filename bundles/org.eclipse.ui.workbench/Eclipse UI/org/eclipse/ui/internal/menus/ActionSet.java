@@ -314,17 +314,13 @@ public class ActionSet {
 			tpath += IWorkbenchActionConstants.MB_ADDITIONS;
 		}
 
-		MToolBarElement action = null;
-		if (!IWorkbenchRegistryConstants.EXTENSION_EDITOR_ACTIONS.equals(element
-				.getDeclaringExtension().getExtensionPointUniqueIdentifier())) {
-
-			action = MenuHelper.createLegacyToolBarActionAdditions(application, element);
-			if (action == null) {
-				return;
-			}
-			action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
-			action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
+		MToolBarElement action = MenuHelper
+				.createLegacyToolBarActionAdditions(application, element);
+		if (action == null) {
+			return;
 		}
+		action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
+		action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
 
 		MToolBarContribution toolBarContribution = MenuFactoryImpl.eINSTANCE
 				.createToolBarContribution();
@@ -372,11 +368,9 @@ public class ActionSet {
 
 		toolBarContribution.setPositionInParent(positionInParent);
 		toolBarContribution.setVisibleWhen(createVisibleWhen());
-		if (action != null) {
-			toolBarContribution.getChildren().add(action);
-		}
-		contributions.add(toolBarContribution);
 
+		toolBarContribution.getChildren().add(action);
+		contributions.add(toolBarContribution);
 	}
 
 	private void addTrimContribution(String idContrib,
