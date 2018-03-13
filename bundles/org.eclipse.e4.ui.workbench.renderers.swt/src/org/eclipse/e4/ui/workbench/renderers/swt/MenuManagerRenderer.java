@@ -151,22 +151,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					}
 				}
 			}
-
-			if (element instanceof MPart) {
-				MPart part = (MPart) element;
-				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-					boolean tbr = (Boolean) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					if (!tbr) {
-						List<MMenu> menus = part.getMenus();
-						for (MMenu menu : menus) {
-							if (menu instanceof MPopupMenu)
-								unlinkMenu(menu);
-						}
-					}
-				}
-			}
-
 			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 				if (element instanceof MMenu) {
 					MMenu menuModel = (MMenu) element;
@@ -906,7 +890,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacySep.setVisible(item.isVisible());
 					legacySep.setOpaqueItem(item);
 					linkModelToContribution(legacySep, item);
-					modelChildren.add(dest, legacySep);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacySep);
+					} else {
+						modelChildren.add(legacySep);
+					}
 				} else if (menuElement instanceof MOpaqueMenuSeparator) {
 					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
@@ -928,7 +916,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacyItem.setVisible(item.isVisible());
 					legacyItem.setOpaqueItem(item);
 					linkModelToContribution(legacyItem, item);
-					modelChildren.add(dest, legacyItem);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(legacyItem);
+					}
 				} else if (menuElement instanceof MOpaqueMenuItem) {
 					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
@@ -1000,20 +992,5 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			menuManager.remove(ici);
 			clearModelToContribution(menuModel, ici);
 		}
-	}
-
-	private void unlinkMenu(MMenu menu) {
-
-		List<MMenuElement> children = menu.getChildren();
-		for (MMenuElement child : children) {
-			if (child instanceof MMenu)
-				unlinkMenu((MMenu) child);
-			else {
-				IContributionItem contribution = getContribution(child);
-				clearModelToContribution(child, contribution);
-			}
-		}
-		MenuManager mm = getManager(menu);
-		clearModelToManager(menu, mm);
 	}
 }
