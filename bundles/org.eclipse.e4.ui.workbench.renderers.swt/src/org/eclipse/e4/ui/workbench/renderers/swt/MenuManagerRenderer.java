@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866							  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -52,7 +53,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -151,22 +151,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					}
 				}
 			}
-
-			if (element instanceof MPart) {
-				MPart part = (MPart) element;
-				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
-					boolean tbr = (Boolean) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					if (!tbr) {
-						List<MMenu> menus = part.getMenus();
-						for (MMenu menu : menus) {
-							if (menu instanceof MPopupMenu)
-								unlinkMenu(menu);
-						}
-					}
-				}
-			}
-
 			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 				if (element instanceof MMenu) {
 					MMenu menuModel = (MMenu) element;
@@ -1005,23 +989,14 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		removeMenuContributions(menuModel, dump);
 		for (MMenuElement mMenuElement : dump) {
 			IContributionItem ici = getContribution(mMenuElement);
-			menuManager.remove(ici);
-			clearModelToContribution(menuModel, ici);
-		}
-	}
-
-	private void unlinkMenu(MMenu menu) {
-
-		List<MMenuElement> children = menu.getChildren();
-		for (MMenuElement child : children) {
-			if (child instanceof MMenu)
-				unlinkMenu((MMenu) child);
-			else {
-				IContributionItem contribution = getContribution(child);
-				clearModelToContribution(child, contribution);
+			if (ici == null && mMenuElement instanceof MMenu) {
+				MMenu menuElement = (MMenu) mMenuElement;
+				ici = getManager(menuElement);
+				clearModelToManager(menuElement, (MenuManager) ici);
+			} else {
+				clearModelToContribution(menuModel, ici);
 			}
+			menuManager.remove(ici);
 		}
-		MenuManager mm = getManager(menu);
-		clearModelToManager(menu, mm);
 	}
 }
