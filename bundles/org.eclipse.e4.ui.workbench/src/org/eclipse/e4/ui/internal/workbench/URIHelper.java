@@ -16,8 +16,8 @@ import java.net.URISyntaxException;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.spi.RegistryContributor;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.service.log.LogService;
-import org.osgi.service.packageadmin.PackageAdmin;
 
 /**
  * Collection of URI-related utilities
@@ -45,12 +45,13 @@ public class URIHelper {
 	final private static String FRAGMENT_SEGMENT = "fragment/"; //$NON-NLS-1$
 
 	static public String constructPlatformURI(Bundle bundle) {
-		PackageAdmin packageAdmin = Activator.getDefault().getBundleAdmin();
-		if (packageAdmin == null)
+		BundleRevision bundleRevision = bundle.adapt(BundleRevision.class);
+		if (bundleRevision == null)
 			return null;
+
 		StringBuffer tmp = new StringBuffer();
 		tmp.append(PLATFORM_SCHEMA);
-		if ((packageAdmin.getBundleType(bundle) & PackageAdmin.BUNDLE_TYPE_FRAGMENT) > 0)
+		if ((bundleRevision.getTypes() & BundleRevision.TYPE_FRAGMENT) == BundleRevision.TYPE_FRAGMENT)
 			tmp.append(FRAGMENT_SEGMENT);
 		else
 			tmp.append(PLUGIN_SEGMENT);
