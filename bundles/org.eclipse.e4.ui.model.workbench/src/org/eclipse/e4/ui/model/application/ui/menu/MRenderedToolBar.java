@@ -19,7 +19,8 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  * <!-- begin-model-doc -->
  * Do no use! This class will be removed at the beginning of Luna (4.4) development.
  * @deprecated Use MToolBar
- * @noreference This interface is not intended to be referenced by clients
+ * @noreference
+ * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -31,7 +32,6 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MRenderedToolBar extends MToolBar {
 	/**
