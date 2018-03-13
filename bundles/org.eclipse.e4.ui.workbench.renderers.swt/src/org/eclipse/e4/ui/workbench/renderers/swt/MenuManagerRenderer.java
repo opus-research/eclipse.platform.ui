@@ -7,8 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
- *     Sopot Cela <sopotcela@gmail.com> 						  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -60,7 +59,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -136,15 +134,13 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			MMenu model = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
 			MenuManager manager = getManager(model);
 			Menu menu = manager.getMenu();
-			if ((menu == null))
+			if ((menu == null) || (menu.getParentItem() == null))
 				return;
 			if (UIEvents.UILabel.LABEL.equals(attName)) {
-				manager.setMenuText(getText(model));
-				manager.update(IAction.TEXT);
+				menu.getParentItem().setText(getText(model));
 			}
 			if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				manager.setImage(getImageDescriptor(model));
-				manager.update(IAction.IMAGE);
+				menu.getParentItem().setImage(getImage(model));
 			}
 		}
 	};
