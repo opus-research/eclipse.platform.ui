@@ -266,14 +266,6 @@ public class UIEvents {
 		 * @since 1.1
 		 */
 		public static final String THEME_CHANGED = TOPIC + TOPIC_SEP + "themeChanged"; //$NON-NLS-1$
-
-		/**
-		 * Sent when the theme definition is changed
-		 * 
-		 * @since 1.1
-		 */
-		public static final String THEME_DEFINITION_CHANGED = TOPIC + TOPIC_SEP
-				+ "themeDefinitionChanged"; //$NON-NLS-1$
 	}
 
 	/**
@@ -609,9 +601,6 @@ public class UIEvents {
 		public static final String DESCRIPTORS = "descriptors"; //$NON-NLS-1$
 	}
 
-	/**
-	 * @since 1.1
-	 */
 	@SuppressWarnings("javadoc")
 	public static interface Application {
 
@@ -624,19 +613,11 @@ public class UIEvents {
 		public static final String TOPIC_ADDONS = "org/eclipse/e4/ui/model/application/Application/addons/*"; //$NON-NLS-1$
 		public static final String TOPIC_CATEGORIES = "org/eclipse/e4/ui/model/application/Application/categories/*"; //$NON-NLS-1$
 		public static final String TOPIC_COMMANDS = "org/eclipse/e4/ui/model/application/Application/commands/*"; //$NON-NLS-1$
-		/**
-		 * @since 1.1
-		 */
-		public static final String TOPIC_DIALOGS = "org/eclipse/e4/ui/model/application/Application/dialogs/*"; //$NON-NLS-1$
 
 		// Attributes that can be tested in event handlers
 		public static final String ADDONS = "addons"; //$NON-NLS-1$
 		public static final String CATEGORIES = "categories"; //$NON-NLS-1$
 		public static final String COMMANDS = "commands"; //$NON-NLS-1$
-		/**
-		 * @since 1.1
-		 */
-		public static final String DIALOGS = "dialogs"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
@@ -764,24 +745,6 @@ public class UIEvents {
 		public static final String DESCRIPTION = "description"; //$NON-NLS-1$
 		public static final String MENUS = "menus"; //$NON-NLS-1$
 		public static final String TOOLBAR = "toolbar"; //$NON-NLS-1$
-	}
-
-	/**
-	 * @since 1.1
-	 */
-	@SuppressWarnings("javadoc")
-	public static interface TrimBar {
-
-		// Topics that can be subscribed to
-
-		@Deprecated
-		public static final String TOPIC = "org/eclipse/e4/ui/model/basic/TrimBar"; //$NON-NLS-1$
-
-		public static final String TOPIC_ALL = "org/eclipse/e4/ui/model/basic/TrimBar/*"; //$NON-NLS-1$
-		public static final String TOPIC_PENDINGCLEANUP = "org/eclipse/e4/ui/model/basic/TrimBar/pendingCleanup/*"; //$NON-NLS-1$
-
-		// Attributes that can be tested in event handlers
-		public static final String PENDINGCLEANUP = "pendingCleanup"; //$NON-NLS-1$
 	}
 
 	@SuppressWarnings("javadoc")
