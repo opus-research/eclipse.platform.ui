@@ -397,7 +397,10 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 	@Override
 	public PartSite getSite() {
-		return (PartSite) legacyPart.getSite();
+		if (legacyPart != null) {
+			return (PartSite) legacyPart.getSite();
+		}
+		return null;
 	}
 
 	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<String, Set<EditorActionBars>>();
