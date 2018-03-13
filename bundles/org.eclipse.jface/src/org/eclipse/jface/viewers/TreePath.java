@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -42,8 +43,8 @@ public final class TreePath {
 	 */
 	public TreePath(Object[] segments) {
 		Assert.isNotNull(segments);
-		for (int i = 0; i < segments.length; i++) {
-			Assert.isNotNull(segments[i]);
+		for (Object segment : segments) {
+			Assert.isNotNull(segment);
 		}
 		this.segments = segments;
 	}
@@ -94,11 +95,7 @@ public final class TreePath {
 		return segments[segments.length - 1];
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof TreePath)) {
 			return false;
@@ -106,11 +103,7 @@ public final class TreePath {
 		return equals((TreePath) other, null);
 	}
 
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
+	@Override
 	public int hashCode() {
 		if (hash == 0) {
 			hash = hashCode(null);
@@ -129,11 +122,11 @@ public final class TreePath {
 	 */
 	public int hashCode(IElementComparer comparer) {
 		int result = 0;
-		for (int i = 0; i < segments.length; i++) {
+		for (Object segment : segments) {
 			if (comparer == null) {
-				result += segments[i].hashCode();
+				result += segment.hashCode();
 			} else {
-				result += comparer.hashCode(segments[i]);
+				result += comparer.hashCode(segment);
 			}
 		}
 		return result;

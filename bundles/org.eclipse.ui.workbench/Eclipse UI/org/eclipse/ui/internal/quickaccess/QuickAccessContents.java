@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -349,7 +350,7 @@ public abstract class QuickAccessContents {
 							}
 
 						}
-						if (entry != null) {
+						if (entryEnabled(provider, entry)) {
 							entries[i].add(entry);
 							count++;
 							countTotal++;
@@ -387,7 +388,7 @@ public abstract class QuickAccessContents {
 		} while ((showAllMatches || countTotal < maxCount) && !done);
 		if (!perfectMatchAdded) {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
-			if (entry != null) {
+			if (entryEnabled(providers[0], entry)) {
 				if (entries[0] == null) {
 					entries[0] = new ArrayList<QuickAccessEntry>();
 					indexPerProvider[0] = 0;
@@ -396,6 +397,28 @@ public abstract class QuickAccessContents {
 			}
 		}
 		return entries;
+	}
+
+	/**
+	 * @param provider
+	 * @param entry
+	 * @return <code>true</code> if the entry is enabled
+	 */
+	private boolean entryEnabled(QuickAccessProvider provider, QuickAccessEntry entry) {
+		if (entry == null) {
+			return false;
+		}
+
+		// For a previous pick provider, check that the original provider does
+		// also provide the element
+		if (provider instanceof PreviousPicksProvider) {
+			QuickAccessElement element = entry.element;
+			final QuickAccessProvider originalProvider = element.getProvider();
+			QuickAccessElement match = originalProvider.getElementForId(element.getId());
+			return match != null;
+		}
+
+		return true;
 	}
 
 	private void doDispose() {
@@ -465,6 +488,7 @@ public abstract class QuickAccessContents {
 	public void hookFilterText(Text filterText) {
 		this.filterText = filterText;
 		filterText.addKeyListener(new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
 				case SWT.CR:
@@ -489,11 +513,13 @@ public abstract class QuickAccessContents {
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
 		});
 		filterText.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				String text = ((Text) e.widget).getText().toLowerCase();
 				refresh(text);
@@ -510,6 +536,7 @@ public abstract class QuickAccessContents {
 	 */
 	public Table createTable(Composite composite, int defaultOrientation) {
 		composite.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				doDispose();
 			}
@@ -540,11 +567,13 @@ public abstract class QuickAccessContents {
 		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100,
 				100));
 		table.getShell().addControlListener(new ControlAdapter() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				if (!showAllMatches) {
 					if (!resized) {
 						resized = true;
 						e.display.timerExec(100, new Runnable() {
+							@Override
 							public void run() {
 								if (table != null && !table.isDisposed()) {
 									refresh(filterText.getText().toLowerCase());
@@ -558,6 +587,7 @@ public abstract class QuickAccessContents {
 		});
 
 		table.addKeyListener(new KeyListener() {
+			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ARROW_UP && table.getSelectionIndex() == 0) {
 					filterText.setFocus();
@@ -566,11 +596,13 @@ public abstract class QuickAccessContents {
 				}
 			}
 
+			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
 		});
 		table.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseUp(MouseEvent e) {
 
 				if (table.getSelectionCount() < 1)
@@ -591,6 +623,7 @@ public abstract class QuickAccessContents {
 		table.addMouseMoveListener(new MouseMoveListener() {
 			TableItem lastItem = null;
 
+			@Override
 			public void mouseMove(MouseEvent e) {
 				if (table.equals(e.getSource())) {
 					Object o = table.getItem(new Point(e.x, e.y));
@@ -611,10 +644,12 @@ public abstract class QuickAccessContents {
 		});
 
 		table.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// do nothing
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				handleSelection();
 			}
@@ -630,6 +665,7 @@ public abstract class QuickAccessContents {
 			boldStyle = null;
 		}
 		Listener listener = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
 				if (entry != null) {

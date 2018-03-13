@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -157,6 +158,7 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 		return element2TreePaths.getComparer();
 	}
 	
+	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof TreeSelection)) {
 			// Fall back to super implementation, see bug 135837.
@@ -179,20 +181,23 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 		return false;
 	}
 
+	@Override
 	public int hashCode() {
 		int code = getClass().hashCode();
 		if (paths != null) {
-			for (int i = 0; i < paths.length; i++) {
-				code = code * 17 + paths[i].hashCode(getElementComparer());
+			for (TreePath path : paths) {
+				code = code * 17 + path.hashCode(getElementComparer());
 			}
 		}
 		return code;
 	}
 
+	@Override
 	public TreePath[] getPaths() {
 		return paths==null ? EMPTY_TREE_PATHS : (TreePath[]) paths.clone();
 	}
 	
+	@Override
 	public TreePath[] getPathsFor(Object element) {
 		Object value= element2TreePaths==null ? null : element2TreePaths.get(element);
 		if (value == null) {

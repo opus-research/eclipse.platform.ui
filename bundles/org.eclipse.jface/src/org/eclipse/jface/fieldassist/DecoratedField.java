@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,6 +62,7 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.2
  * @deprecated As of 3.3, clients should use {@link ControlDecoration} instead.
  */
+@Deprecated
 public class DecoratedField {
 
 	/**
@@ -210,6 +211,7 @@ public class DecoratedField {
 			hoverShell.setForeground(display
 					.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
 			hoverShell.addPaintListener(new PaintListener() {
+				@Override
 				public void paintControl(PaintEvent pe) {
 					pe.gc.drawString(text, hm, hm);
 					if (!MAC) {
@@ -218,6 +220,7 @@ public class DecoratedField {
 				}
 			});
 			hoverShell.addMouseListener(new MouseAdapter() {
+				@Override
 				public void mouseDown(MouseEvent e) {
 					hideHover();
 				}
@@ -407,6 +410,7 @@ public class DecoratedField {
 			formData = createFormDataForIndex(i, decoration.getImage());
 			label = new Label(form, SWT.HORIZONTAL | SWT.VERTICAL | SWT.CENTER);
 			label.addMouseTrackListener(new MouseTrackListener() {
+				@Override
 				public void mouseHover(MouseEvent event) {
 					FieldDecorationData decData = (FieldDecorationData) event.widget
 							.getData();
@@ -416,9 +420,11 @@ public class DecoratedField {
 					}
 				}
 
+				@Override
 				public void mouseEnter(MouseEvent event) {
 				}
 
+				@Override
 				public void mouseExit(MouseEvent event) {
 					hideHover();
 				}
@@ -568,6 +574,7 @@ public class DecoratedField {
 	 */
 	private void addControlListeners() {
 		control.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				if (hover != null) {
 					hover.dispose();
@@ -575,10 +582,12 @@ public class DecoratedField {
 			}
 		});
 		control.addFocusListener(new FocusListener() {
+			@Override
 			public void focusGained(FocusEvent event) {
 				controlFocusGained();
 			}
 
+			@Override
 			public void focusLost(FocusEvent event) {
 				controlFocusLost();
 			}

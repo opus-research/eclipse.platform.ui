@@ -18,31 +18,33 @@ import org.w3c.dom.css.CSSStyleSheet;
 import org.w3c.dom.stylesheets.MediaList;
 
 public class CSSImportRuleImpl extends CSSRuleImpl implements CSSImportRule {
-	
+
 	String uri;
 	MediaListImpl mediaList;
-	
+
 	public CSSImportRuleImpl(CSSStyleSheet parentStyleSheet, CSSRule parentRule,
 			String uri, MediaListImpl mediaListImpl) {
 		super(parentStyleSheet, parentRule);
 		this.uri = uri;
 		this.mediaList = mediaListImpl;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRule#getType()
 	 */
+	@Override
 	public short getType() {
 		return CSSRule.IMPORT_RULE;
 	}
-	
+
 	// W3C CSSImportRule API methods
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSImportRule#getHref()
 	 */
+	@Override
 	public String getHref() {
 		return uri;
 	}
@@ -51,6 +53,7 @@ public class CSSImportRuleImpl extends CSSRuleImpl implements CSSImportRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSImportRule#getMedia()
 	 */
+	@Override
 	public MediaList getMedia() {
 		return mediaList;
 	}
@@ -59,6 +62,7 @@ public class CSSImportRuleImpl extends CSSRuleImpl implements CSSImportRule {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSImportRule#getStyleSheet()
 	 */
+	@Override
 	public CSSStyleSheet getStyleSheet() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");

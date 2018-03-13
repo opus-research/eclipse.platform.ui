@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
@@ -153,7 +152,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * Creates the page's UI content.
      */
-    protected Control createContents(Composite parent) {
+    @Override
+	protected Control createContents(Composite parent) {
         imagesToDispose = new ArrayList();
         editorsToImages = new HashMap(50);
 
@@ -211,7 +211,6 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         addResourceTypeButton = new Button(groupComponent, SWT.PUSH);
         addResourceTypeButton.setText(WorkbenchMessages.FileEditorPreference_add); 
         addResourceTypeButton.addListener(SWT.Selection, this);
-        addResourceTypeButton.setLayoutData(data);
         setButtonLayoutData(addResourceTypeButton);
 
         removeResourceTypeButton = new Button(groupComponent, SWT.PUSH);
@@ -287,7 +286,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * (i.e fonts, cursors, etc). Subclasses should reimplement this method to 
      * release their own allocated SWT resources.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         if (imagesToDispose != null) {
             for (Iterator e = imagesToDispose.iterator(); e.hasNext();) {
@@ -307,7 +307,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * Hook method to get a page specific preference store. Reimplement this
      * method if a page don't want to use its parent's preference store.
      */
-    protected IPreferenceStore doGetPreferenceStore() {
+    @Override
+	protected IPreferenceStore doGetPreferenceStore() {
         return WorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
@@ -434,7 +435,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         return null;
     }
 
-    public void handleEvent(Event event) {
+    @Override
+	public void handleEvent(Event event) {
         if (event.widget == addResourceTypeButton) {
             promptForResourceType();
         } else if (event.widget == removeResourceTypeButton) {
@@ -456,7 +458,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * @see IWorkbenchPreferencePage
      */
-    public void init(IWorkbench aWorkbench) {
+    @Override
+	public void init(IWorkbench aWorkbench) {
         this.workbench = aWorkbench;
         noDefaultAndApplyButton();
     }
@@ -491,7 +494,8 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * For example reimplement this method if you want to save the 
      * page's data into the preference bundle.
      */
-    public boolean performOk() {
+    @Override
+	public boolean performOk() {
         TableItem[] items = resourceTypeTable.getItems();
         FileEditorMapping[] resourceTypes = new FileEditorMapping[items.length];
         for (int i = 0; i < items.length; i++) {

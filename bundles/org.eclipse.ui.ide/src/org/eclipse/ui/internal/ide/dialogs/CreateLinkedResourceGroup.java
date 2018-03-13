@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -278,6 +278,9 @@ public class CreateLinkedResourceGroup {
 		linkTargetField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				linkTarget = linkTargetField.getText();
+				if (isDefaultConfigurationSelected()) {
+					linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTarget, true);
+				}
 				resolveVariable();
 				if (updatableResourceName != null) {
 					String value = updatableResourceName.getValue();
@@ -459,10 +462,8 @@ public class CreateLinkedResourceGroup {
 	private void handleLinkTargetBrowseButtonPressed() {
 		IFileStore store = null;
 		String selection = null;
-		FileSystemConfiguration config = getSelectedConfiguration();
-		boolean isDefault = config == null
-				|| (FileSystemSupportRegistry.getInstance()
-						.getDefaultConfiguration()).equals(config);
+		FileSystemConfiguration config= getSelectedConfiguration();
+		boolean isDefault = isDefaultConfigurationSelected();
 
 		if (linkTarget.length() > 0) {
 			store = IDEResourceInfoUtils.getFileStore(linkTarget);
@@ -521,6 +522,13 @@ public class CreateLinkedResourceGroup {
 		if (selection != null) {
 			linkTargetField.setText(selection);
 		}
+	}
+
+	private boolean isDefaultConfigurationSelected() {
+		FileSystemConfiguration config = getSelectedConfiguration();
+		return config == null
+				|| (FileSystemSupportRegistry.getInstance()
+						.getDefaultConfiguration()).equals(config);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 Tom Schindl and others.
+ * Copyright (c) 2007, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,17 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
+ *     Jeanderson Candido (http://jeandersonbc.github.io) - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -29,43 +34,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 
 /**
- * Demonstrate alternating row colors using new Jace 3.3 API 
- * 
+ * Demonstrate alternating row colors using new Jace 3.3 API
+ *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- * 
+ *
  */
 public class Snippet041TableViewerAlternatingColors {
-
-	private class MyContentProvider implements IStructuredContentProvider {
-		
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[]) inputElement;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
-		public void dispose() {
-
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-
-	}
 
 	public class MyModel {
 		public int counter;
@@ -74,6 +48,7 @@ public class Snippet041TableViewerAlternatingColors {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -81,124 +56,121 @@ public class Snippet041TableViewerAlternatingColors {
 
 	private class OptimizedIndexSearcher {
 		private int lastIndex = 0;
-		
+
 		public boolean isEven(TableItem item) {
 			TableItem[] items = item.getParent().getItems();
-			
+
 			// 1. Search the next ten items
-			for( int i = lastIndex; i < items.length && lastIndex + 10 > i; i++ ) {
-				if( items[i] == item ) {
+			for (int i = lastIndex; i < items.length && lastIndex + 10 > i; i++) {
+				if (items[i] == item) {
 					lastIndex = i;
 					return lastIndex % 2 == 0;
 				}
 			}
-			
+
 			// 2. Search the previous ten items
-			for( int i = lastIndex; i < items.length && lastIndex - 10 > i; i-- ) {
-				if( items[i] == item ) {
+			for (int i = lastIndex; i < items.length && lastIndex - 10 > i; i--) {
+				if (items[i] == item) {
 					lastIndex = i;
 					return lastIndex % 2 == 0;
 				}
 			}
-			
+
 			// 3. Start from the beginning
-			for( int i = 0; i < items.length; i++ ) {
-				if( items[i] == item ) {
+			for (int i = 0; i < items.length; i++) {
+				if (items[i] == item) {
 					lastIndex = i;
 					return lastIndex % 2 == 0;
 				}
 			}
-		
+
 			return false;
 		}
 	}
-	
+
+	final private OptimizedIndexSearcher searcher = new OptimizedIndexSearcher();
+
 	public Snippet041TableViewerAlternatingColors(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
-				| SWT.FULL_SELECTION|SWT.VIRTUAL);
-		v.setContentProvider(new MyContentProvider());
+		final TableViewer viewer = new TableViewer(shell, SWT.BORDER
+				| SWT.FULL_SELECTION | SWT.VIRTUAL);
 
-		final OptimizedIndexSearcher searcher = new OptimizedIndexSearcher();
-		
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
-		column.getColumn().setWidth(200);
-		column.getColumn().setText("Column 1");
-		column.setLabelProvider(new ColumnLabelProvider() {
-			boolean even = true;
-			
-			public Color getBackground(Object element) {
-				if( even ) {
-					return null;
-				} else {
-					return v.getTable().getDisplay().getSystemColor(SWT.COLOR_GRAY);
-				}
-			}
-			
-			public void update(ViewerCell cell) {
-				even = searcher.isEven((TableItem)cell.getItem());
-				super.update(cell);
-			}
-		});
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		String[] labels = { "Column 1", "Column 2" };
+		for (String label : labels) {
+			createColumnFor(viewer, label);
+		}
+		viewer.setInput(createModel());
+		viewer.getTable().setLinesVisible(true);
+		viewer.getTable().setHeaderVisible(true);
 
-		column = new TableViewerColumn(v, SWT.NONE);
-		column.getColumn().setWidth(200);
-		column.getColumn().setText("Column 2");
-		column.setLabelProvider(new ColumnLabelProvider() {
-			boolean even = true;
+		Button b = new Button(shell, SWT.PUSH);
+		b.addSelectionListener(createAdapterFor(viewer));
+	}
 
-			public Color getBackground(Object element) {
-				if( even ) {
-					return null;
-				} else {
-					return v.getTable().getDisplay().getSystemColor(SWT.COLOR_GRAY);
-				}
-			}
-			
-			public void update(ViewerCell cell) {
-				even = searcher.isEven((TableItem)cell.getItem());
-				super.update(cell);
-			}
-			
-		});
-
-		MyModel[] model = createModel();
-		v.setInput(model);
-		v.getTable().setLinesVisible(true);
-		v.getTable().setHeaderVisible(true);
-		
-		final ViewerFilter filter = new ViewerFilter() {
-
-			public boolean select(Viewer viewer, Object parentElement,
-					Object element) {
-				return ((MyModel)element).counter % 2 == 0;
-			}
-			
-		};
-		
-		Button b = new Button(shell,SWT.PUSH);
-		b.addSelectionListener(new SelectionAdapter() {
+	private SelectionAdapter createAdapterFor(final TableViewer viewer) {
+		return new SelectionAdapter() {
 			boolean b = true;
-			
+
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if( b ) {
-					v.setFilters(new ViewerFilter[] {filter});
+				if (b) {
+					viewer.setFilters(new ViewerFilter[] { createFilterForViewer() });
 					b = false;
+
 				} else {
-					v.setFilters(new ViewerFilter[0]);
+					viewer.setFilters(new ViewerFilter[0]);
 					b = true;
 				}
 			}
-			
-		});
+		};
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[100000];
+	private ViewerFilter createFilterForViewer() {
+		return new ViewerFilter() {
 
+			@Override
+			public boolean select(Viewer viewer, Object parentElement,
+					Object element) {
+
+				return ((MyModel) element).counter % 2 == 0;
+			}
+		};
+	}
+
+	private TableViewerColumn createColumnFor(TableViewer viewer, String label) {
+		TableViewerColumn column;
+		column = new TableViewerColumn(viewer, SWT.NONE);
+		column.getColumn().setWidth(200);
+		column.getColumn().setText(label);
+		column.setLabelProvider(createLabelProviderFor(viewer));
+		return column;
+	}
+
+	private ColumnLabelProvider createLabelProviderFor(final TableViewer viewer) {
+		return new ColumnLabelProvider() {
+			boolean isEvenIdx = true;
+
+			@Override
+			public Color getBackground(Object element) {
+				Color grayColor = viewer.getTable().getDisplay()
+						.getSystemColor(SWT.COLOR_GRAY);
+
+				return (isEvenIdx ? null : grayColor);
+			}
+
+			@Override
+			public void update(ViewerCell cell) {
+				isEvenIdx = searcher.isEven((TableItem) cell.getItem());
+				super.update(cell);
+			}
+		};
+	}
+
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>();
 		for (int i = 0; i < 100000; i++) {
-			elements[i] = new MyModel(i);
+			elements.add(new MyModel(i));
 		}
-
 		return elements;
 	}
 
@@ -217,7 +189,6 @@ public class Snippet041TableViewerAlternatingColors {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-
 		display.dispose();
 
 	}

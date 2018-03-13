@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -309,7 +309,11 @@ class PartActivationHistory {
 				activeTag);
 		if (activeCandidates.size() > 0) {
 			activeCandidates.get(0).getTags().remove(EPartService.ACTIVE_ON_CLOSE_TAG);
-			return activeCandidates.get(0);
+			MPart candidate = activeCandidates.get(0);
+			if (partService.isInContainer(perspective, candidate)
+					&& isValid(perspective, candidate)) {
+				return candidate;
+			}
 		}
 
 		Collection<MPart> candidates = perspective.getContext().get(EPartService.class).getParts();
