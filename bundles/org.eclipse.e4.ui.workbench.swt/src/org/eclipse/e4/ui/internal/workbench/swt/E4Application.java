@@ -53,7 +53,6 @@ import org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory;
 import org.eclipse.e4.ui.internal.workbench.ResourceHandler;
 import org.eclipse.e4.ui.internal.workbench.SelectionAggregator;
 import org.eclipse.e4.ui.internal.workbench.SelectionServiceImpl;
-import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.WorkbenchLogger;
 import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -349,17 +348,8 @@ public class E4Application implements IApplication {
 		}
 		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
 				+ " argument missing"); //$NON-NLS-1$
-
-		URI initialWorkbenchDefinitionInstance;
-
-		// check if the appModelPath is already a platform-URI and if so use it
-		if (URIHelper.isPlatformURI(appModelPath)) {
-			initialWorkbenchDefinitionInstance = URI.createURI(appModelPath,
-					true);
-		} else {
-			initialWorkbenchDefinitionInstance = URI.createPlatformPluginURI(
-					appModelPath, true);
-		}
+		final URI initialWorkbenchDefinitionInstance = URI
+				.createPlatformPluginURI(appModelPath, true);
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
