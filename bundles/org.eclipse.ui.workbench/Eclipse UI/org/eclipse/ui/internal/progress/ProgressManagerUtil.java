@@ -499,7 +499,7 @@ public class ProgressManagerUtil {
 	 */
 	public static URL getProgressSpinnerLocation() {
 		try {
-			return new URL(getIconsRoot(), "progress_spinner.png");//$NON-NLS-1$
+			return new URL(getIconsRoot(), "progress_spinner.gif");//$NON-NLS-1$
 		} catch (MalformedURLException e) {
 			return null;
 		}

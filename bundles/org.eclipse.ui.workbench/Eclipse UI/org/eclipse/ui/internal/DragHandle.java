@@ -40,7 +40,7 @@ public DragHandle(Composite parent) {
     
     addPaintListener(this);
     
-    descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(WorkbenchPlugin.PI_WORKBENCH, "icons/misc/handle.png");  //$NON-NLS-1$
+    descriptor = AbstractUIPlugin.imageDescriptorFromPlugin(WorkbenchPlugin.PI_WORKBENCH, "icons/misc/handle.gif");  //$NON-NLS-1$
     
     handleImage = new Image(parent.getDisplay(), 4, 4);
     GC context = new GC(handleImage);
