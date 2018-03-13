@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class ImageRegistry {
 
     private ResourceManager manager;
 
-    private Map<String, Entry> table;
+    private Map table;
     
     private Runnable disposeRunnable = new Runnable() {
         public void run() {
@@ -316,16 +316,16 @@ public class ImageRegistry {
     }
 
     private Entry getEntry(String key) {
-        return getTable().get(key);
+        return (Entry) getTable().get(key);
     }
 
     private void putEntry(String key, Entry entry) {
         getTable().put(key, entry);
     }
 
-    private Map<String, Entry> getTable() {
+    private Map getTable() {
         if (table == null) {
-            table = new HashMap<String, Entry>(10);
+            table = new HashMap(10);
         }
         return table;
     }
@@ -340,8 +340,8 @@ public class ImageRegistry {
         manager.cancelDisposeExec(disposeRunnable);
         
         if (table != null) {
-            for (Iterator<Entry> i = table.values().iterator(); i.hasNext();) {
-                Entry entry = i.next();
+            for (Iterator i = table.values().iterator(); i.hasNext();) {
+                Entry entry = (Entry) i.next();
                 if (entry.image != null) {
                     manager.destroyImage(entry.descriptor);
                 }
