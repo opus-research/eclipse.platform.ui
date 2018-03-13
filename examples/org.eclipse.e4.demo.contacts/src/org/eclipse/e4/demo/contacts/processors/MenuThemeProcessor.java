@@ -9,68 +9,97 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     Kai Tödter - Adoption to contacts demo
- *     Lars Vogel <lars.vogel@gmail.com> - Bug https://bugs.eclipse.org/413431
+ *     Lars Vogel <lars.vogel@gmail.com> - Bug 413431, 416166
  ******************************************************************************/
 package org.eclipse.e4.demo.contacts.processors;
 
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.demo.contacts.util.Util;
+import org.eclipse.e4.ui.css.swt.theme.ITheme;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
+import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.swt.widgets.Display;
 
-public class MenuThemeProcessor extends AbstractThemeProcessor {
+public class MenuThemeProcessor extends Util {
 	private static final String BUNDLE_ID = "platform:/plugin/org.eclipse.e4.demo.contacts"; //$NON-NLS-1$
-	
+
 	@Inject
 	@Named("menu:org.eclipse.ui.main.menu")
 	private MMenu menu;
 	private MMenu themesMenu;
-	
-	private final static String PROCESSOR_ID = "org.eclipse.e4.demo.contacts.processor.menu"; 
 
+	private final static String PROCESSOR_ID = "org.eclipse.e4.demo.contacts.processor.menu";
+
+	@SuppressWarnings("restriction")
 	@Execute
-	public void execute(MApplication app) {
+	public void execute(MApplication app, EModelService service,
+			IExtensionRegistry registery, IThemeManager mgr) {
+
+		// sanity check
 		if (menu == null) {
 			return;
 		}
-		
+
 		List<String> tags = app.getTags();
-		for(String tag : tags) {
-			if (PROCESSOR_ID.equals(tag))
-			 {
+		for (String tag : tags) {
+			if (PROCESSOR_ID.equals(tag)) {
 				return; // already processed
 			}
 		}
-		if (!check()) {
-			return;
-		}
+
 		tags.add(PROCESSOR_ID);
-		super.process(app);
+
+		IThemeEngine engine = mgr.getEngineForDisplay(Display.getCurrent());
+
+		List<ITheme> themes = engine.getThemes();
+		if (themes.size() > 0) {
+
+			MCommand switchThemeCommand = null;
+			for (MCommand cmd : app.getCommands()) {
+				if ("contacts.switchTheme".equals(cmd.getElementId())) { //$NON-NLS-1$
+					switchThemeCommand = cmd;
+					break;
+				}
+			}
+
+			if (switchThemeCommand != null) {
+
+				themesMenu = MMenuFactory.INSTANCE.createMenu();
+				themesMenu.setLabel("%switchThemeMenu"); //$NON-NLS-1$
+				themesMenu.setContributorURI(BUNDLE_ID);
+
+				for (ITheme theme : themes) {
+					MParameter parameter = service
+							.createModelElement(MParameter.class);
+					parameter.setName("contacts.commands.switchtheme.themeid"); //$NON-NLS-1$
+					parameter.setValue(theme.getId());
+					String iconURI = Util.getCSSUri(theme.getId(), registery);
+					if (iconURI != null) {
+						iconURI = iconURI.replace(".css", ".png");
+					}
+					processTheme(theme.getLabel(), switchThemeCommand,
+							parameter, iconURI, service);
+				}
+				menu.getChildren().add(themesMenu);
+			}
+		}
 	}
 
-	@Override
-	protected boolean check() {
-		return menu != null;
-	}
-
-	@Override
-	protected void preprocess() {
-		themesMenu = MMenuFactory.INSTANCE.createMenu();
-		themesMenu.setLabel("%switchThemeMenu"); //$NON-NLS-1$
-		themesMenu.setContributorURI(BUNDLE_ID);
-	}
-
-	@Override
 	protected void processTheme(String name, MCommand switchCommand,
-			MParameter themeId, String iconURI) {
-		MHandledMenuItem menuItem = MMenuFactory.INSTANCE
-				.createHandledMenuItem();
+			MParameter themeId, String iconURI, EModelService service) {
+		MHandledMenuItem menuItem = service
+				.createModelElement(MHandledMenuItem.class);
 		menuItem.setLabel(name);
 		menuItem.setCommand(switchCommand);
 		menuItem.getParameters().add(themeId);
@@ -80,11 +109,6 @@ public class MenuThemeProcessor extends AbstractThemeProcessor {
 		}
 		themesMenu.getChildren().add(menuItem);
 
-	}
-
-	@Override
-	protected void postprocess() {
-		menu.getChildren().add(themesMenu);
 	}
 
 }
