@@ -13,8 +13,6 @@
 
 package org.eclipse.jface.viewers;
 
-import java.lang.reflect.Array;
-
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -204,10 +202,8 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public TreePath<E> getTreePath() {
-		@SuppressWarnings("unchecked")
-		E[] segments = (E[]) Array.newInstance(item.getData().getClass(), 1);
-		return new TreePath<E>(segments);
+	public TreePath getTreePath() {
+		return new TreePath(new Object[] {item.getData()});
 	}
 
 	@Override
