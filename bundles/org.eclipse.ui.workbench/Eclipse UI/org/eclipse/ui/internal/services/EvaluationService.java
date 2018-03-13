@@ -11,6 +11,8 @@
 
 package org.eclipse.ui.internal.services;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +27,6 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
@@ -319,24 +320,12 @@ public final class EvaluationService implements IEvaluationService {
 		for (EvaluationReference ref : refs) {
 			Expression expr = ref.getExpression();
 			if (expr != null) {
-				boolean evaluated = false;
 				ExpressionInfo info = expr.computeExpressionInfo();
 				String[] names = info.getAccessedPropertyNames();
 				for (String name : names) {
 					if (propertyName.equals(name)) {
-						evaluated = true;
 						ref.evaluate();
 						break;
-					}
-				}
-				if (!evaluated) {
-					names = info.getAccessedVariableNames();
-					for (String name : names) {
-						if (propertyName.equals(name)) {
-							evaluated = true;
-							ref.evaluate();
-							break;
-						}
 					}
 				}
 			}

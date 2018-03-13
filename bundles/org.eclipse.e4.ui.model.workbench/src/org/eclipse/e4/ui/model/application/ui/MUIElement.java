@@ -45,6 +45,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MUIElement extends MApplicationElement {
 	/**

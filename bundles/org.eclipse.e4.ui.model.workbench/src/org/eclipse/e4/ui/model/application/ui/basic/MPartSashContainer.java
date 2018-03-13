@@ -29,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.MGenericTile;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MPartSashContainer extends MGenericTile<MPartSashContainerElement>, MPartSashContainerElement, MWindowElement {
 } // MPartSashContainer

@@ -37,6 +37,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MTrimBar extends MGenericTrimContainer<MTrimElement>, MUIElement {
 

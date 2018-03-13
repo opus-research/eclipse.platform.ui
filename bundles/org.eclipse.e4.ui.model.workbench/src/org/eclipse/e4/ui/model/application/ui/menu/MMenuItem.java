@@ -25,9 +25,9 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  * </p>
  * <!-- end-model-doc -->
  *
- *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MMenuItem extends MItem, MMenuElement {
 
