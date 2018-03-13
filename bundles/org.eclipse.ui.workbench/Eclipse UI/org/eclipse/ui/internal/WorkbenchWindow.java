@@ -421,27 +421,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		perspective = pers;
 	}
 
-	/**
-	 * @return The descriptor of the perspective specified by the command line
-	 *         or null if no override is defined
-	 */
-	private IPerspectiveDescriptor getPerspectiveOverride() {
-		String perspId = null;
-		String[] commandLineArgs = Platform.getCommandLineArgs();
-		for (int i = 0; i < commandLineArgs.length - 1; i++) {
-			if (commandLineArgs[i].equalsIgnoreCase("-perspective")) { //$NON-NLS-1$
-				perspId = commandLineArgs[i + 1];
-				break;
-			}
-		}
-		if (perspId == null) {
-			return null;
-		}
-		IPerspectiveDescriptor desc = getWorkbench().getPerspectiveRegistry()
-				.findPerspectiveWithId(perspId);
-		return desc;
-	}
-
 	@PostConstruct
 	public void setup() {
 		// Initialize a previous 'saved' state if applicable. We no longer
@@ -591,6 +570,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (title != null) {
 			getShell().setText(TextProcessor.process(title, TEXT_DELIMITERS));
 		}
+		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 
 		initializeDefaultServices();
 
@@ -628,11 +608,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					perspective = thePersp;
 					newWindow = false;
 				}
-			} else {
-				// No perspectives...do we have an override ?
-				IPerspectiveDescriptor perspOverride = getPerspectiveOverride();
-				if (perspOverride != null)
-					perspective = perspOverride;
 			}
 		}
 
@@ -727,7 +702,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
 
 		getShell().setData(this);
-		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 		trackShellActivation();
 	}
 
@@ -1817,13 +1791,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find("StatusLine", model); //$NON-NLS-1$
-					if (statusLine != null && statusLine.getWidget() instanceof Control) {
-						Control slCtrl = (Control) statusLine.getWidget();
-						for (Control bottomCtrl : tpl.bottom.getChildren()) {
-							if (bottomCtrl != slCtrl)
-								disableControl(bottomCtrl, toEnable);
-						}		
+					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
+					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
+					for (Control bottomCtrl : tpl.bottom.getChildren()) {
+						if (bottomCtrl != slCtrl)
+							disableControl(bottomCtrl, toEnable);
 					}
 				}
 
