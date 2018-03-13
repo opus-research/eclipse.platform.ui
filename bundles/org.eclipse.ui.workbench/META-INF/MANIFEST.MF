@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ui.workbench; singleton:=true
-Bundle-Version: 3.105.100.qualifier
+Bundle-Version: 3.105.2.qualifier
 Bundle-ClassPath: e4-workbench.jar,
  compatibility.jar,
  .
@@ -132,4 +132,3 @@ Import-Package: com.ibm.icu.text,
  org.w3c.dom.css;version="2.0.0",
  org.xml.sax
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Service-Component: OSGI-INF/ColorAndFontProvider.xml

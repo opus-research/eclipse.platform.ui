@@ -92,10 +92,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 				return createPartAdapter();
 			}
 			@Override
-			public Adapter caseCompositePart(MCompositePart object) {
-				return createCompositePartAdapter();
-			}
-			@Override
 			public Adapter caseInputPart(MInputPart object) {
 				return createInputPartAdapter();
 			}
@@ -136,14 +132,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 				return createStackElementAdapter();
 			}
 			@Override
-			public Adapter caseDialog(MDialog object) {
-				return createDialogAdapter();
-			}
-			@Override
-			public Adapter caseWizardDialog(MWizardDialog object) {
-				return createWizardDialogAdapter();
-			}
-			@Override
 			public Adapter caseApplicationElement(MApplicationElement object) {
 				return createApplicationElementAdapter();
 			}
@@ -176,20 +164,20 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 				return createBindingsAdapter();
 			}
 			@Override
-			public <T extends MUIElement> Adapter caseElementContainer(MElementContainer<T> object) {
-				return createElementContainerAdapter();
-			}
-			@Override
-			public <T extends MUIElement> Adapter caseGenericTile(MGenericTile<T> object) {
-				return createGenericTileAdapter();
-			}
-			@Override
 			public Adapter caseInput(MInput object) {
 				return createInputAdapter();
 			}
 			@Override
+			public <T extends MUIElement> Adapter caseElementContainer(MElementContainer<T> object) {
+				return createElementContainerAdapter();
+			}
+			@Override
 			public <T extends MUIElement> Adapter caseGenericStack(MGenericStack<T> object) {
 				return createGenericStackAdapter();
+			}
+			@Override
+			public <T extends MUIElement> Adapter caseGenericTile(MGenericTile<T> object) {
+				return createGenericTileAdapter();
 			}
 			@Override
 			public Adapter caseSnippetContainer(MSnippetContainer object) {
@@ -230,20 +218,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createPartAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MCompositePart <em>Composite Part</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MCompositePart
-	 * @generated
-	 */
-	public Adapter createCompositePartAdapter() {
 		return null;
 	}
 
@@ -384,34 +358,6 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createStackElementAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog <em>Dialog</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog
-	 * @generated
-	 */
-	public Adapter createDialogAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog <em>Wizard Dialog</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog
-	 * @generated
-	 */
-	public Adapter createWizardDialogAdapter() {
 		return null;
 	}
 
