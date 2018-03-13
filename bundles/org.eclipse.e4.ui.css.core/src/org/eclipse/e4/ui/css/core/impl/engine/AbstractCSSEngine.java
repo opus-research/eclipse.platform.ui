@@ -13,6 +13,8 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
+import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -960,7 +962,13 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			widgetsMap.remove(widget);
 		}
 		if (elementsContext != null) {
-			elementsContext.remove(widget);
+			CSSElementContext context = elementsContext.remove(widget);
+			if (context != null) {
+				Element element = context.getElement();
+				if (element instanceof ElementAdapter) {
+					((ElementAdapter) element).dispose();
+				}
+			}
 		}
 	}
 
