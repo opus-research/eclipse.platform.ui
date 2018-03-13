@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,14 +16,16 @@ package org.eclipse.jface.viewers;
 /**
  * TableColumnViewerLabelProvider is the mapping from the table based providers
  * to the ViewerLabelProvider.
- * 
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
+ *
  * @since 3.3
  * @see ITableLabelProvider
  * @see ITableColorProvider
  * @see ITableFontProvider
- * 
+ *
  */
-class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
+class TableColumnViewerLabelProvider<E,I> extends WrappedViewerLabelProvider<E,I> {
 
 	private ITableLabelProvider tableLabelProvider;
 
@@ -33,14 +35,14 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param labelProvider
 	 *            instance of a table based label provider
 	 * @see ITableLabelProvider
 	 * @see ITableColorProvider
 	 * @see ITableFontProvider
 	 */
-	public TableColumnViewerLabelProvider(IBaseLabelProvider labelProvider) {
+	public TableColumnViewerLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		super(labelProvider);
 
 		if (labelProvider instanceof ITableLabelProvider)
@@ -58,9 +60,10 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.WrappedViewerLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
 	 */
-	public void update(ViewerCell cell) {
+	@Override
+	public void update(ViewerCell<E> cell) {
 
-		Object element = cell.getElement();
+		E element = cell.getElement();
 		int index = cell.getColumnIndex();
 
 		if (tableLabelProvider == null) {
