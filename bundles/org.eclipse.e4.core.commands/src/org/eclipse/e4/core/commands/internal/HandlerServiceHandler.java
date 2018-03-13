@@ -42,7 +42,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 	public boolean isEnabled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
 		// setEnabled(contexts);
-		IEclipseContext executionContext = contexts.context; // getExecutionContext(contexts);
+		IEclipseContext executionContext = contexts != null ? contexts.context : null; // getExecutionContext(contexts);
 		if (executionContext == null) {
 			return super.isEnabled();
 		}
@@ -148,13 +148,25 @@ public class HandlerServiceHandler extends AbstractHandler {
 					new NotHandledException(FAILED_TO_FIND_HANDLER_DURING_EXECUTION));
 		}
 
-		IEclipseContext staticContext = getStaticContext(executionContext);
 		Object handler = HandlerServiceImpl.lookUpHandler(executionContext, commandId);
 		if (handler == null) {
 			return null;
 		}
-		return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
-				staticContext, null);
+		IEclipseContext staticContext = getStaticContext(executionContext);
+		IEclipseContext localStaticContext = null;
+		try {
+			if (staticContext == null) {
+				staticContext = localStaticContext = EclipseContextFactory
+						.create(HandlerServiceImpl.TMP_STATIC_CONTEXT);
+				staticContext.set(HandlerServiceImpl.PARM_MAP, event.getParameters());
+			}
+			return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
+					staticContext, null);
+		} finally {
+			if (localStaticContext != null) {
+				localStaticContext.dispose();
+			}
+		}
 	}
 
 	/*

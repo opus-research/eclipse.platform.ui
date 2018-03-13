@@ -210,7 +210,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return the menu control
      * @deprecated use <code>createMenuBar(Decorations)</code> instead.
      */
-    public Menu createMenuBar(Shell parent) {
+    @Deprecated
+	public Menu createMenuBar(Shell parent) {
         return createMenuBar((Decorations) parent);
     }
 
@@ -551,7 +552,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @deprecated this method is no longer a part of the 
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
-    public boolean isSubstituteFor(IContributionItem item) {
+    @Deprecated
+	public boolean isSubstituteFor(IContributionItem item) {
         return this.equals(item);
     }
 
@@ -766,7 +768,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List clean = new ArrayList(items.length);
+                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
                 IContributionItem separator = null;
                 for (int i = 0; i < items.length; ++i) {
                     IContributionItem ci = items[i];
@@ -808,8 +810,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 int srcIx = 0;
                 int destIx = 0;
 
-                for (Iterator e = clean.iterator(); e.hasNext();) {
-                    IContributionItem src = (IContributionItem) e.next();
+                for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
+                    IContributionItem src = e.next();
                     IContributionItem dest;
 
                     // get corresponding item in SWT widget

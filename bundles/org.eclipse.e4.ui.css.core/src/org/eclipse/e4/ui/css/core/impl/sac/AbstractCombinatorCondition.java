@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public abstract class AbstractCombinatorCondition implements
 
 	/**
 	 * Indicates whether some other object is "equal to" this one.
-	 *
+	 * 
 	 * @param obj
 	 *            the reference object with which to compare.
 	 */
@@ -61,11 +61,6 @@ public abstract class AbstractCombinatorCondition implements
 		AbstractCombinatorCondition c = (AbstractCombinatorCondition) obj;
 		return (c.firstCondition.equals(firstCondition) && c.secondCondition
 				.equals(secondCondition));
-	}
-
-	@Override
-	public int hashCode() {
-		return this.firstCondition.hashCode() ^ this.secondCondition.hashCode();
 	}
 
 	/**

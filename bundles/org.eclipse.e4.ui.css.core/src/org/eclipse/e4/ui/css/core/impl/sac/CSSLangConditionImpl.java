@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -61,11 +61,6 @@ public class CSSLangConditionImpl
         CSSLangConditionImpl c = (CSSLangConditionImpl)obj;
         return c.lang.equals(lang);
     }
-
-	@Override
-	public int hashCode() {
-		return this.lang.hashCode();
-	}
 
     /**
      * <b>SAC</b>: Implements {@link
