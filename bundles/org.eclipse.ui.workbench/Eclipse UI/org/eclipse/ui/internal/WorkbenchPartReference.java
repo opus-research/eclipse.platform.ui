@@ -375,15 +375,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		if (isDisposed()) {
 			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
 		}
-
-		WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
-		if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
-			SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+	 
+		if (part != null && part.getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer r = (SWTPartRenderer) part.getRenderer();
 			return r.getImage(part);
 		}
 
-		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+		return null;
 	}
     
     /* package */ void fireVisibilityChange() {

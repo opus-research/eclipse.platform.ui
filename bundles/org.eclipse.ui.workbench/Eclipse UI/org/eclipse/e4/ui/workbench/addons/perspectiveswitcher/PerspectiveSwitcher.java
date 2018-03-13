@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -319,9 +319,8 @@ public class PerspectiveSwitcher {
 		toolParent.addPaintListener(new PaintListener() {
 
 			public void paintControl(PaintEvent e) {
-				if (borderColor == null || borderColor.isDisposed()) {
+				if (borderColor == null)
 					borderColor = e.display.getSystemColor(SWT.COLOR_BLACK);
-				}
 				e.gc.setForeground(borderColor);
 				Rectangle bounds = ((Control) e.widget).getBounds();
 				e.gc.drawLine(0, bounds.height - 1, bounds.width, bounds.height - 1);
@@ -825,9 +824,8 @@ public class PerspectiveSwitcher {
 	void paint(PaintEvent e) {
 		GC gc = e.gc;
 		Point size = comp.getSize();
-		if (curveColor == null || curveColor.isDisposed()) {
+		if (curveColor == null)
 			curveColor = e.display.getSystemColor(SWT.COLOR_BLACK);
-		}
 		int h = size.y;
 		int[] simpleCurve = new int[] { 0, h - 1, 1, h - 1, 2, h - 2, 2, 1, 3, 0 };
 		// draw border
