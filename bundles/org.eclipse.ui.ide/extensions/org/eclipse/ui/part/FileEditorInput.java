@@ -14,14 +14,18 @@ import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.content.IContentType;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IStorage;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPathEditorInput;
@@ -29,7 +33,6 @@ import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
@@ -85,13 +88,10 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	 * @param file the file resource
 	 */
 	public FileEditorInput(IFile file) {
-		if (file == null) {
+		if (file == null)
 			throw new IllegalArgumentException();
-		}
-		if (!file.exists()) {
-			throw new IllegalArgumentException(WorkbenchMessages.EditorManager_resourceNotFound);
-		}
 		this.file = file;
+	
 	}
 
 	/* (non-Javadoc)
