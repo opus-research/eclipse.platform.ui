@@ -386,7 +386,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				else
 					elementCtrl.moveAbove(null);
 				break;
-			} else if (kid.getWidget() instanceof Control && kid.isVisible()) {
+			} else if (kid.getWidget() instanceof Control) {
 				prevCtrl = (Control) kid.getWidget();
 			}
 		}

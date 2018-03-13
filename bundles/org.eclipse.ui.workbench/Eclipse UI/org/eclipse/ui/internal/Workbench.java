@@ -1664,8 +1664,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
-				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
-						colorDefinitions, PrefUtil.getInternalPreferenceStore());
+				ThemeElementHelper.populateRegistry(getThemeManager().getTheme(
+						IThemeManager.DEFAULT_THEME), colorDefinitions, PrefUtil
+						.getInternalPreferenceStore());
 			}
 		});
 	}
@@ -2808,18 +2809,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
+		return showPerspective(perspectiveId, window, null);
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
+			boolean checkPerspective) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (openedPerspective.getId().equals(perspectiveId)) {
+				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -2843,20 +2844,23 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
+			if (activate(perspectiveId, page, input, false)) {
+				return page;
+			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 

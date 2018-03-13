@@ -49,7 +49,16 @@
     <module>org.eclipse.ui.tests.rcp</module>
     <module>org.eclipse.ui.tests.views.properties.tabbed</module>
   </modules>
-  <properties>
-    <code.ignoredWarnings>${tests.ignoredWarnings}</code.ignoredWarnings>
-  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <compilerArgument>-warn:-deprecation,raw,unchecked,discouraged,forbidden,warningToken</compilerArgument>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
