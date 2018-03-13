@@ -1459,8 +1459,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (save) {
 			if (workbenchPart instanceof ISaveablePart) {
 				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-				if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
-					return false;
+				if (saveablePart.isSaveOnCloseNeeded()) {
+					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
+						return false;
+					}
 				}
 			}
 		}
@@ -2805,7 +2807,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler selectionHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+			Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
 
 			if (!(changedElement instanceof MPerspectiveStack)) {
 				return;
@@ -3958,6 +3960,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
+		if (_perspectiveStack != null)
+			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4952,7 +4956,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler firingHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object value = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (value instanceof CompatibilityPart && element instanceof MPart) {
 				Integer events = partEvents.remove(element);
