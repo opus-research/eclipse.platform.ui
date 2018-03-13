@@ -166,9 +166,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
-			List<MToolBar> toolbars = modelService.findElements(window, item.getId(),
-					MToolBar.class, null);
-			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
+			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
 				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
