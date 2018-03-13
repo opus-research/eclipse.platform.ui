@@ -134,13 +134,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
      */
     private Image image = null;
     
-	private ImageDescriptor defaultImageDescriptor;
-
-	/**
-	 * Stores reference to Image kept in legacyPart. Used for quick check if the
-	 * image changed.
-	 */
-	private Image legacyPartImage = null;
+    private ImageDescriptor defaultImageDescriptor;
     
     /**
      * Stores the current image descriptor for the part. 
@@ -407,19 +401,10 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
         if (isDisposed()) {
             return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
         }
-
-		Image newLegacyPartImage = null;
-		if (legacyPart != null) {
-			newLegacyPartImage = legacyPart.getTitleImage();
-		}
-		// refresh the local image if the image in legacyPart changed
-		if ((newLegacyPartImage != null) && (newLegacyPartImage != legacyPartImage)) {
-			legacyPartImage = newLegacyPartImage;
-			setImageDescriptor(computeImageDescriptor());
-		}
-		if (image == null) {
-			image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-		}
+        
+        if (image == null) {        
+            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+        }
         return image;
     }
     
