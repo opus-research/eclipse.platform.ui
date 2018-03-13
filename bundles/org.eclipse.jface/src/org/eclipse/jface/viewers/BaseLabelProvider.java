@@ -28,7 +28,7 @@ public class BaseLabelProvider<E> extends EventManager implements IBaseLabelProv
 	/* (non-Javadoc)
      * Method declared on IBaseLabelProvider.
      */
-    public void addListener(ILabelProviderListener<E> listener) {
+    public void addListener(ILabelProviderListener listener) {
         addListenerObject(listener);
     }
 
@@ -54,7 +54,7 @@ public class BaseLabelProvider<E> extends EventManager implements IBaseLabelProv
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
      */
-    public void removeListener(ILabelProviderListener<E> listener) {
+    public void removeListener(ILabelProviderListener listener) {
         removeListenerObject(listener);
     }
     
@@ -67,11 +67,10 @@ public class BaseLabelProvider<E> extends EventManager implements IBaseLabelProv
 	 * 
 	 * @see ILabelProviderListener#labelProviderChanged
 	 */
-	protected void fireLabelProviderChanged(final LabelProviderChangedEvent<E> event) {
+	protected void fireLabelProviderChanged(final LabelProviderChangedEvent event) {
 		Object[] listeners = getListeners();
 		for (int i = 0; i < listeners.length; ++i) {
-			@SuppressWarnings("unchecked")
-			final ILabelProviderListener<E> l = (ILabelProviderListener<E>) listeners[i];
+			final ILabelProviderListener l = (ILabelProviderListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				public void run() {
 					l.labelProviderChanged(event);
