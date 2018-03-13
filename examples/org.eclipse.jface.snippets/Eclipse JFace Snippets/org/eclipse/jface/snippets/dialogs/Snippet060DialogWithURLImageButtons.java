@@ -58,9 +58,9 @@ public class Snippet060DialogWithURLImageButtons {
 					URL url;
 					try {
 						url = new URL(
-								"http://www.eclipse.org/home/images/enterprise.gif"); //$NON-NLS-N$
+								"http://www.eclipse.org/home/images/enterprise.gif");
 						b.setImage(ImageDescriptor.createFromURL(url)
-								.createImage()); 
+								.createImage()); //$NON-NLS-1$
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
