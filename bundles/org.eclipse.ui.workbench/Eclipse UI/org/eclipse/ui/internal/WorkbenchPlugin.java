@@ -73,7 +73,6 @@ import org.eclipse.ui.internal.wizards.NewWizardRegistry;
 import org.eclipse.ui.operations.IWorkbenchOperationSupport;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.presentations.AbstractPresentationFactory;
-import org.eclipse.ui.testing.TestableObject;
 import org.eclipse.ui.views.IViewRegistry;
 import org.eclipse.ui.wizards.IWizardRegistry;
 import org.osgi.framework.Bundle;
@@ -151,7 +150,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     private BundleContext bundleContext;
 
     // The set of currently starting bundles
-	private Collection<Bundle> startingBundles = new HashSet<Bundle>();
+    private Collection startingBundles = new HashSet();
 
     /**
      * Global workbench ui plugin flag. Only workbench implementation is allowed to use this flag
@@ -198,8 +197,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 	private ServiceTracker debugTracker = null;
     
-	private ServiceTracker testableTracker = null;
-	
     /**
      * Create an instance of the WorkbenchPlugin. The workbench plugin is
      * effectively the "application" for the workbench UI. The entire UI
@@ -270,7 +267,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         try {
             // If plugin has been loaded create extension.
             // Otherwise, show busy cursor then create extension.
-			if (BundleUtility.isActivated(element.getContributor().getName())) {
+            if (BundleUtility.isActivated(element.getDeclaringExtension().getNamespaceIdentifier())) {
                 return element.createExecutableExtension(classAttribute);
             }
             final Object[] ret = new Object[1];
@@ -1149,10 +1146,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			debugTracker.close();
 			debugTracker = null;
 		}
-		if (testableTracker != null) {
-			testableTracker.close();
-			testableTracker = null;
-		}
+    	// TODO normally super.stop(*) would be the last statement in this
+    	// method
         super.stop(context);     
     } 
     
@@ -1245,7 +1240,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * @return the bundle listener for this plug-in
+	 * @return
 	 */
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
@@ -1368,8 +1363,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Initialized the workbench plug-in with the e4 context
-	 * @param context the e4 context
+	 * @param e4Context
 	 */
 	public void initializeContext(IEclipseContext context) {
 		e4Context = context;
@@ -1378,7 +1372,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (perspRegistry == null) {
-					perspRegistry = ContextInjectionFactory.make(
+					perspRegistry = (PerspectiveRegistry) ContextInjectionFactory.make(
 							PerspectiveRegistry.class, e4Context);
 				}
 				return perspRegistry;
@@ -1389,7 +1383,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (viewRegistry == null) {
-					viewRegistry = ContextInjectionFactory.make(ViewRegistry.class,
+					viewRegistry = (ViewRegistry) ContextInjectionFactory.make(ViewRegistry.class,
 							e4Context);
 				}
 				return viewRegistry;
@@ -1529,29 +1523,5 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			debugTracker.open();
 		}
 		return (DebugOptions) debugTracker.getService();
-	}
-	
-
-	/**
-	 * Returns a {@link TestableObject} provided by a TestableObject
-	 * service or <code>null</code> if a service implementation cannot
-	 * be found.  The TestableObject is used to hook tests into the
-	 * application lifecycle.
-	 * <p>
-	 * It is recommended the testable object is obtained via service
-	 * over {@link Workbench#getWorkbenchTestable()} to avoid the 
-	 * tests having a dependency on the Workbench.
-	 * </p> 
-	 * @see PlatformUI#getTestableObject()
-	 * @return TestableObject provided via service or <code>null</code>
-	 */
-	public TestableObject getTestableObject() {
-		if (bundleContext == null)
-			return null;
-		if (testableTracker == null) {
-			testableTracker = new ServiceTracker(bundleContext, TestableObject.class.getName(), null);
-			testableTracker.open();
-		}
-		return (TestableObject) testableTracker.getService();
 	}
 }

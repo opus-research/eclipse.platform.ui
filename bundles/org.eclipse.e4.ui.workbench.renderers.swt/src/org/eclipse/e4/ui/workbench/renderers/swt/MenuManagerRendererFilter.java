@@ -256,7 +256,8 @@ public class MenuManagerRendererFilter implements Listener {
 		if (cmd == null) {
 			return;
 		}
-		final IEclipseContext lclContext = renderer.getContext(item);
+		final IEclipseContext lclContext = modelService
+				.getContainingContext(item);
 		EHandlerService service = lclContext.get(EHandlerService.class);
 		final IEclipseContext staticContext = EclipseContextFactory
 				.create(MMRF_STATIC_CONTEXT);

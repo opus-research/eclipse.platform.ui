@@ -667,7 +667,7 @@ public class TrimStack {
 				return text;
 		}
 
-		String string = label.getLocalizedLabel();
+		String string = label.getLabel();
 		return string == null ? "" : string; //$NON-NLS-1$
 	}
 
