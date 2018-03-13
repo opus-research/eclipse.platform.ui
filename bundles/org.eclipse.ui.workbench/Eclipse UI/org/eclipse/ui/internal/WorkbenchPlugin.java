@@ -31,8 +31,6 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
-import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.util.BidiUtils;
@@ -1516,20 +1514,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 					editorRegistry = new EditorRegistry();
 				}
 				return editorRegistry;
-			}
-		});
-		context.set(FontRegistry.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				return Workbench.getInstance().getThemeManager().getCurrentTheme()
-						.getFontRegistry();
-			}
-		});
-		context.set(ColorRegistry.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				return Workbench.getInstance().getThemeManager().getCurrentTheme()
-						.getColorRegistry();
 			}
 		});
 	}

@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -227,6 +226,16 @@ public class ShowInMenu extends ContributionItem implements
 					CommandContributionItemParameter ccip = new CommandContributionItemParameter(
 							workbenchWindow, commandId, commandId,
 							CommandContributionItem.STYLE_PUSH);
+					String label = menuElement.getLabel();
+					if (label.length() > 0) {
+						ccip.label = label;
+						String mnemonics = menuElement.getMnemonics();
+						if (mnemonics != null && mnemonics.length() == 1) {
+							ccip.mnemonic = mnemonics;
+						} else {
+							ccip.mnemonic = label.substring(0, 1);
+						}
+					}
 					String iconURI = menuElement.getIconURI();
 					try {
 						ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
@@ -296,13 +305,10 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	private IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
-		
+
 		if (window == null)
 			return null;
-		Shell shell = window.getShell();
-		if (shell == null || shell != shell.getDisplay().getActiveShell())
-			return null;
-		
+
 		IWorkbenchPage page = window.getActivePage();
 		if (page != null) {
 			return page.getActivePart();
