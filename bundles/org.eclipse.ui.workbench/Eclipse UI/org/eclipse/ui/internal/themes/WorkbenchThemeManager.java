@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.themes;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -53,7 +52,25 @@ public class WorkbenchThemeManager extends EventManager implements
 	 * 
 	 * @return singleton instance
 	 */
-	public static synchronized WorkbenchThemeManager getInstance() {
+	public static WorkbenchThemeManager getInstance() {
+		if (instance == null) {
+			if (PlatformUI.getWorkbench().getDisplay() != null) {
+				PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+					public void run() {
+						getInternalInstance();
+					}
+				});
+			}
+		}
+		return instance;
+	}
+
+	/**
+	 * Initialize the singleton theme manager. Must be called in the UI thread.
+	 * 
+	 * @return the theme manager.
+	 */
+	private static synchronized WorkbenchThemeManager getInternalInstance() {
 		if (instance == null) {
 			instance = new WorkbenchThemeManager();
 			instance.getCurrentTheme(); // initialize the current theme
@@ -111,38 +128,21 @@ public class WorkbenchThemeManager extends EventManager implements
 		String themeId = PrefUtil.getAPIPreferenceStore().getDefaultString(IWorkbenchPreferenceConstants.CURRENT_THEME_ID);
 
 		//If not set, use default
-		if(themeId.length() == 0)
+		if (themeId.length() == 0)
 			themeId = IThemeManager.DEFAULT_THEME;
-			
-		// Check if we are in high contrast mode. If so then set the theme to
-		// the system default
-		if (PlatformUI.getWorkbench().getDisplay() != null) {
-			// Determine the high contrast setting before
-			// any access to preferences
-			final boolean[] highContrast = new boolean[] { false };
-			PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.lang.Runnable#run()
-				 */
-				public void run() {
-					highContrast[0] = Display.getCurrent().getHighContrast();
+		final boolean highContrast = Display.getCurrent().getHighContrast();
 
-					Display.getCurrent().addListener(SWT.Settings, new Listener() {
-						public void handleEvent(Event event) {
-							updateThemes();
-						}
-					});
-				}
-			});
-			
-			//If in HC, *always* use the system default.
-			//This ignores any default theme set via plugin_customization.ini
-			if (highContrast[0])
-				themeId = SYSTEM_DEFAULT_THEME;
-		}
+		Display.getCurrent().addListener(SWT.Settings, new Listener() {
+			public void handleEvent(Event event) {
+				updateThemes();
+			}
+		});
+
+		// If in HC, *always* use the system default.
+		// This ignores any default theme set via plugin_customization.ini
+		if (highContrast)
+			themeId = SYSTEM_DEFAULT_THEME;
 
 		PrefUtil.getAPIPreferenceStore().setDefault(
 				IWorkbenchPreferenceConstants.CURRENT_THEME_ID, themeId);
