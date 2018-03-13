@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ class FileImageDescriptor extends ImageDescriptor {
 	 * The class whose resource directory contain the file, or <code>null</code>
 	 * if none.
 	 */
-	private Class<?> location;
+	private Class location;
 
 	/**
 	 * The name of the file.
@@ -57,7 +57,7 @@ class FileImageDescriptor extends ImageDescriptor {
 	 * @param filename
 	 *            the name of the file
 	 */
-	FileImageDescriptor(Class<?> clazz, String filename) {
+	FileImageDescriptor(Class clazz, String filename) {
 		this.location = clazz;
 		this.name = filename;
 	}
