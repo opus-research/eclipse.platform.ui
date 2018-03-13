@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.ui.MElementContainer;
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -415,7 +413,8 @@ public class PopupMenuExtender implements IMenuListener2,
 			renderer.reconcileManagerToModel(menu, menuModel);
 			renderer.processContributions(menuModel, false, true);
 			// double cast because we're bad people
-			renderer.processContents((MElementContainer<MUIElement>) ((Object) menuModel));
+			// renderer.processContents((MElementContainer<MUIElement>)
+			// ((Object) menuModel));
 		}
 	}
 
