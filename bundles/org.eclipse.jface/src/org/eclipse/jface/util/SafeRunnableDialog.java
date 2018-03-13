@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	private TableViewer statusListViewer;
 
-	private Collection statuses = new ArrayList();
+	private Collection<IStatus> statuses = new ArrayList<IStatus>();
 
 	/**
 	 * Create a new instance of the receiver on a status.
@@ -171,6 +171,7 @@ class SafeRunnableDialog extends ErrorDialog {
 		statusListViewer.setLabelProvider(getStatusListLabelProvider());
 		statusListViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						handleSelectionChange();
 					}
@@ -211,6 +212,7 @@ class SafeRunnableDialog extends ErrorDialog {
 			 * 
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return statuses.toArray();
 			}
@@ -220,6 +222,7 @@ class SafeRunnableDialog extends ErrorDialog {
 			 * 
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
+			@Override
 			public void dispose() {
 
 			}
@@ -230,6 +233,7 @@ class SafeRunnableDialog extends ErrorDialog {
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 

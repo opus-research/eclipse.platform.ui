@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Adobe Systems, Inc. and others.
+ * Copyright (c) 2008, 2014 Adobe Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collections;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -163,7 +162,7 @@ public class CocoaUIHandler {
 		// call getAddress
 		Method getAddress = Callback.class
 				.getMethod("getAddress", new Class[0]); //$NON-NLS-1$
-		Object object = getAddress.invoke(proc3Args, null);
+		Object object = getAddress.invoke(proc3Args);
 		long proc3 = convertToLong(object);
 		if (proc3 == 0)
 			SWT.error(SWT.ERROR_NO_MORE_CALLBACKS);
@@ -706,7 +705,7 @@ public class CocoaUIHandler {
 			return false;
 		}
 		ParameterizedCommand cmd = commandService.createCommand(commandId,
-				Collections.emptyMap());
+				null);
 		if (cmd == null) {
 			return false;
 		}

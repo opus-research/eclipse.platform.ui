@@ -12,7 +12,6 @@
 package org.eclipse.e4.ui.css.swt.properties.converters;
 
 import java.util.List;
-
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.AbstractCSSValueConverter;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverter;
@@ -20,6 +19,7 @@ import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterCo
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
@@ -39,13 +39,15 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		super(Gradient.class);
 	}
 
+	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
-			Gradient grad = CSSSWTColorHelper.getGradient((CSSValueList) value);
-			List values = grad.getValues();
+			Display display = (context instanceof Display) ? (Display) context : null;
+			Gradient grad = CSSSWTColorHelper.getGradient((CSSValueList) value, display);
+			List<?> values = grad.getValues();
 			for (int i = 0; i < values.size(); i++) {
 				//Ensure all the colors are already converted and in the registry
-				//TODO see bug #278077	
+				//TODO see bug #278077
 				CSSPrimitiveValue prim = (CSSPrimitiveValue) values.get(i);
 				engine.convert(prim, Color.class, context);
 			}
@@ -55,6 +57,7 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		return null;
 	}
 
+	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		return null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,18 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Henrik Still <hendrik.still@gammas.de> - Bug 415875
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -44,10 +48,95 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class Snippet055HideShowColumn {
+
+	private final class MyEditingSupport extends EditingSupport {
+		private final TreeViewer v;
+		private final TextCellEditor textCellEditor;
+
+		private MyEditingSupport(ColumnViewer viewer, TreeViewer v,
+				TextCellEditor textCellEditor) {
+			super(viewer);
+			this.v = v;
+			this.textCellEditor = textCellEditor;
+		}
+
+		@Override
+		protected boolean canEdit(Object element) {
+			return true;
+		}
+
+		@Override
+		protected CellEditor getCellEditor(Object element) {
+			return textCellEditor;
+		}
+
+		@Override
+		protected Object getValue(Object element) {
+			return ((MyModel) element).counter + "";
+		}
+
+		@Override
+		protected void setValue(Object element, Object value) {
+			((MyModel) element).counter = Integer.parseInt(value.toString());
+			v.update(element, null);
+		}
+	}
+
+	class MyContentProvider implements ITreeContentProvider {
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return ((MyModel) inputElement).child.toArray();
+		}
+
+		@Override
+		public void dispose() {
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		}
+
+		@Override
+		public Object[] getChildren(Object parentElement) {
+			return getElements(parentElement);
+		}
+
+		@Override
+		public Object getParent(Object element) {
+			if (element == null) {
+				return null;
+			}
+			return ((MyModel) element).parent;
+		}
+
+		@Override
+		public boolean hasChildren(Object element) {
+			return ((MyModel) element).child.size() > 0;
+		}
+
+	}
+
+	class MyColumnLabelProvider extends ColumnLabelProvider {
+
+		private String prefix;
+
+		public MyColumnLabelProvider(String prefix) {
+			this.prefix = prefix;
+		}
+
+		@Override
+		public String getText(Object element) {
+			return prefix + " => " + element.toString();
+		}
+
+	}
+
 	public Snippet055HideShowColumn(final Shell shell) {
 		final TreeViewer v = new TreeViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
-		v.getTree().setLayoutData(new GridData(SWT.FILL,SWT.FILL,true,true,2,1));
+		v.getTree().setLayoutData(
+				new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
 		v.getTree().setLinesVisible(true);
 		v.getTree().setHeaderVisible(true);
 
@@ -55,6 +144,7 @@ public class Snippet055HideShowColumn {
 				v, new FocusCellOwnerDrawHighlighter(v));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
 				v) {
+			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
@@ -72,130 +162,78 @@ public class Snippet055HideShowColumn {
 
 		final TextCellEditor textCellEditor = new TextCellEditor(v.getTree());
 
-		TreeViewerColumn column_1 = new TreeViewerColumn(v, SWT.NONE);
-		column_1.getColumn().setWidth(200);
-		column_1.getColumn().setMoveable(true);
-		column_1.getColumn().setText("Column 1");
-		column_1.setLabelProvider(new ColumnLabelProvider() {
-
-			public String getText(Object element) {
-				return "Column 1 => " + element.toString();
-			}
-
-		});
-		column_1.setEditingSupport(new EditingSupport(v) {
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			protected CellEditor getCellEditor(Object element) {
-				return textCellEditor;
-			}
-
-			protected Object getValue(Object element) {
-				return ((MyModel) element).counter + "";
-			}
-
-			protected void setValue(Object element, Object value) {
-				((MyModel) element).counter = Integer
-						.parseInt(value.toString());
-				v.update(element, null);
-			}
-		});
-
-		final TreeViewerColumn column_2 = new TreeViewerColumn(v, SWT.NONE);
-		column_2.getColumn().setWidth(200);
-		column_2.getColumn().setMoveable(true);
-		column_2.getColumn().setText("Column 2");
-		column_2.setLabelProvider(new ColumnLabelProvider() {
-
-			public String getText(Object element) {
-				return "Column 2 => " + element.toString();
-			}
-
-		});
-		column_2.setEditingSupport(new EditingSupport(v) {
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			protected CellEditor getCellEditor(Object element) {
-				return textCellEditor;
-			}
-
-			protected Object getValue(Object element) {
-				return ((MyModel) element).counter + "";
-			}
-
-			protected void setValue(Object element, Object value) {
-				((MyModel) element).counter = Integer
-						.parseInt(value.toString());
-				v.update(element, null);
-			}
-		});
-
-		TreeViewerColumn column_3 = new TreeViewerColumn(v, SWT.NONE);
-		column_3.getColumn().setWidth(200);
-		column_3.getColumn().setMoveable(true);
-		column_3.getColumn().setText("Column 3");
-		column_3.setLabelProvider(new ColumnLabelProvider() {
-
-			public String getText(Object element) {
-				return "Column 3 => " + element.toString();
-			}
-
-		});
-		column_3.setEditingSupport(new EditingSupport(v) {
-			protected boolean canEdit(Object element) {
-				return true;
-			}
-
-			protected CellEditor getCellEditor(Object element) {
-				return textCellEditor;
-			}
-
-			protected Object getValue(Object element) {
-				return ((MyModel) element).counter + "";
-			}
-
-			protected void setValue(Object element, Object value) {
-				((MyModel) element).counter = Integer
-						.parseInt(value.toString());
-				v.update(element, null);
-			}
-		});
+		createColumnFor(v, "Column 1", textCellEditor);
+		final TreeViewerColumn column_2 = createColumnFor(v, "Column 2",
+				textCellEditor);
+		createColumnFor(v, "Column 3", textCellEditor);
 
 		v.setContentProvider(new MyContentProvider());
-
 		v.setInput(createModel());
 
-		Button b = new Button(shell, SWT.PUSH);
-		b.setText("Edit-Element");
-		b.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		Button b = createButtonFor(shell, "Edit-Element");
 		b.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MyModel root = (MyModel) v.getInput();
 				TreePath path = new TreePath(new Object[] { root,
-						root.child.get(1),
-						((MyModel) root.child.get(1)).child.get(0) });
+						root.child.get(1), root.child.get(1).child.get(0) });
 				v.editElement(path, 0);
 			}
 
 		});
-
-		b = new Button(shell, SWT.PUSH);
-		b.setText("Hide/Show 2nd Column");
-		b.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		b = createButtonFor(shell, "Hide/Show 2nd Column");
 		b.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
-				column_2.getColumn().setWidth(0);
+				int width = column_2.getColumn().getWidth();
+				column_2.getColumn().setWidth(width == 0 ? 200 : 0);
 			}
 		});
 	}
 
-	private MyModel createModel() {
+	private TreeViewerColumn createColumnFor(final TreeViewer v, String label,
+			TextCellEditor textCellEditor) {
+		TreeViewerColumn column = new TreeViewerColumn(v, SWT.NONE);
+		column.getColumn().setWidth(200);
+		column.getColumn().setMoveable(true);
+		column.getColumn().setText(label);
+		column.setLabelProvider(new MyColumnLabelProvider(label));
+		column.setEditingSupport(new MyEditingSupport(v, v, textCellEditor));
+		return column;
+	}
 
+	private Button createButtonFor(final Shell shell, String label) {
+		Button b = new Button(shell, SWT.PUSH);
+		b.setText(label);
+		b.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		return b;
+	}
+
+	public class MyModel {
+
+		public MyModel parent;
+		public List<MyModel> child = new ArrayList<MyModel>();
+		public int counter;
+
+		public MyModel(int counter, MyModel parent) {
+			this.parent = parent;
+			this.counter = counter;
+		}
+
+		@Override
+		public String toString() {
+			String rv = "Item ";
+			if (parent != null) {
+				rv = parent.toString() + ".";
+			}
+			rv += counter;
+
+			return rv;
+		}
+	}
+
+	private MyModel createModel() {
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;
 
@@ -210,14 +248,13 @@ public class Snippet055HideShowColumn {
 				tmp.child.add(subItem);
 			}
 		}
-
 		return root;
 	}
 
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		shell.setLayout(new GridLayout(2,true));
+		shell.setLayout(new GridLayout(2, true));
 		new Snippet055HideShowColumn(shell);
 		shell.open();
 
@@ -225,61 +262,7 @@ public class Snippet055HideShowColumn {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-
 		display.dispose();
-	}
-
-	private class MyContentProvider implements ITreeContentProvider {
-
-		public Object[] getElements(Object inputElement) {
-			return ((MyModel) inputElement).child.toArray();
-		}
-
-		public void dispose() {
-		}
-
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		}
-
-		public Object[] getChildren(Object parentElement) {
-			return getElements(parentElement);
-		}
-
-		public Object getParent(Object element) {
-			if (element == null) {
-				return null;
-			}
-			return ((MyModel) element).parent;
-		}
-
-		public boolean hasChildren(Object element) {
-			return ((MyModel) element).child.size() > 0;
-		}
-
-	}
-
-	public class MyModel {
-		public MyModel parent;
-
-		public ArrayList child = new ArrayList();
-
-		public int counter;
-
-		public MyModel(int counter, MyModel parent) {
-			this.parent = parent;
-			this.counter = counter;
-		}
-
-		public String toString() {
-			String rv = "Item ";
-			if (parent != null) {
-				rv = parent.toString() + ".";
-			}
-
-			rv += counter;
-
-			return rv;
-		}
 	}
 
 }

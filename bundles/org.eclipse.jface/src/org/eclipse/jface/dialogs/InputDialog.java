@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -172,7 +172,8 @@ public class InputDialog extends Dialog {
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
         text.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 validateInput();
             }
         });
@@ -195,7 +196,8 @@ public class InputDialog extends Dialog {
      * @return the error message label
      * @deprecated use setErrorMessage(String) instead
      */
-    protected Label getErrorMessageLabel() {
+    @Deprecated
+	protected Label getErrorMessageLabel() {
         return null;
     }
 

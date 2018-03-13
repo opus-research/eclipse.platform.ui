@@ -66,6 +66,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @since 2.0
 	 * @deprecated
 	 */
+	@Deprecated
 	public final static String INFO_MESSAGE = "INFO_MESSAGE"; //$NON-NLS-1$
 
 	/**
@@ -74,6 +75,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @since 2.0
 	 * @deprecated
 	 */
+	@Deprecated
 	public final static String WARNING_MESSAGE = "WARNING_MESSAGE"; //$NON-NLS-1$
 
 	// Space between an image and a label
@@ -166,6 +168,7 @@ public class TitleAreaDialog extends TrayDialog {
 		
 		// need to react to new size of title area
 		getShell().addListener(SWT.Resize, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				layoutForNewMessage(true);
 			}
@@ -216,6 +219,7 @@ public class TitleAreaDialog extends TrayDialog {
 
 		// add a dispose listener
 		parent.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (titleAreaColor != null) {
 					titleAreaColor.dispose();
@@ -374,6 +378,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @return Composite
 	 * @deprecated
 	 */
+	@Deprecated
 	protected Composite getTitleArea() {
 		return getShell();
 	}

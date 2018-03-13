@@ -43,6 +43,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 			this.viewer = viewer;
 		}
 
+		@Override
 		public void handleEvent(Event event) {
 			ViewerColumn column = viewer.getViewerColumn(event.index);
 			if (column != null && (enabledGlobally > 0 || enabledColumns.contains(column))) {
@@ -79,6 +80,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *             in this class will set up the necessary owner draw callbacks
 	 *             automatically. Calls to this method can be removed.
 	 */
+	@Deprecated
 	public static void setUpOwnerDraw(final ColumnViewer viewer) {
 		getOrCreateOwnerDrawListener(viewer).enabledGlobally++;
 	}

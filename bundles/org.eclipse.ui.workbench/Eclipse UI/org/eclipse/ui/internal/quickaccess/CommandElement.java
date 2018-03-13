@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display 
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -44,13 +45,15 @@ public class CommandElement extends QuickAccessElement {
 		this.command = command;
 	}
 
+	@Override
 	public void execute() {
 		Object o = getProvider();
 		if (o instanceof CommandProvider) {
 			CommandProvider provider = (CommandProvider) o;
 			if (provider.getHandlerService() != null && provider.getContextSnapshot() != null) {
 				try {
-					provider.getHandlerService().executeCommand(command, null);
+					provider.getHandlerService().executeCommandInContext(command, null,
+							provider.getContextSnapshot());
 				} catch (Exception ex) {
 					StatusUtil.handleStatus(ex, StatusManager.SHOW
 							| StatusManager.LOG);
@@ -63,7 +66,7 @@ public class CommandElement extends QuickAccessElement {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		if (window != null) {
-			IHandlerService handlerService = (IHandlerService) window
+			IHandlerService handlerService = window
 					.getWorkbench().getService(IHandlerService.class);
 			try {
 				handlerService.executeCommand(command, null);
@@ -74,10 +77,12 @@ public class CommandElement extends QuickAccessElement {
 		}
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return null;
 	}
@@ -105,6 +110,7 @@ public class CommandElement extends QuickAccessElement {
 		return label.toString();
 	}
 
+	@Override
 	public String getLabel() {
 		String command = getCommand();
 		String binding = getBinding();
@@ -133,6 +139,16 @@ public class CommandElement extends QuickAccessElement {
 		return null;
 	}
 
+	@Override
+	public String getSortLabel() {
+		try {
+			return command.getName();
+		} catch (NotDefinedException e) {
+			return command.toString();
+		}
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -140,6 +156,7 @@ public class CommandElement extends QuickAccessElement {
 		return result;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

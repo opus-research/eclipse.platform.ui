@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Code 9 Corporation and others.
+ * Copyright (c) 2008, 2014 Code 9 Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Chris Aniszczyk <zx@code9.com> - initial API and implementation
  *     Boris Bokowski, IBM - minor changes
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -24,6 +25,7 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
@@ -155,6 +157,7 @@ public class Snippet027ExternalValidator extends WizardPage {
 	 * 
 	 * @param parent
 	 */
+	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		final GridLayout gridLayout = new GridLayout();
@@ -192,20 +195,21 @@ public class Snippet027ExternalValidator extends WizardPage {
 
 		final IObservableValue name = BeansObservables.observeValue(contact,
 				"name");
-		dbc.bindValue(SWTObservables.observeText(nameValue, SWT.Modify), name,
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(nameValue), name,
 				null, null);
 
 		final IObservableValue email = BeansObservables.observeValue(contact,
 				"email");
-		dbc.bindValue(SWTObservables.observeText(emailValue, SWT.Modify),
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(emailValue),
 				email, null, null);
 
 		final IObservableValue phone = BeansObservables.observeValue(contact,
 				"phoneNumber");
-		dbc.bindValue(SWTObservables.observeText(phoneNumberValue, SWT.Modify),
+		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(phoneNumberValue),
 				phone, null, null);
 
 		MultiValidator validator = new MultiValidator() {
+			@Override
 			protected IStatus validate() {
 
 				// Everything accessed here will trigger re-validation.
@@ -224,14 +228,17 @@ public class Snippet027ExternalValidator extends WizardPage {
 	}
 
 	static class ExternalValidationWizard extends Wizard {
+		@Override
 		public void addPages() {
 			addPage(new Snippet027ExternalValidator());
 		}
 
+		@Override
 		public String getWindowTitle() {
 			return "Snippet 024 - External Validation";
 		}
 
+		@Override
 		public boolean performFinish() {
 			return true;
 		}
@@ -241,6 +248,7 @@ public class Snippet027ExternalValidator extends WizardPage {
 		Display display = new Display();
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				IWizard wizard = new ExternalValidationWizard();
 				WizardDialog dialog = new WizardDialog(null, wizard);

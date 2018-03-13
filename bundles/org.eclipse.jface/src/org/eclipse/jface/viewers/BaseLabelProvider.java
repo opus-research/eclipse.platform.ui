@@ -22,11 +22,9 @@ import org.eclipse.jface.util.SafeRunnable;
  * 
  */
 public class BaseLabelProvider extends EventManager implements IBaseLabelProvider {
-	
-	/* (non-Javadoc)
-     * Method declared on IBaseLabelProvider.
-     */
-    public void addListener(ILabelProviderListener listener) {
+
+    @Override
+	public void addListener(ILabelProviderListener listener) {
         addListenerObject(listener);
     }
 
@@ -35,27 +33,26 @@ public class BaseLabelProvider extends EventManager implements IBaseLabelProvide
      * <code>IBaseLabelProvider</code> method clears its internal listener list.
      * Subclasses may extend but should call the super implementation.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
     	clearListeners();
     }
-    
+
     /**
      * The <code>BaseLabelProvider</code> implementation of this 
      * <code>IBaseLabelProvider</code> method returns <code>true</code>. Subclasses may 
      * override.
      */
-    public boolean isLabelProperty(Object element, String property) {
+    @Override
+	public boolean isLabelProperty(Object element, String property) {
         return true;
     }
 
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
-    public void removeListener(ILabelProviderListener listener) {
+    @Override
+	public void removeListener(ILabelProviderListener listener) {
         removeListenerObject(listener);
     }
-    
+
     /**
 	 * Fires a label provider changed event to all registered listeners Only
 	 * listeners registered at the time this method is called are notified.
@@ -70,6 +67,7 @@ public class BaseLabelProvider extends EventManager implements IBaseLabelProvide
 		for (int i = 0; i < listeners.length; ++i) {
 			final ILabelProviderListener l = (ILabelProviderListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.labelProviderChanged(event);
 				}

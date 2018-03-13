@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -388,7 +388,8 @@ public abstract class FieldEditor {
 				label.setText(text);
 			}
             label.addDisposeListener(new DisposeListener() {
-                public void widgetDisposed(DisposeEvent event) {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
                     label = null;
                 }
             });
@@ -430,7 +431,8 @@ public abstract class FieldEditor {
      * @return the preference page, or <code>null</code> if none
      * @deprecated use #getPage()
      */
-    protected PreferencePage getPreferencePage() {
+    @Deprecated
+	protected PreferencePage getPreferencePage() {
     	if(page != null && page instanceof PreferencePage) {
 			return (PreferencePage) page;
 		}
@@ -593,7 +595,8 @@ public abstract class FieldEditor {
      * @param preferencePage the preference page, or <code>null</code> if none
      * @deprecated use #setPage(DialogPage)
      */
-    public void setPreferencePage(PreferencePage preferencePage) {
+    @Deprecated
+	public void setPreferencePage(PreferencePage preferencePage) {
         setPage(preferencePage);
     }
     

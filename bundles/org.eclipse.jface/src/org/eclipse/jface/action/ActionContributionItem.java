@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -109,6 +109,7 @@ public class ActionContributionItem extends ContributionItem {
 		/**
 		 * @see IPropertyChangeListener#propertyChange(PropertyChangeEvent)
 		 */
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			update(event.getProperty());
 		}
@@ -133,6 +134,7 @@ public class ActionContributionItem extends ContributionItem {
 	 * Listener for action property change notifications.
 	 */
 	private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			actionPropertyChange(event);
 		}
@@ -176,6 +178,7 @@ public class ActionContributionItem extends ContributionItem {
 				update(e.getProperty());
 			} else {
 				display.asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						update(e.getProperty());
 					}
@@ -377,6 +380,7 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getButtonListener() {
 		if (buttonListener == null) {
 			buttonListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -404,6 +408,7 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getMenuItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -445,6 +450,7 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getToolItemListener() {
 		if (toolItemListener == null) {
 			toolItemListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -572,6 +578,7 @@ public class ActionContributionItem extends ContributionItem {
 				IPropertyChangeListener resultListener = null;
 				if (callback != null) {
 					resultListener = new IPropertyChangeListener() {
+						@Override
 						public void propertyChange(PropertyChangeEvent event) {
 							// Check on result
 							if (event.getProperty().equals(IAction.RESULT)) {
@@ -615,9 +622,6 @@ public class ActionContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
 	@Override
 	public int hashCode() {
 		return action.hashCode();
@@ -677,9 +681,6 @@ public class ActionContributionItem extends ContributionItem {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IContributionItem.
-	 */
 	@Override
 	public boolean isEnabled() {
 		return action != null && action.isEnabled();
@@ -1191,11 +1192,6 @@ public class ActionContributionItem extends ContributionItem {
 		return textValue;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -1215,6 +1211,7 @@ public class ActionContributionItem extends ContributionItem {
 	private Listener getMenuCreatorListener() {
 		if (menuCreatorListener == null) {
 			menuCreatorListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Show:
@@ -1279,6 +1276,7 @@ public class ActionContributionItem extends ContributionItem {
 		realMenu.notifyListeners(SWT.Show, null);
 
 		final Listener passThrough = new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				if (!event.widget.isDisposed()) {
 					Widget realItem = (Widget) event.widget.getData();
@@ -1321,6 +1319,7 @@ public class ActionContributionItem extends ContributionItem {
 				subMenu.setData(itemMenu);
 				proxyItem.setMenu(subMenu);
 				subMenu.addListener(SWT.Show, new Listener() {
+					@Override
 					public void handleEvent(Event event) {
 						event.widget.removeListener(SWT.Show, this);
 						if (event.type == SWT.Show) {
@@ -1344,6 +1343,7 @@ public class ActionContributionItem extends ContributionItem {
 	private void handleHideProxy(final Menu proxy) {
 		proxy.removeListener(SWT.Hide, getMenuCreatorListener());
 		proxy.getDisplay().asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!proxy.isDisposed()) {
 					MenuItem parentItem = proxy.getParentItem();

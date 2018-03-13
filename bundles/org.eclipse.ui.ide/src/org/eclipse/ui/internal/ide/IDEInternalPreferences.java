@@ -118,5 +118,16 @@ public interface IDEInternalPreferences {
     /**
      * Workspace name, will be displayed in the window title.
      */
-	public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
+    public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
+
+    /**
+     * System explore command, used to launch file manager showing selected resource.
+     */
+    public static final String WORKBENCH_SYSTEM_EXPLORER = "SYSTEM_EXPLORER"; //$NON-NLS-1$
+
+    /**
+     * Warn the user that the workspace is going to be upgraded because the IDE is newer
+     */
+    public static final String WARN_ABOUT_WORKSPACE_INCOMPATIBILITY = "WARN_ABOUT_WORKSPACE_INCOMPATIBILITY"; //$NON-NLS-1$
+
 }

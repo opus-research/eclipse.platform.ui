@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,6 +67,7 @@ public abstract class Dialog extends Window {
 	 * @deprecated use
 	 *             org.eclipse.swt.widgets.Display.getSystemImage(SWT.ICON_ERROR)
 	 */
+	@Deprecated
 	public static final String DLG_IMG_ERROR = "dialog_error_image"; //$NON-NLS-1$
 
 	/**
@@ -75,6 +76,7 @@ public abstract class Dialog extends Window {
 	 * @deprecated use
 	 *             org.eclipse.swt.widgets.Display.getSystemImage(SWT.ICON_INFORMATION)
 	 */
+	@Deprecated
 	public static final String DLG_IMG_INFO = "dialog_info_imageg"; //$NON-NLS-1$
 
 	/**
@@ -83,6 +85,7 @@ public abstract class Dialog extends Window {
 	 * 
 	 * @deprecated org.eclipse.swt.widgets.Display.getSystemImage(SWT.ICON_QUESTION)
 	 */
+	@Deprecated
 	public static final String DLG_IMG_QUESTION = "dialog_question_image"; //$NON-NLS-1$
 
 	/**
@@ -92,6 +95,7 @@ public abstract class Dialog extends Window {
 	 * @deprecated use
 	 *             org.eclipse.swt.widgets.Display.getSystemImage(SWT.ICON_WARNING)
 	 */
+	@Deprecated
 	public static final String DLG_IMG_WARNING = "dialog_warning_image"; //$NON-NLS-1$
 
 	/**
@@ -209,7 +213,7 @@ public abstract class Dialog extends Window {
 	/**
 	 * Collection of buttons created by the <code>createButton</code> method.
 	 */
-	private HashMap buttons = new HashMap();
+	private HashMap<Integer, Button> buttons = new HashMap<Integer, Button>();
 
 	/**
 	 * Font metrics to use for determining pixel sizes.
@@ -383,36 +387,22 @@ public abstract class Dialog extends Window {
 	 * anything.
 	 */
 	public static IDialogBlockedHandler blockedHandler = new IDialogBlockedHandler() {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#clearBlocked()
-		 */
+
+		@Override
 		public void clearBlocked() {
-			// No default behaviour
+			// No default behavior
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IStatus, java.lang.String)
-		 */
+		@Override
 		public void showBlocked(IProgressMonitor blocking,
 				IStatus blockingStatus, String blockedName) {
-			// No default behaviour
+			// No default behavior
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.swt.widgets.Shell,
-		 *      org.eclipse.core.runtime.IProgressMonitor,
-		 *      org.eclipse.core.runtime.IStatus, java.lang.String)
-		 */
+		@Override
 		public void showBlocked(Shell parentShell, IProgressMonitor blocking,
 				IStatus blockingStatus, String blockedName) {
-			// No default behaviour
+			// No default behavior
 		}
 	};
 
@@ -839,7 +829,7 @@ public abstract class Dialog extends Window {
 	 * @since 2.0
 	 */
 	protected Button getButton(int id) {
-		return (Button) buttons.get(new Integer(id));
+		return buttons.get(new Integer(id));
 	}
 
 	/**
@@ -869,6 +859,7 @@ public abstract class Dialog extends Window {
 	 * @deprecated Use <code>getButton(IDialogConstants.CANCEL_ID)</code>
 	 *             instead. This method will be removed soon.
 	 */
+	@Deprecated
 	protected Button getCancelButton() {
 		return getButton(IDialogConstants.CANCEL_ID);
 	}
@@ -922,6 +913,7 @@ public abstract class Dialog extends Window {
 	 * @deprecated Use <code>getButton(IDialogConstants.OK_ID)</code> instead.
 	 *             This method will be removed soon.
 	 */
+	@Deprecated
 	protected Button getOKButton() {
 		return getButton(IDialogConstants.OK_ID);
 	}
@@ -997,7 +989,7 @@ public abstract class Dialog extends Window {
 
 		boolean returnValue = super.close();
 		if (returnValue) {
-			buttons = new HashMap();
+			buttons = new HashMap<Integer, Button>();
 			buttonBar = null;
 			dialogArea = null;
 		}

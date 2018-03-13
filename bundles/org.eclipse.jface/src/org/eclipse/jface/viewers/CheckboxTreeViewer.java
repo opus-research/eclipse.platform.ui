@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,10 +93,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         super(tree);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void addCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void addCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.add(listener);
     }
     
@@ -163,7 +161,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.checkStateChanged(event);
                 }
             });
@@ -200,10 +199,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean getChecked(Object element) {
+    @Override
+	public boolean getChecked(Object element) {
         Widget widget = findItem(element);
         if (widget instanceof TreeItem) {
 			return ((TreeItem) widget).getChecked();
@@ -265,9 +262,6 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         return result.toArray();
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
 	protected void handleDoubleSelect(SelectionEvent event) {
 
@@ -286,9 +280,6 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
     @Override
 	protected void handleSelect(SelectionEvent event) {
 
@@ -393,9 +384,6 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
     @Override
 	protected void preservingSelection(Runnable updateCode) {
     	if (!getPreserveSelection()) {
@@ -422,17 +410,13 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         applyState(checkedNodes, grayedNodes, getControl());
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void removeCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void removeCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean setChecked(Object element, boolean state) {
+    @Override
+	public boolean setChecked(Object element, boolean state) {
         Assert.isNotNull(element);
         Widget widget = internalExpand(element, false);
         if (widget instanceof TreeItem) {
@@ -627,6 +611,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      *  
      *  @since 3.2
      */
+	@Deprecated
 	public void setAllChecked(boolean state) {
 		setAllChecked(state,  getTree().getItems());
 		
@@ -639,6 +624,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 	 * @deprecated
 	 * @see #setAllChecked(boolean)
 	 */
+	@Deprecated
 	private void setAllChecked(boolean state, TreeItem[] items) {
 		for (int i = 0; i < items.length; i++) {
 			items[i].setChecked(state);			

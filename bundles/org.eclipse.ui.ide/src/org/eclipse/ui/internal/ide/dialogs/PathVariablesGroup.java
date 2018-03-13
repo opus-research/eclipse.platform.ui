@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Group and Project Path Variable Support
  *     Helena Halperin (IBM) - bug #299212
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -220,7 +221,7 @@ public class PathVariablesGroup {
      * longer needed.
      * 
      * @param parent the widget parent
-     * @return container of the widgets 
+     * @return container of the widgets
      */
     public Control createContents(Composite parent) {
         Font font = parent.getFont();
@@ -229,7 +230,7 @@ public class PathVariablesGroup {
             ImageDescriptor descriptor = AbstractUIPlugin
                     .imageDescriptorFromPlugin(
                             IDEWorkbenchPlugin.IDE_WORKBENCH,
-                            "$nl$/icons/full/obj16/warning.gif"); //$NON-NLS-1$
+                            "$nl$/icons/full/obj16/warning.png"); //$NON-NLS-1$
             imageUnkown = descriptor.createImage();
         }
         initializeDialogUnits(parent);
@@ -275,7 +276,8 @@ public class PathVariablesGroup {
 
 		variableTable = new TableViewer(tableComposite, tableStyle);
         variableTable.getTable().addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 updateEnabledState();
                 if (selectionListener != null) {
 					selectionListener.handleEvent(new Event());
@@ -307,18 +309,23 @@ public class PathVariablesGroup {
         variableTable.getTable().setFont(font);
 
         variableTable.getTable().addMouseListener(new MouseListener() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 		        int itemsSelectedCount = variableTable.getTable().getSelectionCount();
 		        if (itemsSelectedCount == 1 && canChangeSelection())
 		        	editSelectedVariable();
 			}
+			@Override
 			public void mouseDown(MouseEvent e) { }
+			@Override
 			public void mouseUp(MouseEvent e) { }
         });
         variableTable.getTable().addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 		        updateEnabledState();
 			}
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 		        updateEnabledState();
 			}
@@ -333,22 +340,27 @@ public class PathVariablesGroup {
 
     class NameLabelProvider extends CellLabelProvider
     {
+		@Override
 		public String getToolTipText(Object element) {
             return null;
 		}
 
+		@Override
 		public Point getToolTipShift(Object object) {
 			return new Point(5, 5);
 		}
 
+		@Override
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 0;
 		}
 
+		@Override
 		public int getToolTipTimeDisplayed(Object object) {
 			return 15000;
 		}
 
+		@Override
 		public void update(ViewerCell cell) {
 			String varName = (String) cell.getElement();
 			cell.setText(varName);
@@ -366,6 +378,7 @@ public class PathVariablesGroup {
     
     class ValueLabelProvider extends CellLabelProvider
     {
+		@Override
 		public String getToolTipText(Object element) {
             IPath value = (IPath) tempPathVariables.get(element);
         	URI resolvedURI = pathVariableManager.resolveURI(URIUtil.toURI(value));
@@ -373,18 +386,22 @@ public class PathVariablesGroup {
             return TextProcessor.process(resolvedValue.toOSString());
 		}
 
+		@Override
 		public Point getToolTipShift(Object object) {
 			return new Point(5, 5);
 		}
 
+		@Override
 		public int getToolTipDisplayDelayTime(Object object) {
 			return 0;
 		}
 
+		@Override
 		public int getToolTipTimeDisplayed(Object object) {
 			return 15000;
 		}
 
+		@Override
 		public void update(ViewerCell cell) {
             IPath value = (IPath) tempPathVariables.get(cell.getElement());
 			cell.setText(TextProcessor.process(removeParentVariable(value.toOSString())));
@@ -516,7 +533,8 @@ public class PathVariablesGroup {
         addButton = new Button(groupComponent, SWT.PUSH);
         addButton.setText(IDEWorkbenchMessages.PathVariablesBlock_addVariableButton);
         addButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 addNewVariable();
             }
         });
@@ -526,7 +544,8 @@ public class PathVariablesGroup {
         editButton = new Button(groupComponent, SWT.PUSH);
         editButton.setText(IDEWorkbenchMessages.PathVariablesBlock_editVariableButton);
         editButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 editSelectedVariable();
             }
         });
@@ -536,7 +555,8 @@ public class PathVariablesGroup {
         removeButton = new Button(groupComponent, SWT.PUSH);
         removeButton.setText(IDEWorkbenchMessages.PathVariablesBlock_removeVariableButton);
         removeButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 removeSelectedVariables();
             }
         });
@@ -607,12 +627,15 @@ public class PathVariablesGroup {
 
 	private class ContentProvider implements IStructuredContentProvider {
 
+		@Override
 		public Object[] getElements(Object inputElement) {
 			return tempPathVariables.keySet().toArray();
 		}
 		
+		@Override
 		public void dispose() { }
 		
+		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { }
 	}
 

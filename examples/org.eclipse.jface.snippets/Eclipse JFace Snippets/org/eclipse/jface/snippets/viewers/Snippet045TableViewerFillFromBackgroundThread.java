@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -17,7 +18,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.jface.resource.FontRegistry;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -44,38 +45,6 @@ import org.eclipse.swt.widgets.TableColumn;
 public class Snippet045TableViewerFillFromBackgroundThread {
 	private static int COUNTER = 0;
 
-	private class MyContentProvider implements IStructuredContentProvider {
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
-		public Object[] getElements(Object inputElement) {
-			return ((List) inputElement).toArray();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
-		public void dispose() {
-
-		}
-
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
-		}
-
-	}
-
 	public class MyModel {
 		public int counter;
 
@@ -83,6 +52,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -92,14 +62,17 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			ITableLabelProvider, ITableFontProvider, ITableColorProvider {
 		FontRegistry registry = new FontRegistry();
 
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
+		@Override
 		public Font getFont(Object element, int columnIndex) {
 			if (((MyModel) element).counter % 2 == 0) {
 				return registry.getBold(Display.getCurrent().getSystemFont()
@@ -108,6 +81,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			return null;
 		}
 
+		@Override
 		public Color getBackground(Object element, int columnIndex) {
 			if (((MyModel) element).counter % 2 == 0) {
 				return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
@@ -115,6 +89,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			return null;
 		}
 
+		@Override
 		public Color getForeground(Object element, int columnIndex) {
 			if (((MyModel) element).counter % 2 == 1) {
 				return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
@@ -128,7 +103,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(new MyContentProvider());
+		v.setContentProvider(ArrayContentProvider.getInstance());
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
@@ -138,9 +113,10 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		final ArrayList model = new ArrayList();
+		final List<MyModel> model = new ArrayList<MyModel>();
 		v.setInput(model);
 		v.setComparator(new ViewerComparator() {
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				MyModel m1 = (MyModel) e1;
 				MyModel m2 = (MyModel) e2;
@@ -153,9 +129,11 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 
 		TimerTask task = new TimerTask() {
 
+			@Override
 			public void run() {
 				shell.getDisplay().syncExec(new Runnable() {
 
+					@Override
 					public void run() {
 						MyModel el = new MyModel(++COUNTER);
 						v.add(el);
@@ -184,9 +162,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-
 		display.dispose();
-
 	}
 
 }
