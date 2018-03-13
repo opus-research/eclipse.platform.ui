@@ -61,16 +61,6 @@
          </keywordReference>
       </wizard>
       <wizard
-            name="%ImportWizards.DirectoryAsProject"
-            icon="$nl$/icons/full/etool16/newprj_wiz.gif"
-            category="org.eclipse.ui.Basic"            
-            class="org.eclipse.ui.wizards.datatransfer.ImportDirectoryAsProjectWizard"
-            id="org.eclipse.ui.wizards.import.ExternalProject">
-         <description>
-            %ImportWizards.DirectoryAsProjectDescription
-         </description>
-      </wizard>
-      <wizard
             name="%ImportWizards.ZipFile"
             icon="$nl$/icons/full/etool16/importzip_wiz.gif"
             category="org.eclipse.ui.Basic"            
