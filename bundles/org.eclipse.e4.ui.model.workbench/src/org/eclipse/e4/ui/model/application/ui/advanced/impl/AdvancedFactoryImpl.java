@@ -10,6 +10,7 @@
  */
 package org.eclipse.e4.ui.model.application.ui.advanced.impl;
 
+import org.eclipse.e4.ui.model.application.ui.advanced.*;
 import org.eclipse.e4.ui.model.application.ui.advanced.MAdvancedFactory;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -44,7 +45,7 @@ public class AdvancedFactoryImpl extends EFactoryImpl implements MAdvancedFactor
 	 */
 	public static AdvancedFactoryImpl init() {
 		try {
-			AdvancedFactoryImpl theAdvancedFactory = (AdvancedFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced"); //$NON-NLS-1$ 
+			AdvancedFactoryImpl theAdvancedFactory = (AdvancedFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(AdvancedPackageImpl.eNS_URI);
 			if (theAdvancedFactory != null) {
 				return theAdvancedFactory;
 			}

@@ -10,6 +10,7 @@
  */
 package org.eclipse.e4.ui.model.application.ui.basic.impl;
 
+import org.eclipse.e4.ui.model.application.ui.basic.*;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -47,7 +48,7 @@ public class BasicFactoryImpl extends EFactoryImpl implements MBasicFactory {
 	 */
 	public static BasicFactoryImpl init() {
 		try {
-			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui/basic"); //$NON-NLS-1$ 
+			BasicFactoryImpl theBasicFactory = (BasicFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(BasicPackageImpl.eNS_URI);
 			if (theBasicFactory != null) {
 				return theBasicFactory;
 			}

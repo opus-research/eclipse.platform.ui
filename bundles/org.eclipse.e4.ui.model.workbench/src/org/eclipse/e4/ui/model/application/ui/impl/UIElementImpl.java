@@ -340,7 +340,7 @@ public abstract class UIElementImpl extends ApplicationElementImpl implements MU
 	@SuppressWarnings("unchecked")
 	public MElementContainer<MUIElement> getParent() {
 		if (eContainerFeatureID() != UiPackageImpl.UI_ELEMENT__PARENT) return null;
-		return (MElementContainer<MUIElement>)eContainer();
+		return (MElementContainer<MUIElement>)eInternalContainer();
 	}
 
 	/**

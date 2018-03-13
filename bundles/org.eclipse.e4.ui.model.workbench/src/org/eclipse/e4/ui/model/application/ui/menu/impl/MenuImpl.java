@@ -109,7 +109,7 @@ public class MenuImpl extends MenuElementImpl implements MMenu {
 	 */
 	public List<MMenuElement> getChildren() {
 		if (children == null) {
-			children = new EObjectContainmentWithInverseEList<MMenuElement>(MUIElement.class, this, MenuPackageImpl.MENU__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT);
+			children = new EObjectContainmentWithInverseEList<MMenuElement>(MMenuElement.class, this, MenuPackageImpl.MENU__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT) { private static final long serialVersionUID = 1L; @Override public Class<?> getInverseFeatureClass() { return MUIElement.class; } };
 		}
 		return children;
 	}

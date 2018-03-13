@@ -63,7 +63,7 @@ public class MenuFactoryImpl extends EFactoryImpl implements MMenuFactory {
 	 */
 	public static MenuFactoryImpl init() {
 		try {
-			MenuFactoryImpl theMenuFactory = (MenuFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui/menu"); //$NON-NLS-1$ 
+			MenuFactoryImpl theMenuFactory = (MenuFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(MenuPackageImpl.eNS_URI);
 			if (theMenuFactory != null) {
 				return theMenuFactory;
 			}
