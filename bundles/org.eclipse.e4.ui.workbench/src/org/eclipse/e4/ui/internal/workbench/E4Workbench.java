@@ -71,12 +71,6 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>dir</code>
 	 */
 	public static final String RTL_MODE = "dir"; //$NON-NLS-1$
-	/**
-	 * The argument for the perspective to activate <br>
-	 * <br>
-	 * Value is: <code>perspectiveId</code>
-	 */
-	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;
