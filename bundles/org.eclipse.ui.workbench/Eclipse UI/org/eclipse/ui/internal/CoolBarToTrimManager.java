@@ -19,11 +19,9 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -704,9 +702,10 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				container, null);
 
 		for (IContributionItem item : manager.getItems()) {
-			if (item == null || !isChildVisible(item)) {
+			if (item == null) {
 				continue;
 			}
+			MToolBarElement toolItem = renderer.getToolElement(item);
 
 			if (item instanceof IToolBarContributionItem) {
 				IToolBarManager manager2 = ((IToolBarContributionItem) item).getToolBarManager();
@@ -718,21 +717,26 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				//		"fill(MToolBar container, IContributionManager manager) with rogue contribution manager: " //$NON-NLS-1$
 				// + item).printStackTrace();
 				fill(container, (IContributionManager) item);
-			} else if (item instanceof CommandContributionItem) {
+			} else if (item instanceof CommandContributionItem && toolItem == null) {
 				CommandContributionItem cci = (CommandContributionItem) item;
-				MToolItem toolItem = MenuHelper.createToolItem(application, cci);
+				toolItem = MenuHelper.createToolItem(application, cci);
 				manager.remove(item);
 				if (toolItem != null) {
 					container.getChildren().add(toolItem);
 				}
 			} else {
-				MOpaqueToolItem toolItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
-				toolItem.setElementId(item.getId());
-				if (item instanceof AbstractGroupMarker) {
-					toolItem.setVisible(item.isVisible());
+				if (toolItem == null) {
+					toolItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
+					toolItem.setElementId(item.getId());
+					renderer.linkModelToContribution(toolItem, item);
+				}
+				if (item instanceof AbstractGroupMarker && container.getWidget() instanceof Control
+						&& !((Control) container.getWidget()).isDisposed()) {
+					toolItem.setVisible(isChildVisible(item));
+					// force the EMF model refresh
+					container.getChildren().remove(toolItem);
 				}
 				container.getChildren().add(toolItem);
-				renderer.linkModelToContribution(toolItem, item);
 			}
 		}
 	}
