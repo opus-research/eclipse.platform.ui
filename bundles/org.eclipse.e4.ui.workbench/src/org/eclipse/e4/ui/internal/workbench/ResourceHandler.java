@@ -207,7 +207,6 @@ public class ResourceHandler implements IModelResourceHandler {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
-			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
 		}
 
 		// Add model items described in the model extension point
