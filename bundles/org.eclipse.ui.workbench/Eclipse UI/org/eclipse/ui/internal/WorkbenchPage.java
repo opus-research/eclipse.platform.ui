@@ -1459,8 +1459,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (save) {
 			if (workbenchPart instanceof ISaveablePart) {
 				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-				if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
-					return false;
+				if (saveablePart.isSaveOnCloseNeeded()) {
+					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
+						return false;
+					}
 				}
 			}
 		}
@@ -2805,7 +2807,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler selectionHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+			Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
 
 			if (!(changedElement instanceof MPerspectiveStack)) {
 				return;
@@ -3958,8 +3960,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
-		if (_perspectiveStack != null)
-			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4954,7 +4954,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler firingHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object value = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (value instanceof CompatibilityPart && element instanceof MPart) {
 				Integer events = partEvents.remove(element);
@@ -5298,5 +5298,21 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void resetToolBarLayout() {
 		ICoolBarManager2 mgr = (ICoolBarManager2) legacyWindow.getCoolBarManager2();
 		mgr.resetItemOrder();
+	}
+
+	/**
+	 * Call {@link #firePartDeactivated(MPart)} if the passed part is the
+	 * currently active part according to the part service. This method should
+	 * only be called in the case of workbench shutdown, where E4 does not fire
+	 * deactivate listeners on the active part.
+	 * 
+	 * @param part
+	 */
+	public void firePartDeactivatedIfActive(MPart part) {
+		if (partService.getActivePart() == part) {
+			// At shutdown, e4 doesn't fire part deactivated on the active
+			// part.
+			firePartDeactivated(part);
+		}
 	}
 }
