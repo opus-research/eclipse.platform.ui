@@ -194,12 +194,20 @@ public class BasicPartList extends AbstractTableInformationControl {
 	protected boolean deleteSelectedElements() {
 		Object selectedElement = getSelectedElement();
 		if (selectedElement != null) {
-			partService.hidePart((MPart) selectedElement);
+			if (partService.savePart((MPart) selectedElement, false))
+				partService.hidePart((MPart) selectedElement);
 
 			if (getInput().isEmpty()) {
 				getShell().dispose();
 				return true;
 			}
+
+			// Remove part from viewer model
+			@SuppressWarnings("unchecked")
+			List<Object> viewerInput = (List<Object>) getTableViewer()
+					.getInput();
+			viewerInput.remove(selectedElement);
+
 		}
 		return false;
 
