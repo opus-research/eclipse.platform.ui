@@ -212,6 +212,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			for (int j = 0; j < tempRules.getLength(); j++) {
 				masterList.add(tempRules.item(j));
 			}
+			stream.close();
 		}
 		
 		//add remaining non import rules
