@@ -359,7 +359,7 @@ public abstract class Window implements IShellProvider {
 		// The equivalent in the multi-image version seems to be to remove the
 		// disposed images from the array passed to the shell.
 		if (defaultImages != null && defaultImages.length > 0) {
-			ArrayList nonDisposedImages = new ArrayList(defaultImages.length);
+			ArrayList<Image> nonDisposedImages = new ArrayList<Image>(defaultImages.length);
 			for (int i = 0; i < defaultImages.length; ++i) {
 				if (defaultImages[i] != null && !defaultImages[i].isDisposed()) {
 					nonDisposedImages.add(defaultImages[i]);
@@ -682,6 +682,7 @@ public abstract class Window implements IShellProvider {
 	 */
 	protected ShellListener getShellListener() {
 		return new ShellAdapter() {
+			@Override
 			public void shellClosed(ShellEvent event) {
 				event.doit = false; // don't close now
 				if (canHandleShellCloseEvent()) {

@@ -685,7 +685,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
 
 		getShell().setData(this);
-		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 		trackShellActivation();
 	}
 
