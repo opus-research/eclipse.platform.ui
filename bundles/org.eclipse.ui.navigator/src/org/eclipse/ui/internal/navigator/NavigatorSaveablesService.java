@@ -280,20 +280,17 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 	}
 
 	public synchronized Saveable[] getActiveSaveables() {
-		if(!isDisposed()){
-			ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
+		ITreeContentProvider contentProvider = (ITreeContentProvider) viewer
 				.getContentProvider();
-			IStructuredSelection selection = (IStructuredSelection) viewer
-					.getSelection();
-			if (selection instanceof ITreeSelection) {
-				return getActiveSaveablesFromTreeSelection((ITreeSelection) selection);
-			} else if (contentProvider instanceof ITreePathContentProvider) {
-				return getActiveSaveablesFromTreePathProvider(selection, (ITreePathContentProvider) contentProvider);
-			} else {
-				return getActiveSaveablesFromTreeProvider(selection, contentProvider);
-			}
+		IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		if (selection instanceof ITreeSelection) {
+			return getActiveSaveablesFromTreeSelection((ITreeSelection) selection);
+		} else if (contentProvider instanceof ITreePathContentProvider) {
+			return getActiveSaveablesFromTreePathProvider(selection, (ITreePathContentProvider) contentProvider);
+		} else {
+			return getActiveSaveablesFromTreeProvider(selection, contentProvider);
 		}
-		return new Saveable[0];
 	}
 	
 	/**

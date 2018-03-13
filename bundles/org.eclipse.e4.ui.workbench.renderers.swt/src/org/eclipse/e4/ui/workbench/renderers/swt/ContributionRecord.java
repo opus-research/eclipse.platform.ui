@@ -215,7 +215,8 @@ public class ContributionRecord {
 					renderer.linkElementToContributionRecord(copy, this);
 					menuModel.getChildren().add(idx++, copy);
 				} else {
-					shared.setVisibleWhen(merge(copy.getVisibleWhen(),
+					shared.setVisibleWhen(merge(
+							menuContribution.getVisibleWhen(),
 							shared.getVisibleWhen()));
 					copy = shared;
 				}

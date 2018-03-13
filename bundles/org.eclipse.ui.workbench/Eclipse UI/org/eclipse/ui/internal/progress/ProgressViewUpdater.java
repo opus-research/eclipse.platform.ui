@@ -234,7 +234,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
             // make sure we don't schedule too often
 			boolean scheduleUpdate = false;
 			synchronized (updateScheduled) {
-				if (!updateScheduled.value || updateJob.getState() == Job.NONE) {
+				if (!updateScheduled.value) {
 					updateScheduled.value = scheduleUpdate = true;
 				}
         	}
