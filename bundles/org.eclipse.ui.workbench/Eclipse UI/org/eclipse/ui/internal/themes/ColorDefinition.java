@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
+import java.util.ResourceBundle;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorDefinitionOverridable;
 import org.eclipse.jface.resource.DataFormatException;
@@ -25,9 +26,13 @@ import org.eclipse.ui.themes.ColorUtil;
  * 
  *  @since 3.0
  */
-public class ColorDefinition extends ThemeElementDefinition implements IPluginContribution,
-		IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition, IEditable,
-		IColorDefinitionOverridable {
+public class ColorDefinition implements IPluginContribution,
+        IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition,
+ IEditable, IColorDefinitionOverridable {
+	
+	private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(Theme.class
+			.getName());
+
 	/**
 	 * Default color value - black - for colors that cannot be parsed.
 	 */
@@ -50,6 +55,8 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
     boolean isEditable;
 
     private RGB parsedValue;
+
+	private boolean overridden;
 
     /**
      * Create a new instance of the receiver.
@@ -105,11 +112,6 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
         return categoryId;
     }
 
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-		setOverridden(true);
-	}
-
     /**
      * @return the defaultsTo value, or <code>null</code> if none was supplied.
      */
@@ -124,11 +126,6 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
         return description;
     }
 
-	public void setDescription(String description) {
-		this.description = description;
-		setOverridden(true);
-	}
-
     /**
      * @return the id of this definition.  Should not be <code>null</code>.
      */
@@ -142,11 +139,6 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
     public String getName() {
         return label;
     }
-
-	public void setName(String label) {
-		this.label = label;
-		setOverridden(true);
-	}
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getLocalId()
@@ -222,15 +214,20 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 	public void setValue(RGB data) {
 		if (data != null) {
 			parsedValue = data;
-			setOverridden(true);
+			if (!isOverridden()) {
+				description += ' ' + RESOURCE_BUNDLE.getString("Overridden.by.css.label"); //$NON-NLS-1$
+				overridden = true;
+			}
 		}
 	}
 
-	@Override
-	protected void setOverridden(boolean overridden) {
-		super.setOverridden(overridden);
-		if (!isAddedByCss() && !description.endsWith(getOverriddenLabel())) {
-			description += ' ' + getOverriddenLabel();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.internal.css.swt.definition.
+	 * IThemeElementDefinitionOverridable#isOverriden()
+	 */
+	public boolean isOverridden() {
+		return overridden;
 	}
 }
