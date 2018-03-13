@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tristan Hume - <trishume@gmail.com> -
+ *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
+ *     		Implemented workbench auto-save to correctly restore state in case of crash.
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -26,9 +29,9 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.RegistryFactory;
+import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
-import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.internal.services.EclipseAdapter;
@@ -60,6 +63,7 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IExceptionHandler;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
+import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
@@ -100,6 +104,8 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
+	private static final String PERSPECTIVE_ARG_NAME = "perspective";
+	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
 
 	private String[] args;
 
@@ -118,6 +124,12 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
+	 * IApplicationContext)
+	 */
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -129,22 +141,24 @@ public class E4Application implements IApplication {
 			Display.setAppName(product.getName());
 		}
 		Display display = getApplicationDisplay();
-		E4Workbench workbench = createE4Workbench(applicationContext, display);
-
-		Location instanceLocation = (Location) workbench.getContext().get(
-				E4Workbench.INSTANCE_LOCATION);
-		Shell shell = display.getActiveShell();
-		if (shell == null) {
-			shell = new Shell();
-			// place it off so it's not visible
-			shell.setLocation(0, 10000);
-		}
+		Location instanceLocation = null;
 		try {
-			if (!checkInstanceLocation(instanceLocation, shell))
+			E4Workbench workbench = createE4Workbench(applicationContext,
+					display);
+
+			instanceLocation = (Location) workbench.getContext().get(
+					E4Workbench.INSTANCE_LOCATION);
+			Shell shell = display.getActiveShell();
+			if (shell == null) {
+				shell = new Shell();
+				// place it off so it's not visible
+				shell.setLocation(0, 10000);
+			}
+			if (!checkInstanceLocation(instanceLocation, shell,
+					workbench.getContext()))
 				return EXIT_OK;
 
 			IEclipseContext workbenchContext = workbench.getContext();
-			workbenchContext.set(Display.class, display);
 
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
@@ -156,6 +170,11 @@ public class E4Application implements IApplication {
 			}
 			saveModel();
 			workbench.close();
+
+			if (workbench.isRestart()) {
+				return EXIT_RESTART;
+			}
+
 			return EXIT_OK;
 		} finally {
 			if (display != null)
@@ -180,6 +199,7 @@ public class E4Application implements IApplication {
 				IApplicationContext.APPLICATION_ARGS);
 
 		IEclipseContext appContext = createDefaultContext();
+		appContext.set(Display.class, display);
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
@@ -192,6 +212,10 @@ public class E4Application implements IApplication {
 			}
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
+
+		// This context will be used by the injector for its
+		// extended data suppliers
+		ContextInjectionFactory.setDefault(appContext);
 
 		// Check if DS is running
 		if (!appContext
@@ -206,7 +230,7 @@ public class E4Application implements IApplication {
 
 		// Install the life-cycle manager for this session if there's one
 		// defined
-		String lifeCycleURI = getArgValue(E4Workbench.LIFE_CYCLE_URI_ARG,
+		String lifeCycleURI = getArgValue(IWorkbench.LIFE_CYCLE_URI_ARG,
 				applicationContext, false);
 		if (lifeCycleURI != null) {
 			lcManager = factory.create(lifeCycleURI, appContext);
@@ -216,6 +240,14 @@ public class E4Application implements IApplication {
 						PostContextCreate.class, appContext, null);
 			}
 		}
+
+		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
+				applicationContext, false);
+		if (forcedPerspectiveId != null) {
+			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
+					forcedPerspectiveId);
+		}
+
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext,
 				appContext);
@@ -235,10 +267,6 @@ public class E4Application implements IApplication {
 
 		// Set the app's context after adding itself
 		appContext.set(MApplication.class.getName(), appModel);
-
-		// This context will be used by the injector for its
-		// extended data suppliers
-		ContextInjectionFactory.setDefault(appContext);
 
 		// adds basic services to the contexts
 		initializeServices(appModel);
@@ -262,18 +290,15 @@ public class E4Application implements IApplication {
 
 		// Parse out parameters from both the command line and/or the product
 		// definition (if any) and put them in the context
-		String xmiURI = getArgValue(E4Workbench.XMI_URI_ARG,
-				applicationContext, false);
-		appContext.set(E4Workbench.XMI_URI_ARG, xmiURI);
+		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
+				false);
+		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
+		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
 
-		String themeId = getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
-		appContext.set(E4Application.THEME_ID, themeId);
-
-		String cssURI = getArgValue(E4Workbench.CSS_URI_ARG,
-				applicationContext, false);
+		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
+				false);
 		if (cssURI != null) {
-			appContext.set(E4Workbench.CSS_URI_ARG, cssURI);
+			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
 		// Temporary to support old property as well
@@ -285,21 +310,21 @@ public class E4Application implements IApplication {
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
-		String cssResourcesURI = getArgValue(E4Workbench.CSS_RESOURCE_URI_ARG,
+		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
 				applicationContext, false);
-		appContext.set(E4Workbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
+		appContext.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 		appContext.set(
 				E4Workbench.RENDERER_FACTORY_URI,
 				getArgValue(E4Workbench.RENDERER_FACTORY_URI,
 						applicationContext, false));
 
 		// This is a default arg, if missing we use the default rendering engine
-		String presentationURI = getArgValue(E4Workbench.PRESENTATION_URI_ARG,
+		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG,
 				applicationContext, false);
 		if (presentationURI == null) {
 			presentationURI = PartRenderingEngine.engineURI;
 		}
-		appContext.set(E4Workbench.PRESENTATION_URI_ARG, presentationURI);
+		appContext.set(IWorkbench.PRESENTATION_URI_ARG, presentationURI);
 
 		// Instantiate the Workbench (which is responsible for
 		// 'running' the UI (if any)...
@@ -313,7 +338,7 @@ public class E4Application implements IApplication {
 		Location instanceLocation = WorkbenchSWTActivator.getDefault()
 				.getInstanceLocation();
 
-		String appModelPath = getArgValue(E4Workbench.XMI_URI_ARG, appContext,
+		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext,
 				false);
 		if (appModelPath == null || appModelPath.length() == 0) {
 			Bundle brandingBundle = appContext.getBrandingBundle();
@@ -321,29 +346,35 @@ public class E4Application implements IApplication {
 				appModelPath = brandingBundle.getSymbolicName() + "/"
 						+ E4Application.APPLICATION_MODEL_PATH_DEFAULT;
 		}
-		Assert.isNotNull(appModelPath, E4Workbench.XMI_URI_ARG
+		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
 				+ " argument missing"); //$NON-NLS-1$
 		final URI initialWorkbenchDefinitionInstance = URI
 				.createPlatformPluginURI(appModelPath, true);
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
-		eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
 
 		// Save and restore
 		boolean saveAndRestore;
-		String value = getArgValue(E4Workbench.PERSIST_STATE, appContext, false);
+		String value = getArgValue(IWorkbench.PERSIST_STATE, appContext, false);
 
 		saveAndRestore = value == null || Boolean.parseBoolean(value);
 
-		eclipseContext.set(E4Workbench.PERSIST_STATE,
+		eclipseContext.set(IWorkbench.PERSIST_STATE,
 				Boolean.valueOf(saveAndRestore));
+
+		// when -data @none or -data @noDefault options
+		if (instanceLocation != null && instanceLocation.getURL() != null) {
+			eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
+		} else {
+			eclipseContext.set(IWorkbench.PERSIST_STATE, false);
+		}
 
 		// Persisted state
 		boolean clearPersistedState;
-		value = getArgValue(E4Workbench.CLEAR_PERSISTED_STATE, appContext, true);
+		value = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true);
 		clearPersistedState = value != null && Boolean.parseBoolean(value);
-		eclipseContext.set(E4Workbench.CLEAR_PERSISTED_STATE,
+		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE,
 				Boolean.valueOf(clearPersistedState));
 
 		// Delta save and restore
@@ -353,8 +384,8 @@ public class E4Application implements IApplication {
 		eclipseContext.set(E4Workbench.DELTA_RESTORE,
 				Boolean.valueOf(deltaRestore));
 
-		String resourceHandler = getArgValue(
-				E4Workbench.MODEL_RESOURCE_HANDLER, appContext, false);
+		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER,
+				appContext, false);
 
 		if (resourceHandler == null) {
 			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
@@ -366,6 +397,7 @@ public class E4Application implements IApplication {
 
 		handler = (IModelResourceHandler) factory.create(resourceHandler,
 				eclipseContext);
+		eclipseContext.set(IModelResourceHandler.class, handler);
 
 		Resource resource = handler.loadMostRecentModel();
 		theApp = (MApplication) resource.getContents().get(0);
@@ -481,7 +513,16 @@ public class E4Application implements IApplication {
 	 * Simplified copy of IDEAplication processing that does not offer to choose
 	 * a workspace location.
 	 */
-	private boolean checkInstanceLocation(Location instanceLocation, Shell shell) {
+	private boolean checkInstanceLocation(Location instanceLocation,
+			Shell shell, IEclipseContext context) {
+
+		// Eclipse has been run with -data @none or -data @noDefault options so
+		// we don't need to validate the location
+		if (instanceLocation == null
+				&& Boolean.FALSE.equals(context.get(IWorkbench.PERSIST_STATE))) {
+			return true;
+		}
+
 		if (instanceLocation == null) {
 			MessageDialog
 					.openError(
@@ -493,7 +534,8 @@ public class E4Application implements IApplication {
 
 		// -data "/valid/path", workspace already set
 		if (instanceLocation.isSet()) {
-			// make sure the meta data version is compatible (or the user has
+			// make sure the meta data version is compatible (or the user
+			// has
 			// chosen to overwrite it).
 			if (!checkValidWorkspace(shell, instanceLocation.getURL())) {
 				return false;
@@ -610,6 +652,11 @@ public class E4Application implements IApplication {
 		mbox.setText(title);
 		mbox.setMessage(message);
 		return mbox.open() == SWT.OK;
+	}
+
+	private String getThemeId(IApplicationContext appContext) {
+		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
+		return themeId != null ? themeId : DEFAULT_THEME_ID;
 	}
 
 	/**
@@ -761,8 +808,9 @@ public class E4Application implements IApplication {
 		// we create a selection service handle on every node that we are asked
 		// about as handle needs to know its context
 		appContext.set(ESelectionService.class.getName(),
-				new IContextFunction() {
-					public Object compute(IEclipseContext context) {
+				new ContextFunction() {
+					public Object compute(IEclipseContext context,
+							String contextKey) {
 						return ContextInjectionFactory.make(
 								SelectionServiceImpl.class, context);
 					}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,17 +12,13 @@
 package org.eclipse.ui.internal.e4.compatibility;
 
 import java.util.Iterator;
-import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
@@ -32,8 +28,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
@@ -69,19 +63,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return (IViewPart) getPart();
 	}
 
-	@Override
-	void updateImages(MPart part) {
-		EModelService ms = part.getContext().get(EModelService.class);
-		MWindow topWin = ms.getTopLevelWindowFor(part);
-		List<MPlaceholder> partRefs = ms.findElements(topWin, part.getElementId(),
-				MPlaceholder.class, null);
-		for (MUIElement ref : partRefs) {
-			updateTabImages(ref);
-		}
-		part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-				wrapped.getTitleImage());
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -111,6 +92,7 @@ public class CompatibilityView extends CompatibilityPart {
 	 */
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
+		clearMenuItems();
 		part.getContext().set(IViewPart.class, (IViewPart) legacyPart);
 
 		final IEclipseContext partContext = getModel().getContext();
@@ -128,7 +110,8 @@ public class CompatibilityView extends CompatibilityPart {
 		if (menu == null) {
 			menu = MenuFactoryImpl.eINSTANCE.createMenu();
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
@@ -150,13 +133,19 @@ public class CompatibilityView extends CompatibilityPart {
 		if (toolbar == null) {
 			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
 			toolbar.setElementId(descId);
 
 			part.setToolbar(toolbar);
+		} else {
+			// clear out the model entries so they can be re-created by
+			// contributions
+			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=402561
+			toolbar.getChildren().clear();
 		}
 		apr = rendererFactory.getRenderer(toolbar, parent);
 		if (apr instanceof ToolBarManagerRenderer) {
@@ -185,7 +174,7 @@ public class CompatibilityView extends CompatibilityPart {
 
 		final IContextFunction func = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				final ViewActionBuilder actionBuilder = new ViewActionBuilder();
 				actionBuilder.readActionExtensions(getView());
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
@@ -218,7 +207,7 @@ public class CompatibilityView extends CompatibilityPart {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_FUNCTION, func);
 		} else {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_DISPOSE,
-					func.compute(partContext));
+					func.compute(partContext, null));
 		}
 
 		return true;

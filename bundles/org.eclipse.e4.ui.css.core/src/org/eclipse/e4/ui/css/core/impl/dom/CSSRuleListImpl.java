@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,29 +7,27 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     IBM Corporation
+ *     IBM Corporation - ongoing development
  *******************************************************************************/
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.w3c.dom.css.CSSRule;
 import org.w3c.dom.css.CSSRuleList;
 
-public class CSSRuleListImpl implements CSSRuleList, Serializable {
+public class CSSRuleListImpl implements CSSRuleList {
 
 	private List<CSSRule> ruleList;
-	
+
 	public CSSRuleListImpl() {
 		super();
 		this.ruleList = new ArrayList<CSSRule>();
 	}
-	
+
 	// W3C CSSRuleList API methods
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRuleList#getLength()
@@ -47,17 +45,17 @@ public class CSSRuleListImpl implements CSSRuleList, Serializable {
 	}
 
 	//Additional
-	
+
 	/**
 	 * @throws IndexOutOfBoundsException
-	 */	
+	 */
 	public void add(CSSRule rule) {
 		ruleList.add(rule);
 	}
 
 	/**
 	 * @throws IndexOutOfBoundsException
-	 */	
+	 */
 	public void remove(int position) {
 		ruleList.remove(position);
 	}

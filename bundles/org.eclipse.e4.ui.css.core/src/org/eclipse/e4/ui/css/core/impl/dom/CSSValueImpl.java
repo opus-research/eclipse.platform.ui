@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
+ *     IBM Corporation - ongoing development
  *******************************************************************************/
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
-import java.io.Serializable;
 import org.eclipse.e4.ui.css.core.exceptions.DOMExceptionImpl;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.css.CSSPrimitiveValue;
@@ -20,10 +20,10 @@ import org.w3c.dom.css.Counter;
 import org.w3c.dom.css.RGBColor;
 import org.w3c.dom.css.Rect;
 
-public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimitiveValue, CSSValue, Serializable {
+public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimitiveValue, CSSValue {
 
 	// W3C CSSValue API methods
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSValue#getCssText()
@@ -68,7 +68,7 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 	public Counter getCounterValue() throws DOMException {
 		throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR, DOMExceptionImpl.COUNTER_ERROR);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSPrimitiveValue#getRGBColorValue()
@@ -76,7 +76,7 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 	public RGBColor getRGBColorValue() throws DOMException {
 		throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR, DOMExceptionImpl.RGBCOLOR_ERROR);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSPrimitiveValue#getRectValue()
@@ -111,9 +111,9 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
-	
+
 	// Additional methods
-	
+
 	public float getFloatValue(short valueType) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");

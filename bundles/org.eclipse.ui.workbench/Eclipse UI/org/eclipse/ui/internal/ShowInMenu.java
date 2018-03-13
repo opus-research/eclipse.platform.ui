@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -25,7 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -53,7 +52,6 @@ import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.menus.IWorkbenchContribution;
 import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.part.IShowInSource;
@@ -129,23 +127,32 @@ public class ShowInMenu extends ContributionItem implements
 		}
 
 		if (currentManager!=null && currentManager.getSize() > 0) {
-			IMenuService service = (IMenuService) locator
-					.getService(IMenuService.class);
-			service.releaseContributions(currentManager);
+			// IMenuService service = (IMenuService) locator
+			// .getService(IMenuService.class);
+			// service.releaseContributions(currentManager);
 			currentManager.removeAll();
 		}
 
 		currentManager = new MenuManager();
 		fillMenu(currentManager);
+		int itemCount = menu.getItemCount();
 		IContributionItem[] items = currentManager.getItems();
 		if (items.length == 0) {
-			MenuItem item = new MenuItem(menu, SWT.NONE, index++);
+			MenuItem item = new MenuItem(menu, SWT.NONE, index == -1 ? itemCount : index);
 			item.setText(NO_TARGETS_MSG);
 			item.setEnabled(false);
 		} else {
 			for (int i = 0; i < items.length; i++) {
-				if (items[i].isVisible()) {
-					items[i].fill(menu, index++);
+				IContributionItem item = items[i];
+				if (item.isVisible()) {
+					if (index == -1) {
+						item.fill(menu, -1);
+					} else {
+						item.fill(menu, index);
+						int newItemCount = menu.getItemCount();
+						index += newItemCount - itemCount;
+						itemCount = newItemCount;
+					}
 				}
 			}
 		}
@@ -219,6 +226,16 @@ public class ShowInMenu extends ContributionItem implements
 					CommandContributionItemParameter ccip = new CommandContributionItemParameter(
 							workbenchWindow, commandId, commandId,
 							CommandContributionItem.STYLE_PUSH);
+					String label = menuElement.getLabel();
+					if (label.length() > 0) {
+						ccip.label = label;
+						String mnemonics = menuElement.getMnemonics();
+						if (mnemonics != null && mnemonics.length() == 1) {
+							ccip.mnemonic = mnemonics;
+						} else {
+							ccip.mnemonic = label.substring(0, 1);
+						}
+					}
 					String iconURI = menuElement.getIconURI();
 					try {
 						ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
@@ -260,7 +277,15 @@ public class ShowInMenu extends ContributionItem implements
 		ArrayList targetIds = new ArrayList();
 		WorkbenchPage page = (WorkbenchPage) getWindow().getActivePage();
 		if (page != null) {
-			targetIds.addAll(page.getShowInPartIds());
+			String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
+			ArrayList<?> pagePartIds = page.getShowInPartIds();
+			for (Object pagePartId : pagePartIds) {
+				// Don't add own view, except when explicitly requested with
+				// IShowInTargetList below
+				if (!pagePartId.equals(srcId)) {
+					targetIds.add(pagePartId);
+				}
+			}
 		}
 		IShowInTargetList targetList = getShowInTargetList(sourcePart);
 		if (targetList != null) {
@@ -288,13 +313,10 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	private IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
-		
+
 		if (window == null)
 			return null;
-		Shell shell = window.getShell();
-		if (shell == null || shell != shell.getDisplay().getActiveShell())
-			return null;
-		
+
 		IWorkbenchPage page = window.getActivePage();
 		if (page != null) {
 			return page.getActivePart();
@@ -362,17 +384,14 @@ public class ShowInMenu extends ContributionItem implements
 	 * Returns the view descriptors to show in the dialog.
 	 */
 	private IViewDescriptor[] getViewDescriptors(IWorkbenchPart sourcePart) {
-		String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
 		ArrayList ids = getShowInPartIds(sourcePart);
 		ArrayList descs = new ArrayList();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
 		for (Iterator i = ids.iterator(); i.hasNext();) {
 			String id = (String) i.next();
-			if (!id.equals(srcId)) {
-				IViewDescriptor desc = reg.find(id);
-				if (desc != null) {
-					descs.add(desc);
-				}
+			IViewDescriptor desc = reg.find(id);
+			if (desc != null) {
+				descs.add(desc);
 			}
 		}
 		return (IViewDescriptor[]) descs.toArray(new IViewDescriptor[descs
@@ -413,11 +432,11 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	public void dispose() {
 		if (currentManager != null && currentManager.getSize() > 0) {
-			IMenuService service = (IMenuService) locator
-					.getService(IMenuService.class);
-			if (service != null) {
-				service.releaseContributions(currentManager);
-			}
+			// IMenuService service = (IMenuService) locator
+			// .getService(IMenuService.class);
+			// if (service != null) {
+			// service.releaseContributions(currentManager);
+			// }
 			currentManager.removeAll();
 			currentManager = null;
 		}

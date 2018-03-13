@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ package org.eclipse.e4.ui.internal.workbench;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -60,6 +61,9 @@ public class ModelServiceImpl implements EModelService {
 
 	private IEclipseContext appContext;
 
+	/** Factory which is able to create {@link MApplicationElement}s in a generic way. */
+	private GenericMApplicationElementFactoryImpl mApplicationElementFactory;
+
 	// Cleans up after a hosted element is disposed
 	private EventHandler hostedElementHandler = new EventHandler() {
 
@@ -85,15 +89,39 @@ public class ModelServiceImpl implements EModelService {
 	 * This is a singleton service. One instance is used throughout the running application
 	 * 
 	 * @param appContext
-	 *            The applicationContext to get teh eventBroker from
+	 *            The applicationContext to get the eventBroker from
+	 * 
+	 * @throws NullPointerException
+	 *             if the given appContext is <code>null</code>
 	 */
 	public ModelServiceImpl(IEclipseContext appContext) {
 		if (appContext == null)
-			return;
+			throw new NullPointerException("No application context given!"); //$NON-NLS-1$
 
 		this.appContext = appContext;
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
+
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
+	}
+
+	/**
+	 * @see EModelService#createModelElement(Class)
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	public final <T extends MApplicationElement> T createModelElement(Class<T> elementType) {
+		if (elementType == null) {
+			throw new NullPointerException("Argument cannot be null."); //$NON-NLS-1$
+		}
+
+		T back = (T) mApplicationElementFactory.createEObject(elementType);
+		if (back != null) {
+			return back;
+		}
+
+		throw new IllegalArgumentException(
+				"Unsupported model object type: " + elementType.getCanonicalName()); //$NON-NLS-1$
 	}
 
 	/**
@@ -597,6 +625,10 @@ public class ModelServiceImpl implements EModelService {
 		} else {
 			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			newSash.setHorizontal(horizontal);
+
+			// Maintain the existing weight in the new sash
+			newSash.setContainerData(relTo.getContainerData());
+
 			combine(toInsert, relTo, newSash, insertBefore, ratio);
 		}
 

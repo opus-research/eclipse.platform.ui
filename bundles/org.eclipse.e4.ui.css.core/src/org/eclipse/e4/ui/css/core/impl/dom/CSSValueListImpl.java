@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -21,10 +21,10 @@ import org.w3c.dom.css.CSSValueList;
 public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 
 	List<CSSValue> values;
-	
+
 	public CSSValueListImpl(LexicalUnit parsePropertyValue) {
 		values = new ArrayList<CSSValue>();
-		
+
 		LexicalUnit unit = parsePropertyValue;
 		while(unit != null) {
 			values.add(CSSValueFactory.newPrimitiveValue(unit));
@@ -75,7 +75,7 @@ public class CSSValueListImpl extends AbstractCSSNode implements CSSValueList {
 	 */
 	public void setCssText(String arg0) throws DOMException {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");		
+		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
 }

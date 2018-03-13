@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2013 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,17 @@ public class CTabItemTest extends CSSSWTTestCase {
 	}
 
 	private void spinEventLoop() {
-		while (shell.getDisplay().readAndDispatch())
-			;
+		// Workaround for https://bugs.eclipse.org/418101 and https://bugs.eclipse.org/403234 :
+		// Add some delay to allow asynchronous events to come in, but don't get trapped in an endless Display#sleep().
+		Display display = shell.getDisplay();
+		for (int i = 0; i < 3; i++) {
+			while (display.readAndDispatch())
+				;
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	private CTabFolder createFolder(Composite composite) {
