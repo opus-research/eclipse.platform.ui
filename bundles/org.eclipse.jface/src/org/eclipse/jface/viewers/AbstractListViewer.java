@@ -25,13 +25,15 @@ import org.eclipse.swt.widgets.Widget;
  * Abstract base class for viewers that contain lists of items (such as a combo or list).
  * Most of the viewer implementation is in this base class, except for the minimal code that
  * actually communicates with the underlying widget.
+ * @param <E> Type of an element of the model
+ * @param <I> Type of input
  * 
  * @see org.eclipse.jface.viewers.ListViewer
  * @see org.eclipse.jface.viewers.ComboViewer
  * 
  * @since 3.0
  */
-public abstract class AbstractListViewer extends StructuredViewer {
+public abstract class AbstractListViewer<E,I> extends StructuredViewer<E,I> {
 
     /**
      * A list of viewer elements (element type: <code>Object</code>).
@@ -493,7 +495,7 @@ public abstract class AbstractListViewer extends StructuredViewer {
 	 * {@link IFontProvider} have no effect for this type of viewer</b>
 	 */
     @Override
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+	public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
         super.setLabelProvider(labelProvider);
     }

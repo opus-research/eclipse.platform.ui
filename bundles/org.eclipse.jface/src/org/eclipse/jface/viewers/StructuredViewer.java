@@ -52,11 +52,13 @@ import org.eclipse.swt.widgets.Widget;
  * <code>addFilter</code>). When the viewer receives an update, it asks each
  * of its filters if it is out of date, and refilters elements as required.
  * </p>
+ * @param <E> Type of an element of the model
+ * @param <I> Type of input
  * 
  * @see ViewerFilter
  * @see ViewerComparator
  */
-public abstract class StructuredViewer extends ContentViewer implements IPostSelectionProvider {
+public abstract class StructuredViewer<E,I> extends ContentViewer<E,I> implements IPostSelectionProvider {
 
 	/**
 	 * A map from the viewer's model elements to SWT widgets. (key type:
@@ -174,7 +176,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		 * @see IColorProvider
 		 * @see IFontProvider
 		 */
-		public ColorAndFontCollectorWithProviders(IBaseLabelProvider provider) {
+		public ColorAndFontCollectorWithProviders(IBaseLabelProvider<E> provider) {
 			super();
 			if (provider instanceof IColorProvider) {
 				colorProvider = (IColorProvider) provider;
@@ -917,7 +919,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the parent element
 	 * @return a filtered array of child elements
 	 */
-	protected Object[] getFilteredChildren(Object parent) {
+	protected Object[] getFilteredChildren(I parent) {
 		Object[] result = getRawChildren(parent);
 		if (filters != null) {
 			for (Iterator iter = filters.iterator(); iter.hasNext();) {
@@ -1006,10 +1008,10 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the parent element
 	 * @return the child elements
 	 */
-	protected Object[] getRawChildren(Object parent) {
-		Object[] result = null;
+	protected Object[] getRawChildren(I parent) {
+		E[] result = null;
 		if (parent != null) {
-			IStructuredContentProvider cp = (IStructuredContentProvider) getContentProvider();
+			IStructuredContentProvider<E,I> cp = (IStructuredContentProvider<E,I>) getContentProvider();
 			if (cp != null) {
 				result = cp.getElements(parent);
 				assertElementsNotNull(result);
@@ -1028,7 +1030,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * 
 	 * @return the root element, or <code>null</code> if none
 	 */
-	protected Object getRoot() {
+	protected I getRoot() {
 		return getInput();
 	}
 
@@ -1068,7 +1070,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the parent element
 	 * @return a sorted and filtered array of child elements
 	 */
-	protected Object[] getSortedChildren(Object parent) {
+	protected Object[] getSortedChildren(I parent) {
 		Object[] result = getFilteredChildren(parent);
 		if (sorter != null) {
 			// be sure we're not modifying the original array from the model
@@ -1667,7 +1669,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @see org.eclipse.jface.viewers.ContentViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
 	 */
 	@Override
-	public void setContentProvider(IContentProvider provider) {
+	public void setContentProvider(IContentProvider<I> provider) {
 		assertContentProviderType(provider);
 		super.setContentProvider(provider);
 	}
@@ -1677,7 +1679,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * supported types.
 	 * @param provider
 	 */
-	protected void assertContentProviderType(IContentProvider provider) {
+	protected void assertContentProviderType(IContentProvider<I> provider) {
 		Assert.isTrue(provider instanceof IStructuredContentProvider);
 	}
 
@@ -1686,7 +1688,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @see org.eclipse.jface.viewers.Viewer#setInput(java.lang.Object)
 	 */
 	@Override
-	public final void setInput(Object input) {
+	public final void setInput(I input) {
 		Control control = getControl();
 		if (control == null || control.isDisposed()) {
 			throw new IllegalStateException(
@@ -2150,7 +2152,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			needsUpdate = true;
 		} else {
 			needsUpdate = false;
-			IBaseLabelProvider labelProvider = getLabelProvider();
+			IBaseLabelProvider<E> labelProvider = getLabelProvider();
 			for (int i = 0; i < properties.length; ++i) {
 				needsUpdate = labelProvider.isLabelProperty(element, properties[i]);
 				if (needsUpdate) {
@@ -2219,7 +2221,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
 	 */
 	@Override
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+	public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		if (labelProvider instanceof IColorProvider || labelProvider instanceof IFontProvider) {
 			colorAndFontCollector = new ColorAndFontCollectorWithProviders(labelProvider);
 		} else {
@@ -2234,7 +2236,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @param updateLabel The ViewerLabel to collect the result in
 	 * @param element The element being decorated.
 	 */
-	protected void buildLabel(ViewerLabel updateLabel, Object element){
+	protected void buildLabel(ViewerLabel updateLabel, E element){
 
 		if (getLabelProvider() instanceof IViewerLabelProvider) {
 			IViewerLabelProvider itemProvider = (IViewerLabelProvider) getLabelProvider();
@@ -2258,7 +2260,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		} 
 		
 		if(getLabelProvider() instanceof ILabelProvider){
-			ILabelProvider labelProvider = (ILabelProvider) getLabelProvider();
+			ILabelProvider<E> labelProvider = (ILabelProvider<E>) getLabelProvider();
 			updateLabel.setText(labelProvider.getText(element));
 			updateLabel.setImage(labelProvider.getImage(element));
 		}
@@ -2323,7 +2325,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @param element The element being decorated.
 	 * @param labelProvider ILabelProvider the labelProvider for the receiver.
 	 */
-	void buildLabel(ViewerLabel updateLabel, Object element,ILabelProvider labelProvider){
+	void buildLabel(ViewerLabel updateLabel, E element,ILabelProvider<E> labelProvider){
 			updateLabel.setText(labelProvider.getText(element));
 			updateLabel.setImage(labelProvider.getImage(element));
 	}
