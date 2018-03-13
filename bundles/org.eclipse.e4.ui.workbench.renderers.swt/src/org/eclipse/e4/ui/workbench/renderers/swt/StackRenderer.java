@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.internal.workbench.TagsUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -500,50 +499,28 @@ public class StackRenderer extends LazyStackRenderer {
 						.getProperty(UIEvents.EventTags.OLD_VALUE);
 
 				if (!(element instanceof MPart)
-						|| (!TagsUtil.isTagModified(oldValue, newValue,
-								CSSConstants.CSS_BUSY_CLASS)
-								&& !TagsUtil.isTagAdded(oldValue, newValue,
-										CSSConstants.CSS_CONTENT_CHANGE_CLASS) && !TagsUtil
-									.isTagAdded(oldValue, newValue,
-											CSSConstants.CSS_ACTIVE_CLASS))) {
+						|| !isBusyTagModified(oldValue, newValue)) {
 					return;
 				}
 
 				MPart part = (MPart) element;
 				CTabItem cti = findItemForPart(part);
-				if (cti == null) {
-					return;
-				}
+				if (cti != null) {
+					setCSSInfo(part, cti);
+					reapplyStyles(cti);
 
-				if (CSSConstants.CSS_CONTENT_CHANGE_CLASS.equals(newValue)) {
-					part.getTags()
-							.remove(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
-					if (cti != cti.getParent().getSelection()) {
-						part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
-					}
-				} else if (CSSConstants.CSS_ACTIVE_CLASS.equals(newValue)
-						&& part.getTags().contains(
-								CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
-					part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 				}
-
-				setCSSInfo(part, cti);
-				reapplyStyles(cti);
 			}
 		};
 		eventBroker.subscribe(UIEvents.ApplicationElement.TOPIC_TAGS,
 				tagsChangeHandler);
 	}
 
-	protected boolean isAnyOfTagsModified(Object oldValue, Object newValue,
-			String... tagNames) {
-		for (String tagName : tagNames) {
-			if ((newValue == null && tagName.equals(oldValue))
-					|| (oldValue == null && tagName.equals(newValue))) {
-				return true;
-			}
-		}
-		return false;
+	private boolean isBusyTagModified(Object oldValue, Object newValue) {
+		return (newValue == null && CSSConstants.CSS_BUSY_CLASS
+				.equals(oldValue))
+				|| (oldValue == null && CSSConstants.CSS_BUSY_CLASS
+						.equals(newValue));
 	}
 
 	/**
