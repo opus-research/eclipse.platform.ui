@@ -141,7 +141,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IDecoratorManager;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IElementFactory;
@@ -164,7 +163,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSetManager;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.WorkbenchException;
@@ -607,16 +605,12 @@ public final class Workbench extends EventManager implements IWorkbench {
 					}
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (returnCode[0] == PlatformUI.RETURN_OK) {
-						// run the e4 event loop and instantiate ... well, stuff
-						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
-								.get(IMenuService.class);
-						wms.dispose();
-					}
-					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-						e4app.saveModel();
-					}
+					// run the e4 event loop and instantiate ... well, stuff
+					e4Workbench.createAndRunUI(e4Workbench.getApplication());
+					WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext().get(
+							IMenuService.class);
+					wms.dispose();
+					e4app.saveModel();
 					e4Workbench.close();
 					returnCode[0] = workbench.returnCode;
 				}
@@ -1604,8 +1598,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 					// TODO compat: open the windows here/instantiate the model
 					// TODO compat: instantiate the WW around the model
 					initializationDone = true;
-					if (isClosing() || !advisor.openWindows()) {
-						// if (isClosing()) {
+					// if (isClosing() || !advisor.openWindows()) {
+					if (isClosing()) {
 						bail[0] = true;
 					}
 
@@ -1917,29 +1911,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 			WorkbenchPage page = getWorkbenchPage(part);
 			EditorReference ref = page.getEditorReference(part);
 			if (ref == null) {
-				// If this editor was cloned from an existing editor (as
-				// part of a split...) then re-create a valid EditorReference
-				// from the existing editor's ref.
-				MPart clonedFrom = (MPart) part.getTransientData().get(
-						EModelService.CLONED_FROM_KEY);
-				if (clonedFrom != null && clonedFrom.getContext() != null) {
-					EditorReference originalRef = page.getEditorReference(clonedFrom);
-					if (originalRef != null) {
-						IEditorInput partInput = null;
-						String editorId = originalRef.getDescriptor().getId();
-						try {
-							partInput = originalRef.getEditorInput();
-						} catch (PartInitException e) {
-							System.out.println("Ooops !!!"); //$NON-NLS-1$
-						}
-						ref = page.createEditorReferenceForPart(part, partInput, editorId, null);
-					}
-				}
-
-				// Fallback code
-				if (ref == null) {
-					ref = createEditorReference(part, page);
-				}
+				ref = createEditorReference(part, page);
 			}
 			context.set(EditorReference.class.getName(), ref);
 		} else {
@@ -2805,9 +2777,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// runEventLoop(handler, display);
 			}
 			returnCode = PlatformUI.RETURN_OK;
-			if (!initOK[0]) {
-				returnCode = PlatformUI.RETURN_UNSTARTABLE;
-			}
 		} catch (final Exception e) {
 			if (!display.isDisposed()) {
 				handler.handleException(e);
