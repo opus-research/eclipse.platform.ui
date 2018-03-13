@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -188,7 +188,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#setFontsAndColors(java.lang.Object)
 		 */
-		@Override
 		public void setFontsAndColors(Object element){
 			
 			if(fontProvider != null){
@@ -215,7 +214,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		 * required.
 		 * @param control
 		 */
-		@Override
 		public void applyFontsAndColors(TableItem control) {
 			
 			if(colorProvider == null){
@@ -252,7 +250,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#applyFontsAndColors(org.eclipse.swt.widgets.TreeItem)
 		 */
-		@Override
 		public void applyFontsAndColors(TreeItem control) {
 			
 			if(colorProvider == null){
@@ -288,7 +285,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#applyFontsAndColors(org.eclipse.swt.custom.TableTreeItem)
 		 */
-		@Override
 		public void applyFontsAndColors(TableTreeItem control) {
 			
 			if(colorProvider == null){
@@ -1041,7 +1037,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * <p>
 	 * @return ISelection
 	 */
-	@Override
 	public ISelection getSelection() {
 		Control control = getControl();
 		if (control == null || control.isDisposed()) {
@@ -1072,7 +1067,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		Object[] result = getFilteredChildren(parent);
 		if (sorter != null) {
 			// be sure we're not modifying the original array from the model
-			result = result.clone();
+			result = (Object[]) result.clone();
 			sorter.sort(this, result);
 		}
 		return result;
@@ -1190,7 +1185,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * </p>
 	 * @param event the event that generated this update
 	 */
-	@Override
 	protected void handleLabelProviderChanged(LabelProviderChangedEvent event) {
 		Object[] elements = event.getElements();
 		if (elements != null) {
@@ -1235,7 +1229,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/*
 	 * (non-Javadoc) Method declared on Viewer.
 	 */
-	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		OpenStrategy handler = new OpenStrategy(control);
@@ -1254,7 +1247,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		});
 		handler.addPostSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handlePostSelect(e);
 			}
@@ -1469,7 +1461,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/*
 	 * Non-Javadoc. Method declared on Viewer.
 	 */
-	@Override
 	public void refresh() {
 		refresh(getRoot());
 	}
@@ -1666,7 +1657,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *  (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ContentViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
 		super.setContentProvider(provider);
@@ -1685,7 +1675,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *  (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.Viewer#setInput(java.lang.Object)
 	 */
-	@Override
 	public final void setInput(Object input) {
 		Control control = getControl();
 		if (control == null || control.isDisposed()) {
@@ -1709,7 +1698,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *  (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection, boolean)
 	 */
-	@Override
 	public void setSelection(ISelection selection, boolean reveal) {
 		/**
 		 * <p>
@@ -2218,7 +2206,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
 	 */
-	@Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
 		if (labelProvider instanceof IColorProvider || labelProvider instanceof IFontProvider) {
 			colorAndFontCollector = new ColorAndFontCollectorWithProviders(labelProvider);
@@ -2337,7 +2324,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		return colorAndFontCollector;
 	}
 	
-	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
 		sorter = null;

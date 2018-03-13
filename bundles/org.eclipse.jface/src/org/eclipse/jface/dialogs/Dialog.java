@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -209,7 +209,7 @@ public abstract class Dialog extends Window {
 	/**
 	 * Collection of buttons created by the <code>createButton</code> method.
 	 */
-	private HashMap<Integer, Button> buttons = new HashMap<Integer, Button>();
+	private HashMap buttons = new HashMap();
 
 	/**
 	 * Font metrics to use for determining pixel sizes.
@@ -624,7 +624,6 @@ public abstract class Dialog extends Window {
 		button.setFont(JFaceResources.getDialogFont());
 		button.setData(new Integer(id));
 		button.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				buttonPressed(((Integer) event.widget.getData()).intValue());
 			}
@@ -713,7 +712,6 @@ public abstract class Dialog extends Window {
 	 * {@link Display#getDismissalAlignment() platform convention}.
 	 * </p>
 	 */
-	@Override
 	protected void initializeBounds() {
 		Shell shell = getShell();
 		if (shell != null) {
@@ -761,7 +759,6 @@ public abstract class Dialog extends Window {
 	 * <code>createButtonBar</code> are recommended rather than overriding
 	 * this method.
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		// create the top level composite for the dialog
 		Composite composite = new Composite(parent, 0);
@@ -839,7 +836,7 @@ public abstract class Dialog extends Window {
 	 * @since 2.0
 	 */
 	protected Button getButton(int id) {
-		return buttons.get(new Integer(id));
+		return (Button) buttons.get(new Integer(id));
 	}
 
 	/**
@@ -989,7 +986,6 @@ public abstract class Dialog extends Window {
 	/**
 	 * @see org.eclipse.jface.window.Window#close()
 	 */
-	@Override
 	public boolean close() {
 		if (getShell() != null && !getShell().isDisposed()) {
 			saveDialogBounds(getShell());
@@ -997,7 +993,7 @@ public abstract class Dialog extends Window {
 
 		boolean returnValue = super.close();
 		if (returnValue) {
-			buttons = new HashMap<Integer, Button>();
+			buttons = new HashMap();
 			buttonBar = null;
 			dialogArea = null;
 		}
@@ -1104,7 +1100,6 @@ public abstract class Dialog extends Window {
 	 * 
 	 * @see org.eclipse.jface.window.Window#create()
 	 */
-	@Override
 	public void create() {
 		super.create();
 		applyDialogFont(buttonBar);
@@ -1212,7 +1207,6 @@ public abstract class Dialog extends Window {
 	 * @see #getDialogBoundsSettings()
 	 * @see #getDialogBoundsStrategy()
 	 */
-	@Override
 	protected Point getInitialSize() {
 		Point result = super.getInitialSize();
 		
@@ -1273,7 +1267,6 @@ public abstract class Dialog extends Window {
 	 * @see #getDialogBoundsSettings()
 	 * @see #getDialogBoundsStrategy()
 	 */
-	@Override
 	protected Point getInitialLocation(Point initialSize) {
 		Point result = super.getInitialLocation(initialSize);
 		if ((getDialogBoundsStrategy() & DIALOG_PERSISTLOCATION)!= 0) {

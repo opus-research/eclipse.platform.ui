@@ -416,8 +416,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionManager#getOverrides()
      */
-    @Override
-	public IContributionManagerOverrides getOverrides() {
+    public IContributionManagerOverrides getOverrides() {
         if (overrides == null) {
             if (parent == null) {
                 overrides = new IContributionManagerOverrides() {
@@ -492,14 +491,12 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void initializeMenu() {
         menu.addMenuListener(new MenuAdapter() {
-            @Override
-			public void menuHidden(MenuEvent e) {
+            public void menuHidden(MenuEvent e) {
                 //			ApplicationWindow.resetDescription(e.widget);
             	handleAboutToHide();
             }
 
-            @Override
-			public void menuShown(MenuEvent e) {
+            public void menuShown(MenuEvent e) {
                 handleAboutToShow();
             }
         });
@@ -588,8 +585,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * 
      * @since 3.1
      */
-    @Override
-	public void markDirty() {
+    public void markDirty() {
         super.markDirty();
         // Can't optimize by short-circuiting when the first dirty manager is encountered,
         // since non-visible children are not even processed.
@@ -635,8 +631,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @param newOverrides the overrides for the items of this manager
      * @since 2.0
      */
-    @Override
-	public void setOverrides(IContributionManagerOverrides newOverrides) {
+    public void setOverrides(IContributionManagerOverrides newOverrides) {
         overrides = newOverrides;
         super.setOverrides(overrides);
     }
@@ -766,7 +761,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
+                List clean = new ArrayList(items.length);
                 IContributionItem separator = null;
                 for (int i = 0; i < items.length; ++i) {
                     IContributionItem ci = items[i];
@@ -808,8 +803,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 int srcIx = 0;
                 int destIx = 0;
 
-                for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
-                    IContributionItem src = e.next();
+                for (Iterator e = clean.iterator(); e.hasNext();) {
+                    IContributionItem src = (IContributionItem) e.next();
                     IContributionItem dest;
 
                     // get corresponding item in SWT widget

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -215,8 +215,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * Method declared on PreferencePage.
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         fieldEditorParent = new Composite(parent, SWT.NULL);
         GridLayout layout = new GridLayout();
         layout.numColumns = 1;
@@ -259,8 +258,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * Subclasses may override to release their own allocated SWT
      * resources, but must call <code>super.dispose</code>.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (fields != null) {
             Iterator e = fields.iterator();
@@ -315,8 +313,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * The field editor preference page implementation of a <code>PreferencePage</code>
      * method loads all the field editors with their default values.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         if (fields != null) {
             Iterator e = fields.iterator();
             while (e.hasNext()) {
@@ -338,8 +335,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      *
      * @see FieldEditor#store()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         if (fields != null) {
             Iterator e = fields.iterator();
             while (e.hasNext()) {
@@ -374,8 +370,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * Method declared on IDialog.
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible && invalidFieldEditor != null) {
             invalidFieldEditor.setFocus();
