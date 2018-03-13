@@ -1455,10 +1455,6 @@
                id="org.eclipse.ui.ide.type"
                label="%markerGrouping.type">
          </markerGrouping>
-         <markerFieldReference
-               id="org.eclipse.ui.ide.symbolicLinkField"
-               visible="false">
-         </markerFieldReference>
       </markerContentGenerator>
       <markerField
             class="org.eclipse.ui.internal.views.markers.MarkerCompletionField"
@@ -1647,11 +1643,6 @@
             filterConfigurationClass="org.eclipse.ui.internal.views.markers.AllMarkersSeverityAndDescriptionConfigurationArea"
             id="org.eclipse.ui.ide.allSeverityField"
             name="%Field.Description">
-      </markerField>
-      <markerField
-            class="org.eclipse.ui.internal.views.markers.MarkerSymbolicLinkField"
-            id="org.eclipse.ui.ide.symbolicLinkField"
-            name="Symbolic Link">
       </markerField>
      
    </extension>
