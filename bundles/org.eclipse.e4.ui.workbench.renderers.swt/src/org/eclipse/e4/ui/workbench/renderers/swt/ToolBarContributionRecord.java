@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
-
-import org.eclipse.e4.core.commands.ExpressionContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.ToolBarManager;
@@ -201,7 +200,7 @@ public class ToolBarContributionRecord {
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
 		factoryDispose = (Runnable) ((IContextFunction) obj)
-				.compute(staticContext, null);
+				.compute(staticContext);
 		return staticContext.get(List.class);
 	}
 

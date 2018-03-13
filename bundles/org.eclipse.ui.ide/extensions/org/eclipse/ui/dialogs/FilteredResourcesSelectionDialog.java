@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -561,30 +562,13 @@ public class FilteredResourcesSelectionDialog extends
 	protected void fillContentProvider(AbstractContentProvider contentProvider,
 			ItemsFilter itemsFilter, IProgressMonitor progressMonitor)
 			throws CoreException {
-		if (itemsFilter instanceof ResourceFilter) {
-			IResource[] members = container.members();
-			progressMonitor
-					.beginTask(
-							WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
-							members.length);
-			
-			ResourceProxyVisitor visitor = new ResourceProxyVisitor(
-					contentProvider, (ResourceFilter) itemsFilter,
-					progressMonitor);
-			
-			if (visitor.visit(container.createProxy())) {
-				for (int i= 0; i < members.length; i++) {
-					IResource member = members[i];
-					if (member.isAccessible())
-						member.accept(visitor, IResource.NONE);
-					progressMonitor.worked(1);
-					if (progressMonitor.isCanceled())
-						break;
-				}
-			}
-			
-		}
-		progressMonitor.done();
+		if (itemsFilter instanceof ResourceFilter)
+			container.accept(new ResourceProxyVisitor(contentProvider,
+					(ResourceFilter) itemsFilter, progressMonitor),
+					IResource.NONE);
+		if (progressMonitor != null)
+			progressMonitor.done();
+
 	}
 
 	/**
@@ -834,6 +818,8 @@ public class FilteredResourcesSelectionDialog extends
 
 		private IProgressMonitor progressMonitor;
 
+		private List projects;
+
 		/**
 		 * Creates new ResourceProxyVisitor instance.
 		 * 
@@ -849,6 +835,14 @@ public class FilteredResourcesSelectionDialog extends
 			this.proxyContentProvider = contentProvider;
 			this.resourceFilter = resourceFilter;
 			this.progressMonitor = progressMonitor;
+			IResource[] resources = container.members();
+			this.projects = new ArrayList(Arrays.asList(resources));
+
+			if (progressMonitor != null)
+				progressMonitor
+						.beginTask(
+								WorkbenchMessages.FilteredItemsSelectionDialog_searchJob_taskName,
+								projects.size());
 		}
 
 		/*
@@ -862,6 +856,11 @@ public class FilteredResourcesSelectionDialog extends
 				return false;
 
 			IResource resource = proxy.requestResource();
+
+			if (this.projects.remove((resource.getProject()))
+					|| this.projects.remove((resource))) {
+				progressMonitor.worked(1);
+			}
 
 			proxyContentProvider.add(resource, resourceFilter);
 
@@ -1021,12 +1020,10 @@ public class FilteredResourcesSelectionDialog extends
 				return false;
 			}
 			IResource resource = (IResource) item;
-			return (this.filterTypeMask & resource.getType()) != 0
-					&& matchName(resource)
-					&& (this.showDerived || !resource.isDerived());
-		}
+			if ((!this.showDerived && resource.isDerived())
+					|| ((this.filterTypeMask & resource.getType()) == 0))
+				return false;
 
-		private boolean matchName(IResource resource) {
 			String name = resource.getName();
 			if (nameMatches(name)) {
 				if (containerPattern != null) {

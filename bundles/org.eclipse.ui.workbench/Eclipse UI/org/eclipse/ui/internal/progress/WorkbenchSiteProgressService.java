@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -60,7 +58,7 @@ public class WorkbenchSiteProgressService implements
 	 * requested.</li>
 	 * </ul>
 	 */
-	private Map<Job, Boolean> busyJobs = new HashMap<Job, Boolean>();
+	private Map busyJobs = new HashMap();
 
     private Object busyLock = new Object();
 
@@ -130,7 +128,7 @@ public class WorkbenchSiteProgressService implements
 					cursor = getWaitCursor(control.getDisplay());
 				}
                 control.setCursor(cursor);
-				showBusy(busy);
+				// site.getPane().setBusy(busy);
                 IWorkbenchPart part = site.getPart();
                  if (part instanceof WorkbenchPart) {
 					((WorkbenchPart) part).showBusy(busy);
@@ -170,7 +168,6 @@ public class WorkbenchSiteProgressService implements
 		}
 
         ProgressManager.getInstance().removeListener(this);
-		showBusy(false);
 
         if (waitCursor == null) {
 			return;
@@ -335,10 +332,7 @@ public class WorkbenchSiteProgressService implements
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#warnOfContentChange()
      */
     public void warnOfContentChange() {
-		MPart part = site.getModel();
-		if (!part.getTags().contains(CSSConstants.CSS_CONTENT_CHANGE_CLASS)) {
-			part.getTags().add(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
-		}
+		// site.getPane().showHighlight();
     }
 
     /*
@@ -450,14 +444,5 @@ public class WorkbenchSiteProgressService implements
 	 */
 	public SiteUpdateJob getUpdateJob() {
 		return updateJob;
-	}
-
-	protected void showBusy(boolean busy) {
-		MPart part = site.getModel();
-		if (busy) {
-			part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
-		} else {
-			part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
-		}
 	}
 }

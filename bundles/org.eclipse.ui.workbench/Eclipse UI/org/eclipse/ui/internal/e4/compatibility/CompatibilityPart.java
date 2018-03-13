@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
@@ -96,7 +95,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				beingDisposed = true;
 				WorkbenchPartReference reference = getReference();
 				// notify the workbench we're being closed
-				((WorkbenchPage) reference.getPage()).firePartDeactivatedIfActive(part);
 				((WorkbenchPage) reference.getPage()).firePartHidden(part);
 				((WorkbenchPage) reference.getPage()).firePartClosed(CompatibilityPart.this);
 			}
@@ -136,9 +134,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	public abstract WorkbenchPartReference getReference();
 
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
-		IWorkbenchPartSite site = null;
 		try {
-			site = legacyPart.getSite();
 			legacyPart.createPartControl(parent);
 		} catch (RuntimeException e) {
 			logger.error(e);
@@ -152,7 +148,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			}
 
 			// dispose the site that was originally initialized for this part
-			internalDisposeSite(site);
+			internalDisposeSite();
 
 			// create a new error part notifying the user of the failure
 			IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
@@ -170,6 +166,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			}
 		}
 
+		IWorkbenchPartSite site = legacyPart.getSite();
 		if (site != null) {
 			ISelectionProvider selectionProvider = site.getSelectionProvider();
 			if (selectionProvider != null) {
@@ -200,9 +197,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	}
 
 	private void invalidate() {
-		IWorkbenchPartSite site = null;
 		if (wrapped != null) {
-			site = wrapped.getSite();
+			IWorkbenchPartSite site = wrapped.getSite();
 			if (site != null) {
 				ISelectionProvider selectionProvider = site.getSelectionProvider();
 				if (selectionProvider != null) {
@@ -230,7 +226,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			}
 		}
 
-		internalDisposeSite(site);
+		internalDisposeSite();
 		alreadyDisposed = true;
 	}
 
@@ -268,7 +264,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	boolean handlePartInitException(PartInitException e) {
 		WorkbenchPartReference reference = getReference();
-		IWorkbenchPartSite site = reference.getSite();
 		reference.invalidate();
 		if (wrapped instanceof IEditorPart) {
 			try {
@@ -278,7 +273,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				logger.error(ex);
 			}
 		}
-		internalDisposeSite(site);
+		internalDisposeSite();
 
 		alreadyDisposed = false;
 		WorkbenchPlugin.log("Unable to create part", e.getStatus()); //$NON-NLS-1$
@@ -306,11 +301,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			reference.initialize(wrapped);
 		} catch (PartInitException e) {
 			if (!handlePartInitException(e)) {
-				return;
-			}
-		} catch (Exception e) {
-			WorkbenchPlugin.log("Unable to initialize part", e); //$NON-NLS-1$
-			if (!handlePartInitException(new PartInitException(e.getMessage()))) {
 				return;
 			}
 		}
@@ -386,6 +376,11 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	abstract void updateImages(MPart part);
 
+	public void deactivateActionBars(boolean forceHide) {
+		PartSite site = getReference().getSite();
+		site.deactivateActionBars(forceHide);
+	}
+
 	@PreDestroy
 	void destroy() {
 		if (!alreadyDisposed) {
@@ -400,9 +395,10 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * Disposes of the 3.x part's site if it has one. Subclasses may override
 	 * but must call <code>super.disposeSite()</code> in its implementation.
 	 */
-	private void internalDisposeSite(IWorkbenchPartSite site) {
-		if (site instanceof PartSite) {
-			disposeSite((PartSite) site);
+	private void internalDisposeSite() {
+		PartSite site = getReference().getSite();
+		if (site != null) {
+			disposeSite(site);
 		}
 	}
 
@@ -411,7 +407,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * but must call <code>super.disposeSite()</code> in its implementation.
 	 */
 	void disposeSite(PartSite site) {
-		site.deactivateActionBars(site instanceof ViewSite);
+		deactivateActionBars(site instanceof ViewSite);
 		site.dispose();
 	}
 
@@ -435,12 +431,5 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(
 				ESelectionService.class.getName());
 		selectionService.setSelection(e.getSelection());
-	}
-
-	protected void clearMenuItems() {
-		// in the workbench, view menus are re-created on startup
-		for (MMenu menu : part.getMenus()) {
-			menu.getChildren().clear();
-		}
 	}
 }
