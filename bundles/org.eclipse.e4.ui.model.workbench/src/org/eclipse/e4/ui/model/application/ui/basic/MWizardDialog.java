@@ -8,26 +8,25 @@
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
-package org.eclipse.e4.ui.model.application.ui.menu;
+package org.eclipse.e4.ui.model.application.ui.basic;
 
-import org.eclipse.e4.ui.model.application.ui.MUIElement;
 
 /**
  * <!-- begin-user-doc -->
- * A representation of the model object '<em><b>Tool Bar Element</b></em>'.
+ * A representation of the model object '<em><b>Wizard Dialog</b></em>'.
  * <!-- end-user-doc -->
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is a placeholder class mixed in to any other type that can be added to a Toolbar.
+ * A subclass of Window representing a wizard dialog.
  * </p>
- * @since 1.0
+ * @since 1.1
  * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  *
- * @model abstract="true"
+ * @model
  * @generated
  */
-public interface MToolBarElement extends MUIElement {
-} // MToolBarElement
+public interface MWizardDialog extends MDialog {
+} // MWizardDialog
