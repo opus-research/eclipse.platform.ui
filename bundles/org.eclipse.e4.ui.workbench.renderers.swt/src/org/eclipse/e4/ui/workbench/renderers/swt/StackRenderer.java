@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.internal.workbench.TagsUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -498,14 +499,13 @@ public class StackRenderer extends LazyStackRenderer {
 				Object oldValue = event
 						.getProperty(UIEvents.EventTags.OLD_VALUE);
 
-				System.err.println(event
-						.getProperty(UIEvents.EventTags.ATTNAME)
-						+ " - " + newValue + "/" + oldValue); //$NON-NLS-1$ //$NON-NLS-2$
-
 				if (!(element instanceof MPart)
-						|| !isAnyOfTagsModified(oldValue, newValue,
-								CSSConstants.CSS_BUSY_CLASS,
-								CSSConstants.CSS_CONTENT_CHANGED_CLASS)) {
+						|| (!TagsUtil.isTagModified(oldValue, newValue,
+								CSSConstants.CSS_BUSY_CLASS)
+								&& !TagsUtil.isTagAdded(oldValue, newValue,
+										CSSConstants.CSS_CONTENT_CHANGE_CLASS) && !TagsUtil
+									.isTagAdded(oldValue, newValue,
+											CSSConstants.CSS_ACTIVE_CLASS))) {
 					return;
 				}
 
@@ -515,11 +515,16 @@ public class StackRenderer extends LazyStackRenderer {
 					return;
 				}
 
-				if (CSSConstants.CSS_CONTENT_CHANGED_CLASS.equals(newValue)
-				// && cti != cti.getParent().getSelection()
-				) {
-					System.err.println("AAAAAAAAA"); //$NON-NLS-1$
-					part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+				if (CSSConstants.CSS_CONTENT_CHANGE_CLASS.equals(newValue)) {
+					part.getTags()
+							.remove(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
+					if (cti != cti.getParent().getSelection()) {
+						part.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+					}
+				} else if (CSSConstants.CSS_ACTIVE_CLASS.equals(newValue)
+						&& part.getTags().contains(
+								CSSConstants.CSS_HIGHLIGHTED_CLASS)) {
+					part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 				}
 
 				setCSSInfo(part, cti);
@@ -530,7 +535,7 @@ public class StackRenderer extends LazyStackRenderer {
 				tagsChangeHandler);
 	}
 
-	private boolean isAnyOfTagsModified(Object oldValue, Object newValue,
+	protected boolean isAnyOfTagsModified(Object oldValue, Object newValue,
 			String... tagNames) {
 		for (String tagName : tagNames) {
 			if ((newValue == null && tagName.equals(oldValue))

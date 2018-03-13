@@ -18,5 +18,5 @@ public class CSSConstants {
 
 	public static final String CSS_HIGHLIGHTED_CLASS = "highlighted";
 
-	public static final String CSS_CONTENT_CHANGED_CLASS = "contentChanged";
+	public static final String CSS_CONTENT_CHANGE_CLASS = "contentChange";
 }
