@@ -1069,7 +1069,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private boolean contains(ViewReference reference) {
 		for (ViewReference viewReference : viewReferences) {
-			if (reference.getModel().getElementId().equals(viewReference.getModel().getElementId())) {
+			if (reference.getId().equals(viewReference.getId())) {
 				return true;
 			}
 		}
@@ -1872,13 +1872,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      * @see org.eclipse.ui.IWorkbenchPage
      */
     public IViewReference findViewReference(String viewId) {
-		for (IViewReference reference : getViewReferences()) {
-			ViewReference ref = (ViewReference) reference;
-			if (viewId.equals(ref.getModel().getElementId())) {
-				return reference;
-			}
-		}
-		return null;
+        return findViewReference(viewId, null);
     }
 
     /*
@@ -1887,10 +1881,19 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      * @see org.eclipse.ui.IWorkbenchPage
      */
     public IViewReference findViewReference(String viewId, String secondaryId) {
-		String compoundId = viewId;
-		if (secondaryId != null && secondaryId.length() > 0)
-			compoundId += ":" + secondaryId; //$NON-NLS-1$
-		return findViewReference(compoundId);
+		for (IViewReference reference : getViewReferences()) {
+			if (viewId.equals(reference.getId())) {
+				String refSecondaryId = reference.getSecondaryId();
+				if (refSecondaryId == null) {
+					if (secondaryId == null) {
+						return reference;
+					}
+				} else if (refSecondaryId.equals(secondaryId)) {
+					return reference;
+				}
+			}
+		}
+		return null;
     }
 
 	public void createViewReferenceForPart(final MPart part, String viewId) {
