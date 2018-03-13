@@ -109,7 +109,7 @@ public class SearchField {
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		text = new Text(comp, SWT.SEARCH | SWT.ICON_SEARCH);
-		GridDataFactory.fillDefaults().applyTo(text);
+		GridDataFactory.fillDefaults().hint(130, SWT.DEFAULT).applyTo(text);
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		parent.getShell().addControlListener(new ControlListener() {
