@@ -18,10 +18,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -31,7 +29,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPropertyListener;
@@ -50,7 +47,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.part.ViewPart;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -60,11 +56,6 @@ import org.osgi.service.event.EventHandler;
 public abstract class WorkbenchPartReference implements IWorkbenchPartReference, ISizeProvider {
 
     /**
-	 * 
-	 */
-	private static final String E4_WRAPPER_KEY = "e4Wrapper"; //$NON-NLS-1$
-
-	/**
      * Internal property ID: Indicates that the underlying part was created
      */
     public static final int INTERNAL_PROPERTY_OPENED = 0x211;
@@ -142,15 +133,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
      * Stores the current Image for this part reference. Lazily created. Null if not allocated.
      */
     private Image image = null;
-
-    /**
-     * Stores reference to the image kept in the legacyPart. Used for quick check
-     * if the image changed.
-     */
-    private Image legacyPartImage = null;
-
+    
     private ImageDescriptor defaultImageDescriptor;
-
+    
     /**
      * Stores the current image descriptor for the part. 
      */
@@ -188,36 +173,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		}
     };
 
-	class E4PartWrapper extends ViewPart {
-		MPart wrappedPart;
-
-		E4PartWrapper(MPart part) {
-			wrappedPart = part;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt
-		 * .widgets.Composite)
-		 */
-		@Override
-		public void createPartControl(Composite parent) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-		 */
-		@Override
-		public void setFocus() {
-			if (part.getObject() != null && part.getContext() != null)
-				ContextInjectionFactory.invoke(part.getObject(), Focus.class, part.getContext());
-		}
-
-	}
 	private IWorkbenchPage page;
 
 	private MPart part;
@@ -446,24 +401,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
         if (isDisposed()) {
             return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
         }
-
-        Image newLegacyPartImage = null;
-        if (legacyPart != null) {
-            newLegacyPartImage = legacyPart.getTitleImage();
-        }
-        // refresh the local image if the image in the legacyPart changed
-        if (newLegacyPartImage != null && newLegacyPartImage != legacyPartImage) {
-            legacyPartImage = newLegacyPartImage;
-            // the setImageDescriptor(ImageDescriptor) method sets the image field to null,
-            // so a new value will be assigned to the image in the conditional statement below
-            setImageDescriptor(computeImageDescriptor());
-        }
-        if (image == null) {
+        
+        if (image == null) {        
             image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
         }
         return image;
     }
-
+    
     public ImageDescriptor getTitleImageDescriptor() {
         if (isDisposed()) {
             return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
@@ -529,19 +473,11 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 			// the last things to be unset during the teardown process, this
 			// means we may return a valid workbench part even if it is actually
 			// in the process of being destroyed, see bug 328944
-			if (part.getObject() instanceof CompatibilityPart) {
+			if (part.getWidget() != null) {
 				CompatibilityPart compatibilityPart = (CompatibilityPart) part.getObject();
 				if (compatibilityPart != null) {
 					legacyPart = compatibilityPart.getPart();
 				}
-			} else if (part.getObject() != null) {
-				if (part.getTransientData().get(E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					legacyPart = (IWorkbenchPart) part.getTransientData().get(E4_WRAPPER_KEY);
-				} else {
-					legacyPart = new E4PartWrapper(part);
-					part.getTransientData().put(E4_WRAPPER_KEY, legacyPart);
-				}
-				
 			}
 		}
 		return legacyPart;
