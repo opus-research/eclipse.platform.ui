@@ -610,7 +610,7 @@ public class RenderMojo extends AbstractMojo {
 
         String workingDirectory = System.getProperty("user.dir");
         
-        File outputDir = new File(workingDirectory+"/eclipse-png/");
+        File outputDir = new File(workingDirectory);
         File iconDirectoryRoot = new File("eclipse-svg/");
 
         // Search each subdir in the root dir for svg icons
