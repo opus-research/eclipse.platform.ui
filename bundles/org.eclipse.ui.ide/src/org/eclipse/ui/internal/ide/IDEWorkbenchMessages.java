@@ -765,8 +765,6 @@ public class IDEWorkbenchMessages extends NLS {
 
 	public static String OpenResourceDialog_showInMenu_label;
 
-	public static String OpenResourceDialog_copyLocation_label;
-
 	public static String NewFolderDialog_title;
 	public static String NewFolderDialog_nameLabel;
 	public static String NewFolderDialog_alreadyExists;
