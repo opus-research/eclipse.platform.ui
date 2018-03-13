@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -726,7 +724,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 			Label label = new Label(parent, SWT.LEAD);
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			label.setText(SWTRenderersMessages.choosePartsToSave);
+			label.setText("Select the parts to save:"); //$NON-NLS-1$
 
 			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
 					| SWT.BORDER);
