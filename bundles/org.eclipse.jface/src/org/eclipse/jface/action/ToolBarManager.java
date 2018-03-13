@@ -93,24 +93,58 @@ public class ToolBarManager extends ContributionManager implements
 	public ToolBarManager(ToolBar toolbar) {
 		this();
 		this.toolBar = toolbar;
+		if (toolBarExist()) {
+			this.itemStyle = toolBar.getStyle();
+		}
 	}
 
 	/**
-	 * Creates and returns this manager's tool bar control. Does not create a
-	 * new control if one already exists. Also create an {@link AccessibleListener}
-	 * for the {@link ToolBar}.
-	 * 
+	 * Creates and returns this manager's tool bar control. Does not create
+	 * a new control if one with the same parent already exists and its orientation
+	 * is the same as in the initial style. Before creating a new control,
+	 * the previous one (if any) is disposed.
+	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
+	 *
 	 * @param parent
 	 *            the parent control
 	 * @return the tool bar control
 	 */
 	public ToolBar createControl(Composite parent) {
-		if (!toolBarExist() && parent != null) {
-			toolBar = new ToolBar(parent, itemStyle);
-			toolBar.setMenu(getContextMenuControl());
-			update(true);
-			
-			toolBar.getAccessible().addAccessibleListener(getAccessibleListener());
+		int currenOrientation = (itemStyle & SWT.VERTICAL) != 0 ? SWT.VERTICAL : SWT.HORIZONTAL;
+		return createControl(parent, currenOrientation);
+	}
+
+	/**
+	 * Creates and returns this manager's tool bar control. Does not create
+	 * a new control if one with the same parent and orientation already exists.
+	 * Before creating a new control, the previous one (if any) is disposed.
+	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
+	 *
+	 * @param parent
+	 *            the parent control
+	 * @param orientation
+	 *            orientation of the tool bar: {@code SWT.HORIZONTAL} or {@code SWT.VERTICAL}
+	 * @return the tool bar control
+	 */
+	public ToolBar createControl(Composite parent, int orientation) {
+		if (parent != null) {
+    		if (toolBarExist() && (parent != toolBar.getParent()
+    				|| (orientation & toolBar.getStyle()) == 0)) {
+    			dispose();
+    		}
+
+    		if (!toolBarExist()) {
+    			int style = itemStyle;
+    			if ((style & orientation) == 0) {
+    				style &= ~SWT.HORIZONTAL & ~SWT.VERTICAL;
+    				style |= orientation;
+    			}
+    			toolBar = new ToolBar(parent, style);
+    			toolBar.setMenu(getContextMenuControl());
+    			update(true);
+
+    			toolBar.getAccessible().addAccessibleListener(getAccessibleListener());
+    		}
 		}
 
 		return toolBar;
