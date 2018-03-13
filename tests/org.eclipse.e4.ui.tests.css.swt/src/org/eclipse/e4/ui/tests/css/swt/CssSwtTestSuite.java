@@ -9,8 +9,13 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
+import org.eclipse.e4.ui.css.core.resources.CSSResourcesHelpersTest;
+import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImplTest;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelperTest;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelperTest;
+import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTColorConverterImplTest;
+import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTFontConverterImplTest;
+import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistryTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -29,6 +34,11 @@ public class CssSwtTestSuite extends TestSuite {
 	public CssSwtTestSuite() {
 		addTestSuite(CSSSWTFontHelperTest.class);
 		addTestSuite(CSSSWTColorHelperTest.class);
+		addTestSuite(SWTResourcesRegistryTest.class);
+		addTestSuite(CSSValueSWTColorConverterImplTest.class);
+		addTestSuite(CSSValueSWTFontConverterImplTest.class);
+		addTestSuite(CSSResourcesHelpersTest.class);
+		addTestSuite(CSSSWTEngineImplTest.class);
 		addTestSuite(FontDefinitionTest.class);
 		addTestSuite(ColorDefinitionTest.class);
 		addTestSuite(CSSSWTWidgetTest.class);		

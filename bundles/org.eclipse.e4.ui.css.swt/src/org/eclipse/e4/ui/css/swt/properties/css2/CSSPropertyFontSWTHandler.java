@@ -9,6 +9,7 @@
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
+ *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.css2;
 
@@ -50,6 +51,18 @@ implements ICSSPropertyHandler2 {
 			((CTabItem) widget).setFont(font);
 		} else if (widget instanceof Control) {
 			((Control) widget).setFont(font);
+			if (widget instanceof CTabFolder) {
+				updateChildrenFonts((CTabFolder) widget, font);
+			}
+		}
+	}
+
+	private static void updateChildrenFonts(CTabFolder folder, Font font) {
+		for (CTabItem item : folder.getItems()) {
+			Font itemFont = item.getFont();
+			if (itemFont == null || itemFont.isDisposed()) {
+				item.setFont(font);
+			}
 		}
 	}
 
