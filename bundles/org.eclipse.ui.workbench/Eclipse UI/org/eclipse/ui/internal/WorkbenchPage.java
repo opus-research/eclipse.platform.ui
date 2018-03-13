@@ -3063,6 +3063,12 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		EditorDescriptor descriptor = (EditorDescriptor) getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry().findEditor(editorId);
 		if (descriptor == null) {
+			// try to reuse already opened editor
+			IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+					.getActiveEditor();
+			if (part != null) {
+				return part;
+			}
 			throw new PartInitException(NLS.bind(
 					WorkbenchMessages.EditorManager_unknownEditorIDMessage, editorId));
 		}
