@@ -7,29 +7,21 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela - Enhancements
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -49,9 +41,6 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 	@Inject
 	private IPresentationEngine engine;
-
-	@Inject
-	private IRendererFactory factory;
 
 	@Optional
 	@Inject
@@ -290,32 +279,9 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 			}
 
 			for (MMenu menu : part.getMenus()) {
-				if (menu instanceof MPopupMenu)
-					unlinkMenu(menu);
 				engine.removeGui(menu);
 			}
 		}
 		super.disposeWidget(element);
 	}
-
-	private void unlinkMenu(MMenu menu) {
-		AbstractPartRenderer abstractRenderer = factory.getRenderer(menu, null);
-		if ((abstractRenderer == null)
-				|| (!(abstractRenderer instanceof MenuManagerRenderer)))
-			return;
-		MenuManagerRenderer renderer = (MenuManagerRenderer) abstractRenderer;
-		List<MMenuElement> children = menu.getChildren();
-		for (MMenuElement child : children) {
-			if (child instanceof MMenu)
-				unlinkMenu((MMenu) child);
-			else {
-				IContributionItem contribution = renderer
-						.getContribution(child);
-				renderer.clearModelToContribution(child, contribution);
-			}
-		}
-		MenuManager mm = renderer.getManager(menu);
-		renderer.clearModelToManager(menu, mm);
-	}
-
 }
