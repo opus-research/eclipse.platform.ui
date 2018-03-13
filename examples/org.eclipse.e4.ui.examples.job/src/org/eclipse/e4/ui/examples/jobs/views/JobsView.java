@@ -1,4 +1,4 @@
-package org.eclipse.ui.examples.job.e4.views;
+package org.eclipse.e4.ui.examples.jobs.views;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -17,9 +17,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.Active;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.ui.examples.job.e4.TestJob;
-import org.eclipse.ui.examples.job.e4.TestJobRule;
-import org.eclipse.ui.examples.job.e4.UITestJob;
+import org.eclipse.e4.ui.examples.jobs.TestJob;
+import org.eclipse.e4.ui.examples.jobs.TestJobRule;
+import org.eclipse.e4.ui.examples.jobs.UITestJob;
 import org.eclipse.e4.ui.progress.IProgressConstants;
 import org.eclipse.e4.ui.progress.IProgressService;
 import org.eclipse.jface.action.Action;
