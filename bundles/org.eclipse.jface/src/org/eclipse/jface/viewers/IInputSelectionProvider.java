@@ -13,8 +13,7 @@ package org.eclipse.jface.viewers;
 /**
  * Interface common to all objects that provide both an input and
  * a selection.
- * @param <I> Type of the input
  */
-public interface IInputSelectionProvider<I> extends IInputProvider<I>,
+public interface IInputSelectionProvider extends IInputProvider,
         ISelectionProvider {
 }
