@@ -20,7 +20,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -42,6 +41,7 @@ public class SplitDropAgent extends DropAgent {
 	private MPartStack dropStack;
 	private CTabFolder dropCTF;
 	private Rectangle clientBounds;
+	private String weight;
 
 	private Rectangle ctfBounds;
 
@@ -88,21 +88,13 @@ public class SplitDropAgent extends DropAgent {
 			dropStack = (MPartStack) parent;
 		}
 
-		// You can only drag MParts from window to window
-		if (!(dragElement instanceof MPart)) {
-			EModelService ms = dndManager.getModelService();
-			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
-			MWindow dropWin = ms.getTopLevelWindowFor(dropStack);
-			if (dragElementWin != dropWin)
-				return false;
-		}
-
 		// We can't split ourselves with if the element being dragged is the only element in the
 		// stack (we check for '2' because the dragAgent puts a Drag Placeholder in the stack)
 		MUIElement dragParent = dragElement.getParent();
 		if (dragParent == dropStack && dropStack.getChildren().size() == 2)
 			return false;
 
+		weight = dropStack.getContainerData();
 		dropCTF = (CTabFolder) dropStack.getWidget();
 
 		return true;
@@ -352,8 +344,13 @@ public class SplitDropAgent extends DropAgent {
 			if (!dndManager.isModified) {
 				relTo = (MPartSashContainerElement) outerRelTo;
 			}
-		} else if (getModified()) {
+		} else if (onEdge) {
 			relTo = (MPartSashContainerElement) outerRelTo;
+			if (outerRelTo instanceof MPerspectiveStack) {
+				if (!getModified())
+					relTo = (MPartSashContainerElement) ((MPerspectiveStack) outerRelTo)
+							.getSelectedElement().getChildren().get(0);
+			}
 		}
 
 		if (dragElement instanceof MPartStack) {
@@ -374,7 +371,13 @@ public class SplitDropAgent extends DropAgent {
 		}
 
 		float pct = (float) (onEdge ? 0.34 : 0.50);
+		MUIElement relToParent = relTo.getParent();
 		dndManager.getModelService().insert(toInsert, relTo, where, pct);
+
+		// Force the new sash to have the same weight as the original element
+		if (relTo.getParent() != relToParent && !onEdge)
+			relTo.getParent().setContainerData(weight);
+		dndManager.update();
 
 		return true;
 	}

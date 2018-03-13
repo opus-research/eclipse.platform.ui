@@ -43,8 +43,7 @@ class DataTransferWizardCollectionComparator extends ViewerComparator {
         super();
     }
 
-    @Override
-	public int category(Object element) {
+    public int category(Object element) {
 		if (element instanceof WizardCollectionElement){
 			String id = ((WizardCollectionElement)element).getId();
     		if (WizardsRegistryReader.GENERAL_WIZARD_CATEGORY.equals(id)) {
@@ -62,8 +61,7 @@ class DataTransferWizardCollectionComparator extends ViewerComparator {
      *	Return true if this sorter is affected by a property 
      *	change of propertyName on the specified element.
      */
-    @Override
-	public boolean isSorterProperty(Object object, String propertyId) {
+    public boolean isSorterProperty(Object object, String propertyId) {
         return propertyId.equals(IBasicPropertyConstants.P_TEXT);
     }
 }

@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -57,11 +57,10 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 
 	/**
 	 * Indicates whether some other object is "equal to" this one.
-	 *
+	 * 
 	 * @param obj
 	 *            the reference object with which to compare.
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (!super.equals(obj)) {
 			return false;
@@ -73,10 +72,9 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 
 	/**
 	 * equal objects should have equal hashCodes.
-	 *
+	 * 
 	 * @return hashCode of this CSSAttributeCondition
 	 */
-	@Override
 	public int hashCode() {
 		return namespaceURI.hashCode() ^ localName.hashCode()
 				^ (specified ? -1 : 0);
@@ -86,7 +84,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.Condition#getConditionType()}.
 	 */
-	@Override
 	public short getConditionType() {
 		return SAC_ATTRIBUTE_CONDITION;
 	}
@@ -95,7 +92,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getNamespaceURI()}.
 	 */
-	@Override
 	public String getNamespaceURI() {
 		return namespaceURI;
 	}
@@ -104,7 +100,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getLocalName()}.
 	 */
-	@Override
 	public String getLocalName() {
 		return localName;
 	}
@@ -113,7 +108,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getSpecified()}.
 	 */
-	@Override
 	public boolean getSpecified() {
 		return specified;
 	}
@@ -121,7 +115,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Tests whether this condition matches the given element.
 	 */
-	@Override
 	public boolean match(Element e, String pseudoE) {
 		String val = getValue();
 		if (val == null) {
@@ -133,7 +126,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Fills the given set with the attribute names found in this selector.
 	 */
-	@Override
 	public void fillAttributeSet(Set attrSet) {
 		attrSet.add(localName);
 	}
@@ -141,7 +133,6 @@ public class CSSAttributeConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Returns a text representation of this object.
 	 */
-	@Override
 	public String toString() {
 		if (value == null) {
 			return '[' + localName + ']';

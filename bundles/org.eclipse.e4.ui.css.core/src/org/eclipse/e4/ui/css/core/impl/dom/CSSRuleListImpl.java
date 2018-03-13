@@ -20,19 +20,18 @@ import org.w3c.dom.css.CSSRuleList;
 public class CSSRuleListImpl implements CSSRuleList {
 
 	private List<CSSRule> ruleList;
-
+	
 	public CSSRuleListImpl() {
 		super();
 		this.ruleList = new ArrayList<CSSRule>();
 	}
-
+	
 	// W3C CSSRuleList API methods
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRuleList#getLength()
 	 */
-	@Override
 	public int getLength() {
 		return ruleList.size();
 	}
@@ -41,23 +40,22 @@ public class CSSRuleListImpl implements CSSRuleList {
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSRuleList#item(int)
 	 */
-	@Override
 	public CSSRule item(int position) {
 		return ruleList.get(position);
 	}
 
 	//Additional
-
+	
 	/**
 	 * @throws IndexOutOfBoundsException
-	 */
+	 */	
 	public void add(CSSRule rule) {
 		ruleList.add(rule);
 	}
 
 	/**
 	 * @throws IndexOutOfBoundsException
-	 */
+	 */	
 	public void remove(int position) {
 		ruleList.remove(position);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids - bug 69254
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -30,11 +30,13 @@ import org.eclipse.swt.widgets.Control;
  * and configured with a domain-specific content provider, label provider, element
  * filter (optional), and element sorter (optional).
  * </p>
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  * 
  * @see org.eclipse.jface.viewers.ListViewer
  * @since 3.0 (made non-final in 3.4)
  */
-public class ComboViewer extends AbstractListViewer {
+public class ComboViewer<E,I>  extends AbstractListViewer<E,I> {
 
     /**
      * This viewer's list control if this viewer is instantiated with a combo control; otherwise
@@ -124,16 +126,18 @@ public class ComboViewer extends AbstractListViewer {
 	protected int[] listGetSelectionIndices() {
         if (combo == null) {
             return new int[] { ccombo.getSelectionIndex() };
+        } else {
+            return new int[] { combo.getSelectionIndex() };
         }
-        return new int[] { combo.getSelectionIndex() };
     }
 
     @Override
 	protected int listGetItemCount() {
         if (combo == null) {
             return ccombo.getItemCount();
+        } else {
+            return combo.getItemCount();
         }
-        return combo.getItemCount();
     }
 
     @Override
@@ -163,12 +167,16 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
     @Override
 	public Control getControl() {
         if (combo == null) {
             return ccombo;
+        } else {
+            return combo;
         }
-        return combo;
     }
 
     /**
@@ -203,20 +211,25 @@ public class ComboViewer extends AbstractListViewer {
 	public void reveal(Object element) {
     }
     
-
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetSelection(int[])
+     */
     @Override
 	protected void listSetSelection(int[] ixs) {
         if (combo == null) {
-            for (int ix : ixs) {
-                ccombo.select(ix);
+            for (int idx = 0; idx < ixs.length; idx++) {
+                ccombo.select(ixs[idx]);
             }
         } else {
-            for (int ix : ixs) {
-                combo.select(ix);
+            for (int idx = 0; idx < ixs.length; idx++) {
+                combo.select(ixs[idx]);
             }
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
+     */
     @Override
 	protected void listDeselectAll() {
         if (combo == null) {
@@ -228,6 +241,9 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
+     */
     @Override
 	protected void listShowSelection() {
     }

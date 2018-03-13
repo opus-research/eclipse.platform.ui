@@ -66,7 +66,6 @@ public class GenericCommandActionDelegate implements
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
 	 */
-	@Override
 	public void dispose() {
 		handlerService = null;
 		parameterizedCommand = null;
@@ -78,7 +77,6 @@ public class GenericCommandActionDelegate implements
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	@Override
 	public void run(IAction action) {
 		if (handlerService == null) {
 			// what, no handler service ... no problem
@@ -103,7 +101,6 @@ public class GenericCommandActionDelegate implements
 	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.jface.viewers.ISelection)
 	 */
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		// we don't care, handlers get their selection from the
 		// ExecutionEvent application context
@@ -115,7 +112,6 @@ public class GenericCommandActionDelegate implements
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		String id = config.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
@@ -191,17 +187,16 @@ public class GenericCommandActionDelegate implements
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
 	 */
-	@Override
 	public void init(IWorkbenchWindow window) {
 		if (handlerService != null) {
 			// already initialized
 			return;
 		}
 
-		handlerService = window
+		handlerService = (IHandlerService) window
 				.getService(IHandlerService.class);
 		if (parameterMap != null) {
-			ICommandService commandService = window
+			ICommandService commandService = (ICommandService) window
 					.getService(ICommandService.class);
 			createCommand(commandService);
 		}
@@ -212,7 +207,6 @@ public class GenericCommandActionDelegate implements
 	 * 
 	 * @see org.eclipse.ui.IViewActionDelegate#init(org.eclipse.ui.IViewPart)
 	 */
-	@Override
 	public void init(IViewPart view) {
 		init(view.getSite().getWorkbenchWindow());
 	}
@@ -223,7 +217,6 @@ public class GenericCommandActionDelegate implements
 	 * @see org.eclipse.ui.IEditorActionDelegate#setActiveEditor(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.ui.IEditorPart)
 	 */
-	@Override
 	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
 		// we don't actually care about the active editor, since that
 		// information is in the ExecutionEvent application context
@@ -239,7 +232,6 @@ public class GenericCommandActionDelegate implements
 	 * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
 	 *      org.eclipse.ui.IWorkbenchPart)
 	 */
-	@Override
 	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// we don't actually care about the active part, since that
 		// information is in the ExecutionEvent application context

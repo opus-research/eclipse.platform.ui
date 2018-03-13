@@ -24,11 +24,10 @@ public abstract class AbstractCSSPropertyHandlerProvider implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
 	 *      java.lang.Object, org.w3c.dom.css.CSSStyleDeclaration)
 	 */
-	@Override
 	public CSSStyleDeclaration getDefaultCSSStyleDeclaration(CSSEngine engine,
 			Object widget, CSSStyleDeclaration newStyle, String pseudoE)
 			throws Exception {
@@ -46,7 +45,7 @@ public abstract class AbstractCSSPropertyHandlerProvider implements
 	/**
 	 * Return the CSS property from the CSS <code>propertyName</code> of the
 	 * <code>stylableElement</code>.
-	 *
+	 * 
 	 * @param engine
 	 * @param stylableElement
 	 * @param propertyName
@@ -72,7 +71,7 @@ public abstract class AbstractCSSPropertyHandlerProvider implements
 	 * Return the default CSS style declaration of the
 	 * {@link CSSStylableElement} <code>stylableElement</code> before apply
 	 * the <code>newStyle</code> {@link CSSStyleDeclaration}.
-	 *
+	 * 
 	 * @param engine
 	 * @param stylableElement
 	 * @param newStyle

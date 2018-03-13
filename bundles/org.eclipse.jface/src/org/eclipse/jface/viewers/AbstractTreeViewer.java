@@ -109,7 +109,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			this.element = element;
 		}
 
-		@Override
 		public void run() {
 			doUpdateItem(item, element);
 		}
@@ -612,6 +611,11 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return comparator.compare(this, e1, e2);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#getSortedChildren(java.lang.Object)
+	 */
 	@Override
 	protected Object[] getSortedChildren(Object parentElementOrTreePath) {
 		Object[] result = getFilteredChildren(parentElementOrTreePath);
@@ -701,6 +705,11 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	protected abstract void addTreeListener(Control control,
 			TreeListener listener);
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see StructuredViewer#associate(Object, Item)
+	 */
 	@Override
 	protected void associate(Object element, Item item) {
 		Object data = item.getData();
@@ -789,7 +798,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			}
 
 			BusyIndicator.showWhile(widget.getDisplay(), new Runnable() {
-				@Override
 				public void run() {
 					// fix for PR 1FW89L7:
 					// don't complain and remove all "dummies" ...
@@ -875,6 +883,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 	}
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected Widget doFindInputItem(Object element) {
 		// compare with root
@@ -889,6 +898,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return null;
 	}
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected Widget doFindItem(Object element) {
 		// compare with root
@@ -1005,6 +1015,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
 		boolean oldBusy = isBusy();
@@ -1088,7 +1099,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			for (int i = 0; i < listeners.length; ++i) {
 				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
 				SafeRunnable.run(new SafeRunnable() {
-					@Override
 					public void run() {
 						l.treeCollapsed(event);
 					}
@@ -1115,7 +1125,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 			for (int i = 0; i < listeners.length; ++i) {
 				final ITreeViewerListener l = (ITreeViewerListener) listeners[i];
 				SafeRunnable.run(new SafeRunnable() {
-					@Override
 					public void run() {
 						l.treeExpanded(event);
 					}
@@ -1330,6 +1339,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return null;
 	}
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected Object[] getRawChildren(Object parentElementOrTreePath) {
 		boolean oldBusy = isBusy();
@@ -1426,6 +1436,11 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 */
 	protected abstract Item[] getSelection(Control control);
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+	 */
 	@Override
 	protected List getSelectionFromWidget() {
 		Widget[] items = getSelection(getControl());
@@ -1498,26 +1513,28 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 	}
 
+	/* (non-Javadoc) Method declared on Viewer. */
 	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		addTreeListener(control, new TreeListener() {
-			@Override
 			public void treeExpanded(TreeEvent event) {
 				handleTreeExpand(event);
 			}
 
-			@Override
 			public void treeCollapsed(TreeEvent event) {
 				handleTreeCollapse(event);
 			}
 		});
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on StructuredViewer. Builds the initial
+	 * tree and handles the automatic expand feature.
+	 */
 	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 	            Control tree = getControl();
 	            tree.setRedraw(false);
@@ -1831,11 +1848,13 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return null;
 	}
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected void internalRefresh(Object element) {
 		internalRefresh(element, true);
 	}
 
+	/* (non-Javadoc) Method declared on StructuredViewer. */
 	@Override
 	protected void internalRefresh(Object element, boolean updateLabels) {
 		// If element is null, do a full refresh.
@@ -2171,6 +2190,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return isExpandable(elementOrTreePath);
 	}
 
+	/* (non-Javadoc) Method declared on Viewer. */
 	@Override
 	protected void labelProviderChanged() {
 		// we have to walk the (visible) tree and update every item
@@ -2215,7 +2235,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		if (checkBusy())
 			return;
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 				internalRemove(elementsOrTreePaths);
 			}
@@ -2248,7 +2267,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		if (checkBusy())
 			return;
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 				internalRemove(parent, elements);
 			}
@@ -2321,6 +2339,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return item;
 	}
 
+	/* (non-Javadoc) Method declared on Viewer. */
 	@Override
 	public Item scrollDown(int x, int y) {
 		Item current = getItem(x, y);
@@ -2332,6 +2351,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		return null;
 	}
 
+	/* (non-Javadoc) Method declared on Viewer. */
 	@Override
 	public Item scrollUp(int x, int y) {
 		Item current = getItem(x, y);
@@ -2453,12 +2473,10 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		final IElementComparer comparer = getComparer();
 		IElementComparer treePathComparer = new IElementComparer() {
 
-			@Override
 			public boolean equals(Object a, Object b) {
 				return ((TreePath) a).equals(((TreePath) b), comparer);
 			}
 
-			@Override
 			public int hashCode(Object element) {
 				return ((TreePath) element).hashCode(comparer);
 			}
@@ -3080,6 +3098,11 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
+	 */
 	@Override
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		// Return null by default

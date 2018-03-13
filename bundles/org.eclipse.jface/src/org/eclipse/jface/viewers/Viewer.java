@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,19 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.events.HelpEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
+
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
+
+import org.eclipse.jface.util.SafeRunnable;
 
 /**
  * A viewer is a model-based adapter on a widget.
@@ -43,8 +45,9 @@ import org.eclipse.swt.widgets.Item;
  * </li>
  * </ul>
  * </p>
+ * @param <I> Type of the input for the view
  */
-public abstract class Viewer implements IInputSelectionProvider {
+public abstract class Viewer<I> implements IInputSelectionProvider<I> {
 
     /**
      * List of selection change listeners (element type: <code>ISelectionChangedListener</code>).
@@ -113,8 +116,7 @@ public abstract class Viewer implements IInputSelectionProvider {
             if (control != null && !control.isDisposed()) {
                 if (this.helpListener == null) {
                     this.helpListener = new HelpListener() {
-                        @Override
-						public void helpRequested(HelpEvent event) {
+                        public void helpRequested(HelpEvent event) {
                             handleHelpRequest(event);
                         }
                     };
@@ -125,8 +127,10 @@ public abstract class Viewer implements IInputSelectionProvider {
         }
     }
 
-    @Override
-	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
 
@@ -140,8 +144,8 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireHelpRequested(HelpEvent event) {
         Object[] listeners = helpListeners.getListeners();
-        for (Object listener : listeners) {
-            ((HelpListener) listener).helpRequested(event);
+        for (int i = 0; i < listeners.length; ++i) {
+            ((HelpListener) listeners[i]).helpRequested(event);
         }
     }
 
@@ -155,11 +159,10 @@ public abstract class Viewer implements IInputSelectionProvider {
      */
     protected void fireSelectionChanged(final SelectionChangedEvent event) {
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (Object listener : listeners) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
+        for (int i = 0; i < listeners.length; ++i) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunnable.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.selectionChanged(event);
                 }
             });
@@ -201,11 +204,15 @@ public abstract class Viewer implements IInputSelectionProvider {
         return null;
     }
 
-    @Override
-	public abstract Object getInput();
+    /* (non-Javadoc)
+     * Copy-down of method declared on <code>IInputProvider</code>.
+     */
+    public abstract I getInput();
 
-    @Override
-	public abstract ISelection getSelection();
+    /* (non-Javadoc)
+     * Copy-down of method declared on <code>ISelectionProvider</code>.
+     */
+    public abstract ISelection getSelection();
 
     /**
      * Handles a help request from the underlying SWT control.
@@ -234,7 +241,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      * @param oldInput the old input element or <code>null</code> if there
      *   was previously no input
      */
-    protected void inputChanged(Object input, Object oldInput) {
+    protected void inputChanged(I input, I oldInput) {
     }
 
     /**
@@ -260,8 +267,10 @@ public abstract class Viewer implements IInputSelectionProvider {
         }
     }
 
-    @Override
-	public void removeSelectionChangedListener(
+    /* (non-Javadoc)
+     * Method declared on ISelectionProvider.
+     */
+    public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
@@ -370,7 +379,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      *
      * @param input the input of this viewer, or <code>null</code> if none
      */
-    public abstract void setInput(Object input);
+    public abstract void setInput(I input);
 
     /**
 	 * The viewer implementation of this <code>ISelectionProvider</code>
@@ -383,8 +392,7 @@ public abstract class Viewer implements IInputSelectionProvider {
 	 * without also revealing it, for example (as of 3.3) TreeViewer.
 	 * </p>
 	 */
-    @Override
-	public void setSelection(ISelection selection) {
+    public void setSelection(ISelection selection) {
         setSelection(selection, false);
     }
 

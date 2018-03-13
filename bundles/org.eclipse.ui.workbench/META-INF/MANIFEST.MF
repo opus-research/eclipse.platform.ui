@@ -2,8 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.ui.workbench; singleton:=true
-Bundle-Version: 3.107.0.qualifier
-Bundle-ClassPath: .
+Bundle-Version: 3.105.100.qualifier
+Bundle-ClassPath: e4-workbench.jar,
+ compatibility.jar,
+ .
 Bundle-Activator: org.eclipse.ui.internal.WorkbenchPlugin
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: %providerName
@@ -66,7 +68,7 @@ Export-Package: org.eclipse.ui;ui.workbench=split;mandatory:="ui.workbench",
  org.eclipse.ui.internal.statushandlers;x-internal:=true,
  org.eclipse.ui.internal.testing;x-internal:=true,
  org.eclipse.ui.internal.themes;x-friends:="org.eclipse.ui",
- org.eclipse.ui.internal.tweaklets;x-friends:="org.eclipse.ui.ide,org.eclipse.ui.ide.application,org.eclipse.ui.cocoa",
+ org.eclipse.ui.internal.tweaklets;x-friends:="org.eclipse.ui.ide,org.eclipse.ui.ide.application",
  org.eclipse.ui.internal.util;x-friends:="org.eclipse.ui,org.eclipse.ui.presentations.r21,org.eclipse.ui.ide",
  org.eclipse.ui.internal.wizards;x-internal:=true,
  org.eclipse.ui.internal.wizards.preferences;x-internal:=true,
@@ -129,5 +131,4 @@ Import-Package: com.ibm.icu.text,
  org.w3c.dom,
  org.w3c.dom.css;version="2.0.0",
  org.xml.sax
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Service-Component: OSGI-INF/ColorAndFontProvider.xml
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

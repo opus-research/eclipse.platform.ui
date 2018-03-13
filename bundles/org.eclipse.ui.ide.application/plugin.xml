@@ -31,7 +31,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             name="%Perspective.resourcePerspective"
-            icon="$nl$/icons/full/eview16/resource_persp.png"
+            icon="$nl$/icons/full/eview16/resource_persp.gif"
             class="org.eclipse.ui.internal.ide.application.ResourcePerspective"
             id="org.eclipse.ui.resourcePerspective">
          <description>
@@ -58,6 +58,25 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+             locationURI="menu:help?after=additions">
+       <menu id="org.eclipse.update.ui.updateMenu" label="%updateMenu.label">
+               <command
+                     commandId="org.eclipse.ui.update.findAndInstallUpdates"
+                     helpContextId="org.eclipse.update.ui.newUpdates"
+                     icon="icons/full/elcl16/usearch_obj.gif"
+                     label="%actionSets.updates.label"
+                     style="push">
+               </command>
+               <command
+                     commandId="org.eclipse.ui.update.manageConfiguration"
+                     helpContextId="org.eclipse.update.ui.newUpdates"
+                     icon="icons/full/elcl16/configs.gif"
+                     label="%actionSets.configManager.label"
+                     style="push">
+               </command>
+       </menu>
+       </menuContribution>
       <menuContribution
             locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <menu
@@ -86,45 +105,5 @@
             </separator>
          </menu>
       </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="menu:window?after=openNewWindow">
-         <menu
-               id="org.eclipse.ui.editors"
-               label="%menu.editor.label"
-               mnemonic="%menu.editor.mnemonic">
-            <command
-                  commandId="org.eclipse.ui.window.splitEditor"
-                  mnemonic="%command.split.horizontal.mnemonic"
-                  style="push">
-               <parameter
-                     name="Splitter.isHorizontal"
-                     value="true">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.splitEditor"
-                  mnemonic="%command.split.vertical.mnemonic"
-                  style="push">
-               <parameter
-                     name="Splitter.isHorizontal"
-                     value="false">
-               </parameter>
-            </command>
-            <command
-                  commandId="org.eclipse.ui.window.newEditor"
-                  label="%command.clone.label"
-                  mnemonic="%command.clone.mnemonic"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
-   </extension>
-   <extension
-         id="id1"
-         point="org.eclipse.e4.workbench.model">
-      <fragment
-            uri="LegacyIDE_fragment.e4xmi">
-      </fragment>
    </extension>
 </plugin>

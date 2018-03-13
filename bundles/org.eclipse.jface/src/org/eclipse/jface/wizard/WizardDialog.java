@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -378,7 +377,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			if (timeWhenLastJobFinished == -1) {
 				timeWhenLastJobFinished= 0;
 				getShell().addTraverseListener(new TraverseListener() {
-					@Override
 					public void keyTraversed(TraverseEvent e) {
 						if (e.detail == SWT.TRAVERSE_RETURN || (e.detail == SWT.TRAVERSE_MNEMONIC && e.keyCode == 32)) {
 							// We want to ignore the keystroke when we detect that it has been received within the
@@ -504,7 +502,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		super.configureShell(newShell);
 		// Register help listener on the shell
 		newShell.addHelpListener(new HelpListener() {
-			@Override
 			public void helpRequested(HelpEvent event) {
 				// call perform help on the current page
 				if (currentPage != null) {
@@ -641,9 +638,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		// Insert a progress monitor
 		progressMonitorPart= createProgressMonitorPart(composite, new GridLayout());
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-		if (!wizard.needsProgressMonitor()) {
-			gridData.exclude = true;
-		}
 		progressMonitorPart.setLayoutData(gridData);
 		progressMonitorPart.setVisible(false);
 		// Build the separator line
@@ -865,7 +859,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public IWizardPage getCurrentPage() {
 		return currentPage;
 	}
@@ -1037,7 +1030,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * operation will be nullified when original UI state is restored.
 	 * 
 	 */
-	@Override
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
@@ -1048,21 +1040,19 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		if (activeRunningOperations++ == 0) {
 			state = aboutToStart(fork && cancelable);
 		}
-		IProgressMonitor progressMonitor = getProgressMonitor();
-		if (progressMonitor == null) {
-			progressMonitor = new NullProgressMonitor();
-		}
 		try {
 			if (!fork) {
 				lockedUI = true;
 			}
-			ModalContext.run(runnable, fork, progressMonitor, getShell()
+			ModalContext.run(runnable, fork, getProgressMonitor(), getShell()
 					.getDisplay());
 			lockedUI = false;
 		} finally {
 			// explicitly invoke done() on our progress monitor so that its
 			// label does not spill over to the next invocation, see bug 271530
-			progressMonitor.done();
+			if (getProgressMonitor() != null) {
+				getProgressMonitor().done();
+			}
 			// Stop if this is the last one
 			if (state != null) {
 				timeWhenLastJobFinished= System.currentTimeMillis();
@@ -1229,7 +1219,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public void showPage(IWizardPage page) {
 		if (page == null || page == currentPage) {
 			return;
@@ -1252,7 +1241,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		} else {
 			final IWizardPage finalPage = page;
 			BusyIndicator.showWhile(getContents().getDisplay(), new Runnable() {
-				@Override
 				public void run() {
 					updateForPage(finalPage);
 				}
@@ -1371,18 +1359,14 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public void updateButtons() {
 		boolean canFlipToNextPage = false;
 		boolean canFinish = wizard.canFinish();
 		if (backButton != null) {
-			boolean backEnabled = currentPage != null
-					&& currentPage.getPreviousPage() != null;
-			backButton.setEnabled(backEnabled);
+			backButton.setEnabled(currentPage.getPreviousPage() != null);
 		}
 		if (nextButton != null) {
-			canFlipToNextPage = currentPage != null
-					&& currentPage.canFlipToNextPage();
+			canFlipToNextPage = currentPage.canFlipToNextPage();
 			nextButton.setEnabled(canFlipToNextPage);
 		}
 		finishButton.setEnabled(canFinish);
@@ -1408,7 +1392,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public void updateMessage() {
 
 		if (currentPage == null) {
@@ -1465,7 +1448,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * 
 	 * @see org.eclipse.jface.wizard.IWizardContainer2#updateSize()
 	 */
-	@Override
 	public void updateSize() {
 		updateSize(currentPage);
 	}
@@ -1512,7 +1494,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public void updateTitleBar() {
 		String s = null;
 		if (currentPage != null) {
@@ -1532,7 +1513,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/*
 	 * (non-Javadoc) Method declared on IWizardContainer.
 	 */
-	@Override
 	public void updateWindowTitle() {
 		if (getShell() == null) {
 			// Not created yet
@@ -1550,7 +1530,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * 
 	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#getSelectedPage()
 	 */
-	@Override
 	public Object getSelectedPage() {
 		return getCurrentPage();
 	}
@@ -1560,7 +1539,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * 
 	 * @see org.eclipse.jface.dialog.IPageChangeProvider#addPageChangedListener()
 	 */
-	@Override
 	public void addPageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.add(listener);
 	}
@@ -1570,7 +1548,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * 
 	 * @see org.eclipse.jface.dialog.IPageChangeProvider#removePageChangedListener()
 	 */
-	@Override
 	public void removePageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.remove(listener);
 	}
@@ -1592,7 +1569,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		for (int i = 0; i < listeners.length; ++i) {
 			final IPageChangedListener l = (IPageChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.pageChanged(event);
 				}
@@ -1641,7 +1617,6 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		for (int i = 0; i < listeners.length; ++i) {
 			final IPageChangingListener l = (IPageChangingListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
-				@Override
 				public void run() {
 					l.handlePageChanging(event);
 				}

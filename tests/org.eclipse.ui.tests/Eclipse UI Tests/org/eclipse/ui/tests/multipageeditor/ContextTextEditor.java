@@ -37,7 +37,7 @@ public class ContextTextEditor extends TextEditor {
 			throws PartInitException {
 		super.init(site, input);
 		IServiceLocator locator = getSite();
-		IContextService contextService = locator
+		IContextService contextService = (IContextService) locator
 				.getService(IContextService.class);
 
 		// if this was instantiated as a regular editor, the context would

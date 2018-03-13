@@ -32,8 +32,7 @@ public final class ProxyActivityManager extends AbstractActivityManager {
 
         this.activityManager
                 .addActivityManagerListener(new IActivityManagerListener() {
-                    @Override
-					public void activityManagerChanged(
+                    public void activityManagerChanged(
                             ActivityManagerEvent activityManagerEvent) {
                         ActivityManagerEvent proxyActivityManagerEvent = new ActivityManagerEvent(
                                 ProxyActivityManager.this, activityManagerEvent
@@ -53,33 +52,27 @@ public final class ProxyActivityManager extends AbstractActivityManager {
                 });
     }
 
-    @Override
-	public IActivity getActivity(String activityId) {
+    public IActivity getActivity(String activityId) {
         return activityManager.getActivity(activityId);
     }
 
-    @Override
-	public ICategory getCategory(String categoryId) {
+    public ICategory getCategory(String categoryId) {
         return activityManager.getCategory(categoryId);
     }
 
-    @Override
-	public Set getDefinedActivityIds() {
+    public Set getDefinedActivityIds() {
         return activityManager.getDefinedActivityIds();
     }
 
-    @Override
-	public Set getDefinedCategoryIds() {
+    public Set getDefinedCategoryIds() {
         return activityManager.getDefinedCategoryIds();
     }
 
-    @Override
-	public Set getEnabledActivityIds() {
+    public Set getEnabledActivityIds() {
         return activityManager.getEnabledActivityIds();
     }
 
-    @Override
-	public IIdentifier getIdentifier(String identifierId) {
+    public IIdentifier getIdentifier(String identifierId) {
         return activityManager.getIdentifier(identifierId);
     }
 }

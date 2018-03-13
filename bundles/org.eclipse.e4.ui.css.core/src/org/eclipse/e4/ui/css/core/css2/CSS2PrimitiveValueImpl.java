@@ -19,10 +19,10 @@ import org.w3c.dom.css.Rect;
 
 /**
  * Simple {@link CSSPrimitiveValue} implementation.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSS2PrimitiveValueImpl implements CSSPrimitiveValue {
 
@@ -49,70 +49,58 @@ public class CSS2PrimitiveValueImpl implements CSSPrimitiveValue {
 		this.primitiveType = CSSPrimitiveValue.CSS_NUMBER;
 	}
 
-	@Override
 	public Counter getCounterValue() throws DOMException {
 		return null;
 	}
 
-	@Override
 	public float getFloatValue(short word0) throws DOMException {
 		if (v != -9999)
 			return v;
 		return i;
 	}
 
-	@Override
 	public short getPrimitiveType() {
 		return primitiveType;
 	}
 
-	@Override
 	public Rect getRectValue() throws DOMException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public RGBColor getRGBColorValue() throws DOMException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String getStringValue() throws DOMException {
 		return s;
 	}
 
-	@Override
 	public void setFloatValue(short word0, float f) throws DOMException {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public void setStringValue(short word0, String s) throws DOMException {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public String getCssText() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public short getCssValueType() {
 		return CSSValue.CSS_PRIMITIVE_VALUE;
 	}
 
-	@Override
 	public void setCssText(String s) throws DOMException {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
 	public String toString() {
 		if (s != null)
 			return s;
