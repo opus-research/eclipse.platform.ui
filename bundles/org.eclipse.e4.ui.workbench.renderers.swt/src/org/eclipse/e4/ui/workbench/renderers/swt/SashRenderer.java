@@ -24,8 +24,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Layout;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -83,15 +82,17 @@ public class SashRenderer extends SWTPartRenderer {
 	 */
 	protected void forceLayout(MElementContainer<MUIElement> pscModel) {
 		// layout the containing Composite
-		while (!(pscModel.getWidget() instanceof Control))
+		while (!(pscModel.getWidget() instanceof Composite))
 			pscModel = pscModel.getParent();
 
-		Control ctrl = (Control) pscModel.getWidget();
-		Control[] ca = { ctrl };
-		if (ctrl instanceof Shell)
-			((Shell) ctrl).layout(ca);
-		else
-			ctrl.getParent().layout(ca);
+		Composite s = (Composite) pscModel.getWidget();
+		Layout layout = s.getLayout();
+		if (layout instanceof SashLayout) {
+			if (((SashLayout) layout).layoutUpdateInProgress) {
+				return;
+			}
+		}
+		s.layout(true, true);
 	}
 
 	@PreDestroy
