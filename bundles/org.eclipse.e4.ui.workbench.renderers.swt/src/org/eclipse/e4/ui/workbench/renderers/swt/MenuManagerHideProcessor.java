@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug403081
- *     Marco Descher <marco@descher.at> - Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -90,16 +89,15 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 
 							IEclipseContext dynamicMenuContext = EclipseContextFactory
 									.create();
+							dynamicMenuContext.setParent(modelService
+									.getContainingContext(currentMenuElement));
 							@SuppressWarnings("unchecked")
 							ArrayList<MMenuElement> mel = (ArrayList<MMenuElement>) currentMenuElement
 									.getTransientData()
 									.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
 							dynamicMenuContext.set(List.class, mel);
-							IEclipseContext parentContext = modelService
-									.getContainingContext(currentMenuElement);
 							ContextInjectionFactory.invoke(contribution,
-									AboutToHide.class, parentContext,
-									dynamicMenuContext, null);
+									AboutToHide.class, dynamicMenuContext);
 						}
 
 					}
