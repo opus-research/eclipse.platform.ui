@@ -112,6 +112,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -1745,6 +1746,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public void run(final boolean fork, boolean cancelable, final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
 		final StatusLineManager manager = getStatusLineManager();
+		EPartService partService = model.getContext().get(EPartService.class);
+		final MPart curActive = partService.getActivePart();
 
 		// Temporary Hack for bug 330106, remove when bug 334093 is fixed
 		boolean progressHack = manager.getControl() == null;
@@ -1757,6 +1760,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			IBindingService bs = model.getContext().get(IBindingService.class);
 			boolean keyFilterEnabled = bs.isKeyFilterEnabled();
 			List<Control> toEnable = new ArrayList<Control>();
+			Shell theShell = getShell();
+			Display display = theShell.getDisplay();
+
 			try {
 				Menu mainMenu = (Menu) model.getMainMenu().getWidget();
 				if (mainMenu != null && !mainMenu.isDisposed() && mainMenu.isEnabled()) {
@@ -1767,12 +1773,14 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				if (keyFilterEnabled)
 					bs.setKeyFilterEnabled(false);
 				
-				// disable child shells
-				Shell theShell = getShell();
-				for (Shell childShell : theShell.getShells()) {
-					disableControl(childShell, toEnable);
+				// disable all other shells
+				for (Shell childShell : display.getShells()) {
+					if (childShell != theShell) {
+						disableControl(childShell, toEnable);
+					}
 				}
 				
+
 				//Disable the presentation (except the bottom trim)
 				TrimmedPartLayout tpl = (TrimmedPartLayout) getShell().getLayout();
 				disableControl(tpl.clientArea, toEnable);
@@ -1831,8 +1839,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 				// Re-enable any disabled controls
 				for (Control ctrl : toEnable) {
-					if (!ctrl.isDisposed())
+					if (!ctrl.isDisposed() && !ctrl.isEnabled())
 						ctrl.setEnabled(true);
+				}
+
+				MPart activePart = partService.getActivePart();
+				if (curActive != activePart && activePart != null) {
+					engine.focusGui(activePart);
 				}
 			}
 		}
