@@ -52,13 +52,11 @@ public class HandlerProcessingAddon {
 		List<MHandlerContainer> findElements = modelService.findElements(application, null,
 				MHandlerContainer.class, null);
 		for (MHandlerContainer mHandlerContainer : findElements) {
-			if (mHandlerContainer instanceof MContext) {
+			for (MHandler mHandler : mHandlerContainer.getHandlers()) {
 				MContext mContext = (MContext) mHandlerContainer;
 				IEclipseContext context = mContext.getContext();
 				if (context != null) {
-					for (MHandler mHandler : mHandlerContainer.getHandlers()) {
-						processActiveHandler(mHandler, context);
-					}
+					processActiveHandler(mHandler, context);
 				}
 			}
 		}
@@ -69,8 +67,7 @@ public class HandlerProcessingAddon {
 	private void registerModelListeners() {
 		eventHandler = new EventHandler() {
 			public void handleEvent(Event event) {
-				if ((event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MHandlerContainer)
-						&& (event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MContext)) {
+				if ((event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MHandlerContainer)) {
 					MHandlerContainer handlerContainer = (MHandlerContainer) event
 							.getProperty(UIEvents.EventTags.ELEMENT);
 					if (UIEvents.EventTypes.ADD.equals(event.getProperty(UIEvents.EventTags.TYPE))) {
