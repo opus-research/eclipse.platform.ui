@@ -1834,6 +1834,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					if (!ctrl.isDisposed())
 						ctrl.setEnabled(true);
 				}
+				
+				// Force a full activation of the currently active part
+				EPartService ps = model.getContext().get(EPartService.class);
+				MPart curActive = ps.getActivePart();
+				ps.activate(null);
+				ps.activate(curActive);
 			}
 		}
 	}
