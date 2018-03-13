@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -38,12 +39,10 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -512,6 +511,11 @@ public class PartServiceImpl implements EPartService {
 				modelService.bringToTop(perspective);
 				perspective.getContext().activate();
 			} else {
+				if ((modelService.getElementLocation(newActivePart) & EModelService.IN_SHARED_AREA) != 0) {
+					if (newActivePart.getParent().getSelectedElement() != newActivePart) {
+						newActivePart = (MPart) newActivePart.getParent().getSelectedElement();
+					}
+				}
 				activate(newActivePart, true, false);
 			}
 		}
@@ -661,8 +665,7 @@ public class PartServiceImpl implements EPartService {
 		if (descriptor == null) {
 			return null;
 		}
-
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = modelService.createModelElement(MPart.class);
 		part.setElementId(descriptor.getElementId());
 		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
 		if (descriptor.getToolbar() != null) {
@@ -723,7 +726,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPlaceholder createSharedPart(MPart sharedPart) {
 		// Create and return a reference to the shared part
-		MPlaceholder sharedPartRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
+		MPlaceholder sharedPartRef = modelService.createModelElement(MPlaceholder.class);
 		sharedPartRef.setElementId(sharedPart.getElementId());
 		sharedPartRef.setRef(sharedPart);
 		return sharedPartRef;
@@ -892,18 +895,18 @@ public class PartServiceImpl implements EPartService {
 		MElementContainer<MUIElement> searchRoot = getContainer();
 		List<MUIElement> children = searchRoot.getChildren();
 		if (children.size() == 0) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		}
 
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
 		if (lastContainer == null) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		} else if (!(lastContainer instanceof MPartStack)) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			((List) lastContainer.getChildren()).add(stack);
 			return stack;
 		}
@@ -1024,6 +1027,7 @@ public class PartServiceImpl implements EPartService {
 		case VISIBLE:
 			MPart activePart = getActivePart();
 			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
+				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
 				bringToTop(addedPart);

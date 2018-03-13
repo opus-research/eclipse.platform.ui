@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
- *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -65,7 +64,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -212,7 +210,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
-			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
+			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
+			if (!wwindow.isClosing()) {
+				wwindow.getStatusLineManager().update(false);
+			}
 		}
 
 		public void partHidden(MPart part) {
@@ -558,7 +559,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		private IEditorPart topEditor;
 
-		private ArrayList oldActionSets = new ArrayList();
+		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -623,7 +624,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newPart, true);
 			}
 
-			ArrayList newActionSets = null;
+			List<IActionSetDescriptor> newActionSets = null;
 			if (isNewPartAnEditor || (activePart == topEditor && newPart == null)) {
 				newActionSets = calculateActionSets(newPart, null);
 			} else {
@@ -685,7 +686,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newEditor, false);
 			}
 
-			ArrayList newActionSets = calculateActionSets(activePart, newEditor);
+			List<IActionSetDescriptor> newActionSets = calculateActionSets(activePart, newEditor);
 			if (!updateActionSets(newActionSets)) {
 				updateActionBars();
 			}
@@ -735,8 +736,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            active part
 		 * @return the new action sets
 		 */
-		private ArrayList calculateActionSets(IWorkbenchPart part, IEditorPart editor) {
-			ArrayList newActionSets = new ArrayList();
+		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
+				IEditorPart editor) {
+			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -762,7 +764,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            the action sets to show
 		 * @return <code>true</code> if the action sets changed
 		 */
-		private boolean updateActionSets(ArrayList newActionSets) {
+		private boolean updateActionSets(List<IActionSetDescriptor> newActionSets) {
 			if (oldActionSets.equals(newActionSets)) {
 				return false;
 			}
@@ -1375,7 +1377,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				IEditorReference ref = it.next();
 				// hide editors that haven't been instantiated first
 				if (ref.getPart(false) == null) {
-					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false, false))) {
+					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false))) {
 						return false;
 					}
 					// hidden successfully, remove it from the list
@@ -1390,7 +1392,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				MPart model = ((EditorReference) editorRef).getModel();
 				if (activePart == model) {
 					closeActivePart = true;
-				} else if (!(hidePart(model, false, confirm, false, false))) {
+				} else if (!(hidePart(model, false, confirm, false))) {
 					// saving should've been handled earlier above
 					return false;
 				}
@@ -2611,13 +2613,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
-
-			MPerspective persp = perspectiveStack.getSelectedElement();
-			List<String> newIds = ModeledPageLayout.getIds(persp, ModeledPageLayout.ACTION_SET_TAG);
-			EContextService contextService = window.getContext().get(EContextService.class);
-			for (String id : newIds) {
-				contextService.activateContext(id);
-			}
 		}
 
 		IPerspectiveRegistry registry = getWorkbenchWindow().getWorkbench()
@@ -5129,7 +5124,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see #unzoomSharedArea(MUIElement)
 	 */
 	private void unzoomSharedArea() {
-		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, window);
+		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
+		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {
 				MPlaceholder placeholder = part.getCurSharedRef();
