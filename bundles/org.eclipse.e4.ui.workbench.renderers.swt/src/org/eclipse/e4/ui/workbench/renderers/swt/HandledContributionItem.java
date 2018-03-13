@@ -280,8 +280,11 @@ public class HandledContributionItem extends ContributionItem {
 		model = item;
 		setId(model.getElementId());
 		generateCommand();
-		if (model.getCommand() == null)
-			logger.error("Element " + model.getElementId() + " invalid, no command defined."); //$NON-NLS-1$ //$NON-NLS-2$
+		if (model.getCommand() == null) {
+			if (logger != null) {
+				logger.error("Element " + model.getElementId() + " invalid, no command defined."); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+		}
 		updateVisible();
 	}
 
@@ -444,7 +447,7 @@ public class HandledContributionItem extends ContributionItem {
 			staticContext.set(WW_SUPPORT, context.get(WW_SUPPORT));
 
 			IContextFunction func = (IContextFunction) obj;
-			obj = func.compute(staticContext);
+			obj = func.compute(staticContext, null);
 			if (obj != null) {
 				model.getTransientData().put(DISPOSABLE_CHECK, obj);
 			}
@@ -777,7 +780,7 @@ public class HandledContributionItem extends ContributionItem {
 			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
-				obj = ((IContextFunction) obj).compute(lclContext);
+				obj = ((IContextFunction) obj).compute(lclContext, null);
 				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
