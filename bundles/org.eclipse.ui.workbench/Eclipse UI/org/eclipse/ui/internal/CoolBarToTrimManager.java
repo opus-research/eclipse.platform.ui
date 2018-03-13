@@ -167,9 +167,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
-			List<MToolBar> toolbars = modelService.findElements(window, item.getId(),
-					MToolBar.class, null);
-			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
+			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
 				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
@@ -266,12 +264,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	 * @see org.eclipse.jface.action.IContributionManager#find(java.lang.String)
 	 */
 	public IContributionItem find(String id) {
-		List<MToolBar> toolbars = modelService.findElements(window, id, MToolBar.class, null);
-		if (toolbars.isEmpty()) {
+		MUIElement el = modelService.find(id, window);
+		if (!(el instanceof MToolBar))
 			return null;
-		}
 
-		final MToolBar model = toolbars.get(0);
+		final MToolBar model = (MToolBar) el;
 		if (model.getTransientData().get(OBJECT) != null) {
 			return (IContributionItem) model.getTransientData().get(OBJECT);
 		}
