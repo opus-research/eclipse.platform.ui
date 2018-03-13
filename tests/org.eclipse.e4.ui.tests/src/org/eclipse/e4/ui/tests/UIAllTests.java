@@ -35,9 +35,7 @@ import org.eclipse.e4.ui.tests.workbench.MToolItemTest;
 import org.eclipse.e4.ui.tests.workbench.MWindowTest;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
-import org.eclipse.e4.ui.tests.workbench.SWTPartRendererTest;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
-import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 
 /**
  *
@@ -71,7 +69,5 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(InjectionEventTest.class);
 		addTestSuite(PartFocusTest.class);
 		addTestSuite(ModelElementTest.class);
-		addTestSuite(StackRendererTest.class);
-		addTestSuite(SWTPartRendererTest.class);
 	}
 }
