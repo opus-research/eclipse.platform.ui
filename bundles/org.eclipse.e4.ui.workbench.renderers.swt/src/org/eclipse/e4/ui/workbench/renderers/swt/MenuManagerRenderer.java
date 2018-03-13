@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866							  
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -629,8 +629,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		Object obj = itemModel.getContributionItem();
 		if (obj instanceof IContextFunction) {
 			final IEclipseContext lclContext = getContext(itemModel);
-			ici = (IContributionItem) ((IContextFunction) obj).compute(
-					lclContext, null);
+			ici = (IContributionItem) ((IContextFunction) obj)
+					.compute(lclContext, null);
 			itemModel.setContributionItem(ici);
 		} else if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -890,11 +890,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacySep.setVisible(item.isVisible());
 					legacySep.setOpaqueItem(item);
 					linkModelToContribution(legacySep, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacySep);
-					} else {
-						modelChildren.add(legacySep);
-					}
+					modelChildren.add(dest, legacySep);
 				} else if (menuElement instanceof MOpaqueMenuSeparator) {
 					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
@@ -916,11 +912,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacyItem.setVisible(item.isVisible());
 					legacyItem.setOpaqueItem(item);
 					linkModelToContribution(legacyItem, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacyItem);
-					} else {
-						modelChildren.add(legacyItem);
-					}
+					modelChildren.add(dest, legacyItem);
 				} else if (menuElement instanceof MOpaqueMenuItem) {
 					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
@@ -989,14 +981,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		removeMenuContributions(menuModel, dump);
 		for (MMenuElement mMenuElement : dump) {
 			IContributionItem ici = getContribution(mMenuElement);
-			if (ici == null && mMenuElement instanceof MMenu) {
-				MMenu menuElement = (MMenu) mMenuElement;
-				ici = getManager(menuElement);
-				clearModelToManager(menuElement, (MenuManager) ici);
-			} else {
-				clearModelToContribution(menuModel, ici);
-			}
 			menuManager.remove(ici);
+			clearModelToContribution(menuModel, ici);
 		}
 	}
 }

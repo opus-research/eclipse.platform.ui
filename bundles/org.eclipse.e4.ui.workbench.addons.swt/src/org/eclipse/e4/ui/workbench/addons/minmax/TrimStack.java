@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,6 +96,10 @@ public class TrimStack {
 	 */
 	private Menu trimStackMenu;
 
+	/**
+	 * The tool item that the cursor is currently hovering over.
+	 */
+	private ToolItem selectedToolItem;
 	private boolean isShowing = false;
 	private MUIElement minimizedElement;
 	private Composite hostPane;
@@ -496,27 +500,23 @@ public class TrimStack {
 
 		trimStackTB.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
-				// Clear any existing menus
+				// Clear any existing items
 				while (trimStackMenu.getItemCount() > 0)
 					trimStackMenu.getItem(0).dispose();
 
-				// Only add the menu if hovering over a tool item (vs restore button)
+				// remap the coordinate relative to the control
 				Point point = trimStackTB.getDisplay().map(null, trimStackTB,
 						new Point(event.x, event.y));
-				ToolItem selectedToolItem = trimStackTB.getItem(point);
-				if (selectedToolItem == null) {
+				// get the selected item in question
+				selectedToolItem = trimStackTB.getItem(point);
+
+				if (selectedToolItem == null)
 					return;
-				}
 
-				MPart toActivate = null;
-				if (minimizedElement instanceof MPartStack) {
-					if (selectedToolItem.getData() instanceof MPart) {
-						toActivate = (MPart) selectedToolItem.getData();
-					}
-				}
-
-				final MUIElement partToTag = minimizedElement;
-				final MPart partToActivate = toActivate;
+				final MPart menuPart = selectedToolItem.getData() instanceof MPart ? (MPart) selectedToolItem
+						.getData() : null;
+				if (menuPart == null)
+					return;
 
 				MenuItem orientationItem = new MenuItem(trimStackMenu, SWT.CASCADE);
 				orientationItem.setText(Messages.TrimStack_OrientationMenu);
@@ -527,11 +527,9 @@ public class TrimStack {
 				defaultItem.setText(Messages.TrimStack_DefaultOrientationItem);
 				defaultItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
-						boolean doRefresh = partToTag.getTags().remove(
-								IPresentationEngine.ORIENTATION_HORIZONTAL);
-						doRefresh |= partToTag.getTags().remove(
-								IPresentationEngine.ORIENTATION_VERTICAL);
-						if (isShowing && doRefresh) {
+						menuPart.getTags().remove(IPresentationEngine.ORIENTATION_HORIZONTAL);
+						menuPart.getTags().remove(IPresentationEngine.ORIENTATION_VERTICAL);
+						if (isShowing) {
 							setPaneLocation(hostPane);
 						}
 					}
@@ -541,35 +539,39 @@ public class TrimStack {
 				horizontalItem.setText(Messages.TrimStack_Horizontal);
 				horizontalItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
-						if (!partToTag.getTags().contains(
-								IPresentationEngine.ORIENTATION_HORIZONTAL)) {
-							partToTag.getTags().remove(IPresentationEngine.ORIENTATION_VERTICAL);
-							partToTag.getTags().add(IPresentationEngine.ORIENTATION_HORIZONTAL);
-							if (isShowing) {
-								setPaneLocation(hostPane);
-							}
+						if (menuPart.getTags().contains(IPresentationEngine.ORIENTATION_HORIZONTAL)) {
+							menuPart.getTags().remove(IPresentationEngine.ORIENTATION_HORIZONTAL);
+						} else {
+							menuPart.getTags().remove(IPresentationEngine.ORIENTATION_VERTICAL);
+							menuPart.getTags().add(IPresentationEngine.ORIENTATION_HORIZONTAL);
+						}
+						if (isShowing) {
+							setPaneLocation(hostPane);
 						}
 					}
 				});
 
 				MenuItem verticalItem = new MenuItem(orientationMenu, SWT.RADIO);
 				verticalItem.setText(Messages.TrimStack_Vertical);
+
 				verticalItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
-						if (!partToTag.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL)) {
-							partToTag.getTags().remove(IPresentationEngine.ORIENTATION_HORIZONTAL);
-							partToTag.getTags().add(IPresentationEngine.ORIENTATION_VERTICAL);
-							if (isShowing) {
-								setPaneLocation(hostPane);
-							}
+						if (menuPart.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL)) {
+							menuPart.getTags().remove(IPresentationEngine.ORIENTATION_VERTICAL);
+						} else {
+							menuPart.getTags().remove(IPresentationEngine.ORIENTATION_HORIZONTAL);
+							menuPart.getTags().add(IPresentationEngine.ORIENTATION_VERTICAL);
+						}
+						if (isShowing) {
+							setPaneLocation(hostPane);
 						}
 					}
 				});
 
 				// Set initial orientation selection
-				if (partToTag.getTags().contains(IPresentationEngine.ORIENTATION_HORIZONTAL)) {
+				if (menuPart.getTags().contains(IPresentationEngine.ORIENTATION_HORIZONTAL)) {
 					horizontalItem.setSelection(true);
-				} else if (partToTag.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL)) {
+				} else if (menuPart.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL)) {
 					verticalItem.setSelection(true);
 				} else {
 					defaultItem.setSelection(true);
@@ -580,27 +582,22 @@ public class TrimStack {
 				restoreItem.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
 						minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
-						if (partToActivate != null) {
-							partService.activate(partToActivate);
-						}
+						partService.activate(menuPart);
 					}
 				});
 
-				// Don't allow the editor area to be closed
-				if (!isEditorStack()) {
-					MenuItem closeItem = new MenuItem(trimStackMenu, SWT.NONE);
-					closeItem.setText(Messages.TrimStack_CloseText);
-					closeItem.addListener(SWT.Selection, new Listener() {
-						public void handleEvent(Event event) {
-							partService.hidePart((MPart) partToTag);
-						}
-					});
-				}
+				MenuItem closeItem = new MenuItem(trimStackMenu, SWT.NONE);
+				closeItem.setText(Messages.TrimStack_CloseText);
+				closeItem.addListener(SWT.Selection, new Listener() {
+					public void handleEvent(Event event) {
+						partService.hidePart(menuPart);
+					}
+				});
 
 			}
 		});
 
-		if (minimizedElement instanceof MPartStack || minimizedElement instanceof MPlaceholder) {
+		if (minimizedElement instanceof MPartStack) {
 			trimStackMenu = new Menu(trimStackTB);
 			trimStackTB.setMenu(trimStackMenu);
 		}
@@ -833,12 +830,20 @@ public class TrimStack {
 		if (paneSize.y > caRect.height)
 			paneSize.y = caRect.height;
 
-		if (minimizedElement.getTags().contains(IPresentationEngine.ORIENTATION_HORIZONTAL))
-			paneSize.x = caRect.width;
-		if (minimizedElement.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL))
-			paneSize.y = caRect.height;
-
+		if (minimizedElement instanceof MPartStack) {
+			MPartStack stack = (MPartStack) minimizedElement;
+			MUIElement stackSel = stack.getSelectedElement();
+			if (stackSel instanceof MPlaceholder)
+				stackSel = ((MPlaceholder) stackSel).getRef();
+			if (stackSel instanceof MPart) {
+				if (stackSel.getTags().contains(IPresentationEngine.ORIENTATION_HORIZONTAL))
+					paneSize.x = caRect.width;
+				if (stackSel.getTags().contains(IPresentationEngine.ORIENTATION_VERTICAL))
+					paneSize.y = caRect.height;
+			}
+		}
 		Point loc = new Point(0, 0);
+
 		if (isFixed(SWT.LEFT))
 			loc.x = caRect.x;
 		else
