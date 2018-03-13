@@ -141,8 +141,7 @@ public abstract class ImageDescriptor extends DeviceResourceDescriptor {
      * @param theDevice the device that was used to create the Image
      * @return a newly created image descriptor
      */
-    @Deprecated
-	public static ImageDescriptor createFromImage(Image img, Device theDevice) {
+    public static ImageDescriptor createFromImage(Image img, Device theDevice) {
         return new ImageDataImageDescriptor(img);
     }
     

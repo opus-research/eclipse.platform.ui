@@ -412,8 +412,7 @@ public abstract class ViewerDropAdapter extends DropTargetAdapter {
      * @param exception the exception
      * @param event the event
      */
-    @Deprecated
-	protected void handleException(Throwable exception, DropTargetEvent event) {
+    protected void handleException(Throwable exception, DropTargetEvent event) {
         // Currently we never rethrow because VA/Java crashes if an SWT
         // callback throws anything. Generally catching Throwable is bad, but in
         // this cases it's better than hanging the image.

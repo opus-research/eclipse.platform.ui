@@ -234,8 +234,7 @@ public abstract class SubContributionManager implements IContributionManager {
      * @return fetch all enumeration of wrappers for the item
      * @deprecated Use getItems(String value) instead.
      */
-    @Deprecated
-	public Enumeration<SubContributionItem> items() {
+    public Enumeration<SubContributionItem> items() {
         final Iterator<SubContributionItem> i = mapItemToWrapper.values().iterator();
         return new Enumeration<SubContributionItem>() {
             public boolean hasMoreElements() {
