@@ -659,6 +659,10 @@ public class TrimStack {
 		}
 	}
 
+	public MUIElement getMinimizedElement() {
+		return minimizedElement;
+	}
+
 	private MUIElement findElement() {
 		MUIElement result;
 		List<MPerspectiveStack> ps = modelService.findElements(window, null,
@@ -810,7 +814,6 @@ public class TrimStack {
 			hostPane.layout(true);
 			hostPane.moveAbove(null);
 			hostPane.setVisible(true);
-			isShowing = true;
 
 			// Activate the part that is being brought up...
 			if (minimizedElement instanceof MPartStack) {
@@ -857,12 +860,14 @@ public class TrimStack {
 				}
 			}
 
+			isShowing = true;
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
 			// Check to ensure that the client area is non-null since the
 			// trimstack may be currently hosted in the limbo shell
-			if (clientArea != null)
+			if (clientArea != null) {
 				clientArea.removeControlListener(caResizeListener);
+			}
 
 			if (hostPane != null && hostPane.isVisible()) {
 				hostPane.setVisible(false);
