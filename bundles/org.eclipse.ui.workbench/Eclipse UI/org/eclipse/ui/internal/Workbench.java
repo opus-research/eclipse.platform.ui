@@ -2821,7 +2821,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
