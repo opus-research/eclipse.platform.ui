@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.css.swt.CSSConstants;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
@@ -531,22 +530,6 @@ public class StackRenderer extends LazyStackRenderer {
 			} else if (hasAsterisk) {
 				cti.setText(text.substring(1));
 			}
-		} else if (UIEvents.UILabel.BUSY.equals(attName)) {
-			updateBusyIndicator(cti, part, (Boolean) newValue);
-		}
-	}
-
-	@SuppressWarnings("restriction")
-	protected void updateBusyIndicator(CTabItem cti, MPart part, boolean busy) {
-		IEclipseContext context = part.getContext();
-		CSSRenderingUtils renderingUtils = context.get(CSSRenderingUtils.class);
-		if (renderingUtils == null) {
-			return;
-		}
-		if (busy) {
-			renderingUtils.addCSSClass(cti, CSSConstants.CSS_BUSY_CLASS);
-		} else {
-			renderingUtils.removeCSSClass(cti, CSSConstants.CSS_BUSY_CLASS);
 		}
 	}
 
@@ -794,9 +777,8 @@ public class StackRenderer extends LazyStackRenderer {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
 			Control ctrl = (Control) element.getWidget();
-			if (ctrl.getParent() == ctf) {
+			if (ctrl.getParent() == ctf)
 				cti.setControl((Control) element.getWidget());
-			}
 		}
 	}
 
