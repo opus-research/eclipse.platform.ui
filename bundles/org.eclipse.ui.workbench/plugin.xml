@@ -72,9 +72,4 @@
          </parameter>
       </key>
    </extension>
-   <extension point="org.eclipse.ui.themes">
-      <themeElementCategory
-         id="org.eclipse.ui.themes.CssTheme"
-         label="%Other.defined.by.css.label"/>
-   </extension>
 </plugin>
