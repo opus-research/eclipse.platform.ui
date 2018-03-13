@@ -13,7 +13,8 @@
  *     Dmitry Spiridenok - Bug 429756
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863, 472654
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 461026
- ******************************************************************************/
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
+******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.HashMap;
@@ -242,7 +243,11 @@ public class HandledContributionItem extends AbstractContributionItem {
 		String keyBindingText = null;
 		if (parmCmd != null) {
 			if (text == null || text.isEmpty()) {
-				text = getModel().getCommand().getLocalizedCommandName();
+				try {
+					text = parmCmd.getName(getModel().getCommand().getLocalizedCommandName());
+				} catch (NotDefinedException e) {
+					e.printStackTrace();
+				}
 			}
 			if (bindingService != null) {
 				TriggerSequence binding = bindingService.getBestSequenceFor(parmCmd);
@@ -268,6 +273,8 @@ public class HandledContributionItem extends AbstractContributionItem {
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
+		final String tooltip = getToolTipText(false);
+		item.setToolTipText(tooltip);
 		item.setSelection(getModel().isSelected());
 		item.setEnabled(getModel().isEnabled());
 	}
@@ -293,13 +300,13 @@ public class HandledContributionItem extends AbstractContributionItem {
 			item.setText(""); //$NON-NLS-1$
 		}
 
-		final String tooltip = getToolTipText();
+		final String tooltip = getToolTipText(true);
 		item.setToolTipText(tooltip);
 		item.setSelection(getModel().isSelected());
 		item.setEnabled(getModel().isEnabled());
 	}
 
-	private String getToolTipText() {
+	private String getToolTipText(boolean attachKeybinding) {
 		String text = getModel().getLocalizedTooltip();
 		ParameterizedCommand parmCmd = getModel().getWbCommand();
 		if (parmCmd == null) {
@@ -316,7 +323,7 @@ public class HandledContributionItem extends AbstractContributionItem {
 		}
 
 		TriggerSequence sequence = bindingService.getBestSequenceFor(parmCmd);
-		if (sequence != null) {
+		if (attachKeybinding && sequence != null) {
 			text = text + " (" + sequence.format() + ')'; //$NON-NLS-1$
 		}
 		return text;
