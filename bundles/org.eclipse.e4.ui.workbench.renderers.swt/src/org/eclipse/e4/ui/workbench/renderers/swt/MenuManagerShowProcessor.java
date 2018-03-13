@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug403081
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -155,8 +155,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 				IEclipseContext dynamicMenuContext = EclipseContextFactory
 						.create();
-				dynamicMenuContext.setParent(modelService
-						.getContainingContext(currentMenuElement));
 				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
 				dynamicMenuContext.set(List.class, mel);
 				ContextInjectionFactory.invoke(contribution, AboutToShow.class,
