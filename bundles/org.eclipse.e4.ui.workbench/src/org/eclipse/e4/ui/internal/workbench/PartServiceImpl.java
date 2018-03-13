@@ -823,8 +823,7 @@ public class PartServiceImpl implements EPartService {
 					}
 				} else {
 					List<MElementContainer> containers = modelService.findElements(getContainer(),
-							null, MElementContainer.class, Collections.singletonList(category),
-							EModelService.PRESENTATION);
+							null, MElementContainer.class, Collections.singletonList(category));
 					if (containers.isEmpty()) {
 						// couldn't find any containers with the specified tag, just add it to the
 						// end
