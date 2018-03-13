@@ -25,11 +25,13 @@ import org.eclipse.swt.graphics.Point;
  * structured viewers.
  * 
  * <p><b>This class is intended to be subclassed</b></p>
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  * 
  * @since 3.3
  * @see ColumnLabelProvider as a concrete implementation
  */
-public abstract class CellLabelProvider extends BaseLabelProvider {
+public abstract class CellLabelProvider<E,I> extends BaseLabelProvider<E> {
 
 	/**
 	 * Create a new instance of the receiver.
@@ -45,8 +47,8 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *            The labelProvider to convert
 	 * @return ViewerLabelProvider
 	 */
-	/* package */static CellLabelProvider createViewerLabelProvider(
-			ColumnViewer viewer, IBaseLabelProvider labelProvider) {
+	/* package */static <E,I> CellLabelProvider<E,I> createViewerLabelProvider(
+			ColumnViewer<E,I> viewer, IBaseLabelProvider<E> labelProvider) {
 
 		boolean noColumnTreeViewer = viewer instanceof AbstractTreeViewer && viewer
 				.doGetColumnCount() == 0;
@@ -93,7 +95,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * @return the {@link String} or <code>null</code> if there is not text to
 	 *         display
 	 */
-	public String getToolTipText(Object element) {
+	public String getToolTipText(E element) {
 		return null;
 	}
 
@@ -107,7 +109,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *         the default color {@link SWT#COLOR_INFO_BACKGROUND}
 	 * @see SWT#COLOR_INFO_BACKGROUND
 	 */
-	public Color getToolTipBackgroundColor(Object object) {
+	public Color getToolTipBackgroundColor(E object) {
 		return null;
 	}
 
@@ -120,7 +122,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *         the default color {@link SWT#COLOR_INFO_FOREGROUND}
 	 * @see SWT#COLOR_INFO_FOREGROUND
 	 */
-	public Color getToolTipForegroundColor(Object object) {
+	public Color getToolTipForegroundColor(E object) {
 		return null;
 	}
 
@@ -132,7 +134,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * @return {@link Font} or <code>null</code> if the default font is to be
 	 *         used.
 	 */
-	public Font getToolTipFont(Object object) {
+	public Font getToolTipFont(E object) {
 		return null;
 	}
 
@@ -148,7 +150,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * @return {@link Point} to shift of the tool tip or <code>null</code> if the
 	 *         default shift should be used.
 	 */
-	public Point getToolTipShift(Object object) {
+	public Point getToolTipShift(E object) {
 		return null;
 	}
 
@@ -169,7 +171,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return <code>true</code> if native tool tips should be used
 	 */
-	public boolean useNativeToolTip(Object object) {
+	public boolean useNativeToolTip(E object) {
 		return false;
 	}
 
@@ -180,7 +182,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return time in milliseconds the tool tip is shown for
 	 */
-	public int getToolTipTimeDisplayed(Object object) {
+	public int getToolTipTimeDisplayed(E object) {
 		return 0;
 	}
 
@@ -191,7 +193,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 *            the {@link Object} for which the tool tip is shown
 	 * @return time in milliseconds until the tool tip is displayed
 	 */
-	public int getToolTipDisplayDelayTime(Object object) {
+	public int getToolTipDisplayDelayTime(E object) {
 		return 0;
 	}
 
@@ -204,7 +206,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * @return the style used to create the label
 	 * @see CLabel
 	 */
-	public int getToolTipStyle(Object object) {
+	public int getToolTipStyle(E object) {
 		return SWT.SHADOW_NONE;
 	}
 
@@ -214,7 +216,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * @param cell
 	 *            {@link ViewerCell}
 	 */
-	public abstract void update(ViewerCell cell);
+	public abstract void update(ViewerCell<E> cell);
 	
 	/**
 	 * Initialize this label provider for use with the given column viewer for
@@ -230,7 +232,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * 
 	 * @since 3.4
 	 */
-	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
+	protected void initialize(ColumnViewer<E,I> viewer, ViewerColumn column) {
 	}
 
 	/**
@@ -246,7 +248,7 @@ public abstract class CellLabelProvider extends BaseLabelProvider {
 	 * 
 	 * @since 3.4
 	 */
-	public void dispose(ColumnViewer viewer, ViewerColumn column) {
+	public void dispose(ColumnViewer<E,I> viewer, ViewerColumn column) {
 		dispose();
 	}
 	
