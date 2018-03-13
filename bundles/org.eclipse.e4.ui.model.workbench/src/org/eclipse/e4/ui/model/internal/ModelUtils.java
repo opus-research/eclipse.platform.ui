@@ -83,38 +83,46 @@ public class ModelUtils {
 			boolean flag = true;
 			if( positionInList != null && positionInList.trim().length() != 0 ) {
 				int index = -1;
-				if( positionInList.startsWith("first") ) {
-					index = 0;
-				} else if( positionInList.startsWith("index:") ) {
-					index = Integer.parseInt(positionInList.substring("index:".length()));	
-				} else if( positionInList.startsWith("before:") || positionInList.startsWith("after:") ) {
-					String elementId;
-					boolean before;
-					if( positionInList.startsWith("before:") ) {
-						elementId = positionInList.substring("before:".length());
-						before = true;
-					} else {
-						elementId = positionInList.substring("after:".length());
-						before = false;
-					}
-					
-					int tmpIndex = -1;
-					for( int i = 0; i < list.size(); i++ ) {
-						if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
-							tmpIndex = i;
-							break;
-						}
-					}
-					
-					if( tmpIndex != -1 ) {
-						if( before ) {
-							index = tmpIndex;
-						} else {
-							index = tmpIndex + 1;
-						}
-					} else {
-						System.err.println("Could not find element with Id '"+elementId+"'");
-					}
+				
+				PositionInfo posInfo = PositionInfo.parse(positionInList);
+				
+				if( posInfo != null ){
+				  switch (posInfo.getPosition()){
+				    case FIRST:
+				      index = 0;
+				      break;
+				      
+				    case INDEX:
+				      index = posInfo.getPositionReferenceAsInteger();
+				      break;
+				      
+				    case BEFORE:
+				    case AFTER:
+				      int tmpIndex = -1;
+				      String elementId = posInfo.getPositionReference();
+				      
+				      for( int i = 0; i < list.size(); i++ ) {
+		            if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
+		              tmpIndex = i;
+		              break;
+		            }
+		          }
+				      
+				      if( tmpIndex != -1 ) {
+		            if( posInfo.getPosition() == Position.BEFORE ) {
+		              index = tmpIndex;
+		            } else {
+		              index = tmpIndex + 1;
+		            }
+		          } else {
+		            System.err.println("Could not find element with Id '"+elementId+"'");
+		          }
+				      
+				    case LAST:
+				      default:
+				        // both no special operation, because the default is adding it at the last position
+				        break;
+				  }
 				} else {
 					System.err.println("Not a valid list position.");
 				}
@@ -208,5 +216,188 @@ public class ModelUtils {
 
 		return null;
 	}
+	
+  /**
+   * All the possible positioning values which can be used to contribute
+   * elements into the wanted place of a list.
+   * 
+   * @author René Brandstetter
+   */
+  public static enum Position {
+    /** Add an element to the end of a list (absolute positioning). */
+    LAST("last"),
 
+    /** Add an element at the beginning of a list (absolute positioning). */
+    FIRST("first"),
+
+    /** Add an element before another named element (relative positioning). */
+    BEFORE("before:"),
+
+    /** Add an element after a named element (relative positioning). */
+    AFTER("after:"),
+
+    /** Add an element at a specific index (absolute positioning). */
+    INDEX("index:");
+
+    /** The prefix of the enum which is used in the positioning string. */
+    private final String prefix;
+
+    private Position(String prefix) {
+      assert prefix != null : "Prefix required!";
+      this.prefix = prefix;
+    }
+
+    /**
+     * Find the {@link Position} enum value used in the given positioning
+     * string.
+     * 
+     * @param positionInfo
+     *          the positioning string (can be <code>null</code>, which would
+     *          result in <code>null</code>)
+     * @return the {@link Position} which is mentioned in the positioning
+     *         string, or <code>null</code> if none can be found
+     */
+    public static final Position find(String positionInfo) {
+      if (positionInfo == null || positionInfo.length() <= 0)
+        return null;
+
+      for (Position position : Position.values()) {
+        if (positionInfo.startsWith(position.prefix))
+          return position;
+      }
+
+      return null;
+    }
+  }
+
+  /**
+   * A holder class for the full information to position an element in a list.
+   * 
+   * @author René Brandstetter
+   */
+  public static final class PositionInfo {
+    /** The position type to use. */
+    private final Position position;
+
+    /**
+     * The additional positioning information which can be used to position an
+     * element relative to another element.
+     */
+    private final String positionReference;
+
+    /**
+     * The {@link PositionInfo} which represent an insert at the beginning of
+     * the list.
+     */
+    public static final PositionInfo FIRST = new PositionInfo(Position.FIRST, null);
+
+    /**
+     * The {@link PositionInfo} which represent an insert at the end of the
+     * list.
+     */
+    public static final PositionInfo LAST = new PositionInfo(Position.LAST, null);
+
+    /**
+     * Creates an instance of the PositionInfo.
+     * 
+     * @param position
+     *          the kind of the positioning
+     * @param positionReference
+     *          additional information which is need to position an element
+     *          (e.g.: index, ID of another element)
+     * @throws NullPointerException
+     *           if the <code>position</code> is <code>null</code>
+     */
+    public PositionInfo(Position position, String positionReference) {
+      if (position == null) {
+        throw new NullPointerException("No position given!");
+      }
+
+      this.position = position;
+      this.positionReference = positionReference;
+    }
+
+    /**
+     * Returns the kind/type of positioning which should be used.
+     * 
+     * @return the position
+     */
+    public Position getPosition() {
+      return position;
+    }
+
+    /**
+     * Returns additional information which is needed to place an element.
+     * 
+     * @return the positionReference
+     */
+    public String getPositionReference() {
+      return positionReference;
+    }
+
+    /**
+     * Returns the additional information which is needed to place an element as
+     * an int.
+     * 
+     * @return the positionReference as an int
+     * @throws NumberFormatException
+     *           if the {@link #positionReference} can't be parsed to an int
+     * @throws NullPointerException
+     *           if the {@link #positionReference} is <code>null</code>
+     */
+    public int getPositionReferenceAsInteger() {
+      return Integer.parseInt(positionReference);
+    }
+
+    /**
+     * Creates a {@link PositionInfo} object out of the given positioning
+     * string.
+     * 
+     * <p>
+     * <b>Examples for a positioning string:</b>
+     * <ul>
+     * <li><code>last</code> - place an element to the end of a list</li>
+     * <li><code>first</code> - place an element to the beginning of a list</li>
+     * <li><code>index:3</code> - place an element at the provided index 3 in a
+     * list</li>
+     * <li><code>before:org.eclipse.test.id</code> - place an element in a list
+     * in front of the element with the ID "org.eclipse.test.id"</li>
+     * <li><code>after:org.eclipse.test.id</code> - place an element in a list
+     * after the element with the ID "org.eclipse.test.id"</li>
+     * </ul>
+     * </p>
+     * 
+     * @param positionInfo
+     *          the positioning string
+     * @return a {@link PositionInfo} which holds all the data mentioned in the
+     *         positioning string, or <code>null</code> if the positioning
+     *         string doesn't hold a positioning information
+     */
+    public static PositionInfo parse(String positionInfo) {
+      Position position = Position.find(positionInfo);
+      if (position != null) {
+        switch (position) {
+          case FIRST:
+            return PositionInfo.FIRST;
+
+          case LAST:
+            return PositionInfo.LAST;
+
+          default:
+            return new PositionInfo(position, positionInfo.substring(position.prefix.length()));
+        }
+      }
+
+      return null;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder back = new StringBuilder(position.prefix);
+      if (positionReference != null) {
+        back.append(positionReference);
+      }
+      return back.toString();
+    }
+  }
 }
