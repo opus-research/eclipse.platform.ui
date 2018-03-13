@@ -47,8 +47,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.FontMetrics;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
@@ -108,7 +106,9 @@ public class SearchField {
 		// borderColor = new Color(parent.getDisplay(), 170, 176, 191);
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
-		text = createText(comp);
+		text = new Text(comp, SWT.SEARCH | SWT.ICON_SEARCH);
+		GridDataFactory.fillDefaults().hint(130, SWT.DEFAULT).applyTo(text);
+		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		parent.getShell().addControlListener(new ControlListener() {
 			public void controlResized(ControlEvent e) {
@@ -254,20 +254,6 @@ public class SearchField {
 			}
 		});
 		quickAccessContents.createInfoLabel(shell);
-	}
-
-	private Text createText(Composite parent) {
-		Text text = new Text(parent, SWT.SEARCH | SWT.ICON_SEARCH);
-		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
-
-		GC gc = new GC(text);
-		FontMetrics fm = gc.getFontMetrics();
-		int width = text.computeSize(fm.getAverageCharWidth() * text.getMessage().length(),
-				SWT.DEFAULT).x + 15 /* some extra space */;
-		gc.dispose();
-
-		GridDataFactory.fillDefaults().hint(width, SWT.DEFAULT).applyTo(text);
-		return text;
 	}
 
 	private void hookUpSelectAll() {
