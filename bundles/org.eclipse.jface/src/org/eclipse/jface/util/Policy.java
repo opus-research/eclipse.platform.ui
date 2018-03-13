@@ -137,7 +137,6 @@ public class Policy {
 		return new StatusHandler() {
 			private SafeRunnableDialog dialog;
 
-			@Override
 			public void show(final IStatus status, String title) {
 				Runnable runnable = new Runnable() {
 					public void run() {

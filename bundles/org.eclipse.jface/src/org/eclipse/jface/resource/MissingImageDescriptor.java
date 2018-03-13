@@ -33,8 +33,7 @@ class MissingImageDescriptor extends ImageDescriptor {
     /* (non-Javadoc)
      * Method declared on ImageDesciptor.
      */
-    @Override
-	public ImageData getImageData() {
+    public ImageData getImageData() {
         return DEFAULT_IMAGE_DATA;
     }
 

@@ -280,7 +280,6 @@ public class ControlDecoration {
 				}
 			});
 			hoverShell.addMouseListener(new MouseAdapter() {
-				@Override
 				public void mouseDown(MouseEvent e) {
 					hideHover();
 				}
