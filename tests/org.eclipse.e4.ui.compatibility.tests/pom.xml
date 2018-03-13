@@ -14,10 +14,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>eclipse.platform.ui</artifactId>
+    <artifactId>eclipse.platform.ui.tests</artifactId>
     <groupId>eclipse.platform.ui</groupId>
     <version>3.8.0-SNAPSHOT</version>
-    <relativePath>../../</relativePath>
   </parent>
   <groupId>org.eclipse.e4</groupId>
   <artifactId>org.eclipse.e4.ui.compatibility.tests</artifactId>
