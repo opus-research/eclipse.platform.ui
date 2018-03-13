@@ -53,7 +53,6 @@ import org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory;
 import org.eclipse.e4.ui.internal.workbench.ResourceHandler;
 import org.eclipse.e4.ui.internal.workbench.SelectionAggregator;
 import org.eclipse.e4.ui.internal.workbench.SelectionServiceImpl;
-import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.WorkbenchLogger;
 import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -105,8 +104,6 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
-	private static final String PERSPECTIVE_ARG_NAME = "perspective";
-	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
 
 	private String[] args;
 
@@ -241,14 +238,6 @@ public class E4Application implements IApplication {
 						PostContextCreate.class, appContext, null);
 			}
 		}
-
-		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
-				applicationContext, false);
-		if (forcedPerspectiveId != null) {
-			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
-					forcedPerspectiveId);
-		}
-
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext,
 				appContext);
@@ -294,7 +283,10 @@ public class E4Application implements IApplication {
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
-		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
+
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		appContext.set(E4Application.THEME_ID, themeId);
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
@@ -349,17 +341,8 @@ public class E4Application implements IApplication {
 		}
 		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
 				+ " argument missing"); //$NON-NLS-1$
-
-		URI initialWorkbenchDefinitionInstance;
-
-		// check if the appModelPath is already a platform-URI and if so use it
-		if (URIHelper.isPlatformURI(appModelPath)) {
-			initialWorkbenchDefinitionInstance = URI.createURI(appModelPath,
-					true);
-		} else {
-			initialWorkbenchDefinitionInstance = URI.createPlatformPluginURI(
-					appModelPath, true);
-		}
+		final URI initialWorkbenchDefinitionInstance = URI
+				.createPlatformPluginURI(appModelPath, true);
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
@@ -662,11 +645,6 @@ public class E4Application implements IApplication {
 		mbox.setText(title);
 		mbox.setMessage(message);
 		return mbox.open() == SWT.OK;
-	}
-
-	private String getThemeId(IApplicationContext appContext) {
-		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
-		return themeId != null ? themeId : DEFAULT_THEME_ID;
 	}
 
 	/**

@@ -54,7 +54,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -545,9 +544,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			if (currentWidget instanceof Control) {
 				Control control = (Control) currentWidget;
 				// make sure the control is visible
-				MUIElement elementParent = element.getParent();
-				if (!(element instanceof MPlaceholder)
-						|| !(elementParent instanceof MPartStack))
+				if (!(element instanceof MPlaceholder))
 					control.setVisible(true);
 
 				if (parentWidget instanceof Composite) {
@@ -630,12 +627,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					lclContext.set(key, props.get(key));
 				}
 			}
-		}
-
-		// We check the widget again since it could be created by some UI event.
-		// See Bug 417399
-		if (element.getWidget() != null) {
-			return safeCreateGui(element, parentWidget, parentContext);
 		}
 
 		// Create a control appropriate to the part
@@ -1262,7 +1253,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
@@ -1363,9 +1354,5 @@ public class PartRenderingEngine implements IPresentationEngine {
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
 
-		IEventBroker broker = appContext.get(IEventBroker.class);
-		if (broker != null) {
-			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
-		}
 	}
 }

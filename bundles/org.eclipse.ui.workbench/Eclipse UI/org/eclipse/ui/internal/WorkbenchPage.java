@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
- *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1164,15 +1163,32 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 			part = (MPart) ph.getRef();
 			part.setCurSharedRef(ph);
+
+			part = showPart(mode, part);
+
+			CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
+
+			if (compatibilityView != null) {
+				IWorkbenchPartReference ref = compatibilityView.getReference();
+
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+			}
+			return compatibilityView.getView();
 		}
 
 		part = showPart(mode, part);
 
-		ViewReference ref = getViewReference(part);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
 
-		return (IViewPart) ref.getPart(true);
+		if (compatibilityView != null) {
+			IWorkbenchPartReference ref = compatibilityView.getReference();
+
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		}
+		return compatibilityView.getView();
+
 	}
 	private MPart showPart(int mode, MPart part) {
 		switch (mode) {
@@ -1361,7 +1377,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				IEditorReference ref = it.next();
 				// hide editors that haven't been instantiated first
 				if (ref.getPart(false) == null) {
-					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false, false))) {
+					if (!(hidePart(((EditorReference) ref).getModel(), false, confirm, false))) {
 						return false;
 					}
 					// hidden successfully, remove it from the list
@@ -1376,7 +1392,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				MPart model = ((EditorReference) editorRef).getModel();
 				if (activePart == model) {
 					closeActivePart = true;
-				} else if (!(hidePart(model, false, confirm, false, false))) {
+				} else if (!(hidePart(model, false, confirm, false))) {
 					// saving should've been handled earlier above
 					return false;
 				}
@@ -2248,11 +2264,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see org.eclipse.ui.IWorkbenchPage#getEditors()
 	 */
 	public IEditorPart[] getEditors() {
-		final IEditorReference[] editorReferences = getEditorReferences();
-		int length = editorReferences.length;
+		int length = editorReferences.size();
 		IEditorPart[] editors = new IEditorPart[length];
 		for (int i = 0; i < length; i++) {
-			editors[i] = editorReferences[i].getEditor(true);
+			editors[i] = editorReferences.get(i).getEditor(true);
 		}
 		return editors;
 	}
@@ -3757,9 +3772,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 */
 	public boolean saveSaveable(ISaveablePart saveable, IWorkbenchPart part, boolean confirm,
 			boolean closing) {
-		if (closing && !saveable.isSaveOnCloseNeeded()) {
-			return true;
-		}
 		return SaveableHelper.savePart(saveable, part, legacyWindow, confirm);
 	}
 
