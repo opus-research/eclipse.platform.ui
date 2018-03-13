@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -119,9 +118,8 @@ public class SashLayout extends Layout {
 			}
 
 			public void mouseDown(MouseEvent e) {
-				if (e.button != 1) {
+				if (e.button != 1)
 					return;
-				}
 
 				sashesToDrag = getSashRects(e.x, e.y);
 				if (sashesToDrag.size() > 0) {
@@ -148,6 +146,10 @@ public class SashLayout extends Layout {
 				// }
 			}
 		});
+	}
+
+	public void setRootElemenr(MUIElement newRoot) {
+		root = newRoot;
 	}
 
 	@Override
@@ -226,10 +228,17 @@ public class SashLayout extends Layout {
 
 	protected List<SashRect> getSashRects(int x, int y) {
 		List<SashRect> srs = new ArrayList<SashRect>();
+		boolean inSash = false;
+		for (SashRect sr : sashes) {
+			if (sr.rect.contains(x, y))
+				inSash = true;
+		}
+		if (!inSash)
+			return srs;
+
 		Rectangle target = new Rectangle(x - 5, y - 5, 10, 10);
 		for (SashRect sr : sashes) {
-			if (!sr.container.getTags().contains(IPresentationEngine.NO_MOVE)
-					&& sr.rect.intersects(target))
+			if (sr.rect.intersects(target))
 				srs.add(sr);
 		}
 		return srs;

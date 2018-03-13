@@ -21,7 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MGenericTrimContainer;
 import org.eclipse.e4.ui.model.application.ui.MInput;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -102,7 +101,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseWindowElement(part);
 				if (result == null) result = caseUIElement(part);
 				if (result == null) result = caseApplicationElement(part);
-				if (result == null) result = caseLocalizable(part);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -123,7 +121,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(compositePart);
 				if (result == null) result = caseUIElement(compositePart);
 				if (result == null) result = caseApplicationElement(compositePart);
-				if (result == null) result = caseLocalizable(compositePart);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -143,7 +140,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseWindowElement(inputPart);
 				if (result == null) result = caseUIElement(inputPart);
 				if (result == null) result = caseApplicationElement(inputPart);
-				if (result == null) result = caseLocalizable(inputPart);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -156,7 +152,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(partStack);
 				if (result == null) result = caseUIElement(partStack);
 				if (result == null) result = caseApplicationElement(partStack);
-				if (result == null) result = caseLocalizable(partStack);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -169,7 +164,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(partSashContainer);
 				if (result == null) result = caseUIElement(partSashContainer);
 				if (result == null) result = caseApplicationElement(partSashContainer);
-				if (result == null) result = caseLocalizable(partSashContainer);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -184,7 +178,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseSnippetContainer(window);
 				if (result == null) result = caseUIElement(window);
 				if (result == null) result = caseApplicationElement(window);
-				if (result == null) result = caseLocalizable(window);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -200,7 +193,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseSnippetContainer(trimmedWindow);
 				if (result == null) result = caseUIElement(trimmedWindow);
 				if (result == null) result = caseApplicationElement(trimmedWindow);
-				if (result == null) result = caseLocalizable(trimmedWindow);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -209,7 +201,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				T1 result = caseTrimElement(trimElement);
 				if (result == null) result = caseUIElement(trimElement);
 				if (result == null) result = caseApplicationElement(trimElement);
-				if (result == null) result = caseLocalizable(trimElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -218,7 +209,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				T1 result = casePartSashContainerElement(partSashContainerElement);
 				if (result == null) result = caseUIElement(partSashContainerElement);
 				if (result == null) result = caseApplicationElement(partSashContainerElement);
-				if (result == null) result = caseLocalizable(partSashContainerElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -227,7 +217,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				T1 result = caseWindowElement(windowElement);
 				if (result == null) result = caseUIElement(windowElement);
 				if (result == null) result = caseApplicationElement(windowElement);
-				if (result == null) result = caseLocalizable(windowElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -238,7 +227,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(trimBar);
 				if (result == null) result = caseUIElement(trimBar);
 				if (result == null) result = caseApplicationElement(trimBar);
-				if (result == null) result = caseLocalizable(trimBar);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -247,7 +235,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				T1 result = caseStackElement(stackElement);
 				if (result == null) result = caseUIElement(stackElement);
 				if (result == null) result = caseApplicationElement(stackElement);
-				if (result == null) result = caseLocalizable(stackElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -263,7 +250,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseSnippetContainer(dialog);
 				if (result == null) result = caseUIElement(dialog);
 				if (result == null) result = caseApplicationElement(dialog);
-				if (result == null) result = caseLocalizable(dialog);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -280,7 +266,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseSnippetContainer(wizardDialog);
 				if (result == null) result = caseUIElement(wizardDialog);
 				if (result == null) result = caseApplicationElement(wizardDialog);
-				if (result == null) result = caseLocalizable(wizardDialog);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -615,21 +600,6 @@ public class BasicSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseBindings(MBindings object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseLocalizable(MLocalizable object) {
 		return null;
 	}
 

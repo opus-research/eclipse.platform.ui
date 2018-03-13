@@ -168,7 +168,6 @@ public class TitleAreaDialog extends TrayDialog {
 		
 		// need to react to new size of title area
 		getShell().addListener(SWT.Resize, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				layoutForNewMessage(true);
 			}
@@ -219,7 +218,6 @@ public class TitleAreaDialog extends TrayDialog {
 
 		// add a dispose listener
 		parent.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (titleAreaColor != null) {
 					titleAreaColor.dispose();

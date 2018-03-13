@@ -42,7 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getToolbar <em>Toolbar</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#isCloseable <em>Closeable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getDescription <em>Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription <em>Localized Description</em>}</li>
  * </ul>
  * </p>
  *
@@ -155,11 +154,17 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	void setDescription(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Localized Description</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Localized Description</em>' attribute.
-	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * <!-- begin-model-doc -->
+	 * <p>
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
+	 * </p>
+	 * <!-- end-model-doc -->
+	 * @model kind="operation"
 	 * @generated
 	 */
 	String getLocalizedDescription();

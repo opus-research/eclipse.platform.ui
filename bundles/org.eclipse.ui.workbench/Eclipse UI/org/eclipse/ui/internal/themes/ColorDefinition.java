@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
+import java.util.ResourceBundle;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorDefinitionOverridable;
 import org.eclipse.jface.resource.DataFormatException;
@@ -25,9 +26,13 @@ import org.eclipse.ui.themes.ColorUtil;
  * 
  *  @since 3.0
  */
-public class ColorDefinition extends ThemeElementDefinition implements IPluginContribution,
-		IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition, IEditable,
-		IColorDefinitionOverridable {
+public class ColorDefinition implements IPluginContribution,
+        IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition,
+ IEditable, IColorDefinitionOverridable {
+	
+	private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(Theme.class
+			.getName());
+
 	/**
 	 * Default color value - black - for colors that cannot be parsed.
 	 */
@@ -35,13 +40,23 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 
 	private String defaultsTo;
 
+    private String description;
+
+    private String id;
+
+    private String label;
+
     private String pluginId;
 
     private String rawValue;
 
+    private String categoryId;
+
     boolean isEditable;
 
     private RGB parsedValue;
+
+	private boolean overridden;
 
     /**
      * Create a new instance of the receiver.
@@ -59,9 +74,13 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
     public ColorDefinition(String label, String id, String defaultsTo,
             String value, String categoryId, boolean isEditable,
             String description, String pluginId) {
-		super(id, label, description, categoryId);
+
+        this.label = label;
+        this.id = id;
         this.defaultsTo = defaultsTo;
         this.rawValue = value;
+        this.categoryId = categoryId;
+        this.description = description;
         this.isEditable = isEditable;
         this.pluginId = pluginId;
     }
@@ -75,11 +94,22 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
      * @param value the RGB value
      */
     public ColorDefinition(ColorDefinition original, RGB value) {
-		super(original.getId(), original.getName(), original.getDescription(), original
-				.getCategoryId());
+
+        this.label = original.getName();
+        this.id = original.getId();
+        this.categoryId = original.getCategoryId();
+        this.description = original.getDescription();
         this.isEditable = original.isEditable();
         this.pluginId = original.getPluginId();
+
         this.parsedValue = value;
+    }
+
+    /**
+     * @return the categoryId, or <code>null</code> if none was supplied.
+     */
+    public String getCategoryId() {
+        return categoryId;
     }
 
     /**
@@ -87,6 +117,27 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
      */
     public String getDefaultsTo() {
         return defaultsTo;
+    }
+
+    /**
+     * @return the description text, or <code>null</code> if none was supplied.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the id of this definition.  Should not be <code>null</code>.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @return the label text.  Should not be <code>null</code>.
+     */
+    public String getName() {
+        return label;
     }
 
     /* (non-Javadoc)
@@ -114,18 +165,12 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 			} catch (DataFormatException e) {
 				parsedValue = DEFAULT_COLOR_VALUE;
 				IStatus status = StatusUtil.newStatus(IStatus.WARNING,
-						"Could not parse value for theme color " + getId(), e); //$NON-NLS-1$
+						"Could not parse value for theme color " + id, e); //$NON-NLS-1$
 				StatusManager.getManager().handle(status, StatusManager.LOG);
 			}
 		}
         return parsedValue;
     }
-
-	@Override
-	public void resetToDefaultValue() {
-		parsedValue = null;
-		super.resetToDefaultValue();
-	}
 
     /*
 	 * (non-Javadoc)
@@ -157,7 +202,7 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-		return getId().hashCode();
+        return id.hashCode();
     }
 
 	/*
@@ -169,7 +214,20 @@ public class ColorDefinition extends ThemeElementDefinition implements IPluginCo
 	public void setValue(RGB data) {
 		if (data != null) {
 			parsedValue = data;
-			appendState(State.OVERRIDDEN);
+			if (!isOverridden()) {
+				description += ' ' + RESOURCE_BUNDLE.getString("Overridden.by.css.label"); //$NON-NLS-1$
+				overridden = true;
+			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.internal.css.swt.definition.
+	 * IThemeElementDefinitionOverridable#isOverriden()
+	 */
+	public boolean isOverridden() {
+		return overridden;
 	}
 }
