@@ -1742,102 +1742,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		// TODO compat: we have no min/max behaviour
     }
 
-
-
-    /**
-	 * Cleanup.
-	 */
-	public void dispose() {
-
-// // Always unzoom
-		// if (isZoomed()) {
-		// zoomOut();
-		// }
-		//
-		// // makeActiveEditor(null);
-		// // makeActive(null);
-		//        
-		// // Close and dispose the editors.
-		// closeAllEditors(false);
-		//        
-		// // Need to make sure model data is cleaned up when the page is
-		// // disposed. Collect all the views on the page and notify the
-		// // saveable list of a pre/post close. This will free model data.
-		// IWorkbenchPartReference[] partsToClose = getOpenParts();
-		// List dirtyParts = new ArrayList(partsToClose.length);
-		// for (int i = 0; i < partsToClose.length; i++) {
-		// IWorkbenchPart part = partsToClose[i].getPart(false);
-		// if (part != null && part instanceof IViewPart) {
-		// dirtyParts.add(part);
-		// }
-		// }
-		// SaveablesList saveablesList = (SaveablesList)
-		// getWorkbenchWindow().getWorkbench().getService(ISaveablesLifecycleListener.class);
-		// Object postCloseInfo = saveablesList.preCloseParts(dirtyParts,
-		// false,getWorkbenchWindow());
-		// saveablesList.postClose(postCloseInfo);
-		//
-		// // Get rid of perspectives. This will close the views.
-		// Iterator itr = perspList.iterator();
-		// while (itr.hasNext()) {
-		// Perspective perspective = (Perspective) itr.next();
-		// legacyWindow.firePerspectiveClosed(this, perspective.getDesc());
-		// perspective.dispose();
-		// }
-		// perspList = new PerspectiveList();
-		//
-		// // Capture views.
-		// IViewReference refs[] = viewFactory.getViews();
-		//
-		// if (refs.length > 0) {
-		// // Dispose views.
-		// for (int i = 0; i < refs.length; i++) {
-		// final WorkbenchPartReference ref = (WorkbenchPartReference) refs[i];
-		// //partList.removePart(ref);
-		// //firePartClosed(refs[i]);
-		// Platform.run(new SafeRunnable() {
-		// public void run() {
-		// // WorkbenchPlugin.log(new Status(IStatus.WARNING,
-		// WorkbenchPlugin.PI_WORKBENCH,
-		////                                Status.OK, "WorkbenchPage leaked a refcount for view " + ref.getId(), null));  //$NON-NLS-1$//$NON-NLS-2$
-		//                        
-		// ref.dispose();
-		// }
-		//    
-		// public void handleException(Throwable e) {
-		// }
-		// });
-		// }
-		// }
-		//        
-		// activationList = new ActivationList();
-		//
-		// // Get rid of editor presentation.
-		// editorPresentation.dispose();
-		//
-		// // Get rid of composite.
-		// composite.dispose();
-		//
-		// navigationHistory.dispose();
-		//
-		// stickyViewMan.clear();
-		//        
-		// if (tracker != null) {
-		// tracker.close();
-		// }
-		//        
-		// // if we're destroying a window in a non-shutdown situation then we
-		// should
-		// // clean up the working set we made.
-		// if (!legacyWindow.getWorkbench().isClosing()) {
-		// if (aggregateWorkingSet != null) {
-		// PlatformUI.getWorkbench().getWorkingSetManager().removeWorkingSet(aggregateWorkingSet);
-		// }
-		// }
-    }
-
-
-
     /**
      * @return NavigationHistory
      */
@@ -2560,7 +2464,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		this.legacyWindow = w;
         this.input = input;
         actionSets = new ActionSetManager(w);
-		initActionSetListener();
 	}
 
 	@PostConstruct
@@ -3375,29 +3278,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		// reset complete
 		legacyWindow.firePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
-	}
-
-	private void initActionSetListener() {
-		// actionSets.addListener(new IPropertyListener() {
-		// public void propertyChanged(Object source, int propId) {
-		// if (source instanceof IActionSetDescriptor) {
-		// final IActionSetDescriptor desc = (IActionSetDescriptor) source;
-		// final String actionSetId = ModeledPageLayout.ACTION_SET_TAG +
-		// desc.getId();
-		// final MPerspective currentPerspective = getCurrentPerspective();
-		// if (currentPerspective != null) {
-		// final List<String> tags = currentPerspective.getTags();
-		// if (propId == ActionSetManager.PROP_VISIBLE) {
-		// if (!tags.contains(actionSetId)) {
-		// tags.add(actionSetId);
-		// }
-		// } else if (propId == ActionSetManager.PROP_HIDDEN) {
-		// tags.remove(actionSetId);
-		// }
-		// }
-		// }
-		// }
-		// });
 	}
 
     /**
