@@ -74,7 +74,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		getContextStack().addFirst(new ExecutionContexts(ctx, staticCtx));
 	}
 
-	public static ExecutionContexts pop() {
+	static ExecutionContexts pop() {
 		return getContextStack().poll();
 	}
 
