@@ -84,7 +84,7 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public static final QualifiedName PROPERTY_IN_DIALOG = IProgressConstants.PROPERTY_IN_DIALOG;
 
-	private static final String ERROR_JOB = "errorstate.gif"; //$NON-NLS-1$
+	private static final String ERROR_JOB = "errorstate.png"; //$NON-NLS-1$
 
 	static final String ERROR_JOB_KEY = "ERROR_JOB"; //$NON-NLS-1$
 
@@ -104,11 +104,11 @@ public class ProgressManager extends ProgressProvider implements
 
 	static final String PROGRESS_FOLDER = "$nl$/icons/full/progress/"; //$NON-NLS-1$
 
-	private static final String SLEEPING_JOB = "sleeping.gif"; //$NON-NLS-1$
+	private static final String SLEEPING_JOB = "sleeping.png"; //$NON-NLS-1$
 
-	private static final String WAITING_JOB = "waiting.gif"; //$NON-NLS-1$
+	private static final String WAITING_JOB = "waiting.png"; //$NON-NLS-1$
 
-	private static final String BLOCKED_JOB = "lockedstate.gif"; //$NON-NLS-1$
+	private static final String BLOCKED_JOB = "lockedstate.png"; //$NON-NLS-1$
 
 	/**
 	 * The key for the sleeping job icon.

@@ -271,11 +271,11 @@ public class ProgressAnimationItem extends AnimationItem implements
 		if (okImage == null) {
 			Display display = parent.getDisplay();
 			noneImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_none.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_none.png").createImage(display); //$NON-NLS-1$
 			okImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_ok.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_ok.png").createImage(display); //$NON-NLS-1$
 			errorImage = WorkbenchImages.getWorkbenchImageDescriptor(
-					"progress/progress_error.gif").createImage(display); //$NON-NLS-1$
+					"progress/progress_error.png").createImage(display); //$NON-NLS-1$
 		}
 
 		top = new Composite(parent, SWT.NULL);
