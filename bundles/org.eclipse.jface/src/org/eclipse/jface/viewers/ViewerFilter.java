@@ -81,7 +81,7 @@ public abstract class ViewerFilter<E,I> {
      * @return the filtered elements
      * @since 3.2
      */
-    public Object[] filter(Viewer<I> viewer, TreePath parentPath, E[] elements) {
+    public Object[] filter(Viewer<I> viewer, TreePath<E> parentPath, E[] elements) {
         return filter(viewer, parentPath.getLastSegment(), elements);
     }
     
