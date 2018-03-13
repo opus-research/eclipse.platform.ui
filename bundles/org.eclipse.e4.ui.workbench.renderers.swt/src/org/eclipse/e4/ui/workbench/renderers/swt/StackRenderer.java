@@ -47,6 +47,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
@@ -413,7 +414,7 @@ public class StackRenderer extends LazyStackRenderer {
 			cti.setImage(getImage(part));
 		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 			String newTTip = (String) newValue;
-			cti.setToolTipText(newTTip);
+			cti.setToolTipText(getToolTip(newTTip));
 		} else if (UIEvents.Dirtyable.DIRTY.equals(attName)) {
 			Boolean dirtyState = (Boolean) newValue;
 			String text = cti.getText();
@@ -443,11 +444,18 @@ public class StackRenderer extends LazyStackRenderer {
 	private String getLabel(MUILabel itemPart, String newName) {
 		if (newName == null) {
 			newName = ""; //$NON-NLS-1$
+		} else {
+			newName = LegacyActionTools.escapeMnemonics(newName);
 		}
+
 		if (itemPart instanceof MDirtyable && ((MDirtyable) itemPart).isDirty()) {
 			newName = '*' + newName;
 		}
 		return newName;
+	}
+
+	private String getToolTip(String newToolTip) {
+		return newToolTip == null ? null : LegacyActionTools.escapeMnemonics(newToolTip);
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -566,79 +574,83 @@ public class StackRenderer extends LazyStackRenderer {
 			return;
 
 		adjusting = true;
-		MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
-		MUIElement element = stack.getSelectedElement();
-		if (element == null && ctf.getItemCount() > 1) {
-			// We'll be selecting another item...
+
+		try {
+			// Gather the parameters...old part, new part...
+			MPartStack stack = (MPartStack) ctf.getData(OWNING_ME);
+			MUIElement element = stack.getSelectedElement();
+			MPart curPart = (MPart) ctf.getTopRight().getData("thePart"); //$NON-NLS-1$
+			MPart part = null;
+			if (element != null) {
+				part = (MPart) ((element instanceof MPart) ? element
+						: ((MPlaceholder) element).getRef());
+			}
+
+			// Hide the old TB if we're changing
+			if (part != curPart && curPart != null
+					&& curPart.getToolbar() != null) {
+				curPart.getToolbar().setVisible(false);
+			}
+
+			Composite trComp = (Composite) ctf.getTopRight();
+			Control[] kids = trComp.getChildren();
+
+			boolean needsTB = part != null && part.getToolbar() != null
+					&& part.getToolbar().isToBeRendered();
+
+			// View menu (if any)
+			MMenu viewMenu = getViewMenu(part);
+			boolean needsMenu = viewMenu != null
+					&& hasVisibleMenuItems(viewMenu, part);
+
+			// Check the current state of the TB's
+			ToolBar menuTB = (ToolBar) kids[kids.length - 1];
+
+			// We need to modify the 'exclude' bit based on if the menuTB is
+			// visible or not
+			RowData rd = (RowData) menuTB.getLayoutData();
+			if (needsMenu) {
+				menuTB.getItem(0).setData("thePart", part); //$NON-NLS-1$
+				menuTB.moveBelow(null);
+				menuTB.pack();
+				rd.exclude = false;
+				menuTB.setVisible(true);
+			} else {
+				menuTB.getItem(0).setData("thePart", null); //$NON-NLS-1$
+				rd.exclude = true;
+				menuTB.setVisible(false);
+			}
+
+			ToolBar newViewTB = null;
+			if (needsTB) {
+				part.getToolbar().setVisible(true);
+				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
+						ctf.getTopRight(), part.getContext());
+				// We can get calls during shutdown in which case the
+				// rendering engine will return 'null' because you can't
+				// render anything while a removeGui is taking place...
+				if (newViewTB == null) {
+					adjusting = false;
+					return;
+				}
+				newViewTB.moveAbove(null);
+				newViewTB.pack();
+			}
+
+			if (needsMenu || needsTB) {
+				ctf.getTopRight().setData("thePart", part); //$NON-NLS-1$
+				ctf.getTopRight().pack(true);
+				ctf.getTopRight().setVisible(true);
+			} else {
+				ctf.getTopRight().setData("thePart", null); //$NON-NLS-1$
+				ctf.getTopRight().setVisible(false);
+			}
+
+			// Pack the result
+			trComp.pack();
+		} finally {
 			adjusting = false;
-			return;
 		}
-
-		MPart curPart = (MPart) ctf.getTopRight().getData("thePart"); //$NON-NLS-1$
-		MPart part = null;
-		if (element != null) {
-			part = (MPart) ((element instanceof MPart) ? element
-					: ((MPlaceholder) element).getRef());
-		}
-
-		// Hide the old TB if we're changing
-		if (part != curPart && curPart != null && curPart.getToolbar() != null) {
-			curPart.getToolbar().setVisible(false);
-		}
-
-		Composite trComp = (Composite) ctf.getTopRight();
-		Control[] kids = trComp.getChildren();
-
-		boolean needsTB = part != null && part.getToolbar() != null
-				&& part.getToolbar().isToBeRendered();
-
-		// View menu (if any)
-		MMenu viewMenu = getViewMenu(part);
-		boolean needsMenu = viewMenu != null
-				&& hasVisibleMenuItems(viewMenu, part);
-
-		// Check the current state of the TB's
-		ToolBar menuTB = (ToolBar) kids[kids.length - 1];
-
-		// We need to modify the 'exclude' bit based on if the menuTB is
-		// visible or not
-		RowData rd = (RowData) menuTB.getLayoutData();
-		if (needsMenu) {
-			menuTB.getItem(0).setData("thePart", part); //$NON-NLS-1$
-			menuTB.moveBelow(null);
-			menuTB.pack();
-			rd.exclude = false;
-			menuTB.setVisible(true);
-		} else {
-			menuTB.getItem(0).setData("thePart", null); //$NON-NLS-1$
-			rd.exclude = true;
-			menuTB.setVisible(false);
-		}
-
-		ToolBar newViewTB = null;
-		if (needsTB) {
-			part.getToolbar().setVisible(true);
-			newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
-					ctf.getTopRight(), part.getContext());
-			if (newViewTB == null)
-				return;
-			newViewTB.moveAbove(null);
-			newViewTB.pack();
-		}
-
-		if (needsMenu || needsTB) {
-			ctf.getTopRight().setData("thePart", part); //$NON-NLS-1$
-			ctf.getTopRight().pack(true);
-			ctf.getTopRight().setVisible(true);
-		} else {
-			ctf.getTopRight().setData("thePart", null); //$NON-NLS-1$
-			ctf.getTopRight().setVisible(false);
-		}
-
-		// Pack the result
-		trComp.pack();
-
-		adjusting = false;
 	}
 
 	protected void createTab(MElementContainer<MUIElement> stack,
@@ -674,7 +686,7 @@ public class StackRenderer extends LazyStackRenderer {
 		cti.setData(OWNING_ME, element);
 		cti.setText(getLabel(part, part.getLocalizedLabel()));
 		cti.setImage(getImage(part));
-		cti.setToolTipText(part.getLocalizedTooltip());
+		cti.setToolTipText(getToolTip(part.getLocalizedTooltip()));
 		if (element.getWidget() != null) {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
