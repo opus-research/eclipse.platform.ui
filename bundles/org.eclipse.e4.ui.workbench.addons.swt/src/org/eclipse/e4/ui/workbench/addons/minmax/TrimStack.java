@@ -592,7 +592,18 @@ public class TrimStack {
 					closeItem.setText(Messages.TrimStack_CloseText);
 					closeItem.addListener(SWT.Selection, new Listener() {
 						public void handleEvent(Event event) {
-							partService.hidePart((MPart) partToTag);
+							if (partToActivate != null) {
+								// try to close the selected view
+								partService.hidePart(partToActivate);
+							} else {
+								// try to close all the views
+								ToolItem[] items = trimStackTB.getItems();
+								for (int i = 0; i < items.length; i++) {
+									if (items[i].getData() instanceof MPart) {
+										partService.hidePart((MPart) items[i].getData());
+									}
+								}
+							}
 						}
 					});
 				}
