@@ -12,9 +12,7 @@
 package org.eclipse.ui.internal.contexts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -42,15 +40,6 @@ public final class ContextPersistence extends RegistryPersistence {
 	 */
 	private static final int INDEX_CONTEXT_DEFINITIONS = 0;
 
-	private Map<Context, IConfigurationElement> contextsToConfiguration = new HashMap<Context, IConfigurationElement>();
-
-	/**
-	 * @return Returns the contextsToConfiguration.
-	 */
-	public Map<Context, IConfigurationElement> getContextsToConfiguration() {
-		return contextsToConfiguration;
-	}
-
 	/**
 	 * Reads all of the command definitions from the commands extension point.
 	 * 
@@ -67,8 +56,7 @@ public final class ContextPersistence extends RegistryPersistence {
 	private static final void readContextsFromRegistry(
 			final IConfigurationElement[] configurationElements,
 			final int configurationElementCount,
- final ContextManager contextManager,
-			Map<Context, IConfigurationElement> contextsToConfigElement) {
+			final ContextManager contextManager) {
 		final List warningsToLog = new ArrayList(1);
 
 		for (int i = 0; i < configurationElementCount; i++) {
@@ -109,7 +97,6 @@ public final class ContextPersistence extends RegistryPersistence {
 			final Context context = contextManager.getContext(contextId);
 			if (!context.isDefined()) {
 				context.define(name, description, parentId);
-				contextsToConfigElement.put(context, configurationElement);
 			}
 		}
 
@@ -234,18 +221,7 @@ public final class ContextPersistence extends RegistryPersistence {
 
 		readContextsFromRegistry(
 				indexedConfigurationElements[INDEX_CONTEXT_DEFINITIONS],
-				contextDefinitionCount, contextManager, contextsToConfiguration);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.services.RegistryPersistence#dispose()
-	 */
-	@Override
-	public void dispose() {
-		contextsToConfiguration.clear();
-		super.dispose();
+				contextDefinitionCount, contextManager);
 	}
 
 }
