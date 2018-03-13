@@ -154,7 +154,16 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			activate(p, true, true);
+			if (p != null) {
+				MPerspective persp = modelService.getPerspectiveFor(p);
+				boolean inCurrentPerspective = persp == null
+						|| persp == persp.getParent().getSelectedElement();
+				if (inCurrentPerspective) {
+					activate(p, true, true);
+				}
+			} else {
+				activate(p, true, true);
+			}
 		}
 	}
 
@@ -1072,7 +1081,8 @@ public class PartServiceImpl implements EPartService {
 			engine.createGui(target);
 		}
 		// ask the engine to create the element
-		engine.createGui(element);
+		if (element.getWidget() == null)
+			engine.createGui(element);
 
 		parent = element.getParent();
 		if (parent != null && parent.getChildren().size() == 1) {
