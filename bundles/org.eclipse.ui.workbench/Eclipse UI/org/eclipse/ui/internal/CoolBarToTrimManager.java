@@ -57,7 +57,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	private static final String TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 	private static final String MAIN_TOOLBAR_ID = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 	private static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
-	private static final String PREV_CHILD_VISIBLE = "prevChildVisible"; //$NON-NLS-1$
 	private MTrimBar topTrim;
 	private List<MTrimElement> workbenchTrimElements;
 	private IRendererFactory rendererFactory;
@@ -555,7 +554,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				workbenchTrimElements.remove(child);
 
 				child.setToBeRendered(false);
-				child.getParent().getChildren().remove(child);
+				child.getParent().getChildren().remove(i);
 				return (IContributionItem) obj;
 			}
 			if (item.getId() != null && item.getId().equals(child.getElementId())) {
@@ -708,11 +707,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			if (item == null) {
 				continue;
 			}
-			MToolBarElement toolBarElem = renderer.getToolElement(item);
-			if (toolBarElem != null) {
-				if (container.isVisible()) {
-					setChildVisible(toolBarElem, item, manager);
-				}
+			if (renderer.getToolElement(item) != null) {
 				continue;
 			}
 			if (item instanceof IToolBarContributionItem) {
@@ -742,36 +737,5 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				renderer.linkModelToContribution(toolItem, item);
 			}
 		}
-	}
-
-	private void setChildVisible(MToolBarElement modelItem, IContributionItem item,
-			IContributionManager manager) {
-		Boolean currentChildVisible = isChildVisible(item, manager);
-		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
-
-		if (currentChildVisible != null) {
-			if (prevChildVisible == null) {
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
-				modelItem.setVisible(currentChildVisible);
-			}
-		} else if (prevChildVisible != null) {
-			modelItem.setVisible(prevChildVisible);
-			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
-		}
-	}
-
-	private Boolean isChildVisible(IContributionItem item, IContributionManager manager) {
-		Boolean v;
-		IContributionManagerOverrides overrides = manager.getOverrides();
-		if (overrides == null) {
-			v = null;
-		} else {
-			v = overrides.getVisible(item);
-		}
-
-		if (v != null) {
-			return v.booleanValue();
-		}
-		return null;
 	}
 }

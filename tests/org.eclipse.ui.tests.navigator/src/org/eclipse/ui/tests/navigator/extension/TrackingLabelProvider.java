@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Fair Issac Corp and others.
+ * Copyright (c) 2009 Fair Issac Corp and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,19 +14,17 @@ package org.eclipse.ui.tests.navigator.extension;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.IFontProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.IColorProvider;
-import org.eclipse.jface.viewers.IFontProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StyledString;
-
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonLabelProvider;
@@ -40,7 +38,6 @@ public class TrackingLabelProvider extends LabelProvider implements
 ICommonLabelProvider, IDescriptionProvider, IColorProvider,
 IFontProvider, IStyledLabelProvider {
 	
-	private static final boolean PRINT_DEBUG_INFO = false;
 	public static Color BG_COLOR = Display.getCurrent().getSystemColor(
 			SWT.COLOR_GRAY);
 	public static Color FG_COLOR = Display.getCurrent().getSystemColor(
@@ -76,7 +73,7 @@ IFontProvider, IStyledLabelProvider {
 		StringBuffer builder = new StringBuffer(entry==null ? "" : entry);
 		builder.append(_id);
 		map.put(element, builder.toString());
-		if (PRINT_DEBUG_INFO)
+		if (false)
 			System.out.println(_id + ": " + element + " map: " + map);
 	}
 
@@ -113,8 +110,11 @@ IFontProvider, IStyledLabelProvider {
 	public void restoreState(IMemento aMemento) {}
 	public void saveState(IMemento aMemento) {}
 
+	/**
+	 * 
+	 */
 	public static void resetQueries() {
-		if (PRINT_DEBUG_INFO)
+		if (false)
 			System.out.println("resetQueries()");
 		descriptionQueries.clear();
 		backgroundQueries.clear();
