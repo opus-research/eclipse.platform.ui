@@ -68,7 +68,7 @@ public class ContributionFactoryGenerator extends ContextFunction {
 	 * .contexts.IEclipseContext)
 	 */
 	@Override
-	public Object compute(IEclipseContext context, String contextKey) {
+	public Object compute(IEclipseContext context) {
 		AbstractContributionFactory factory = getFactory();
 		final IMenuService menuService = context.get(IMenuService.class);
 		final ContributionRoot root = new ContributionRoot(menuService, new HashSet<Object>(),

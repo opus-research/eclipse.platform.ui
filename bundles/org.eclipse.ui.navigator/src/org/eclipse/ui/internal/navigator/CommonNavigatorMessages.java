@@ -59,9 +59,6 @@ public class CommonNavigatorMessages extends NLS {
 	public static String Navigator_statusLineMultiSelect;
 
 	/** */
-	public static String Navigator_statusLineSingleSelect;
-
-	/** */
 	public static String SelectFiltersActionDelegate_1;
 
 	/** */

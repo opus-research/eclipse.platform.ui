@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.contexts;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,7 +22,9 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
+import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.EContextService;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -60,6 +60,9 @@ public final class ContextService implements IContextService {
 
 	@Inject
 	private IEclipseContext eclipseContext;
+
+	@Inject
+	private UISynchronize synchService;
 
 	/**
 	 * The persistence class for this context service.

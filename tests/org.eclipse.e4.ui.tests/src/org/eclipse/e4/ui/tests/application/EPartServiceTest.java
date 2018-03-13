@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.Focus;
+import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.UIEventPublisher;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -10154,9 +10155,9 @@ public class EPartServiceTest extends UITest {
 	}
 
 	private void initialize() {
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) application).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		E4Workbench.processHierarchy(application);
+		((Notifier) application).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 
 		applicationContext.set(ISaveHandler.class.getName(),
 				new ISaveHandler() {

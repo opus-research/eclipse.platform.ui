@@ -298,6 +298,8 @@ public abstract class HeadlessApplicationTest extends
 			E4Workbench.initializeContext(appContext, window);
 		}
 
+		E4Workbench.processHierarchy(application);
+
 		processPartContributions(application.getContext(), resource);
 
 		renderer = createPresentationEngine(getEngineURI());

@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.dialogs;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -82,6 +83,10 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		}
 	}
 
+	private final static int SIZING_SELECTION_WIDGET_HEIGHT = 200;
+
+	private final static int SIZING_SELECTION_WIDGET_WIDTH = 50;
+
 	private CheckboxTableViewer viewer;
 
 	private IWorkingSet[] initialSelection;
@@ -118,16 +123,20 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
 		layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 		viewerComposite.setLayout(layout);
-		viewerComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.heightHint = SIZING_SELECTION_WIDGET_HEIGHT;
+		data.widthHint = SIZING_SELECTION_WIDGET_WIDTH + 300; // fudge? I like
+		// fudge.
+		viewerComposite.setLayoutData(data);
 
 		viewer = CheckboxTableViewer.newCheckList(viewerComposite, SWT.BORDER);
 		viewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 		viewer.setLabelProvider(new WorkingSetLabelProvider());
 		viewer.setContentProvider(new ArrayContentProvider());
 		viewer.addFilter(new WorkingSetFilter(null));
-		IWorkingSet[] workingSets = PlatformUI.getWorkbench().getWorkingSetManager()
-				.getWorkingSets();
-		viewer.setInput(workingSets);
+		viewer.setInput(PlatformUI.getWorkbench().getWorkingSetManager()
+				.getWorkingSets());
 		viewer.setFilters(new ViewerFilter[] { new Filter() });
 
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -137,10 +146,11 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		});
 		viewer.setCheckedElements(initialSelection);
 
-		GridData viewerData = new GridData(GridData.FILL_BOTH);
-		viewerData.widthHint = convertWidthInCharsToPixels(50);
-		viewer.getControl().setLayoutData(viewerData);
+		data = new GridData(GridData.FILL_BOTH);
+		data.heightHint = SIZING_SELECTION_WIDGET_HEIGHT;
+		data.widthHint = SIZING_SELECTION_WIDGET_WIDTH;
 
+		viewer.getControl().setLayoutData(data);
 		addModifyButtons(viewerComposite);
 
 		addSelectionButtons(composite);
@@ -148,9 +158,6 @@ public class SimpleWorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		availableWorkingSetsChanged();
 
 		Dialog.applyDialogFont(composite);
-
-		viewerData.heightHint = viewer.getTable().getItemHeight()
-				* Math.min(30, Math.max(10, workingSets.length));
 
 		return composite;
 	}

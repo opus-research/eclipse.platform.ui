@@ -95,8 +95,6 @@ public class CompatibilityEditor extends CompatibilityPart {
 	protected boolean createPartControl(final IWorkbenchPart legacyPart, Composite parent) {
 		super.createPartControl(legacyPart, parent);
 
-		clearMenuItems();
-
 		part.getContext().set(IEditorPart.class, (IEditorPart) legacyPart);
 
 		EditorDescriptor descriptor = reference.getDescriptor();

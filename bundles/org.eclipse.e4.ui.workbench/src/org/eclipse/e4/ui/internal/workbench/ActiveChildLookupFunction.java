@@ -28,7 +28,7 @@ public class ActiveChildLookupFunction extends ContextFunction {
 	}
 
 	@Override
-	public Object compute(IEclipseContext context, String contextKey) {
+	public Object compute(IEclipseContext context) {
 		IEclipseContext childContext = context.getActiveChild();
 		if (childContext != null) {
 			return childContext.get(var);

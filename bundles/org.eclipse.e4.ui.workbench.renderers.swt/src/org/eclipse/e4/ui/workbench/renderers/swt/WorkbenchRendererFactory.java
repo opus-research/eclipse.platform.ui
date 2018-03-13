@@ -1,7 +1,5 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.util.HashMap;
-import java.util.Set;
 import javax.annotation.PostConstruct;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -24,7 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 
 public class WorkbenchRendererFactory implements IRendererFactory {
-	public static final String SHARED_ELEMENTS_STORE = "org.eclipse.e4.ui.workbench.renderers.swt.SHARED_ELEMENTS_STORE"; //$NON-NLS-1$
+
 	private AreaRenderer areaRenderer;
 	private MenuManagerRenderer menuRenderer;
 	private ToolBarManagerRenderer toolbarRenderer;
@@ -138,8 +136,6 @@ public class WorkbenchRendererFactory implements IRendererFactory {
 	@PostConstruct
 	public void init(IEclipseContext context) {
 		this.context = context;
-		this.context.set(SHARED_ELEMENTS_STORE,
-				new HashMap<MUIElement, Set<MPlaceholder>>());
 	}
 
 }

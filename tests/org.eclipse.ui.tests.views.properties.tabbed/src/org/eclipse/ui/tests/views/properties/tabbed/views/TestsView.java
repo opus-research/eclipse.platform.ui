@@ -28,7 +28,7 @@ public class TestsView
 
     private TreeViewer viewer;
 
-    protected TabbedPropertySheetPage tabbedPropertySheetPage;
+    private TabbedPropertySheetPage tabbedPropertySheetPage;
 
     public static final String TESTS_VIEW_ID = "org.eclipse.ui.tests.views.properties.tabbed.views.TestsView"; //$NON-NLS-1$
 

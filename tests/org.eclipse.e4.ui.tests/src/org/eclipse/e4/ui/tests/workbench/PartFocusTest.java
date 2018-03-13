@@ -158,7 +158,7 @@ public class PartFocusTest extends TestCase {
 		assertTrue(((PartBackend) part.getObject()).text1.isFocusControl());
 	}
 
-	public void XXXtestNoFocusChangeOnExplicitWidgetSelection() {
+	public void testNoFocusChangeOnExplicitWidgetSelection() {
 		assertFalse(((PartBackend) part.getObject()).text1.isFocusControl());
 		((TextField) toolControl.getObject()).text.setFocus();
 		processEvents();

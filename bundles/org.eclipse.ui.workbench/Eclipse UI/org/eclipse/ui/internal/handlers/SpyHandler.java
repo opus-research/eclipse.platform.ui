@@ -10,13 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.handlers;
 
+import org.eclipse.ui.internal.testing.ContributionInfoMessages;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.testing.ContributionInfo;
 import org.osgi.framework.Bundle;
@@ -114,13 +114,10 @@ public class SpyHandler extends AbstractHandler {
 			protected Composite createToolTipContentArea(Event event, Composite parent) {
 				// Create the content area
 				Composite composite = new Composite(parent, SWT.NONE);
-				Color fg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-				Color bg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
-				composite.setForeground(fg);
-				composite.setBackground(bg);
+				composite.setBackground(parent.getDisplay().getSystemColor(
+						SWT.COLOR_INFO_BACKGROUND));
 				Text text = new Text(composite, SWT.READ_ONLY);
-				text.setForeground(fg);
-				text.setBackground(bg);
+				text.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 				String info = NLS.bind(ContributionInfoMessages.ContributionInfo_ContributedBy,
 						contributionInfo.getElementType(), contributionInfo.getBundleId());
 				text.setText(info);

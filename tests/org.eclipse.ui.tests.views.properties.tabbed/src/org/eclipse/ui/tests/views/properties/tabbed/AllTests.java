@@ -28,7 +28,6 @@ public class AllTests
         suite.addTestSuite(TabbedPropertySheetPageDynamicTest.class);
         suite.addTestSuite(TabbedPropertySheetPageTextTest.class);
         suite.addTestSuite(TabbedPropertySheetPageOverrideTest.class);
-        suite.addTestSuite(TabbedPropertySheetPageDecorationsTest.class);
         return suite;
     }
 

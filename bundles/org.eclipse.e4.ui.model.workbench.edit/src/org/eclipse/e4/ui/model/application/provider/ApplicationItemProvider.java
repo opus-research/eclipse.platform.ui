@@ -402,11 +402,6 @@ public class ApplicationItemProvider extends ElementContainerItemProvider
 		newChildDescriptors.add
 			(createChildParameter
 				(UiPackageImpl.Literals.SNIPPET_CONTAINER__SNIPPETS,
-				 MMenuFactory.INSTANCE.createDynamicMenuContribution()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(UiPackageImpl.Literals.SNIPPET_CONTAINER__SNIPPETS,
 				 org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory.INSTANCE.createPart()));
 
 		newChildDescriptors.add

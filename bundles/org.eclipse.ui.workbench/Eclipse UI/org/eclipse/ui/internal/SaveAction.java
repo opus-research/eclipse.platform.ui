@@ -17,7 +17,6 @@ import org.eclipse.ui.ISaveablesSource;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 
 /**
@@ -66,15 +65,9 @@ public class SaveAction extends BaseSaveAction implements IBackgroundSaveListene
          */
         ISaveablePart saveView = getSaveableView();
         if (saveView != null) {
-			IWorkbenchPart activePart = getActivePart();
-			WorkbenchPage workbenchPage;
-			if (activePart != null) {
-				workbenchPage = (WorkbenchPage) activePart.getSite().getPage();
-			} else {
-				workbenchPage = (WorkbenchPage) getActivePage();
-			}
-			workbenchPage.saveSaveable(saveView, false, false);
-			return;
+			((WorkbenchPage) getActivePart().getSite().getPage()).saveSaveable(saveView, false,
+					false);
+            return;
         }
 
         IEditorPart part = getActiveEditor();

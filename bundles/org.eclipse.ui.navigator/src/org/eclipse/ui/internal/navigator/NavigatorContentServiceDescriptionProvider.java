@@ -73,11 +73,11 @@ public final class NavigatorContentServiceDescriptionProvider implements
 	/**
 	 * @param aSize
 	 *            The number of items selected.
-	 * @return A string of the form "# item(s) selected"
+	 * @return A string of the form "# items selected"
 	 */
 	protected final String getDefaultStatusBarMessage(int aSize) {
-		return NLS.bind(aSize != 1 ? CommonNavigatorMessages.Navigator_statusLineMultiSelect
-				: CommonNavigatorMessages.Navigator_statusLineSingleSelect,
+		return NLS.bind(
+				CommonNavigatorMessages.Navigator_statusLineMultiSelect,
 				new Object[] { new Integer(aSize) });
 
 	}
