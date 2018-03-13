@@ -7,7 +7,8 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
+ *     Sopot Cela <sopotcela@gmail.com>
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,6 +60,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -133,14 +135,15 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					.getProperty(UIEvents.EventTags.ATTNAME);
 			MMenu model = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
 			MenuManager manager = getManager(model);
-			Menu menu = manager.getMenu();
-			if ((menu == null) || (menu.getParentItem() == null))
+			if ((manager == null))
 				return;
 			if (UIEvents.UILabel.LABEL.equals(attName)) {
-				menu.getParentItem().setText(getText(model));
+				manager.setMenuText(getText(model));
+				manager.update(IAction.TEXT);
 			}
 			if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				menu.getParentItem().setImage(getImage(model));
+				manager.setImageDescriptor(getImageDescriptor(model));
+				manager.update(IAction.IMAGE);
 			}
 		}
 	};
@@ -247,29 +250,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
-	private EventHandler childrenUpdater = new EventHandler() {
-
-		public void handleEvent(Event event) {
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (changedObj instanceof MMenu) {
-				MMenu menuModel = (MMenu) changedObj;
-				MenuManager manager = getManager(menuModel);
-				if (manager == null)
-					return;
-				if (UIEvents.isREMOVE(event)) {
-					MMenuElement menuElement = (MMenuElement) event
-							.getProperty(UIEvents.EventTags.OLD_VALUE);
-					handleMenuElementRemove(manager, menuElement);
-				} else if (UIEvents.isADD(event)) {
-					MMenuElement menuElement = (MMenuElement) event
-							.getProperty(UIEvents.EventTags.NEW_VALUE);
-					handleMenuElementAdd(manager, menuElement);
-				}
-			}
-
-		}
-	};
-
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
@@ -280,8 +260,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
 				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
-				childrenUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -298,29 +276,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	}
 
-	/**
-	 * @param manager
-	 * @param menuElement
-	 */
-	protected void handleMenuElementAdd(MenuManager manager,
-			MMenuElement menuElement) {
-		modelProcessSwitch(manager, menuElement);
-	}
-
-	/**
-	 * @param manager
-	 * @param menuElement
-	 */
-	protected void handleMenuElementRemove(MenuManager manager,
-			MMenuElement menuElement) {
-		if (menuElement instanceof MMenu) {
-			MMenu menuModel = (MMenu) menuElement;
-			manager.remove(getManager(menuModel));
-		} else
-			manager.remove(getContribution(menuElement));
-		manager.update(false);
-	}
-
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -328,7 +283,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
-		eventBroker.unsubscribe(childrenUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.showHelper,
 				context);
