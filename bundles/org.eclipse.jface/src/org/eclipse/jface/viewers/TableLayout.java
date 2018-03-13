@@ -58,7 +58,7 @@ public class TableLayout extends Layout {
 	 * The list of column layout data (element type:
 	 * <code>ColumnLayoutData</code>).
 	 */
-	private List columns = new ArrayList();
+	private List<ColumnLayoutData> columns = new ArrayList<ColumnLayoutData>();
 
 	/**
 	 * Indicates whether <code>layout</code> has yet to be called.
@@ -97,6 +97,7 @@ public class TableLayout extends Layout {
 	/*
 	 * (non-Javadoc) Method declared on Layout.
 	 */
+	@Override
 	public Point computeSize(Composite c, int wHint, int hHint, boolean flush) {
 		if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 			return new Point(wHint, hHint);
@@ -112,7 +113,7 @@ public class TableLayout extends Layout {
 		int width = 0;
 		int size = columns.size();
 		for (int i = 0; i < size; ++i) {
-			ColumnLayoutData layoutData = (ColumnLayoutData) columns.get(i);
+			ColumnLayoutData layoutData = columns.get(i);
 			if (layoutData instanceof ColumnPixelData) {
 				ColumnPixelData col = (ColumnPixelData) layoutData;
 				width += col.width;
@@ -135,6 +136,7 @@ public class TableLayout extends Layout {
 	/*
 	 * (non-Javadoc) Method declared on Layout.
 	 */
+	@Override
 	public void layout(Composite c, boolean flush) {
 		// Only do initial layout. Trying to maintain proportions when resizing
 		// is too hard,
@@ -165,7 +167,7 @@ public class TableLayout extends Layout {
 
 		// First calc space occupied by fixed columns
 		for (int i = 0; i < size; i++) {
-			ColumnLayoutData col = (ColumnLayoutData) columns.get(i);
+			ColumnLayoutData col = columns.get(i);
 			if (col instanceof ColumnPixelData) {
 				ColumnPixelData cpd = (ColumnPixelData) col;
 				int pixels = cpd.width;
@@ -198,7 +200,7 @@ public class TableLayout extends Layout {
 			int rest = width - fixedWidth;
 			int totalDistributed = 0;
 			for (int i = 0; i < size; ++i) {
-				ColumnLayoutData col = (ColumnLayoutData) columns.get(i);
+				ColumnLayoutData col = columns.get(i);
 				if (col instanceof ColumnWeightData) {
 					ColumnWeightData cw = (ColumnWeightData) col;
 					// calculate weight as above
@@ -221,7 +223,7 @@ public class TableLayout extends Layout {
 				if (i == size) {
 					i = 0;
 				}
-				ColumnLayoutData col = (ColumnLayoutData) columns.get(i);
+				ColumnLayoutData col = columns.get(i);
 				if (col instanceof ColumnWeightData) {
 					++widths[i];
 					--diff;

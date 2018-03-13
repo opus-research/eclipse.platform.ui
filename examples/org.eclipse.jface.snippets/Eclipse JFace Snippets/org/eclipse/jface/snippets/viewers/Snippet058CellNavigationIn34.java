@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 Tom Schindl and others.
+ * Copyright (c) 2006, 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,9 +8,14 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Niels Lippke - initial API and implementation
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellNavigationStrategy;
@@ -40,22 +45,25 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example for full feature cell navigation until bug 230955 is fixed
- * 
+ *
  * @author Tom Schindl <tom.schindl@bestsolution.at>, Niels Lippke <niels.lippke@airpas.com>
- * 
+ *
  */
 public class Snippet058CellNavigationIn34 {
 
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<Person,List<Person>> {
 
-		public Object[] getElements(Object inputElement) {
-			return (Person[]) inputElement;
+		public Person[] getElements(List<Person> inputElement) {
+			Person[] persons = new Person[inputElement.size()];
+			return inputElement.toArray(persons);
 		}
 
 		public void dispose() {
+
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<Person>> viewer, List<Person> oldInput, List<Person> newInput) {
+
 		}
 
 	}
@@ -76,13 +84,13 @@ public class Snippet058CellNavigationIn34 {
 	}
 
 	protected abstract class AbstractEditingSupport extends EditingSupport {
-		private CellEditor editor;
+		private final CellEditor editor;
 
 		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
-		
+
 		public AbstractEditingSupport(TableViewer viewer, CellEditor editor) {
 			super(viewer);
 			this.editor = editor;
@@ -105,17 +113,17 @@ public class Snippet058CellNavigationIn34 {
 	}
 
 	public Snippet058CellNavigationIn34(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		final TableViewer<Person,List<Person>>  v = new TableViewer<Person,List<Person>> (shell, SWT.BORDER | SWT.FULL_SELECTION);
 		v.setContentProvider(new MyContentProvider());
 
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		TableViewerColumn<Person,List<Person>> column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Givenname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
 
-			public String getText(Object element) {
-				return ((Person) element).givenname;
+			public String getText(Person element) {
+				return element.givenname;
 			}
 		});
 
@@ -131,14 +139,14 @@ public class Snippet058CellNavigationIn34 {
 
 		});
 
-		column = new TableViewerColumn(v, SWT.NONE);
+		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Surname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
 
-			public String getText(Object element) {
-				return ((Person) element).surname;
+			public String getText(Person element) {
+				return element.surname;
 			}
 
 		});
@@ -155,23 +163,23 @@ public class Snippet058CellNavigationIn34 {
 
 		});
 
-		column = new TableViewerColumn(v, SWT.NONE);
+		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("E-Mail");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
 
-			public String getText(Object element) {
-				return ((Person) element).email;
+			public String getText(Person element) {
+				return element.email;
 			}
 
 		});
 
-		
+
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			protected Object getValue(Object element) {				
-				return ((Person) element).email;	
+			protected Object getValue(Object element) {
+				return ((Person) element).email;
 			}
 
 			protected void doSetValue(Object element, Object value) {
@@ -181,24 +189,24 @@ public class Snippet058CellNavigationIn34 {
 		});
 
 
-		column = new TableViewerColumn(v, SWT.NONE);
+		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Gender");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
 
-			public String getText(Object element) {
-				return ((Person) element).gender;
+			public String getText(Person element) {
+				return element.gender;
 			}
 
 		});
-		
-		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) v).getTable(), new String[] {"M","F"});
-		editor.setActivationStyle(ComboBoxCellEditor.DROP_DOWN_ON_TRAVERSE_ACTIVATION | 
+
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(v.getTable(), new String[] {"M","F"});
+		editor.setActivationStyle(ComboBoxCellEditor.DROP_DOWN_ON_TRAVERSE_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_PROGRAMMATIC_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_MOUSE_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_KEY_ACTIVATION);
-		
+
 		column.setEditingSupport(new AbstractEditingSupport(v, editor) {
 
 			protected Object getValue(Object element) {
@@ -216,24 +224,24 @@ public class Snippet058CellNavigationIn34 {
 			}
 
 		});
-		
+
 		CellNavigationStrategy naviStrat = new CellNavigationStrategy() {
 
 			public ViewerCell findSelectedCell(ColumnViewer viewer,
 					ViewerCell currentSelectedCell, Event event) {
 				ViewerCell cell = super.findSelectedCell(viewer, currentSelectedCell, event);
-				
+
 				if( cell != null ) {
 					v.getTable().showColumn(v.getTable().getColumn(cell.getColumnIndex()));
 				}
-				
+
 				return cell;
 			}
-			
+
 		};
-		
+
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new FocusCellOwnerDrawHighlighter(v),naviStrat);
-		
+
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
@@ -243,21 +251,21 @@ public class Snippet058CellNavigationIn34 {
 						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC;
 			}
 		};
-		
+
 		TableViewerEditor.create(v, focusCellManager, actSupport, ColumnViewerEditor.TABBING_HORIZONTAL
 				| ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR
 				| ColumnViewerEditor.TABBING_VERTICAL | ColumnViewerEditor.KEYBOARD_ACTIVATION);
-		
+
 		v.getColumnViewerEditor().addEditorActivationListener(new ColumnViewerEditorActivationListener() {
 
 			public void afterEditorActivated(
 					ColumnViewerEditorActivationEvent event) {
-				
+
 			}
 
 			public void afterEditorDeactivated(
 					ColumnViewerEditorDeactivationEvent event) {
-				
+
 			}
 
 			public void beforeEditorActivated(
@@ -268,27 +276,28 @@ public class Snippet058CellNavigationIn34 {
 
 			public void beforeEditorDeactivated(
 					ColumnViewerEditorDeactivationEvent event) {
-				
+
 			}
-			
+
 		});
-		
-		Person[] model = createModel();
+
+		List<Person> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private Person[] createModel() {
-		Person[] elements = new Person[4];
-		elements[0] = new Person("Tom", "Schindl",
-				"tom.schindl@bestsolution.at", "M");
-		elements[1] = new Person("Boris", "Bokowski",
-				"Boris_Bokowski@ca.ibm.com","M");
-		elements[2] = new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com","M");
-		elements[3] = new Person("Wayne", "Beaton", "wayne@eclipse.org","M");
+	private List<Person>  createModel() {
+		List<Person> elements = new ArrayList<Person>(4);
+		elements.add(new Person("Tom", "Schindl",
+				"tom.schindl@bestsolution.at", "M"));
+		elements.add(new Person("Boris", "Bokowski",
+				"Boris_Bokowski@ca.ibm.com", "M"));
+		elements.add(new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com", "M"));
+		elements.add(new Person("Wayne", "Beaton", "wayne@eclipse.org", "M"));
 
 		return elements;
+
 	}
 
 	/**

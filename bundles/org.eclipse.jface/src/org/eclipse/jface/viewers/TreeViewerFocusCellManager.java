@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,12 +24,16 @@ import org.eclipse.swt.widgets.TreeItem;
  * This class is responsible to provide the concept of cells for {@link Tree}.
  * This concept is needed to provide features like editor activation with the
  * keyboard
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public class TreeViewerFocusCellManager extends SWTFocusCellManager {
+public class TreeViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
+	@SuppressWarnings("rawtypes")
 	private static final CellNavigationStrategy TREE_NAVIGATE = new CellNavigationStrategy() {
+		@Override
 		public void collapse(ColumnViewer viewer, ViewerCell cellToCollapse,
 				Event event) {
 			if (cellToCollapse != null) {
@@ -37,6 +41,7 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 			}
 		}
 
+		@Override
 		public void expand(ColumnViewer viewer, ViewerCell cellToExpand,
 				Event event) {
 			if (cellToExpand != null) {
@@ -46,6 +51,7 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 			}
 		}
 
+		@Override
 		public boolean isCollapseEvent(ColumnViewer viewer,
 				ViewerCell cellToCollapse, Event event) {
 
@@ -59,6 +65,7 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 					&& isFirstColumnCell(cellToCollapse);
 		}
 
+		@Override
 		public boolean isExpandEvent(ColumnViewer viewer,
 				ViewerCell cellToExpand, Event event) {
 
@@ -94,8 +101,9 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 	 * @param focusDrawingDelegate
 	 *            the delegate responsible to highlight selected cell
 	 */
-	public TreeViewerFocusCellManager(TreeViewer viewer,
-			FocusCellHighlighter focusDrawingDelegate) {
+	@SuppressWarnings("unchecked")
+	public TreeViewerFocusCellManager(TreeViewer<E,I> viewer,
+			FocusCellHighlighter<E,I> focusDrawingDelegate) {
 		this(viewer, focusDrawingDelegate, TREE_NAVIGATE);
 	}
 
@@ -110,17 +118,18 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 	 *            the strategy used to navigate the cells
 	 * @since 3.4
 	 */
-	public TreeViewerFocusCellManager(TreeViewer viewer,
-			FocusCellHighlighter focusDrawingDelegate,
-			CellNavigationStrategy navigationStrategy) {
+	public TreeViewerFocusCellManager(TreeViewer<E,I> viewer,
+			FocusCellHighlighter<E,I> focusDrawingDelegate,
+			CellNavigationStrategy<E,I> navigationStrategy) {
 		super(viewer, focusDrawingDelegate, navigationStrategy);
 	}
 
-	ViewerCell getInitialFocusCell() {
+	@Override
+	ViewerCell<E> getInitialFocusCell() {
 		Tree tree = (Tree) getViewer().getControl();
 
 		if (! tree.isDisposed() && tree.getItemCount() > 0 && ! tree.getTopItem().isDisposed()) {
-			ViewerRow aViewerRow = getViewer().getViewerRowFromItem(tree.getTopItem());
+			ViewerRow<E> aViewerRow = getViewer().getViewerRowFromItem(tree.getTopItem());
 			if (tree.getColumnCount() == 0) {
 				return aViewerRow.getCell(0);
 			}
@@ -135,12 +144,13 @@ public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 		return null;
 	}
 
-	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow row, int colIndex) {
+	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow<E> row, int colIndex) {
 		return row.getBounds(colIndex).x >= clientArea.x;
 	}
 
-	public ViewerCell getFocusCell() {
-		ViewerCell cell = super.getFocusCell();
+	@Override
+	public ViewerCell<E> getFocusCell() {
+		ViewerCell<E> cell = super.getFocusCell();
 		Tree t = (Tree) getViewer().getControl();
 
 		// It is possible that the selection has changed under the hood

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation bug 154329
  *                                               - fixes in bug 170381, 198665, 200731
+ *	    *     Hendrik Still <hendrik.still@gammas.de> - b *     Hendrik Still <hendrik.still@gammas.de> - bug 413973, bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -26,17 +27,18 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
-
 import org.eclipse.core.runtime.Assert;
 
 /**
  * This is a widget independent class implementors of
  * {@link org.eclipse.swt.widgets.Table} like widgets can use to provide a
  * viewer on top of their widget implementations.
- *
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
+*
  * @since 3.3
  */
-public abstract class AbstractTableViewer extends ColumnViewer {
+public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 
 	private class VirtualManager {
 
@@ -46,13 +48,18 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * ILazyStructuredContentProvider as an ILazyStructuredContentProvider
 		 * is only queried on the virtual callback.
 		 */
-		private Object[] cachedElements = new Object[0];
+		private E[] cachedElements;
 
 		/**
 		 * Create a new instance of the receiver.
 		 *
 		 */
 		public VirtualManager() {
+
+			@SuppressWarnings("unchecked")
+			E[] initialCachedElements = (E[]) new Object[0];
+			cachedElements = initialCachedElements;
+
 			addTableListener();
 		}
 
@@ -69,22 +76,22 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				public void handleEvent(Event event) {
 					Item item = (Item) event.item;
 					final int index = doIndexOf(item);
-					
+
 					if (index == -1) {
 						// Should not happen, but the spec for doIndexOf allows returning -1.
 						// See bug 241117.
 						return;
 					}
-					
-					Object element = resolveElement(index);
+
+					E element = resolveElement(index);
 					if (element == null) {
 						// Didn't find it so make a request
 						// Keep looking if it is not in the cache.
-						IContentProvider contentProvider = getContentProvider();
+						IContentProvider<? super I> contentProvider = getContentProvider();
 						// If we are building lazily then request lookup now
 						if (contentProvider instanceof ILazyContentProvider) {
-							((ILazyContentProvider) contentProvider)
-									.updateElement(index);
+							ILazyContentProvider<? super I> lazyContentProvider = ((ILazyContentProvider<? super I>) contentProvider);
+							lazyContentProvider.updateElement(index);
 							return;
 						}
 					}
@@ -102,9 +109,9 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * @param index
 		 * @return Object or <code>null</code> if it could not be found
 		 */
-		protected Object resolveElement(int index) {
+		protected E resolveElement(int index) {
 
-			Object element = null;
+			E element = null;
 			if (index < cachedElements.length) {
 				element = cachedElements[index];
 			}
@@ -118,11 +125,12 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * @param element
 		 * @param index
 		 */
-		public void notVisibleAdded(Object element, int index) {
+		public void notVisibleAdded(E element, int index) {
 
 			int requiredCount = doGetItemCount() + 1;
 
-			Object[] newCache = new Object[requiredCount];
+			@SuppressWarnings("unchecked")
+			E[] newCache = (E[]) new Object[requiredCount];
 			System.arraycopy(cachedElements, 0, newCache, 0, index);
 			if (index < cachedElements.length) {
 				System.arraycopy(cachedElements, index, newCache, index + 1,
@@ -147,7 +155,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			int requiredCount = doGetItemCount() - indices.length;
 
 			Arrays.sort(indices);
-			Object[] newCache = new Object[requiredCount];
+			@SuppressWarnings("unchecked")
+			E[] newCache = (E[]) new Object[requiredCount];
 			int indexInNewCache = 0;
 			int nextToSkip = 0;
 			for (int i = 0; i < cachedElements.length; i++) {
@@ -169,7 +178,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 */
 		public void removeIndicesFromTo(int from, int to) {
 			int indexAfterTo = to + 1;
-			Object[] newCache = new Object[cachedElements.length
+			@SuppressWarnings("unchecked")
+			E[] newCache = (E[]) new Object[cachedElements.length
 					- (indexAfterTo - from)];
 			System.arraycopy(cachedElements, 0, newCache, 0, from);
 			if (indexAfterTo < cachedElements.length) {
@@ -182,7 +192,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * @param element
 		 * @return the index of the element in the cache, or null
 		 */
-		public int find(Object element) {
+		public int find(E element) {
 			return Arrays.asList(cachedElements).indexOf(element);
 		}
 
@@ -193,11 +203,13 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			if (count == cachedElements.length) {
 				return;
 			} else if (count < cachedElements.length) {
-				Object[] newCache = new Object[count];
+				@SuppressWarnings("unchecked")
+				E[] newCache = (E[]) new Object[count];
 				System.arraycopy(cachedElements, 0, newCache, 0, count);
 				cachedElements = newCache;
 			} else {
-				Object[] newCache = new Object[count];
+				@SuppressWarnings("unchecked")
+				E[] newCache = (E[]) new Object[count];
 				System.arraycopy(cachedElements, 0, newCache, 0,
 						cachedElements.length);
 				cachedElements = newCache;
@@ -215,11 +227,13 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		super();
 	}
 
+	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		initializeVirtualManager(getControl().getStyle());
 	}
-	
+
+	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
 		virtualManager = null;
@@ -252,14 +266,14 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param elements
 	 *            the elements to add
 	 */
-	public void add(Object[] elements) {
+	public void add(E[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
 			return;
-		Object[] filtered = filter(elements);
+		E[] filtered = filter(elements);
 
 		for (int i = 0; i < filtered.length; i++) {
-			Object element = filtered[i];
+			E element = filtered[i];
 			int index = indexForElement(element);
 			createItem(element, index);
 		}
@@ -273,7 +287,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @since 3.1
 	 */
-	private void createItem(Object element, int index) {
+	private void createItem(E element, int index) {
 		if (virtualManager == null) {
 			updateItem(internalCreateNewRowPart(SWT.NONE, index).getItem(),
 					element);
@@ -294,7 +308,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *            the index of the row or -1 if the row is appended at the end
 	 * @return the newly created row
 	 */
-	protected abstract ViewerRow internalCreateNewRowPart(int style,
+	protected abstract ViewerRow<E> internalCreateNewRowPart(int style,
 			int rowIndex);
 
 	/**
@@ -312,8 +326,10 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param element
 	 *            the element to add
 	 */
-	public void add(Object element) {
-		add(new Object[] { element });
+	public void add(E element) {
+		@SuppressWarnings("unchecked")
+		E[] newElements = (E[]) new Object[] { element };
+		add(newElements);
 	}
 
 	/*
@@ -321,7 +337,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
 	 */
-	protected Widget doFindInputItem(Object element) {
+	@Override
+	protected Widget doFindInputItem(E element) {
 		if (equals(element, getRoot())) {
 			return getControl();
 		}
@@ -333,7 +350,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
 	 */
-	protected Widget doFindItem(Object element) {
+	@Override
+	protected Widget doFindItem(E element) {
 
 		Item[] children = doGetItems();
 		for (int i = 0; i < children.length; i++) {
@@ -353,7 +371,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
 	 *      java.lang.Object, boolean)
 	 */
-	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
+	@Override
+	protected void doUpdateItem(Widget widget, E element, boolean fullMap) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
@@ -364,7 +383,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				if (fullMap) {
 					associate(element, item);
 				} else {
-					Object data = item.getData();
+					@SuppressWarnings("unchecked")
+					E data = (E) item.getData();
 					if (data != null) {
 						unmapElement(data, item);
 					}
@@ -376,25 +396,27 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				if (columnCount == 0)
 					columnCount = 1;// If there are no columns do the first one
 
-				ViewerRow viewerRowFromItem = getViewerRowFromItem(item);
+				ViewerRow<E> viewerRowFromItem = getViewerRowFromItem(item);
 
 				boolean isVirtual = (getControl().getStyle() & SWT.VIRTUAL) != 0;
 
 				// If the control is virtual, we cannot use the cached viewer row object. See bug 188663.
 				if (isVirtual) {
-					viewerRowFromItem = (ViewerRow) viewerRowFromItem.clone();
+					@SuppressWarnings("unchecked")
+					ViewerRow<E> viewerRowFromItemClone = (ViewerRow<E>) viewerRowFromItem.clone();
+					viewerRowFromItem = viewerRowFromItemClone;
 				}
 
 				// Also enter loop if no columns added. See 1G9WWGZ: JFUIF:WINNT -
 				// TableViewer with 0 columns does not work
 				for (int column = 0; column < columnCount || column == 0; column++) {
-					ViewerColumn columnViewer = getViewerColumn(column);
-					ViewerCell cellToUpdate = updateCell(viewerRowFromItem,
+					ViewerColumn<E,I> columnViewer = getViewerColumn(column);
+					ViewerCell<E> cellToUpdate = updateCell(viewerRowFromItem,
 							column, element);
 
 					// If the control is virtual, we cannot use the cached cell object. See bug 188663.
 					if (isVirtual) {
-						cellToUpdate = new ViewerCell(cellToUpdate.getViewerRow(), cellToUpdate.getColumnIndex(), element);
+						cellToUpdate = new ViewerCell<E>(cellToUpdate.getViewerRow(), cellToUpdate.getColumnIndex(), element);
 					}
 
 					columnViewer.refresh(cellToUpdate);
@@ -422,6 +444,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
 	 */
+	@Override
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		int columnCount = doGetColumnCount();
 
@@ -468,7 +491,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * then it provides only the label text and image for the first column, and
 	 * any remaining columns are blank.
 	 */
-	public IBaseLabelProvider getLabelProvider() {
+	@Override
+	public IBaseLabelProvider<E> getLabelProvider() {
 		return super.getLabelProvider();
 	}
 
@@ -477,15 +501,17 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
 	 */
-	protected List getSelectionFromWidget() {
+	@Override
+	protected List<E> getSelectionFromWidget() {
 		if (virtualManager != null) {
 			return getVirtualSelection();
 		}
 		Widget[] items = doGetSelection();
-		ArrayList list = new ArrayList(items.length);
+		ArrayList<E> list = new ArrayList<E>(items.length);
 		for (int i = 0; i < items.length; i++) {
 			Widget item = items[i];
-			Object e = item.getData();
+			@SuppressWarnings("unchecked")
+			E e = (E) item.getData();
 			if (e != null) {
 				list.add(e);
 			}
@@ -500,18 +526,19 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @return List of Object
 	 */
 
-	private List getVirtualSelection() {
+	private List<E> getVirtualSelection() {
 
-		List result = new ArrayList();
+		List<E> result = new ArrayList<E>();
 		int[] selectionIndices = doGetSelectionIndices();
 		if (getContentProvider() instanceof ILazyContentProvider) {
-			ILazyContentProvider lazy = (ILazyContentProvider) getContentProvider();
+			ILazyContentProvider<? super I> lazy = (ILazyContentProvider<? super I>) getContentProvider();
 			for (int i = 0; i < selectionIndices.length; i++) {
 				int selectionIndex = selectionIndices[i];
 				lazy.updateElement(selectionIndex);// Start the update
 				// check for the case where the content provider changed the number of items
 				if (selectionIndex < doGetItemCount()) {
-					Object element = doGetItem(selectionIndex).getData();
+					@SuppressWarnings("unchecked")
+					E element = (E) doGetItem(selectionIndex).getData();
 					// Only add the element if it got updated.
 					// If this is done deferred the selection will
 					// be incomplete until selection is finished.
@@ -522,7 +549,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			}
 		} else {
 			for (int i = 0; i < selectionIndices.length; i++) {
-				Object element = null;
+				E element = null;
 				// See if it is cached
 				int selectionIndex = selectionIndices[i];
 				if (selectionIndex < virtualManager.cachedElements.length) {
@@ -531,7 +558,9 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				if (element == null) {
 					// Not cached so try the item's data
 					Item item = doGetItem(selectionIndex);
-					element = item.getData();
+					@SuppressWarnings("unchecked")
+					E itemElement = (E) item.getData();
+					element = itemElement;
 				}
 				if (element != null) {
 					result.add(element);
@@ -547,8 +576,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *            the element to insert
 	 * @return the index where the item should be inserted.
 	 */
-	protected int indexForElement(Object element) {
-		ViewerComparator comparator = getComparator();
+	protected int indexForElement(E element) {
+		ViewerComparator<E,I> comparator = getComparator();
 		if (comparator == null) {
 			return doGetItemCount();
 		}
@@ -556,7 +585,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		int min = 0, max = count - 1;
 		while (min <= max) {
 			int mid = (min + max) / 2;
-			Object data = doGetItem(mid).getData();
+			@SuppressWarnings("unchecked")
+			E data = (E)doGetItem(mid).getData();
 			int compare = comparator.compare(this, data, element);
 			if (compare == 0) {
 				// find first item > element
@@ -565,7 +595,9 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 					if (mid >= count) {
 						break;
 					}
-					data = doGetItem(mid).getData();
+					@SuppressWarnings("unchecked")
+					E itemElement = (E)doGetItem(mid).getData();
+					data = itemElement;
 					compare = comparator.compare(this, data, element);
 				}
 				return mid;
@@ -585,6 +617,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
 	 *      java.lang.Object)
 	 */
+	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		getControl().setRedraw(false);
 		try {
@@ -614,7 +647,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *            a 0-based position relative to the model, or -1 to indicate
 	 *            the last position
 	 */
-	public void insert(Object element, int position) {
+	public void insert(E element, int position) {
 		applyEditorValue();
 		if (getComparator() != null || hasFilters()) {
 			add(element);
@@ -633,6 +666,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
 	 */
+	@Override
 	protected void internalRefresh(Object element) {
 		internalRefresh(element, true);
 	}
@@ -643,6 +677,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object,
 	 *      boolean)
 	 */
+	@Override
 	protected void internalRefresh(Object element, boolean updateLabels) {
 		applyEditorValue();
 		if (element == null || equals(element, getRoot())) {
@@ -652,9 +687,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				internalVirtualRefreshAll();
 			}
 		} else {
-			Widget w = findItem(element);
+			@SuppressWarnings("unchecked")
+			E castedElement = (E) element;
+			Widget w = findItem(castedElement);
 			if (w != null) {
-				updateItem(w, element);
+				updateItem(w, castedElement);
 			}
 		}
 	}
@@ -666,8 +703,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 */
 	private void internalVirtualRefreshAll() {
 
-		Object root = getRoot();
-		IContentProvider contentProvider = getContentProvider();
+		I root = getRoot();
+		IContentProvider<? super I> contentProvider = getContentProvider();
 
 		// Invalidate for lazy
 		if (!(contentProvider instanceof ILazyContentProvider)
@@ -699,7 +736,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		// item 1 could undo
 		// the associate of b to item 0.
 
-		Object[] children = getSortedChildren(getRoot());
+		E[] children = getSortedChildren(getRoot());
 		Item[] items = doGetItems();
 		int min = Math.min(children.length, items.length);
 		for (int i = 0; i < min; ++i) {
@@ -765,8 +802,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param elements
 	 *            the elements to remove
 	 */
-	private void internalRemove(final Object[] elements) {
-		Object input = getInput();
+	private void internalRemove(final E[] elements) {
+		I input = getInput();
 		for (int i = 0; i < elements.length; ++i) {
 			if (equals(elements[i], input)) {
 				boolean oldBusy = isBusy();
@@ -823,7 +860,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param elements
 	 *            the elements to remove
 	 */
-	public void remove(final Object[] elements) {
+	public void remove(final E[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
 			return;
@@ -853,8 +890,10 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param element
 	 *            the element
 	 */
-	public void remove(Object element) {
-		remove(new Object[] { element });
+	public void remove(E element) {
+		@SuppressWarnings("unchecked")
+		E[] elements = (E[]) new Object[] { element };
+		remove(elements);
 	}
 
 	/*
@@ -862,7 +901,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
 	 */
-	public void reveal(Object element) {
+	@Override
+	public void reveal(E element) {
 		Assert.isNotNull(element);
 		Widget w = findItem(element);
 		if (w instanceof Item) {
@@ -876,7 +916,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
 	 *      boolean)
 	 */
-	protected void setSelectionToWidget(List list, boolean reveal) {
+	@Override
+	protected void setSelectionToWidget(List<E> list, boolean reveal) {
 		if (list == null) {
 			doDeselectAll();
 			return;
@@ -894,7 +935,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			Item[] items = new Item[size];
 			int count = 0;
 			for (int i = 0; i < size; ++i) {
-				Object o = list.get(i);
+				E o = list.get(i);
 				Widget w = findItem(o);
 				if (w instanceof Item) {
 					Item item = (Item) w;
@@ -910,9 +951,9 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			if( ! list.isEmpty() ) {
 				int[] indices = new int[list.size()];
 
-				Iterator it = list.iterator();
+				Iterator<E> it = list.iterator();
 				Item[] items = doGetItems();
-				Object modelElement;
+				E modelElement;
 
 				int count = 0;
 				while( it.hasNext() ) {
@@ -943,15 +984,15 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @param reveal
 	 *            Whether or not reveal the first item.
 	 */
-	private void virtualSetSelectionToWidget(List list, boolean reveal) {
+	private void virtualSetSelectionToWidget(List<E> list, boolean reveal) {
 		int size = list.size();
 		int[] indices = new int[list.size()];
 
 		Item firstItem = null;
 		int count = 0;
-		HashSet virtualElements = new HashSet();
+		HashSet<E> virtualElements = new HashSet<E>();
 		for (int i = 0; i < size; ++i) {
-			Object o = list.get(i);
+			E o = list.get(i);
 			Widget w = findItem(o);
 			if (w instanceof Item) {
 				Item item = (Item) w;
@@ -965,7 +1006,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		}
 
 		if (getContentProvider() instanceof ILazyContentProvider) {
-			ILazyContentProvider provider = (ILazyContentProvider) getContentProvider();
+			ILazyContentProvider<? super I> provider = (ILazyContentProvider<? super I>) getContentProvider();
 
 			// Now go through it again until all is done or we are no longer
 			// virtual
@@ -989,7 +1030,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				// have been found
 				// If it is not lazy we can use the cache
 				for (int i = 0; i < virtualManager.cachedElements.length; i++) {
-					Object element = virtualManager.cachedElements[i];
+					E element = virtualManager.cachedElements[i];
 					if (virtualElements.contains(element)) {
 						Item item = doGetItem(i);
 						item.getText();// Be sure to fire the update
@@ -1048,14 +1089,14 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Replace the element at the given index with the given element. This
 	 * method will not call the content provider to verify. <strong>Note that
 	 * this method will materialize a TableItem the given index.</strong>.
-	 * 
+	 *
 	 * @param element
 	 * @param index
 	 * @see ILazyContentProvider
-	 * 
+	 *
 	 * @since 3.1
 	 */
-	public void replace(Object element, int index) {
+	public void replace(E element, int index) {
 		if (checkBusy())
 			return;
 		Item item = doGetItem(index);
@@ -1083,11 +1124,14 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
 	 */
-	protected Object[] getRawChildren(Object parent) {
+	@Override
+	protected E[] getRawChildren(Object parent) {
 
 		Assert.isTrue(!(getContentProvider() instanceof ILazyContentProvider),
 				"Cannot get raw children with an ILazyContentProvider");//$NON-NLS-1$
-		return super.getRawChildren(parent);
+		@SuppressWarnings("unchecked")
+		I input = (I) parent;
+		return super.getRawChildren(input);
 
 	}
 
@@ -1096,7 +1140,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#assertContentProviderType(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	protected void assertContentProviderType(IContentProvider provider) {
+	@Override
+	protected void assertContentProviderType(IContentProvider<? super I> provider) {
 		Assert.isTrue(provider instanceof IStructuredContentProvider
 				|| provider instanceof ILazyContentProvider);
 	}
@@ -1290,11 +1335,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Items that are not in the receiver are ignored. If the receiver is single-select and multiple
 	 * items are specified, then all items are ignored.
 	 * </p>
-	 * 
+	 *
 	 * @param items the array of items
-	 * 
+	 *
 	 * @exception IllegalArgumentException - if the array of items is null
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(Item[] items);
@@ -1316,11 +1361,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Indices that are out of range and duplicate indices are ignored. If the receiver is
 	 * single-select and multiple indices are specified, then all indices are ignored.
 	 * </p>
-	 * 
+	 *
 	 * @param indices the indices of the items to select
-	 * 
+	 *
 	 * @exception IllegalArgumentException - if the array of indices is null
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(int[] indices);

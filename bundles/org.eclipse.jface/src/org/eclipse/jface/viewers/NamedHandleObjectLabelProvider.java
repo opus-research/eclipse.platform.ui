@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,10 +17,11 @@ import org.eclipse.core.commands.common.NotDefinedException;
 /**
  * A label provider for instances of <code>NamedHandlerObject</code>, which
  * exposes the name as the label.
+ * @param <E> Type of an element of the model
  * 
  * @since 3.2
  */
-public final class NamedHandleObjectLabelProvider extends LabelProvider {
+public final class NamedHandleObjectLabelProvider<E> extends LabelProvider<E> {
 	
 	/**
 	 * The text of the element is simply the name of the element if its a
@@ -33,7 +34,8 @@ public final class NamedHandleObjectLabelProvider extends LabelProvider {
 	 * @return the name of the handle object; <code>null</code> if there is no
 	 *         name or if the element is not a named handle object.
 	 */
-	public final String getText(final Object element) {
+	@Override
+	public final String getText(final E element) {
 		if (element instanceof NamedHandleObject) {
 			try {
 				return ((NamedHandleObject) element).getName();

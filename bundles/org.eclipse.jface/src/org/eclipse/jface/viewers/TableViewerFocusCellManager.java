@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,14 @@ import org.eclipse.swt.widgets.Table;
  * This class is responsible to provide the concept of cells for {@link Table}.
  * This concept is needed to provide features like editor activation with the
  * keyboard
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public class TableViewerFocusCellManager extends SWTFocusCellManager {
+public class TableViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
+	@SuppressWarnings("rawtypes")
 	private static final CellNavigationStrategy TABLE_NAVIGATE = new CellNavigationStrategy();
 
 	/**
@@ -43,8 +46,9 @@ public class TableViewerFocusCellManager extends SWTFocusCellManager {
 	 * @param focusDrawingDelegate
 	 *            the delegate responsible to highlight selected cell
 	 */
-	public TableViewerFocusCellManager(TableViewer viewer,
-			FocusCellHighlighter focusDrawingDelegate) {
+	@SuppressWarnings("unchecked")
+	public TableViewerFocusCellManager(TableViewer<E,I> viewer,
+			FocusCellHighlighter<E,I> focusDrawingDelegate) {
 		this(viewer, focusDrawingDelegate, TABLE_NAVIGATE);
 	}
 
@@ -59,18 +63,19 @@ public class TableViewerFocusCellManager extends SWTFocusCellManager {
 	 *            the strategy used to navigate the cells
 	 * @since 3.4
 	 */
-	public TableViewerFocusCellManager(TableViewer viewer,
-			FocusCellHighlighter focusDrawingDelegate,
-			CellNavigationStrategy navigationStrategy) {
+	public TableViewerFocusCellManager(TableViewer<E,I> viewer,
+			FocusCellHighlighter<E,I> focusDrawingDelegate,
+			CellNavigationStrategy<E,I> navigationStrategy) {
 		super(viewer, focusDrawingDelegate, navigationStrategy);
 	}
 
-	ViewerCell getInitialFocusCell() {
+	@Override
+	ViewerCell<E> getInitialFocusCell() {
 		Table table = (Table) getViewer().getControl();
 
 		if (!table.isDisposed() && table.getItemCount() > 0
 				&& !table.getItem(table.getTopIndex()).isDisposed()) {
-			final ViewerRow aViewerRow = getViewer().getViewerRowFromItem(
+			final ViewerRow<E> aViewerRow = getViewer().getViewerRowFromItem(
 					table.getItem(table.getTopIndex()));
 			if (table.getColumnCount() == 0) {
 				return aViewerRow.getCell(0);
@@ -86,12 +91,13 @@ public class TableViewerFocusCellManager extends SWTFocusCellManager {
 		return null;
 	}
 
-	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow row, int colIndex) {
+	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow<E> row, int colIndex) {
 		return row.getBounds(colIndex).x >= clientArea.x;
 	}
 
-	public ViewerCell getFocusCell() {
-		ViewerCell cell = super.getFocusCell();
+	@Override
+	public ViewerCell<E> getFocusCell() {
+		ViewerCell<E> cell = super.getFocusCell();
 		Table t = (Table) getViewer().getControl();
 
 		// It is possible that the selection has changed under the hood

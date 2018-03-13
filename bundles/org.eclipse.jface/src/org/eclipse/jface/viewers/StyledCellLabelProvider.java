@@ -39,10 +39,12 @@ import org.eclipse.swt.widgets.Event;
  * {@link ViewerCell#setStyleRanges(StyleRange[])} to set style ranges
  * on the label.
  * </p>
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  * 
  * @since 3.4
  */
-public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
+public abstract class StyledCellLabelProvider<E,I> extends OwnerDrawLabelProvider<E,I> {
 
 	/**
 	 * Style constant for indicating that the styled colors are to be applied
@@ -67,8 +69,8 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	// reused text layout
 	private TextLayout cachedTextLayout;
 	
-	private ColumnViewer viewer;
-	private ViewerColumn column;
+	private ColumnViewer<E,I> viewer;
+	private ViewerColumn<E,I> column;
 	
 	private int deltaOfLastMeasure;
 
@@ -138,7 +140,7 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * @return the viewer on which this label provider is installed on or <code>null</code> if the
 	 * label provider is not installed.
 	 */
-	protected final ColumnViewer getViewer() {
+	protected final ColumnViewer<E,I> getViewer() {
 		return this.viewer;
 	}
 	
@@ -149,14 +151,15 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * @return the column on which this label provider is installed on or <code>null</code> if the
 	 * label provider is not installed.
 	 */
-	protected final ViewerColumn getColumn() {
+	protected final ViewerColumn<E,I> getColumn() {
 		return this.column;
 	}
 		
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#initialize(org.eclipse.jface.viewers.ColumnViewer, org.eclipse.jface.viewers.ViewerColumn)
 	 */
-	public void initialize(ColumnViewer viewer, ViewerColumn column) {
+	@Override
+	public void initialize(ColumnViewer<E,I> viewer, ViewerColumn<E,I> column) {
 		Assert.isTrue(this.viewer == null && this.column == null, "Label provider instance already in use"); //$NON-NLS-1$
 		
 		this.viewer= viewer;
@@ -169,6 +172,7 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * 
 	 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
 	 */
+	@Override
 	public void dispose() {
 		if (this.cachedTextLayout != null) {
 			cachedTextLayout.dispose();
@@ -186,7 +190,8 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * 
 	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
 	 */
-	public void update(ViewerCell cell) {
+	@Override
+	public void update(ViewerCell<E> cell) {
 		// clients must override and configure the cell and call super
 		super.update(cell); // calls 'repaint' to trigger the paint listener
 	}
@@ -236,9 +241,9 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		return styleRange;
 	}
 
-	private ViewerCell getViewerCell(Event event, Object element) {
-		ViewerRow row= viewer.getViewerRowFromItem(event.item);
-		return new ViewerCell(row, event.index, element);
+	private ViewerCell<E> getViewerCell(Event event, E element) {
+		ViewerRow<E> row= viewer.getViewerRowFromItem(event.item);
+		return new ViewerCell<E>(row, event.index, element);
 	}
 	
 	/**
@@ -251,7 +256,8 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 *            the model object
 	 * @see SWT#EraseItem
 	 */
-	protected void erase(Event event, Object element) {
+	@Override
+	protected void erase(Event event, E element) {
 		// use native erase
 		if (isOwnerDrawEnabled()) {
 			// info has been set by 'update': announce that we paint ourselves
@@ -265,11 +271,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#measure(org.eclipse.swt.widgets.Event,
 	 *      java.lang.Object)
 	 */
-	protected void measure(Event event, Object element) {
+	@Override
+	protected void measure(Event event, E element) {
 		if (!isOwnerDrawEnabled())
 			return;
 		
-		ViewerCell cell= getViewerCell(event, element);
+		ViewerCell<E> cell= getViewerCell(event, element);
 		boolean applyColors = useColors(event);
 		
 		TextLayout layout = getSharedTextLayout(event.display);
@@ -285,7 +292,7 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * @param applyColors
 	 * @return the text width delta (0 if the text layout contains no other font)
 	 */
-	private int updateTextLayout(TextLayout layout, ViewerCell cell,
+	private int updateTextLayout(TextLayout layout, ViewerCell<E> cell,
 			boolean applyColors) {
 		layout.setStyle(null, 0, Integer.MAX_VALUE); // clear old styles
 
@@ -318,11 +325,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
 	 *      java.lang.Object)
 	 */
-	protected void paint(Event event, Object element) {
+	@Override
+	protected void paint(Event event, E element) {
 		if (!isOwnerDrawEnabled())
 			return;
 		
-		ViewerCell cell= getViewerCell(event, element);
+		ViewerCell<E> cell= getViewerCell(event, element);
 
 		boolean applyColors= useColors(event);
 		

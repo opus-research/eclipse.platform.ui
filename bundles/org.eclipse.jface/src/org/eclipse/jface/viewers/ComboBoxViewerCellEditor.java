@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 Tom Schindl and others.
+ * Copyright (c) 2006, 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,14 +35,16 @@ import org.eclipse.swt.widgets.Control;
  * A cell editor that presents a list of items in a combo box. In contrast to
  * {@link ComboBoxCellEditor} it wraps the underlying {@link CCombo} using a
  * {@link ComboViewer}
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
  * @since 3.4
  */
-public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
+public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 
 	/**
 	 * The custom combo box control.
 	 */
-	ComboViewer viewer;
+	ComboViewer<E,I> viewer;
 
 	Object selectedValue;
 
@@ -77,24 +79,28 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	/*
 	 * (non-Javadoc) Method declared on CellEditor.
 	 */
+	@Override
 	protected Control createControl(Composite parent) {
 
 		CCombo comboBox = new CCombo(parent, getStyle());
 		comboBox.setFont(parent.getFont());
-		viewer = new ComboViewer(comboBox);
+		viewer = new ComboViewer<E,I>(comboBox);
 
 		comboBox.addKeyListener(new KeyAdapter() {
 			// hook key pressed - see PR 14201
+			@Override
 			public void keyPressed(KeyEvent e) {
 				keyReleaseOccured(e);
 			}
 		});
 
 		comboBox.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 				applyEditorValueAndDeactivate();
 			}
 
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				ISelection selection = viewer.getSelection();
 				if (selection.isEmpty()) {
@@ -116,6 +122,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		});
 
 		comboBox.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent e) {
 				ComboBoxViewerCellEditor.this.focusLost();
 			}
@@ -131,6 +138,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @return the zero-based index of the current selection wrapped as an
 	 *         <code>Integer</code>
 	 */
+	@Override
 	protected Object doGetValue() {
 		return selectedValue;
 	}
@@ -138,6 +146,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	/*
 	 * (non-Javadoc) Method declared on CellEditor.
 	 */
+	@Override
 	protected void doSetFocus() {
 		viewer.getControl().setFocus();
 	}
@@ -150,6 +159,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * to make sure the arrow button and some text is visible. The list of
 	 * CCombo will be wide enough to show its longest item.
 	 */
+	@Override
 	public LayoutData getLayoutData() {
 		LayoutData layoutData = super.getLayoutData();
 		if ((viewer.getControl() == null) || viewer.getControl().isDisposed()) {
@@ -170,6 +180,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @param value
 	 *            the new value
 	 */
+	@Override
 	protected void doSetValue(Object value) {
 	    Assert.isTrue(viewer != null);
 	    selectedValue = value;
@@ -185,7 +196,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 *            the label provider used
 	 * @see StructuredViewer#setLabelProvider(IBaseLabelProvider)
 	 */
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+	public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		viewer.setLabelProvider(labelProvider);
 	}
 
@@ -195,7 +206,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @see StructuredViewer#setContentProvider(IContentProvider)
 	 * @since 3.7
 	 */
-	public void setContentProvider(IStructuredContentProvider provider) {
+	public void setContentProvider(IStructuredContentProvider<E,I> provider) {
 		viewer.setContentProvider(provider);
 	}
 
@@ -206,7 +217,8 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @deprecated As of 3.7, replaced by
 	 *             {@link #setContentProvider(IStructuredContentProvider)}
 	 */
-	public void setContenProvider(IStructuredContentProvider provider) {
+	@Deprecated
+	public void setContenProvider(IStructuredContentProvider<E,I> provider) {
 		viewer.setContentProvider(provider);
 	}
 
@@ -215,14 +227,14 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 *            the input used
 	 * @see StructuredViewer#setInput(Object)
 	 */
-	public void setInput(Object input) {
+	public void setInput(I input) {
 		viewer.setInput(input);
 	}
 
 	/**
 	 * @return get the viewer
 	 */
-	public ComboViewer getViewer() {
+	public ComboViewer<E,I> getViewer() {
 		return viewer;
 	}
 
@@ -258,6 +270,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 *
 	 * @see org.eclipse.jface.viewers.CellEditor#focusLost()
 	 */
+	@Override
 	protected void focusLost() {
 		if (isActivated()) {
 			applyEditorValueAndDeactivate();
@@ -269,6 +282,7 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 *
 	 * @see org.eclipse.jface.viewers.CellEditor#keyReleaseOccured(org.eclipse.swt.events.KeyEvent)
 	 */
+	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.character == '\u001b') { // Escape character
 			fireCancelEditor();
