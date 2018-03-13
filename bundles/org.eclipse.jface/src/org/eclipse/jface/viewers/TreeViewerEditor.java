@@ -25,16 +25,18 @@ import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * This is an editor implementation for {@link Tree}
+ * @param <E> Type of an single element of the model
+ * @param <I> Type of the input
  *
  * @since 3.3
  */
-public class TreeViewerEditor extends ColumnViewerEditor {
+public class TreeViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 	/**
 	 * This viewer's tree editor.
 	 */
 	private TreeEditor treeEditor;
 
-	private SWTFocusCellManager focusCellManager;
+	private SWTFocusCellManager<E,I> focusCellManager;
 
 	/**
 	 * @param viewer
@@ -46,7 +48,7 @@ public class TreeViewerEditor extends ColumnViewerEditor {
 	 * @param feature
 	 *            the feature mask
 	 */
-	TreeViewerEditor(TreeViewer viewer, SWTFocusCellManager focusCellManager,
+	TreeViewerEditor(TreeViewer<E,I> viewer, SWTFocusCellManager<E,I> focusCellManager,
 			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
 		super(viewer, editorActivationStrategy, feature);
@@ -74,11 +76,11 @@ public class TreeViewerEditor extends ColumnViewerEditor {
 	 *            </ul>
 	 * @see #create(TreeViewer, ColumnViewerEditorActivationStrategy, int)
 	 */
-	public static void create(TreeViewer viewer,
-			SWTFocusCellManager focusCellManager,
+	public static <E,I> void create(TreeViewer<E,I> viewer,
+			SWTFocusCellManager<E,I> focusCellManager,
 			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
-		TreeViewerEditor editor = new TreeViewerEditor(viewer,
+		TreeViewerEditor<E,I> editor = new TreeViewerEditor<E,I>(viewer,
 				focusCellManager, editorActivationStrategy, feature);
 		viewer.setColumnViewerEditor(editor);
 		if (focusCellManager != null) {
@@ -103,7 +105,7 @@ public class TreeViewerEditor extends ColumnViewerEditor {
 	 *            <li>{@link ColumnViewerEditor#TABBING_VERTICAL}</li>
 	 *            </ul>
 	 */
-	public static void create(TreeViewer viewer,
+	public static <E,I> void create(TreeViewer<E,I> viewer,
 			ColumnViewerEditorActivationStrategy editorActivationStrategy,
 			int feature) {
 		create(viewer, null, editorActivationStrategy, feature);
@@ -126,7 +128,7 @@ public class TreeViewerEditor extends ColumnViewerEditor {
 	}
 
 	@Override
-	public ViewerCell getFocusCell() {
+	public ViewerCell<E> getFocusCell() {
 		if (focusCellManager != null) {
 			return focusCellManager.getFocusCell();
 		}
@@ -135,21 +137,21 @@ public class TreeViewerEditor extends ColumnViewerEditor {
 	}
 
 	@Override
-	protected void updateFocusCell(ViewerCell focusCell,
+	protected void updateFocusCell(ViewerCell<E> focusCell,
 			ColumnViewerEditorActivationEvent event) {
 		// Update the focus cell when we activated the editor with these 2
 		// events
 		if (event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC
 				|| event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL) {
 
-			List l = getViewer().getSelectionFromWidget();
+			List<E> l = getViewer().getSelectionFromWidget();
 
 			if (!l.contains(focusCell.getElement())) {
 				getViewer().setSelection(
 						new TreeSelection(focusCell.getViewerRow()
 								.getTreePath()),true);
 			}
-			
+
 			// Set the focus cell after the selection is updated because else
 			// the cell is not scrolled into view
 			if (focusCellManager != null) {
