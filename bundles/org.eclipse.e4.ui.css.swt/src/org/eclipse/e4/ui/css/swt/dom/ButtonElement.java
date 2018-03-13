@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Angelo Zerr and others.
+ * Copyright (c) 2009, 2012 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,13 +49,16 @@ public class ButtonElement extends ControlElement {
 		button.addSelectionListener(selectionListener);
 	}
 
-	@Override
-	public void dispose() {		
+	public void dispose() {
+
+		super.dispose();
+
+		if (!dynamicEnabled) return; 
+		
 		Button button = getButton();
 		if (!button.isDisposed()) {
 			button.removeSelectionListener(selectionListener);
 		}
-		super.dispose();
 	}
 
 	public boolean isPseudoInstanceOf(String s) {		
