@@ -69,7 +69,7 @@ public class StackDropAgent extends DropAgent {
 		if (stack == dragElement)
 			return false;
 
-		// You can only drag MParts from window to window 68
+		// You can only drag MParts from window to window
 		if (!(dragElement instanceof MPart)) {
 			EModelService ms = dndManager.getModelService();
 			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
