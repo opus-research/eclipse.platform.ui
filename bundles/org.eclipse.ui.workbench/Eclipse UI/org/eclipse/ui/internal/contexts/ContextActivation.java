@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,7 +98,6 @@ final class ContextActivation extends EvaluationResultCache implements
 		return evaluate(context);
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 
@@ -109,18 +108,6 @@ final class ContextActivation extends EvaluationResultCache implements
 		buffer.append(')');
 
 		return buffer.toString();
-	}
-
-	@Override
-	public int hashCode() {
-		return (contextId + getSourcePriority()).hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof ContextActivation &&
-			((ContextActivation) obj).getSourcePriority() == getSourcePriority() &&
- ((ContextActivation) obj).contextId.equals(contextId);
 	}
 
 }
