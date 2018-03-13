@@ -92,8 +92,7 @@ public class SubMenuManager extends SubContributionManager implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.SubContributionManager#disposeManager()
      */
-    @Override
-	public void disposeManager() {
+    public void disposeManager() {
         if (menuListener != null) {
             getParentMenuManager().removeMenuListener(menuListener);
             menuListener = null;
@@ -157,8 +156,7 @@ public class SubMenuManager extends SubContributionManager implements
      * In the case of menu's not added by this manager,
      * ensure that we return a wrapper for the menu.
      */
-    @Override
-	public IContributionItem find(String id) {
+    public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
         if (item instanceof SubContributionItem) {
 			// Return the item passed to us, not the wrapper.
@@ -290,8 +288,7 @@ public class SubMenuManager extends SubContributionManager implements
     /**
      * Remove all contribution items.
      */
-    @Override
-	public void removeAll() {
+    public void removeAll() {
         super.removeAll();
         if (mapMenuToWrapper != null) {
             Iterator iter = mapMenuToWrapper.values().iterator();
@@ -336,8 +333,7 @@ public class SubMenuManager extends SubContributionManager implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.SubContributionManager#setVisible(boolean)
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (mapMenuToWrapper != null) {
             Iterator iter = mapMenuToWrapper.values().iterator();

@@ -245,8 +245,7 @@ public final class Scheme extends NamedHandleObject implements Comparable {
      * 
      * @return The string representation; never <code>null</code>.
      */
-    @Override
-	public final String toString() {
+    public final String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("Scheme("); //$NON-NLS-1$
@@ -270,8 +269,7 @@ public final class Scheme extends NamedHandleObject implements Comparable {
      * the name, description and parent identifier to <code>null</code>.
      * Notification is sent to all listeners.
      */
-    @Override
-	public final void undefine() {
+    public final void undefine() {
         string = null;
 
         final boolean definedChanged = defined;

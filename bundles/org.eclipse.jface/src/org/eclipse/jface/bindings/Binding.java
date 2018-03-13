@@ -240,7 +240,6 @@ public abstract class Binding {
 	 * @return <code>true</code> if the object is a binding with equivalent
 	 *         values for all of its properties; <code>false</code> otherwise.
 	 */
-	@Override
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -352,7 +351,6 @@ public abstract class Binding {
 	 * 
 	 * @return The hash code for this key binding.
 	 */
-	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL;
@@ -380,7 +378,6 @@ public abstract class Binding {
 	 * 
 	 * @return The string representation; never <code>null</code>.
 	 */
-	@Override
 	public String toString() {
 		if (string == null) {
 			

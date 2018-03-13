@@ -73,8 +73,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * this <code>IWizardPage</code> method returns <code>true</code>
      * if there is a selected node.
      */
-    @Override
-	public boolean canFlipToNextPage() {
+    public boolean canFlipToNextPage() {
         return selectedNode != null;
     }
 
@@ -82,8 +81,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * The <code>WizardSelectionPage</code> implementation of an <code>IDialogPage</code>
      * method disposes of all nested wizards. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         // notify nested wizards
         for (int i = 0; i < selectedWizardNodes.size(); i++) {
@@ -96,8 +94,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * this <code>IWizardPage</code> method returns the first page 
      * of the currently selected wizard if there is one.
      */
-    @Override
-	public IWizardPage getNextPage() {
+    public IWizardPage getNextPage() {
         if (selectedNode == null) {
 			return null;
 		}
