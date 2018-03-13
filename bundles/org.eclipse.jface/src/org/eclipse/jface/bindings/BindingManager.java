@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2041,14 +2041,15 @@ public final class BindingManager extends HandleObjectManager implements
 			 * parent context -- assuming that the schemes lead to a conflict.
 			 */
 			final String currentContext = current.getContextId();
-			final String bestContext = bestMatch.getContextId();
+			final String bestContext = bestMatch.getContextId();			
 			if (!currentContext.equals(bestContext)) {
 				boolean goToNextBinding = false;
+				String bestContextParent = (String) activeContextTree.get(bestContext);
 
 				// Ascend the current's context tree.
 				String contextPointer = currentContext;
 				while (contextPointer != null) {
-					if (contextPointer.equals(bestContext)) {
+					if (contextPointer.equals(bestContext) || contextPointer.equals(bestContextParent)) {
 						// the current wins
 						bestMatch = current;
 						conflict = false;
@@ -2069,7 +2070,7 @@ public final class BindingManager extends HandleObjectManager implements
 					}
 					contextPointer = (String) activeContextTree
 							.get(contextPointer);
-				}
+				}				
 
 				if (goToNextBinding) {
 					continue;
