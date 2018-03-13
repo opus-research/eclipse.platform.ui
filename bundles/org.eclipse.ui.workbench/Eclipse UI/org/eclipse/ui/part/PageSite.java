@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -251,6 +251,10 @@ public class PageSite implements IPageSite, INestable {
 		selectionProvider = provider;
 	}
 
+	/* Package */IEclipseContext getSiteContext() {
+		return e4Context;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -260,7 +264,7 @@ public class PageSite implements IPageSite, INestable {
 	 */
 	public void activate() {
 		active = true;
-		e4Context.activate();
+
 		serviceLocator.activate();
 
 		if (contextService != null) {
@@ -282,6 +286,5 @@ public class PageSite implements IPageSite, INestable {
 		}
 
 		serviceLocator.deactivate();
-		e4Context.deactivate();
 	}
 }

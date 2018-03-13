@@ -19,17 +19,15 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
  *
  * <!-- begin-model-doc -->
  * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
+ * A class to be mixed in to any element that should be allowed to be added to a
+ * Window.
  * </p>
+ * @since 1.0
  * <!-- end-model-doc -->
  *
  *
  * @model interface="true" abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MWindowElement extends MUIElement {
 } // MWindowElement

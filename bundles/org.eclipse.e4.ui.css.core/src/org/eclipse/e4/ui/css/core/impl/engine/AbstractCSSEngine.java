@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
+ *     Red Hat Inc. (mistria) - Fixes suggested by FindBugs
+ *     Red Hat Inc. (mistria) - Bug 413348: fix stream leak
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
@@ -201,16 +203,23 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		    		url = new URL(path);
 		    	}
 		    }
-			InputStream stream = url.openStream();
-			InputSource tempStream = new InputSource();
-			tempStream.setURI(url.toString());
-			tempStream.setByteStream(stream);
-			parseImport = true;
-			styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
-			parseImport = false;
-			CSSRuleList tempRules = styleSheet.getCssRules();
-			for (int j = 0; j < tempRules.getLength(); j++) {
-				masterList.add(tempRules.item(j));
+			InputStream stream = null;
+			try {
+				stream = url.openStream();
+				InputSource tempStream = new InputSource();
+				tempStream.setURI(url.toString());
+				tempStream.setByteStream(stream);
+				parseImport = true;
+				styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
+				parseImport = false;
+				CSSRuleList tempRules = styleSheet.getCssRules();
+				for (int j = 0; j < tempRules.getLength(); j++) {
+					masterList.add(tempRules.item(j));
+				}
+			} finally {
+				if (stream != null) {
+					stream.close();
+				}
 			}
 		}
 		
@@ -222,10 +231,8 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		//final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
-		if (documentCSS instanceof ExtendedDocumentCSS) {
-			if (!parseImport) {
-				documentCSS.addStyleSheet(s);
-			}
+		if (!parseImport) {
+			documentCSS.addStyleSheet(s);
 		}
 		return s;
 	}

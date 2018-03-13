@@ -20,11 +20,10 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * <!-- begin-model-doc -->
  * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
+ * A set of Bindings that will be active if the matching <code>MBindingContext</code>
+ * is active.
  * </p>
+ * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -37,7 +36,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MBindingTable extends MApplicationElement {
 	/**

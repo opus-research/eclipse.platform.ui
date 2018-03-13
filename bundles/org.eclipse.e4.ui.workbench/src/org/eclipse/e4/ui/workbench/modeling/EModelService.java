@@ -30,6 +30,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
  * This service is used to find, create and handle model elements
  * 
  * @since 1.0
+ * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface EModelService {
 	// Insertion constants
@@ -94,6 +95,7 @@ public interface EModelService {
 	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MCommand MCommand}</li>
 	 * <li>
 	 * {@link org.eclipse.e4.ui.model.application.commands.MCommandParameter MCommandParameter}</li>
+	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MCompositePart MCompositePart}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.MCoreExpression MCoreExpression}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem MDirectMenuItem}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem MDirectToolItem}</li>
