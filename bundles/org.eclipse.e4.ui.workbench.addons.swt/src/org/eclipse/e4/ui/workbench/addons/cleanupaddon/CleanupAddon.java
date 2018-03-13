@@ -263,8 +263,7 @@ public class CleanupAddon {
 				// Bring the container back if one of its children goes visible
 				if (!container.isToBeRendered())
 					container.setToBeRendered(true);
-				if (!container.isVisible()
-						&& !container.getTags().contains(IPresentationEngine.MINIMIZED))
+				if (!container.isVisible())
 					container.setVisible(true);
 			} else {
 				// Never hide the container marked as no_close
