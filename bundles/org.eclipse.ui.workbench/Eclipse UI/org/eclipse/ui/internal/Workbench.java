@@ -591,8 +591,11 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+
 					IProgressMonitor progressMonitor = null;
-					if (handler != null) {
+					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -1661,8 +1664,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
-				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
-						colorDefinitions, PrefUtil.getInternalPreferenceStore());
+				ThemeElementHelper.populateRegistry(getThemeManager().getTheme(
+						IThemeManager.DEFAULT_THEME), colorDefinitions, PrefUtil
+						.getInternalPreferenceStore());
 			}
 		});
 	}
