@@ -64,6 +64,29 @@ public interface IPresentationEngine {
 	public static final String NO_MOVE = "NoMove"; //$NON-NLS-1$
 
 	/**
+	 * This key is used to store information in the 'persistentData' map which will be used to
+	 * override the initial style of an element at rendering time. For example the SWT renderer will
+	 * expect to see an integer (as a string) which defines the initial SWT style bits.
+	 * 
+	 * @since 1.1
+	 */
+	public static String STYLE_OVERRIDE_KEY = "styleOverride"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to minimize the resulting control.
+	 * 
+	 * @since 1.1
+	 */
+	public static String WINDOW_MINIMIZED_TAG = "shellMinimized"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to maximize the resulting control.
+	 * 
+	 * @since 1.1
+	 */
+	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
+
+	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
 	 * the trim. In the default implementation you can only apply this tag to an MPartStack or the
 	 * MPlaceholder of the MArea.
@@ -99,6 +122,22 @@ public interface IPresentationEngine {
 	 * to. It could also be used for example to control where the tabs appear on an MPartStack.
 	 */
 	public static String ORIENTATION_VERTICAL = "Vertical"; //$NON-NLS-1$
+
+	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be split with the result being side by side.
+	 * 
+	 * @since 1.1
+	 */
+	public static String SPLIT_HORIZONTAL = "Split Horizontal"; //$NON-NLS-1$
+
+	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be split with the result being one above the other.
+	 * 
+	 * @since 1.1
+	 */
+	public static String SPLIT_VERTICAL = "Split Vertical"; //$NON-NLS-1$
 
 	/**
 	 * This key should be used to add an optional String to an element that is a URI to the elements
@@ -144,6 +183,14 @@ public interface IPresentationEngine {
 	 * ABstractPartRenderer that is to be used to render the element
 	 */
 	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
+
+	/**
+	 * This is the tag name that enables the DND support for the element. The element's tags list
+	 * has to be updated with the tag in order to enable the DND processing.
+	 *
+	 * @since 1.1
+	 */
+	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.

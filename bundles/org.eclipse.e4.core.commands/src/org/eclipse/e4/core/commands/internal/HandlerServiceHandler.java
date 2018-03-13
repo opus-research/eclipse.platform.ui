@@ -58,11 +58,6 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return super.isEnabled();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
-	 */
 	@Override
 	public void setEnabled(Object evaluationContext) {
 		boolean createContext = false;
@@ -117,11 +112,6 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#isHandled()
-	 */
 	@Override
 	public boolean isHandled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
@@ -136,11 +126,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEclipseContext executionContext = getExecutionContext(event.getApplicationContext());
 		if (executionContext == null) {
@@ -169,12 +155,6 @@ public class HandlerServiceHandler extends AbstractHandler {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.AbstractHandler#fireHandlerChanged(org.eclipse.core.commands.
-	 * HandlerEvent)
-	 */
 	@Override
 	public void fireHandlerChanged(HandlerEvent handlerEvent) {
 		super.fireHandlerChanged(handlerEvent);
