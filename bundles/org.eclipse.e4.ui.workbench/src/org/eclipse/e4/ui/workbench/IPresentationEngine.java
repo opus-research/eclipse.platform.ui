@@ -114,6 +114,8 @@ public interface IPresentationEngine {
 	 * This key should be used to add an optional org.eclipse.swt.graphics.Image to an elements
 	 * TRANSIENTDATA. If present, the image will be used to override that elements iconURI. An
 	 * example is drawing the error icon on a minimized problems view stack.
+	 * 
+	 * NOTE: This image must be checked to ensure that it hasn't been disposed on retrieval.
 	 */
 	public static final String OVERRIDE_ICON_IMAGE_KEY = "e4_override_icon_image_key"; //$NON-NLS-1$
 
@@ -123,6 +125,14 @@ public interface IPresentationEngine {
 	 * ToolTip of a minimized problems view stack to the number of errors and warnings in the view.
 	 */
 	public static final String OVERRIDE_TITLE_TOOL_TIP_KEY = "e4_override_title_tool_tip_key"; //$NON-NLS-1$
+
+	/**
+	 * This is a Tag that when applied to an MUILabel element will cause whatever Image is to be
+	 * shown to be adorned with the 'pinned' affordance.
+	 * 
+	 * @since 1.1
+	 */
+	public static final String ADORNMENT_PIN = "Pin Adornment"; //$NON-NLS-1$
 
 	/**
 	 * This is a <b>Boolean</b> preference used to control animations in the application
