@@ -43,7 +43,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -666,8 +665,7 @@ public class PartServiceImpl implements EPartService {
 		if (descriptor == null) {
 			return null;
 		}
-
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = modelService.createModelElement(MPart.class);
 		part.setElementId(descriptor.getElementId());
 		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
 		if (descriptor.getToolbar() != null) {
@@ -897,18 +895,18 @@ public class PartServiceImpl implements EPartService {
 		MElementContainer<MUIElement> searchRoot = getContainer();
 		List<MUIElement> children = searchRoot.getChildren();
 		if (children.size() == 0) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		}
 
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
 		if (lastContainer == null) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		} else if (!(lastContainer instanceof MPartStack)) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			((List) lastContainer.getChildren()).add(stack);
 			return stack;
 		}
