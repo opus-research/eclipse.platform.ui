@@ -670,7 +670,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		else if (shellME.getTags().contains(ShellMinimizedTag))
 			shell.setMinimized(true);
 
-		shell.layout();
+		shell.layout(true);
 		if (shellME.isVisible()) {
 			shell.open();
 		} else {

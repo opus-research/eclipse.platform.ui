@@ -139,7 +139,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 						ToolBar tb = parent.getControl();
 						if (tb != null && !tb.isDisposed()) {
 							tb.pack(true);
-							tb.getShell().layout(new Control[] { tb });
+							tb.getShell().layout(new Control[] { tb },
+									SWT.DEFER);
 						}
 					}
 				} else {
@@ -168,7 +169,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					ToolBar tb = parent.getControl();
 					if (tb != null && !tb.isDisposed()) {
 						tb.pack(true);
-						tb.getShell().layout(new Control[] { tb });
+						tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 					}
 				}
 			}
@@ -385,7 +386,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar bar = manager.createControl(parent);
 		bar.setData(manager);
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
-		bar.getShell().layout(new Control[] { bar });
+		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
 		bar.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
@@ -472,7 +473,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar tb = getToolbarFrom(container.getWidget());
 		if (tb != null) {
 			tb.pack(true);
-			tb.getShell().layout(new Control[] { tb });
+			tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 		}
 	}
 
@@ -527,7 +528,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
 				toolbar.pack(true);
-				toolbar.getShell().layout(new Control[] { toolbar });
+				toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
 			}
 			// disposeToolbarIfNecessary(parentElement);
 		}
@@ -541,7 +542,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
 			toolbar.pack(true);
-			toolbar.getShell().layout(new Control[] { toolbar });
+			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
 		}
 	}
 

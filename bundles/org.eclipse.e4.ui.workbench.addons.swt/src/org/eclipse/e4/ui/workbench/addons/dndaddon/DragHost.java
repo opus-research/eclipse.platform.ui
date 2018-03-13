@@ -16,6 +16,7 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
@@ -38,7 +39,8 @@ class DragHost {
 
 	public DragHost(Shell shell) {
 		dragWindow = (MWindow) shell.getData(AbstractPartRenderer.OWNING_ME);
-		baseWindow = (MWindow) shell.getParent().getData(AbstractPartRenderer.OWNING_ME);
+		baseWindow = (MWindow) shell.getParent().getData(
+				AbstractPartRenderer.OWNING_ME);
 		dragElement = dragWindow.getChildren().get(0);
 	}
 
@@ -86,7 +88,8 @@ class DragHost {
 		formatModel(dragWindow);
 
 		// define the initial location and size for the window
-		Point cp = ((Shell) baseWindow.getWidget()).getDisplay().getCursorLocation();
+		Point cp = ((Shell) baseWindow.getWidget()).getDisplay()
+				.getCursorLocation();
 		Point size = new Point(200, 200);
 		if (dragElement.getWidget() instanceof Control) {
 			Control ctrl = (Control) dragElement.getWidget();
@@ -105,7 +108,7 @@ class DragHost {
 		// add the window as a child of the base window
 		baseWindow.getWindows().add(dragWindow);
 
-		getShell().layout(getShell().getChildren());
+		getShell().layout(getShell().getChildren(), SWT.CHANGED | SWT.DEFER);
 		getShell().setVisible(true);
 	}
 
@@ -125,7 +128,8 @@ class DragHost {
 			ToolItem ti = (ToolItem) dragElement.getWidget();
 			ToolBar tb = ti.getParent();
 			tb.layout(true);
-			tb.getParent().layout(new Control[] { tb });
+			tb.getParent()
+					.layout(new Control[] { tb }, SWT.CHANGED | SWT.DEFER);
 		}
 
 		baseWindow.getChildren().remove(dragWindow);

@@ -199,7 +199,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 					Control ctrl = (Control) changedElement.getWidget();
 
 					if (!(ctrl instanceof Shell)) {
-						ctrl.getShell().layout(new Control[] { ctrl });
+						ctrl.getShell().layout(new Control[] { ctrl },
+								SWT.DEFER);
 					}
 
 					ctrl.setParent(getLimboShell());
@@ -280,7 +281,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 							final Control ctrl = (Control) w;
 							fixZOrder(added);
 							if (!ctrl.isDisposed()) {
-								ctrl.getShell().layout(new Control[] { ctrl });
+								ctrl.getShell().layout(new Control[] { ctrl },
+										SWT.DEFER);
 							}
 						}
 					} else {
@@ -313,7 +315,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 					if (removed.getWidget() instanceof Control) {
 						Control ctrl = (Control) removed.getWidget();
 						ctrl.setLayoutData(null);
-						ctrl.getParent().layout(new Control[] { ctrl });
+						ctrl.getParent().layout(new Control[] { ctrl },
+								SWT.CHANGED | SWT.DEFER);
 					}
 
 					// Ensure that the element about to be removed is not the
@@ -400,7 +403,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					temp = temp.getParent();
 				}
 
-				composite.layout();
+				composite.layout(true, true);
 			}
 		}
 	}

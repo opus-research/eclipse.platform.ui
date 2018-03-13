@@ -777,7 +777,7 @@ public class TrimStack {
 		}
 
 		trimStackTB.pack();
-		trimStackTB.getShell().layout(new Control[] { trimStackTB });
+		trimStackTB.getShell().layout(new Control[] { trimStackTB }, SWT.DEFER);
 	}
 
 	void restoreStack() {

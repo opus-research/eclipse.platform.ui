@@ -233,7 +233,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			refCtrl.setParent(phComp);
 
 			element = ref;
-			phComp.layout();
 		}
 
 		if (element instanceof MContext) {

@@ -92,7 +92,7 @@ public class SashRenderer extends SWTPartRenderer {
 				return;
 			}
 		}
-		s.layout();
+		s.layout(true, true);
 	}
 
 	@PreDestroy

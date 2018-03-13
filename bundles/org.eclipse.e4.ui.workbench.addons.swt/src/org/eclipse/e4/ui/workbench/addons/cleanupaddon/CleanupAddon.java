@@ -33,6 +33,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.renderers.swt.SashLayout;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -193,7 +194,7 @@ public class CleanupAddon {
 								ctrl.moveBelow(prevControl);
 							else
 								ctrl.moveAbove(null);
-							ctrl.getShell().layout(new Control[] { ctrl });
+							ctrl.getShell().layout(new Control[] { ctrl }, SWT.DEFER);
 						}
 
 						// Check if the parent is visible
@@ -206,9 +207,9 @@ public class CleanupAddon {
 					// Reparent the control to 'limbo'
 					Composite curParent = ctrl.getParent();
 					ctrl.setParent(limbo);
-					curParent.layout();
+					curParent.layout(true);
 					if (curParent.getShell() != curParent)
-						curParent.getShell().layout(new Control[] { curParent });
+						curParent.getShell().layout(new Control[] { curParent }, SWT.DEFER);
 
 					// Always leave Window's in the presentation
 					if ((Object) parent instanceof MWindow)
