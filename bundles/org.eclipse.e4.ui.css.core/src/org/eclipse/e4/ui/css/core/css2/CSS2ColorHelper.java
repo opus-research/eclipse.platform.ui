@@ -58,7 +58,7 @@ public class CSS2ColorHelper {
 		}
 		// Search if it's color name
 		value = value.toLowerCase();
-		value = colorNamesMap.get(value);
+		value = (String) colorNamesMap.get(value);
 		if (value != null) {
 			return getRGBColor(value);
 		}
@@ -89,9 +89,8 @@ public class CSS2ColorHelper {
 				if (hexaColor != null) {
 					// Search into hexa map the color name
 					String colorName = getColorNameFromHexaColor(hexaColor);
-					if (colorName != null) {
+					if (colorName != null)
 						return colorName;
-					}
 					// Color name is not found, return the Hexa value
 					return hexaColor;
 
@@ -138,21 +137,18 @@ public class CSS2ColorHelper {
 		String result = "#";
 		int red = (int) rgbColor.getRed().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (red < 16) {
+		if (red < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(red);
 		int green = (int) rgbColor.getGreen().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (green < 16) {
+		if (green < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(green);
 		int blue = (int) rgbColor.getBlue().getFloatValue(
 				CSSPrimitiveValue.CSS_NUMBER);
-		if (blue < 16) {
+		if (blue < 16)
 			result += "0";
-		}
 		result += Integer.toHexString(blue);
 		return result;
 	}
@@ -164,7 +160,7 @@ public class CSS2ColorHelper {
 	 * @return
 	 */
 	public static String getHexaColorFromColorName(String colorName) {
-		return colorNamesMap.get(colorName);
+		return (String) colorNamesMap.get(colorName);
 	}
 
 	/**
@@ -186,7 +182,7 @@ public class CSS2ColorHelper {
 	 */
 	public static String getColorNameFromHexaColor(String hexaColor) {
 		hexaColor = hexaColor.toUpperCase();
-		return colorHexasMap.get(hexaColor);
+		return (String) colorHexasMap.get(hexaColor);
 	}
 
 	static {

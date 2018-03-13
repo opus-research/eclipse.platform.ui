@@ -102,8 +102,7 @@ public class ModelServiceImpl implements EModelService {
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
-		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
-				appContext.get(IExtensionRegistry.class));
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
 	}
 
 	/**
@@ -115,6 +114,14 @@ public class ModelServiceImpl implements EModelService {
 		if (elementType == null) {
 			throw new NullPointerException("Argument cannot be null."); //$NON-NLS-1$
 		}
+
+		/*
+		 * TODO: We can even tune the performance of this method if we add the previous generated
+		 * if-else-if-else... block. The eObjectFactory#createEObject(Class) could afterwards be the
+		 * fallback if a user specific model element should be created. But for this we need to
+		 * adapt the generator of Paul Elder and to be honest I wasn't able to find it (either its
+		 * call during the build nor its template) ;-( .
+		 */
 
 		T back = (T) mApplicationElementFactory.createEObject(elementType);
 		if (back != null) {
@@ -336,10 +343,6 @@ public class ModelServiceImpl implements EModelService {
 				snippetContainer.getSnippets().remove(snippet);
 			snippetContainer.getSnippets().add(clone);
 		}
-
-		// Cache the original element in the clone's transientData
-		clone.getTransientData().put(CLONED_FROM_KEY, element);
-
 		return clone;
 	}
 
