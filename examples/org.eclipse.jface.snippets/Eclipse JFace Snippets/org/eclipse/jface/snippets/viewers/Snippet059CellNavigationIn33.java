@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2008 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -99,7 +98,7 @@ public class Snippet059CellNavigationIn33 {
 	}
 
 	protected abstract class AbstractEditingSupport extends EditingSupport {
-		private final CellEditor editor;
+		private CellEditor editor;
 
 		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
@@ -405,11 +404,11 @@ public class Snippet059CellNavigationIn33 {
 		/**
 		 * This viewer's table editor.
 		 */
-		private final TableEditor tableEditor;
+		private TableEditor tableEditor;
 
-		private final TableViewerFocusCellManager focusCellManager;
+		private TableViewerFocusCellManager focusCellManager;
 
-		private final int feature;
+		private int feature;
 
 		/**
 		 * @param viewer

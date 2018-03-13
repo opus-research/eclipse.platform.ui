@@ -64,6 +64,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
+import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -210,10 +211,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
-			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
-			if (!wwindow.isClosing()) {
-				wwindow.getStatusLineManager().update(false);
-			}
+			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
 		}
 
 		public void partHidden(MPart part) {
@@ -1462,10 +1460,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (save) {
 			if (workbenchPart instanceof ISaveablePart) {
 				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-				if (saveablePart.isSaveOnCloseNeeded()) {
-					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
-						return false;
-					}
+				if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
+					return false;
 				}
 			}
 		}
@@ -1746,102 +1742,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void unzoomAllPerspectives() {
 		// TODO compat: we have no min/max behaviour
     }
-
-
-
-    /**
-	 * Cleanup.
-	 */
-	public void dispose() {
-
-// // Always unzoom
-		// if (isZoomed()) {
-		// zoomOut();
-		// }
-		//
-		// // makeActiveEditor(null);
-		// // makeActive(null);
-		//        
-		// // Close and dispose the editors.
-		// closeAllEditors(false);
-		//        
-		// // Need to make sure model data is cleaned up when the page is
-		// // disposed. Collect all the views on the page and notify the
-		// // saveable list of a pre/post close. This will free model data.
-		// IWorkbenchPartReference[] partsToClose = getOpenParts();
-		// List dirtyParts = new ArrayList(partsToClose.length);
-		// for (int i = 0; i < partsToClose.length; i++) {
-		// IWorkbenchPart part = partsToClose[i].getPart(false);
-		// if (part != null && part instanceof IViewPart) {
-		// dirtyParts.add(part);
-		// }
-		// }
-		// SaveablesList saveablesList = (SaveablesList)
-		// getWorkbenchWindow().getWorkbench().getService(ISaveablesLifecycleListener.class);
-		// Object postCloseInfo = saveablesList.preCloseParts(dirtyParts,
-		// false,getWorkbenchWindow());
-		// saveablesList.postClose(postCloseInfo);
-		//
-		// // Get rid of perspectives. This will close the views.
-		// Iterator itr = perspList.iterator();
-		// while (itr.hasNext()) {
-		// Perspective perspective = (Perspective) itr.next();
-		// legacyWindow.firePerspectiveClosed(this, perspective.getDesc());
-		// perspective.dispose();
-		// }
-		// perspList = new PerspectiveList();
-		//
-		// // Capture views.
-		// IViewReference refs[] = viewFactory.getViews();
-		//
-		// if (refs.length > 0) {
-		// // Dispose views.
-		// for (int i = 0; i < refs.length; i++) {
-		// final WorkbenchPartReference ref = (WorkbenchPartReference) refs[i];
-		// //partList.removePart(ref);
-		// //firePartClosed(refs[i]);
-		// Platform.run(new SafeRunnable() {
-		// public void run() {
-		// // WorkbenchPlugin.log(new Status(IStatus.WARNING,
-		// WorkbenchPlugin.PI_WORKBENCH,
-		////                                Status.OK, "WorkbenchPage leaked a refcount for view " + ref.getId(), null));  //$NON-NLS-1$//$NON-NLS-2$
-		//                        
-		// ref.dispose();
-		// }
-		//    
-		// public void handleException(Throwable e) {
-		// }
-		// });
-		// }
-		// }
-		//        
-		// activationList = new ActivationList();
-		//
-		// // Get rid of editor presentation.
-		// editorPresentation.dispose();
-		//
-		// // Get rid of composite.
-		// composite.dispose();
-		//
-		// navigationHistory.dispose();
-		//
-		// stickyViewMan.clear();
-		//        
-		// if (tracker != null) {
-		// tracker.close();
-		// }
-		//        
-		// // if we're destroying a window in a non-shutdown situation then we
-		// should
-		// // clean up the working set we made.
-		// if (!legacyWindow.getWorkbench().isClosing()) {
-		// if (aggregateWorkingSet != null) {
-		// PlatformUI.getWorkbench().getWorkingSetManager().removeWorkingSet(aggregateWorkingSet);
-		// }
-		// }
-    }
-
-
 
     /**
      * @return NavigationHistory
@@ -2565,7 +2465,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		this.legacyWindow = w;
         this.input = input;
         actionSets = new ActionSetManager(w);
-		initActionSetListener();
 	}
 
 	@PostConstruct
@@ -2613,6 +2512,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
+
+			MPerspective persp = perspectiveStack.getSelectedElement();
+			List<String> newIds = ModeledPageLayout.getIds(persp, ModeledPageLayout.ACTION_SET_TAG);
+			EContextService contextService = window.getContext().get(EContextService.class);
+			for (String id : newIds) {
+				contextService.activateContext(id);
+			}
 		}
 
 		IPerspectiveRegistry registry = getWorkbenchWindow().getWorkbench()
@@ -2803,7 +2709,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler selectionHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 			if (!(changedElement instanceof MPerspectiveStack)) {
 				return;
@@ -3375,29 +3281,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		legacyWindow.firePerspectiveChanged(this, desc, CHANGE_RESET_COMPLETE);
 	}
 
-	private void initActionSetListener() {
-		// actionSets.addListener(new IPropertyListener() {
-		// public void propertyChanged(Object source, int propId) {
-		// if (source instanceof IActionSetDescriptor) {
-		// final IActionSetDescriptor desc = (IActionSetDescriptor) source;
-		// final String actionSetId = ModeledPageLayout.ACTION_SET_TAG +
-		// desc.getId();
-		// final MPerspective currentPerspective = getCurrentPerspective();
-		// if (currentPerspective != null) {
-		// final List<String> tags = currentPerspective.getTags();
-		// if (propId == ActionSetManager.PROP_VISIBLE) {
-		// if (!tags.contains(actionSetId)) {
-		// tags.add(actionSetId);
-		// }
-		// } else if (propId == ActionSetManager.PROP_HIDDEN) {
-		// tags.remove(actionSetId);
-		// }
-		// }
-		// }
-		// }
-		// });
-	}
-
     /**
      * See IWorkbenchPage
      */
@@ -3956,6 +3839,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
+		if (_perspectiveStack != null)
+			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4950,7 +4835,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler firingHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object value = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (value instanceof CompatibilityPart && element instanceof MPart) {
 				Integer events = partEvents.remove(element);
@@ -5124,8 +5009,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see #unzoomSharedArea(MUIElement)
 	 */
 	private void unzoomSharedArea() {
-		MPerspective curPersp = getPerspectiveStack().getSelectedElement();
-		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, curPersp);
+		MPlaceholder eaPH = (MPlaceholder) modelService.find(IPageLayout.ID_EDITOR_AREA, window);
 		for (MPart part : modelService.findElements(eaPH, null, MPart.class, null)) {
 			if (part.isToBeRendered()) {
 				MPlaceholder placeholder = part.getCurSharedRef();
@@ -5295,21 +5179,5 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void resetToolBarLayout() {
 		ICoolBarManager2 mgr = (ICoolBarManager2) legacyWindow.getCoolBarManager2();
 		mgr.resetItemOrder();
-	}
-
-	/**
-	 * Call {@link #firePartDeactivated(MPart)} if the passed part is the
-	 * currently active part according to the part service. This method should
-	 * only be called in the case of workbench shutdown, where E4 does not fire
-	 * deactivate listeners on the active part.
-	 * 
-	 * @param part
-	 */
-	public void firePartDeactivatedIfActive(MPart part) {
-		if (partService.getActivePart() == part) {
-			// At shutdown, e4 doesn't fire part deactivated on the active
-			// part.
-			firePartDeactivated(part);
-		}
 	}
 }
