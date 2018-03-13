@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -38,12 +39,10 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
@@ -155,7 +154,16 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			activate(p, true, true);
+			if (p != null) {
+				MPerspective persp = modelService.getPerspectiveFor(p);
+				boolean inCurrentPerspective = persp == null
+						|| persp == persp.getParent().getSelectedElement();
+				if (inCurrentPerspective) {
+					activate(p, true, true);
+				}
+			} else {
+				activate(p, true, true);
+			}
 		}
 	}
 
@@ -666,8 +674,7 @@ public class PartServiceImpl implements EPartService {
 		if (descriptor == null) {
 			return null;
 		}
-
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = modelService.createModelElement(MPart.class);
 		part.setElementId(descriptor.getElementId());
 		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
 		if (descriptor.getToolbar() != null) {
@@ -728,7 +735,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPlaceholder createSharedPart(MPart sharedPart) {
 		// Create and return a reference to the shared part
-		MPlaceholder sharedPartRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
+		MPlaceholder sharedPartRef = modelService.createModelElement(MPlaceholder.class);
 		sharedPartRef.setElementId(sharedPart.getElementId());
 		sharedPartRef.setRef(sharedPart);
 		return sharedPartRef;
@@ -750,29 +757,6 @@ public class PartServiceImpl implements EPartService {
 	 * @see MPartDescriptor#isAllowMultiple()
 	 */
 	private MPart addPart(MPart providedPart, MPart localPart) {
-		// If this is a multi-instance view see if there's a placeholder
-		String partId = providedPart.getElementId();
-		int colonIndex = partId == null ? -1 : partId.indexOf(':');
-		if (colonIndex >= 0) {
-			String descId = providedPart.getElementId().substring(0, colonIndex);
-			descId += ":*"; //$NON-NLS-1$
-			List<MPlaceholder> phList = modelService.findElements(workbenchWindow, descId,
-					MPlaceholder.class, null);
-			if (phList.size() > 0) {
-				MUIElement phParent = phList.get(0).getParent();
-				if (phParent instanceof MPartStack) {
-					MPartStack theStack = (MPartStack) phParent;
-					adjustPlaceholder(providedPart);
-					MPlaceholder placeholder = providedPart.getCurSharedRef();
-					if (placeholder == null) {
-						theStack.getChildren().add(providedPart);
-					} else {
-						theStack.getChildren().add(placeholder);
-					}
-
-				}
-			}
-		}
 		MPartDescriptor descriptor = modelService.getPartDescriptor(providedPart.getElementId());
 		if (descriptor == null) {
 			// there is no part descriptor backing the provided part, just add it to the container
@@ -839,7 +823,8 @@ public class PartServiceImpl implements EPartService {
 					}
 				} else {
 					List<MElementContainer> containers = modelService.findElements(getContainer(),
-							null, MElementContainer.class, Collections.singletonList(category));
+							null, MElementContainer.class, Collections.singletonList(category),
+							EModelService.PRESENTATION);
 					if (containers.isEmpty()) {
 						// couldn't find any containers with the specified tag, just add it to the
 						// end
@@ -880,6 +865,32 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void addToLastContainer(String category, MPart part) {
+		// OK, we haven't found an explicit placeholder;
+		// If this is a multi-instance view see if there's a 'global' placeholder
+		String partId = part.getElementId();
+		int colonIndex = partId == null ? -1 : partId.indexOf(':');
+		if (colonIndex >= 0) {
+			String descId = part.getElementId().substring(0, colonIndex);
+			descId += ":*"; //$NON-NLS-1$
+			List<MPlaceholder> phList = modelService.findElements(workbenchWindow, descId,
+					MPlaceholder.class, null, EModelService.PRESENTATION);
+			if (phList.size() > 0) {
+				MUIElement phParent = phList.get(0).getParent();
+				if (phParent instanceof MPartStack) {
+					MPartStack theStack = (MPartStack) phParent;
+					int phIndex = theStack.getChildren().indexOf(phList.get(0));
+					adjustPlaceholder(part);
+					MPlaceholder placeholder = part.getCurSharedRef();
+					if (placeholder == null) {
+						theStack.getChildren().add(phIndex, part);
+					} else {
+						theStack.getChildren().add(phIndex, placeholder);
+					}
+					return;
+				}
+			}
+		}
+
 		MElementContainer<?> lastContainer = getLastContainer();
 		MPlaceholder placeholder = part.getCurSharedRef();
 		if (placeholder == null) {
@@ -897,18 +908,18 @@ public class PartServiceImpl implements EPartService {
 		MElementContainer<MUIElement> searchRoot = getContainer();
 		List<MUIElement> children = searchRoot.getChildren();
 		if (children.size() == 0) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		}
 
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
 		if (lastContainer == null) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			searchRoot.getChildren().add(stack);
 			return stack;
 		} else if (!(lastContainer instanceof MPartStack)) {
-			MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
 			((List) lastContainer.getChildren()).add(stack);
 			return stack;
 		}
@@ -1029,6 +1040,7 @@ public class PartServiceImpl implements EPartService {
 		case VISIBLE:
 			MPart activePart = getActivePart();
 			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
+				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
 				bringToTop(addedPart);
@@ -1073,7 +1085,8 @@ public class PartServiceImpl implements EPartService {
 			engine.createGui(target);
 		}
 		// ask the engine to create the element
-		engine.createGui(element);
+		if (element.getWidget() == null)
+			engine.createGui(element);
 
 		parent = element.getParent();
 		if (parent != null && parent.getChildren().size() == 1) {
