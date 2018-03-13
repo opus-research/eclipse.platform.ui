@@ -568,8 +568,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
 							display);
-					IEclipseContext workbenchContext = e4Workbench.getContext();
-					workbenchContext.set(Display.class, display);
 
 					// create the workbench instance
 					Workbench workbench = new Workbench(display, advisor, e4Workbench
@@ -1185,6 +1183,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 					res.save(null);
 				} catch (IOException e) {
 					// Just auto-save, we don't really care
+				} finally {
+					res.unload();
+					res.getResourceSet().getResources().remove(res);
 				}
 				return Status.OK_STATUS;
 			}
@@ -1938,7 +1939,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	private final void initializeLazyServices() {
 		e4Context.set(IExtensionTracker.class.getName(), new ContextFunction() {
 
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (tracker == null) {
 					tracker = new UIExtensionTracker(getDisplay());
 				}
@@ -1947,7 +1948,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		});
 		e4Context.set(IWorkbenchActivitySupport.class.getName(), new ContextFunction() {
 
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (workbenchActivitySupport == null) {
 					workbenchActivitySupport = new WorkbenchActivitySupport();
 				}
@@ -1956,7 +1957,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		});
 		e4Context.set(IProgressService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				return ProgressManager.getInstance();
 			}
 		});

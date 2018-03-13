@@ -33,6 +33,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.debug.DebugOptions;
 import org.eclipse.swt.SWT;
@@ -65,6 +66,7 @@ import org.eclipse.ui.internal.themes.IThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistry;
 import org.eclipse.ui.internal.themes.ThemeRegistryReader;
 import org.eclipse.ui.internal.util.BundleUtility;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.internal.wizards.ExportWizardRegistry;
 import org.eclipse.ui.internal.wizards.ImportWizardRegistry;
 import org.eclipse.ui.internal.wizards.NewWizardRegistry;
@@ -121,6 +123,10 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	private static final String ORIENTATION_COMMAND_LINE = "-dir";//$NON-NLS-1$
 	private static final String ORIENTATION_PROPERTY = "eclipse.orientation";//$NON-NLS-1$
 	private static final String NL_USER_PROPERTY = "osgi.nl.user"; //$NON-NLS-1$
+	private static final String BIDI_COMMAND_LINE = "-bidi";//$NON-NLS-1$	
+	private static final String BIDI_SUPPORT_OPTION = "on";//$NON-NLS-1$
+	private static final String BIDI_TEXTDIR_OPTION = "textDir";//$NON-NLS-1$
+
    
     // Default instance of the receiver
     private static WorkbenchPlugin inst;
@@ -841,6 +847,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         
         JFaceUtil.initializeJFace();
 		
+		parseBidiArguments();
 		 Window.setDefaultOrientation(getDefaultOrientation());
 
         // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
@@ -864,6 +871,61 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		 */
 
     }
+
+	/**
+	 * Read the -bidi option from the command line arguments. The valid values /
+	 * syntax is as follows:
+	 * 
+	 * <pre>
+	 * -bidi "on=[y/n];textDir=[ltr/rtl/auto]"
+	 * </pre>
+	 * <p>
+	 * Important:
+	 * <ul>
+	 * <li>The order of parameters under the <code>-bidi</code> switch is
+	 * arbitrary.</li>
+	 * <li>The presence of any parameter is not mandatory.</li>
+	 * <li>If any of the parameters is not specified, the default value is
+	 * assumed. Defaults:
+	 * <ul>
+	 * <li>on: n</li>
+	 * <li>textDir: no default value</li>
+	 * </ul>
+	 * </li>
+	 * <li>If no value (or an illegal value) is provided for handling of base
+	 * text direction functionality, then bidi support is turned off and no
+	 * handling occurs.</li>
+	 * </ul>
+	 */
+	private void parseBidiArguments() {
+		String[] commandLineArgs = Platform.getCommandLineArgs();
+		String bidiParams = null;
+		// Do not process the last one as it will never have a parameter
+		for (int i = 0; i < commandLineArgs.length - 1; i++) {
+			if (commandLineArgs[i].equals(BIDI_COMMAND_LINE)) {
+				bidiParams = commandLineArgs[i + 1];
+			}
+		}
+		if (bidiParams != null) {
+			String[] bidiProps = Util.getArrayFromList(bidiParams, ";"); //$NON-NLS-1$
+			for (int i = 0; i < bidiProps.length; ++i) {
+				int eqPos = bidiProps[i].indexOf("="); //$NON-NLS-1$
+				if ((eqPos > 0) && (eqPos < bidiProps[i].length() - 1)) {
+					String nameProp = bidiProps[i].substring(0, eqPos);
+					String valProp = bidiProps[i].substring(eqPos + 1);
+					if (nameProp.equals(BIDI_SUPPORT_OPTION)) {
+						BidiUtils.setBidiSupport("y".equals(valProp)); //$NON-NLS-1$
+					} else if (nameProp.equalsIgnoreCase(BIDI_TEXTDIR_OPTION)) {
+						try {
+							BidiUtils.setTextDirection(valProp.intern());
+						} catch (IllegalArgumentException e) {
+							WorkbenchPlugin.log(e);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	/**
      * Get the default orientation from the command line
@@ -1308,7 +1370,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		e4Context.set(IPerspectiveRegistry.class.getName(), new ContextFunction() {
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (perspRegistry == null) {
 					perspRegistry = (PerspectiveRegistry) ContextInjectionFactory.make(
 							PerspectiveRegistry.class, e4Context);
@@ -1319,7 +1381,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		e4Context.set(IViewRegistry.class.getName(), new ContextFunction() {
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (viewRegistry == null) {
 					viewRegistry = (ViewRegistry) ContextInjectionFactory.make(ViewRegistry.class,
 							e4Context);
@@ -1329,7 +1391,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		e4Context.set(ActionSetRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (actionSetRegistry == null) {
 					actionSetRegistry = new ActionSetRegistry();
 				}
@@ -1338,7 +1400,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IDecoratorManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (decoratorManager == null) {
 					decoratorManager = new DecoratorManager();
 				}
@@ -1347,19 +1409,19 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(ExportWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				return ExportWizardRegistry.getInstance();
 			}
 		});
 		context.set(ImportWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				return ImportWizardRegistry.getInstance();
 			}
 		});
 		context.set(IIntroRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (introRegistry == null) {
 					introRegistry = new IntroRegistry();
 				}
@@ -1368,13 +1430,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(NewWizardRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				return NewWizardRegistry.getInstance();
 			}
 		});
 		context.set(IWorkbenchOperationSupport.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (operationSupport == null) {
 					operationSupport = new WorkbenchOperationSupport();
 				}
@@ -1383,7 +1445,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(PreferenceManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (preferenceManager == null) {
 					preferenceManager = new WorkbenchPreferenceManager(
 							PREFERENCE_PAGE_CATEGORY_SEPARATOR);
@@ -1400,7 +1462,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(ISharedImages.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (sharedImages == null) {
 					sharedImages = new SharedImages();
 				}
@@ -1410,7 +1472,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 
 		context.set(IThemeRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (themeRegistry == null) {
 					themeRegistry = new ThemeRegistry();
 					ThemeRegistryReader reader = new ThemeRegistryReader();
@@ -1421,7 +1483,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IWorkingSetManager.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (workingSetManager == null) {
 					workingSetManager = new WorkingSetManager(bundleContext);
 					workingSetManager.restoreState();
@@ -1431,7 +1493,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(WorkingSetRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (workingSetRegistry == null) {
 					workingSetRegistry = new WorkingSetRegistry();
 					workingSetRegistry.load();
@@ -1441,7 +1503,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		});
 		context.set(IEditorRegistry.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (editorRegistry == null) {
 					editorRegistry = new EditorRegistry();
 				}
