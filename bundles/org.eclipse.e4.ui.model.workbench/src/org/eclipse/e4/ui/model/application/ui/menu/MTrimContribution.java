@@ -22,7 +22,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
  * <p>
  * Provisional for 4.3.
  * </p>
- * @noreference
+ * @noreference This interface is not intended to be referenced by clients
+ * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -35,7 +36,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MTrimContribution extends MElementContainer<MTrimElement> {
 

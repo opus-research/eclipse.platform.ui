@@ -11,9 +11,12 @@
 
 package org.eclipse.ui.internal.e4.compatibility;
 
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -25,7 +28,6 @@ import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
@@ -80,6 +82,26 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	private boolean beingDisposed = false;
 
 	private boolean alreadyDisposed = false;
+
+	/**
+	 * This handler will be notified when the part's widget has been un/set.
+	 */
+	private EventHandler widgetSetHandler = new EventHandler() {
+		public void handleEvent(Event event) {
+			// check that we're looking at our own part and that the widget is
+			// being unset
+			if (event.getProperty(UIEvents.EventTags.ELEMENT) == part
+					&& event.getProperty(UIEvents.EventTags.NEW_VALUE) == null) {
+				 Assert.isTrue(!composite.isDisposed(),
+										"The widget should not have been disposed at this point"); //$NON-NLS-1$
+				beingDisposed = true;
+				WorkbenchPartReference reference = getReference();
+				// notify the workbench we're being closed
+				((WorkbenchPage) reference.getPage()).firePartHidden(part);
+				((WorkbenchPage) reference.getPage()).firePartClosed(CompatibilityPart.this);
+			}
+		}
+	};
 
 	/**
 	 * This handler will be notified when the part's client object has been
@@ -273,6 +295,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	@PostConstruct
 	public void create() {
+		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, widgetSetHandler);
 		eventBroker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, objectSetHandler);
 
 		WorkbenchPartReference reference = getReference();
@@ -369,6 +392,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			invalidate();
 		}
 
+		eventBroker.unsubscribe(widgetSetHandler);
 		eventBroker.unsubscribe(objectSetHandler);
 	}
 
