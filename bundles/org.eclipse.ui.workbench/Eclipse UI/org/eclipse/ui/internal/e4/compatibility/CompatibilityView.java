@@ -174,7 +174,7 @@ public class CompatibilityView extends CompatibilityPart {
 
 		final IContextFunction func = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				final ViewActionBuilder actionBuilder = new ViewActionBuilder();
 				actionBuilder.readActionExtensions(getView());
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
@@ -207,7 +207,7 @@ public class CompatibilityView extends CompatibilityPart {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_FUNCTION, func);
 		} else {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_DISPOSE,
-					func.compute(partContext, null));
+					func.compute(partContext));
 		}
 
 		return true;

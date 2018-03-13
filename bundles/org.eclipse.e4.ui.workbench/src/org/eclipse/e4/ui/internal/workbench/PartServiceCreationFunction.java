@@ -32,7 +32,7 @@ public class PartServiceCreationFunction extends ContextFunction {
 	 * .context.IEclipseContext, java.lang.Object[])
 	 */
 	@Override
-	public Object compute(IEclipseContext context, String contextKey) {
+	public Object compute(IEclipseContext context) {
 		// look for the top-most MWindow in the context chain:
 
 		// 1st: go up the tree to find topmost MWindow

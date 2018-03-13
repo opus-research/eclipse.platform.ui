@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,15 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>UI Element</b></em>'.
  * <!-- end-user-doc -->
- *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * <!-- end-model-doc -->
  *
  * <p>
  * The following features are supported:
@@ -45,21 +36,16 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
  *
  * @model abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Widget</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Widget</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Widget</em>' attribute.
 	 * @see #setWidget(Object)
 	 * @model transient="true" derived="true"
@@ -80,15 +66,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Renderer</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Renderer</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Renderer</em>' attribute.
 	 * @see #setRenderer(Object)
 	 * @model transient="true" derived="true"
@@ -110,15 +92,11 @@ public interface MUIElement extends MApplicationElement {
 	 * Returns the value of the '<em><b>To Be Rendered</b></em>' attribute.
 	 * The default value is <code>"true"</code>.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>To Be Rendered</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>To Be Rendered</em>' attribute.
 	 * @see #setToBeRendered(boolean)
 	 * @model default="true"
@@ -139,15 +117,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>On Top</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>On Top</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>On Top</em>' attribute.
 	 * @see #setOnTop(boolean)
 	 * @model
@@ -169,15 +143,11 @@ public interface MUIElement extends MApplicationElement {
 	 * Returns the value of the '<em><b>Visible</b></em>' attribute.
 	 * The default value is <code>"true"</code>.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Visible</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Visible</em>' attribute.
 	 * @see #setVisible(boolean)
 	 * @model default="true"
@@ -199,15 +169,11 @@ public interface MUIElement extends MApplicationElement {
 	 * Returns the value of the '<em><b>Parent</b></em>' container reference.
 	 * It is bidirectional and its opposite is '{@link org.eclipse.e4.ui.model.application.ui.MElementContainer#getChildren <em>Children</em>}'.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Parent</em>' container reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Parent</em>' container reference.
 	 * @see #setParent(MElementContainer)
 	 * @see org.eclipse.e4.ui.model.application.ui.MElementContainer#getChildren
@@ -229,15 +195,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Container Data</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Container Data</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Container Data</em>' attribute.
 	 * @see #setContainerData(String)
 	 * @model
@@ -258,15 +220,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Cur Shared Ref</b></em>' reference.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Cur Shared Ref</em>' reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Cur Shared Ref</em>' reference.
 	 * @see #setCurSharedRef(MPlaceholder)
 	 * @model transient="true" derived="true"
@@ -287,15 +245,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Visible When</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Visible When</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Visible When</em>' containment reference.
 	 * @see #setVisibleWhen(MExpression)
 	 * @model containment="true"
@@ -316,15 +270,11 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Accessibility Phrase</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Accessibility Phrase</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Accessibility Phrase</em>' attribute.
 	 * @see #setAccessibilityPhrase(String)
 	 * @model
@@ -345,14 +295,6 @@ public interface MUIElement extends MApplicationElement {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */

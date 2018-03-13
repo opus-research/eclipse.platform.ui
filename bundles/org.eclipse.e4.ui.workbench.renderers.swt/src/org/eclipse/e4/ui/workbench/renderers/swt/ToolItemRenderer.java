@@ -433,7 +433,7 @@ public class ToolItemRenderer extends SWTPartRenderer {
 			obj = ((MRenderedMenu) mmenu).getContributionManager();
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
-				obj = ((IContextFunction) obj).compute(lclContext, null);
+				obj = ((IContextFunction) obj).compute(lclContext);
 				((MRenderedMenu) mmenu).setContributionManager(obj);
 			}
 			if (obj instanceof IMenuCreator) {
