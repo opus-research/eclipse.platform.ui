@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -53,6 +52,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -890,7 +890,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacySep.setVisible(item.isVisible());
 					legacySep.setOpaqueItem(item);
 					linkModelToContribution(legacySep, item);
-					modelChildren.add(dest, legacySep);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacySep);
+					} else {
+						modelChildren.add(legacySep);
+					}
 				} else if (menuElement instanceof MOpaqueMenuSeparator) {
 					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
@@ -912,7 +916,11 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacyItem.setVisible(item.isVisible());
 					legacyItem.setOpaqueItem(item);
 					linkModelToContribution(legacyItem, item);
-					modelChildren.add(dest, legacyItem);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(legacyItem);
+					}
 				} else if (menuElement instanceof MOpaqueMenuItem) {
 					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
