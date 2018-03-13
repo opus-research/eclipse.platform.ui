@@ -77,6 +77,7 @@ import org.eclipse.ui.internal.ide.WorkbenchActionBuilder;
 import org.eclipse.ui.internal.ide.dialogs.WelcomeEditorInput;
 import org.eclipse.ui.internal.tweaklets.TitlePathUpdater;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.MarkerTransfer;
 import org.eclipse.ui.part.ResourceTransfer;
@@ -377,7 +378,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 		if (currentPage != null) {
 			if (activeEditor != null) {
-				lastEditorTitle = activeEditor.getTitleToolTip();
+				lastEditorTitle = Util.safeString(activeEditor.getTitleToolTip());
 				title = NLS.bind(
 						IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
 						lastEditorTitle, title);
