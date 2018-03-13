@@ -84,13 +84,13 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		composite.setLayout(new GridLayout(2, true));
 
-		final DelegatingStyledCellLabelProvider styledCellLP1= new DelegatingStyledCellLabelProvider(new NameAndSizeLabelProvider());
-		final DelegatingStyledCellLabelProvider styledCellLP2= new DelegatingStyledCellLabelProvider(new ModifiedDateLabelProvider());
-		final ColumnViewer ownerDrawViewer= createViewer("Owner draw viewer:", composite, styledCellLP1, styledCellLP2); //$NON-NLS-1$
+		final DelegatingStyledCellLabelProvider<Object,Object> styledCellLP1= new DelegatingStyledCellLabelProvider<Object,Object>(new NameAndSizeLabelProvider());
+		final DelegatingStyledCellLabelProvider<Object,Object> styledCellLP2= new DelegatingStyledCellLabelProvider<Object,Object>(new ModifiedDateLabelProvider());
+		final ColumnViewer<Object,Object> ownerDrawViewer= createViewer("Owner draw viewer:", composite, styledCellLP1, styledCellLP2); //$NON-NLS-1$
 
-		CellLabelProvider normalLP1= new NameAndSizeLabelProvider();
-		CellLabelProvider normalLP2= new ModifiedDateLabelProvider();
-		final ColumnViewer normalViewer= createViewer("Normal viewer:", composite, normalLP1, normalLP2); //$NON-NLS-1$
+		CellLabelProvider<Object,Object> normalLP1= new NameAndSizeLabelProvider();
+		CellLabelProvider<Object,Object> normalLP2= new ModifiedDateLabelProvider();
+		final ColumnViewer<Object,Object> normalViewer= createViewer("Normal viewer:", composite, normalLP1, normalLP2); //$NON-NLS-1$
 
 		Composite buttons= new Composite(parent, SWT.NONE);
 		buttons.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -138,7 +138,7 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 		}
 	}
 
-	private ColumnViewer createViewer(String description, Composite parent, CellLabelProvider labelProvider1, CellLabelProvider labelProvider2) {
+	private ColumnViewer<Object,Object> createViewer(String description, Composite parent, CellLabelProvider<Object,Object> labelProvider1, CellLabelProvider<Object,Object> labelProvider2) {
 
 		Composite composite= new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -148,16 +148,16 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		label.setText(description);
 
-		TreeViewer treeViewer= new TreeViewer(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		TreeViewer<Object,Object> treeViewer= new TreeViewer<Object,Object>(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		treeViewer.getTree().setHeaderVisible(true);
 		treeViewer.setContentProvider(new FileSystemContentProvider());
 
-		TreeViewerColumn tvc1 = new TreeViewerColumn(treeViewer, SWT.NONE);
+		TreeViewerColumn<Object,Object> tvc1 = new TreeViewerColumn<Object,Object>(treeViewer, SWT.NONE);
 		tvc1.getColumn().setText("Name"); //$NON-NLS-1$
 		tvc1.getColumn().setWidth(200);
 		tvc1.setLabelProvider(labelProvider1);
 
-		TreeViewerColumn tvc2 = new TreeViewerColumn(treeViewer, SWT.NONE);
+		TreeViewerColumn<Object,Object> tvc2 = new TreeViewerColumn<Object,Object>(treeViewer, SWT.NONE);
 		tvc2.getColumn().setText("Date Modified"); //$NON-NLS-1$
 		tvc2.getColumn().setWidth(200);
 		tvc2.setLabelProvider(labelProvider2);
@@ -173,7 +173,7 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 	/**
 	 * A simple label provider
 	 */
-	private static class NameAndSizeLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+	private static class NameAndSizeLabelProvider extends ColumnLabelProvider<Object,Object> implements IStyledLabelProvider<Object> {
 
 		private static int IMAGE_SIZE= 16;
 		private static final Image IMAGE1= new Image(DISPLAY, DISPLAY.getSystemImage(SWT.ICON_WARNING).getImageData().scaledTo(IMAGE_SIZE, IMAGE_SIZE));
@@ -213,7 +213,7 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 		}
 	}
 
-	private static class ModifiedDateLabelProvider extends ColumnLabelProvider implements IStyledLabelProvider {
+	private static class ModifiedDateLabelProvider extends ColumnLabelProvider<Object,Object> implements IStyledLabelProvider<Object> {
 		public String getText(Object element) {
 			return getStyledText(element).toString();
 		}
@@ -235,7 +235,7 @@ public class Snippet050DelegatingStyledCellLabelProvider {
 		}
 	}
 
-	private static class FileSystemContentProvider implements ITreeContentProvider {
+	private static class FileSystemContentProvider implements ITreeContentProvider<Object,Object> {
 
 		public Object[] getChildren(Object element) {
 			if (element instanceof File) {

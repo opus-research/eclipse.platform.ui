@@ -13,6 +13,7 @@ package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,17 +41,17 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class Snippet022TableViewerRefreshNoScroll {
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			ArrayList list = (ArrayList) inputElement;
-			list.add(new MyModel(list.size()));
-			return list.toArray();
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			inputElement.add(new MyModel(inputElement.size()));
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
 		/*
@@ -68,7 +69,7 @@ public class Snippet022TableViewerRefreshNoScroll {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 
 		}
 
@@ -88,13 +89,13 @@ public class Snippet022TableViewerRefreshNoScroll {
 
 	public Snippet022TableViewerRefreshNoScroll(Shell shell) {
 		shell.setLayout(new GridLayout(2, false));
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
 
-		v.setLabelProvider(new LabelProvider());
+		v.setLabelProvider(new LabelProvider<MyModel>());
 		v.setContentProvider(new MyContentProvider());
 		v.setInput(createModel(100));
 		v.getTable().setLinesVisible(true);
@@ -150,8 +151,8 @@ public class Snippet022TableViewerRefreshNoScroll {
 		});
 	}
 
-	private ArrayList createModel(int size) {
-		ArrayList elements = new ArrayList();
+	private ArrayList<MyModel> createModel(int size) {
+		ArrayList<MyModel> elements = new ArrayList<MyModel>();
 
 		for (int i = 0; i < size; i++) {
 			elements.add(new MyModel(i));

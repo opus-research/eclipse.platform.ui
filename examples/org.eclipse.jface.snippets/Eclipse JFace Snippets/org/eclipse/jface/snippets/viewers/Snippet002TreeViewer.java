@@ -28,13 +28,14 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class Snippet002TreeViewer {
-	private class MyContentProvider implements ITreeContentProvider {
+	private class MyContentProvider implements ITreeContentProvider<MyModel,MyModel> {
 		
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			return ((MyModel)inputElement).child.toArray();
+		public MyModel[] getElements(MyModel inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.child.size()];
+			return inputElement.child.toArray(myModels);
 		}
 
 		/* (non-Javadoc)
@@ -47,21 +48,21 @@ public class Snippet002TreeViewer {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends MyModel> viewer, MyModel oldInput, MyModel newInput) {
 			
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 		 */
-		public Object[] getChildren(Object parentElement) {
+		public MyModel[] getChildren(MyModel parentElement) {
 			return getElements(parentElement);
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		public Object getParent(Object element) {
+		public MyModel getParent(MyModel element) {
 			if( element == null) {
 				return null;
 			}
@@ -72,7 +73,7 @@ public class Snippet002TreeViewer {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 		 */
-		public boolean hasChildren(Object element) {
+		public boolean hasChildren(MyModel element) {
 			return ((MyModel)element).child.size() > 0;
 		}
 		
@@ -80,7 +81,7 @@ public class Snippet002TreeViewer {
 	
 	public class MyModel {
 		public MyModel parent;
-		public ArrayList child = new ArrayList();
+		public ArrayList<MyModel> child = new ArrayList<MyModel>();
 		public int counter;
 		
 		public MyModel(int counter, MyModel parent) {
@@ -101,8 +102,8 @@ public class Snippet002TreeViewer {
 	}
 	
 	public Snippet002TreeViewer(Shell shell) {
-		final TreeViewer v = new TreeViewer(shell);
-		v.setLabelProvider(new LabelProvider());
+		final TreeViewer<MyModel,MyModel> v = new TreeViewer<MyModel,MyModel>(shell);
+		v.setLabelProvider(new LabelProvider<MyModel>());
 		v.setContentProvider(new MyContentProvider());
 		v.setInput(createModel());
 	}

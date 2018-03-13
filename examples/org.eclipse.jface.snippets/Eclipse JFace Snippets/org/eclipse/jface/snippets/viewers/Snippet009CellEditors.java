@@ -11,6 +11,10 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.snippets.viewers.Snippet007FullSelection.MyModel;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -31,26 +35,18 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public class Snippet009CellEditors {
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[])inputElement;
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
 		public void dispose() {
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 			
 		}
 		
@@ -69,8 +65,8 @@ public class Snippet009CellEditors {
 	}
 	
 	public Snippet009CellEditors(Shell shell) {
-		final TableViewer v = new TableViewer(shell,SWT.BORDER|SWT.FULL_SELECTION);
-		v.setLabelProvider(new LabelProvider());
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell,SWT.BORDER|SWT.FULL_SELECTION);
+		v.setLabelProvider(new LabelProvider<MyModel>());
 		v.setContentProvider(new MyContentProvider());
 		v.setCellModifier(new ICellModifier() {
 
@@ -94,7 +90,7 @@ public class Snippet009CellEditors {
 			public void modify(Object element, String property, Object value) {
 				TableItem item = (TableItem)element;
 				((MyModel)item.getData()).counter = Integer.parseInt(value.toString());
-				v.update(item.getData(), null);
+				v.update((MyModel)item.getData(), null);
 			}
 			
 		});
@@ -102,18 +98,16 @@ public class Snippet009CellEditors {
 		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()) });
 		
 		
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 	}
 	
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[10];
-		
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>(10);
 		for( int i = 0; i < 10; i++ ) {
-			elements[i] = new MyModel(i);
+			elements.add(i,new MyModel(i));
 		}
-		
 		return elements;
 	}
 	
