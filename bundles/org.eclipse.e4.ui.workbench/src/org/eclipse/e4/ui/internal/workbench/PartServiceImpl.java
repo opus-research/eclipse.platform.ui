@@ -1177,11 +1177,6 @@ public class PartServiceImpl implements EPartService {
 				part.setToBeRendered(false);
 			}
 
-			// refresh action bars of the active part
-			if (activePart != null) {
-				firePartActivated(activePart);
-			}
-
 			if (parent.getSelectedElement() == toBeRemoved) {
 				parent.setSelectedElement(null);
 			}
