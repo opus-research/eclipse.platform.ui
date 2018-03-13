@@ -25,13 +25,15 @@ import org.eclipse.swt.widgets.Widget;
  * providers and editing support can be configured for each column separately.
  * Concrete subclasses of {@link ColumnViewer} should implement a matching
  * concrete subclass of {@link ViewerColumn}.
+ * @param <E> 
+ * @param <I> 
  * 
  * @since 3.3
  * 
  */
-public abstract class ViewerColumn {
+public abstract class ViewerColumn<E,I> {
 
-	private CellLabelProvider labelProvider;
+	private CellLabelProvider<E,I> labelProvider;
 
 	static String COLUMN_VIEWER_KEY = Policy.JFACE + ".columnViewer";//$NON-NLS-1$
 
@@ -41,7 +43,7 @@ public abstract class ViewerColumn {
 
 	private boolean listenerRegistered = false;
 
-	private ColumnViewer viewer;
+	private ColumnViewer<E,I> viewer;
 
 	/**
 	 * Create a new instance of the receiver at columnIndex.
@@ -52,7 +54,7 @@ public abstract class ViewerColumn {
 	 *            the widget owning the viewer in case the widget has no columns
 	 *            this could be the widget itself
 	 */
-	protected ViewerColumn(final ColumnViewer viewer, Widget columnOwner) {
+	protected ViewerColumn(final ColumnViewer<E,I> viewer, Widget columnOwner) {
 		this.viewer = viewer;
 		columnOwner.setData(ViewerColumn.COLUMN_VIEWER_KEY, this);
 		this.listener = new ILabelProviderListener() {
@@ -74,7 +76,7 @@ public abstract class ViewerColumn {
 	 * 
 	 * @return ViewerLabelProvider
 	 */
-	/* package */CellLabelProvider getLabelProvider() {
+	/* package */CellLabelProvider<E,I> getLabelProvider() {
 		return labelProvider;
 	}
 
@@ -85,7 +87,7 @@ public abstract class ViewerColumn {
 	 * @param labelProvider
 	 *            the new {@link CellLabelProvider}
 	 */
-	public void setLabelProvider(CellLabelProvider labelProvider) {
+	public void setLabelProvider(CellLabelProvider<E,I> labelProvider) {
 		setLabelProvider(labelProvider, true);
 	}
 
@@ -93,7 +95,7 @@ public abstract class ViewerColumn {
 	 * @param labelProvider
 	 * @param registerListener
 	 */
-	/* package */void setLabelProvider(CellLabelProvider labelProvider,
+	/* package */void setLabelProvider(CellLabelProvider<E,I> labelProvider,
 			boolean registerListener) {
 		if (listenerRegistered && this.labelProvider != null) {
 			this.labelProvider.removeListener(listener);
@@ -143,8 +145,8 @@ public abstract class ViewerColumn {
 	 * @param cell
 	 *            {@link ViewerCell}
 	 */
-	/* package */void refresh(ViewerCell cell) {
-		CellLabelProvider labelProvider = getLabelProvider();
+	/* package */void refresh(ViewerCell<E> cell) {
+		CellLabelProvider<E,I> labelProvider = getLabelProvider();
 		if (labelProvider == null) {
 			Assert.isTrue(false, "Column " + cell.getColumnIndex() + //$NON-NLS-1$
 			" has no label provider."); //$NON-NLS-1$
@@ -160,7 +162,7 @@ public abstract class ViewerColumn {
 	 */
 	protected void handleDispose() {
 		boolean disposeLabelProvider = listenerRegistered;
-		CellLabelProvider cellLabelProvider = labelProvider;
+		CellLabelProvider<E,I> cellLabelProvider = labelProvider;
 		setLabelProvider(null, false);
 		if (disposeLabelProvider) {
 			cellLabelProvider.dispose(viewer, this);
@@ -170,7 +172,7 @@ public abstract class ViewerColumn {
 		viewer = null;
 	}
 
-	private void handleDispose(ColumnViewer viewer) {
+	private void handleDispose(ColumnViewer<E,I> viewer) {
 		handleDispose();
 		viewer.clearLegacyEditingSetup();
 	}
@@ -182,7 +184,7 @@ public abstract class ViewerColumn {
 	 * 
 	 * @since 3.4
 	 */
-	public ColumnViewer getViewer() {
+	public ColumnViewer<E,I> getViewer() {
 		return viewer;
 	}
 }
