@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2010 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Henrik Still<hendrik.still@gammas.de> - bug 415875
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -21,9 +20,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -58,7 +55,6 @@ public class Snippet055HideShowColumn {
 				v, new FocusCellOwnerDrawHighlighter(v));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
 				v) {
-			@Override
 			protected boolean isEditorActivationEvent(
 					ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
@@ -82,29 +78,24 @@ public class Snippet055HideShowColumn {
 		column_1.getColumn().setText("Column 1");
 		column_1.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return "Column 1 => " + element.toString();
 			}
 
 		});
 		column_1.setEditingSupport(new EditingSupport(v) {
-			@Override
 			protected boolean canEdit(Object element) {
 				return true;
 			}
 
-			@Override
 			protected CellEditor getCellEditor(Object element) {
 				return textCellEditor;
 			}
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((MyModel) element).counter + "";
 			}
 
-			@Override
 			protected void setValue(Object element, Object value) {
 				((MyModel) element).counter = Integer
 						.parseInt(value.toString());
@@ -118,29 +109,24 @@ public class Snippet055HideShowColumn {
 		column_2.getColumn().setText("Column 2");
 		column_2.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return "Column 2 => " + element.toString();
 			}
 
 		});
 		column_2.setEditingSupport(new EditingSupport(v) {
-			@Override
 			protected boolean canEdit(Object element) {
 				return true;
 			}
 
-			@Override
 			protected CellEditor getCellEditor(Object element) {
 				return textCellEditor;
 			}
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((MyModel) element).counter + "";
 			}
 
-			@Override
 			protected void setValue(Object element, Object value) {
 				((MyModel) element).counter = Integer
 						.parseInt(value.toString());
@@ -154,29 +140,24 @@ public class Snippet055HideShowColumn {
 		column_3.getColumn().setText("Column 3");
 		column_3.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return "Column 3 => " + element.toString();
 			}
 
 		});
 		column_3.setEditingSupport(new EditingSupport(v) {
-			@Override
 			protected boolean canEdit(Object element) {
 				return true;
 			}
 
-			@Override
 			protected CellEditor getCellEditor(Object element) {
 				return textCellEditor;
 			}
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((MyModel) element).counter + "";
 			}
 
-			@Override
 			protected void setValue(Object element, Object value) {
 				((MyModel) element).counter = Integer
 						.parseInt(value.toString());
@@ -193,7 +174,6 @@ public class Snippet055HideShowColumn {
 		b.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		b.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				MyModel root = (MyModel) v.getInput();
 				TreePath path = new TreePath(new Object[] { root,
@@ -208,13 +188,8 @@ public class Snippet055HideShowColumn {
 		b.setText("Hide/Show 2nd Column");
 		b.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		b.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if(column_2.getColumn().getWidth() == 0){
-					column_2.getColumn().setWidth(200);
-				}else{
-					column_2.getColumn().setWidth(0);
-				}
+				column_2.getColumn().setWidth(0);
 			}
 		});
 	}
@@ -256,25 +231,20 @@ public class Snippet055HideShowColumn {
 
 	private class MyContentProvider implements ITreeContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return ((MyModel) inputElement).child.toArray();
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		@Override
 		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
@@ -282,7 +252,6 @@ public class Snippet055HideShowColumn {
 			return ((MyModel) element).parent;
 		}
 
-		@Override
 		public boolean hasChildren(Object element) {
 			return ((MyModel) element).child.size() > 0;
 		}
@@ -301,7 +270,6 @@ public class Snippet055HideShowColumn {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {

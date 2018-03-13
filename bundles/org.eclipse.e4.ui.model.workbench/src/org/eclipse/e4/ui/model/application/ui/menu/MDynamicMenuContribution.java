@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.model.application.MContribution;
  * provide the appropriate MMenuElement model elements when queried.
  * </p>
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  *
