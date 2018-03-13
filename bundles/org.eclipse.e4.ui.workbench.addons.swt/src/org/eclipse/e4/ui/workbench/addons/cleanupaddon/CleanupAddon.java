@@ -277,8 +277,7 @@ public class CleanupAddon {
 				if (visCount == 0) {
 					Display.getCurrent().asyncExec(new Runnable() {
 						public void run() {
-							int visCount = modelService.countRenderableChildren(theContainer);
-							if (!isLastEditorStack(theContainer) && visCount == 0)
+							if (!isLastEditorStack(theContainer))
 								theContainer.setToBeRendered(false);
 						}
 					});
