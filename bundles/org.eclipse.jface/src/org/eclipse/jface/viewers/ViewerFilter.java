@@ -19,12 +19,10 @@ import java.util.ArrayList;
  * Subclasses must implement the <code>select</code> method
  * and may implement the <code>isFilterProperty</code> method.
  * </p>
- * @param <E>
- * @param <I>
  * @see IStructuredContentProvider
  * @see StructuredViewer
  */
-public abstract class ViewerFilter<E,I> {
+public abstract class ViewerFilter {
     /**
      * Creates a new viewer filter.
      */
@@ -35,8 +33,8 @@ public abstract class ViewerFilter<E,I> {
      * Filters the given elements for the given viewer.
      * The input array is not modified.
      * <p>
-     * The default implementation of this method calls
-     * <code>select</code> on each element in the array,
+     * The default implementation of this method calls 
+     * <code>select</code> on each element in the array, 
      * and returns only those elements for which <code>select</code>
      * returns <code>true</code>.
      * </p>
@@ -45,27 +43,24 @@ public abstract class ViewerFilter<E,I> {
      * @param elements the elements to filter
      * @return the filtered elements
      */
-    public E[] filter(Viewer<I> viewer, Object parent, E[] elements) {
+    public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
         int size = elements.length;
-        ArrayList<E> out = new ArrayList<E>(size);
-        E element = null;
+        ArrayList out = new ArrayList(size);
         for (int i = 0; i < size; ++i) {
-            element = elements[i];
+            Object element = elements[i];
             if (select(viewer, parent, element)) {
 				out.add(element);
 			}
         }
-        @SuppressWarnings("unchecked")
-		E[] result = (E[]) out.toArray();
-		return result;
+        return out.toArray();
     }
 
     /**
      * Filters the given elements for the given viewer.
      * The input array is not modified.
      * <p>
-     * The default implementation of this method calls
-     * {@link #filter(Viewer, Object, Object[])} with the
+     * The default implementation of this method calls 
+     * {@link #filter(Viewer, Object, Object[])} with the 
      * parent from the path. Subclasses may override
      * </p>
      * @param viewer the viewer
@@ -74,12 +69,12 @@ public abstract class ViewerFilter<E,I> {
      * @return the filtered elements
      * @since 3.2
      */
-    public Object[] filter(Viewer<I> viewer, TreePath<E> parentPath, E[] elements) {
+    public Object[] filter(Viewer viewer, TreePath parentPath, Object[] elements) {
         return filter(viewer, parentPath.getLastSegment(), elements);
     }
-
+    
     /**
-     * Returns whether this viewer filter would be affected
+     * Returns whether this viewer filter would be affected 
      * by a change to the given property of the given element.
      * <p>
      * The default implementation of this method returns <code>false</code>.
@@ -91,7 +86,7 @@ public abstract class ViewerFilter<E,I> {
      * @return <code>true</code> if the filtering would be affected,
      *    and <code>false</code> if it would be unaffected
      */
-    public boolean isFilterProperty(E element, String property) {
+    public boolean isFilterProperty(Object element, String property) {
         return false;
     }
 
@@ -104,6 +99,6 @@ public abstract class ViewerFilter<E,I> {
      * @return <code>true</code> if element is included in the
      *   filtered set, and <code>false</code> if excluded
      */
-    public abstract boolean select(Viewer<I> viewer, Object parentElement,
-            E element);
+    public abstract boolean select(Viewer viewer, Object parentElement,
+            Object element);
 }

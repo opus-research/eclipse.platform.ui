@@ -19,7 +19,7 @@ public class ChangeInputLabelAction extends TestBrowserAction {
     }
 
     public void run() {
-        TestElement element = getBrowser().getInput();
+        TestElement element = (TestElement) getBrowser().getInput();
         element.setLabel(element.getLabel() + " changed");
     }
 }

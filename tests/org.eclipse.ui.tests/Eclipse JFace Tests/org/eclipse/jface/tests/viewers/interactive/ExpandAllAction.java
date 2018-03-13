@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
-import org.eclipse.jface.tests.viewers.TestElement;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -21,8 +20,8 @@ public class ExpandAllAction extends TestBrowserAction {
     }
 
     public void run() {
-        Viewer<TestElement> viewer = getBrowser().getViewer();
+        Viewer viewer = getBrowser().getViewer();
         if (viewer instanceof AbstractTreeViewer)
-            ((AbstractTreeViewer<TestElement,TestElement>) viewer).expandAll();
+            ((AbstractTreeViewer) viewer).expandAll();
     }
 }

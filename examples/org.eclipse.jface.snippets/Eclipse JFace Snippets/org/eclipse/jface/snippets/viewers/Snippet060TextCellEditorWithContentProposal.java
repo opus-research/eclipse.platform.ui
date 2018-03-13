@@ -5,9 +5,6 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contibutors
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -42,7 +39,7 @@ import org.eclipse.swt.widgets.Table;
 
 /**
  * Shows how to attach content assist to a text cell editor.
- *
+ * 
  * @author Mario Winterer
  */
 public class Snippet060TextCellEditorWithContentProposal {
@@ -90,7 +87,7 @@ public class Snippet060TextCellEditorWithContentProposal {
 
 		/**
 		 * Return the {@link ContentProposalAdapter} of this cell editor.
-		 *
+		 * 
 		 * @return the {@link ContentProposalAdapter}
 		 */
 		public ContentProposalAdapter getContentProposalAdapter() {
@@ -146,18 +143,18 @@ public class Snippet060TextCellEditorWithContentProposal {
 	}
 
 	public Snippet060TextCellEditorWithContentProposal(Shell shell) {
-		final TableViewer<Color,Object> viewer = new TableViewer<Color,Object>(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		final TableViewer viewer = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		final Table table = viewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 
-		final TableViewerColumn<Color,Object> colorColumn = new TableViewerColumn<Color,Object>(viewer, SWT.LEFT);
+		final TableViewerColumn colorColumn = new TableViewerColumn(viewer, SWT.LEFT);
 		colorColumn.getColumn().setText("Color name");
 		colorColumn.getColumn().setWidth(200);
-		colorColumn.setLabelProvider(new ColumnLabelProvider<Color,Object>());
+		colorColumn.setLabelProvider(new ColumnLabelProvider());
 		colorColumn.setEditingSupport(new ColorNameEditingSupport(viewer));
 
-		viewer.setContentProvider(new ArrayContentProvider<Color>(Color.class));
+		viewer.setContentProvider(new ArrayContentProvider());
 
 		ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
 			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
