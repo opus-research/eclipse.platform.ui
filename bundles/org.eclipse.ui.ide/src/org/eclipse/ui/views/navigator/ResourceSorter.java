@@ -15,6 +15,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 
+import com.ibm.icu.text.Collator;
+
 /**
  * Sorter for viewers that display items of type <code>IResource</code>.
  * The sorter supports two sort criteria:
@@ -37,6 +39,14 @@ import org.eclipse.jface.viewers.ViewerSorter;
  */
 public class ResourceSorter extends ViewerSorter {
 
+	/*
+	 * Note that this class is required to be used by the Common Navigator
+	 * since ViewerSorter is part of its API. But the ViewerSorter uses the
+	 * undesireable Java Collator (rather than the ICU one), we we have to put
+	 * this here. 
+	 */
+	private Collator icuCollator;
+	
     /**
      * Constructor argument value that indicates to sort items by name.
      */
@@ -57,6 +67,7 @@ public class ResourceSorter extends ViewerSorter {
      */
     public ResourceSorter(int criteria) {
         super();
+        icuCollator = Collator.getInstance();
         this.criteria = criteria;
     }
 
@@ -136,7 +147,7 @@ public class ResourceSorter extends ViewerSorter {
      *  element is greater than the second element
      */
     protected int compareNames(IResource resource1, IResource resource2) {
-        return collator.compare(resource1.getName(), resource2.getName());
+        return icuCollator.compare(resource1.getName(), resource2.getName());
     }
 
     /**
@@ -158,7 +169,7 @@ public class ResourceSorter extends ViewerSorter {
         // Compare extensions.  If they're different then return a value that
         // indicates correct extension ordering.  If they're the same then
         // return a value that indicates the correct NAME ordering.
-        int result = collator.compare(ext1, ext2);
+        int result = icuCollator.compare(ext1, ext2);
 
         if (result != 0) {
 			return result;
