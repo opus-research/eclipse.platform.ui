@@ -152,11 +152,12 @@ public class E4Application implements IApplication {
 				// place it off so it's not visible
 				shell.setLocation(0, 10000);
 			}
-			if (!checkInstanceLocation(instanceLocation, shell,
-					workbench.getContext()))
+
+			if (!checkInstanceLocation(instanceLocation, shell))
 				return EXIT_OK;
 
 			IEclipseContext workbenchContext = workbench.getContext();
+			workbenchContext.set(Display.class, display);
 
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
@@ -197,7 +198,6 @@ public class E4Application implements IApplication {
 				IApplicationContext.APPLICATION_ARGS);
 
 		IEclipseContext appContext = createDefaultContext();
-		appContext.set(Display.class, display);
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
@@ -346,6 +346,7 @@ public class E4Application implements IApplication {
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
+		eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
 
 		// Save and restore
 		boolean saveAndRestore;
@@ -355,13 +356,6 @@ public class E4Application implements IApplication {
 
 		eclipseContext.set(IWorkbench.PERSIST_STATE,
 				Boolean.valueOf(saveAndRestore));
-
-		// when -data @none or -data @noDefault options
-		if (instanceLocation != null && instanceLocation.getURL() != null) {
-			eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
-		} else {
-			eclipseContext.set(IWorkbench.PERSIST_STATE, false);
-		}
 
 		// Persisted state
 		boolean clearPersistedState;
@@ -506,16 +500,7 @@ public class E4Application implements IApplication {
 	 * Simplified copy of IDEAplication processing that does not offer to choose
 	 * a workspace location.
 	 */
-	private boolean checkInstanceLocation(Location instanceLocation,
-			Shell shell, IEclipseContext context) {
-
-		// Eclipse has been run with -data @none or -data @noDefault options so
-		// we don't need to validate the location
-		if (instanceLocation == null
-				&& Boolean.FALSE.equals(context.get(IWorkbench.PERSIST_STATE))) {
-			return true;
-		}
-
+	private boolean checkInstanceLocation(Location instanceLocation, Shell shell) {
 		if (instanceLocation == null) {
 			MessageDialog
 					.openError(
@@ -527,8 +512,7 @@ public class E4Application implements IApplication {
 
 		// -data "/valid/path", workspace already set
 		if (instanceLocation.isSet()) {
-			// make sure the meta data version is compatible (or the user
-			// has
+			// make sure the meta data version is compatible (or the user has
 			// chosen to overwrite it).
 			if (!checkValidWorkspace(shell, instanceLocation.getURL())) {
 				return false;
