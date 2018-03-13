@@ -26,7 +26,6 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.commands.internal.HandlerServiceHandler;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.SetEnabled;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -113,18 +112,6 @@ public class E4HandlerProxy implements IHandlerListener, IElementUpdater {
 	public void updateElement(UIElement element, Map parameters) {
 		if (handler instanceof IElementUpdater) {
 			((IElementUpdater) handler).updateElement(element, parameters);
-		}
-	}
-
-	@SetEnabled
-	void setEnabled(@Optional IEvaluationContext evalContext) {
-		if (evalContext == null) {
-			IEclipseContext appContext = ((Workbench) PlatformUI.getWorkbench()).getApplication()
-					.getContext();
-			evalContext = new ExpressionContext(appContext);
-		}
-		if (handler instanceof IHandler2) {
-			((IHandler2) handler).setEnabled(evalContext);
 		}
 	}
 }
