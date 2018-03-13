@@ -12,9 +12,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellEditor;
@@ -103,16 +100,15 @@ public class Snippet033CellEditorPerRowPre33 {
 		}
 	}
 
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
 		/*
 		 * (non-Javadoc)
 		 *
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
 		}
 
 		/*
@@ -130,7 +126,7 @@ public class Snippet033CellEditorPerRowPre33 {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
@@ -274,7 +270,7 @@ public class Snippet033CellEditorPerRowPre33 {
 		final Table table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		final MyCellModifier modifier = new MyCellModifier();
 
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
+		final TableViewer v = new TableViewer(table);
 		modifier.setViewer(v);
 
 		TableColumn column = new TableColumn(table, SWT.NONE);
@@ -286,13 +282,13 @@ public class Snippet033CellEditorPerRowPre33 {
 		v.setColumnProperties(new String[] { "column1" });
 		v.setCellEditors(new CellEditor[] { new DelegatingEditor(v,v.getTable()) });
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 	}
 
-	private class MyLabelProvider extends LabelProvider<MyModel> {
-		public Image getImage(MyModel element) {
+	private class MyLabelProvider extends LabelProvider {
+		public Image getImage(Object element) {
 			if( element instanceof MyModel3 ) {
 				if( ((MyModel3)element).checked ) {
 					return JFaceResources.getImage("IMG_1");
@@ -306,19 +302,19 @@ public class Snippet033CellEditorPerRowPre33 {
 
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(30);
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[30];
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(i,new MyModel3(i));
+			elements[i] = new MyModel3(i);
 		}
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(i+10,new MyModel(i));
+			elements[i+10] = new MyModel(i);
 		}
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(i+20,new MyModel2(i));
+			elements[i+20] = new MyModel2(i);
 		}
 
 		return elements;

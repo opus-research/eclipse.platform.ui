@@ -12,10 +12,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
@@ -40,9 +36,9 @@ import org.eclipse.swt.widgets.TableItem;
 public class Snippet027ComboBoxCellEditors {
 	private class MyCellModifier implements ICellModifier {
 
-		private TableViewer<MyModel,List<MyModel>> viewer;
+		private TableViewer viewer;
 
-		public MyCellModifier(TableViewer<MyModel,List<MyModel>> viewer) {
+		public MyCellModifier(TableViewer viewer) {
 			this.viewer = viewer;
 		}
 
@@ -77,25 +73,40 @@ public class Snippet027ComboBoxCellEditors {
 			TableItem item = (TableItem) element;
 			// We get the index and need to calculate the real value
 			((MyModel) item.getData()).counter = ((Integer) value).intValue() * 10;
-			viewer.update((MyModel)item.getData(), null);
+			viewer.update(item.getData(), null);
 		}
 	}
 
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
-			
+
 		}
 
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
-			
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
 		}
-		
+
 	}
 
 	public class MyModel {
@@ -112,13 +123,13 @@ public class Snippet027ComboBoxCellEditors {
 
 	public Snippet027ComboBoxCellEditors(Shell shell) {
 		final Table table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
+		final TableViewer v = new TableViewer(table);
 		final MyCellModifier modifier = new MyCellModifier(v);
 
 		TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setWidth(200);
 
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
 		v.setCellModifier(modifier);
 		v.setColumnProperties(new String[] { "column1" });
@@ -127,16 +138,18 @@ public class Snippet027ComboBoxCellEditors {
 						"Fourty", "Fifty", "Sixty", "Seventy", "Eighty",
 						"Ninety" }) });
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
-		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+
+		for (int i = 0; i < 10; i++) {
+			elements[i] = new MyModel(i * 10);
 		}
+
 		return elements;
 	}
 

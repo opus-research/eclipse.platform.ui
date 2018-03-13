@@ -302,7 +302,7 @@ public class Snippet010OwnerDraw {
 		}
 	}
 
-	private TableViewer<CountryEntry,CountryEntry[]> viewer;
+	private TableViewer viewer;
 
 	private CountryEntry[] entries;
 
@@ -319,15 +319,16 @@ public class Snippet010OwnerDraw {
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer<CountryEntry,CountryEntry[]>(parent, SWT.FULL_SELECTION);
-		viewer.setContentProvider(ArrayContentProvider.getInstance(CountryEntry.class));
+		viewer = new TableViewer(parent, SWT.FULL_SELECTION);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
 		
 		createColumns();
 
-		viewer.setLabelProvider(new OwnerDrawLabelProvider<CountryEntry,CountryEntry[]>() {
-			protected void measure(Event event, CountryEntry element) {
-				event.setBounds(new Rectangle(event.x, event.y, element.getWidth(event),
-						element.getHeight(event)));
+		viewer.setLabelProvider(new OwnerDrawLabelProvider() {
+			protected void measure(Event event, Object element) {
+				CountryEntry country = (CountryEntry) element;
+				event.setBounds(new Rectangle(event.x, event.y, country.getWidth(event),
+						country.getHeight(event)));
 			}
 
 			/*
@@ -336,8 +337,9 @@ public class Snippet010OwnerDraw {
 			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
 			 *      java.lang.Object)
 			 */
-			protected void paint(Event event, CountryEntry element) {
-				element.draw(event);
+			protected void paint(Event event, Object element) {
+				CountryEntry entry = (CountryEntry) element;
+				entry.draw(event);
 
 			}
 		});

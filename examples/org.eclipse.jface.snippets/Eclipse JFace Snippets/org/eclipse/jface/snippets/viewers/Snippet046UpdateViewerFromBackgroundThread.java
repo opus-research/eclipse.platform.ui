@@ -11,10 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -41,21 +37,29 @@ import org.eclipse.swt.widgets.TableColumn;
 public class Snippet046UpdateViewerFromBackgroundThread {
 	private static Image[] images;
 
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[])inputElement;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
-			
+
 		}
 
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
-			
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
 		}
-		
+
 	}
 
 	public class MyModel {
@@ -71,17 +75,17 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider<MyModel> implements ITableLabelProvider<MyModel> {
+	public class MyLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		public Image getColumnImage(MyModel element, int columnIndex) {
+		public Image getColumnImage(Object element, int columnIndex) {
 			if( columnIndex == 0 ) {
-				return images[element.finished?0:1];
+				return images[((MyModel)element).finished?0:1];
 			}
 
 			return null;
 		}
 
-		public String getColumnText(MyModel element, int columnIndex) {
+		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
@@ -99,7 +103,7 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 	}
 
 	public Snippet046UpdateViewerFromBackgroundThread(Shell shell) {
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell,SWT.BORDER|SWT.FULL_SELECTION);
+		final TableViewer v = new TableViewer(shell,SWT.BORDER|SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(new MyContentProvider());
 
@@ -111,7 +115,7 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		final List<MyModel> model = createModel();
+		final MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
@@ -124,7 +128,7 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 				final Thread t = new Thread() {
 
 					public void run() {
-						for( int i = 0; i < model.size(); i++ ) {
+						for( int i = 0; i < model.length; i++ ) {
 							if( v.getTable().isDisposed()) {
 								return;
 							}
@@ -132,8 +136,8 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 							v.getTable().getDisplay().asyncExec(new Runnable() {
 
 								public void run() {
-									model.get(j).finished = true;
-									v.update(model.get(j), null);
+									model[j].finished = true;
+									v.update(model[j], null);
 								}
 
 							});
@@ -150,11 +154,13 @@ public class Snippet046UpdateViewerFromBackgroundThread {
 		});
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+
 		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

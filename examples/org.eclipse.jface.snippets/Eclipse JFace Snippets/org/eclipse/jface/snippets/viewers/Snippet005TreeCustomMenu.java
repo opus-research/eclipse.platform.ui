@@ -17,7 +17,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.snippets.viewers.Snippet002TreeViewer.MyModel;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -34,61 +33,37 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class Snippet005TreeCustomMenu {
-	private class MyContentProvider implements
-			ITreeContentProvider<MyModel, MyModel> {
+	private class MyContentProvider implements ITreeContentProvider {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements(
-		 * java.lang.Object)
-		 */
-		public MyModel[] getElements(MyModel inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.child.size()];
-			return inputElement.child.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return ((MyModel) inputElement).child.toArray();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
+		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
 		public void dispose() {
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse
-		 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends MyModel> viewer,
-				MyModel oldInput, MyModel newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang
-		 * .Object)
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 		 */
-		public MyModel[] getChildren(MyModel parentElement) {
+		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang
-		 * .Object)
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		public MyModel getParent(MyModel element) {
+		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
 			}
@@ -96,14 +71,10 @@ public class Snippet005TreeCustomMenu {
 			return ((MyModel) element).parent;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang
-		 * .Object)
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 		 */
-		public boolean hasChildren(MyModel element) {
+		public boolean hasChildren(Object element) {
 			return ((MyModel) element).child.size() > 0;
 		}
 
@@ -111,29 +82,31 @@ public class Snippet005TreeCustomMenu {
 
 	public class MyModel {
 		public MyModel parent;
-		public ArrayList<MyModel> child = new ArrayList<MyModel>();
+
+		public ArrayList child = new ArrayList();
+
 		public int counter;
-		
+
 		public MyModel(int counter, MyModel parent) {
 			this.parent = parent;
 			this.counter = counter;
 		}
-		
+
 		public String toString() {
 			String rv = "Item ";
-			if( parent != null ) {
+			if (parent != null) {
 				rv = parent.toString() + ".";
 			}
-			
+
 			rv += counter;
-			
+
 			return rv;
 		}
 	}
 
 	public Snippet005TreeCustomMenu(Shell shell) {
-		final TreeViewer<MyModel,MyModel> v = new TreeViewer<MyModel,MyModel>(shell);
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		final TreeViewer v = new TreeViewer(shell);
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
 		v.setInput(createModel());
 

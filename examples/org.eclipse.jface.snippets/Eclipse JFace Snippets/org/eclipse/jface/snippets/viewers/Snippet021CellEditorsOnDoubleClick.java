@@ -12,10 +12,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellModifier;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -42,7 +38,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class Snippet021CellEditorsOnDoubleClick {
 	private class MyCellModifier implements ICellModifier {
 		
-		private TableViewer<MyModel,List<MyModel>> viewer;
+		private TableViewer viewer;
 		
 		private boolean enabled;
 		
@@ -51,7 +47,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 		}
 
 
-		public void setViewer(TableViewer<MyModel,List<MyModel>> viewer) {
+		public void setViewer(TableViewer viewer) {
 			this.viewer = viewer;
 		}
 
@@ -85,20 +81,19 @@ public class Snippet021CellEditorsOnDoubleClick {
 			TableItem item = (TableItem) element;
 			((MyModel) item.getData()).counter = Integer.parseInt(value
 					.toString());
-			viewer.update((MyModel)item.getData(), null);
+			viewer.update(item.getData(), null);
 		}
 	}
 	
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
 		}
 
 		/*
@@ -116,7 +111,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
@@ -146,7 +141,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 
 		});
 
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
+		final TableViewer v = new TableViewer(table);
 
 		table.addListener(SWT.MouseDoubleClick, new Listener() {
 
@@ -162,7 +157,7 @@ public class Snippet021CellEditorsOnDoubleClick {
 
 				for (int i = 0; i < table.getColumnCount(); i++) {
 					if (item.getBounds(i).contains(event.x, event.y)) {
-						v.editElement((MyModel)item.getData(), i);
+						v.editElement(item.getData(), i);
 						modifier.setEnabled(false);
 						break;
 					}
@@ -176,22 +171,24 @@ public class Snippet021CellEditorsOnDoubleClick {
 		TableColumn column = new TableColumn(table, SWT.NONE);
 		column.setWidth(200);
 
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
 		v.setCellModifier(modifier);
 		v.setColumnProperties(new String[] { "column1" });
 		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()) });
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
-		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+
+		for (int i = 0; i < 10; i++) {
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

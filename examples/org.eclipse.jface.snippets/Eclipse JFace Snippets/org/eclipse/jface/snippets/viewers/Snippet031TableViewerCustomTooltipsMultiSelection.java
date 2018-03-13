@@ -45,13 +45,13 @@ import org.eclipse.swt.widgets.TableItem;
  * 
  */
 public class Snippet031TableViewerCustomTooltipsMultiSelection {
-	public class MyLableProvider implements ITableLabelProvider<MyModel> {
+	public class MyLableProvider implements ITableLabelProvider {
 
-		public Image getColumnImage(MyModel element, int columnIndex) {
+		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(MyModel element, int columnIndex) {
+		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof MyModel) {
 				switch (columnIndex) {
 					case 0: return ((MyModel)element).col1;
@@ -69,7 +69,7 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 			/* Ignore */
 		}
 
-		public boolean isLabelProperty(MyModel element, String property) {
+		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
@@ -98,7 +98,7 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 		table.setHeaderVisible(true);
         table.setLinesVisible(true);
         
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
+		final TableViewer v = new TableViewer(table);
 		TableColumn tableColumn1 = new TableColumn(table, SWT.NONE);
 		TableColumn tableColumn2 = new TableColumn(table, SWT.NONE);
 		
@@ -111,7 +111,7 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
         
         v.setColumnProperties(new String[] { column1, column2 });
 		v.setLabelProvider(new MyLableProvider());
-		v.setContentProvider(new ArrayContentProvider<MyModel>(MyModel.class));
+		v.setContentProvider(new ArrayContentProvider());
 		v.setInput(createModel());
 		
 		/**
@@ -265,8 +265,8 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 	    	
 	    
 		
-	private List<MyModel> createModel() {
-		ArrayList<MyModel> list = new ArrayList<MyModel>();
+	private List createModel() {
+		ArrayList list = new ArrayList();
 		list.add(new MyModel("A", "B"));
 		list.add(new MyModel("C", "D"));
 		list.add(new MyModel("E", "F"));
