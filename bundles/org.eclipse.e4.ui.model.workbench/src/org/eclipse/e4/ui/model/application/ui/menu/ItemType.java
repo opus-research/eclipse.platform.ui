@@ -23,7 +23,7 @@ import java.util.List;
  * @model
  * @generated
  */
-public enum ItemType implements org.eclipse.emf.common.util.Enumerator {
+public enum ItemType implements InternalItemType {
 	/**
 	 * The '<em><b>Push</b></em>' literal object.
 	 * <!-- begin-user-doc -->
@@ -239,3 +239,13 @@ public enum ItemType implements org.eclipse.emf.common.util.Enumerator {
 	}
 	
 } //ItemType
+
+/**
+ * A private implementation interface used to hide the inheritance from Enumerator.
+ * <!-- begin-user-doc -->
+ * <!-- end-user-doc -->
+ * @generated
+ */
+interface InternalItemType extends org.eclipse.emf.common.util.Enumerator {
+	// Empty 
+}

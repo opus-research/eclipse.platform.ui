@@ -67,6 +67,7 @@ public class ModelUtils {
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static List<MApplicationElement> merge(MApplicationElement container, EStructuralFeature feature, List<MApplicationElement> elements, String positionInList) {
 		EObject eContainer = (EObject) container;
 		

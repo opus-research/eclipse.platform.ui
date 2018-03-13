@@ -27,8 +27,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 
 /**
- * This service presents API appropriate for working with the UI Model
- * 
  * @since 1.0
  */
 public interface EModelService {
