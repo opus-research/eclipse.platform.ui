@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation; bug 153993
  *												   fix in bug 163317, 151295, 167323, 167858, 184346, 187826, 201905
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -736,7 +735,7 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	}
 
 	@Override
-	protected E[] getRawChildren(Object parent) {
+	protected E[] getRawChildren(I parent) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {
