@@ -664,7 +664,7 @@ public class MinMaxAddon {
 			}
 
 			// Find any 'standalone' views *not* in a stack
-			List<String> standaloneTag = new ArrayList<String>();
+			List<String> standaloneTag = new ArrayList();
 			standaloneTag.add(IPresentationEngine.STANDALONE);
 			List<MPlaceholder> standaloneViews = modelService.findElements(persp == null ? win
 					: persp, null, MPlaceholder.class, standaloneTag, EModelService.PRESENTATION);
@@ -714,10 +714,6 @@ public class MinMaxAddon {
 		List<MUIElement> curMax = modelService.findElements(win, null, MUIElement.class, maxTag);
 		if (curMax.size() > 0) {
 			for (MUIElement maxElement : curMax) {
-				// Only unmax elements in this window
-				if (getWindowFor(maxElement) != win)
-					continue;
-
 				MPerspective maxPersp = modelService.getPerspectiveFor(maxElement);
 				if (maxPersp != elePersp)
 					continue;
@@ -756,7 +752,7 @@ public class MinMaxAddon {
 	}
 
 	void unzoom(final MUIElement element) {
-		MWindow win = getWindowFor(element);
+		MWindow win = modelService.getTopLevelWindowFor(element);
 		MPerspective persp = modelService.getActivePerspective(win);
 
 		Shell hostShell = (Shell) win.getWidget();
@@ -772,10 +768,7 @@ public class MinMaxAddon {
 				EModelService.PRESENTATION);
 		for (MPartStack theStack : stacks) {
 			if (theStack.getWidget() != null) {
-				// Make sure we're only working on *our* window
-				if (getWindowFor(theStack) == win) {
-					theStack.getTags().remove(MINIMIZED);
-				}
+				theStack.getTags().remove(MINIMIZED);
 			}
 		}
 

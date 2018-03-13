@@ -102,7 +102,6 @@ public class TrimStack {
 
 	private boolean isShowing = false;
 	private MUIElement minimizedElement;
-	private Composite clientAreaComposite;
 	private Composite hostPane;
 
 	@Inject
@@ -508,18 +507,8 @@ public class TrimStack {
 			public void widgetDisposed(DisposeEvent e) {
 				trimStackTB = null;
 				trimStackMenu = null;
-
-				if (isShowing && hostPane != null && !hostPane.isDisposed())
-					showStack(false);
 			}
 		});
-
-		// Get the shell's client area composite
-		Shell theShell = trimStackTB.getShell();
-		if (theShell.getLayout() instanceof TrimmedPartLayout) {
-			TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
-			clientAreaComposite = tpl.clientArea;
-		}
 
 		trimStackTB.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
@@ -832,13 +821,14 @@ public class TrimStack {
 	 */
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
-		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
+		Composite clientArea = getShellClientComposite();
+		if (clientArea == null)
 			return;
 
 		if (show && !isShowing) {
 			hostPane = getHostPane();
 			ctrl.setParent(hostPane);
-			clientAreaComposite.addControlListener(caResizeListener);
+			clientArea.addControlListener(caResizeListener);
 
 			// Set the initial location
 			setPaneLocation(hostPane);
@@ -902,8 +892,8 @@ public class TrimStack {
 		} else if (!show && isShowing) {
 			// Check to ensure that the client area is non-null since the
 			// trimstack may be currently hosted in the limbo shell
-			if (clientAreaComposite != null) {
-				clientAreaComposite.removeControlListener(caResizeListener);
+			if (clientArea != null) {
+				clientArea.removeControlListener(caResizeListener);
 			}
 
 			if (hostPane != null && hostPane.isVisible()) {
@@ -915,11 +905,24 @@ public class TrimStack {
 		}
 	}
 
+	Composite getShellClientComposite() {
+		if (trimStackTB == null || trimStackTB.isDisposed()) {
+			return null;
+		}
+		Shell theShell = trimStackTB.getShell();
+		if (!(theShell.getLayout() instanceof TrimmedPartLayout))
+			return null;
+
+		TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
+		return tpl.clientArea;
+	}
+
 	private void setPaneLocation(Composite someShell) {
-		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
+		Composite clientComp = getShellClientComposite();
+		if (clientComp == null || clientComp.isDisposed())
 			return;
 
-		Rectangle caRect = clientAreaComposite.getBounds();
+		Rectangle caRect = getShellClientComposite().getBounds();
 
 		// NOTE: always starts in the persisted (or default) size
 		Point paneSize = getHostPane().getSize();
