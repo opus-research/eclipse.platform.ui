@@ -34,14 +34,17 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Display;
 
 public class StackRendererTest extends TestCase {
 	private IEclipseContext context;
 	private E4Workbench wb;
-	private MPart part;
+	private MPart part1;
+	private MPart part2;
 	private CTabItemStylingMethodsListener executedMethodsListener;
+	private MPartStack partStack;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -52,20 +55,24 @@ public class StackRendererTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
-		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
-		part = BasicFactoryImpl.eINSTANCE.createPart();
-		part.setLabel("some title");
+		partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		part1 = BasicFactoryImpl.eINSTANCE.createPart();
+		part1.setLabel("some title");
+
+		part2 = BasicFactoryImpl.eINSTANCE.createPart();
+		part2.setLabel("some title2");
 
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
 		window.getChildren().add(partStack);
-		partStack.getChildren().add(part);
+		partStack.getChildren().add(part1);
+		partStack.getChildren().add(part2);
 
 		application.setContext(context);
 		context.set(MApplication.class.getName(), application);
 
-		executedMethodsListener = new CTabItemStylingMethodsListener(part);
+		executedMethodsListener = new CTabItemStylingMethodsListener(part1);
 
 		wb = new E4Workbench(application, context);
 		wb.getContext().set(
@@ -89,7 +96,7 @@ public class StackRendererTest extends TestCase {
 	}
 
 	public void testTagsChangeHandlerWhenBusyTagAddEvent() throws Exception {
-		part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
+		part1.getTags().add(CSSConstants.CSS_BUSY_CLASS);
 
 		assertEquals(1,
 				executedMethodsListener
@@ -100,8 +107,8 @@ public class StackRendererTest extends TestCase {
 	}
 
 	public void testTagsChangeHandlerWhenBusyTagRemoveEvent() throws Exception {
-		part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
-		part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
+		part1.getTags().add(CSSConstants.CSS_BUSY_CLASS);
+		part1.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
 
 		assertEquals(2,
 				executedMethodsListener
@@ -113,9 +120,53 @@ public class StackRendererTest extends TestCase {
 				.isMethodExecuted("setClassnameAndId(.+MPart.+)"));
 	}
 
-	public void testTagsChangeHandlerWhenNotBusyTagModifiedEvent()
+	public void testTagsChangeHandlerWhenContentChangedOfNotActivePart()
 			throws Exception {
-		part.getTags().add("not busy tag");
+		CTabFolder tabFolder = (CTabFolder) partStack.getWidget();
+		tabFolder.setSelection(getTabItem(part2));
+
+		part1.getTags().add(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
+
+		assertEquals(1,
+				executedMethodsListener
+						.getMethodExecutionCount("setClassnameAndId(.+)"));
+		assertTrue(executedMethodsListener
+				.isMethodExecuted("setClassnameAndId(.+MPart "
+						+ CSSConstants.CSS_HIGHLIGHTED_CLASS + ".+)"));
+	}
+
+	public void testTagsChangeHandlerWhenContentChangedOfSelectedPart()
+			throws Exception {
+		CTabFolder tabFolder = (CTabFolder) partStack.getWidget();
+		tabFolder.setSelection(getTabItem(part1));
+
+		part1.getTags().add(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
+
+		assertEquals(1,
+				executedMethodsListener
+						.getMethodExecutionCount("setClassnameAndId(.+)"));
+		assertTrue(executedMethodsListener
+				.isMethodExecuted("setClassnameAndId(.+MPart.+)"));
+	}
+
+	public void testTagsChangeHandlerWhenContentChangeForPartAndItGetsActive()
+			throws Exception {
+		part1.getTags().add(CSSConstants.CSS_HIGHLIGHTED_CLASS);
+		part1.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+
+		assertFalse(part1.getTags()
+				.contains(CSSConstants.CSS_HIGHLIGHTED_CLASS));
+		assertEquals(1,
+				executedMethodsListener
+						.getMethodExecutionCount("setClassnameAndId(.+)"));
+		assertTrue(executedMethodsListener
+				.isMethodExecuted("setClassnameAndId(.+MPart "
+						+ CSSConstants.CSS_ACTIVE_CLASS + ".+)"));
+	}
+
+	public void testTagsChangeHandlerWhenNotSupportedTagModifiedEvent()
+			throws Exception {
+		part1.getTags().add("not supported tag");
 
 		assertEquals(0,
 				executedMethodsListener
@@ -124,7 +175,7 @@ public class StackRendererTest extends TestCase {
 
 	public void testTagsChangeHandlerWhenNotTagReleatedEvent() throws Exception {
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(UIEvents.EventTags.ELEMENT, part);
+		params.put(UIEvents.EventTags.ELEMENT, part1);
 
 		context.get(IEventBroker.class).send(
 				UIEvents.ApplicationElement.TOPIC_ELEMENTID.replace(
@@ -174,5 +225,16 @@ public class StackRendererTest extends TestCase {
 			}
 			return result;
 		}
+	}
+
+	private CTabItem getTabItem(MPart part) {
+		for (CTabItem tabItem : ((CTabFolder) partStack.getWidget()).getItems()) {
+			if (part.getLabel().equals(tabItem.getText())) {
+				return tabItem;
+			}
+		}
+
+		throw new IllegalArgumentException(
+				"No such CTabItem item for given part: " + part);
 	}
 }
