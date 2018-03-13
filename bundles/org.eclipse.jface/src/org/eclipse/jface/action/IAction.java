@@ -75,11 +75,6 @@ public interface IAction {
     /**
      * Action style constant (value <code>8</code>) indicating action is 
      * a radio button.
-     * <p>
-     * Note that when a radio button becomes deselected because another one was
-     * selected, {@link #run()} is executed for the selected as well as the
-     * deselected action. The application can use {@link #isChecked()} to
-     * determine which case applies.
      * 
      * @since 2.1
      */
@@ -328,11 +323,6 @@ public interface IAction {
      * Each action implementation must define the steps needed to carry out this action.
      * The default implementation of this method in <code>Action</code>
      * does nothing.
-     * <p>
-     * When this is a {@link #AS_RADIO_BUTTON} action and the user selected
-     * another item, both the deselected action's and the selected action's run
-     * method is executed. The application can use {@link #isChecked()} to
-     * determine which case applies.
      */
     public void run();
 
@@ -342,12 +332,7 @@ public interface IAction {
      * instead of <code>run()</code>.  
      * The default implementation of this method in <code>Action</code>
      * simply calls <code>run()</code> for backwards compatibility.
-     * <p>
-     * When this is a {@link #AS_RADIO_BUTTON} action and the user selected
-     * another item, both the deselected action's and the selected action's run
-     * method is executed. The application can use {@link #isChecked()} to
-     * determine which case applies.
-     *
+     * 
      * @param event the SWT event which triggered this action being run 
      * @since 2.0
      */
