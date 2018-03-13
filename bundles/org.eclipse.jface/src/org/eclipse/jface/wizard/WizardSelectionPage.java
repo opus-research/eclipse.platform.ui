@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * List of wizard nodes that have cropped up in the past
      * (element type: <code>IWizardNode</code>).
      */
-    private List selectedWizardNodes = new ArrayList();
+    private List<IWizardNode> selectedWizardNodes = new ArrayList<IWizardNode>();
 
     /**
      * Creates a new wizard selection page with the given name, and
@@ -87,7 +87,7 @@ public abstract class WizardSelectionPage extends WizardPage {
         super.dispose();
         // notify nested wizards
         for (int i = 0; i < selectedWizardNodes.size(); i++) {
-            ((IWizardNode) selectedWizardNodes.get(i)).dispose();
+            selectedWizardNodes.get(i).dispose();
         }
     }
 
