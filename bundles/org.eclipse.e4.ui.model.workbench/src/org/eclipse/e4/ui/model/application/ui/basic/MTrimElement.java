@@ -26,7 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
  * <!-- end-model-doc -->
  *
  *
- * @model interface="true" abstract="true"
+ * @model abstract="true"
  * @generated
  */
 public interface MTrimElement extends MUIElement {
