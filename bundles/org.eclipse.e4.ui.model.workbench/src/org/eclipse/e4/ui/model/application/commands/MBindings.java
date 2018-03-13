@@ -19,12 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Mixin interface that lists MBindingContexts that should be active when this
- * object is active.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * <p>Example values: org.eclipse.ui.contexts.dialog, org.eclipse.ui.contexts.window
- * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -36,6 +35,7 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MBindings {
 	/**

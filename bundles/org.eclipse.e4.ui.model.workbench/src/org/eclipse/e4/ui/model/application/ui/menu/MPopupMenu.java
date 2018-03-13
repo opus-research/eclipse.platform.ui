@@ -19,15 +19,17 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is a concrete class representing context menus. Menus of this type are generally
- * managed by code within the running application since they're not visible in the UI.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MPopupMenu extends MMenu, MContext {
 } // MPopupMenu

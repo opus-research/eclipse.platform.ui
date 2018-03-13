@@ -71,12 +71,6 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>dir</code>
 	 */
 	public static final String RTL_MODE = "dir"; //$NON-NLS-1$
-	/**
-	 * The argument for the perspective to activate <br>
-	 * <br>
-	 * Value is: <code>perspectiveId</code>
-	 */
-	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;
@@ -116,7 +110,6 @@ public class E4Workbench implements IWorkbench {
 		}
 
 		uiEventPublisher = new UIEventPublisher(appContext);
-		appContext.set(UIEventPublisher.class, uiEventPublisher);
 		((Notifier) uiRoot).eAdapters().add(uiEventPublisher);
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", getId()); //$NON-NLS-1$

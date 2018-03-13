@@ -19,11 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This type contains the list of binding 'tables', representing the various sets of bindings
- * based on the applicaiton's current running 'context'. Here the 'context' represents
- * the applicaiton's UI state (i.e. whenther a Dialog is open...).
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MBindingTableContainer {
 	/**

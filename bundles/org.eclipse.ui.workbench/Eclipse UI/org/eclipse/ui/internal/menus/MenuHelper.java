@@ -243,8 +243,7 @@ public class MenuHelper {
 										ICommandService.class);
 								if (service == null || commandService == null) {
 									WorkbenchPlugin
-											.log("Could not retrieve EHandlerService or ICommandService from context evaluation context for" //$NON-NLS-1$
-													+ commandId);
+											.log("Could not retrieve EHandlerService or ICommandService from context evaluation context."); //$NON-NLS-1$
 									return EvaluationResult.FALSE;
 								}
 								Command c = commandService.getCommand(commandId);

@@ -28,10 +28,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This a concrete class representing the core UI functionality within a Window. It's what
- * used to be a View / Editor in Eclipse 3.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -46,6 +47,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MPart extends MUIElement, MPartSashContainerElement, MStackElement, MContribution, MContext, MUILabel, MHandlerContainer, MDirtyable, MBindings, MWindowElement {
 	/**
@@ -55,15 +57,10 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This defines the list of the menus associated with this part. There are two specific menus
-	 * that are managed by the core UI;
-	 * <ul>
-	 * <li>If the menu is the part's id prefixed with "menu:" then it will appear as the 
-	 * drop down menu available from the view's toolbar.</li>
-	 * <li>If the menu is the part's id prefixed with "popup:" then it will appear as the 
-	 * ddefault context menu for this view.</li>
-	 * </ul>
-	 * Other menus can be added here but have to be managed by the part itsefl...
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Menus</em>' containment reference list.
@@ -78,7 +75,10 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is the Toolbar associated with tihs Part (if any).
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Toolbar</em>' containment reference.
@@ -105,7 +105,10 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Determines whether the user is allowed to close this view.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Closeable</em>' attribute.
@@ -131,8 +134,10 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The description of this Part; used when the Part appears in a list of Parts
-	 * (i.e. 'Show View').
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
