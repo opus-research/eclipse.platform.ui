@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -63,11 +63,6 @@ public abstract class AbstractDescendantSelector
         return s.simpleSelector.equals(simpleSelector);
     }
 
-
-	@Override
-	public int hashCode() {
-		return this.simpleSelector.hashCode();
-	}
     /**
      * Returns the specificity of this selector.
      */

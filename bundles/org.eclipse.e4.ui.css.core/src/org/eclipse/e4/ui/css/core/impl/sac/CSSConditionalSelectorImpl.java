@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -65,11 +65,6 @@ public class CSSConditionalSelectorImpl
         return (s.simpleSelector.equals(simpleSelector) &&
                 s.condition.equals(condition));
     }
-
-	@Override
-	public int hashCode() {
-		return this.simpleSelector.hashCode() ^ this.condition.hashCode();
-	}
 
     /**
      * <b>SAC</b>: Implements {@link
