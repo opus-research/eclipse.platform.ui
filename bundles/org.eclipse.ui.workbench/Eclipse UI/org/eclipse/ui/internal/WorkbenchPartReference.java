@@ -254,6 +254,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     }
     
     protected void partPropertyChanged(Object source, int propId) {
+		if (propId == IWorkbenchPartConstants.PROP_TITLE) {
+			setImageDescriptor(computeImageDescriptor());
+		}
 
         // We handle these properties directly (some of them may be transformed
         // before firing events to workbench listeners)
