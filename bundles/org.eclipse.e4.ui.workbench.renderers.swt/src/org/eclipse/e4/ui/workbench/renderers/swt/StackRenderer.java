@@ -530,9 +530,6 @@ public class StackRenderer extends LazyStackRenderer {
 			} else if (hasAsterisk) {
 				cti.setText(text.substring(1));
 			}
-		} else if (UIEvents.UILifeCycle.BUSY.equals(attName)) {
-			setCSSInfo(part, cti);
-			reapplyStyles(cti);
 		}
 	}
 
