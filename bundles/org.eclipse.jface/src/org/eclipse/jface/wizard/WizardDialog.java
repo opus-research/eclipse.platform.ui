@@ -92,10 +92,10 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	private IWizard wizard;
 
 	// Wizards to dispose
-	private ArrayList createdWizards = new ArrayList();
+	private ArrayList<IWizard> createdWizards = new ArrayList<IWizard>();
 
 	// Current nested wizards
-	private ArrayList nestedWizards = new ArrayList();
+	private ArrayList<IWizard> nestedWizards = new ArrayList<IWizard>();
 
 	// The currently displayed page.
 	private IWizardPage currentPage = null;
@@ -339,7 +339,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @return the saved UI state
 	 */
 	private Object aboutToStart(boolean enableCancelButton) {
-		Map savedState = null;
+		Map<String, Object> savedState = null;
 		if (getShell() != null) {
 			// Save focus control
 			Control focusControl = getShell().getDisplay().getFocusControl();
@@ -848,7 +848,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			// Call perform finish on outer wizards in the nested chain
 			// (to allow them to save state for example)
 			for (int i = 0; i < nestedWizards.size() - 1; i++) {
-				((IWizard) nestedWizards.get(i)).performFinish();
+				nestedWizards.get(i).performFinish();
 			}
 			// Hard close the dialog.
 			setReturnCode(OK);
@@ -891,7 +891,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	private boolean hardClose() {
 		// inform wizards
 		for (int i = 0; i < createdWizards.size(); i++) {
-			IWizard createdWizard = (IWizard) createdWizards.get(i);
+			IWizard createdWizard = createdWizards.get(i);
 			try {
 				createdWizard.dispose();
 			} catch (Exception e) {
@@ -986,7 +986,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 *            the key
 	 * @see #saveEnableStateAndSet
 	 */
-	private void restoreEnableState(Control w, Map h, String key) {
+	private void restoreEnableState(Control w, Map<String,?> h, String key) {
 		if (w != null) {
 			Boolean b = (Boolean) h.get(key);
 			if (b != null) {
@@ -1004,7 +1004,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 *            <code>saveUIState</code>
 	 * @see #saveUIState
 	 */
-	private void restoreUIState(Map state) {
+	private void restoreUIState(Map<String,?> state) {
 		restoreEnableState(backButton, state, "back"); //$NON-NLS-1$
 		restoreEnableState(nextButton, state, "next"); //$NON-NLS-1$
 		restoreEnableState(finishButton, state, "finish"); //$NON-NLS-1$
@@ -1079,7 +1079,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 *            <code>false</code> to disable it
 	 * @see #restoreEnableState(Control, Map, String)
 	 */
-	private void saveEnableStateAndSet(Control w, Map h, String key,
+	private void saveEnableStateAndSet(Control w, Map<String, Object> h, String key,
 			boolean enabled) {
 		if (w != null) {
 			h.put(key, w.getEnabled() ? Boolean.TRUE : Boolean.FALSE);
@@ -1100,8 +1100,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 *         with <code>restoreUIState</code>
 	 * @see #restoreUIState
 	 */
-	private Map saveUIState(boolean keepCancelEnabled) {
-		Map savedState = new HashMap(10);
+	private Map<String, Object> saveUIState(boolean keepCancelEnabled) {
+		Map<String, Object> savedState = new HashMap<String, Object>(10);
 		saveEnableStateAndSet(backButton, savedState, "back", false); //$NON-NLS-1$
 		saveEnableStateAndSet(nextButton, savedState, "next", false); //$NON-NLS-1$
 		saveEnableStateAndSet(finishButton, savedState, "finish", false); //$NON-NLS-1$
@@ -1323,7 +1323,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				progressMonitorPart.setVisible(false);
 				progressMonitorPart.removeFromCancelComponent(cancelButton);
 			}
-			Map state = (Map) savedState;
+			
+			@SuppressWarnings("unchecked")
+			Map<String,Object> state = (Map<String,Object>) savedState;
 			restoreUIState(state);
 			setDisplayCursor(null);
 			if (useCustomProgressMonitorPart) {
