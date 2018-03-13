@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,13 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 443391
+ *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.runtime.ILogListener;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.monitoring.PreferenceConstants;
-import org.eclipse.ui.monitoring.StackSample;
-import org.eclipse.ui.monitoring.UiFreezeEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -25,10 +21,19 @@ import java.lang.management.ThreadMXBean;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.core.runtime.ILogListener;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.ui.monitoring.PreferenceConstants;
+import org.eclipse.ui.monitoring.StackSample;
+import org.eclipse.ui.monitoring.UiFreezeEvent;
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * JUnit test for the {@link DefaultUiFreezeEventLogger}.
  */
-public class DefaultLoggerTests extends TestCase {
+public class DefaultLoggerTests {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 	private static final String RUNTIME_ID = "org.eclipse.core.runtime";
 	private static final long TIME = 120000000;
@@ -37,9 +42,9 @@ public class DefaultLoggerTests extends TestCase {
 	private ThreadInfo thread;
 	private IStatus loggedStatus;
 
-	@Override
+	@Before
 	public void setUp() {
-		logger = new DefaultUiFreezeEventLogger();
+		logger = new DefaultUiFreezeEventLogger(DURATION * 10);
 		createLogListener();
 	}
 
@@ -59,15 +64,16 @@ public class DefaultLoggerTests extends TestCase {
 		thread = jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
 
 		StackSample[] samples = { new StackSample(TIME, new ThreadInfo[] { thread }) };
-		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, false);
+		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, false, false, false);
 		return event;
 	}
 
-	public void testLogEvent() throws Exception {
+	@Test
+	public void testLogEvent() {
 		UiFreezeEvent event = createFreezeEvent();
 		String expectedTime = dateFormat.format(new Date(TIME));
 		String expectedHeader =
-				String.format("UI Delay of %.2fs at %s", DURATION / 1000.0, expectedTime);
+				String.format("UI freeze of %.2gs at %s", DURATION / 1000.0, expectedTime);
 		String expectedEventMessage = String.format("Sample at %s (+%.3fs)", expectedTime, 0.000);
 
 		logger.log(event);

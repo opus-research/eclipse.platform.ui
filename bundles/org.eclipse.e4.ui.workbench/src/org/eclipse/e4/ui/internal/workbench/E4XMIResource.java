@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -32,8 +33,8 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 public class E4XMIResource extends XMIResourceImpl {
 
-	private Map<EObject, String> objectMap = new WeakHashMap<EObject, String>();
-	private Set<String> knownIds = new HashSet<String>();
+	private Map<EObject, String> objectMap = new WeakHashMap<>();
+	private Set<String> knownIds = new HashSet<>();
 
 	public E4XMIResource() {
 	}
@@ -109,7 +110,7 @@ public class E4XMIResource extends XMIResourceImpl {
 		MApplicationElement create();
 	}
 
-	static final Map<String, ObjectCreator> deprecatedTypeMappings = new HashMap<String, ObjectCreator>();
+	static final Map<String, ObjectCreator> deprecatedTypeMappings = new HashMap<>();
 	static {
 		deprecatedTypeMappings.put("OpaqueMenu", new ObjectCreator() { //$NON-NLS-1$
 
@@ -162,23 +163,11 @@ public class E4XMIResource extends XMIResourceImpl {
 				});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl#createXMLHelper()
-	 */
 	@Override
 	protected XMLHelper createXMLHelper() {
 		// Handle mapping of deprecated types
 		return new XMIHelperImpl(this) {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl#createObject(org.eclipse.emf.ecore.EFactory
-			 * , org.eclipse.emf.ecore.EClassifier)
-			 */
 			@Override
 			public EObject createObject(EFactory eFactory, EClassifier type) {
 				if (MMenuFactory.INSTANCE == eFactory && type != null && type.getName() != null) {
@@ -190,13 +179,6 @@ public class E4XMIResource extends XMIResourceImpl {
 				return super.createObject(eFactory, type);
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl#getType(org.eclipse.emf.ecore.EFactory,
-			 * java.lang.String)
-			 */
 			@Override
 			public EClassifier getType(EFactory eFactory, String typeName) {
 				if (deprecatedTypeMappings.containsKey(typeName)) {

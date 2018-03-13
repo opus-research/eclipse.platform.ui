@@ -28,7 +28,7 @@ public class ResourceFilterPage extends PropertyPage {
 	ResourceFilterGroup groupWidget;
 
 	/**
-	 * 
+	 *
 	 */
 	public ResourceFilterPage() {
 		groupWidget = new ResourceFilterGroup();
@@ -40,8 +40,7 @@ public class ResourceFilterPage extends PropertyPage {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_FILTER_PROPERTY_PAGE);
 
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
+		IResource resource = getElement().getAdapter(IResource.class);
 		IContainer container = resource instanceof IContainer ? (IContainer) resource
 				: null;
 		groupWidget.setContainer(container);
@@ -54,11 +53,6 @@ public class ResourceFilterPage extends PropertyPage {
 		groupWidget.performDefaults();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
-	 */
 	@Override
 	public void dispose() {
 		groupWidget.dispose();

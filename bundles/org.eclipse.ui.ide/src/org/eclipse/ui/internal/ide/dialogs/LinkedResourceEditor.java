@@ -80,11 +80,11 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 /**
  * UI to edit the location of the linked resources contained in a project.
  * @since 3.5
- * 
+ *
  */
 public class LinkedResourceEditor {
 
-	
+
 	private static int NAME_COLUMN = 0;
 	private static int PATH_COLUMN = -1;
 	private static int LOCATION_COLUMN = 1;
@@ -156,7 +156,7 @@ public class LinkedResourceEditor {
 				removeSelection();
 			}
 		});
-		
+
 		updateSelection();
 	}
 
@@ -181,7 +181,7 @@ public class LinkedResourceEditor {
 	/**
 	 * Creates the widget group. Callers must call <code>dispose</code> when the
 	 * group is no longer needed.
-	 * 
+	 *
 	 * @param parent
 	 *            the widget parent
 	 * @return container of the widgets
@@ -290,7 +290,7 @@ public class LinkedResourceEditor {
     }
 
     /**
-     * 
+     *
     */
 	public void dispose() {
 		fixedImg.dispose();
@@ -340,47 +340,29 @@ public class LinkedResourceEditor {
 			return null;
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-		 */
 		@Override
 		public void dispose() {
 			stockProvider.dispose();
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object, java.lang.String)
-		 */
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return stockProvider.isLabelProperty(element, property);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-		 */
 		@Override
 		public Image getImage(Object element) {
 			return getColumnImage(element, 0);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-		 */
 		@Override
 		public String getText(Object element) {
 			return getColumnText(element, 0);
@@ -400,7 +382,7 @@ public class LinkedResourceEditor {
 		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof LinkedResourceEditor) {
-				ArrayList list = new ArrayList(); 
+				ArrayList list = new ArrayList();
 				Object[] objs = { BROKEN, ABSOLUTE, FIXED };
 				for (int i = 0; i < objs.length; i++) {
 					Object[] children = getChildren(objs[i]);
@@ -561,8 +543,8 @@ public class LinkedResourceEditor {
 	}
 
 	private void convertLocation() {
-		if (MessageDialog.openConfirm(fConvertAbsoluteButton.getShell(), 
-				IDEWorkbenchMessages.LinkedResourceEditor_convertTitle, 
+		if (MessageDialog.openConfirm(fConvertAbsoluteButton.getShell(),
+				IDEWorkbenchMessages.LinkedResourceEditor_convertTitle,
 				IDEWorkbenchMessages.LinkedResourceEditor_convertMessage)) {
 			ArrayList/* <IResource> */resources = new ArrayList/* <IResource> */();
 			IResource[] selectedResources = getSelectedResource();
@@ -660,7 +642,7 @@ public class LinkedResourceEditor {
 	/**
 	 * @param res
 	 * @param location
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	private void setLinkLocation(IResource res, IPath location) throws CoreException {
 		if (res.getType() == IResource.FILE)
@@ -692,9 +674,6 @@ public class LinkedResourceEditor {
 				new String[] { IDEWorkbenchMessages.linkedResourceEditor_OK },
 				0) {
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-			 */
 			@Override
 			protected boolean isResizable() {
 				return true;
@@ -740,7 +719,7 @@ public class LinkedResourceEditor {
 	private void convertToRelative(ArrayList/* <IResource> */resources,
 			IResource[] selectedResources) {
 		ArrayList/* <String> */report = new ArrayList/* <String> */();
-		
+
 		// first, try to use the automatic converter
 		ArrayList/* <IResource> */remaining = new ArrayList/* <IResource> */();
 		Iterator/* <IResource> */it = resources.iterator();
@@ -903,7 +882,7 @@ public class LinkedResourceEditor {
 			IPath commonPath = resLocation.removeLastSegments(1);
 			String variableName = getSuitablePathVariable(commonPath);
 			try {
-				fProject.getPathVariableManager().setURIValue(variableName, 
+				fProject.getPathVariableManager().setURIValue(variableName,
 						URIUtil.toURI(commonPath));
 			} catch (CoreException e) {
 				report
@@ -1073,7 +1052,7 @@ public class LinkedResourceEditor {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void reloadContent() {
 		refreshContent();

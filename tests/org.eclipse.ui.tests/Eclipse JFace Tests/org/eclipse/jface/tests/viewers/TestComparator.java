@@ -18,10 +18,7 @@ import java.util.Comparator;
 public class TestComparator implements Comparator {
 
     public volatile int comparisons = 0;
-    
-    /* (non-Javadoc)
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-     */
+
     @Override
 	public int compare(Object arg0, Object arg1) {
         comparisons++;

@@ -17,7 +17,7 @@ import org.eclipse.emf.ecore.EObject;
 
 /**
  * Factory which creates an XPathContextFactory for {@link EObject}s
- * 
+ *
  * @since 1.0
  */
 public class EcoreXPathContextFactory{
@@ -28,11 +28,11 @@ public class EcoreXPathContextFactory{
 
 	/**
 	 * Create a new factory
-	 * 
+	 *
 	 * @return the factory
 	 */
 	public static XPathContextFactory<EObject> newInstance() {
-		return new JXPathContextFactoryImpl<EObject>();
+		return new JXPathContextFactoryImpl<>();
 	}
 
 }

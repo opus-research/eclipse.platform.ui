@@ -27,14 +27,14 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * This tests whether we are leaking handlers after their submission has been
  * removed.
- * 
+ *
  * @since 3.1
  */
 public class Bug87856Test extends UITestCase {
 
 	/**
 	 * Constructs a new instance of <code>Bug87856Test</code>.
-	 * 
+	 *
 	 * @param name
 	 *            The name of the test
 	 */
@@ -50,8 +50,7 @@ public class Bug87856Test extends UITestCase {
 	public final void testHandlerLeak() {
 		final IWorkbenchCommandSupport commandSupport = fWorkbench
 				.getCommandSupport();
-		final ICommandService commandService = (ICommandService) fWorkbench
-				.getAdapter(ICommandService.class);
+		final ICommandService commandService = fWorkbench.getAdapter(ICommandService.class);
 		final String commandId = Bug87856Test.class.getName();
 		final Command command = commandService.getCommand(commandId);
 

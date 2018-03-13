@@ -20,7 +20,7 @@ import org.eclipse.ui.ISources;
 /**
  * A registered source provider that can update variables for the
  * IEvaluationService.
- * 
+ *
  * @since 3.4
  */
 public class ActiveUserSourceProvider extends AbstractSourceProvider {
@@ -28,20 +28,10 @@ public class ActiveUserSourceProvider extends AbstractSourceProvider {
 
 	private String username = "guest";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
-	 */
 	@Override
 	public Map getCurrentState() {
 		Map map = new HashMap();
@@ -55,11 +45,6 @@ public class ActiveUserSourceProvider extends AbstractSourceProvider {
 				PROVIDED_SOURCE_NAMES[0], name);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
-	 */
 	@Override
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;

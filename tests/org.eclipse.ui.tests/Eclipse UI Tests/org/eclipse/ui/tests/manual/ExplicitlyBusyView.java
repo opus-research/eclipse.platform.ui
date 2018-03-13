@@ -26,7 +26,7 @@ import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class ExplicitlyBusyView extends ViewPart {
 
@@ -57,8 +57,7 @@ public class ExplicitlyBusyView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		progressService = (IWorkbenchSiteProgressService) getSite().getAdapter(
-				IWorkbenchSiteProgressService.class);
+		progressService = getSite().getAdapter(IWorkbenchSiteProgressService.class);
 		progressService.showBusyForFamily(family);
 		{
 			final Button button = new Button(parent, SWT.CHECK);

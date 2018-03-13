@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,31 +20,31 @@ public class Account extends ModelObject {
 	private String firstName;
 	private String lastName;
 	private String state;
-	private String phone;	
+	private String phone;
 	private Date expiryDate;
 
 	public void setFirstName(String string) {
 		String oldValue = firstName;
 		firstName = string;
-		firePropertyChange("firstName", oldValue, string);		
+		firePropertyChange("firstName", oldValue, string);
 	}
 
 	public void setLastName(String string) {
 		String oldValue = lastName;
 		lastName = string;
-		firePropertyChange("lastName", oldValue, string);				
+		firePropertyChange("lastName", oldValue, string);
 	}
 
 	public void setState(String string) {
 		String oldValue = state;
 		state = string;
-		firePropertyChange("state", oldValue, string);		
+		firePropertyChange("state", oldValue, string);
 	}
 
 	public void setPhone(String string) {
 		String oldValue = phone;
 		phone = string;
-		firePropertyChange("phone", oldValue, phone);		
+		firePropertyChange("phone", oldValue, phone);
 	}
 
 	public void setCountry(String string) {

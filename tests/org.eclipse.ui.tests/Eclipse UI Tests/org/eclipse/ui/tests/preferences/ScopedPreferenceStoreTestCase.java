@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.preferences;
 
-import java.io.*;
-import org.eclipse.core.runtime.preferences.*;
+import java.io.IOException;
+
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -26,7 +29,7 @@ public class ScopedPreferenceStoreTestCase extends UITestCase {
 	}
 
 	public void testNeedsSaving() {
-		IScopeContext context = new InstanceScope();
+		IScopeContext context = InstanceScope.INSTANCE;
 		String qualifier = "org.eclipse.ui.tests.preferences";
 		ScopedPreferenceStore store = new ScopedPreferenceStore(context,
 				qualifier);
@@ -62,14 +65,14 @@ public class ScopedPreferenceStoreTestCase extends UITestCase {
 		assertEquals("4.0", value2, node.get(key2, null));
 		assertFalse("4.1", store.needsSaving());
 	}
-	
+
 	public void testRestoreDefaults() {
-		IScopeContext context = new InstanceScope();
+		IScopeContext context = InstanceScope.INSTANCE;
 		String qualifier = "org.eclipse.ui.tests.preferences#testRestoreDefaults";
 		ScopedPreferenceStore store = new ScopedPreferenceStore(context, qualifier);
 		final String key = "key";
 		final String value = "value";
-		
+
 		// setup and initial assertions
 		assertFalse("0.1", store.contains(key));
 		assertEquals("0.2", DEFAULT_DEFAULT_STRING, store.getString(key));
@@ -78,17 +81,18 @@ public class ScopedPreferenceStoreTestCase extends UITestCase {
 		store.setValue(key, value);
 		assertTrue("1.0", store.contains(key));
 		assertEquals("1.1", value, store.getString(key));
-		
+
 		final boolean[] found = new boolean[1];
 		IPropertyChangeListener listener= new IPropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent event) {
-				if (key.equals(event.getProperty()) && value.equals(event.getOldValue()))
+				if (key.equals(event.getProperty()) && value.equals(event.getOldValue())) {
 					found[0] = true;
+				}
 			}
 		};
 		store.addPropertyChangeListener(listener);
-		
+
 		// restore the default
 		store.setToDefault(key);
 		assertFalse("2.0", store.contains(key));

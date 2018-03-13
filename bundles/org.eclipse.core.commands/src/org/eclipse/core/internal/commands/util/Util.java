@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -27,7 +28,7 @@ import org.eclipse.core.commands.Command;
 
 /**
  * A class providing utility functions for the commands plug-in.
- * 
+ *
  * @since 3.1
  */
 public final class Util {
@@ -36,15 +37,14 @@ public final class Util {
      * A shared, unmodifiable, empty, sorted map. This value is guaranteed to
      * always be the same.
      */
-    public final static SortedMap EMPTY_SORTED_MAP = Collections
-            .unmodifiableSortedMap(new TreeMap());
+	public final static SortedMap<?, ?> EMPTY_SORTED_MAP = Collections
+			.unmodifiableSortedMap(new TreeMap<Object, Object>());
 
     /**
      * A shared, unmodifiable, empty, sorted set. This value is guaranteed to
      * always be the same.
      */
-    public final static SortedSet EMPTY_SORTED_SET = Collections
-            .unmodifiableSortedSet(new TreeSet());
+	public final static SortedSet<?> EMPTY_SORTED_SET = Collections.unmodifiableSortedSet(new TreeSet<Object>());
 
     /**
      * A shared, zero-length string -- for avoiding non-externalized string
@@ -55,7 +55,7 @@ public final class Util {
     /**
      * Asserts the the given object is an instance of the given class --
      * optionally allowing the object to be <code>null</code>.
-     * 
+     *
      * @param object
      *            The object for which the type should be checked.
      * @param c
@@ -65,8 +65,7 @@ public final class Util {
      *            Whether the object being <code>null</code> will not cause a
      *            failure.
      */
-    public static final void assertInstance(final Object object, final Class c,
-            final boolean allowNull) {
+	public static final void assertInstance(final Object object, final Class<?> c, final boolean allowNull) {
         if (object == null && allowNull) {
 			return;
 		}
@@ -81,7 +80,7 @@ public final class Util {
     /**
      * Compares two boolean values. <code>false</code> is considered to be
      * less than <code>true</code>.
-     * 
+     *
      * @param left
      *            The left value to compare.
      * @param right
@@ -93,14 +92,13 @@ public final class Util {
      *         <code>false</code>
      */
     public static final int compare(final boolean left, final boolean right) {
-        return left == false ? (right == true ? -1 : 0) : (right == true ? 0
-                : 1);
+		return left == false ? (right == true ? -1 : 0) : (right == true ? 0 : 1);
     }
 
     /**
      * Compares two comparable objects, but with protection against
      * <code>null</code>.
-     * 
+     *
      * @param left
      *            The left value to compare; may be <code>null</code>.
      * @param right
@@ -112,8 +110,7 @@ public final class Util {
      *         and <code>right</code> is <code>null</code>. Otherwise, the
      *         result of <code>left.compareTo(right)</code>.
      */
-    public static final int compare(final Comparable left,
-            final Comparable right) {
+	public static final <T extends Comparable<? super T>> int compare(final T left, final T right) {
         if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -129,7 +126,7 @@ public final class Util {
      * Compares two integer values. This method fails if the distance between
      * <code>left</code> and <code>right</code> is greater than
      * <code>Integer.MAX_VALUE</code>.
-     * 
+     *
      * @param left
      *            The left value to compare.
      * @param right
@@ -144,7 +141,7 @@ public final class Util {
      * Compares two objects that are not otherwise comparable. If neither object
      * is <code>null</code>, then the string representation of each object is
      * used.
-     * 
+     *
      * @param left
      *            The left value to compare. The string representation of this
      *            value must not be <code>null</code>.
@@ -173,7 +170,7 @@ public final class Util {
 
     /**
      * Decides whether two booleans are equal.
-     * 
+     *
      * @param left
      *            The first boolean to compare; may be <code>null</code>.
      * @param right
@@ -188,7 +185,7 @@ public final class Util {
     /**
      * Decides whether two objects are equal -- defending against
      * <code>null</code>.
-     * 
+     *
      * @param left
      *            The first object to compare; may be <code>null</code>.
      * @param right
@@ -197,15 +194,14 @@ public final class Util {
      *         otherwise.
      */
     public static final boolean equals(final Object left, final Object right) {
-        return left == null ? right == null : ((right != null) && left
-                .equals(right));
+		return left == null ? right == null : ((right != null) && left.equals(right));
     }
 
 	/**
 	 * Tests whether two arrays of objects are equal to each other. The arrays
 	 * must not be <code>null</code>, but their elements may be
 	 * <code>null</code>.
-	 * 
+	 *
 	 * @param leftArray
 	 *            The left array to compare; may be <code>null</code>, and
 	 *            may be empty and may contain <code>null</code> elements.
@@ -216,8 +212,7 @@ public final class Util {
 	 *         elements at the same position are equal; <code>false</code>
 	 *         otherwise.
 	 */
-	public static final boolean equals(final Object[] leftArray,
-			final Object[] rightArray) {
+	public static final boolean equals(final Object[] leftArray, final Object[] rightArray) {
 		if (leftArray == null) {
 			return (rightArray == null);
 		} else if (rightArray == null) {
@@ -231,8 +226,7 @@ public final class Util {
 		for (int i = 0; i < leftArray.length; i++) {
 			final Object left = leftArray[i];
 			final Object right = rightArray[i];
-			final boolean equal = (left == null) ? (right == null) : (left
-					.equals(right));
+			final boolean equal = (left == null) ? (right == null) : (left.equals(right));
 			if (!equal) {
 				return false;
 			}
@@ -243,7 +237,7 @@ public final class Util {
 
     /**
      * Computes the hash code for an integer.
-     * 
+     *
      * @param i
      *            The integer for which a hash code should be computed.
      * @return <code>i</code>.
@@ -255,7 +249,7 @@ public final class Util {
     /**
      * Computes the hash code for an object, but with defense against
      * <code>null</code>.
-     * 
+     *
      * @param object
      *            The object for which a hash code is needed; may be
      *            <code>null</code>.
@@ -270,7 +264,7 @@ public final class Util {
      * Makes a type-safe copy of the given map. This method should be used when
      * a map is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param map
      *            The map which should be copied; must not be <code>null</code>.
      * @param keyClass
@@ -285,30 +279,28 @@ public final class Util {
      *            Whether <code>null</code> values should be allowed.
      * @return A copy of the map; may be empty, but never <code>null</code>.
      */
-    public static final Map safeCopy(final Map map, final Class keyClass,
-            final Class valueClass, final boolean allowNullKeys,
-            final boolean allowNullValues) {
+	public static final <K, V> Map<K, V> safeCopy(final Map<K, V> map, final Class<K> keyClass,
+			final Class<V> valueClass, final boolean allowNullKeys, final boolean allowNullValues) {
         if (map == null || keyClass == null || valueClass == null) {
 			throw new NullPointerException();
 		}
 
-        final Map copy = Collections.unmodifiableMap(new HashMap(map));
-        final Iterator iterator = copy.entrySet().iterator();
+		final Map<K, V> copy = Collections.unmodifiableMap(new HashMap<>(map));
+		final Iterator<Entry<K, V>> iterator = copy.entrySet().iterator();
 
         while (iterator.hasNext()) {
-            final Map.Entry entry = (Map.Entry) iterator.next();
+			final Entry<K, V> entry = iterator.next();
             assertInstance(entry.getKey(), keyClass, allowNullKeys);
             assertInstance(entry.getValue(), valueClass, allowNullValues);
         }
-
-        return map;
+		return copy;
     }
 
     /**
      * Makes a type-safe copy of the given set. This method should be used when
      * a set is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param set
      *            The set which should be copied; must not be <code>null</code>.
      * @param c
@@ -317,7 +309,7 @@ public final class Util {
      * @return A copy of the set; may be empty, but never <code>null</code>.
      *         None of its element will be <code>null</code>.
      */
-    public static final Set safeCopy(final Set set, final Class c) {
+	public static final <T> Set<T> safeCopy(final Set<T> set, final Class<T> c) {
         return safeCopy(set, c, false);
     }
 
@@ -325,7 +317,7 @@ public final class Util {
      * Makes a type-safe copy of the given set. This method should be used when
      * a set is crossing an API boundary (i.e., from a hostile plug-in into
      * internal code, or vice versa).
-     * 
+     *
      * @param set
      *            The set which should be copied; must not be <code>null</code>.
      * @param c
@@ -335,20 +327,19 @@ public final class Util {
      *            Whether null values should be allowed.
      * @return A copy of the set; may be empty, but never <code>null</code>.
      */
-    public static final Set safeCopy(final Set set, final Class c,
-            final boolean allowNullElements) {
+	public static final <T> Set<T> safeCopy(final Set<T> set, final Class<T> c, final boolean allowNullElements) {
         if (set == null || c == null) {
 			throw new NullPointerException();
 		}
 
-        final Set copy = Collections.unmodifiableSet(new HashSet(set));
-        final Iterator iterator = copy.iterator();
+		final Set<T> copy = Collections.unmodifiableSet(new HashSet<>(set));
+		final Iterator<T> iterator = copy.iterator();
 
         while (iterator.hasNext()) {
 			assertInstance(iterator.next(), c, allowNullElements);
 		}
 
-        return set;
+		return copy;
     }
 
 	/**
@@ -363,7 +354,7 @@ public final class Util {
 	public static final String getHelpContextId(Command command) {
 		Method method = null;
 		try {
-			method = Command.class.getDeclaredMethod("getHelpContextId", null); //$NON-NLS-1$
+			method = Command.class.getDeclaredMethod("getHelpContextId"); //$NON-NLS-1$
 		} catch (Exception e) {
 			// do nothing
 		}
@@ -373,7 +364,7 @@ public final class Util {
 			boolean accessible = method.isAccessible();
 			method.setAccessible(true);
 			try {
-				contextId = (String) method.invoke(command, null);
+				contextId = (String) method.invoke(command);
 			} catch (Exception e) {
 				// do nothing
 			}

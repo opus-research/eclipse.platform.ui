@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -45,7 +46,7 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public final class EvaluationService implements IEvaluationService {
 	public static final String DEFAULT_VAR = "org.eclipse.ui.internal.services.EvaluationService.default_var"; //$NON-NLS-1$
@@ -57,11 +58,11 @@ public final class EvaluationService implements IEvaluationService {
 	private int notifying = 0;
 
 	private ListenerList serviceListeners = new ListenerList(ListenerList.IDENTITY);
-	ArrayList<ISourceProvider> sourceProviders = new ArrayList<ISourceProvider>();
-	LinkedList<EvaluationReference> refs = new LinkedList<EvaluationReference>();
+	ArrayList<ISourceProvider> sourceProviders = new ArrayList<>();
+	LinkedList<EvaluationReference> refs = new LinkedList<>();
 	private ISourceProviderListener contextUpdater;
 
-	private HashSet<String> ratVariables = new HashSet<String>();
+	private HashSet<String> ratVariables = new HashSet<>();
 	private RunAndTrack ratUpdater = new RunAndTrack() {
 		@Override
 		public boolean changed(IEclipseContext context) {
@@ -83,7 +84,7 @@ public final class EvaluationService implements IEvaluationService {
 		}
 	};
 
-	private HashSet<String> variableFilter = new HashSet<String>();
+	private HashSet<String> variableFilter = new HashSet<>();
 	private IEventBroker eventBroker;
 
 	public EvaluationService(IEclipseContext c) {
@@ -151,7 +152,7 @@ public final class EvaluationService implements IEvaluationService {
 	}
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
 	 * .ui.ISourceProvider)
@@ -182,7 +183,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
 	 * eclipse.ui.ISourceProvider)
@@ -204,7 +205,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IDisposable#dispose()
 	 */
 	@Override
@@ -218,7 +219,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IEvaluationService#addServiceListener(org.eclipse
 	 * .jface.util.IPropertyChangeListener)
@@ -230,7 +231,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IEvaluationService#removeServiceListener(org.
 	 * eclipse.jface.util.IPropertyChangeListener)
@@ -242,7 +243,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IEvaluationService#addEvaluationListener(org.
 	 * eclipse.core.expressions.Expression,
@@ -259,7 +260,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IEvaluationService#addEvaluationReference(org
 	 * .eclipse.ui.services.IEvaluationReference)
@@ -303,7 +304,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IEvaluationService#removeEvaluationListener(org
 	 * .eclipse.ui.services.IEvaluationReference)
@@ -315,7 +316,7 @@ public final class EvaluationService implements IEvaluationService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IEvaluationService#getCurrentState()
 	 */
 	@Override

@@ -154,7 +154,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the name, location, size and type.
-	 * 
+	 *
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -163,7 +163,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 */
 	private Composite createBasicInfoGroup(Composite parent, IResource resource) {
 		initializeDialogUnits(parent);
-		
+
 		Composite basicInfoComposite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -338,8 +338,7 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	protected void editLinkLocation() {
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
+		IResource resource = getElement().getAdapter(IResource.class);
 		String locationFormat = resource.getPathVariableManager().convertFromUserEditableFormat(locationValue.getText(), true);
 		IPath location = Path.fromOSString(locationFormat);
 
@@ -358,8 +357,7 @@ public class ResourceInfoPage extends PropertyPage {
 	}
 
 	private void refreshLinkLocation() {
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
+		IResource resource = getElement().getAdapter(IResource.class);
 
 		String userEditableFormat = resource.getPathVariableManager().convertToUserEditableFormat(newResourceLocation.toOSString(), true);
 		locationValue.setText(userEditableFormat);
@@ -395,15 +393,14 @@ public class ResourceInfoPage extends PropertyPage {
 				IIDEHelpContextIds.RESOURCE_INFO_PROPERTY_PAGE);
 
 		// layout the page
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
-		
+		IResource resource = getElement().getAdapter(IResource.class);
+
 		if (resource == null) {
 			Label label = new Label(parent, SWT.NONE);
 			label.setText(IDEWorkbenchMessages.ResourceInfoPage_noResource);
 			return label;
 		}
-		
+
 		if (resource.getType() != IResource.PROJECT) {
 			ResourceAttributes attrs = resource.getResourceAttributes();
 			if (attrs != null) {
@@ -448,11 +445,6 @@ public class ResourceInfoPage extends PropertyPage {
 			encodingEditor.load();
 
 			encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-				 */
 				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(FieldEditor.IS_VALID)) {
@@ -467,7 +459,7 @@ public class ResourceInfoPage extends PropertyPage {
 				lineDelimiterEditor.doLoad();
 			}
 		}
-		
+
 		Dialog.applyDialogFont(composite);
 
 		return composite;
@@ -577,7 +569,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Return the label for the encoding field editor for the resource.
-	 * 
+	 *
 	 * @param resource -
 	 *            the resource to edit.
 	 * @return String
@@ -593,7 +585,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isEditable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -609,7 +601,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isExecutable button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -625,7 +617,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isLocked button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -640,7 +632,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the isArchive button and it's associated label as a child of
 	 * parent using the editableValue of the receiver. The Composite will be the
 	 * parent of the button.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent of the button
 	 */
@@ -656,7 +648,7 @@ public class ResourceInfoPage extends PropertyPage {
 	 * Create the derived button and it's associated label as a child of parent
 	 * using the derived of the receiver. The Composite will be the parent of
 	 * the button.
-	 * 
+	 *
 	 * @param composite
 	 *            the parent of the button
 	 * @param resource
@@ -675,7 +667,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create a separator that goes across the entire page
-	 * 
+	 *
 	 * @param composite
 	 *            The parent of the seperator
 	 */
@@ -690,7 +682,7 @@ public class ResourceInfoPage extends PropertyPage {
 
 	/**
 	 * Create the group that shows the read only state and the timestamp.
-	 * 
+	 *
 	 * @param parent
 	 *            the composite the group will be created in
 	 * @param resource
@@ -862,9 +854,8 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	protected void performDefaults() {
 
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
-		
+		IResource resource = getElement().getAdapter(IResource.class);
+
 		if (resource == null)
 			return;
 
@@ -891,7 +882,7 @@ public class ResourceInfoPage extends PropertyPage {
 		if (this.executableBox != null) {
 			this.executableBox.setSelection(false);
 		}
-		
+
 		// Nothing to update if we never made the box
 		if (this.archiveBox != null) {
 			this.archiveBox.setSelection(true);
@@ -1105,9 +1096,8 @@ public class ResourceInfoPage extends PropertyPage {
 	@Override
 	public boolean performOk() {
 
-		IResource resource = (IResource) getElement().getAdapter(
-				IResource.class);
-		
+		IResource resource = getElement().getAdapter(IResource.class);
+
 		if (resource == null)
 			return true;
 

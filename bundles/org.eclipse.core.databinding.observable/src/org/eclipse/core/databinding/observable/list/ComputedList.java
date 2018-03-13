@@ -1,15 +1,16 @@
 /************************************************************************************************************
- * Copyright (c) 2007, 2009 Matthew Hall and others.
+ * Copyright (c) 2007, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  * 		Matthew Hall - initial API and implementation
  * 		IBM Corporation - initial API and implementation
  * 		Brad Reynolds - initial API and implementation (through bug 116920 and bug 147515)
  * 		Matthew Hall - bugs 211786, 274081
+ * 		Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ***********************************************************************************************************/
 package org.eclipse.core.databinding.observable.list;
 
@@ -41,14 +42,14 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * Example: compute the fibonacci sequence, up to as many elements as the value
  * of an {@link IObservableValue} &lt; {@link Integer} &gt;.
  * </p>
- * 
+ *
  * <pre>
  * final IObservableValue count = WritableValue.withValueType(Integer.TYPE);
  * count.setValue(new Integer(0));
  * IObservableList fibonacci = new ComputedList() {
  * 	protected List calculate() {
  * 		int size = ((Integer) count.getValue()).intValue();
- * 
+ *
  * 		List result = new ArrayList();
  * 		for (int i = 0; i &lt; size; i++) {
  * 			if (i == 0)
@@ -64,17 +65,20 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * 		return result;
  * 	}
  * };
- * 
+ *
  * System.out.println(fibonacci); // =&gt; &quot;[]&quot;
- * 
+ *
  * count.setValue(new Integer(5));
  * System.out.println(fibonacci); // =&gt; &quot;[0, 1, 1, 2, 3]&quot;
  * </pre>
- * 
+ *
+ * @param <E>
+ *            the list element type
+ *
  * @since 1.1
  */
-public abstract class ComputedList extends AbstractObservableList {
-	private List cachedList = new ArrayList();
+public abstract class ComputedList<E> extends AbstractObservableList<E> {
+	private List<E> cachedList = new ArrayList<E>();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -92,7 +96,7 @@ public abstract class ComputedList extends AbstractObservableList {
 	/**
 	 * Creates a computed list in the default realm and with the given element
 	 * type.
-	 * 
+	 *
 	 * @param elementType
 	 *            the element type, may be <code>null</code> to indicate unknown
 	 *            element type
@@ -104,10 +108,10 @@ public abstract class ComputedList extends AbstractObservableList {
 	/**
 	 * Creates a computed list in given realm and with an unknown (null) element
 	 * type.
-	 * 
+	 *
 	 * @param realm
 	 *            the realm
-	 * 
+	 *
 	 */
 	public ComputedList(Realm realm) {
 		this(realm, null);
@@ -116,7 +120,7 @@ public abstract class ComputedList extends AbstractObservableList {
 	/**
 	 * Creates a computed list in the given realm and with the given element
 	 * type.
-	 * 
+	 *
 	 * @param realm
 	 *            the realm
 	 * @param elementType
@@ -133,35 +137,38 @@ public abstract class ComputedList extends AbstractObservableList {
 	 * public API. Each interface could have been implemented using a separate
 	 * anonymous class, but we combine them here to reduce the memory overhead
 	 * and number of classes.
-	 * 
+	 *
 	 * <p>
 	 * The Runnable calls calculate and stores the result in cachedList.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * The IChangeListener stores each observable in the dependencies list. This
 	 * is registered as the listener when calling ObservableTracker, to detect
 	 * every observable that is used by computeValue.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * The IChangeListener is attached to every dependency.
 	 * </p>
-	 * 
+	 *
 	 */
 	private class PrivateInterface implements Runnable, IChangeListener,
 			IStaleListener {
+		@Override
 		public void run() {
 			cachedList = calculate();
 			if (cachedList == null)
 				cachedList = Collections.EMPTY_LIST;
 		}
 
+		@Override
 		public void handleStale(StaleEvent event) {
 			if (!dirty)
 				makeStale();
 		}
 
+		@Override
 		public void handleChange(ChangeEvent event) {
 			makeDirty();
 		}
@@ -171,21 +178,23 @@ public abstract class ComputedList extends AbstractObservableList {
 
 	private Object elementType;
 
+	@Override
 	protected int doGetSize() {
 		return doGetList().size();
 	}
 
-	public Object get(int index) {
+	@Override
+	public E get(int index) {
 		getterCalled();
 		return doGetList().get(index);
 	}
 
-	private final List getList() {
+	private final List<E> getList() {
 		getterCalled();
 		return doGetList();
 	}
 
-	final List doGetList() {
+	final List<E> doGetList() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
@@ -228,10 +237,10 @@ public abstract class ComputedList extends AbstractObservableList {
 	 * dependencies used to calculate the list must be {@link IObservable}, and
 	 * implementers must use one of the interface methods tagged TrackedGetter
 	 * for ComputedList to recognize it as a dependency.
-	 * 
+	 *
 	 * @return the object's list.
 	 */
-	protected abstract List calculate();
+	protected abstract List<E> calculate();
 
 	private void makeDirty() {
 		if (!dirty) {
@@ -242,17 +251,19 @@ public abstract class ComputedList extends AbstractObservableList {
 			stopListening();
 
 			// copy the old list
-			final List oldList = new ArrayList(cachedList);
+			final List<E> oldList = new ArrayList<E>(cachedList);
 			// Fire the "dirty" event. This implementation recomputes the new
 			// list lazily.
-			fireListChange(new ListDiff() {
-				ListDiffEntry[] differences;
+			fireListChange(new ListDiff<E>() {
+				List<ListDiffEntry<E>> differences;
 
-				public ListDiffEntry[] getDifferences() {
+				@Override
+				public ListDiffEntry<E>[] getDifferences() {
 					if (differences == null)
-						differences = Diffs.computeListDiff(oldList, getList())
+						return Diffs.computeListDiff(oldList, getList())
 								.getDifferences();
-					return differences;
+					return differences.toArray(new ListDiffEntry[differences
+							.size()]);
 				}
 			});
 		}
@@ -277,16 +288,19 @@ public abstract class ComputedList extends AbstractObservableList {
 		}
 	}
 
+	@Override
 	public boolean isStale() {
 		// recalculate list if dirty, to ensure staleness is correct.
 		getList();
 		return stale;
 	}
 
+	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
+	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		super.addChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
@@ -294,7 +308,8 @@ public abstract class ComputedList extends AbstractObservableList {
 		computeListForListeners();
 	}
 
-	public synchronized void addListChangeListener(IListChangeListener listener) {
+	@Override
+	public synchronized void addListChangeListener(IListChangeListener<? super E> listener) {
 		super.addListChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners
@@ -311,6 +326,7 @@ public abstract class ComputedList extends AbstractObservableList {
 		// been executed. It is their job to figure out what to do with those
 		// notifications.
 		getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				if (dependencies == null) {
 					// We are not currently listening.
@@ -323,6 +339,7 @@ public abstract class ComputedList extends AbstractObservableList {
 		});
 	}
 
+	@Override
 	public synchronized void dispose() {
 		stopListening();
 		super.dispose();

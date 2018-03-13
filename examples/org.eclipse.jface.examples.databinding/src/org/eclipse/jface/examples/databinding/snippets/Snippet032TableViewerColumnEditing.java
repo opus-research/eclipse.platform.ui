@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.beans.IBeanValueProperty;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
@@ -30,7 +29,7 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.core.databinding.property.value.IValueProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.CellEditorProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
@@ -54,7 +53,7 @@ import org.eclipse.swt.widgets.Table;
 public class Snippet032TableViewerColumnEditing {
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
@@ -246,12 +245,14 @@ public class Snippet032TableViewerColumnEditing {
 			// current selection
 			IObservableValue selection = ViewersObservables
 					.observeSingleSelection(peopleViewer);
-			bindingContext.bindValue(WidgetProperties.text().observe(selectedCommitterName),
-					BeansObservables
-					.observeDetailValue(selection, "name", String.class));
-			bindingContext.bindValue(WidgetProperties.text().observe(selectedCommitterFirstName),
-					BeansObservables
-					.observeDetailValue(selection, "firstName", String.class));
+			bindingContext.bindValue(
+					WidgetProperties.text().observe(selectedCommitterName),
+					BeanProperties.value((Class) selection.getValueType(), "name", String.class)
+					.observeDetail(selection));
+			bindingContext.bindValue(
+					WidgetProperties.text().observe(selectedCommitterFirstName),
+					BeanProperties.value((Class) selection.getValueType(), "firstName", String.class)
+					.observeDetail(selection));
 		}
 	}
 }

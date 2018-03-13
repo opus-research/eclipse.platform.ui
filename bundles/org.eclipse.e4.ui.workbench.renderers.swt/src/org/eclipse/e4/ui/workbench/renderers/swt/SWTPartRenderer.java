@@ -1,25 +1,30 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Ragnar Nevries <r.eclipse@nevri.es> - Bug 443514
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 400217
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
+import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
+import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
+import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -30,6 +35,7 @@ import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.DisposeEvent;
@@ -40,11 +46,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class SWTPartRenderer extends AbstractPartRenderer {
+	private static final String ICON_URI_FOR_PART = "IconUriForPart"; //$NON-NLS-1$
 
-	Map<String, Image> imageMap = new HashMap<String, Image>();
+	private Map<String, Image> imageMap = new HashMap<String, Image>();
 
-	String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.gif"; //$NON-NLS-1$
-	Image pinImage;
+	private String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.gif"; //$NON-NLS-1$
+	private Image pinImage;
 
 	private ISWTResourceUtilities resUtils;
 
@@ -206,7 +213,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	protected String getToolTip(MUILabel element) {
+	public String getToolTip(MUILabel element) {
 		String overrideTip = (String) ((MUIElement) element).getTransientData()
 				.get(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
 		return overrideTip == null ? element.getLocalizedTooltip()
@@ -231,8 +238,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		Image image = (Image) ((MUIElement) element).getTransientData().get(
 				IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY);
 		if (image == null || image.isDisposed()) {
-			String iconURI = element.getIconURI();
-			image = getImageFromURI(iconURI);
+			image = getImageFromURI(getIconURI(element));
 		}
 
 		if (image != null) {
@@ -240,6 +246,26 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 
 		return image;
+	}
+
+	private String getIconURI(MUILabel element) {
+		if (element instanceof MPart) {
+			MPart part = (MPart) element;
+			String iconURI = (String) part.getTransientData().get(
+					ICON_URI_FOR_PART);
+			if (iconURI != null) {
+				return iconURI;
+			}
+
+			MPartDescriptor desc = modelService.getPartDescriptor(part
+					.getElementId());
+			iconURI = desc != null && desc.getIconURI() != null ? desc
+					.getIconURI() : element.getIconURI();
+			part.getTransientData().put(ICON_URI_FOR_PART, iconURI);
+
+			return iconURI;
+		}
+		return element.getIconURI();
 	}
 
 	/**
@@ -271,7 +297,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	 * Calculates the index of the element in terms of the other <b>rendered</b>
 	 * elements. This is useful when 'inserting' elements in the middle of
 	 * existing, rendered parents.
-	 * 
+	 *
 	 * @param element
 	 *            The element to get the index for
 	 * @return The visible index or -1 if the element is not a child of the
@@ -297,26 +323,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return parent.getChildren().indexOf(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.AbstractPartRenderer#childRendered
-	 * (org.eclipse.e4.ui.model.application.MElementContainer,
-	 * org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void childRendered(MElementContainer<MUIElement> parentElement,
 			MUIElement element) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#init(org
-	 * .eclipse.e4.core.contexts.IEclipseContext)
-	 */
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
@@ -372,13 +383,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return getModelElement(ctrl.getParent());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#forceFocus
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void forceFocus(MUIElement element) {
 		if (element.getWidget() instanceof Control) {
@@ -388,4 +392,18 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 				ctrl.forceFocus();
 		}
 	}
+
+	public void processVisibility(IContributionItem ci, MUIElement itemModel) {
+		if (itemModel.getVisibleWhen() instanceof MCoreExpression) {
+			final IEclipseContext evalContext = modelService.getContainingContext(itemModel);
+			ExpressionContext exprContext = new ExpressionContext(evalContext);
+			boolean visible = ContributionsAnalyzer
+					.isVisible((MCoreExpression) itemModel.getVisibleWhen(), exprContext);
+			ci.setVisible(visible);
+			itemModel.setVisible(visible);
+		} else {
+			ci.setVisible(itemModel.isVisible());
+		}
+	}
+
 }

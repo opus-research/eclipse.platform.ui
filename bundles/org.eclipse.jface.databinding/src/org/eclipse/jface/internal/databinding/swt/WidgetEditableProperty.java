@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class WidgetEditableProperty extends WidgetDelegatingValueProperty {
 	IValueProperty text;
@@ -27,12 +27,13 @@ public class WidgetEditableProperty extends WidgetDelegatingValueProperty {
 	IValueProperty styledText;
 
 	/**
-	 * 
+	 *
 	 */
 	public WidgetEditableProperty() {
 		super(Boolean.TYPE);
 	}
 
+	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Text) {
 			if (text == null)

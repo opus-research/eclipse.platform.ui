@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -65,7 +66,7 @@ import org.eclipse.ui.menus.IMenuService;
 
 /**
  * @since 3.5
- * 
+ *
  */
 public class WorkbenchMenuService implements IMenuService {
 
@@ -75,7 +76,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private ServiceLocator serviceLocator;
 	private ExpressionContext legacyContext;
 	private MenuPersistence persistence;
-	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<AbstractContributionFactory, Object>();
+	private Map<AbstractContributionFactory, Object> factoriesToContributions = new HashMap<>();
 	private EModelService modelService;
 
 	/**
@@ -92,7 +93,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
 	 * .ui.ISourceProvider)
@@ -105,7 +106,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
 	 * eclipse.ui.ISourceProvider)
@@ -118,7 +119,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.services.IDisposable#dispose()
 	 */
 	@Override
@@ -132,7 +133,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#addContributionFactory(org.eclipse.
 	 * ui.menus.AbstractContributionFactory)
@@ -215,7 +216,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#removeContributionFactory(org.eclipse
 	 * .ui.menus.AbstractContributionFactory)
@@ -278,7 +279,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#populateContributionManager(org.eclipse
 	 * .jface.action.ContributionManager, java.lang.String)
@@ -384,7 +385,7 @@ public class WorkbenchMenuService implements IMenuService {
 		ArrayList<MToolBar> toolbars = (ArrayList<MToolBar>) model.getTransientData().get(
 				POPULATED_TOOL_BARS);
 		if (toolbars == null) {
-			toolbars = new ArrayList<MToolBar>();
+			toolbars = new ArrayList<>();
 			model.getTransientData().put(POPULATED_TOOL_BARS, toolbars);
 		}
 		if (toolbars.contains(tb)) {
@@ -398,7 +399,7 @@ public class WorkbenchMenuService implements IMenuService {
 	private void addMenu(MApplicationElement model, MMenu menu, IEclipseContext ctx) {
 		ArrayList<MMenu> menus = (ArrayList<MMenu>) model.getTransientData().get(POPULATED_MENUS);
 		if (menus == null) {
-			menus = new ArrayList<MMenu>();
+			menus = new ArrayList<>();
 			model.getTransientData().put(POPULATED_MENUS, menus);
 		}
 		if (menus.contains(menu)) {
@@ -464,7 +465,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.ui.menus.IMenuService#releaseContributions(org.eclipse.jface
 	 * .action.ContributionManager)
@@ -554,7 +555,7 @@ public class WorkbenchMenuService implements IMenuService {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.menus.IMenuService#getCurrentState()
 	 */
 	@Override

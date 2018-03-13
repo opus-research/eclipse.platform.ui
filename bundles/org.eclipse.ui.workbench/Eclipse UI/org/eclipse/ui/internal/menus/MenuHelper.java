@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 180308
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 180308, 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.menus;
 
@@ -103,19 +103,19 @@ public class MenuHelper {
 		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
-	public static final String MAIN_MENU_ID = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
+	public static final String MAIN_MENU_ID = ActionSet.MAIN_MENU;
 	private static Field urlField;
 
 	/**
 	 * The private 'location' field that is defined in the FileImageDescriptor.
-	 * 
+	 *
 	 * @see #getLocation(ImageDescriptor)
 	 */
 	private static Field locationField;
 
 	/**
 	 * The private 'name' field that is defined in the FileImageDescriptor.
-	 * 
+	 *
 	 * @see #getName(ImageDescriptor)
 	 */
 	private static Field nameField;
@@ -282,7 +282,7 @@ public class MenuHelper {
 
 	/**
 	 * Do a type-safe extraction of an object from the evalation context
-	 * 
+	 *
 	 * @param context
 	 *            the evaluation context
 	 * @param expectedType
@@ -432,7 +432,7 @@ public class MenuHelper {
 	}
 
 	public static Map<String, String> getParameters(IConfigurationElement element) {
-		HashMap<String, String> map = new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<>();
 		IConfigurationElement[] parameters = element
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
 		for (int i = 0; i < parameters.length; i++) {
@@ -659,7 +659,7 @@ public class MenuHelper {
 			RenderedElementUtil.setContributionManager(menu, generator);
 			item.setMenu(menu);
 		}
-		
+
 		item.setElementId(id);
 		item.setCommand(cmd);
 		if (iconUri == null) {
@@ -799,7 +799,7 @@ public class MenuHelper {
 		return null;
 	}
 
-	public static MToolItem createToolItem(MApplication application, CommandContributionItem cci) {
+	public static MHandledToolItem createToolItem(MApplication application, CommandContributionItem cci) {
 		String id = cci.getCommand().getId();
 		for (MCommand command : application.getCommands()) {
 			if (id.equals(command.getElementId())) {
@@ -1168,7 +1168,7 @@ public class MenuHelper {
 	/**
 	 * Rewrite certain types of URLs to more durable forms, as these URLs may
 	 * may be persisted in the model.
-	 * 
+	 *
 	 * @param url
 	 *            the url
 	 * @return the rewritten URL

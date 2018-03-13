@@ -19,12 +19,11 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -63,12 +62,12 @@ public class Snippet019TreeViewerWithListFactory {
 
 	/**
 	 * Launch the application
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Display display = Display.getDefault();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -239,16 +238,15 @@ public class Snippet019TreeViewerWithListFactory {
 		IObservableValue treeViewerSelectionObserveSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
 		IObservableValue textTextObserveWidget = WidgetProperties.text(SWT.Modify).observe(beanText);
-		IObservableValue treeViewerValueObserveDetailValue = BeansObservables
-				.observeDetailValue(treeViewerSelectionObserveSelection,
-						"text", String.class);
-		//
-		//
+		IObservableValue treeViewerValueObserveDetailValue = BeanProperties.value(
+				(Class) treeViewerSelectionObserveSelection.getValueType(), "text", String.class).observeDetail(
+				treeViewerSelectionObserveSelection);
+
 		DataBindingContext bindingContext = new DataBindingContext();
-		//
+
 		bindingContext.bindValue(textTextObserveWidget,
 				treeViewerValueObserveDetailValue);
-		//
+
 		return bindingContext;
 	}
 

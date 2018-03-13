@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Brock Janiczak (brockj_eclipse@ihug.com.au) - handler registration
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 473063
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -34,7 +35,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  * <li>It <code>hasCustomFile</code>, in which case the user created a new
  * perspective.</li>
  * </ol>
- * 
+ *
  */
 public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 		IPluginContribution {
@@ -86,7 +87,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getId()
 	 */
 	@Override
@@ -104,7 +105,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getImageDescriptor()
 	 */
 	@Override
@@ -128,9 +129,21 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 		return image;
 	}
 
+	/**
+	 * Set the {@link ImageDescriptor} that should be used to provide the
+	 * perspective icon. Needed for contributing perspectives via model
+	 * fragments.
+	 *
+	 * @param image
+	 *            The {@link ImageDescriptor} to use
+	 */
+	public void setImageDescriptor(ImageDescriptor image) {
+		this.image = image;
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPerspectiveDescriptor#getLabel()
 	 */
 	@Override
@@ -141,7 +154,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
 	@Override
@@ -151,7 +164,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
 	@Override
@@ -161,7 +174,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/**
 	 * Returns <code>true</code> if this perspective has a custom definition.
-	 * 
+	 *
 	 * @return whether this perspective has a custom definition
 	 */
 	public boolean hasCustomDefinition() {
@@ -175,7 +188,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 	/**
 	 * Returns <code>true</code> if this perspective is predefined by an
 	 * extension.
-	 * 
+	 *
 	 * @return boolean whether this perspective is predefined by an extension
 	 */
 	public boolean isPredefined() {
@@ -184,7 +197,7 @@ public class PerspectiveDescriptor implements IPerspectiveDescriptor,
 
 	/**
 	 * Returns <code>true</code> if this perspective is a singleton.
-	 * 
+	 *
 	 * @return whether this perspective is a singleton
 	 */
 	public boolean isSingleton() {

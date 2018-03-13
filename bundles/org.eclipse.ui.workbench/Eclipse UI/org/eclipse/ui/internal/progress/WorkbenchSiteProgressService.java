@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  * IBM - Initial API and implementation
  * Remy Chi Jian Suen (Versant Corporation) - bug 255005
+ * Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -60,7 +61,7 @@ public class WorkbenchSiteProgressService implements
 	 * requested.</li>
 	 * </ul>
 	 */
-	private Map<Job, Boolean> busyJobs = new HashMap<Job, Boolean>();
+	private Map<Job, Boolean> busyJobs = new HashMap<>();
 
     private Object busyLock = new Object();
 
@@ -69,9 +70,9 @@ public class WorkbenchSiteProgressService implements
     private Cursor waitCursor;
 
     private int waitCursorJobCount;
-    
+
     private Object waitCursorLock = new Object();
-    
+
     private SiteUpdateJob updateJob;
 
 	/**
@@ -87,7 +88,7 @@ public class WorkbenchSiteProgressService implements
 
         /**
          * Set whether we are updating with the wait or busy cursor.
-         * 
+         *
          * @param cursorState
          */
         void setBusy(boolean cursorState) {
@@ -114,7 +115,7 @@ public class WorkbenchSiteProgressService implements
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
          */
         @Override
@@ -146,12 +147,12 @@ public class WorkbenchSiteProgressService implements
                 waitCursor = null;
             }
         }
-        
+
     }
 
     /**
      * Create a new instance of the receiver with a site of partSite
-     * 
+     *
      * @param partSite
      *            PartSite.
      */
@@ -182,7 +183,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IProgressService#busyCursorWhile(org.eclipse.jface.operation.IRunnableWithProgress)
      */
     @Override
@@ -193,7 +194,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#schedule(org.eclipse.core.runtime.jobs.Job,
      *      long, boolean)
      */
@@ -205,7 +206,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#schedule(org.eclipse.core.runtime.jobs.Job,
      *      int)
      */
@@ -216,7 +217,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#schedule(org.eclipse.core.runtime.jobs.Job)
      */
     @Override
@@ -226,7 +227,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#showBusyForFamily(java.lang.Object)
      */
     @Override
@@ -236,7 +237,7 @@ public class WorkbenchSiteProgressService implements
 
     /**
      * Get the job change listener for this site.
-     * 
+     *
      * @param useHalfBusyCursor
      * @return IJobChangeListener
      */
@@ -245,7 +246,7 @@ public class WorkbenchSiteProgressService implements
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see
 			 * org.eclipse.core.runtime.jobs.JobChangeAdapter#aboutToRun(org
 			 * .eclipse.core.runtime.jobs.IJobChangeEvent)
@@ -257,7 +258,7 @@ public class WorkbenchSiteProgressService implements
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see
 			 * org.eclipse.core.runtime.jobs.JobChangeAdapter#done(org.eclipse
 			 * .core.runtime.jobs.IJobChangeEvent)
@@ -273,7 +274,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.internal.progress.IJobBusyListener#decrementBusy(org.eclipse.core.runtime.jobs.Job)
      */
     @Override
@@ -300,7 +301,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.internal.progress.IJobBusyListener#incrementBusy(org.eclipse.core.runtime.jobs.Job)
      */
     @Override
@@ -341,7 +342,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#warnOfContentChange()
      */
     @Override
@@ -354,7 +355,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.progress.IProgressService#showInDialog(org.eclipse.swt.widgets.Shell,
      *      org.eclipse.core.runtime.jobs.Job)
      */
@@ -365,7 +366,7 @@ public class WorkbenchSiteProgressService implements
 
     /**
      * Get the progress service for the workbnech,
-     * 
+     *
      * @return IProgressService
      */
     private IProgressService getWorkbenchProgressService() {
@@ -374,7 +375,7 @@ public class WorkbenchSiteProgressService implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.jface.operation.IRunnableContext#run(boolean, boolean,
      *      org.eclipse.jface.operation.IRunnableWithProgress)
      */
@@ -460,11 +461,11 @@ public class WorkbenchSiteProgressService implements
 			updateJob.cancel();
 		}
 	}
-	
+
 	/**
-	 * This method is made public only for the tests. 
+	 * This method is made public only for the tests.
 	 * Clients should not be using this method
-	 * 
+	 *
 	 * @return the updateJob that updates the site
 	 */
 	public SiteUpdateJob getUpdateJob() {

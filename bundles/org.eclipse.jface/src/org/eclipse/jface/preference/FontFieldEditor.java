@@ -125,14 +125,14 @@ public class FontFieldEditor extends FieldEditor {
     }
 
     /**
-     * Creates a new font field editor 
+     * Creates a new font field editor
      */
     protected FontFieldEditor() {
     }
 
     /**
      * Creates a font field editor with an optional preview area.
-     * 
+     *
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param previewAreaText the text used for the preview window. If it is
@@ -150,7 +150,7 @@ public class FontFieldEditor extends FieldEditor {
 
     /**
      * Creates a font field editor without a preview.
-     * 
+     *
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -160,9 +160,6 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void adjustForNumColumns(int numColumns) {
 
@@ -175,9 +172,6 @@ public class FontFieldEditor extends FieldEditor {
         valueControl.setLayoutData(data);
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void applyFont() {
         if (chosenFont != null && previewer != null) {
@@ -185,9 +179,6 @@ public class FontFieldEditor extends FieldEditor {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
         getLabelControl(parent);
@@ -216,9 +207,6 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doLoad() {
         if (changeFontButton == null) {
@@ -228,9 +216,6 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceName()));
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doLoadDefault() {
         if (changeFontButton == null) {
@@ -240,9 +225,6 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceStore(), getPreferenceName()));
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	protected void doStore() {
         if (chosenFont != null) {
@@ -301,20 +283,17 @@ public class FontFieldEditor extends FieldEditor {
         return changeFontButton;
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
     @Override
 	public int getNumberOfControls() {
         if (previewer == null) {
 			return 3;
 		}
-        
+
         return 4;
     }
 
     /**
-     * Returns the preferred preview height. 
+     * Returns the preferred preview height.
      *
      * @return the height, or <code>-1</code> if no previewer
      *  is installed

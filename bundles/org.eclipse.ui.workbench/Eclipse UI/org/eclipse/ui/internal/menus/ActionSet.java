@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -50,12 +51,12 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 
 /**
  * @since e4
- * 
+ *
  */
 public class ActionSet {
 
-	protected static final String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
-	protected static final String MAIN_MENU = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
+	public static final String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
+	public static final String MAIN_MENU = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
 
 	protected IConfigurationElement configElement;
 
@@ -63,8 +64,8 @@ public class ActionSet {
 
 	protected Expression visibleWhen;
 
-	private HashSet<String> menuContributionGroupIds = new HashSet<String>();
-	private HashSet<String> toolbarContributionGroupIds = new HashSet<String>();
+	private HashSet<String> menuContributionGroupIds = new HashSet<>();
+	private HashSet<String> toolbarContributionGroupIds = new HashSet<>();
 	private String id;
 
 	public String getId() {
@@ -122,7 +123,7 @@ public class ActionSet {
 	}
 
 	private Set<String> actionSetPartAssociations(String actionSetId) {
-		HashSet<String> result = new HashSet<String>();
+		HashSet<String> result = new HashSet<>();
 		final IExtensionRegistry registry = Platform.getExtensionRegistry();
 		final IConfigurationElement[] associations = registry
 				.getConfigurationElementsFor(PlatformUI.PLUGIN_ID + '.'

@@ -35,12 +35,12 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * A CopyProjectOperation represents an undoable operation for copying a
  * project, also specifying the location of its contents. Clients may call the
  * public API from a background thread.
- * 
+ *
  * <p>
  * This class is intended to be instantiated and used by clients. It is not
  * intended to be subclassed by clients.
  * </p>
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  * @since 3.3
  */
@@ -55,7 +55,7 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	/**
 	 * Create a CopyProjectOperation that copies the specified project and sets
 	 * its location to the specified location.
-	 * 
+	 *
 	 * @param project
 	 *            the project to be copied
 	 * @param name
@@ -92,12 +92,8 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Checks that the specified project location is valid in addition to
 	 * superclass checks.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#computeMoveOrCopyStatus()
 	 */
 	@Override
 	protected IStatus computeMoveOrCopyStatus() {
@@ -117,12 +113,7 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map execute to copying the project
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
@@ -134,12 +125,7 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * Map undo to deleting the project we just copied.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
@@ -152,35 +138,17 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 		setResourceDescriptions(new ResourceDescription[0]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#isDestinationPathValid(org.eclipse.core.resources.IResource,
-	 *      int)
-	 */
 	@Override
 	protected boolean isDestinationPathValid(IResource resource, int index) {
 		// path has already been validated in #computeMoveOrCopyStatus()
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractCopyOrMoveResourcesOperation#getProposedName(org.eclipse.core.resources.IResource,
-	 *      int)
-	 */
 	@Override
 	protected String getProposedName(IResource resource, int index) {
 		return destination.lastSegment();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
-	 *      int)
-	 */
 	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
@@ -199,12 +167,8 @@ public class CopyProjectOperation extends AbstractCopyOrMoveResourcesOperation {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * 
 	 * This implementation computes the ability to delete the original copy and
 	 * restore any overwritten resources.
-	 * 
-	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {

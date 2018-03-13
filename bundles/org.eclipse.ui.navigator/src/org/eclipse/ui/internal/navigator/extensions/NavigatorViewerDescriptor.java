@@ -27,15 +27,15 @@ import org.eclipse.ui.navigator.NavigatorActionService;
 /**
  * Encapsulates the <code>org.eclipse.ui.navigator.viewer</code> extension.
  * <p>
- * 
+ *
  * @since 3.2
  */
 public final class NavigatorViewerDescriptor implements
 		INavigatorViewerDescriptor {
-	
+
 
 	/**
-	 * {@value} (boolean): True indicates the ITreeContentProvider.hasChildren() 
+	 * {@value} (boolean): True indicates the ITreeContentProvider.hasChildren()
 	 * should force plugins to load if necessary <b>false</b>).
 	 */
 	public static final String PROP_ENFORCE_HAS_CHILDREN = "org.eclipse.ui.navigator.enforceHasChildren"; //$NON-NLS-1$
@@ -50,7 +50,7 @@ public final class NavigatorViewerDescriptor implements
 
 	private static final String TAG_CONTENT_EXTENSION = "contentExtension"; //$NON-NLS-1$
 
-	private static final String TAG_ACTION_EXTENSION = "actionExtension"; //$NON-NLS-1$ 
+	private static final String TAG_ACTION_EXTENSION = "actionExtension"; //$NON-NLS-1$
 
 	private final String viewerId;
 
@@ -65,16 +65,16 @@ public final class NavigatorViewerDescriptor implements
 	private boolean allowsPlatformContributions = true;
 
 	private String inheritBindingsFromViewer;
-	
+
 	private String helpContext;
-	
+
 	private final Properties properties = new Properties();
 
-	private Set dragAssistants; 
+	private Set dragAssistants;
 
 	/**
 	 * Creates a new content descriptor from a configuration element.
-	 * 
+	 *
 	 * @param aViewerId
 	 *            The identifier for this descriptor.
 	 */
@@ -83,21 +83,11 @@ public final class NavigatorViewerDescriptor implements
 		this.viewerId = aViewerId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#getViewerId()
-	 */
 	@Override
 	public String getViewerId() {
 		return viewerId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#getPopupMenuId()
-	 */
 	@Override
 	public String getPopupMenuId() {
 		return popupMenuId != null ? popupMenuId : viewerId;
@@ -105,7 +95,7 @@ public final class NavigatorViewerDescriptor implements
 
 	/**
 	 * Consume an action binding for this viewer.
-	 * 
+	 *
 	 * @param element
 	 *            The IConfigurationElement containing a viewerActionBinding
 	 *            element.
@@ -116,7 +106,7 @@ public final class NavigatorViewerDescriptor implements
 
 	/**
 	 * Consume a content binding for this viewer.
-	 * 
+	 *
 	 * @param element
 	 *            The IConfigurationElement containing a viewerContentBinding
 	 *            element.
@@ -156,7 +146,7 @@ public final class NavigatorViewerDescriptor implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @param newCustomInsertionPoints
 	 *            The set of custom insertion points, if any. A null list
 	 *            indicates the default set (as defined by
@@ -176,7 +166,7 @@ public final class NavigatorViewerDescriptor implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @param toAllowPlatformContributions
 	 *            A value of 'true' enables object/viewer contributions. 'false'
 	 *            will only allow programmatic contributions from
@@ -193,14 +183,14 @@ public final class NavigatorViewerDescriptor implements
 	public String getInheritBindingsFromViewer() {
 		return inheritBindingsFromViewer;
 	}
-	
+
 	/**
 	 * @param inherit
 	 */
 	public void setInheritBindingsFromViewer(String inherit) {
 		inheritBindingsFromViewer = inherit;
 	}
-	
+
 	/**
 	 * @return the help context associated with this viewer
 	 */
@@ -216,59 +206,49 @@ public final class NavigatorViewerDescriptor implements
 	public void setHelpContext(String context) {
 		helpContext = context;
 	}
-	
+
 	/**
 	 * @param binding
 	 */
 	public void setContentBinding(Binding binding) {
 		contentBinding = binding;
 	}
-	
+
 	/**
 	 * @return the content Binding
 	 */
 	public Binding getContentBinding() {
 		return contentBinding;
 	}
-	
+
 	/**
 	 * @param binding
 	 */
 	public void setActionBinding(Binding binding) {
 		actionBinding = binding;
 	}
-	
+
 	/**
 	 * @return the action Binding
 	 */
 	public Binding getActionBinding() {
 		return actionBinding;
 	}
-	
+
 	/**
 	 * @param assistants
 	 */
 	public void setDragAssistants(Set assistants) {
 		dragAssistants = assistants;
 	}
-	
 
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorViewerDescriptor#getStringConfigProperty(java.lang.String)
-	 */
+
+
 	@Override
 	public String getStringConfigProperty(String aPropertyName) {
 		return properties.getProperty(aPropertyName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.navigator.INavigatorViewerDescriptor#getBooleanConfigProperty(java.lang.String)
-	 */
 	@Override
 	public boolean getBooleanConfigProperty(String aPropertyName) {
 		String propValue = properties.getProperty(aPropertyName);
@@ -277,17 +257,12 @@ public final class NavigatorViewerDescriptor implements
 		}
 		return Boolean.valueOf(propValue).booleanValue();
 	}
-	 
+
 
 	/* package */ void setProperty(String aPropertyName, String aPropertyValue) {
 		properties.setProperty(aPropertyName, aPropertyValue);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "ViewerDescriptor[" + viewerId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -296,7 +271,7 @@ public final class NavigatorViewerDescriptor implements
 	/**
 	 * Update the popupMenuId. If a value is already set, then a warning message
 	 * will be logged.
-	 * 
+	 *
 	 * @param newPopupMenuId
 	 *            The new popup menu id.
 	 */
@@ -329,7 +304,7 @@ public final class NavigatorViewerDescriptor implements
 	}
 
 	/**
-	 * 
+	 *
 	 * @return The set of {@link CommonDragAssistantDescriptor}s for this
 	 *         viewer.
 	 */
@@ -382,7 +357,7 @@ public final class NavigatorViewerDescriptor implements
 					null);
 		}
 	}
-	
+
 	void updateFromParent(NavigatorViewerDescriptor parent) {
 		getActionBinding().addBinding(parent.getActionBinding());
 		getContentBinding().addBinding(parent.getContentBinding());

@@ -31,7 +31,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.103
- * 
+ *
  */
 public class CommandExecutionTest extends UITestCase {
 	static class Pair {
@@ -43,11 +43,6 @@ public class CommandExecutionTest extends UITestCase {
 		String key;
 		Object result;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
-		 */
 		@Override
 		public String toString() {
 			return "(" + key + ",\n\t" + result + ")";
@@ -157,7 +152,7 @@ public class CommandExecutionTest extends UITestCase {
 				"HandlerUtil.getActiveWorkbenchWindow() returned null during ICommandListener.preExecute().",
 				listener.wbw);
 	}
-	
+
 	public void testCommandListenerExecute() throws Exception {
 		EL listener = new EL();
 		ICommandService cmdService = getWorkbench()
@@ -220,7 +215,7 @@ public class CommandExecutionTest extends UITestCase {
 		compare(calls, listener.methods);
 		verifyHandlerUtilAccessDuringPreExecute(listener);
 	}
-	
+
 	public void testCommandListenerExecuteRefresh() throws Exception {
 		EL listener = new EL();
 		ICommandService cmdService = getWorkbench()
@@ -287,7 +282,7 @@ public class CommandExecutionTest extends UITestCase {
 		compare(calls, listener.methods);
 		verifyHandlerUtilAccessDuringPreExecute(listener);
 	}
-	
+
 	public void testCommandListenerExecuteClosePart() throws Exception {
 		getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.showView(IPageLayout.ID_PROGRESS_VIEW);

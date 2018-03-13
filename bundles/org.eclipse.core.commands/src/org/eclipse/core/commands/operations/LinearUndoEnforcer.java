@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.Status;
  * the undo or redo of any operation that is not the latest available operation
  * in all of its undo contexts.  This class may be instantiated by clients.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class LinearUndoEnforcer extends LinearUndoViolationDetector {
@@ -36,6 +36,7 @@ public final class LinearUndoEnforcer extends LinearUndoViolationDetector {
 	 * is defined as a request to redo a particular operation even if it is not the most
 	 * recently added operation to the redo history.
 	 */
+	@Override
 	protected IStatus allowLinearRedoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 		return Status.CANCEL_STATUS;
@@ -46,6 +47,7 @@ public final class LinearUndoEnforcer extends LinearUndoViolationDetector {
 	 * is defined as a request to undo a particular operation even if it is not the most
 	 * recently added operation to the undo history.
 	 */
+	@Override
 	protected IStatus allowLinearUndoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 		return Status.CANCEL_STATUS;

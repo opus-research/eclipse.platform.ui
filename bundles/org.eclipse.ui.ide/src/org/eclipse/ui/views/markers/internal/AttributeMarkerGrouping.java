@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,12 +20,12 @@ import org.eclipse.core.runtime.IConfigurationElement;
 /**
  * AttributeMarkerGrouping is the configuration element for the
  * markerAttributeGrouping extension.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class AttributeMarkerGrouping {
-	
+
 	private static final String DEFAULT_GROUPING_ENTRY = "defaultGroupingEntry";//$NON-NLS-1$
 
 	private static final String MARKER_TYPE = "markerType";//$NON-NLS-1$
@@ -41,7 +41,7 @@ public class AttributeMarkerGrouping {
 	private IConfigurationElement element;
 
 	// A list of groups we are associated with for unloading
-	private Collection groups = new HashSet();
+	private Collection<MarkerGroup> groups = new HashSet<>();
 
 	/**
 	 * Create a new instance of the receiver from element.
@@ -57,7 +57,7 @@ public class AttributeMarkerGrouping {
 
 	/**
 	 * Return the id of the default grouping.
-	 * 
+	 *
 	 * @return String or <code>null</code> if it is not defined.
 	 */
 	public String getDefaultGroupingEntry() {
@@ -66,7 +66,7 @@ public class AttributeMarkerGrouping {
 
 	/**
 	 * Return the id of the marker type for this type.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getMarkerType() {
@@ -75,7 +75,7 @@ public class AttributeMarkerGrouping {
 
 	/**
 	 * Return the name of the attribute for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getAttribute() {
@@ -84,7 +84,7 @@ public class AttributeMarkerGrouping {
 
 	/**
 	 * Return the IConfigurationElement for the receiver.
-	 * 
+	 *
 	 * @return IConfigurationElement
 	 */
 	public IConfigurationElement getElement() {
@@ -93,24 +93,22 @@ public class AttributeMarkerGrouping {
 
 	/**
 	 * Add markerGroup to the list of referenced groups.
-	 * 
+	 *
 	 * @param markerGroup
 	 */
 	public void addGroup(MarkerGroup markerGroup) {
 		groups.add(markerGroup);
-
 	}
 
 	/**
 	 * Unmap the receiver from the groups
 	 */
 	public void unmap() {
-		Iterator referencedGroups = groups.iterator();
+		Iterator<MarkerGroup> referencedGroups = groups.iterator();
 		while (referencedGroups.hasNext()) {
-			MarkerGroup group = (MarkerGroup) referencedGroups.next();
+			MarkerGroup group = referencedGroups.next();
 			group.unmap(this);
 		}
-
 	}
 
 }

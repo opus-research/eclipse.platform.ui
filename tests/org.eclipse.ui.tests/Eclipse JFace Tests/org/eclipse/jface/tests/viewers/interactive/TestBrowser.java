@@ -87,9 +87,6 @@ public abstract class TestBrowser extends ApplicationWindow {
         addMenuBar();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -249,8 +246,9 @@ public abstract class TestBrowser extends ApplicationWindow {
 
     public void setInput(TestElement input) {
         fInput = input;
-        if (getViewer() != null)
-            getViewer().setInput(input);
+        if (getViewer() != null) {
+			getViewer().setInput(input);
+		}
     }
 
     public void show2Panes() {

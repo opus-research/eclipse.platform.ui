@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.core.internal.commands.util.Util;
  * category. The category has no functional effect, but may be used in graphical
  * tools that want to group the set of commands somehow.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class Category extends NamedHandleObject {
@@ -32,14 +32,14 @@ public final class Category extends NamedHandleObject {
 	 * A collection of objects listening to changes to this category. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private Collection categoryListeners;
+	private Collection<ICategoryListener> categoryListeners;
 
 	/**
 	 * Constructs a new instance of <code>Category</code> based on the given
 	 * identifier. When a category is first constructed, it is undefined.
 	 * Category should only be constructed by the <code>CommandManager</code>
 	 * to ensure that identifier remain unique.
-	 * 
+	 *
 	 * @param id
 	 *            The identifier for the category. This value must not be
 	 *            <code>null</code>, and must be unique amongst all
@@ -52,7 +52,7 @@ public final class Category extends NamedHandleObject {
 	/**
 	 * Adds a listener to this category that will be notified when this
 	 * category's state changes.
-	 * 
+	 *
 	 * @param categoryListener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
@@ -62,7 +62,7 @@ public final class Category extends NamedHandleObject {
 			throw new NullPointerException();
 		}
 		if (categoryListeners == null) {
-			categoryListeners = new ArrayList();
+			categoryListeners = new ArrayList<>();
 		}
 		if (!categoryListeners.contains(categoryListener)) {
 			categoryListeners.add(categoryListener);
@@ -77,7 +77,7 @@ public final class Category extends NamedHandleObject {
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 * 
+	 *
 	 * @param name
 	 *            The name of this command; must not be <code>null</code>.
 	 * @param description
@@ -85,8 +85,7 @@ public final class Category extends NamedHandleObject {
 	 */
 	public final void define(final String name, final String description) {
 		if (name == null) {
-			throw new NullPointerException(
-					"The name of a command cannot be null"); //$NON-NLS-1$
+			throw new NullPointerException("The name of a command cannot be null"); //$NON-NLS-1$
 		}
 
 		final boolean definedChanged = !this.defined;
@@ -95,17 +94,15 @@ public final class Category extends NamedHandleObject {
 		final boolean nameChanged = !Util.equals(this.name, name);
 		this.name = name;
 
-		final boolean descriptionChanged = !Util.equals(this.description,
-				description);
+		final boolean descriptionChanged = !Util.equals(this.description, description);
 		this.description = description;
 
-		fireCategoryChanged(new CategoryEvent(this, definedChanged,
-				descriptionChanged, nameChanged));
+		fireCategoryChanged(new CategoryEvent(this, definedChanged, descriptionChanged, nameChanged));
 	}
 
 	/**
 	 * Notifies the listeners for this category that it has changed in some way.
-	 * 
+	 *
 	 * @param categoryEvent
 	 *            The event to send to all of the listener; must not be
 	 *            <code>null</code>.
@@ -115,10 +112,9 @@ public final class Category extends NamedHandleObject {
 			throw new NullPointerException();
 		}
 		if (categoryListeners != null) {
-			final Iterator listenerItr = categoryListeners.iterator();
+			final Iterator<ICategoryListener> listenerItr = categoryListeners.iterator();
 			while (listenerItr.hasNext()) {
-				final ICategoryListener listener = (ICategoryListener) listenerItr
-						.next();
+				final ICategoryListener listener = listenerItr.next();
 				listener.categoryChanged(categoryEvent);
 			}
 		}
@@ -126,10 +122,10 @@ public final class Category extends NamedHandleObject {
 
 	/**
 	 * Removes a listener from this category.
-	 * 
+	 *
 	 * @param categoryListener
 	 *            The listener to be removed; must not be <code>null</code>.
-	 * 
+	 *
 	 */
 	public final void removeCategoryListener(
 			final ICategoryListener categoryListener) {
@@ -144,9 +140,10 @@ public final class Category extends NamedHandleObject {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.common.HandleObject#toString()
 	 */
+	@Override
 	public String toString() {
 		if (string == null) {
 			final StringBuffer stringBuffer = new StringBuffer();
@@ -166,9 +163,10 @@ public final class Category extends NamedHandleObject {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.common.HandleObject#undefine()
 	 */
+	@Override
 	public void undefine() {
 		string = null;
 
@@ -181,8 +179,7 @@ public final class Category extends NamedHandleObject {
 		final boolean descriptionChanged = description != null;
 		description = null;
 
-		fireCategoryChanged(new CategoryEvent(this, definedChanged,
-				descriptionChanged, nameChanged));
+		fireCategoryChanged(new CategoryEvent(this, definedChanged, descriptionChanged, nameChanged));
 	}
 
 }

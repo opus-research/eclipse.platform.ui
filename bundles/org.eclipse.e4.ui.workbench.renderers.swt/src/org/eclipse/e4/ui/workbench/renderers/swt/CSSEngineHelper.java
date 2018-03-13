@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -22,15 +22,15 @@ import org.w3c.dom.css.CSSValue;
  * used by renderers.
  */
 public class CSSEngineHelper {
-	IEclipseContext context;
-	Control control;
-	IStylingEngine engine;
-	CSSStyleDeclaration style;
+	private IEclipseContext context;
+	private Control control;
+	private IStylingEngine engine;
+	private CSSStyleDeclaration style;
 
 	/**
 	 * Create a CSSEngineHelper that can retrieve engine values for a particular
 	 * control.
-	 * 
+	 *
 	 * @param context
 	 * @param control
 	 */
@@ -50,7 +50,7 @@ public class CSSEngineHelper {
 	/**
 	 * Return the margin bottom as specified in the stylesheet for this control,
 	 * or the defaultValue if none is specified.
-	 * 
+	 *
 	 * @param defaultValue
 	 * @return the margin in pixels
 	 */
@@ -64,7 +64,7 @@ public class CSSEngineHelper {
 	/**
 	 * Return the margin top as specified in the stylesheet for this control, or
 	 * the defaultValue if none is specified.
-	 * 
+	 *
 	 * @param defaultValue
 	 * @return the margin in pixels
 	 */
@@ -77,7 +77,7 @@ public class CSSEngineHelper {
 	/**
 	 * Return the margin left as specified in the stylesheet for this control,
 	 * or the defaultValue if none is specified.
-	 * 
+	 *
 	 * @param defaultValue
 	 * @return the margin in pixels
 	 */
@@ -91,7 +91,7 @@ public class CSSEngineHelper {
 	/**
 	 * Return the margin right as specified in the stylesheet for this control,
 	 * or the defaultValue if none is specified.
-	 * 
+	 *
 	 * @param defaultValue
 	 * @return the margin in pixels
 	 */
