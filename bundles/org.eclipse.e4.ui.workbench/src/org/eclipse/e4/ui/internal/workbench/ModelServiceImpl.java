@@ -102,8 +102,7 @@ public class ModelServiceImpl implements EModelService {
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
-		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
-				appContext.get(IExtensionRegistry.class));
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
 	}
 
 	/**
@@ -336,10 +335,6 @@ public class ModelServiceImpl implements EModelService {
 				snippetContainer.getSnippets().remove(snippet);
 			snippetContainer.getSnippets().add(clone);
 		}
-
-		// Cache the original element in the clone's transientData
-		clone.getTransientData().put(CLONED_FROM_KEY, element);
-
 		return clone;
 	}
 
