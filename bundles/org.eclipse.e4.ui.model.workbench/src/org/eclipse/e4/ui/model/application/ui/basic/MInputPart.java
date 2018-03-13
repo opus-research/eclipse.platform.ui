@@ -25,7 +25,6 @@ import org.eclipse.e4.ui.model.application.ui.MInput;
  * </p>
  * @since 1.0
  * @deprecated Use Part instead.
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  *
