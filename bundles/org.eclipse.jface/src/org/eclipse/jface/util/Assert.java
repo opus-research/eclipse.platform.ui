@@ -29,7 +29,6 @@ package org.eclipse.jface.util;
  * @deprecated As of 3.3, replaced by {@link org.eclipse.core.runtime.Assert}
  * </p>
  */
-@Deprecated
 public final class Assert {
 
     /**

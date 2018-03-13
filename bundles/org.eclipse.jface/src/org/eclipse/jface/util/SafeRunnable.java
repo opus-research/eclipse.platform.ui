@@ -76,7 +76,6 @@ public abstract class SafeRunnable implements ISafeRunnable {
 	 * @return true if errors should be ignored
 	 * @deprecated use getIgnoreErrors()
 	 */
-	@Deprecated
 	public static boolean getIgnoreErrors(boolean flag) {
 		return ignoreErrors;
 	}

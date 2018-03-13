@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,8 +67,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @deprecated use newCheckList(Composite, int) or new CheckboxTableViewer(Table)
      *   instead (see below for details)
      */
-    @Deprecated
-	public CheckboxTableViewer(Composite parent) {
+    public CheckboxTableViewer(Composite parent) {
         this(parent, SWT.BORDER);
     }
 
@@ -103,8 +102,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @deprecated use newCheckList(Composite, int) or new CheckboxTableViewer(Table) 
      *   instead (see above for details)
      */
-    @Deprecated
-	public CheckboxTableViewer(Composite parent, int style) {
+    public CheckboxTableViewer(Composite parent, int style) {
         this(createTable(parent, style));
     }
 

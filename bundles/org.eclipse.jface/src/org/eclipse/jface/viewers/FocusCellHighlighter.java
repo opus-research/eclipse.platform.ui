@@ -55,7 +55,6 @@ public abstract class FocusCellHighlighter {
 	 *            the new focus cell
 	 * @deprecated use {@link #focusCellChanged(ViewerCell, ViewerCell)} instead
 	 */
-	@Deprecated
 	protected void focusCellChanged(ViewerCell cell) {
 	}
 
