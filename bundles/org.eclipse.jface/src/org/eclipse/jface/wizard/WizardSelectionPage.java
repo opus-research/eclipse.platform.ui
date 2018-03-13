@@ -36,7 +36,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * List of wizard nodes that have cropped up in the past
      * (element type: <code>IWizardNode</code>).
      */
-    private List<IWizardNode> selectedWizardNodes = new ArrayList<IWizardNode>();
+    private List selectedWizardNodes = new ArrayList();
 
     /**
      * Creates a new wizard selection page with the given name, and
@@ -87,7 +87,7 @@ public abstract class WizardSelectionPage extends WizardPage {
         super.dispose();
         // notify nested wizards
         for (int i = 0; i < selectedWizardNodes.size(); i++) {
-            selectedWizardNodes.get(i).dispose();
+            ((IWizardNode) selectedWizardNodes.get(i)).dispose();
         }
     }
 
