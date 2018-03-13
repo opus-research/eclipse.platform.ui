@@ -264,12 +264,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	 * @see org.eclipse.jface.action.IContributionManager#find(java.lang.String)
 	 */
 	public IContributionItem find(String id) {
-		List<MToolBar> toolbars = modelService.findElements(window, id, MToolBar.class, null);
-		if (toolbars.isEmpty()) {
+		MTrimElement el = (MTrimElement) modelService.find(id, window);
+		if (el == null || !(el instanceof MToolBar))
 			return null;
-		}
 
-		final MToolBar model = toolbars.get(0);
+		final MToolBar model = (MToolBar) el;
 		if (model.getTransientData().get(OBJECT) != null) {
 			return (IContributionItem) model.getTransientData().get(OBJECT);
 		}
