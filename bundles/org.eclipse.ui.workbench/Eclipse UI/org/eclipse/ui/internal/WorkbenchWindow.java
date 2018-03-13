@@ -112,8 +112,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
@@ -124,6 +122,7 @@ import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
@@ -532,7 +531,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
 					if (workbenchPart instanceof ISaveablePart) {
 						ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-						return page.saveSaveable(saveablePart, workbenchPart, confirm, true);
+						return page.saveSaveable(saveablePart, workbenchPart, confirm, false);
 					}
 				}
 				return super.save(dirtyPart, confirm);
@@ -569,13 +568,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 		cs.getActiveContextIds();
 
+		configureShell(getShell(), windowContext);
 
 		initializeDefaultServices();
 
 		// register with the tracker
 
 		fireWindowOpening();
-		configureShell(getShell(), windowContext);
 
 		try {
 			page = new WorkbenchPage(this, input);
@@ -592,23 +591,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		// Fill the action bars
 		fillActionBars(FILL_ALL_ACTION_BARS);
 		firePageOpened();
-
-		List<MPerspectiveStack> ps = modelService.findElements(model, null,
-				MPerspectiveStack.class, null);
-		MPerspective curPersp = null;
-		boolean newWindow = true;
-		if (ps.size() > 0) {
-			MPerspectiveStack stack = ps.get(0);
-			if (stack.getSelectedElement() != null) {
-				curPersp = stack.getSelectedElement();
-				IPerspectiveDescriptor thePersp = getWorkbench().getPerspectiveRegistry()
-						.findPerspectiveWithId(curPersp.getElementId());
-				if (thePersp != null) {
-					perspective = thePersp;
-					newWindow = false;
-				}
-			}
-		}
 
 		populateTopTrimContributions();
 		populateBottomTrimContributions();
@@ -672,8 +654,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, windowWidgetHandler);
 
+		boolean newWindow = setupPerspectiveStack(windowContext);
 		page.setPerspective(perspective);
 		firePageActivated();
+
 		if (newWindow) {
 			page.fireInitialPartVisibilityEvents();
 		} else {
@@ -713,17 +697,37 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		IContextService contextService = context.get(IContextService.class);
 		contextService.registerShell(shell, IContextService.TYPE_WINDOW);
-		if (model.getContext().get(E4Workbench.NO_SAVED_MODEL_FOUND) != null) {
-			Point initialSize = getWindowConfigurer().getInitialSize();
-			Rectangle bounds = shell.getBounds();
-			// actually set the shell size, so that setting the
-			// menuBar on the shell doesn't override the model changes.
-			bounds.width = initialSize.x;
-			bounds.height = initialSize.y;
-			shell.setBounds(bounds);
-		}
 	}
 	
+	private boolean setupPerspectiveStack(IEclipseContext context) {
+		IPerspectiveRegistry registry = getWorkbench().getPerspectiveRegistry();
+		String forcedPerspectiveId = (String) context.get(E4Workbench.FORCED_PERSPECTIVE_ID);
+
+		if (forcedPerspectiveId != null) {
+			perspective = registry.findPerspectiveWithId(forcedPerspectiveId);
+		}
+
+		List<MPerspectiveStack> perspStackList = modelService.findElements(model, null,
+				MPerspectiveStack.class, null);
+		MPerspective selectedPersp = null;
+
+		if (!perspStackList.isEmpty()) {
+			selectedPersp = perspStackList.get(0).getSelectedElement();
+		}
+
+		if (forcedPerspectiveId == null && selectedPersp != null) {
+			perspective = registry.findPerspectiveWithId(selectedPersp.getElementId());
+		}
+
+		if (perspective == null) {
+			perspective = registry.findPerspectiveWithId(registry.getDefaultPerspective());
+		}
+
+		// the perspective stack doesn't have a selected element what means that
+		// we have a new window
+		return selectedPersp == null;
+	}
+
 	private boolean manageChanges = true;
 	private boolean canUpdateMenus = true;
 

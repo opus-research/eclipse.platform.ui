@@ -172,11 +172,7 @@ public class KeyAssistDialog extends PopupDialog {
 			completionsTable = null;
 		}
 		matches = null;
-		boolean popupClosed = super.close();
-		if (resetState) {
-			workbenchKeyboard.resetState();
-		}
-		return popupClosed;
+		return super.close();
 	}
 
 	/**
@@ -368,7 +364,6 @@ public class KeyAssistDialog extends PopupDialog {
 		int selectionIndex = completionsTable.getSelectionIndex();
 		// Try to execute the corresponding command.
 		if (selectionIndex >= 0) {
-			close();
 			Binding binding = bindings.get(selectionIndex);
 			try {
 				// workbenchKeyboard.updateShellKludge(null);
