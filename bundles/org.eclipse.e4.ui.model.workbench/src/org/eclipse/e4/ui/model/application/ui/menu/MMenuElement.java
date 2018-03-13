@@ -20,7 +20,10 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the bsae type for both menu items and Separators.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->
@@ -43,8 +46,10 @@ public interface MMenuElement extends MUIElement, MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is the character that is interpreted by the platform to allow for easier navigation
-	 * through menus.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Mnemonics</em>' attribute.
@@ -69,7 +74,10 @@ public interface MMenuElement extends MUIElement, MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is a method that will return the translated mnemonic for this element.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @model kind="operation"

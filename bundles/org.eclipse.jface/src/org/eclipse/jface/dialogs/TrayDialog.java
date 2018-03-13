@@ -68,7 +68,6 @@ public abstract class TrayDialog extends Dialog {
 			this.shell = shell;
 		}
 
-		@Override
 		public void controlResized (ControlEvent event) {
 				int newWidth = shell.getSize().x;
 				if (newWidth != shellWidth) {					
@@ -211,7 +210,6 @@ public abstract class TrayDialog extends Dialog {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
 	 */
-	@Override
 	protected void handleShellCloseEvent() {
 		/*
 		 * Close the tray to ensure that those dialogs that remember their
@@ -227,7 +225,6 @@ public abstract class TrayDialog extends Dialog {
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
      */
-	@Override
 	protected Control createButtonBar(Composite parent) {
     	Composite composite = new Composite(parent, SWT.NONE);
     	GridLayout layout = new GridLayout();
@@ -288,8 +285,7 @@ public abstract class TrayDialog extends Dialog {
 		fHelpButton.setImage(image);
 		fHelpButton.setToolTipText(JFaceResources.getString("helpToolTip")); //$NON-NLS-1$
 		fHelpButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
@@ -307,8 +303,7 @@ public abstract class TrayDialog extends Dialog {
 		link.setText("<a>"+IDialogConstants.HELP_LABEL+"</a>"); //$NON-NLS-1$ //$NON-NLS-2$
 		link.setToolTipText(IDialogConstants.HELP_LABEL);
 		link.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
 				helpPressed();
             }
         });
@@ -352,7 +347,6 @@ public abstract class TrayDialog extends Dialog {
 	 * @see org.eclipse.jface.window.Window#getLayout()
 	 * @return a newly created layout or <code>null</code> for no layout
 	 */
-	@Override
 	protected Layout getLayout() {
 		GridLayout layout = (GridLayout)super.getLayout();
 		layout.numColumns = 5;

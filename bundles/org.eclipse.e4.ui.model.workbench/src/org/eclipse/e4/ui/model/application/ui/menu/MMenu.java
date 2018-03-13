@@ -19,7 +19,10 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is a concrete class used to represent a menu in the UI Model.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->
@@ -42,7 +45,10 @@ public interface MMenu extends MMenuElement, MElementContainer<MMenuElement> {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This field determines whether the associated menu is enabled or not.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Enabled</em>' attribute.

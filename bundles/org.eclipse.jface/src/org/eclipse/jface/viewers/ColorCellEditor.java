@@ -73,8 +73,7 @@ public class ColorCellEditor extends DialogCellEditor {
      * Internal class for laying out this cell editor.
      */
     private class ColorCellLayout extends Layout {
-        @Override
-		public Point computeSize(Composite editor, int wHint, int hHint,
+        public Point computeSize(Composite editor, int wHint, int hHint,
                 boolean force) {
             if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 				return new Point(wHint, hHint);
@@ -87,8 +86,7 @@ public class ColorCellEditor extends DialogCellEditor {
                     colorSize.y, rgbSize.y));
         }
 
-        @Override
-		public void layout(Composite editor, boolean force) {
+        public void layout(Composite editor, boolean force) {
             Rectangle bounds = editor.getClientArea();
             Point colorSize = colorLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT,
                     force);
@@ -187,8 +185,7 @@ public class ColorCellEditor extends DialogCellEditor {
     /* (non-Javadoc)
      * Method declared on DialogCellEditor.
      */
-    @Override
-	protected Control createContents(Composite cell) {
+    protected Control createContents(Composite cell) {
         Color bg = cell.getBackground();
         composite = new Composite(cell, getStyle());
         composite.setBackground(bg);
@@ -204,8 +201,7 @@ public class ColorCellEditor extends DialogCellEditor {
     /* (non-Javadoc)
      * Method declared on CellEditor.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (image != null) {
             image.dispose();
             image = null;
@@ -216,8 +212,7 @@ public class ColorCellEditor extends DialogCellEditor {
     /* (non-Javadoc)
      * Method declared on DialogCellEditor.
      */
-    @Override
-	protected Object openDialogBox(Control cellEditorWindow) {
+    protected Object openDialogBox(Control cellEditorWindow) {
         ColorDialog dialog = new ColorDialog(cellEditorWindow.getShell());
         Object value = getValue();
         if (value != null) {
@@ -230,8 +225,7 @@ public class ColorCellEditor extends DialogCellEditor {
     /* (non-Javadoc)
      * Method declared on DialogCellEditor.
      */
-    @Override
-	protected void updateContents(Object value) {
+    protected void updateContents(Object value) {
         RGB rgb = (RGB) value;
         // XXX: We don't have a value the first time this method is called".
         if (rgb == null) {

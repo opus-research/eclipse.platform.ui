@@ -71,7 +71,6 @@ abstract class AbstractComboBoxCellEditor extends CellEditor {
 	 *
 	 * @see org.eclipse.jface.viewers.CellEditor#activate(org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent)
 	 */
-	@Override
 	public void activate(ColumnViewerEditorActivationEvent activationEvent) {
 		super.activate(activationEvent);
 		if (activationStyle != SWT.NONE) {
