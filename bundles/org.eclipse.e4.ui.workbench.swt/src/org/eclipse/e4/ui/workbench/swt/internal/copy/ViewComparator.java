@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementati
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -36,7 +35,6 @@ public class ViewComparator extends ViewerComparator {
 	 * Returns a negative, zero, or positive number depending on whether the
 	 * first element is less than, equal to, or greater than the second element.
 	 */
-	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		// place "General" category first
 		if (WorkbenchSWTMessages.ICategory_general.equals(e1))

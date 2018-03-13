@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -82,7 +81,7 @@ public class ShellActivationListener implements Listener {
 	private void processWindow(Event event, Shell shell, MWindow window) {
 		switch (event.type) {
 		case SWT.Activate:
-			final IEclipseContext local = window.getContext();
+			final IEclipseContext local = ((MWindow) window).getContext();
 			WorkbenchSWTActivator.trace("/trace/workbench",
 					"setting mwindow context " + local, null);
 			// record this shell's context
@@ -130,38 +129,14 @@ public class ShellActivationListener implements Listener {
 	}
 
 	private void deactivate(Shell shell) {
-		Shell parent = shell.isDisposed() ? null : (Shell) shell.getParent();
-		if (parent == null) {
-			// no parent shell, clear the chain to reflect reality, if there are
-			// other shells, the chain will be reconstructed on activation
-			IEclipseContext currentlyActive = application.getContext()
-					.getActiveChild();
-			if (currentlyActive != null)
-				currentlyActive.deactivate();
-			return;
-		}
-		final IEclipseContext prevChild = (IEclipseContext) parent
-				.getData(ECLIPSE_CONTEXT_SHELL_CONTEXT);
-		final IEclipseContext parentContext = application.getContext();
-		SafeRunner.run(new ISafeRunnable() {
-			public void run() throws Exception {
-				if (prevChild == null) {
-					IEclipseContext activeChild = parentContext
-							.getActiveChild();
-					if (activeChild != null) {
-						activeChild.deactivate();
-					}
-				} else {
-					// Bug 412001. Don't do this!
-					// prevChild.activate();
-				}
-			}
-
-			public void handleException(Throwable exception) {
-				WorkbenchSWTActivator.trace("/trace/workbench",
-						"failed resetting previous child", exception);
-			}
-		});
+		// bug 412001. Cannot assume anything about a non-modelled Shell's
+		// deactivation. It could be:
+		// * some other application got activated
+		// * some dialog we cannot see (IE's Find dialog in 412001) get's
+		// activated
+		// * another unmodelled shell is about to be activated
+		// * a modelled shell is about to be activated.
+		// No matter what, the time to do things is on activation
 
 	}
 

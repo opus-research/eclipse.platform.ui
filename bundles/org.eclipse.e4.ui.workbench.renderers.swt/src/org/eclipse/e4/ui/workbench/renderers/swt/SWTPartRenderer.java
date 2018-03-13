@@ -247,10 +247,10 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
 		Image adornedImage = image;
 		if (element.getTags().contains(IPresentationEngine.ADORNMENT_PIN)) {
-			// adornedImage = resUtils.adornImage(image, pinImage);
-			// if (adornedImage != image)
-			// element.getTransientData().put(
-			//						"previouslyAdorned", adornedImage); //$NON-NLS-1$
+			adornedImage = resUtils.adornImage(image, pinImage);
+			if (adornedImage != image)
+				element.getTransientData().put(
+						"previouslyAdorned", adornedImage); //$NON-NLS-1$
 		}
 
 		return adornedImage;

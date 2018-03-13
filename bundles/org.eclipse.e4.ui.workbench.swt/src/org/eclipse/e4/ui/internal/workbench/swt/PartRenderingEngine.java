@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementatio
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
+ *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -55,6 +54,7 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -545,7 +545,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 			if (currentWidget instanceof Control) {
 				Control control = (Control) currentWidget;
 				// make sure the control is visible
-				if (!(element instanceof MPlaceholder))
+				MUIElement elementParent = element.getParent();
+				if (!(element instanceof MPlaceholder)
+						|| !(elementParent instanceof MPartStack))
 					control.setVisible(true);
 
 				if (parentWidget instanceof Composite) {
@@ -628,6 +630,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 					lclContext.set(key, props.get(key));
 				}
 			}
+		}
+
+		// We check the widget again since it could be created by some UI event.
+		// See Bug 417399
+		if (element.getWidget() != null) {
+			return safeCreateGui(element, parentWidget, parentContext);
 		}
 
 		// Create a control appropriate to the part
@@ -927,7 +935,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 	}
 
 	private void clearContext(MContext contextME) {
-		MContext ctxt = contextME;
+		MContext ctxt = (MContext) contextME;
 		IEclipseContext lclContext = ctxt.getContext();
 		if (lclContext != null) {
 			IEclipseContext parentContext = lclContext.getParent();
@@ -1005,8 +1013,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 						new ResourceUtility());
 
 				// set up the keybinding manager
-				KeyBindingDispatcher dispatcher = ContextInjectionFactory.make(
-						KeyBindingDispatcher.class, runContext);
+				KeyBindingDispatcher dispatcher = (KeyBindingDispatcher) ContextInjectionFactory
+						.make(KeyBindingDispatcher.class, runContext);
 				runContext.set(KeyBindingDispatcher.class.getName(), dispatcher);
 				keyListener = dispatcher.getKeyDownFilter();
 				display.addFilter(SWT.KeyDown, keyListener);
@@ -1320,14 +1328,17 @@ public class PartRenderingEngine implements IPresentationEngine {
 				stream = url.openStream();
 				engine.parseStyleSheet(stream);
 			} catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				if (stream != null) {
 					try {
 						stream.close();
 					} catch (IOException e) {
+						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -1340,6 +1351,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					s.reskin(SWT.ALL);
 					engine.applyStyles(s, true);
 				} catch (Exception e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
 					s.setRedraw(true);

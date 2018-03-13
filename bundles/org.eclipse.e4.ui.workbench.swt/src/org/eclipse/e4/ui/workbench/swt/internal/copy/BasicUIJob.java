@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -44,7 +43,6 @@ public abstract class BasicUIJob extends Job {
 	 *      Note: this message is marked final. Implementors should use
 	 *      runInUIThread() instead.
 	 */
-	@Override
 	public final IStatus run(final IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
