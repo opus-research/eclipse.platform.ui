@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.2.1.qualifier"
+      version="1.1.2.qualifier"
       provider-name="%providerName"
       image="eclipse_update_120.jpg"
       license-feature="org.eclipse.license"
@@ -141,7 +141,7 @@
          id="javax.annotation"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="1.0.0.qualifier"
          unpack="false"/>
 
    <plugin
@@ -489,10 +489,10 @@
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.gtk.hpux.ia64"
+         id="org.eclipse.equinox.launcher.gtk.hpux.ia64_32"
          os="hpux"
          ws="gtk"
-         arch="ia64"
+         arch="ia64_32"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -691,10 +691,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.gtk.hpux.ia64"
+         id="org.eclipse.swt.gtk.hpux.ia64_32"
          os="hpux"
          ws="gtk"
-         arch="ia64"
+         arch="ia64_32"
          download-size="0"
          install-size="0"
          version="0.0.0"
