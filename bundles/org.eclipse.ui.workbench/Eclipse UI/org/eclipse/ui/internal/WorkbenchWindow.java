@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Zhongwei Zhao - Bug 379495 - Two "Run" on top menu
+ *     Patrick Chuong - Bug 391481 - Contributing perspectiveExtension, hiddenMenuItem 
+ *     								 removes a menu from multiple perspectives
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -86,6 +88,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.StatusLineManager;
+import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.internal.provisional.action.CoolBarManager2;
@@ -172,7 +175,6 @@ import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IEvaluationService;
 import org.eclipse.ui.services.IServiceScopes;
 import org.eclipse.ui.views.IViewDescriptor;
-import org.eclipse.ui.views.IViewRegistry;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -1158,7 +1160,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		// Setup internal flags to indicate window is in
 		// progress of closing and no update should be done.
-		closing = true;
 		updateDisabled = true;
 
 		try {
@@ -1183,6 +1184,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				windowClosed = workbench.close();
 			} else {
 				if (okToClose()) {
+					closing = true;
 					windowClosed = hardClose(remove);
 				}
 			}
@@ -1275,9 +1277,31 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
+	 * Mark contributions dirty for future update.
+	 */
+	private void allowUpdates(IMenuManager menuManager) {
+		menuManager.markDirty();
+		final IContributionItem[] items = menuManager.getItems();
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] instanceof IMenuManager) {
+				allowUpdates((IMenuManager) items[i]);
+			} else if (items[i] instanceof SubContributionItem) {
+				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
+				if (innerItem instanceof IMenuManager) {
+					allowUpdates((IMenuManager) innerItem);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Fires perspective activated
 	 */
 	void firePerspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		IMenuManager windowManager = ((WorkbenchPage) page).getActionBars().getMenuManager();
+		allowUpdates(windowManager);
+		windowManager.update(false);
+
 		UIListenerLogging.logPerspectiveEvent(this, page, perspective,
 				UIListenerLogging.PLE_PERSP_ACTIVATED);
 		perspectiveListeners.firePerspectiveActivated(page, perspective);
@@ -1431,43 +1455,46 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return PlatformUI.getWorkbench();
 	}
 
-	private void hideNonRestorablePlaceholder(MPlaceholder placeholder) {
-		MElementContainer<MUIElement> parent = placeholder.getParent();
-		// if this placeholder is currently the selected element, its parent
-		// needs to select something else
-		if (parent.getSelectedElement() == placeholder) {
-			// if nothing found just set it to null
-			MUIElement candidate = null;
-			// search for a valid candidate from the list of children
-			for (MUIElement element : parent.getChildren()) {
-				if (element.isVisible() && element.isToBeRendered() && element != placeholder) {
-					candidate = element;
-					break;
+	private void hideNonRestorableViews() {
+		List<MPart> sharedPartsToRemove = new ArrayList<MPart>();
+		List<MPlaceholder> phList = modelService
+				.findElements(model, null, MPlaceholder.class, null);
+		for (MPlaceholder ph : phList) {
+			if (!(ph.getRef() instanceof MPart))
+				continue;
+
+			String partId = ph.getElementId();
+
+			// If the id contains a ':' use the part before it as the
+			// descriptor id
+			int colonIndex = partId.indexOf(':');
+			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
+			String secondaryId = colonIndex == -1 ? null : partId.substring(colonIndex + 1);
+			IViewDescriptor regEntry = ((Workbench) workbench).getViewRegistry().find(descId);
+			if (regEntry != null && !regEntry.isRestorable() && !("*".equals(secondaryId))) { //$NON-NLS-1$
+				MElementContainer<MUIElement> phParent = ph.getParent();
+				if (colonIndex != -1) {
+					// if it's a multi-instance part remove it (and its MPart)
+					if (!sharedPartsToRemove.contains(ph.getRef()))
+						sharedPartsToRemove.add((MPart) ph.getRef());
+					ph.getParent().getChildren().remove(ph);
+				} else if (ph.isToBeRendered()) {
+					// just hide it (so we remember where to open it again
+					ph.setToBeRendered(false);
+				}
+
+				// We need to do our own cleanup here...
+				int vc = modelService.countRenderableChildren(phParent);
+				if (vc == 0) {
+					phParent.setToBeRendered(false);
 				}
 			}
-
-			parent.setSelectedElement(candidate);
 		}
 
-		// this tag is only applied to editors technically speaking, but better
-		// safe than sorry
-		MUIElement ref = placeholder.getRef();
-		if (ref != null && ref.getTags().contains(EPartService.REMOVE_ON_HIDE_TAG)) {
-			parent.getChildren().remove(placeholder);
-		}
-
-		placeholder.setToBeRendered(false);
-	}
-
-	private void hideNonRestorableViews() {
-		List<MPlaceholder> placeholders = modelService.findElements(model, null,
-				MPlaceholder.class, null);
-		IViewRegistry registry = getWorkbench().getViewRegistry();
-		for (MPlaceholder placeholder : placeholders) {
-			IViewDescriptor descriptor = registry.find(placeholder.getElementId());
-			if (descriptor != null && !descriptor.isRestorable()) {
-				hideNonRestorablePlaceholder(placeholder);
-			}
+		// Remove the actual shared Parts for any placeholder that was removed
+		List<MUIElement> seList = model.getSharedElements();
+		for (MPart partToRemove : sharedPartsToRemove) {
+			seList.remove(partToRemove);
 		}
 	}
 
