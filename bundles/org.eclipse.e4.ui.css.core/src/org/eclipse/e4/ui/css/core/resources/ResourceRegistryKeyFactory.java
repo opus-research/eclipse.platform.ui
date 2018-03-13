@@ -7,15 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *******************************************************************************/
-package org.eclipse.e4.ui.internal.css.swt.definition;
+ ******************************************************************************/
+package org.eclipse.e4.ui.css.core.resources;
 
-public interface IThemeElementDefinitionOverridable<T> {
-	String getId();
-	
-	void setValue(T data);
-	
-	T getValue();	
-	
-	boolean isOverridden();
+import org.w3c.dom.css.CSSValue;
+
+public class ResourceRegistryKeyFactory {
+	public Object createKey(CSSValue value) {
+		return CSSResourcesHelpers.getCSSValueKey(value);
+	}
 }

@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
+import java.util.ResourceBundle;
 import org.eclipse.e4.ui.internal.css.swt.definition.IFontDefinitionOverridable;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
@@ -20,9 +21,11 @@ import org.eclipse.ui.PlatformUI;
  * The FontDefiniton is the representation of the fontDefinition
  * from the plugin.xml of a type.
  */
-public class FontDefinition extends ThemeElementDefinition implements
-		IHierarchalThemeElementDefinition, ICategorizedThemeElementDefinition, IEditable,
-		IFontDefinitionOverridable {
+public class FontDefinition implements IHierarchalThemeElementDefinition,
+		ICategorizedThemeElementDefinition, IEditable, IFontDefinitionOverridable {
+	private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(Theme.class
+			.getName());
+
     private String label;
 
     private String id;
@@ -36,6 +39,8 @@ public class FontDefinition extends ThemeElementDefinition implements
     private String value;
 
     private boolean isEditable;
+
+	private boolean overridden;
 
     private FontData[] parsedValue;
 
@@ -94,11 +99,6 @@ public class FontDefinition extends ThemeElementDefinition implements
         return description;
     }
 
-	public void setDescription(String description) {
-		this.description = description;
-		setOverridden(true);
-	}
-
     /**
      * Returns the label.
      * @return String
@@ -106,11 +106,6 @@ public class FontDefinition extends ThemeElementDefinition implements
     public String getName() {
         return label;
     }
-
-	public void setName(String label) {
-		this.label = label;
-		setOverridden(true);
-	}
 
     /**
      * Returns the id.
@@ -127,11 +122,6 @@ public class FontDefinition extends ThemeElementDefinition implements
     public String getCategoryId() {
         return categoryId;
     }
-
-	public void setCategoryId(String categoryId) {
-		this.categoryId = categoryId;
-		setOverridden(true);
-	}
 
     /**
      * Returns the value.
@@ -186,15 +176,20 @@ public class FontDefinition extends ThemeElementDefinition implements
 		if (data != null && data.length > 0) {
 			value = data[0].getName();
 			parsedValue = data;
-			setOverridden(true);
+			if (!isOverridden()) {
+				description += ' ' + RESOURCE_BUNDLE.getString("Overridden.by.css.label"); //$NON-NLS-1$
+				overridden = true;
+			}
 		}
 	}
 
-	@Override
-	protected void setOverridden(boolean overridden) {
-		super.setOverridden(overridden);
-		if (!isAddedByCss() && !description.endsWith(getOverriddenLabel())) {
-			description += ' ' + getOverriddenLabel();
-		}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.css.swt.definition.IDefinitionOverridable#isOverriden()
+	 */
+	public boolean isOverridden() {
+		return overridden;
 	}
 }
