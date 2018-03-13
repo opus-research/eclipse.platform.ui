@@ -473,7 +473,6 @@ public final class KeySequenceText {
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.TAB
 				| SWT.SHIFT));
 		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.BS));
-		trappedKeys.add(SWTKeySupport.convertAcceleratorToKeyStroke(SWT.DEL));
 		List trappedKeyList = new ArrayList(trappedKeys);
 		TRAPPED_KEYS = Collections.unmodifiableList(trappedKeyList);
 	}
