@@ -18,9 +18,11 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This provides a collection specifically for TrimBars.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -32,6 +34,7 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MGenericTrimContainer<T extends MUIElement> extends MElementContainer<T> {
 	/**
@@ -41,8 +44,10 @@ public interface MGenericTrimContainer<T extends MUIElement> extends MElementCon
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is an enum defining the side of the UI Window on which this collection
-	 * should be displayed.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Side</em>' attribute.

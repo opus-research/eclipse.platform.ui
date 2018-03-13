@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,17 +18,23 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
+import org.eclipse.e4.ui.internal.workbench.Policy;
+import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -115,9 +121,61 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
+	private EventHandler childHandler;
 
 	public WBWRenderer() {
 		super();
+	}
+
+	MPart activePart = null;
+
+	@Inject
+	void trackActivePart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
+		if (activePart == p) {
+			return;
+		}
+
+		if (activePart != null) {
+			activePart.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
+
+			MUIElement parent = activePart.getParent();
+			if (parent == null && activePart.getCurSharedRef() != null) {
+				MPlaceholder ph = activePart.getCurSharedRef();
+				parent = ph.getParent();
+			}
+			if (parent instanceof MPartStack) {
+				styleStack((MPartStack) parent, false);
+			} else {
+				if (activePart.getWidget() != null)
+					setCSSInfo(activePart, activePart.getWidget());
+			}
+		}
+
+		activePart = p;
+
+		if (activePart != null) {
+			activePart.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+			MUIElement parent = activePart.getParent();
+			if (parent == null && activePart.getCurSharedRef() != null) {
+				MPlaceholder ph = activePart.getCurSharedRef();
+				parent = ph.getParent();
+			}
+			if (parent instanceof MPartStack && parent.getWidget() != null) {
+				styleStack((MPartStack) parent, true);
+			} else if (activePart.getWidget() != null) {
+				setCSSInfo(activePart, activePart.getWidget());
+			}
+		}
+	}
+
+	private void styleStack(MPartStack stack, boolean active) {
+		if (!active)
+			stack.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
+		else
+			stack.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+
+		if (stack.getWidget() != null)
+			setCSSInfo(stack, stack.getWidget());
 	}
 
 	/**
@@ -151,7 +209,6 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	@PostConstruct
 	public void init() {
-
 		topWindowHandler = new EventHandler() {
 
 			public void handleEvent(Event event) {
@@ -291,6 +348,41 @@ public class WBWRenderer extends SWTPartRenderer {
 		};
 
 		eventBroker.subscribe(UIEvents.Window.TOPIC_ALL, sizeHandler);
+
+		childHandler = new EventHandler() {
+			public void handleEvent(Event event) {
+				// Track additions/removals of the active part and keep its
+				// stack styled correctly
+				Object changedObj = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				if (!(changedObj instanceof MPartStack))
+					return;
+				MPartStack stack = (MPartStack) changedObj;
+
+				if (UIEvents.isADD(event)) {
+					for (Object o : UIEvents.asIterable(event,
+							UIEvents.EventTags.NEW_VALUE)) {
+						MUIElement added = (MUIElement) o;
+						if (added == activePart) {
+							styleStack(stack, true);
+						}
+					}
+				} else if (UIEvents.isREMOVE(event)) {
+					Activator.trace(Policy.DEBUG_RENDERER,
+							"Child Removed", null); //$NON-NLS-1$
+					for (Object o : UIEvents.asIterable(event,
+							UIEvents.EventTags.OLD_VALUE)) {
+						MUIElement removed = (MUIElement) o;
+						if (removed == activePart) {
+							styleStack(stack, false);
+						}
+					}
+				}
+			}
+		};
+
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
+				childHandler);
 	}
 
 	@PreDestroy
@@ -299,6 +391,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(shellUpdater);
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
+		eventBroker.unsubscribe(childHandler);
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -396,7 +489,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return wbwShell;
 			}
 		});
-		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+		localContext.set(ISaveHandler.class, new ISaveHandler() {
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
@@ -424,9 +517,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 				return response;
 			}
-		};
-		saveHandler.logger = logger;
-		localContext.set(ISaveHandler.class, saveHandler);
+		});
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
@@ -599,9 +690,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (wbwModel instanceof MTrimmedWindow) {
 			Shell shell = (Shell) wbwModel.getWidget();
 			MTrimmedWindow tWindow = (MTrimmedWindow) wbwModel;
-			List<MTrimBar> trimBars = new ArrayList<MTrimBar>(
-					tWindow.getTrimBars());
-			for (MTrimBar trimBar : trimBars) {
+			for (MTrimBar trimBar : tWindow.getTrimBars()) {
 				renderer.createGui(trimBar, shell, wbwModel.getContext());
 				// bug 387161: hack around that createGui(e, parent, context)
 				// does not reparent the element widget to the

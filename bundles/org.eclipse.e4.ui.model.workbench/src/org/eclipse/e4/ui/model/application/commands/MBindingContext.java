@@ -20,11 +20,11 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This class describes the hierarchy of contexts that are used by the 
- * <code>EBindingService</code> to determine which Bindings are currently 
- * available to the user.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -38,6 +38,7 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MBindingContext extends MApplicationElement {
 	/**

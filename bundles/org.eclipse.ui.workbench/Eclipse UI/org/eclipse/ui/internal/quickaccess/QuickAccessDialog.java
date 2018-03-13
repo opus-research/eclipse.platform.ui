@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -26,6 +25,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Util;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -40,6 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
+import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
@@ -85,8 +87,7 @@ public class QuickAccessDialog extends PopupDialog {
 
 					public void run() {
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
-								new PreviousPicksProvider(previousPicksList),
-								new EditorProvider(),
+								new PreviousPicksProvider(), new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
 								new PerspectiveProvider(),
 								new CommandProvider(), new ActionProvider(), new WizardProvider(),
@@ -390,6 +391,42 @@ public class QuickAccessDialog extends PopupDialog {
 					arrayIndex += numTexts;
 				}
 			}
+		}
+	}
+
+	private class PreviousPicksProvider extends QuickAccessProvider {
+
+		public QuickAccessElement getElementForId(String id) {
+			return null;
+		}
+
+		public QuickAccessElement[] getElements() {
+			return (QuickAccessElement[]) previousPicksList
+					.toArray(new QuickAccessElement[previousPicksList.size()]);
+		}
+
+		public QuickAccessElement[] getElementsSorted() {
+			return getElements();
+		}
+
+		public String getId() {
+			return "org.eclipse.ui.previousPicks"; //$NON-NLS-1$
+		}
+
+		public ImageDescriptor getImageDescriptor() {
+			return WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
+		}
+
+		public String getName() {
+			return QuickAccessMessages.QuickAccess_Previous;
+		}
+
+		public boolean isAlwaysPresent() {
+			// TODO Auto-generated method stub
+			return true;
+		}
+
+		protected void doReset() {
 		}
 	}
 

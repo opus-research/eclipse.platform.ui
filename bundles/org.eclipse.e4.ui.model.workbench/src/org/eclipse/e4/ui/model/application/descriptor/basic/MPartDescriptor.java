@@ -25,11 +25,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This element represents a template from which an MPart can be created on demand.
- * The collection of PartDescriptors owned by the Application represents the contributed
- * parts and is used in the e4 version of 'Show View'...
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -48,6 +48,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandlerContainer, MBindings {
 	/**
@@ -56,8 +57,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Determines whether or not the part represented by this descriptot can have multiple
-	 * instances with a given window.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Allow Multiple</em>' attribute.
@@ -83,7 +86,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The category that the view represented by this descriptor belongs to.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Category</em>' attribute.
@@ -110,15 +116,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This defines the list of the menus associated with the part represented by this descriptor. 
-	 * There are two specific menus that are managed by the core UI;
-	 * <ul>
-	 * <li>If the menu is the part's id prefixed with "menu:" then it will appear as the 
-	 * drop down menu available from the view's toolbar.</li>
-	 * <li>If the menu is the part's id prefixed with "popup:" then it will appear as the 
-	 * ddefault context menu for this view.</li>
-	 * </ul>
-	 * Other menus can be added here but have to be managed by the part itsefl...
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Menus</em>' containment reference list.
@@ -133,7 +134,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is the Toolbar associated with tihs Part (if any).
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Toolbar</em>' containment reference.
@@ -160,8 +164,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Defines whether instances of views created from this descriptor are closeable by the
-	 * User.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Closeable</em>' attribute.
@@ -187,8 +193,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Determines whether Parts generated from this template can participate in the
-	 * Dirty -> Save cycle. At best this is a hint since all Parts are inherently dirtyable.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Dirtyable</em>' attribute.
@@ -214,7 +222,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The fully qualified path to the class implementing the behavior of the Part.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Contribution URI</em>' attribute.
@@ -240,7 +251,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The description of this Part.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
@@ -265,7 +279,10 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * A method that will return the translated description.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @model kind="operation"

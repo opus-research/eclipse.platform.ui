@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly 
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -3183,7 +3182,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 					toolbarEntry.setActionSet((ActionSet) idToActionSet
 							.get(getActionSetID(contributionItem)));
 					if (toolbarEntry.getChildren().isEmpty()) {
-						toolbarEntry.setCheckState(getToolbarItemIsVisible(toolbarEntry));
+						toolbarEntry.setCheckState(contributionItem.isVisible());
 					}
 					parent.addChild(toolbarEntry);
 				}
@@ -3351,7 +3350,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Remove explicitly 'visible' elements from the current list
 		for (Iterator<String> iterator = changedAndVisible.iterator(); iterator.hasNext();) {
 			String id = iterator.next();
-			if (id != null && currentHidden.contains(prefix + id)) {
+			if (id != null && currentHidden.contains(id)) {
 				hasChanges = true;
 				((WorkbenchPage) window.getActivePage()).removeHiddenItems(prefix + id);
 			}
@@ -3360,7 +3359,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Add explicitly 'hidden' elements to the current list
 		for (Iterator<String> iterator = changedAndInvisible.iterator(); iterator.hasNext();) {
 			String id = iterator.next();
-			if (id != null && !currentHidden.contains(prefix + id)) {
+			if (id != null && !currentHidden.contains(id)) {
 				hasChanges = true;
 				((WorkbenchPage) window.getActivePage()).addHiddenItems(prefix + id);
 			}

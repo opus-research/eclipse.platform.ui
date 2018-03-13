@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,8 @@ package org.eclipse.ui.internal.browser.browsers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.Platform;
-
 import org.eclipse.ui.browser.AbstractWebBrowser;
 import org.eclipse.ui.internal.browser.WebBrowserUIPlugin;
 import org.eclipse.ui.internal.browser.WebBrowserUtil;
@@ -88,19 +86,12 @@ public class MozillaBrowser extends AbstractWebBrowser {
 		}
 
 		/**
-		 * @param command the command
-		 * @param parameters the parameters
+		 * @param browserCmd
 		 * @return int 0 if success
 		 */
-		private int openBrowser(String command, String parameters) {
+		private int openBrowser(String browserCmd) {
 			try {
-				StringTokenizer tokenizer = new StringTokenizer(parameters);
-				String[] commandArray = new String[tokenizer.countTokens() + 1];
-				commandArray[0] = command;
-				for (int i= 1; tokenizer.hasMoreTokens(); i++)
-					commandArray[i] = tokenizer.nextToken();
-
-				Process pr = Runtime.getRuntime().exec(commandArray);
+				Process pr = Runtime.getRuntime().exec(browserCmd);
 				StreamConsumer outputs = new StreamConsumer(pr.getInputStream());
 				(outputs).start();
 				StreamConsumer errors = new StreamConsumer(pr.getErrorStream());
@@ -171,19 +162,19 @@ public class MozillaBrowser extends AbstractWebBrowser {
 			if (exitRequested)
 				return;
 			if (firstLaunch && Platform.OS_WIN32.equals(Platform.getOS())) {
-				if (openBrowser(executable, WebBrowserUtil.createParameterString(parameters, url)) == 0)
+				if (openBrowser(executable + " " + WebBrowserUtil.createParameterString(parameters, url)) == 0) //$NON-NLS-1$
 					return;
 				browserFullyOpenedAt = System.currentTimeMillis() + DELAY;
 				return;
 			}
-			if (openBrowser(executable, parameters + " -remote openURL(" + url + ")") //$NON-NLS-1$ //$NON-NLS-2$
+			if (openBrowser(executable + ' ' + parameters + " -remote openURL(" + url + ")") //$NON-NLS-1$ //$NON-NLS-2$
 					== 0)
 				return;
 			
 			if (exitRequested)
 				return;
 			browserFullyOpenedAt = System.currentTimeMillis() + DELAY;
-			openBrowser(executable, WebBrowserUtil.createParameterString(parameters, url));
+			openBrowser(executable + " " + WebBrowserUtil.createParameterString(parameters, url)); //$NON-NLS-1$
 		}
 
 		private void waitForBrowser() {

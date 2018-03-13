@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.CommandException;
@@ -282,12 +281,12 @@ public class KeyBindingDispatcher {
 				}
 			}
 
-			handlerService.executeHandler(parameterizedCommand, staticContext);
-			final Object commandException = staticContext.get(HandlerServiceImpl.HANDLER_EXCEPTION);
-			if (commandException instanceof CommandException) {
+			try {
+				handlerService.executeHandler(parameterizedCommand, staticContext);
+			} catch (final Exception e) {
 				commandHandled = false;
-				if (logger != null && commandException instanceof ExecutionException) {
-					logger.error((Throwable) commandException);
+				if (logger != null) {
+					logger.error(e);
 				}
 			}
 			/*

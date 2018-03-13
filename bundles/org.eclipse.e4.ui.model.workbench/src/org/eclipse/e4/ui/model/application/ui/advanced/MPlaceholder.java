@@ -21,12 +21,11 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
  *
  * <!-- begin-model-doc -->
  * <p>
- * A Placeholder is a concrete class used to share elements between perspectives. The
- * elements referenced by a Placeholder generally exist in the Window's 'sharedElements'
- * list. By convention a placeholder usually shares the same elementId as the element
- * that it's referencing.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -39,6 +38,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MPlaceholder extends MUIElement, MPartSashContainerElement, MStackElement {
 	/**
@@ -47,7 +47,10 @@ public interface MPlaceholder extends MUIElement, MPartSashContainerElement, MSt
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The reference to the actual UI element that this Placeholder is acting as a proxy for.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Ref</em>' reference.
@@ -74,9 +77,10 @@ public interface MPlaceholder extends MUIElement, MPartSashContainerElement, MSt
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Determines whether the element (usually a Part) referenced by this Placeholder can
-	 * be closed by the User. This allows a Part to be closeable in one perspective but
-	 * not closeable in a different one.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Closeable</em>' attribute.
