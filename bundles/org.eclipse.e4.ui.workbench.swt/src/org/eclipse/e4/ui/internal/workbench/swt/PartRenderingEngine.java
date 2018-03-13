@@ -1253,7 +1253,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
@@ -1354,9 +1354,5 @@ public class PartRenderingEngine implements IPresentationEngine {
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
 
-		IEventBroker broker = appContext.get(IEventBroker.class);
-		if (broker != null) {
-			broker.send(UIEvents.UILifeCycle.CSS_THEME_CHANGED, null);
-		}
 	}
 }

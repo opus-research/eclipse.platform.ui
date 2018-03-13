@@ -259,11 +259,6 @@ public class UIEvents {
 		 * Sent when application startup is complete
 		 */
 		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
-
-		/**
-		 * Sent when the CSS theme is changed
-		 */
-		public static final String CSS_THEME_CHANGED = TOPIC + TOPIC_SEP + "cssThemeChanged"; //$NON-NLS-1$
 	}
 
 	/**

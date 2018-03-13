@@ -1851,11 +1851,11 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         if (fontDefinition != null) {
 			boolean isDefault = isDefault(fontDefinition);
 			boolean hasDefault = fontDefinition.getDefaultsTo() != null;
-			fontChangeButton.setEnabled(!fontDefinition.isOverriden());
-			fontSystemButton.setEnabled(!fontDefinition.isOverriden());
-			fontResetButton.setEnabled(!isDefault && !fontDefinition.isOverriden());
-			editDefaultButton.setEnabled(hasDefault && isDefault && !fontDefinition.isOverriden());
-			goToDefaultButton.setEnabled(hasDefault && !fontDefinition.isOverriden());
+            fontChangeButton.setEnabled(true);
+            fontSystemButton.setEnabled(true);
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentFont(fontDefinition);
             return;
         }
@@ -1863,11 +1863,11 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         if (colorDefinition != null) {
 			boolean isDefault = isDefault(getSelectedColorDefinition());
 			boolean hasDefault = colorDefinition.getDefaultsTo() != null;
-            fontChangeButton.setEnabled(!colorDefinition.isOverriden());
+            fontChangeButton.setEnabled(true);
             fontSystemButton.setEnabled(false);
-			fontResetButton.setEnabled(!isDefault && !colorDefinition.isOverriden());
-			editDefaultButton.setEnabled(hasDefault && isDefault && !colorDefinition.isOverriden());
-			goToDefaultButton.setEnabled(hasDefault && !colorDefinition.isOverriden());
+			fontResetButton.setEnabled(!isDefault);
+			editDefaultButton.setEnabled(hasDefault && isDefault);
+			goToDefaultButton.setEnabled(hasDefault);
             setCurrentColor(colorDefinition);
             return;
         }

@@ -9,17 +9,14 @@
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation
  *     Kai Toedter - added radial gradient support
+ *     Robin Stocker - Bug 420035 - [CSS] Support SWT color constants in gradients
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.helpers;
-
-import static org.eclipse.e4.ui.css.swt.helpers.ThemeElementDefinitionHelper.normalizeId;
-
-import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
-import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import java.util.List;
 import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
@@ -37,8 +34,7 @@ import org.w3c.dom.css.CSSValueList;
 import org.w3c.dom.css.RGBColor;
 
 public class CSSSWTColorHelper {
-	private static final String COLOR_DEFINITION_MARKER = "#";
-	
+
 	private static Field[] cachedFields;
 	
 	/*--------------- SWT Color Helper -----------------*/
@@ -53,26 +49,21 @@ public class CSSSWTColorHelper {
 			return null;
 		}
 		Color color = display.getSystemColor(SWT.COLOR_BLACK);
-		RGB rgb = getRGB((CSSPrimitiveValue) value);
-		if (rgb == null) {
-			String name = ((CSSPrimitiveValue) value).getStringValue();			
-			if (name.startsWith(COLOR_DEFINITION_MARKER)) {
-				rgb = findColorByDefinition(name);
-			} else if (name.contains("-")) {
+		RGB rgb = getRGB((CSSPrimitiveValue) value, display);
+		if (rgb != null) color = new Color(display, rgb.red, rgb.green, rgb.blue);
+		return color;
+	}
+
+	private static RGB getRGB(CSSPrimitiveValue value, Display display) {
+		RGB rgb = getRGB(value);
+		if (rgb == null && display != null) {
+			String name = value.getStringValue();
+			if (name.contains("-")) {
 				name = name.replace('-', '_');
 				rgb = process(display, name);
 			}
 		}
-		if (rgb != null) color = new Color(display, rgb.red, rgb.green, rgb.blue);
-		return color;
-	}
-	
-	private static RGB findColorByDefinition(String name) {
-		IColorAndFontProvider provider = CSSActivator.getDefault().getColorAndFontProvider();
-		if (provider != null) {
-			return provider.getColor(normalizeId(name.substring(1)));
-		}
-		return null;
+		return rgb;
 	}
 
 	/**
@@ -178,7 +169,7 @@ public class CSSSWTColorHelper {
 		return new Integer(percent);
 	}
 
-	public static Gradient getGradient(CSSValueList list) {
+	public static Gradient getGradient(CSSValueList list, Display display) {
 		Gradient gradient = new Gradient();
 		for (int i = 0; i < list.getLength(); i++) {
 			CSSValue value = list.item(i);
@@ -202,7 +193,7 @@ public class CSSSWTColorHelper {
 				case CSSPrimitiveValue.CSS_IDENT:
 				case CSSPrimitiveValue.CSS_STRING:
 				case CSSPrimitiveValue.CSS_RGBCOLOR:
-					RGB rgb = getRGB((CSSPrimitiveValue) value);
+					RGB rgb = getRGB((CSSPrimitiveValue) value, display);
 					if (rgb != null) {
 						gradient.addRGB(rgb, (CSSPrimitiveValue) value);
 					} else {
