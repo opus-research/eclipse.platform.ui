@@ -58,7 +58,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -671,10 +670,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 	private IEclipseContext getContext(MUIElement parent) {
 		if (parent instanceof MContext) {
 			return ((MContext) parent).getContext();
-		} else if (parent.getTransientData().containsKey(
-				ModelUtils.CONTAINING_CONTEXT)) {
-			return (IEclipseContext) parent.getTransientData().get(
-					ModelUtils.CONTAINING_CONTEXT);
 		}
 		return modelService.getContainingContext(parent);
 	}
@@ -931,7 +926,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 		IEclipseContext lclContext = ctxt.getContext();
 		if (lclContext != null) {
 			IEclipseContext parentContext = lclContext.getParent();
-			IEclipseContext child = parentContext.getActiveChild();
+			IEclipseContext child = parentContext != null ? parentContext
+					.getActiveChild() : null;
 			if (child == lclContext) {
 				child.deactivate();
 			}

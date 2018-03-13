@@ -1107,9 +1107,8 @@ public class ESelectionServiceTest extends UITest {
 			}
 		});
 		application.setContext(applicationContext);
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) application).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		((Notifier) application).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 	}
 
 	static class SelectionListener implements ISelectionListener {

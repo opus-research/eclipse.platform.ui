@@ -468,7 +468,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			return false;
 		}
 		if (menuBar || isPartMenu(menuModel)) {
-			final IEclipseContext parentContext = getContext(menuModel);
+			final IEclipseContext parentContext = modelService
+					.getContainingContext(menuModel);
 			parentContext.runAndTrack(new RunAndTrack() {
 				@Override
 				public boolean changed(IEclipseContext context) {

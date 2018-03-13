@@ -27,9 +27,8 @@ public abstract class HeadlessApplicationElementTest extends
 		applicationElement = createApplicationElement(applicationContext);
 
 		// Hook the global notifications
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) applicationElement).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		((Notifier) applicationElement).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 	}
 
 	protected abstract MApplicationElement createApplicationElement(
