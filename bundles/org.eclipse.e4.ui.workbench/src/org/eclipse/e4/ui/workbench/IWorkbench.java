@@ -103,11 +103,4 @@ public interface IWorkbench {
 	 */
 	public String getId();
 
-	/**
-	 * restart the workbench
-	 * 
-	 * @return <code>false</code> if the restart is aborted
-	 */
-	public boolean restart();
-
 }
