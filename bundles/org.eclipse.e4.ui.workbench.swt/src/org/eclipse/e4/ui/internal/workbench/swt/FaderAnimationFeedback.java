@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -17,24 +18,25 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * Creates an animation effect where the Shell's image is captured and
- * over-lain (in its own shell) on top of the real one. This image
- * masks the changes to the 'real' shell and then the covering image
- * fades to transparent, revealing the new state.
+ * Creates an animation effect where the Shell's image is captured and over-lain
+ * (in its own shell) on top of the real one. This image masks the changes to
+ * the 'real' shell and then the covering image fades to transparent, revealing
+ * the new state.
  * 
- * This provides a nice cross-fade effect for operations like a
- * perspective change (where the overall effect on the shell is large.
+ * This provides a nice cross-fade effect for operations like a perspective
+ * change (where the overall effect on the shell is large.
  * 
  * @since 3.3
- *
+ * 
  */
-public class FaderAnimationFeedback extends	AnimationFeedbackBase {
+public class FaderAnimationFeedback extends AnimationFeedbackBase {
 	private Image backingStore;
 
 	public FaderAnimationFeedback(Shell parentShell) {
 		super(parentShell);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 
@@ -42,6 +44,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 			backingStore.dispose();
 	}
 
+	@Override
 	public void initialize(AnimationEngine engine) {
 		Rectangle psRect = getBaseShell().getBounds();
 		getAnimationShell().setBounds(psRect);
@@ -53,14 +56,15 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 		// gc.copyArea(backingStore, psRect.x, psRect.y);
 		gc.copyArea(backingStore, psRect.x, psRect.y);
 		gc.dispose();
-		
+
 		getAnimationShell().setAlpha(254);
 		getAnimationShell().setBackgroundImage(backingStore);
 		getAnimationShell().setVisible(true);
 	}
 
+	@Override
 	public void renderStep(AnimationEngine engine) {
-		getAnimationShell().setAlpha((int) (255 - (engine.amount()*255)));
+		getAnimationShell().setAlpha((int) (255 - (engine.amount() * 255)));
 	}
-	
+
 }

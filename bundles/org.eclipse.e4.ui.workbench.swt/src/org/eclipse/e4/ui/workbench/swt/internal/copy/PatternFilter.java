@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 20103 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -53,13 +54,7 @@ public class PatternFilter extends ViewerFilter {
 
 	private static Object[] EMPTY = new Object[0];
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ViewerFilter#filter(org.eclipse.jface.viewers
-	 * .Viewer, java.lang.Object, java.lang.Object[])
-	 */
+	@Override
 	public final Object[] filter(Viewer viewer, Object parent, Object[] elements) {
 		// we don't want to optimize if we've extended the filter ... this
 		// needs to be addressed in 3.4
@@ -137,13 +132,7 @@ public class PatternFilter extends ViewerFilter {
 		return elementFound;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers
-	 * .Viewer, java.lang.Object, java.lang.Object)
-	 */
+	@Override
 	public final boolean select(Viewer viewer, Object parentElement,
 			Object element) {
 		return isElementVisible(viewer, element);

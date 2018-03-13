@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010 - 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -94,6 +95,7 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method ensures that the workbench has been
 	 * set.
 	 */
+	@Override
 	public void testingStarting() {
 		Assert.isNotNull(workbench);
 		oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
@@ -107,6 +109,7 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method flushes the event queue, runs the test
 	 * in a <code>syncExec</code>, then flushes the event queue again.
 	 */
+	@Override
 	public void runTest(Runnable testRunnable) {
 		Assert.isNotNull(workbench);
 		display.syncExec(testRunnable);
@@ -117,6 +120,7 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method flushes the event queue, then closes
 	 * the workbench.
 	 */
+	@Override
 	public void testingFinished() {
 		// force events to be processed, and ensure the close is done in the UI
 		// thread

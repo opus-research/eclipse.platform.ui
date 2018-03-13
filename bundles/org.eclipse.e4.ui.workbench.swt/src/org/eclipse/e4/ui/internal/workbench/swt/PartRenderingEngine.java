@@ -6,7 +6,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
+ *     IBM Corporation - initial API and implementatio
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -926,7 +927,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 	}
 
 	private void clearContext(MContext contextME) {
-		MContext ctxt = (MContext) contextME;
+		MContext ctxt = contextME;
 		IEclipseContext lclContext = ctxt.getContext();
 		if (lclContext != null) {
 			IEclipseContext parentContext = lclContext.getParent();
@@ -1004,8 +1005,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 						new ResourceUtility());
 
 				// set up the keybinding manager
-				KeyBindingDispatcher dispatcher = (KeyBindingDispatcher) ContextInjectionFactory
-						.make(KeyBindingDispatcher.class, runContext);
+				KeyBindingDispatcher dispatcher = ContextInjectionFactory.make(
+						KeyBindingDispatcher.class, runContext);
 				runContext.set(KeyBindingDispatcher.class.getName(), dispatcher);
 				keyListener = dispatcher.getKeyDownFilter();
 				display.addFilter(SWT.KeyDown, keyListener);
@@ -1244,12 +1245,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
@@ -1257,14 +1258,14 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
-					return engine.getStyle((Widget) widget);
+					return engine.getStyle(widget);
 				}
 
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 			});
@@ -1282,16 +1283,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
@@ -1307,7 +1308,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles((Widget) widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 			});
@@ -1319,17 +1320,14 @@ public class PartRenderingEngine implements IPresentationEngine {
 				stream = url.openStream();
 				engine.parseStyleSheet(stream);
 			} catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				if (stream != null) {
 					try {
 						stream.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -1342,7 +1340,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					s.reskin(SWT.ALL);
 					engine.applyStyles(s, true);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} finally {
 					s.setRedraw(true);

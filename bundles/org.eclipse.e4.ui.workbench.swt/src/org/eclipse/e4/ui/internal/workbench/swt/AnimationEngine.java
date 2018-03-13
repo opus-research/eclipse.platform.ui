@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -167,6 +168,7 @@ public class AnimationEngine extends Job {
 		return amount;
 	}
 
+	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		// We use preference value to indicate that the animation should be
 		// skipped on this platform.

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -81,7 +82,7 @@ public class ShellActivationListener implements Listener {
 	private void processWindow(Event event, Shell shell, MWindow window) {
 		switch (event.type) {
 		case SWT.Activate:
-			final IEclipseContext local = ((MWindow) window).getContext();
+			final IEclipseContext local = window.getContext();
 			WorkbenchSWTActivator.trace("/trace/workbench",
 					"setting mwindow context " + local, null);
 			// record this shell's context

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ * 	   Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -162,14 +163,14 @@ public class CSSRenderingUtils {
 			return null;
 		}
 		if (classId != null)
-			ControlElement.setCSSClass(styleControl, classId); //$NON-NLS-1$
+			WidgetElement.setCSSClass(styleControl, classId);
 
 		CSSStyleDeclaration styleDeclarations = csseng.getViewCSS()
 				.getComputedStyle(tempEment, "");
 		if (styleDeclarations == null)
 			return null;
 
-		CSSValue imagePath = styleDeclarations.getPropertyCSSValue(attName); //$NON-NLS-1$
+		CSSValue imagePath = styleDeclarations.getPropertyCSSValue(attName);
 		if (imagePath == null)
 			return null;
 
@@ -201,7 +202,6 @@ public class CSSRenderingUtils {
 							}
 						}
 
-						// System.out.println("Results " + frameInts);
 					}
 				}
 			} catch (Exception e1) {

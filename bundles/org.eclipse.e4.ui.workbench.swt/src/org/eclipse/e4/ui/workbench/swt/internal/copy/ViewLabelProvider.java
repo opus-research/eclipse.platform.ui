@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla  - bug 77710
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -67,11 +68,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		this.context = context;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 		for (Image image : imageMap.values()) {
 			image.dispose();
@@ -79,11 +76,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		super.dispose();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
+	@Override
 	public Image getImage(Object element) {
 		if (element instanceof MPartDescriptor) {
 			String iconURI = ((MPartDescriptor) element).getIconURI();
@@ -111,11 +104,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
+	@Override
 	public String getText(Object element) {
 		String label = WorkbenchSWTMessages.ViewLabel_unknown;
 		if (element instanceof String) {
@@ -126,6 +115,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		return label;
 	}
 
+	@Override
 	public Color getBackground(Object element) {
 		return null;
 	}

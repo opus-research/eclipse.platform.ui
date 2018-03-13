@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.swt.internal.copy;
 
@@ -67,7 +68,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	}
 
 	public Object[] getChildren(Object element) {
-		Object[] children = (Object[]) childMap.get(element);
+		Object[] children = childMap.get(element);
 		if (children == null) {
 			children = createChildren(element);
 			childMap.put(element, children);

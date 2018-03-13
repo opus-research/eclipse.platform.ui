@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422802
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -15,10 +16,11 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 
 /**
- *
+ * Context function which creates the WorkbenchStatusReporter
  */
 public class StatusReporterCreationFunction extends ContextFunction {
 
+	@Override
 	public Object compute(IEclipseContext context, String contextKey) {
 		return ContextInjectionFactory.make(WorkbenchStatusReporter.class,
 				context);
