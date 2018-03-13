@@ -25,6 +25,8 @@ import org.eclipse.e4.ui.model.application.MApplication;
  * </ul>
  * <b>It is possible that there are multiple active {@link IWorkbench} instances in one
  * OSGi-Instance</b>
+ * 
+ * @since 1.0
  */
 public interface IWorkbench {
 	/**
