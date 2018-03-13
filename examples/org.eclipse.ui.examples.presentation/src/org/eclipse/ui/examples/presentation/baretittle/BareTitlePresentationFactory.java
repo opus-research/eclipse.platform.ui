@@ -23,8 +23,7 @@ public class BareTitlePresentationFactory extends AbstractPresentationFactory {
 	 */
 	public StackPresentation createEditorPresentation(Composite parent,
 			IStackPresentationSite site) {
-		//return new WorkbenchPresentationFactory().createEditorPresentation(parent, site);
-		return null;
+		return new WorkbenchPresentationFactory().createEditorPresentation(parent, site);
 	}
 
 	/* (non-Javadoc)

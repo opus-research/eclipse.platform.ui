@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly 
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -51,6 +50,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
@@ -169,6 +169,8 @@ import org.eclipse.ui.internal.util.BundleUtility;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.menus.CommandContributionItem;
+import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.menus.MenuUtil;
 import org.eclipse.ui.model.WorkbenchViewerComparator;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.services.IServiceLocator;
@@ -762,13 +764,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 * @return the created label
 		 */
 		protected Label createEntry(Composite parent, Image icon, String text) {
-			Color fg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-			Color bg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 			if (icon != null) {
 				Label iconLabel = new Label(parent, SWT.NONE);
 				iconLabel.setImage(icon);
-				iconLabel.setForeground(fg);
-				iconLabel.setBackground(bg);
+				iconLabel.setBackground(parent.getDisplay().getSystemColor(
+						SWT.COLOR_INFO_BACKGROUND));
 				iconLabel.setData(new GridData());
 			}
 
@@ -781,8 +781,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			}
 			
 			textLabel.setText(text);
-			textLabel.setForeground(fg);
-			textLabel.setBackground(bg);
+			textLabel.setBackground(parent.getDisplay().getSystemColor(
+					SWT.COLOR_INFO_BACKGROUND));
 			return textLabel;
 		}
 
@@ -803,13 +803,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		 */
 		protected Link createEntryWithLink(Composite parent, Image icon,
 				String text) {
-			Color fg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND);
-			Color bg = parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 			if (icon != null) {
 				Label iconLabel = new Label(parent, SWT.NONE);
 				iconLabel.setImage(icon);
-				iconLabel.setForeground(fg);
-				iconLabel.setBackground(bg);
+				iconLabel.setBackground(parent.getDisplay().getSystemColor(
+						SWT.COLOR_INFO_BACKGROUND));
 				iconLabel.setData(new GridData());
 			}
 			
@@ -820,8 +818,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			}
 			
 			textLink.setText(text);
-			textLink.setForeground(fg);
-			textLink.setBackground(bg);
+			textLink.setBackground(parent.getDisplay().getSystemColor(
+					SWT.COLOR_INFO_BACKGROUND));
 			return textLink;
 		}
 
@@ -2653,16 +2651,16 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				| ActionBarAdvisor.FILL_COOL_BAR);
 
 		// 3.3 start
-		// final IMenuService menuService = (IMenuService) window
-		// .getService(IMenuService.class);
-		// menuService.populateContributionManager(
-		// (ContributionManager) customizeActionBars.getMenuManager(),
-		// MenuUtil.MAIN_MENU);
-		// ICoolBarManager coolbar = customizeActionBars.getCoolBarManager();
-		// if (coolbar != null) {
-		// menuService.populateContributionManager(
-		// (ContributionManager) coolbar, MenuUtil.MAIN_TOOLBAR);
-		// }
+		final IMenuService menuService = (IMenuService) window
+				.getService(IMenuService.class);
+		menuService.populateContributionManager(
+				(ContributionManager) customizeActionBars.getMenuManager(),
+				MenuUtil.MAIN_MENU);
+		ICoolBarManager coolbar = customizeActionBars.getCoolBarManager();
+		if (coolbar != null) {
+			menuService.populateContributionManager(
+					(ContributionManager) coolbar, MenuUtil.MAIN_TOOLBAR);
+		}
 		// 3.3 end
 
 		// Populate the action bars with the action sets' data
@@ -3183,7 +3181,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 					toolbarEntry.setActionSet((ActionSet) idToActionSet
 							.get(getActionSetID(contributionItem)));
 					if (toolbarEntry.getChildren().isEmpty()) {
-						toolbarEntry.setCheckState(getToolbarItemIsVisible(toolbarEntry));
+						toolbarEntry.setCheckState(contributionItem.isVisible());
 					}
 					parent.addChild(toolbarEntry);
 				}
@@ -3351,7 +3349,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Remove explicitly 'visible' elements from the current list
 		for (Iterator<String> iterator = changedAndVisible.iterator(); iterator.hasNext();) {
 			String id = iterator.next();
-			if (id != null && currentHidden.contains(prefix + id)) {
+			if (id != null && currentHidden.contains(id)) {
 				hasChanges = true;
 				((WorkbenchPage) window.getActivePage()).removeHiddenItems(prefix + id);
 			}
@@ -3360,7 +3358,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Add explicitly 'hidden' elements to the current list
 		for (Iterator<String> iterator = changedAndInvisible.iterator(); iterator.hasNext();) {
 			String id = iterator.next();
-			if (id != null && !currentHidden.contains(prefix + id)) {
+			if (id != null && !currentHidden.contains(id)) {
 				hasChanges = true;
 				((WorkbenchPage) window.getActivePage()).addHiddenItems(prefix + id);
 			}
