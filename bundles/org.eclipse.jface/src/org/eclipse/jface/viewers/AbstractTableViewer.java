@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation bug 154329
  *                                               - fixes in bug 170381, 198665, 200731
- *	    *     Hendrik Still <hendrik.still@gammas.de> - b *     Hendrik Still <hendrik.still@gammas.de> - bug 413973, bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -90,8 +89,8 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 						IContentProvider<I> contentProvider = getContentProvider();
 						// If we are building lazily then request lookup now
 						if (contentProvider instanceof ILazyContentProvider) {
-							ILazyContentProvider<I> lazyContentProvider = ((ILazyContentProvider<I>) contentProvider);
-							lazyContentProvider.updateElement(index);
+							((ILazyContentProvider<I>) contentProvider)
+									.updateElement(index);
 							return;
 						}
 					}
@@ -1125,13 +1124,11 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
 	 */
 	@Override
-	protected E[] getRawChildren(Object parent) {
+	protected E[] getRawChildren(I parent) {
 
 		Assert.isTrue(!(getContentProvider() instanceof ILazyContentProvider),
 				"Cannot get raw children with an ILazyContentProvider");//$NON-NLS-1$
-		@SuppressWarnings("unchecked")
-		I input = (I) parent;
-		return super.getRawChildren(input);
+		return super.getRawChildren(parent);
 
 	}
 
