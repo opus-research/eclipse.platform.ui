@@ -133,6 +133,7 @@ public class PartServiceImpl implements EPartService {
 	private PartActivationHistory partActivationHistory;
 
 	private MPart activePart;
+	private MPart activatedPart;
 
 	private ListenerList listeners = new ListenerList();
 
@@ -158,6 +159,7 @@ public class PartServiceImpl implements EPartService {
 		if (activePart != p) {
 			MPart lastActivePart = activePart;
 			activePart = p;
+			activatedPart = p;
 
 			// no need to do anything if we have no listeners
 			if (constructed && !listeners.isEmpty()) {
@@ -557,7 +559,7 @@ public class PartServiceImpl implements EPartService {
 		MWindow window = getWindow();
 		IEclipseContext windowContext = window.getContext();
 		// check if the active part has changed or if we are no longer the active window
-		if (windowContext.getParent().getActiveChild() == windowContext && part == activePart) {
+		if (windowContext.getParent().getActiveChild() == windowContext && part == activatedPart) {
 			// insert it in the beginning of the activation history, it may not have been inserted
 			// pending when this service was instantiated
 			partActivationHistory.prepend(part);
@@ -567,6 +569,8 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
+		activatedPart = part;
+
 		try {
 			// record any sibling into the activation history if necessary, this will allow it to be
 			// reselected again in the future as it will be an activation candidate in the future,
