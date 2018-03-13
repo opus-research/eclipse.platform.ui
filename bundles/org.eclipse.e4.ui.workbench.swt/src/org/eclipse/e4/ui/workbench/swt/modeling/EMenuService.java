@@ -12,6 +12,7 @@ package org.eclipse.e4.ui.workbench.swt.modeling;
 
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 
+
 /**
  * Provide for management of different menus.
  * 
