@@ -44,8 +44,9 @@ import org.eclipse.jface.util.SafeRunnable;
  * </li>
  * </ul>
  * </p>
+ * @param <I> Type of the input for the view
  */
-public abstract class Viewer implements IInputSelectionProvider {
+public abstract class Viewer<I> implements IInputSelectionProvider<I> {
 
     /**
      * List of selection change listeners (element type: <code>ISelectionChangedListener</code>).
@@ -205,7 +206,7 @@ public abstract class Viewer implements IInputSelectionProvider {
     /* (non-Javadoc)
      * Copy-down of method declared on <code>IInputProvider</code>.
      */
-    public abstract Object getInput();
+    public abstract I getInput();
 
     /* (non-Javadoc)
      * Copy-down of method declared on <code>ISelectionProvider</code>.
@@ -239,7 +240,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      * @param oldInput the old input element or <code>null</code> if there
      *   was previously no input
      */
-    protected void inputChanged(Object input, Object oldInput) {
+    protected void inputChanged(I input, I oldInput) {
     }
 
     /**
@@ -377,7 +378,7 @@ public abstract class Viewer implements IInputSelectionProvider {
      *
      * @param input the input of this viewer, or <code>null</code> if none
      */
-    public abstract void setInput(Object input);
+    public abstract void setInput(I input);
 
     /**
 	 * The viewer implementation of this <code>ISelectionProvider</code>
