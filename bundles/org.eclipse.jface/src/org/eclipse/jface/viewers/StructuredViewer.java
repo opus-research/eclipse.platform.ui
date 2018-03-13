@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 402439
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -1019,12 +1020,19 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 
 	/**
 	 * The <code>StructuredViewer</code> implementation of this method returns
-	 * the result as an <code>IStructuredSelection</code>.
+	 * the result as an <code>IStructuredSelection</code>. Sub-classes should
+	 * also return a <code>IStructuredSelection</code>.
+	 * 
 	 * <p>
 	 * Subclasses do not typically override this method, but implement
 	 * <code>getSelectionFromWidget(List)</code> instead.
 	 * <p>
+	 *
+	 * Call <code>getStructuredSelection</code> instead to the
+	 * <code>IStructuredSelection</code> type directly.
+	 *
 	 * @return ISelection
+	 *
 	 */
 	@Override
 	public ISelection getSelection() {
@@ -1034,6 +1042,22 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		}
 		List list = getSelectionFromWidget();
 		return new StructuredSelection(list, comparer);
+	}
+
+	/**
+	 * Returns the <code>IStructuredSelection</code> of this viewer.
+	 *
+	 * @return IStructuredSelection
+	 * @since 3.11
+	 */
+	public IStructuredSelection getStructuredSelection() {
+		ISelection selection = getSelection();
+		if (selection instanceof IStructuredSelection) {
+			return (IStructuredSelection) selection;
+
+		}
+		throw new ClassCastException(
+				"StructuredViewer should return an instance of IStructuredSelection from its getSelection() method. "); //$NON-NLS-1$
 	}
 
 	/**
