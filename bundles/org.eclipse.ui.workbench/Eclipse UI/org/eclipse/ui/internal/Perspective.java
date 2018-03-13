@@ -133,8 +133,7 @@ public class Perspective {
             if (desc != null) {
 				outputList.add(desc);
 			} else {
-				// plugin with actionSet was removed
-				// we remember then so it's available when added back
+				WorkbenchPlugin.log("Unable to find Action Set: " + id);//$NON-NLS-1$
 			}
         }
     }

@@ -512,10 +512,10 @@ public class PartServiceImpl implements EPartService {
 				modelService.bringToTop(perspective);
 				perspective.getContext().activate();
 			} else {
+				// Ensure that the topmost editor doesn't change
 				if ((modelService.getElementLocation(newActivePart) & EModelService.IN_SHARED_AREA) != 0) {
-					if (newActivePart.getParent().getSelectedElement() != newActivePart) {
+					if (newActivePart.getParent().getSelectedElement() != newActivePart)
 						newActivePart = (MPart) newActivePart.getParent().getSelectedElement();
-					}
 				}
 				activate(newActivePart, true, false);
 			}
@@ -681,7 +681,6 @@ public class PartServiceImpl implements EPartService {
 		part.setTooltip(descriptor.getTooltip());
 		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
 		part.getTags().addAll(descriptor.getTags());
-		part.getPersistedState().putAll(descriptor.getPersistedState());
 		part.getBindingContexts().addAll(descriptor.getBindingContexts());
 		return part;
 	}

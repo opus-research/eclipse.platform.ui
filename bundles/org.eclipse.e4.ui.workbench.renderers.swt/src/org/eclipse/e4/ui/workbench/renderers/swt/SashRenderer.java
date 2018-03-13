@@ -24,7 +24,8 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -82,17 +83,13 @@ public class SashRenderer extends SWTPartRenderer {
 	 */
 	protected void forceLayout(MElementContainer<MUIElement> pscModel) {
 		// layout the containing Composite
-		while (!(pscModel.getWidget() instanceof Composite))
+		while (!(pscModel.getWidget() instanceof Control))
 			pscModel = pscModel.getParent();
-
-		Composite s = (Composite) pscModel.getWidget();
-		Layout layout = s.getLayout();
-		if (layout instanceof SashLayout) {
-			if (((SashLayout) layout).layoutUpdateInProgress) {
-				return;
-			}
-		}
-		s.layout(true, true);
+		Control ctrl = (Control) pscModel.getWidget();
+		if (ctrl instanceof Shell)
+			((Shell) ctrl).layout(null, SWT.ALL | SWT.CHANGED | SWT.DEFER);
+		else
+			ctrl.getParent().layout(null, SWT.ALL | SWT.CHANGED | SWT.DEFER);
 	}
 
 	@PreDestroy
@@ -159,6 +156,24 @@ public class SashRenderer extends SWTPartRenderer {
 		if (weight == UNDEFINED_WEIGHT) {
 			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
 		}
+
+		forceLayout(parentElement);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer,
+	 * org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
+	@Override
+	public void hideChild(MElementContainer<MUIElement> parentElement,
+			MUIElement child) {
+		super.hideChild(parentElement, child);
+
+		forceLayout(parentElement);
 	}
 
 	/*

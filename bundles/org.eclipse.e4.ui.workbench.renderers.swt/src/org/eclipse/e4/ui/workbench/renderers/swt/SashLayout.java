@@ -41,8 +41,6 @@ public class SashLayout extends Layout {
 	MUIElement root;
 	private Composite host;
 
-	boolean layoutUpdateInProgress = false;
-
 	class SashRect {
 		Rectangle rect;
 		MGenericTile<?> container;
@@ -80,7 +78,7 @@ public class SashLayout extends Layout {
 		});
 
 		host.addMouseMoveListener(new MouseMoveListener() {
-			public void mouseMove(final MouseEvent e) {
+			public void mouseMove(MouseEvent e) {
 				if (!draggingSashes) {
 					// Set the cursor feedback
 					List<SashRect> sashList = getSashRects(e.x, e.y);
@@ -99,14 +97,9 @@ public class SashLayout extends Layout {
 								SWT.CURSOR_SIZEALL));
 					}
 				} else {
-					try {
-						layoutUpdateInProgress = true;
-						adjustWeights(sashesToDrag, e.x, e.y);
-						host.layout();
-						host.update();
-					} finally {
-						layoutUpdateInProgress = false;
-					}
+					adjustWeights(sashesToDrag, e.x, e.y);
+					host.layout();
+					host.update();
 				}
 			}
 		});
@@ -150,6 +143,7 @@ public class SashLayout extends Layout {
 
 	public void setRootElemenr(MUIElement newRoot) {
 		root = newRoot;
+		host.layout(null, SWT.DEFER);
 	}
 
 	@Override
