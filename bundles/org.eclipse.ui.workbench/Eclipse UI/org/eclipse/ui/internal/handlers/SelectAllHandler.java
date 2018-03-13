@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,7 +76,8 @@ public class SelectAllHandler extends WidgetMethodHandler {
 							Runnable methodRunnable = new Runnable() {
 								public void run() {
 									try {
-										methodToExecute.invoke(focusComponent);
+										methodToExecute.invoke(focusComponent,
+												null);
 										// and back to the UI thread :-)
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
@@ -130,7 +131,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					}
 				} else if (numParams == 0) {
 					// This is a no-argument selectAll method.
-					methodToExecute.invoke(focusControl);
+					methodToExecute.invoke(focusControl, null);
 					focusControl.notifyListeners(SWT.Selection, null);
 
 				} else if (numParams == 1) {
@@ -138,7 +139,7 @@ public class SelectAllHandler extends WidgetMethodHandler {
 					final Method textLimitAccessor = focusControl.getClass()
 							.getMethod("getTextLimit", NO_PARAMETERS); //$NON-NLS-1$
 					final Integer textLimit = (Integer) textLimitAccessor
-							.invoke(focusControl);
+							.invoke(focusControl, null);
 					final Object[] parameters = { new Point(0, textLimit
 							.intValue()) };
 					methodToExecute.invoke(focusControl, parameters);
