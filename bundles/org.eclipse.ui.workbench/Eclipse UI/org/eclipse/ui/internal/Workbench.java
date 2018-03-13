@@ -1820,6 +1820,22 @@ public final class Workbench extends EventManager implements IWorkbench {
 			}
 		});
 
+		// watch for parts' "toBeRendered" attribute being flipped to true, if
+		// they need to be rendered, then they need a corresponding 3.x
+		// reference
+		eventBroker.subscribe(
+UIEvents.UIElement.TOPIC_TOBERENDERED, new EventHandler() {
+			public void handleEvent(org.osgi.service.event.Event event) {
+				if (Boolean.TRUE.equals(event.getProperty(UIEvents.EventTags.NEW_VALUE))) {
+					Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+					if (element instanceof MPart) {
+						MPart part = (MPart) element;
+						createReference(part);
+					}
+				}
+			}
+		});
+
 		// watch for parts' contexts being set, once they've been set, we need
 		// to inject the ViewReference/EditorReference into the context
 		eventBroker.subscribe(
@@ -1934,6 +1950,30 @@ UIEvents.Context.TOPIC_CONTEXT,
 				null, null);
 		page.addEditorReference(ref);
 		return ref;
+	}
+
+	/**
+	 * Creates a workbench part reference for the specified part if one does not
+	 * already exist.
+	 * 
+	 * @param part
+	 *            the model part to create a 3.x part reference for
+	 */
+	private void createReference(MPart part) {
+		String uri = part.getContributionURI();
+		if (CompatibilityPart.COMPATIBILITY_VIEW_URI.equals(uri)) {
+			WorkbenchPage page = getWorkbenchPage(part);
+			ViewReference ref = page.getViewReference(part);
+			if (ref == null) {
+				createViewReference(part, page);
+			}
+		} else if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
+			WorkbenchPage page = getWorkbenchPage(part);
+			EditorReference ref = page.getEditorReference(part);
+			if (ref == null) {
+				createEditorReference(part, page);
+			}
+		}
 	}
 
 	private IEclipseContext getWindowContext(MPart part) {
