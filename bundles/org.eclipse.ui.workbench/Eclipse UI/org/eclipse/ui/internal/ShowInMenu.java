@@ -300,7 +300,7 @@ public class ShowInMenu extends ContributionItem implements
 		if (window == null)
 			return null;
 		Shell shell = window.getShell();
-		if (shell == null)
+		if (shell == null || shell != shell.getDisplay().getActiveShell())
 			return null;
 		
 		IWorkbenchPage page = window.getActivePage();
