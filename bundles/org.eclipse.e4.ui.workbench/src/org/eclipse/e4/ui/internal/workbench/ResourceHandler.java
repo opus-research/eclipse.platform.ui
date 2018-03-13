@@ -207,7 +207,6 @@ public class ResourceHandler implements IModelResourceHandler {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
 			resource = createResourceWithApp(theApp);
-			context.set(E4Workbench.NO_SAVED_MODEL_FOUND, Boolean.TRUE);
 		}
 
 		// Add model items described in the model extension point
@@ -218,12 +217,6 @@ public class ResourceHandler implements IModelResourceHandler {
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
 		contribProcessor.processModel();
-
-		if (!clearPersistedState) {
-			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
-					CommandLineOptionModelProcessor.class, context);
-			processor.process();
-		}
 
 		return resource;
 	}

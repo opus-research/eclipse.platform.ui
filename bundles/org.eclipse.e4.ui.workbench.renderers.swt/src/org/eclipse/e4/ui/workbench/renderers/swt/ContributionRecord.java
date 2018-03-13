@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +22,6 @@ import java.util.List;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.OrExpression;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -247,7 +248,8 @@ public class ContributionRecord {
 				menuModel.getChildren().add(idx++, copy);
 			}
 			if (copy instanceof MMenu || copy instanceof MMenuSeparator) {
-				renderer.addRecord(copy, this);
+				ArrayList<ContributionRecord> array = renderer.getList(copy);
+				array.add(this);
 			}
 		}
 		return true;
@@ -263,8 +265,8 @@ public class ContributionRecord {
 		}
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
-		factoryDispose = (Runnable) ((IContextFunction) obj).compute(
-				staticContext, null);
+		factoryDispose = (Runnable) ((IContextFunction) obj)
+				.compute(staticContext, null);
 		return staticContext.get(List.class);
 	}
 
@@ -313,8 +315,8 @@ public class ContributionRecord {
 			menuModel.getChildren().remove(copy);
 		}
 		for (MMenuElement shared : sharedElements) {
-			renderer.removeRecord(shared, this);
 			ArrayList<ContributionRecord> array = renderer.getList(shared);
+			array.remove(this);
 			if (array.isEmpty()) {
 				menuModel.getChildren().remove(shared);
 			}
