@@ -10,6 +10,8 @@
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
 
+import org.eclipse.e4.ui.model.application.ui.MGenericTile;
+
 
 /**
  * <!-- begin-user-doc -->
@@ -29,5 +31,5 @@ package org.eclipse.e4.ui.model.application.ui.basic;
  * @model
  * @generated
  */
-public interface MCompositePart extends MPart, MPartSashContainer {
+public interface MCompositePart extends MPart, MGenericTile<MPartSashContainerElement> {
 } // MCompositePart

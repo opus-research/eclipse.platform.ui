@@ -39,7 +39,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -155,7 +154,16 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			activate(p, true, true);
+			if (p != null) {
+				MPerspective persp = modelService.getPerspectiveFor(p);
+				boolean inCurrentPerspective = persp == null
+						|| persp == persp.getParent().getSelectedElement();
+				if (inCurrentPerspective) {
+					activate(p, true, true);
+				}
+			} else {
+				activate(p, true, true);
+			}
 		}
 	}
 
@@ -727,7 +735,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPlaceholder createSharedPart(MPart sharedPart) {
 		// Create and return a reference to the shared part
-		MPlaceholder sharedPartRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
+		MPlaceholder sharedPartRef = modelService.createModelElement(MPlaceholder.class);
 		sharedPartRef.setElementId(sharedPart.getElementId());
 		sharedPartRef.setRef(sharedPart);
 		return sharedPartRef;
@@ -1073,7 +1081,8 @@ public class PartServiceImpl implements EPartService {
 			engine.createGui(target);
 		}
 		// ask the engine to create the element
-		engine.createGui(element);
+		if (element.getWidget() == null)
+			engine.createGui(element);
 
 		parent = element.getParent();
 		if (parent != null && parent.getChildren().size() == 1) {
