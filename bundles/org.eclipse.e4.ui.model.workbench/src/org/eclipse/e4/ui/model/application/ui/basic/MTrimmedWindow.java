@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MTrimmedWindow extends MWindow {
 	/**

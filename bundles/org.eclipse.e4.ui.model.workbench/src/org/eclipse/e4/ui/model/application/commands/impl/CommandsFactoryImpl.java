@@ -10,7 +10,6 @@
  */
 package org.eclipse.e4.ui.model.application.commands.impl;
 
-import org.eclipse.e4.ui.model.application.commands.*;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCategory;
@@ -50,7 +49,7 @@ public class CommandsFactoryImpl extends EFactoryImpl implements MCommandsFactor
 	 */
 	public static CommandsFactoryImpl init() {
 		try {
-			CommandsFactoryImpl theCommandsFactory = (CommandsFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(CommandsPackageImpl.eNS_URI);
+			CommandsFactoryImpl theCommandsFactory = (CommandsFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/commands"); //$NON-NLS-1$ 
 			if (theCommandsFactory != null) {
 				return theCommandsFactory;
 			}

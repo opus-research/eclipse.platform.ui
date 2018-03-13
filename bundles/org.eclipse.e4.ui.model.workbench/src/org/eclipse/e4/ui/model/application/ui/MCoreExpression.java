@@ -35,6 +35,7 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MCoreExpression extends MExpression {
 	/**

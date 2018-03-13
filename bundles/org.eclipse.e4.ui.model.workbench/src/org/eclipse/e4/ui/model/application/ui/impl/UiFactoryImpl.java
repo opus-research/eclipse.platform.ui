@@ -10,7 +10,6 @@
  */
 package org.eclipse.e4.ui.model.application.ui.impl;
 
-import org.eclipse.e4.ui.model.application.ui.*;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MUiFactory;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
@@ -44,7 +43,7 @@ public class UiFactoryImpl extends EFactoryImpl implements MUiFactory {
 	 */
 	public static UiFactoryImpl init() {
 		try {
-			UiFactoryImpl theUiFactory = (UiFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(UiPackageImpl.eNS_URI);
+			UiFactoryImpl theUiFactory = (UiFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui"); //$NON-NLS-1$ 
 			if (theUiFactory != null) {
 				return theUiFactory;
 			}

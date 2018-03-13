@@ -92,7 +92,7 @@ public class PerspectiveStackImpl extends UIElementImpl implements MPerspectiveS
 	 */
 	public List<MPerspective> getChildren() {
 		if (children == null) {
-			children = new EObjectContainmentWithInverseEList<MPerspective>(MPerspective.class, this, AdvancedPackageImpl.PERSPECTIVE_STACK__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT) { private static final long serialVersionUID = 1L; @Override public Class<?> getInverseFeatureClass() { return MUIElement.class; } };
+			children = new EObjectContainmentWithInverseEList<MPerspective>(MUIElement.class, this, AdvancedPackageImpl.PERSPECTIVE_STACK__CHILDREN, UiPackageImpl.UI_ELEMENT__PARENT);
 		}
 		return children;
 	}

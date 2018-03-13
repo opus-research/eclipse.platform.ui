@@ -36,6 +36,7 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MUILabel {
 	/**

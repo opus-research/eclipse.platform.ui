@@ -28,6 +28,7 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MHandledToolItem extends MToolItem, MHandledItem {
 } // MHandledToolItem

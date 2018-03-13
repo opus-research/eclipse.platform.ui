@@ -15,7 +15,6 @@ package org.eclipse.e4.ui.model.application;
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Contribution</b></em>'.
  * <!-- end-user-doc -->
- *
  * <!-- begin-model-doc -->
  * <p>
  * <strong>Developers</strong>:
@@ -35,6 +34,7 @@ package org.eclipse.e4.ui.model.application;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MContribution extends MApplicationElement {
 	/**
