@@ -19,9 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Provisional for 4.3.
+ * Provisional for 4.3. This is a container aggregating the menu contributions to be
+ * applied to menus.
  * </p>
- * @noreference
+ * @noreference This interface is not intended to be referenced by clients.
+ * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -33,7 +35,6 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MMenuContributions {
 	/**

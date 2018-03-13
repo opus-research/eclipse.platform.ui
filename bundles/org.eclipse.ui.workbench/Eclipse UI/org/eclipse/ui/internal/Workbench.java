@@ -90,10 +90,13 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -588,8 +591,11 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+
 					IProgressMonitor progressMonitor = null;
-					if (handler != null) {
+					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -1209,7 +1215,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
-				cleanUpCopy(appCopy);
+				cleanUpCopy(appCopy, e4Context);
 				try {
 					res.save(null);
 				} catch (IOException e) {
@@ -1227,10 +1233,12 @@ public final class Workbench extends EventManager implements IWorkbench {
 		cleanAndSaveJob.schedule();
 	}
 
-	private static void cleanUpCopy(MApplication appCopy) {
+	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
-		for (MWindow window : appCopy.getChildren()) {
+		EModelService modelService = context.get(EModelService.class);
+		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
+		for (MWindow window : windows) {
 			if (window instanceof MTrimmedWindow) {
 				MTrimmedWindow trimmedWindow = (MTrimmedWindow) window;
 				// clean up the main menu to avoid duplicate menu items
@@ -1245,6 +1253,17 @@ public final class Workbench extends EventManager implements IWorkbench {
 		appCopy.getMenuContributions().clear();
 		appCopy.getToolBarContributions().clear();
 		appCopy.getTrimContributions().clear();
+
+		List<MPart> parts = modelService.findElements(appCopy, null, MPart.class, null);
+		for (MPart part : parts) {
+			for (MMenu menu : part.getMenus()) {
+				menu.getChildren().clear();
+			}
+			MToolBar tb = part.getToolbar();
+			if (tb != null) {
+				tb.getChildren().clear();
+			}
+		}
 	}
 
 	private static void cleanUpTrimBar(MTrimBar element) {
@@ -1267,7 +1286,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
-				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing)) {
+				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing, false)) {
 					return false;
 				}
 			}
@@ -1645,9 +1664,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
-				ThemeElementHelper.populateRegistry(getThemeManager().getTheme(
-						IThemeManager.DEFAULT_THEME), colorDefinitions, PrefUtil
-						.getInternalPreferenceStore());
+				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
+						colorDefinitions, PrefUtil.getInternalPreferenceStore());
 			}
 		});
 	}
@@ -2713,11 +2731,14 @@ UIEvents.Context.TOPIC_CONTEXT,
 								return Status.CANCEL_STATUS;
 							}
 							final int nextDelay = getAutoSaveJobTime();
-							persist(false);
-							monitor.done();
-							// repeat
-							if (nextDelay > 0 && workbenchAutoSave) {
-								this.schedule(nextDelay);
+							try {
+								persist(false);
+								monitor.done();
+							} finally {
+								// repeat
+								if (nextDelay > 0 && workbenchAutoSave) {
+									this.schedule(nextDelay);
+								}
 							}
 							return Status.OK_STATUS;
 						}
@@ -2787,18 +2808,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, null);
+		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
-			boolean checkPerspective) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
+				if (openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
+						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -2822,23 +2843,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input, true)) {
+			if (activate(perspectiveId, page, input)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input, true)) {
+			if (activate(perspectiveId, page, input)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input, false)) {
-				return page;
-			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 
@@ -2877,6 +2895,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		cancelEarlyStartup();
 		if (workbenchService != null)
 			workbenchService.unregister();
+		workbenchService = null;
 
 		// for dynamic UI
 		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);

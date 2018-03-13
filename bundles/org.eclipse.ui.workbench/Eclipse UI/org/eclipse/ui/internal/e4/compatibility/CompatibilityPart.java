@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
@@ -95,6 +96,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				beingDisposed = true;
 				WorkbenchPartReference reference = getReference();
 				// notify the workbench we're being closed
+				((WorkbenchPage) reference.getPage()).firePartDeactivatedIfActive(part);
 				((WorkbenchPage) reference.getPage()).firePartHidden(part);
 				((WorkbenchPage) reference.getPage()).firePartClosed(CompatibilityPart.this);
 			}
@@ -306,6 +308,11 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			if (!handlePartInitException(e)) {
 				return;
 			}
+		} catch (Exception e) {
+			WorkbenchPlugin.log("Unable to initialize part", e); //$NON-NLS-1$
+			if (!handlePartInitException(new PartInitException(e.getMessage()))) {
+				return;
+			}
 		}
 
 		// hook reference listeners to the part
@@ -428,5 +435,12 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(
 				ESelectionService.class.getName());
 		selectionService.setSelection(e.getSelection());
+	}
+
+	protected void clearMenuItems() {
+		// in the workbench, view menus are re-created on startup
+		for (MMenu menu : part.getMenus()) {
+			menu.getChildren().clear();
+		}
 	}
 }

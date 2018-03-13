@@ -23,6 +23,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -302,6 +303,12 @@ public class HandledContributionItem extends ContributionItem {
 			ParameterizedCommand parmCmd = commandService.createCommand(cmdId,
 					parameters);
 			Activator.trace(Policy.DEBUG_MENUS, "command: " + parmCmd, null); //$NON-NLS-1$
+			if (parmCmd == null) {
+				Activator.log(IStatus.ERROR,
+						"Unable to generate parameterized command for " + model //$NON-NLS-1$
+								+ " with " + parameters); //$NON-NLS-1$
+				return;
+			}
 
 			model.setWbCommand(parmCmd);
 
@@ -810,8 +817,9 @@ public class HandledContributionItem extends ContributionItem {
 				Menu menu = (Menu) obj;
 				// menu.setData(AbstractPartRenderer.OWNING_ME, menu);
 				return menu;
-			} else {
-				System.err.println("Rendering returned " + obj); //$NON-NLS-1$
+			}
+			if (logger != null) {
+				logger.debug("Rendering returned " + obj); //$NON-NLS-1$
 			}
 		}
 		return null;
@@ -897,5 +905,12 @@ public class HandledContributionItem extends ContributionItem {
 
 	public Widget getWidget() {
 		return widget;
+	}
+
+	/**
+	 * @return the model
+	 */
+	public MHandledItem getModel() {
+		return model;
 	}
 }

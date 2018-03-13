@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2012 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,6 +111,16 @@ public class ToolBarContributionRecord {
 			}
 		}
 		if (currentVisibility
+				&& item.getPersistedState().get(
+						MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
+			String identifier = item.getPersistedState().get(
+					MenuManagerRenderer.VISIBILITY_IDENTIFIER);
+			Object rc = exprContext.eclipseContext.get(identifier);
+			if (rc instanceof Boolean) {
+				currentVisibility = ((Boolean) rc).booleanValue();
+			}
+		}
+		if (currentVisibility
 				&& item.getVisibleWhen() instanceof MCoreExpression) {
 			boolean val = ContributionsAnalyzer.isVisible(
 					(MCoreExpression) item.getVisibleWhen(), exprContext);
@@ -124,7 +134,9 @@ public class ToolBarContributionRecord {
 			return true;
 		}
 		for (MToolBarElement child : toolbarContribution.getChildren()) {
-			if (child.getVisibleWhen() != null) {
+			if (child.getVisibleWhen() != null
+					|| child.getPersistedState().get(
+							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
 				return true;
 			}
 		}
