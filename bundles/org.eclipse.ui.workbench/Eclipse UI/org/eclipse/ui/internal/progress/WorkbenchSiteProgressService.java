@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,7 @@ public class WorkbenchSiteProgressService implements
 	 * requested.</li>
 	 * </ul>
 	 */
-	private Map<Job, Boolean> busyJobs = new HashMap<Job, Boolean>();
+	private Map busyJobs = new HashMap();
 
     private Object busyLock = new Object();
 
@@ -170,7 +170,6 @@ public class WorkbenchSiteProgressService implements
 		}
 
         ProgressManager.getInstance().removeListener(this);
-		showBusy(false);
 
         if (waitCursor == null) {
 			return;
@@ -454,9 +453,11 @@ public class WorkbenchSiteProgressService implements
 
 	protected void showBusy(boolean busy) {
 		MPart part = site.getModel();
-		if (busy) {
+		boolean containsBusyTag = part.getTags().contains(CSSConstants.CSS_BUSY_CLASS);
+
+		if (busy && !containsBusyTag) {
 			part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
-		} else {
+		} else if (!busy && containsBusyTag) {
 			part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
 		}
 	}
