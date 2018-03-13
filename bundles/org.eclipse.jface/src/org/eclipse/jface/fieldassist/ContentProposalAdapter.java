@@ -1121,6 +1121,7 @@ public class ContentProposalAdapter {
 	 *             {@link IContentProposalProvider}, such as that performed by
 	 *             {@link SimpleContentProposalProvider}
 	 */
+	@Deprecated
 	public static final int FILTER_CUMULATIVE = 3;
 
 	/*
