@@ -47,7 +47,6 @@ import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.IUpdateService;
@@ -122,7 +121,6 @@ import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
@@ -592,6 +590,23 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		fillActionBars(FILL_ALL_ACTION_BARS);
 		firePageOpened();
 
+		List<MPerspectiveStack> ps = modelService.findElements(model, null,
+				MPerspectiveStack.class, null);
+		MPerspective curPersp = null;
+		boolean newWindow = true;
+		if (ps.size() > 0) {
+			MPerspectiveStack stack = ps.get(0);
+			if (stack.getSelectedElement() != null) {
+				curPersp = stack.getSelectedElement();
+				IPerspectiveDescriptor thePersp = getWorkbench().getPerspectiveRegistry()
+						.findPerspectiveWithId(curPersp.getElementId());
+				if (thePersp != null) {
+					perspective = thePersp;
+					newWindow = false;
+				}
+			}
+		}
+
 		populateTopTrimContributions();
 		populateBottomTrimContributions();
 
@@ -654,10 +669,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, windowWidgetHandler);
 
-		boolean newWindow = setupPerspectiveStack(windowContext);
 		page.setPerspective(perspective);
 		firePageActivated();
-
 		if (newWindow) {
 			page.fireInitialPartVisibilityEvents();
 		} else {
@@ -699,36 +712,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		contextService.registerShell(shell, IContextService.TYPE_WINDOW);
 	}
 	
-	private boolean setupPerspectiveStack(IEclipseContext context) {
-		IPerspectiveRegistry registry = getWorkbench().getPerspectiveRegistry();
-		String forcedPerspectiveId = (String) context.get(E4Workbench.FORCED_PERSPECTIVE_ID);
-
-		if (forcedPerspectiveId != null) {
-			perspective = registry.findPerspectiveWithId(forcedPerspectiveId);
-			if (perspective != null) {
-				return false;
-			}
-		}
-
-		List<MPerspectiveStack> perspStackList = modelService.findElements(model, null,
-				MPerspectiveStack.class, null);
-		MPerspectiveStack perspStack = !perspStackList.isEmpty() ? perspStackList.get(0) : null;
-
-		if (perspStack != null && perspStack.getSelectedElement() != null) {
-			perspective = registry.findPerspectiveWithId(perspStack.getSelectedElement()
-					.getElementId());
-			if (perspective != null) {
-				return false;
-			}
-		}
-
-		if (perspective == null) {
-			perspective = registry.findPerspectiveWithId(registry.getDefaultPerspective());
-		}
-
-		return true;
-	}
-
 	private boolean manageChanges = true;
 	private boolean canUpdateMenus = true;
 
