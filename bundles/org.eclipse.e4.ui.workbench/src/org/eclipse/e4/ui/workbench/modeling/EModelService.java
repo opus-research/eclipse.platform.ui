@@ -14,8 +14,6 @@ package org.eclipse.e4.ui.workbench.modeling;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -69,10 +67,6 @@ public interface EModelService {
 	/** Returned Location if the element is in an MTrimBar */
 	public static final int IN_TRIM = 0x10;
 
-	public static final int IN_MENU = 0x20;
-
-	public static final int IN_TOOLBAR = 0x40;
-
 	// 'Standard' searches
 
 	/** Searches for elements in the UI that the user is currently seeing (excluding trim) */
@@ -81,7 +75,7 @@ public interface EModelService {
 
 	/** Searches for elements in the UI that the user is currently seeing */
 	public static final int ANYWHERE = OUTSIDE_PERSPECTIVE | IN_ANY_PERSPECTIVE | IN_SHARED_AREA
-			| IN_TRIM | IN_MENU | IN_TOOLBAR;
+			| IN_TRIM;
 
 	/**
 	 * Searches for elements in the UI that the user is currently seeing that are OUTSIDE the
@@ -314,8 +308,6 @@ public interface EModelService {
 	 * @return the MPlaceholder or null if none is found
 	 */
 	public MPlaceholder findPlaceholderFor(MWindow window, MUIElement element);
-
-	public MHandler findHandler(MHandlerContainer handlerContainer, String id);
 
 	/**
 	 * Move the element to a new location. The element will be placed at the end of the new parent's

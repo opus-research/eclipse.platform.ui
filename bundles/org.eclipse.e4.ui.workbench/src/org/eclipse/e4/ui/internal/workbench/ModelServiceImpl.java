@@ -19,8 +19,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
@@ -42,16 +40,11 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
-import org.eclipse.e4.ui.workbench.UIEvents.TrimBar;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
@@ -109,8 +102,7 @@ public class ModelServiceImpl implements EModelService {
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
-		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
-				appContext.get(IExtensionRegistry.class));
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
 	}
 
 	/**
@@ -145,8 +137,7 @@ public class ModelServiceImpl implements EModelService {
 	 *            The tags to check, <b>all</b> the specified rags must be in the element's tags
 	 * @return <code>true</code> iff all the tests pass
 	 */
-	private boolean match(MApplicationElement element, String id, Class clazz,
-			List<String> tagsToMatch) {
+	private boolean match(MUIElement element, String id, Class clazz, List<String> tagsToMatch) {
 		if (id != null && !id.equals(element.getElementId()))
 			return false;
 
@@ -200,7 +191,11 @@ public class ModelServiceImpl implements EModelService {
 					}
 				}
 			} else {
-				processContainer(searchRoot, id, type, tagsToMatch, elements, searchFlags);
+				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
+				List<MUIElement> children = container.getChildren();
+				for (MUIElement child : children) {
+					findElementsRecursive(child, id, type, tagsToMatch, elements, searchFlags);
+				}
 			}
 		}
 
@@ -220,7 +215,6 @@ public class ModelServiceImpl implements EModelService {
 				findElementsRecursive(dw, id, type, tagsToMatch, elements, searchFlags);
 			}
 		}
-
 		if (searchRoot instanceof MPerspective) {
 			MPerspective persp = (MPerspective) searchRoot;
 			for (MWindow dw : persp.getWindows()) {
@@ -237,60 +231,6 @@ public class ModelServiceImpl implements EModelService {
 				findElementsRecursive(ph.getRef(), id, type, tagsToMatch, elements, searchFlags);
 			}
 		}
-
-		processMenus(searchRoot, id, type, tagsToMatch, elements, searchFlags);
-		processToolBars(searchRoot, id, type, tagsToMatch, elements, searchFlags);
-	}
-
-	private <T> void processContainer(MUIElement searchRoot, String id, Class<? extends T> type,
-			List<String> tagsToMatch, List<T> elements, int searchFlags) {
-		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
-		List<MUIElement> children = container.getChildren();
-		boolean excludeToolBars = (searchFlags & IN_TOOLBAR) == 0 && searchRoot instanceof TrimBar;
-		for (MUIElement child : children) {
-			if (!(excludeToolBars && child instanceof MToolBar)) {
-				findElementsRecursive(child, id, type, tagsToMatch, elements, searchFlags);
-			}
-		}
-	}
-
-	private <T> void processMenus(MUIElement element, String id, Class<? extends T> type,
-			List<String> tagsToMatch, List<T> elements, int searchFlags) {
-
-		if ((searchFlags & IN_MENU) == 0 || !isTypeSupported(type, MMenuElement.class)) {
-			return;
-		}
-
-		if (element instanceof MPart) {
-			for (MMenu menu : ((MPart) element).getMenus()) {
-				findElementsRecursive(menu, id, type, tagsToMatch, elements, searchFlags);
-			}
-		} else if (element instanceof MWindow) {
-			MMenu menu = ((MWindow) element).getMainMenu();
-			if (menu != null) {
-				findElementsRecursive(menu, id, type, tagsToMatch, elements, searchFlags);
-			}
-		}
-	}
-
-	private <T> void processToolBars(MUIElement element, String id, Class<? extends T> type,
-			List<String> tagsToMatch, List<T> elements, int searchFlags) {
-
-		if ((searchFlags & IN_TOOLBAR) == 0
-				|| !(element instanceof MPart)
-				|| !(isTypeSupported(type, MToolBar.class) || isTypeSupported(type,
-						MToolBarElement.class))) {
-			return;
-		}
-
-		MToolBar toolBar = ((MPart) element).getToolbar();
-		if (toolBar != null) {
-			findElementsRecursive(toolBar, id, type, tagsToMatch, elements, searchFlags);
-		}
-	}
-
-	private boolean isTypeSupported(Class<?> type, Class<?> acceptable) {
-		return type == null || acceptable.isAssignableFrom(type);
 	}
 
 	/*
@@ -1234,24 +1174,5 @@ public class ModelServiceImpl implements EModelService {
 			return false;
 
 		return hostWindow.getSharedElements().contains(curElement);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#findHandler(org.eclipse.e4.ui.model.
-	 * application.commands.MHandlerContainer, java.lang.String)
-	 */
-	public MHandler findHandler(MHandlerContainer handlerContainer, String id) {
-		if (handlerContainer == null) {
-			return null;
-		}
-
-		for (MHandler handler : handlerContainer.getHandlers()) {
-			if (match(handler, id, null, null)) {
-				return handler;
-			}
-		}
-		return null;
 	}
 }
