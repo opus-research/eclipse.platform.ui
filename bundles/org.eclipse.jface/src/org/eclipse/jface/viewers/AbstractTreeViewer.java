@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -677,7 +677,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *            the SWT selection listener
 	 * @deprecated
 	 */
-	@Deprecated
 	protected void addSelectionListener(Control control,
 			SelectionListener listener) {
 		// do nothing
@@ -2598,7 +2597,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 *            the child elements, or null
 	 * @deprecated this is no longer called by the framework
 	 */
-	@Deprecated
 	protected void updateChildren(Widget widget, Object parent,
 			Object[] elementChildren) {
 		updateChildren(widget, parent, elementChildren, true);
@@ -2861,7 +2859,6 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * @deprecated This method was inadvertently released as API but is not
 	 *             intended to be called by clients.
 	 */
-	@Deprecated
 	public Item[] getChildren(Widget widget,  Object[] elementChildren) {
 		return getChildren(widget);
 	}
