@@ -8,7 +8,7 @@
  * 
  * Contributors:
  *     Kai Tödter - initial implementation
- *     Lars Vogel <lars.vogel@gmail.com> - Bug 413431, 416166
+ *     Lars Vogel <lars.vogel@gmail.com> - Bug https://bugs.eclipse.org/413431
  ******************************************************************************/
 
 package org.eclipse.e4.demo.contacts.processors;
@@ -16,84 +16,58 @@ package org.eclipse.e4.demo.contacts.processors;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.demo.contacts.util.Util;
-import org.eclipse.e4.ui.css.swt.theme.ITheme;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
-import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
-import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.swt.widgets.Display;
 
-public class ToolbarThemeProcessor extends Util {
+public class ToolbarThemeProcessor extends AbstractThemeProcessor {
 
 	@Inject
 	@Named("toolbar:org.eclipse.ui.main.toolbar")
 	private MToolBar toolbar;
 
-	private final static String PROCESSOR_ID = "org.eclipse.e4.demo.contacts.processor.toolbar";
+	private final static String PROCESSOR_ID = "org.eclipse.e4.demo.contacts.processor.toolbar"; 
 
-	@SuppressWarnings("restriction")
 	@Execute
-	public void execute(MApplication app, EModelService service,
-			IExtensionRegistry registery, IThemeManager mgr) {
+	public void execute(MApplication app) {
 		if (toolbar == null) {
 			return;
 		}
-
+		
 		List<String> tags = app.getTags();
-		for (String tag : tags) {
-			if (PROCESSOR_ID.equals(tag)) {
+		for(String tag : tags) {
+			if (PROCESSOR_ID.equals(tag))
+			 {
 				return; // already processed
 			}
 		}
-		tags.add(PROCESSOR_ID);
-
-		IThemeEngine engine = mgr.getEngineForDisplay(Display.getCurrent());
-		List<ITheme> themes = engine.getThemes();
-		if (themes.size() > 0) {
-
-			MCommand switchThemeCommand = null;
-			for (MCommand cmd : app.getCommands()) {
-				if ("contacts.switchTheme".equals(cmd.getElementId())) { //$NON-NLS-1$
-					switchThemeCommand = cmd;
-					break;
-				}
-			}
-
-			if (switchThemeCommand != null) {
-
-				toolbar.getChildren().add(
-						MMenuFactory.INSTANCE.createToolBarSeparator());
-
-				for (ITheme theme : themes) {
-					MParameter parameter = MCommandsFactory.INSTANCE
-							.createParameter();
-					parameter.setName("contacts.commands.switchtheme.themeid"); //$NON-NLS-1$
-					parameter.setValue(theme.getId());
-					String iconURI = getCSSUri(theme.getId(), registery);
-					if (iconURI != null) {
-						iconURI = iconURI.replace(".css", ".png");
-					}
-					processTheme(theme.getLabel(), switchThemeCommand,
-							parameter, iconURI, service);
-				}
-
-			}
+		if (!check()) {
+			return;
 		}
+		tags.add(PROCESSOR_ID);
+		super.process(app);
 	}
 
+	@Override
+	protected boolean check() {
+		return toolbar != null;
+	}
+
+	@Override
+	protected void preprocess() {
+		toolbar.getChildren().add(
+				MMenuFactory.INSTANCE.createToolBarSeparator());
+	}
+
+	@Override
 	protected void processTheme(String name, MCommand switchCommand,
-			MParameter themeId, String iconURI, EModelService service) {
-		MHandledToolItem toolItem = service
-				.createModelElement(MHandledToolItem.class);
+			MParameter themeId, String iconURI) {
+		MHandledToolItem toolItem = MMenuFactory.INSTANCE
+				.createHandledToolItem();
 		toolItem.setTooltip(name);
 		toolItem.setCommand(switchCommand);
 		toolItem.getParameters().add(themeId);
@@ -101,6 +75,10 @@ public class ToolbarThemeProcessor extends Util {
 			toolItem.setIconURI(iconURI);
 		}
 		toolbar.getChildren().add(toolItem);
+	}
+
+	@Override
+	protected void postprocess() {
 	}
 
 }
