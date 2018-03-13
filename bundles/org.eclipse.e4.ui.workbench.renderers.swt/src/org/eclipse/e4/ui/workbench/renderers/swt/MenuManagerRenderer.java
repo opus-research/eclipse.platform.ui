@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471						  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866							  
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -22,7 +22,6 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -53,6 +52,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -208,6 +209,68 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
+	private EventHandler childUpdater = new EventHandler() {
+		public void handleEvent(Event event) {
+			// Ensure that this event is for a MMenu
+			final Object obj = event.getProperty(UIEvents.EventTags.ELEMENT);
+			if (!(obj instanceof MMenu) || (obj instanceof MOpaqueMenu))
+				return;
+
+			MMenu menuModel = (MMenu) obj;
+
+			if (UIEvents.isADD(event)) {
+				MenuManager parentManager = getManager(menuModel);
+				if (parentManager == null) {
+					return;
+				}
+				Object newValue = event
+						.getProperty(UIEvents.EventTags.NEW_VALUE);
+				if (newValue instanceof List) {
+					for (Object object : (List) newValue) {
+						if (object instanceof MMenuElement) {
+							modelProcessSwitch(parentManager,
+									(MMenuElement) object);
+						}
+					}
+				} else if (newValue instanceof MMenuElement) {
+					modelProcessSwitch(parentManager, (MMenuElement) newValue);
+				}
+			} else if (UIEvents.isREMOVE(event)) {
+				MenuManager parentManager = getManager(menuModel);
+				if (parentManager == null) {
+					return;
+				}
+				Object oldValue = event
+						.getProperty(UIEvents.EventTags.OLD_VALUE);
+				if (oldValue instanceof MMenu
+						&& !(oldValue instanceof MOpaqueMenu)) {
+					cleanUp((MMenu) oldValue);
+					disposeMenuManager(getManager((MMenu) oldValue),
+							parentManager, (MMenu) oldValue);
+				} else if (oldValue instanceof MMenuElement) {
+					disposeContributionItem(
+							getContribution((MMenuElement) oldValue),
+							parentManager, (MMenuElement) oldValue);
+					parentManager.update(false);
+				} else if (oldValue instanceof List) {
+					for (Object object : (List) oldValue) {
+						if (object instanceof MMenu
+								&& !(object instanceof MOpaqueMenu)) {
+							cleanUp((MMenu) object);
+							disposeMenuManager(getManager((MMenu) object),
+									parentManager, (MMenu) object);
+						} else if (object instanceof MMenuElement) {
+							disposeContributionItem(
+									getContribution((MMenuElement) object),
+									parentManager, (MMenuElement) object);
+						}
+					}
+					parentManager.update(false);
+				}
+			}
+		}
+	};
+
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
@@ -217,6 +280,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
 				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
+		eventBroker.subscribe(ElementContainer.TOPIC_CHILDREN, childUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -239,6 +303,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
+		eventBroker.unsubscribe(childUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.showHelper,
 				context);
@@ -535,6 +600,19 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			}
 		}
 		parentManager.update(false);
+	}
+
+	private void disposeMenuManager(MenuManager menuManager,
+			MenuManager parentManager, MMenu modelElement) {
+		clearModelToManager(modelElement, menuManager);
+		parentManager.remove(menuManager);
+	}
+
+	private void disposeContributionItem(IContributionItem contributionItem,
+			MenuManager parentManager, MMenuElement menuElement) {
+		clearModelToContribution(menuElement, contributionItem);
+		parentManager.remove(contributionItem);
+		// contributionItem.dispose();
 	}
 
 	private void addToManager(MenuManager parentManager, MMenuElement model,
@@ -890,11 +968,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacySep.setVisible(item.isVisible());
 					legacySep.setOpaqueItem(item);
 					linkModelToContribution(legacySep, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacySep);
-					} else {
-						modelChildren.add(legacySep);
-					}
+					modelChildren.add(dest, legacySep);
 				} else if (menuElement instanceof MOpaqueMenuSeparator) {
 					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
@@ -916,11 +990,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacyItem.setVisible(item.isVisible());
 					legacyItem.setOpaqueItem(item);
 					linkModelToContribution(legacyItem, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacyItem);
-					} else {
-						modelChildren.add(legacyItem);
-					}
+					modelChildren.add(dest, legacyItem);
 				} else if (menuElement instanceof MOpaqueMenuItem) {
 					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
@@ -989,14 +1059,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		removeMenuContributions(menuModel, dump);
 		for (MMenuElement mMenuElement : dump) {
 			IContributionItem ici = getContribution(mMenuElement);
-			if (ici == null && mMenuElement instanceof MMenu) {
-				MMenu menuElement = (MMenu) mMenuElement;
-				ici = getManager(menuElement);
-				clearModelToManager(menuElement, (MenuManager) ici);
-			} else {
-				clearModelToContribution(menuModel, ici);
-			}
 			menuManager.remove(ici);
+			clearModelToContribution(menuModel, ici);
 		}
 	}
 }
