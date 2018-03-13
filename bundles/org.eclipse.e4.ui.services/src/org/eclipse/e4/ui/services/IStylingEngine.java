@@ -14,7 +14,8 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 
 
 /**
- * @noimplement
+ * @noimplement This interface is not intended to be implemented by clients.
+ * @noreference This interface is not intended to be referenced by clients.
  */
 public interface IStylingEngine {
 	/**

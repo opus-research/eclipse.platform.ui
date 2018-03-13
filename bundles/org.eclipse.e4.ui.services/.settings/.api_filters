@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.e4.ui.services" version="2">
+    <resource path="src/org/eclipse/e4/ui/services/ContextServiceAddon.java" type="org.eclipse.e4.ui.services.ContextServiceAddon">
+        <filter comment="This is ok since we the class is tagged noreference and will be removed from API" id="643846161">
+            <message_arguments>
+                <message_argument value="IEclipseContext"/>
+                <message_argument value="ContextServiceAddon"/>
+                <message_argument value="init(IEclipseContext)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

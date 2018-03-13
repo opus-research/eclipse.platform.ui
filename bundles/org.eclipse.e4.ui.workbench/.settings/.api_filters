@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.eclipse.e4.ui.workbench" version="2">
+    <resource path="src/org/eclipse/e4/ui/internal/workbench/PartServiceImpl.java" type="org.eclipse.e4.ui.internal.workbench.PartServiceImpl">
+        <filter comment="This is expected as we will be removing EContextService#deferUpdates from API" id="640712815">
+            <message_arguments>
+                <message_argument value="EContextService"/>
+                <message_argument value="PartServiceImpl"/>
+                <message_argument value="deferUpdates(boolean)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/eclipse/e4/ui/workbench/modeling/ExpressionContext.java" type="org.eclipse.e4.ui.workbench.modeling.ExpressionContext">
+        <filter comment="Known problem so the workbench can provide a default eveluation context" id="574619656">
+            <message_arguments>
+                <message_argument value="IEvaluationContext"/>
+                <message_argument value="ExpressionContext"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
