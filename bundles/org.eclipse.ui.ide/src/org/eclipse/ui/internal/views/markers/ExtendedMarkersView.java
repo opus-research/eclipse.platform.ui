@@ -1854,24 +1854,4 @@ public class ExtendedMarkersView extends ViewPart {
 		return markers.length == 1 ? MarkerMessages.deleteMarker_operationName : MarkerMessages.deleteMarkers_operationName;
 	}
 
-	/**
-	 * Sets a boolean value to make the 'Suppress Symbolic Links' button on 'Configure Contents' Dialog visible or not
-	 *
-	 * @param suppressSymbolicLinksCheckBoxVisible - true if it should be visible, false otherwise
-	 * @since 3.9
-	 * */
-	public void setSupressSymbolicLinksCheckBoxVisible(boolean suppressSymbolicLinksCheckBoxVisible) {
-		if (generator !=null)
-			generator.setSuppressSymbolicLinksVisible(suppressSymbolicLinksCheckBoxVisible);
-	}
-
-	/**
-	 * @return boolean - Returns true if the supressSymbolicLinks button is checked, false otherwise
-	 * @since 3.9
-	 */
-	public boolean isSupressSymbolicLinksChecked() {
-		if (generator !=null)
-			return generator.isSuppressSymbolicLinksChecked();
-		return false;
-	}
 }

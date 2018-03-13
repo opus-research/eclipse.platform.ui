@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2013 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> 
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
- *     Lidia Gutu (Windriver) - Bug 415241 - Added the symbolicLinkButton and its functionality
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -97,15 +96,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private Button limitButton;
 	private Text limitText;
 
-
-	/**
-	 * The button used for configuring the Tasks View, In case this button
-	 * should be visible, will be initialized, otherwise it will be null. To
-	 * avoid empty line when it should be unvisible for other
-	 * ExtendedMarkersView implementations like Problems View and Bookmarks
-	 * View.
-	 * */
-	private Button symbolicLinkButton;
 	private GroupFilterConfigurationArea scopeArea = new ScopeArea();
 	private ScrolledForm form;
 
@@ -194,8 +184,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		createMarkerLimits(composite);
 
-		createMarkerSystemLinks(composite);
-
 		Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -228,10 +216,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		updateRadioButtonsFromTable();
 		int limits = generator.getMarkerLimits();
 		boolean limitsEnabled = generator.isMarkerLimitsEnabled();
-
-		if (symbolicLinkButton !=null) {
-			symbolicLinkButton.setSelection(generator.isSuppressSymbolicLinksChecked());
-		}
 		limitButton.setSelection(limitsEnabled);
 		limitsLabel.setEnabled(limitsEnabled);
 		limitText.setEnabled(limitsEnabled);
@@ -330,25 +314,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-	}
-
-	/**
-	 * Creates the Symbolic Link Button
-	 *
-	 * @parent parent
-	 * */
-	private void createMarkerSystemLinks(Composite parent) {
-
-		if (generator.isSuppressSymbolicLinksVisible()) {
-			symbolicLinkButton = new Button(parent, SWT.CHECK);
-			symbolicLinkButton.setText(MarkerMessages.MarkerPreferences_SymbolicLinks);
-			symbolicLinkButton.addSelectionListener(new SelectionAdapter() {
-
-				public void widgetSelected(SelectionEvent e) {
-					generator.setSuppressSymbolicLinksChecked(symbolicLinkButton.getSelection());
-				}
-			});
-		}
 	}
 
 	/**
@@ -768,10 +733,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		generator.setMarkerLimitsEnabled(limitButton.getSelection());
 		generator.setMarkerLimits(Integer.parseInt(limitText.getText().trim()));
-
-		if (symbolicLinkButton !=null) {
-			generator.setSuppressSymbolicLinksChecked(symbolicLinkButton.getSelection());
-		}
 
 		Iterator filterGroupIterator = filterGroups.iterator();
 		while (filterGroupIterator.hasNext()) {
