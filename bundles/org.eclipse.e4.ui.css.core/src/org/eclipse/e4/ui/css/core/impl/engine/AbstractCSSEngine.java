@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,14 +73,14 @@ import org.w3c.dom.stylesheets.StyleSheet;
 /**
  * Abstract CSS Engine manage style sheet parsing and store the
  * {@link CSSStyleSheet} into {@link DocumentCSS}.
- * 
+ *
  * To apply styles, call the {@link #applyStyles(Object, boolean, boolean)}
  * method. This method check if {@link ICSSPropertyHandler} is registered for
  * apply the CSS property.
- * 
+ *
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- * 
+ *
  */
 public abstract class AbstractCSSEngine implements CSSEngine {
 
@@ -132,9 +131,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	private Map<Object, ICSSValueConverter> valueConverters = null;
 
 	protected HashMap widgetsMap = new HashMap();
-	
-	private boolean parseImport;
-	
+
 	public AbstractCSSEngine() {
 		this(new DocumentCSSImpl());
 	}
@@ -148,7 +145,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleSheet(java.io.Reader)
 	 */
 	public StyleSheet parseStyleSheet(Reader reader) throws IOException {
@@ -159,7 +156,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleSheet(java.io.InputStream)
 	 */
 	public StyleSheet parseStyleSheet(InputStream stream) throws IOException {
@@ -170,19 +167,23 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleSheet(org.w3c.css.sac.InputSource)
 	 */
 	public StyleSheet parseStyleSheet(InputSource source) throws IOException {
+		return parseStyleSheet(source, false);
+	}
+
+	protected StyleSheet parseStyleSheet(InputSource source, boolean parseImport) throws IOException {
 		// Check that CharacterStream or ByteStream is not null
 		checkInputSource(source);
 		CSSParser parser = makeCSSParser();
 		CSSStyleSheet styleSheet = parser.parseStyleSheet(source);
-		
+
 		CSSRuleList rules = styleSheet.getCssRules();
 		int length = rules.getLength();
 		CSSRuleListImpl masterList = new CSSRuleListImpl();
-		int counter;
+		int counter = 0;
 		for (counter = 0; counter < length; counter++) {
 			CSSRule rule = rules.item(counter);
 			if (rule.getType() !=  CSSRule.IMPORT_RULE) {
@@ -190,7 +191,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			}
 			Path p = new Path(source.getURI());
 			IPath trim = p.removeLastSegments(1);
-		
+
 			URL url = FileLocator.resolve(new URL(trim.addTrailingSeparator().toString() + ((CSSImportRule) rule).getHref()));
 		    File testFile = new File(url.getFile());
 		    if (!testFile.exists()) {
@@ -201,30 +202,36 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		    		url = new URL(path);
 		    	}
 		    }
-			InputStream stream = url.openStream();
-			InputSource tempStream = new InputSource();
-			tempStream.setURI(url.toString());
-			tempStream.setByteStream(stream);
-			parseImport = true;
-			styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream);
-			parseImport = false;
+		    InputStream stream = null;
+		    try {
+		    	stream = url.openStream();
+				InputSource tempStream = new InputSource();
+				tempStream.setURI(url.toString());
+				tempStream.setByteStream(stream);
+				styleSheet = (CSSStyleSheet) this.parseStyleSheet(tempStream, true);
+				stream.close();
+		    } catch (IOException ex) {
+		    	if (stream != null) {
+		    		stream.close();
+		    	}
+		    }
 			CSSRuleList tempRules = styleSheet.getCssRules();
 			for (int j = 0; j < tempRules.getLength(); j++) {
 				masterList.add(tempRules.item(j));
 			}
 		}
-		
+
 		//add remaining non import rules
 		for (int i = counter; i < length; i++) {
 			masterList.add(rules.item(i));
 		}
-		
+
 		//final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
-		if (documentCSS instanceof ExtendedDocumentCSS) {
+		if (this.documentCSS != null) {
 			if (!parseImport) {
-				documentCSS.addStyleSheet(s);
+				this.documentCSS.addStyleSheet(s);
 			}
 		}
 		return s;
@@ -232,23 +239,23 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
 	 * Return true if <code>source</code> is valid and false otherwise.
-	 * 
+	 *
 	 * @param source
 	 * @throws IOException
 	 */
 	private void checkInputSource(InputSource source) throws IOException {
 		Reader reader = source.getCharacterStream();
 		InputStream stream = source.getByteStream();
-		if (reader == null && stream == null)
-			throw new IOException(
-					"CharacterStream or ByteStream cannot be null for the InputSource.");
+		if (reader == null && stream == null) {
+			throw new IOException("CharacterStream or ByteStream cannot be null for the InputSource.");
+		}
 	}
 
 	/*--------------- Parse style declaration -----------------*/
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleDeclaration(java.lang.String)
 	 */
 	public CSSStyleDeclaration parseStyleDeclaration(String style)
@@ -259,7 +266,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleDeclaration(java.io.Reader)
 	 */
 	public CSSStyleDeclaration parseStyleDeclaration(Reader reader)
@@ -271,7 +278,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleDeclaration(java.io.InputStream)
 	 */
 	public CSSStyleDeclaration parseStyleDeclaration(InputStream stream)
@@ -283,7 +290,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseStyleDeclaration(org.w3c.css.sac.InputSource)
 	 */
 	public CSSStyleDeclaration parseStyleDeclaration(InputSource source)
@@ -299,7 +306,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.core.css.engine.CSSEngine#parseSelectors(java.lang.
 	 * String)
@@ -311,7 +318,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.core.css.engine.CSSEngine#parseSelectors(java.io.Reader
 	 * )
@@ -324,7 +331,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseSelectors(java.io.
 	 * InputStream)
 	 */
@@ -336,7 +343,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.core.css.engine.CSSEngine#parseSelectors(org.w3c.css
 	 * .sac.InputSource)
@@ -352,7 +359,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parsePropertyValue(java.io.Reader)
 	 */
 	public CSSValue parsePropertyValue(Reader reader) throws IOException {
@@ -363,7 +370,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parsePropertyValue(java.io.InputStream)
 	 */
 	public CSSValue parsePropertyValue(InputStream stream) throws IOException {
@@ -374,7 +381,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parsePropertyValue(java.lang.String)
 	 */
 	public CSSValue parsePropertyValue(String value) throws IOException {
@@ -384,7 +391,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parsePropertyValue(org.w3c.css.sac.InputSource)
 	 */
 	public CSSValue parsePropertyValue(InputSource source) throws IOException {
@@ -397,28 +404,27 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.css.core.engine.CSSEngine#applyStyles(java.lang.Object,
 	 *      boolean)
 	 */
 	public void applyStyles(Object element, boolean applyStylesToChildNodes) {
-		applyStyles(element, applyStylesToChildNodes, computeDefaultStyle);
+		applyStyles(element, applyStylesToChildNodes, this.computeDefaultStyle);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.css.core.engine.CSSEngine#applyStyles(java.lang.Object,
 	 *      boolean, boolean)
 	 */
-	public void applyStyles(Object element, boolean applyStylesToChildNodes,
-			boolean computeDefaultStyle) {
+	public void applyStyles(Object element, boolean applyStylesToChildNodes, boolean computeDefaultStyle) {
 		Element elt = getElement(element);
 		if (elt != null) {
 			/*
 			 * Compute new Style to apply.
 			 */
-			CSSStyleDeclaration style = viewCSS.getComputedStyle(elt, null);
+			CSSStyleDeclaration style = this.viewCSS.getComputedStyle(elt, null);
 			if (computeDefaultStyle) {
 				if (applyStylesToChildNodes)
 					this.computeDefaultStyle = computeDefaultStyle;
@@ -446,14 +452,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 						applyDefaultStyleDeclaration(element, false,
 								styleWithPseudoInstance, pseudoInstance);
 					}
-					
+
 					if (styleWithPseudoInstance != null) {
 						CSSRule parentRule = styleWithPseudoInstance.getParentRule();
 						if (parentRule instanceof ExtendedCSSRule) {
 							applyConditionalPseudoStyle((ExtendedCSSRule) parentRule, pseudoInstance, element, styleWithPseudoInstance);
 						} else {
-//							applyStyleDeclaration(element, styleWithPseudoInstance,
-//									pseudoInstance);	
 							applyStyleDeclaration(elt, styleWithPseudoInstance, pseudoInstance);
 						}
 					}
@@ -486,7 +490,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		}
 
 	}
-	
+
 	private void applyConditionalPseudoStyle(ExtendedCSSRule parentRule, String pseudoInstance, Object element, CSSStyleDeclaration styleWithPseudoInstance) {
 		SelectorList selectorList = parentRule.getSelectorList();
 		for (int j = 0; j < selectorList.getLength(); j++) {
@@ -499,10 +503,9 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					String value = ((AttributeCondition) condition).getValue();
 					if (value.equals(pseudoInstance)) {
 						// if we match the pseudo, apply the style
-						applyStyleDeclaration(element, styleWithPseudoInstance,
-								pseudoInstance);
+						applyStyleDeclaration(element, styleWithPseudoInstance, pseudoInstance);
 						return;
-					}										
+					}
 				}
 			}
 		}
@@ -519,7 +522,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/**
 	 * Callback method called when styles applied of <code>nodes</code>
 	 * children of the <code>element</code>.
-	 * 
+	 *
 	 * @param element
 	 * @param nodes
 	 */
@@ -532,16 +535,16 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#applyStyleDeclaration(java.lang.Object,
 	 *      org.w3c.dom.css.CSSStyleDeclaration, java.lang.String)
 	 */
 	public void applyStyleDeclaration(Object element,
 			CSSStyleDeclaration style, String pseudo) {
 		// Apply style
-		boolean avoidanceCacheInstalled = currentCSSPropertiesApplyed == null;
+		boolean avoidanceCacheInstalled = this.currentCSSPropertiesApplyed == null;
 		if (avoidanceCacheInstalled) {
-			currentCSSPropertiesApplyed = new HashMap<String, String>();
+			this.currentCSSPropertiesApplyed = new HashMap<String, String>();
 		}
 		List<ICSSPropertyHandler2> handlers2 = null;
 		for (int i = 0; i < style.getLength(); i++) {
@@ -565,17 +568,16 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					if (!handlers2.contains(propertyHandler2))
 						handlers2.add(propertyHandler2);
 				}
-			} catch (Exception e) {
-				if (throwError
-						|| (!throwError && !(e instanceof UnsupportedPropertyException)))
+			} catch (UnsupportedPropertyException e) {
+				if (this.throwError) {
 					handleExceptions(e);
+				}
+			} catch (Exception e) {
+				handleExceptions(e);
 			}
 		}
 		if (handlers2 != null) {
-			for (Iterator<ICSSPropertyHandler2> iterator = handlers2.iterator(); iterator
-					.hasNext();) {
-				ICSSPropertyHandler2 handler2 = iterator
-						.next();
+			for (ICSSPropertyHandler2 handler2 : handlers2) {
 				try {
 					handler2.onAllCSSPropertiesApplyed(element, this);
 				} catch (Exception e) {
@@ -584,19 +586,18 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			}
 		}
 		if (avoidanceCacheInstalled) {
-			currentCSSPropertiesApplyed = null;
+			this.currentCSSPropertiesApplyed = null;
 		}
 
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseAndApplyStyleDeclaration(java.io.Reader,
 	 *      java.lang.Object)
 	 */
-	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node,
-			Reader reader) throws IOException {
+	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node, Reader reader) throws IOException {
 		CSSStyleDeclaration style = parseStyleDeclaration(reader);
 		this.applyStyleDeclaration(node, style, null);
 		return style;
@@ -604,12 +605,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseAndApplyStyleDeclaration(java.io.InputStream,
 	 *      java.lang.Object)
 	 */
-	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node,
-			InputStream stream) throws IOException {
+	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node, InputStream stream) throws IOException {
 		CSSStyleDeclaration style = parseStyleDeclaration(stream);
 		this.applyStyleDeclaration(node, style, null);
 		return style;
@@ -617,12 +617,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseAndApplyStyleDeclaration(org.w3c.css.sac.InputSource,
 	 *      java.lang.Object)
 	 */
-	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node,
-			InputSource source) throws IOException {
+	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node, InputSource source) throws IOException {
 		CSSStyleDeclaration style = parseStyleDeclaration(source);
 		this.applyStyleDeclaration(node, style, null);
 		return style;
@@ -630,12 +629,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#parseAndApplyStyleDeclaration(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node,
-			String style) throws IOException {
+	public CSSStyleDeclaration parseAndApplyStyleDeclaration(Object node, String style) throws IOException {
 		CSSStyleDeclaration styleDeclaration = parseStyleDeclaration(style);
 		this.applyStyleDeclaration(node, styleDeclaration, null);
 		return styleDeclaration;
@@ -645,20 +643,18 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.core.css.engine.CSSEngine#applyInlineStyle(java.lang.Object,
 	 *      boolean)
 	 */
-	public void applyInlineStyle(Object node, boolean applyStylesToChildNodes)
-			throws IOException {
+	public void applyInlineStyle(Object node, boolean applyStylesToChildNodes) throws IOException {
 		Element elt = getElement(node);
 		if (elt != null) {
 			if (elt instanceof CSSStylableElement) {
 				CSSStylableElement stylableElement = (CSSStylableElement) elt;
 				String style = stylableElement.getCSSStyle();
 				if (style != null && style.length() > 0) {
-					parseAndApplyStyleDeclaration(stylableElement
-							.getNativeWidget(), style);
+					parseAndApplyStyleDeclaration(stylableElement.getNativeWidget(), style);
 				}
 			}
 			if (applyStylesToChildNodes) {
@@ -682,17 +678,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		return getDefaultStyleDeclaration(element, null, pseudoE);
 	}
 
-	public CSSStyleDeclaration getDefaultStyleDeclaration(Object widget,
-			CSSStyleDeclaration newStyle, String pseudoE) {
+	public CSSStyleDeclaration getDefaultStyleDeclaration(Object widget, CSSStyleDeclaration newStyle, String pseudoE) {
 		CSSStyleDeclaration style = null;
-		for (Iterator<ICSSPropertyHandlerProvider> iterator = propertyHandlerProviders
-				.iterator(); iterator
-				.hasNext();) {
-			ICSSPropertyHandlerProvider provider = iterator
-					.next();
+		for (ICSSPropertyHandlerProvider provider : this.propertyHandlerProviders) {
 			try {
-				style = provider.getDefaultCSSStyleDeclaration(this, widget,
-						newStyle, pseudoE);
+				style = provider.getDefaultCSSStyleDeclaration(this, widget, newStyle, pseudoE);
 			} catch (Exception e) {
 				handleExceptions(e);
 			}
@@ -700,36 +690,29 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		return style;
 	}
 
-	public void applyDefaultStyleDeclaration(Object element,
-			boolean applyStylesToChildNodes) {
-		applyDefaultStyleDeclaration(element, applyStylesToChildNodes, null,
-				null);
+	public void applyDefaultStyleDeclaration(Object element, boolean applyStylesToChildNodes) {
+		applyDefaultStyleDeclaration(element, applyStylesToChildNodes, null, null);
 	}
 
-	public void applyDefaultStyleDeclaration(Object element,
-			boolean applyStylesToChildNodes, CSSStyleDeclaration newStyle,
-			String pseudoE) {
+	public void applyDefaultStyleDeclaration(Object element, boolean applyStylesToChildNodes, CSSStyleDeclaration newStyle, String pseudoE) {
 		// Initial styles must be computed or applied
 		Element elt = getElement(element);
 		if (elt != null) {
 			if (elt instanceof CSSStylableElement) {
 				CSSStylableElement stylableElement = (CSSStylableElement) elt;
-				CSSStyleDeclaration oldDefaultStyleDeclaration = stylableElement
-						.getDefaultStyleDeclaration(pseudoE);
+				CSSStyleDeclaration oldDefaultStyleDeclaration = stylableElement.getDefaultStyleDeclaration(pseudoE);
 				// CSSStyleDeclaration defaultStyleDeclaration =
 				// computeDefaultStyleDeclaration(
 				// stylableElement, newStyle);
-				CSSStyleDeclaration defaultStyleDeclaration = getDefaultStyleDeclaration(
-						element, newStyle, pseudoE);
+				CSSStyleDeclaration defaultStyleDeclaration = getDefaultStyleDeclaration(element, newStyle, pseudoE);
 				if (oldDefaultStyleDeclaration != null) {
 					// Second apply styles, apply the initial style
 					// before apply the new style
 					try {
-						throwError = false;
-						applyStyleDeclaration(element, defaultStyleDeclaration,
-								pseudoE);
+						this.throwError = false;
+						applyStyleDeclaration(element, defaultStyleDeclaration,	pseudoE);
 					} finally {
-						throwError = true;
+						this.throwError = true;
 					}
 				}
 			}
@@ -751,18 +734,16 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
 	 * Delegates the handle method.
-	 * 
+	 *
 	 * @param element
 	 *            may be a widget or a node or some object
 	 * @param property
 	 * @param value
 	 * @param pseudo
 	 */
-	public ICSSPropertyHandler applyCSSProperty(Object element,
-			String property,
-			CSSValue value, String pseudo) throws Exception {
-		if (currentCSSPropertiesApplyed != null
-				&& currentCSSPropertiesApplyed.containsKey(property)) {
+	public ICSSPropertyHandler applyCSSProperty(Object element,	String property, CSSValue value, String pseudo) throws Exception {
+		if (this.currentCSSPropertiesApplyed != null
+				&& this.currentCSSPropertiesApplyed.containsKey(property)) {
 			// CSS Property was already applied, ignore it.
 			return null;
 		}
@@ -782,15 +763,18 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					if (result) {
 						// Add CSS Property to flag that this CSS Property was
 						// applied.
-						if (currentCSSPropertiesApplyed != null) {
-							currentCSSPropertiesApplyed.put(property, property);
+						if (this.currentCSSPropertiesApplyed != null) {
+							this.currentCSSPropertiesApplyed.put(property, property);
 						}
 						return handler;
 					}
-				} catch (Exception e) {
-					if (throwError
-							|| (!throwError && !(e instanceof UnsupportedPropertyException)))
+				} catch (UnsupportedPropertyException e) {
+					if (this.throwError) {
 						handleExceptions(e);
+					}
+				} catch (Exception e) {
+					// unexpected exception
+					handleExceptions(e);
 				}
 			}
 		}
@@ -798,11 +782,10 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		return null;
 	}
 
-	public String retrieveCSSProperty(Object element, String property,
-			String pseudo) {
+	public String retrieveCSSProperty(Object element, String property, String pseudo) {
 		try {
 			element = getElement(element); // in case we're passed a node
-			for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
+			for (ICSSPropertyHandlerProvider provider : this.propertyHandlerProviders) {
 				Collection<ICSSPropertyHandler> handlers = provider
 						.getCSSPropertyHandlers(element, property);
 				if (handlers == null) {
@@ -824,16 +807,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	public String[] getCSSCompositePropertiesNames(String property) {
 		try {
 			Collection<ICSSPropertyHandler> handlers = getCSSPropertyHandlers(property);
-			if (handlers == null) {
-				return null;
-			}
-			for (Iterator<ICSSPropertyHandler> iterator = handlers.iterator(); iterator
-					.hasNext();) {
-				ICSSPropertyHandler handler = iterator.next();
+			for (ICSSPropertyHandler handler : handlers) {
 				if (handler instanceof ICSSPropertyCompositeHandler) {
 					ICSSPropertyCompositeHandler compositeHandler = (ICSSPropertyCompositeHandler) handler;
-					if (compositeHandler.isCSSPropertyComposite(property))
+					if (compositeHandler.isCSSPropertyComposite(property)) {
 						return compositeHandler.getCSSPropertiesNames(property);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -842,16 +821,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		return null;
 	}
 
-	protected Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
-			String property) throws Exception {
+	protected Collection<ICSSPropertyHandler> getCSSPropertyHandlers(String property) throws Exception {
 		Collection<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
-		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
-			Collection<ICSSPropertyHandler> h = provider
-					.getCSSPropertyHandlers(property);
-			if (handlers == null) {
-				handlers = h;
-			} else {
-				handlers = new ArrayList<ICSSPropertyHandler>(handlers);
+		for (ICSSPropertyHandlerProvider provider : this.propertyHandlerProviders) {
+			Collection<ICSSPropertyHandler> h = provider.getCSSPropertyHandlers(property);
+			if (h != null) {
 				handlers.addAll(h);
 			}
 		}
@@ -860,13 +834,13 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
 	 * Return the set of property names and handlers for the provided node.
-	 * 
+	 *
 	 * @param node
 	 * @return the property names and handlers
 	 */
 	public Collection<String> getCSSProperties(Object element) {
 		Set<String> properties = new HashSet<String>();
-		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
+		for (ICSSPropertyHandlerProvider provider : this.propertyHandlerProviders) {
 			properties.addAll(provider.getCSSProperties(element));
 		}
 		return properties;
@@ -875,7 +849,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/*--------------- Dynamic pseudo classes -----------------*/
 
 	public IElementProvider getElementProvider() {
-		return elementProvider;
+		return this.elementProvider;
 	}
 
 	public void setElementProvider(IElementProvider elementProvider) {
@@ -885,7 +859,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
 	 * Return the w3c Element linked to the Object element.
-	 * 
+	 *
 	 * @param element
 	 * @return
 	 */
@@ -899,14 +873,14 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		}
 		if (element instanceof Element)
 			elt = (Element) element;
-		else if (elementProvider != null) {
-			elt = elementProvider.getElement(element, this);
-		} else if (elementProvider == null) {
-			Object tmp = widgetsMap.get(element.getClass().getName());
-			Class parent = element.getClass();
+		else if (this.elementProvider != null) {
+			elt = this.elementProvider.getElement(element, this);
+		} else if (this.elementProvider == null) {
+			Object tmp = this.widgetsMap.get(element.getClass().getName());
+			Class<?> parent = element.getClass();
 			while (tmp == null && parent != Object.class) {
 					parent = parent.getSuperclass();
-					tmp = widgetsMap.get(parent.getName());
+					tmp = this.widgetsMap.get(parent.getName());
 			}
 			if(tmp != null && tmp instanceof IElementProvider) {
 				elt = ((IElementProvider)tmp).getElement(element, this);
@@ -917,10 +891,9 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				elementContext = new CSSElementContextImpl();
 				Object nativeWidget = getNativeWidget(element);
 				hookNativeWidget(nativeWidget);
-				getElementsContext().put(nativeWidget,
-						elementContext);
+				getElementsContext().put(nativeWidget, elementContext);
 			}
-			elementContext.setElementProvider(elementProvider);
+			elementContext.setElementProvider(this.elementProvider);
 			elementContext.setElement(elt);
 			if (elt instanceof CSSStylableElement) {
 					// Initialize CSS stylable element
@@ -938,23 +911,26 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	 * when the widget is disposed.
 	 * <p>
 	 * The default implementation of this method does nothing.
-	 * </p> 
-	 * 
-	 * @param widget the native widget to hook 
+	 * </p>
+	 *
+	 * @param widget the native widget to hook
 	 */
 	protected void hookNativeWidget(Object widget) {
+		// The default implementation of this method does nothing.
 	}
-	
+
 	/**
 	 * Called when a widget is disposed. Removes the element context
 	 * from the element contexts map and the widgets map. Overriding
 	 * classes must call the super implementation.
 	 */
 	protected void handleWidgetDisposed(Object widget) {
-		if (widgetsMap != null)
-			widgetsMap.remove(widget);
-		if (elementsContext != null)
-			elementsContext.remove(widget);
+		if (this.widgetsMap != null) {
+			this.widgetsMap.remove(widget);
+		}
+		if (this.elementsContext != null) {
+			this.elementsContext.remove(widget);
+		}
 	}
 
 	public Object getDocument() {
@@ -975,9 +951,10 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	}
 
 	protected Map<Object, CSSElementContext> getElementsContext() {
-		if (elementsContext == null)
-			elementsContext = new HashMap<Object, CSSElementContext>();
-		return elementsContext;
+		if (this.elementsContext == null) {
+			this.elementsContext = new HashMap<Object, CSSElementContext>();
+		}
+		return this.elementsContext;
 	}
 
 	public boolean matches(Selector selector, Object element, String pseudoElt) {
@@ -1000,15 +977,16 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/**
 	 * Handle exceptions thrown while parsing, applying styles. By default this
 	 * method call CSS Error Handler if it is initialized.
-	 * 
+	 *
 	 */
 	public void handleExceptions(Exception e) {
-		if (errorHandler != null)
-			errorHandler.error(e);
+		if (this.errorHandler != null) {
+			this.errorHandler.error(e);
+		}
 	}
 
 	public CSSErrorHandler getErrorHandler() {
-		return errorHandler;
+		return this.errorHandler;
 	}
 
 	/**
@@ -1021,97 +999,95 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/*--------------- Resources Locator Manager -----------------*/
 
 	public IResourcesLocatorManager getResourcesLocatorManager() {
-		if (resourcesLocatorManager == null)
+		if (this.resourcesLocatorManager == null) {
 			return defaultResourcesLocatorManager;
-		return resourcesLocatorManager;
+		}
+		return this.resourcesLocatorManager;
 	}
 
-	public void setResourcesLocatorManager(
-			IResourcesLocatorManager resourcesLocatorManager) {
+	public void setResourcesLocatorManager(IResourcesLocatorManager resourcesLocatorManager) {
 		this.resourcesLocatorManager = resourcesLocatorManager;
 	}
 
 	/*--------------- Document/View CSS -----------------*/
 
 	public DocumentCSS getDocumentCSS() {
-		return documentCSS;
+		return this.documentCSS;
 	}
 
 	public ViewCSS getViewCSS() {
-		return viewCSS;
+		return this.viewCSS;
 	}
 
 	public void dispose() {
 		reset();
 		// Call dispose for each CSSStylableElement which was registered
-		Collection<CSSElementContext> contexts = elementsContext.values();
-		for (Iterator<CSSElementContext> iterator = contexts.iterator(); iterator
-				.hasNext();) {
-			CSSElementContext context = iterator.next();
+		Collection<CSSElementContext> contexts = this.elementsContext.values();
+		for (CSSElementContext context : contexts) {
 			Element element = context.getElement();
 			if (element instanceof CSSStylableElement) {
 				((CSSStylableElement) element).dispose();
 			}
 		}
-		elementsContext = null;
-		widgetsMap = null;
-		if (resourcesRegistry != null)
-			resourcesRegistry.dispose();
+		this.elementsContext = null;
+		this.widgetsMap = null;
+		if (this.resourcesRegistry != null) {
+			this.resourcesRegistry.dispose();
+		}
 	}
 
 	public void reset() {
 		// Remove All Style Sheets
-		((ExtendedDocumentCSS) documentCSS).removeAllStyleSheets();
+		((ExtendedDocumentCSS) this.documentCSS).removeAllStyleSheets();
 	}
 
 	/*--------------- Resources Registry -----------------*/
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.e4.ui.css.core.engine.CSSEngine#getResourcesRegistry()
 	 */
 	public IResourcesRegistry getResourcesRegistry() {
-		return resourcesRegistry;
+		return this.resourcesRegistry;
 	}
 
 	public void setResourcesRegistry(IResourcesRegistry resourcesRegistry) {
 		this.resourcesRegistry = resourcesRegistry;
 	}
 
-	public void registerCSSPropertyHandlerProvider(
-			ICSSPropertyHandlerProvider handlerProvider) {
-		propertyHandlerProviders.add(handlerProvider);
+	public void registerCSSPropertyHandlerProvider(ICSSPropertyHandlerProvider handlerProvider) {
+		this.propertyHandlerProviders.add(handlerProvider);
 	}
 
-	public void unregisterCSSPropertyHandlerProvider(
-			ICSSPropertyHandlerProvider handlerProvider) {
-		propertyHandlerProviders.remove(handlerProvider);
+	public void unregisterCSSPropertyHandlerProvider(ICSSPropertyHandlerProvider handlerProvider) {
+		this.propertyHandlerProviders.remove(handlerProvider);
 	}
 
 	/*--------------- CSS Value Converter -----------------*/
 
 	public void registerCSSValueConverter(ICSSValueConverter converter) {
-		if (valueConverters == null)
-			valueConverters = new HashMap<Object, ICSSValueConverter>();
-		valueConverters.put(converter.getToType(), converter);
+		if (this.valueConverters == null) {
+			this.valueConverters = new HashMap<Object, ICSSValueConverter>();
+		}
+		this.valueConverters.put(converter.getToType(), converter);
 	}
 
 	public void unregisterCSSValueConverter(ICSSValueConverter converter) {
-		if (valueConverters == null)
+		if (this.valueConverters == null) {
 			return;
-		valueConverters.remove(converter);
+		}
+		this.valueConverters.remove(converter);
 	}
 
 	public ICSSValueConverter getCSSValueConverter(Object toType) {
-		if (valueConverters != null) {
-			return valueConverters.get(toType);
+		if (this.valueConverters != null) {
+			return this.valueConverters.get(toType);
 		}
 		return null;
 	}
 
-	public Object convert(CSSValue value, Object toType, Object context)
-			throws Exception {
+	public Object convert(CSSValue value, Object toType, Object context) throws Exception {
 		Object newValue = null;
 		String key = CSSResourcesHelpers.getCSSValueKey(value);
 		IResourcesRegistry resourcesRegistry = getResourcesRegistry();
@@ -1127,8 +1103,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 					// cache it
 					if (resourcesRegistry != null) {
 						if (key != null)
-							resourcesRegistry.registerResource(toType, key,
-									newValue);
+							resourcesRegistry.registerResource(toType, key, newValue);
 					}
 				}
 			}
@@ -1136,10 +1111,10 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		return newValue;
 	}
 
-	public String convert(Object value, Object toType, Object context)
-			throws Exception {
-		if (value == null)
+	public String convert(Object value, Object toType, Object context) throws Exception {
+		if (value == null) {
 			return null;
+		}
 		ICSSValueConverter converter = getCSSValueConverter(toType);
 		if (converter != null) {
 			return converter.convert(value, this, context);
