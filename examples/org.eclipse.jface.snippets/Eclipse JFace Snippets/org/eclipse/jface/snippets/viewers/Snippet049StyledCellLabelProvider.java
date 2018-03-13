@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Michael Krkoska - initial API and implementation (bug 188333)
+ *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -19,10 +21,10 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -43,8 +45,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 
 public class Snippet049StyledCellLabelProvider {
-	
-	
+
+
 	private static final int SHELL_WIDTH= 400;
 	private static final Display DISPLAY= Display.getDefault();
 
@@ -52,7 +54,7 @@ public class Snippet049StyledCellLabelProvider {
 	public static void main(String[] args) {
 
 		JFaceResources.getColorRegistry().put(JFacePreferences.COUNTER_COLOR, new RGB(0,127,174));
-		
+
 		Shell shell= new Shell(DISPLAY, SWT.CLOSE | SWT.RESIZE);
 		shell.setSize(SHELL_WIDTH, 400);
 		shell.setLayout(new GridLayout(1, false));
@@ -60,7 +62,7 @@ public class Snippet049StyledCellLabelProvider {
 		Snippet049StyledCellLabelProvider example= new Snippet049StyledCellLabelProvider();
 		Control composite= example.createPartControl(shell);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		
+
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -82,8 +84,8 @@ public class Snippet049StyledCellLabelProvider {
 		Label label= new Label(composite, SWT.NONE);
 		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		label.setText("Viewer with a StyledCellLabelProvider:"); //$NON-NLS-1$
-		
-		final TableViewer tableViewer= new TableViewer(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+
+		final TableViewer<File,Object> tableViewer= new TableViewer<File,Object>(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		// Multi-font support only works in JFace 3.5 and above (specifically, 3.5 M4 and above).
 		// With JFace 3.4, the font information (bold in this example) will be ignored.
@@ -92,7 +94,7 @@ public class Snippet049StyledCellLabelProvider {
 		Font boldFont = new Font(Display.getCurrent(), boldFontData);
 		ExampleLabelProvider labelProvider= new ExampleLabelProvider(boldFont);
 		FileSystemContentProvider contentProvider= new FileSystemContentProvider();
-		
+
 		tableViewer.setContentProvider(contentProvider);
 		tableViewer.setLabelProvider(labelProvider);
 
@@ -102,7 +104,7 @@ public class Snippet049StyledCellLabelProvider {
 
 		return composite;
 	}
-	
+
 	private static FontData[] getModifiedFontData(FontData[] originalData, int additionalStyle) {
 		FontData[] styleData = new FontData[originalData.length];
 		for (int i = 0; i < styleData.length; i++) {
@@ -111,15 +113,15 @@ public class Snippet049StyledCellLabelProvider {
 		}
        	return styleData;
     }
-	
-	private static class ExampleLabelProvider extends StyledCellLabelProvider {
+
+	private static class ExampleLabelProvider extends StyledCellLabelProvider<File,Object> {
 
 		private static int IMAGE_SIZE= 16;
 		private static final Image IMAGE1= new Image(DISPLAY, DISPLAY.getSystemImage(SWT.ICON_WARNING).getImageData().scaledTo(IMAGE_SIZE, IMAGE_SIZE));
 		private static final Image IMAGE2= new Image(DISPLAY, DISPLAY.getSystemImage(SWT.ICON_ERROR).getImageData().scaledTo(IMAGE_SIZE, IMAGE_SIZE));
 
-		private final Styler fBoldStyler; 
-		
+		private final Styler fBoldStyler;
+
 		public ExampleLabelProvider(final Font boldFont) {
 			fBoldStyler= new Styler() {
 				public void applyStyles(TextStyle textStyle) {
@@ -127,23 +129,23 @@ public class Snippet049StyledCellLabelProvider {
 				}
 			};
 		}
-		
-		public void update(ViewerCell cell) {
-			Object element= cell.getElement();
-			
+
+		public void update(ViewerCell<File> cell) {
+			File element= cell.getElement();
+
 			if (element instanceof File) {
-				File file= (File) element;
-				
+				File file= element;
+
 				// Multi-font support only works in JFace 3.5 and above (specifically, 3.5 M4 and above).
 				// With JFace 3.4, the font information (bold in this example) will be ignored.
 				Styler style= file.isDirectory() ? fBoldStyler: null;
 				StyledString styledString= new StyledString(file.getName(), style);
 				String decoration = MessageFormat.format(" ({0} bytes)", new Object[] { new Long(file.length()) }); //$NON-NLS-1$
 				styledString.append(decoration, StyledString.COUNTER_STYLER);
-				
+
 				cell.setText(styledString.toString());
 				cell.setStyleRanges(styledString.getStyleRanges());
-				
+
 				if (file.isDirectory()) {
 					cell.setImage(IMAGE1);
 				} else {
@@ -155,15 +157,15 @@ public class Snippet049StyledCellLabelProvider {
 
 			super.update(cell);
 		}
-		
-		protected void measure(Event event, Object element) {
+
+		protected void measure(Event event, File element) {
 			super.measure(event, element);
 		}
 	}
 
-	private static class FileSystemContentProvider implements IStructuredContentProvider {
+	private static class FileSystemContentProvider implements IStructuredContentProvider<File,Object> {
 
-		public Object[] getElements(Object element) {
+		public File[] getElements(Object element) {
 			File[] roots = File.listRoots();
 			for (int i = 0; i < roots.length; i++) {
 				File[] list = roots[i].listFiles();
@@ -177,7 +179,7 @@ public class Snippet049StyledCellLabelProvider {
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends Object> viewer, Object oldInput, Object newInput) {
 		}
 	}
 }

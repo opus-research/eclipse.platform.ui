@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,6 +147,7 @@ public class StyledString {
 	 * 
 	 * @return the current string of this {@link StyledString}.
 	 */
+	@Override
 	public String toString() {
 		return getString();
 	}
@@ -213,10 +214,10 @@ public class StyledString {
 		int offset = fBuffer.length();
 		fBuffer.append(string.toString());
 
-		List otherRuns = string.fStyleRuns;
+		List<StyleRun> otherRuns = string.fStyleRuns;
 		if (otherRuns != null && !otherRuns.isEmpty()) {
 			for (int i = 0; i < otherRuns.size(); i++) {
-				StyleRun curr = (StyleRun) otherRuns.get(i);
+				StyleRun curr = otherRuns.get(i);
 				if (i == 0 && curr.offset != 0) {
 					appendStyleRun(null, offset); // appended string will
 					// start with the default
@@ -409,13 +410,13 @@ public class StyledString {
 	 */
 	public StyleRange[] getStyleRanges() {
 		if (hasRuns()) {
-			ArrayList res = new ArrayList();
+			ArrayList<StyleRange> res = new ArrayList<StyleRange>();
 
-			List styleRuns = getStyleRuns();
+			List<StyleRun> styleRuns = getStyleRuns();
 			int offset = 0;
 			Styler style = null;
 			for (int i = 0; i < styleRuns.size(); i++) {
-				StyleRun curr = (StyleRun) styleRuns.get(i);
+				StyleRun curr = styleRuns.get(i);
 				if (isDifferentStyle(curr.style, style)) {
 					if (curr.offset > offset && style != null) {
 						res.add(createStyleRange(offset, curr.offset, style));
@@ -427,7 +428,7 @@ public class StyledString {
 			if (fBuffer.length() > offset && style != null) {
 				res.add(createStyleRange(offset, fBuffer.length(), style));
 			}
-			return (StyleRange[]) res.toArray(new StyleRange[res.size()]);
+			return res.toArray(new StyleRange[res.size()]);
 		}
 		return EMPTY;
 	}
@@ -504,12 +505,13 @@ public class StyledString {
 			this.style = style;
 		}
 
+		@Override
 		public String toString() {
 			return "Offset " + offset + ", style: " + style; //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
 
-	private static class StyleRunList extends ArrayList {
+	private static class StyleRunList extends ArrayList<StyleRun> {
 		private static final long serialVersionUID = 123L;
 
 		public StyleRunList() {
@@ -517,9 +519,10 @@ public class StyledString {
 		}
 
 		public StyleRun getRun(int index) {
-			return (StyleRun) get(index);
+			return get(index);
 		}
 
+		@Override
 		public void removeRange(int fromIndex, int toIndex) {
 			super.removeRange(fromIndex, toIndex);
 		}
@@ -535,6 +538,7 @@ public class StyledString {
 			fBackgroundColorName = backgroundColorName;
 		}
 
+		@Override
 		public void applyStyles(TextStyle textStyle) {
 			ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 			if (fForegroundColorName != null) {
