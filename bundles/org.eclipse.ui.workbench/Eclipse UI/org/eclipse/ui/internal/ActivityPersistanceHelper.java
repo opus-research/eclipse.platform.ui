@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -68,7 +67,7 @@ final class ActivityPersistanceHelper {
                         .getActivityManager().getEnabledActivityIds(), delta);
             }
             if (activityManagerEvent.haveEnabledActivityIdsChanged()) {
-				saveEnabledStates();
+				saveEnabledStates(false);
 			}
         }
     };
@@ -261,7 +260,7 @@ final class ActivityPersistanceHelper {
     /**
      * Save the enabled states in the preference store.
      */
-    protected void saveEnabledStates() {
+	protected void saveEnabledStates(boolean persist) {
         try {
             saving = true;
 	        
@@ -282,7 +281,9 @@ final class ActivityPersistanceHelper {
 	            store.setValue(createPreferenceKey(activity.getId()), activity
 	                    .isEnabled());
 	        }
-	        WorkbenchPlugin.getDefault().savePluginPreferences();
+			if (persist) {
+				WorkbenchPlugin.getDefault().savePluginPreferences();
+			}
         }
         finally {
             saving = false;
@@ -294,6 +295,6 @@ final class ActivityPersistanceHelper {
      */
     public void shutdown() {
         unhookListeners();
-        saveEnabledStates();        
+		saveEnabledStates(true);
     }
 }
