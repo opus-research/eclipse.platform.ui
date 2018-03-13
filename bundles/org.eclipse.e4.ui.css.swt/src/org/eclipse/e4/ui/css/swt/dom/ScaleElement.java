@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 Angelo Zerr and others.
+ * Copyright (c) 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Scale;
 public class ScaleElement extends ControlElement {
 	
 	private SelectionListener selectionListener = new SelectionAdapter() {
-		@Override
 		public void widgetSelected(SelectionEvent e) {
 			doApplyStyles();
 		}
@@ -34,7 +33,6 @@ public class ScaleElement extends ControlElement {
 		super(scale, engine);
 	}
 
-	@Override
 	public void initialize() {
 		super.initialize();
 
@@ -44,7 +42,6 @@ public class ScaleElement extends ControlElement {
 		scale.addSelectionListener(selectionListener);
 	}
 		
-	@Override
 	public void dispose() {	
 		super.dispose();
 		
@@ -56,7 +53,6 @@ public class ScaleElement extends ControlElement {
 		}
 	}
 
-	@Override
 	public String getAttribute(String attr) {
 		return super.getAttribute(attr);
 	}

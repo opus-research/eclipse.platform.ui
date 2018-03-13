@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     /**
      * The field editors, or <code>null</code> if not created yet.
      */
-    private List<FieldEditor> fields = null;
+    private List fields = null;
 
     /**
      * The layout style; either <code>FLAT</code> or <code>GRID</code>.
@@ -139,7 +139,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      */
     protected void addField(FieldEditor editor) {
         if (fields == null) {
-			fields = new ArrayList<FieldEditor>();
+			fields = new ArrayList();
 		}
         fields.add(editor);
     }
@@ -153,7 +153,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
         ((GridLayout) fieldEditorParent.getLayout()).numColumns = numColumns;
         if (fields != null) {
             for (int i = 0; i < fields.size(); i++) {
-                FieldEditor fieldEditor = fields.get(i);
+                FieldEditor fieldEditor = (FieldEditor) fields.get(i);
                 fieldEditor.adjustForNumColumns(numColumns);
             }
         }
@@ -164,9 +164,9 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      */
     protected void applyFont() {
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 pe.applyFont();
             }
         }
@@ -180,9 +180,9 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     private int calcNumberOfColumns() {
         int result = 0;
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 result = Math.max(result, pe.getNumberOfControls());
             }
         }
@@ -201,7 +201,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
         if (fields != null) {
             int size = fields.size();
             for (int i = 0; i < size; i++) {
-                FieldEditor editor = fields.get(i);
+                FieldEditor editor = (FieldEditor) fields.get(i);
                 valid = valid && editor.isValid();
                 if (!valid) {
                     invalidFieldEditor = editor;
@@ -215,8 +215,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * Method declared on PreferencePage.
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         fieldEditorParent = new Composite(parent, SWT.NULL);
         GridLayout layout = new GridLayout();
         layout.numColumns = 1;
@@ -259,13 +258,12 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * Subclasses may override to release their own allocated SWT
      * resources, but must call <code>super.dispose</code>.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 pe.setPage(null);
                 pe.setPropertyChangeListener(null);
                 pe.setPreferenceStore(null);
@@ -300,9 +298,9 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      */
     protected void initialize() {
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 pe.setPage(this);
                 pe.setPropertyChangeListener(this);
                 pe.setPreferenceStore(getPreferenceStore());
@@ -315,12 +313,11 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * The field editor preference page implementation of a <code>PreferencePage</code>
      * method loads all the field editors with their default values.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 pe.loadDefault();
             }
         }
@@ -338,12 +335,11 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      *
      * @see FieldEditor#store()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         if (fields != null) {
-            Iterator<FieldEditor> e = fields.iterator();
+            Iterator e = fields.iterator();
             while (e.hasNext()) {
-                FieldEditor pe = e.next();
+                FieldEditor pe = (FieldEditor) e.next();
                 pe.store();
                 pe.setPresentsDefaultValue(false);
             }
@@ -356,8 +352,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      * (and <code>IPropertyChangeListener</code>) method intercepts <code>IS_VALID</code> 
      * events but passes other events on to its superclass.
      */
-    @Override
-	public void propertyChange(PropertyChangeEvent event) {
+    public void propertyChange(PropertyChangeEvent event) {
 
         if (event.getProperty().equals(FieldEditor.IS_VALID)) {
             boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
@@ -375,8 +370,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
     /* (non-Javadoc)
      * Method declared on IDialog.
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         super.setVisible(visible);
         if (visible && invalidFieldEditor != null) {
             invalidFieldEditor.setFocus();

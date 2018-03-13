@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,7 +58,6 @@ public class CyclePageHandler extends CycleBaseHandler {
 		this.pageSwitcher = pageSwitcher;
 	}
 
-	@Override
 	protected void addItems(Table table, WorkbenchPage page) {
 		Object[] pages = pageSwitcher.getPages();
 		for (int i = 0; i < pages.length; i++) {
@@ -82,12 +81,10 @@ public class CyclePageHandler extends CycleBaseHandler {
 		}
 	}
 	
-	@Override
 	protected int getCurrentItemIndex() {
 		return pageSwitcher.getCurrentPageIndex();
 	}
 
-	@Override
 	protected ParameterizedCommand getBackwardCommand() {
 		final ICommandService commandService = (ICommandService) window
 				.getWorkbench().getService(ICommandService.class);
@@ -97,7 +94,6 @@ public class CyclePageHandler extends CycleBaseHandler {
 		return commandF;
 	}
 
-	@Override
 	protected ParameterizedCommand getForwardCommand() {
 		final ICommandService commandService = (ICommandService) window
 				.getWorkbench().getService(ICommandService.class);
@@ -106,7 +102,6 @@ public class CyclePageHandler extends CycleBaseHandler {
 		return commandF;
 	}
 
-	@Override
 	protected String getTableHeader(IWorkbenchPart activePart) {
 		if (activePart instanceof WorkbenchPart) {
 			return ((WorkbenchPart) activePart).getPartName();
@@ -115,7 +110,6 @@ public class CyclePageHandler extends CycleBaseHandler {
 		return activePart.getTitle();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (event.getCommand().getId().equals(IWorkbenchCommandConstants.NAVIGATE_NEXT_PAGE)) {
 			gotoDirection = true;
@@ -130,7 +124,6 @@ public class CyclePageHandler extends CycleBaseHandler {
 		return null;
 	}
 
-	@Override
 	protected void setDialogLocation(final Shell dialog,
 			IWorkbenchPart activePart) {
 		if (dialog == null)
@@ -161,13 +154,11 @@ public class CyclePageHandler extends CycleBaseHandler {
 		dialog.setLocation(dlgAnchor);
 	}
 
-	@Override
 	public void dispose() {
 		super.dispose();
 		this.pageSwitcher = null;
 	}
 
-	@Override
 	protected void activate(IWorkbenchPage page, Object selectedItem) {
 		if (selectedItem == null) {
 			return;

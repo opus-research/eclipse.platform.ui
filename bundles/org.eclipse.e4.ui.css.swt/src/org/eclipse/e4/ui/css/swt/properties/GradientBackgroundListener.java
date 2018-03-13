@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,7 +49,6 @@ public class GradientBackgroundListener implements Listener {
 	Image gradientImage;
 	
 	private DisposeListener disposeListener = new DisposeListener() {
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			dispose();
 		}
@@ -60,7 +59,8 @@ public class GradientBackgroundListener implements Listener {
 		// java.awt.RadialGradientPaint that is only available in Java 6 and
 		// higher. Since the BREE is set to J2SE-1.5, reflection is used.
 		try {
-			Class.forName("java.awt.RadialGradientPaint"); //$NON-NLS-1$
+			Class<?> radialGradientPaintClass = Class
+					.forName("java.awt.RadialGradientPaint"); //$NON-NLS-1$
 			isRadialSupported = true;
 		} catch (Exception e) {
 //			System.err
@@ -111,7 +111,6 @@ public class GradientBackgroundListener implements Listener {
 		}
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		Point size = control.getSize();
 		if (size.x <= 0 || size.y <= 0) {

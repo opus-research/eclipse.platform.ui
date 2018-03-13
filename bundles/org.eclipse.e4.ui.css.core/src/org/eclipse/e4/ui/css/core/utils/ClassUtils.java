@@ -17,7 +17,7 @@ public class ClassUtils {
 
 	/**
 	 * Return the simple name of Class <code>c</code>.
-	 *
+	 * 
 	 * @param c
 	 * @return
 	 */
@@ -27,17 +27,12 @@ public class ClassUtils {
 		if (index > 0) {
 			name = name.substring(index + 1, name.length());
 		}
-
-		// inner classes contain a "$" as in Outer$Inner. As "$" is not allowed
-		// as part of a CSS selector
-		// we translate a "$" into a "-" here.
-		name = name.replace('$', '-');
 		return name;
 	}
 
 	/**
 	 * Return the package name of Class <code>c</code>.
-	 *
+	 * 
 	 * @param c
 	 * @return
 	 */

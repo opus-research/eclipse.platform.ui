@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,8 +67,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    protected void adjustForNumColumns(int numColumns) {
         ((GridData) getTextControl().getLayoutData()).horizontalSpan = numColumns - 2;
     }
 
@@ -88,8 +87,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     /* (non-Javadoc)
      * Method declared on StringFieldEditor (and FieldEditor).
      */
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         super.doFillIntoGrid(parent, numColumns - 1);
         changeButton = getChangeControl(parent);
         GridData gd = new GridData();
@@ -115,8 +113,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
             changeButton.setText(changeButtonText);
             changeButton.setFont(parent.getFont());
             changeButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent evt) {
+                public void widgetSelected(SelectionEvent evt) {
                     String newValue = changePressed();
                     if (newValue != null) {
                         setStringValue(newValue);
@@ -124,8 +121,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
                 }
             });
             changeButton.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     changeButton = null;
                 }
             });
@@ -138,8 +134,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	public int getNumberOfControls() {
+    public int getNumberOfControls() {
         return 3;
     }
 
@@ -174,8 +169,7 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean, org.eclipse.swt.widgets.Composite)
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         if (changeButton != null) {
             changeButton.setEnabled(enabled);

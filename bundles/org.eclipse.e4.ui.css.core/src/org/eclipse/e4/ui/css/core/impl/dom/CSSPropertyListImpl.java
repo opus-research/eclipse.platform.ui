@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     IBM Corporation - ongoing development
  *******************************************************************************/
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.e4.ui.css.core.dom.CSSProperty;
 import org.eclipse.e4.ui.css.core.dom.CSSPropertyList;
 
@@ -31,7 +31,6 @@ public class CSSPropertyListImpl implements CSSPropertyList {
 	 * (non-Javadoc)
 	 * @see org.eclipse.e4.css.core.dom.CSSPropertyList#getLength()
 	 */
-	@Override
 	public int getLength() {
 		return (properties != null) ? properties.size() : 0;
 	}
@@ -40,7 +39,6 @@ public class CSSPropertyListImpl implements CSSPropertyList {
 	 * (non-Javadoc)
 	 * @see org.eclipse.e4.css.core.dom.CSSPropertyList#item(int)
 	 */
-	@Override
 	public CSSProperty item(int index) {
 		return (properties != null) ? (CSSProperty) properties.get(index)
 				: null;
@@ -83,7 +81,6 @@ public class CSSPropertyListImpl implements CSSPropertyList {
 	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < getLength(); i++) {

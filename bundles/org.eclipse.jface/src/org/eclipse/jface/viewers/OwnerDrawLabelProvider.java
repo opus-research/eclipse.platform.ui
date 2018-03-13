@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,6 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 			this.viewer = viewer;
 		}
 
-		@Override
 		public void handleEvent(Event event) {
 			ViewerColumn column = viewer.getViewerColumn(event.index);
 			if (column != null && (enabledGlobally > 0 || enabledColumns.contains(column))) {
@@ -80,11 +79,15 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *             in this class will set up the necessary owner draw callbacks
 	 *             automatically. Calls to this method can be removed.
 	 */
-	@Deprecated
 	public static void setUpOwnerDraw(final ColumnViewer viewer) {
 		getOrCreateOwnerDrawListener(viewer).enabledGlobally++;
 	}
 
+	/**
+	 * @param viewer
+	 * @param control
+	 * @return
+	 */
 	private static OwnerDrawListener getOrCreateOwnerDrawListener(
 			final ColumnViewer viewer) {
 		Control control = viewer.getControl();
@@ -108,7 +111,6 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	}
 
-	@Override
 	public void dispose(ColumnViewer viewer, ViewerColumn column) {
 		if (!viewer.getControl().isDisposed()) {
 			setOwnerDrawEnabled(viewer, column, false);
@@ -125,7 +127,6 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * implementation or, alternatively,
 	 * {@link #initialize(ColumnViewer, ViewerColumn, boolean)}.
 	 */
-	@Override
 	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
 		this.initialize(viewer, column, true);
 	}
@@ -155,7 +156,6 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 		setOwnerDrawEnabled(viewer, column, enableOwnerDraw);
 	}
 
-	@Override
 	public void update(ViewerCell cell) {
 		// Force a redraw
 		Rectangle cellBounds = cell.getBounds();

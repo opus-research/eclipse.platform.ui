@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,6 @@ public class SaveAsHandler extends AbstractSaveHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		ISaveablePart saveablePart = getSaveablePart(event);
@@ -44,7 +43,6 @@ public class SaveAsHandler extends AbstractSaveHandler {
 		return null;
 	}
 
-	@Override
 	protected EvaluationResult evaluate(IEvaluationContext context) {
 
 		IWorkbenchWindow window = InternalHandlerUtil.getActiveWorkbenchWindow(context);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,11 @@ class TableColumnViewerLabelProvider extends WrappedViewerLabelProvider {
 			tableFontProvider = (ITableFontProvider) labelProvider;
 	}
 
-	@Override
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.WrappedViewerLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 
 		Object element = cell.getElement();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,8 +104,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
      * 
      * @see org.eclipse.ui.INestableKeyBindingService#activateKeyBindingService(org.eclipse.ui.IWorkbenchSite)
      */
-    @Override
-	public boolean activateKeyBindingService(IWorkbenchSite nestedSite) {
+    public boolean activateKeyBindingService(IWorkbenchSite nestedSite) {
         if (disposed) {
 			return false;
 		}
@@ -266,7 +265,6 @@ public final class KeyBindingService implements INestableKeyBindingService {
      * 
      * @see org.eclipse.ui.INestableKeyBindingService#getKeyBindingService(org.eclipse.ui.IWorkbenchSite)
      */
-	@Override
 	public IKeyBindingService getKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
 			return null;
@@ -292,8 +290,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		return service;
 	}
 
-    @Override
-	public String[] getScopes() {
+    public String[] getScopes() {
         if (disposed) {
 			return null;
 		}
@@ -308,8 +305,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		return activeScopes.toArray(new String[activeScopes.size()]);
     }
 
-    @Override
-	public void registerAction(IAction action) {
+    public void registerAction(IAction action) {
         if (disposed) {
 			return;
 		}
@@ -363,7 +359,6 @@ public final class KeyBindingService implements INestableKeyBindingService {
      * 
      * @see org.eclipse.ui.INestableKeyBindingService#removeKeyBindingService(org.eclipse.ui.IWorkbenchSite)
      */
-	@Override
 	public boolean removeKeyBindingService(IWorkbenchSite nestedSite) {
 		if (disposed) {
 			return false;
@@ -381,8 +376,7 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		return true;
 	}
 
-    @Override
-	public void setScopes(String[] scopes) {
+    public void setScopes(String[] scopes) {
         if (disposed) {
 			return;
 		}
@@ -424,7 +418,6 @@ public final class KeyBindingService implements INestableKeyBindingService {
 		}
 	}
 
-	@Override
 	public void unregisterAction(IAction action) {
 		if (disposed) {
 			return;

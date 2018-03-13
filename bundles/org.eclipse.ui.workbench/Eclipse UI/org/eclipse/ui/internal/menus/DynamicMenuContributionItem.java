@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
 	 */
-	@Override
 	public boolean isDynamic() {
 		if (loadedDynamicContribution != null) {
 			return loadedDynamicContribution.isDynamic();
@@ -80,7 +79,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		if (loadedDynamicContribution != null) {
 			return loadedDynamicContribution.isDirty();
@@ -95,7 +93,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .Composite)
 	 */
-	@Override
 	public void fill(Composite parent) {
 		IContributionItem contributionItem = getContributionItem();
 		if (contributionItem != null)
@@ -109,7 +106,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .CoolBar, int)
 	 */
-	@Override
 	public void fill(CoolBar parent, int index) {
 		IContributionItem contributionItem = getContributionItem();
 		if (contributionItem != null)
@@ -123,7 +119,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .Menu, int)
 	 */
-	@Override
 	public void fill(Menu menu, int index) {
 		IContributionItem contributionItem = getContributionItem();
 		if (contributionItem != null)
@@ -137,7 +132,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .ToolBar, int)
 	 */
-	@Override
 	public void fill(ToolBar parent, int index) {
 		IContributionItem contributionItem = getContributionItem();
 		if (contributionItem != null)
@@ -175,7 +169,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (loadedDynamicContribution != null) {
 			loadedDynamicContribution.dispose();
@@ -189,14 +182,12 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#update()
 	 */
-	@Override
 	public void update() {
 		if (loadedDynamicContribution != null) {
 			loadedDynamicContribution.update();
 		}
 	}
 
-	@Override
 	public void update(String id) {
 		if (loadedDynamicContribution != null) {
 			loadedDynamicContribution.update(id);
@@ -210,7 +201,6 @@ public class DynamicMenuContributionItem extends ContributionItem {
 	 * org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface
 	 * .action.IContributionManager)
 	 */
-	@Override
 	public void setParent(IContributionManager parent) {
 		super.setParent(parent);
 		if (loadedDynamicContribution != null) {

@@ -230,7 +230,6 @@ public class ConflictModel extends CommonModel {
 			}
 		}
 		controller.addPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getSource() == ConflictModel.this
 						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event

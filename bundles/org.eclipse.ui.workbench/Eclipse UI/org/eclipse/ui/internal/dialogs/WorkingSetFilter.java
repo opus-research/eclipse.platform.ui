@@ -24,8 +24,7 @@ public class WorkingSetFilter extends ViewerFilter {
 			this.workingSetIds = workingSetIds;
 		}
 		
-    @Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
+    public boolean select(Viewer viewer, Object parentElement, Object element) {
         if (element instanceof IWorkingSet) {
             IWorkingSet workingSet = (IWorkingSet) element;
 			String id = workingSet.getId();

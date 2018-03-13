@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IExtensionDelta;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.Parameter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -207,7 +206,6 @@ public final class CommandPersistence extends RegistryPersistence {
 			}
 			if (!command.isDefined()) {
 				command.define(name, description, category, parameters, returnType, helpContextId);
-				command.setHandler(HandlerServiceImpl.getHandler(commandId));
 			}
 			readState(configurationElement, warningsToLog, command);
 		}
@@ -423,7 +421,6 @@ public final class CommandPersistence extends RegistryPersistence {
 		this.commandManager = commandService;
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		return false;
 	}
@@ -450,7 +447,6 @@ public final class CommandPersistence extends RegistryPersistence {
 	 *            The command service which should be populated with the values
 	 *            from the registry; must not be <code>null</code>.
 	 */
-	@Override
 	protected final void read() {
 		super.read();
 		reRead();

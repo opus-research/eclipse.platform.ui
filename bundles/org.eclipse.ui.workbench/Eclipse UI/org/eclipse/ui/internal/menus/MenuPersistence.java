@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,6 @@ final public class MenuPersistence extends RegistryPersistence {
 	private ArrayList<MTrimContribution> trimContributions = new ArrayList<MTrimContribution>();
 
 	private final Comparator<IConfigurationElement> comparer = new Comparator<IConfigurationElement>() {
-		@Override
 		public int compare(IConfigurationElement c1, IConfigurationElement c2) {
 			return c1.getContributor().getName().compareToIgnoreCase(c2.getContributor().getName());
 		}
@@ -106,7 +105,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		read();
 	}
 
-	@Override
 	protected final void read() {
 		super.read();
 

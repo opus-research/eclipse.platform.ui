@@ -11,9 +11,8 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.converters;
 
-import org.eclipse.swt.widgets.Display;
-
 import java.util.List;
+
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.AbstractCSSValueConverter;
 import org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverter;
@@ -40,11 +39,9 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		super(Gradient.class);
 	}
 
-	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
-			Display display = (context instanceof Display) ? (Display) context : null;
-			Gradient grad = CSSSWTColorHelper.getGradient((CSSValueList) value, display);
+			Gradient grad = CSSSWTColorHelper.getGradient((CSSValueList) value);
 			List values = grad.getValues();
 			for (int i = 0; i < values.size(); i++) {
 				//Ensure all the colors are already converted and in the registry
@@ -58,7 +55,6 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		return null;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		return null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     R�diger Herrmann - 395426: [JFace] StatusDialog should escape ampersand in status message
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Policy;
@@ -109,7 +107,7 @@ public abstract class StatusDialog extends TrayDialog {
 			if (status != null && !status.isOK()) {
 				String message = status.getMessage();
 				if (message != null && message.length() > 0) {
-					setText(LegacyActionTools.escapeMnemonics(message));
+					setText(message);
 					// unqualified call of setImage is too ambiguous for
 					// Foundation 1.0 compiler
 					// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=140576
@@ -191,7 +189,6 @@ public abstract class StatusDialog extends TrayDialog {
 	/*
 	 * @see Window#create(Shell)
 	 */
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		if (fTitle != null) {
@@ -202,7 +199,6 @@ public abstract class StatusDialog extends TrayDialog {
 	/*
 	 * @see Window#create()
 	 */
-	@Override
 	public void create() {
 		super.create();
 		if (fLastStatus != null) {
@@ -220,7 +216,6 @@ public abstract class StatusDialog extends TrayDialog {
 	/*
 	 * @see Dialog#createButtonsForButtonBar(Composite)
 	 */
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		fOkButton = createButton(parent, IDialogConstants.OK_ID,
 				IDialogConstants.OK_LABEL, true);
@@ -231,7 +226,6 @@ public abstract class StatusDialog extends TrayDialog {
 	/*
 	 * @see Dialog#createButtonBar(Composite)
 	 */
-	@Override
 	protected Control createButtonBar(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,6 @@ public class WidgetMethodHandler extends AbstractHandler implements
 		display = Display.getCurrent();
 		if (display != null) {
 			focusListener = new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					updateEnablement();
 				}
@@ -70,7 +69,6 @@ public class WidgetMethodHandler extends AbstractHandler implements
 	private Listener focusListener;
 	private Display display;
 
-	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Method methodToExecute = getMethodToExecute();
 		if (methodToExecute != null) {
@@ -96,10 +94,10 @@ public class WidgetMethodHandler extends AbstractHandler implements
 						final Object focusComponent = getFocusComponent();
 						if (focusComponent != null) {
 							Runnable methodRunnable = new Runnable() {
-								@Override
 								public void run() {
 									try {
-										methodToExecute.invoke(focusComponent);
+										methodToExecute.invoke(focusComponent,
+												null);
 									} catch (final IllegalAccessException e) {
 										// The method is protected, so do
 										// nothing.
@@ -113,7 +111,6 @@ public class WidgetMethodHandler extends AbstractHandler implements
 										 */
 										focusControl.getDisplay().asyncExec(
 												new Runnable() {
-													@Override
 													public void run() {
 														ExceptionHandler
 																.getInstance()
@@ -142,7 +139,7 @@ public class WidgetMethodHandler extends AbstractHandler implements
 
 				} else {
 
-					methodToExecute.invoke(focusControl);
+					methodToExecute.invoke(focusControl, null);
 				}
 
 			} catch (IllegalAccessException e) {
@@ -213,31 +210,30 @@ public class WidgetMethodHandler extends AbstractHandler implements
 		if (keyboardFocusManagerClass != null) {
 			// Use JRE 1.4 API
 			final Method keyboardFocusManagerGetCurrentKeyboardFocusManagerMethod = keyboardFocusManagerClass
-					.getMethod("getCurrentKeyboardFocusManager"); //$NON-NLS-1$
+					.getMethod("getCurrentKeyboardFocusManager", null); //$NON-NLS-1$
 			final Object keyboardFocusManager = keyboardFocusManagerGetCurrentKeyboardFocusManagerMethod
-					.invoke(keyboardFocusManagerClass);
+					.invoke(keyboardFocusManagerClass, null);
 			final Method keyboardFocusManagerGetFocusOwner = keyboardFocusManagerClass
-					.getMethod("getFocusOwner"); //$NON-NLS-1$
+					.getMethod("getFocusOwner", null); //$NON-NLS-1$
 			final Object focusComponent = keyboardFocusManagerGetFocusOwner
-					.invoke(keyboardFocusManager);
+					.invoke(keyboardFocusManager, null);
 			return focusComponent;
 		}
 		// Use JRE 1.3 API
 		final Class focusManagerClass = Class
 				.forName("javax.swing.FocusManager"); //$NON-NLS-1$
 		final Method focusManagerGetCurrentManagerMethod = focusManagerClass
-				.getMethod("getCurrentManager"); //$NON-NLS-1$
+				.getMethod("getCurrentManager", null); //$NON-NLS-1$
 		final Object focusManager = focusManagerGetCurrentManagerMethod
-		        .invoke(focusManagerClass);
+		        .invoke(focusManagerClass, null);
 		final Method focusManagerGetFocusOwner = focusManagerClass
-		        .getMethod("getFocusOwner"); //$NON-NLS-1$
+		        .getMethod("getFocusOwner", null); //$NON-NLS-1$
 		final Object focusComponent = focusManagerGetFocusOwner
-		        .invoke(focusManager);
+		        .invoke(focusManager, null);
 		return focusComponent;
 
 	}
 	
-	@Override
 	public final boolean isHandled() {
 		return getMethodToExecute() != null;
 	}
@@ -311,7 +307,6 @@ public class WidgetMethodHandler extends AbstractHandler implements
 	 * .eclipse.core.runtime.IConfigurationElement, java.lang.String,
 	 * java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 		// The data is really just a string (i.e., the method name).
@@ -321,7 +316,6 @@ public class WidgetMethodHandler extends AbstractHandler implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (display!=null && !display.isDisposed()) {
 			display.removeFilter(SWT.FocusIn, focusListener);

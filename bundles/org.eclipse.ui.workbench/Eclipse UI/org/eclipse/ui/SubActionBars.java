@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,12 +54,10 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * over handlers contributed to the {@link IHandlerService}.
 	 */
 	private static final Expression EXPRESSION = new Expression() {
-		@Override
 		public final EvaluationResult evaluate(final IEvaluationContext context) {
 			return EvaluationResult.TRUE;
 		}
 
-		@Override
 		public final void collectExpressionInfo(final ExpressionInfo info) {
 			info
 					.addVariableNameAccess(SourcePriorityNameMapping.LEGACY_LEGACY_NAME);
@@ -175,7 +173,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	/**
 	 * Clear the global action handlers.
 	 */
-	@Override
 	public void clearGlobalActionHandlers() {
 		if (actionHandlers != null) {
 			actionHandlers.clear();
@@ -310,7 +307,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * @return an action handler which implements the action ID, or
 	 *         <code>null</code> if none is registered.
 	 */
-	@Override
 	public IAction getGlobalActionHandler(String actionID) {
 		if (actionHandlers == null) {
 			return null;
@@ -332,7 +328,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * 
 	 * @return the menu manager
 	 */
-	@Override
 	public IMenuManager getMenuManager() {
 		if (menuMgr == null) {
 			menuMgr = createSubMenuManager(parent.getMenuManager());
@@ -356,7 +351,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 *     
 	 * @since 3.2
 	 */
-	@Override
 	public final IServiceLocator getServiceLocator() {
 		if (serviceLocator != null) {
 			return serviceLocator;
@@ -371,7 +365,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * 
 	 * @return the status line manager
 	 */
-	@Override
 	public IStatusLineManager getStatusLineManager() {
 		if (statusLineMgr == null) {
 			statusLineMgr = new SubStatusLineManager(parent
@@ -387,7 +380,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		if (toolBarMgr == null) {
 			toolBarMgr = createSubToolBarManager(parent.getToolBarManager());
@@ -461,7 +453,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 *            an action which implements the action ID. <code>null</code>
 	 *            may be passed to deregister a handler.
 	 */
-	@Override
 	public void setGlobalActionHandler(String actionID, IAction handler) {
 		if (actionID == null) {
 			/*
@@ -616,7 +607,6 @@ public class SubActionBars extends EventManager implements IActionBars {
 	 * Commits all UI changes. This should be called after additions or
 	 * subtractions have been made to a menu, status line, or toolbar.
 	 */
-	@Override
 	public void updateActionBars() {
 		parent.updateActionBars();
 		fireActionHandlersChanged();

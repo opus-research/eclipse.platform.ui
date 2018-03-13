@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,8 +80,7 @@ public class CheckboxCellEditor extends CellEditor {
      * the toggling of the checkbox control and notifies
      * listeners with <code>ICellEditorListener.applyEditorValue</code>.
      */
-    @Override
-	public void activate() {
+    public void activate() {
         value = !value;
         fireApplyEditorValue();
     }
@@ -91,8 +90,7 @@ public class CheckboxCellEditor extends CellEditor {
      * this <code>CellEditor</code> framework method does
      * nothing and returns <code>null</code>.
      */
-    @Override
-	protected Control createControl(Composite parent) {
+    protected Control createControl(Composite parent) {
         return null;
     }
 
@@ -103,13 +101,14 @@ public class CheckboxCellEditor extends CellEditor {
      *
      * @return the Boolean checkbox value
      */
-    @Override
-	protected Object doGetValue() {
+    protected Object doGetValue() {
         return value ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    @Override
-	protected void doSetFocus() {
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
+    protected void doSetFocus() {
         // Ignore
     }
 
@@ -120,14 +119,12 @@ public class CheckboxCellEditor extends CellEditor {
      *
      * @param value a Boolean value
      */
-    @Override
-	protected void doSetValue(Object value) {
+    protected void doSetValue(Object value) {
         Assert.isTrue(value instanceof Boolean);
         this.value = ((Boolean) value).booleanValue();
     }
 
-    @Override
-	public void activate(ColumnViewerEditorActivationEvent activationEvent) {
+    public void activate(ColumnViewerEditorActivationEvent activationEvent) {
     	if (activationEvent.eventType != ColumnViewerEditorActivationEvent.TRAVERSAL) {
     		super.activate(activationEvent);
     	}

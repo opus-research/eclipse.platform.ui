@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,7 @@ public class CascadingColorRegistry extends ColorRegistry {
     private ColorRegistry parent;
 
     private IPropertyChangeListener listener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
         	// check to see if we have an override for the given key. If so,
 			// then a change in our parent registry shouldn't cause a change in
 			// us. Without this check we will propagate a new value
@@ -56,8 +55,7 @@ public class CascadingColorRegistry extends ColorRegistry {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ColorRegistry#get(java.lang.String)
      */
-    @Override
-	public Color get(String symbolicName) {
+    public Color get(String symbolicName) {
         if (super.hasValueFor(symbolicName)) {
 			return super.get(symbolicName);
 		}
@@ -68,8 +66,7 @@ public class CascadingColorRegistry extends ColorRegistry {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ColorRegistry#getKeySet()
      */
-    @Override
-	public Set getKeySet() {
+    public Set getKeySet() {
         Set keyUnion = new HashSet(super.getKeySet());
         keyUnion.addAll(parent.getKeySet());
         return keyUnion;
@@ -78,8 +75,7 @@ public class CascadingColorRegistry extends ColorRegistry {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ColorRegistry#getRGB(java.lang.String)
      */
-    @Override
-	public RGB getRGB(String symbolicName) {
+    public RGB getRGB(String symbolicName) {
         if (super.hasValueFor(symbolicName)) {
 			return super.getRGB(symbolicName);
 		}
@@ -90,8 +86,7 @@ public class CascadingColorRegistry extends ColorRegistry {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ColorRegistry#hasValueFor(java.lang.String)
      */
-    @Override
-	public boolean hasValueFor(String colorKey) {
+    public boolean hasValueFor(String colorKey) {
         return super.hasValueFor(colorKey) || parent.hasValueFor(colorKey);
     }
 

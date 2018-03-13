@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,6 @@ public class CSSValueSWTFontDataConverterImpl extends AbstractCSSValueConverter 
 		super(FontData.class);
 	}
 
-	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context)
 			throws Exception {
 		FontData fontData = null;
@@ -77,7 +76,6 @@ public class CSSValueSWTFontDataConverterImpl extends AbstractCSSValueConverter 
 		return null;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		FontData fontData = (FontData) value;

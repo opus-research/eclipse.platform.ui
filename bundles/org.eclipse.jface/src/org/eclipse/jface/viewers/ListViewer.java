@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,8 +80,10 @@ public class ListViewer extends AbstractListViewer {
         hookControl(list);
     }
 
-    @Override
-	public Control getControl() {
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
+    public Control getControl() {
         return list;
     }
 
@@ -94,8 +96,11 @@ public class ListViewer extends AbstractListViewer {
         return list;
     }
 
-    @Override
-	public void reveal(Object element) {
+    /*
+     * Non-Javadoc.
+     * Method defined on StructuredViewer.
+     */
+    public void reveal(Object element) {
         Assert.isNotNull(element);
         int index = getElementIndex(element);
         if (index == -1) {
@@ -119,67 +124,94 @@ public class ListViewer extends AbstractListViewer {
         list.setTopIndex(newTop);
     }
 
-    @Override
-	protected void listAdd(String string, int index) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listAdd(java.lang.String, int)
+     */
+    protected void listAdd(String string, int index) {
         list.add(string, index);
     }
 
-    @Override
-	protected void listSetItem(int index, String string) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetItem(int, java.lang.String)
+     */
+    protected void listSetItem(int index, String string) {
         list.setItem(index, string);
     }
 
-    @Override
-	protected int[] listGetSelectionIndices() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetSelectionIndices()
+     */
+    protected int[] listGetSelectionIndices() {
         return list.getSelectionIndices();
     }
 
-    @Override
-	protected int listGetItemCount() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetItemCount()
+     */
+    protected int listGetItemCount() {
         return list.getItemCount();
     }
 
-    @Override
-	protected void listSetItems(String[] labels) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetItems(java.lang.String[])
+     */
+    protected void listSetItems(String[] labels) {
         list.setItems(labels);
     }
 
-    @Override
-	protected void listRemoveAll() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listRemoveAll()
+     */
+    protected void listRemoveAll() {
         list.removeAll();
     }
 
-    @Override
-	protected void listRemove(int index) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listRemove(int)
+     */
+    protected void listRemove(int index) {
         list.remove(index);
     }
 
-    @Override
-	protected void listSetSelection(int[] ixs) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSelectAndShow(int[])
+     */
+    protected void listSetSelection(int[] ixs) {
         list.setSelection(ixs);
     }
 
-    @Override
-	protected void listDeselectAll() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
+     */
+    protected void listDeselectAll() {
         list.deselectAll();
     }
 
-    @Override
-	protected void listShowSelection() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
+     */
+    protected void listShowSelection() {
         list.showSelection();
     }
-
-    @Override
-	protected int listGetTopIndex() {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listGetTopIndex()
+     */
+    protected int listGetTopIndex() {
     	return list.getTopIndex();
     }
-
-    @Override
-	protected void listSetTopIndex(int index) {
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetTopIndex(int)
+     */
+    protected void listSetTopIndex(int index) {
     	list.setTopIndex(index);
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.AbstractListViewer#setSelectionToWidget(java.util.List, boolean)
+	 */
 	protected void setSelectionToWidget(List in, boolean reveal) {
 		if( reveal ) {
 			super.setSelectionToWidget(in, reveal);
@@ -205,5 +237,6 @@ public class ListViewer extends AbstractListViewer {
 	        }
 		}
 	}
-
+    
+    
 }

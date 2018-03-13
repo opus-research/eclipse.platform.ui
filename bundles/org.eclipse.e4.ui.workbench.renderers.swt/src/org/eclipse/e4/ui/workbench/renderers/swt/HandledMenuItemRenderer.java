@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 	@Inject
 	Logger logger;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MHandledMenuItem) || !(parent instanceof Menu))
 			return null;
@@ -106,7 +105,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 		newItem.setEnabled(itemModel.isEnabled());
 	}
 
-	@Override
 	protected void setItemText(MMenuItem model, MenuItem item) {
 		String text = model.getLocalizedLabel();
 		if (model instanceof MHandledItem) {
@@ -153,7 +151,6 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 			final IEclipseContext lclContext = getContext(me);
 			MenuItem mi = (MenuItem) me.getWidget();
 			mi.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(Event e) {
 					EHandlerService service = (EHandlerService) lclContext
 							.get(EHandlerService.class.getName());

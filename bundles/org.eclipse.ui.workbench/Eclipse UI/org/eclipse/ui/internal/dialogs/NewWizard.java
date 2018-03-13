@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,8 +43,7 @@ public class NewWizard extends Wizard {
     /**
      * Create the wizard pages
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         IWizardCategory root = WorkbenchPlugin.getDefault().getNewWizardRegistry().getRootCategory();
         IWizardDescriptor [] primary = WorkbenchPlugin.getDefault().getNewWizardRegistry().getPrimaryWizards();
 
@@ -124,8 +123,7 @@ public class NewWizard extends Wizard {
      * 
      * @return boolean
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         //save our selection state
         mainPage.saveWidgetValues();
         // if we're finishing from the main page then perform finish on the selected wizard.
@@ -162,8 +160,7 @@ public class NewWizard extends Wizard {
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizard#canFinish()
      */
-    @Override
-	public boolean canFinish() {
+    public boolean canFinish() {
          // we can finish if the first page is current and the the page can finish early.
 	    	if (getContainer().getCurrentPage() == mainPage) {
 	    		if (mainPage.canFinishEarly()) {

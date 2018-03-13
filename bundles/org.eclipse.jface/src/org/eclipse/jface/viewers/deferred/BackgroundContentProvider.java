@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
  * rather than being tied to a <code>TableViewer</code>.
  * 
  * <p>
- * This is package visibility since it currently only needs to be used in one place,
+ * This is package visiblity since it currently only needs to be used in one place,
  * but it could potentially be made public if there was a need to use the same background
  * sorting algorithm for something other than a TableViewer. 
  * </p>
@@ -89,23 +89,30 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
      * Listener that gets callbacks from the model
      */
     private IConcurrentModelListener listener = new IConcurrentModelListener() {
-
-		@Override
+    	/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#add(java.lang.Object[])
+		 */
 		public void add(Object[] added) {
 			BackgroundContentProvider.this.add(added);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#remove(java.lang.Object[])
+		 */
 		public void remove(Object[] removed) {
 			BackgroundContentProvider.this.remove(removed);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#setContents(java.lang.Object[])
+		 */
 		public void setContents(Object[] newContents) {
 			BackgroundContentProvider.this.setContents(newContents);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.IConcurrentModelListener#update(java.lang.Object[])
+		 */
 		public void update(Object[] changed) {
 			BackgroundContentProvider.this.update(changed);
 		}
@@ -452,7 +459,6 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
 			super(name);
 		}
 
-		@Override
 		public void run() {
 			loop: while (true) {
 				synchronized (lock) {
@@ -497,7 +503,7 @@ import org.eclipse.jface.viewers.deferred.ConcurrentTableUpdator.Range;
     /**
 	 * Cancels any sort in progress. Note that we try to use the
 	 * FastProgresReporter if possible since this is more responsive than
-	 * canceling the sort job. However, it is not a problem to cancel in both
+	 * cancelling the sort job. However, it is not a problem to cancel in both
 	 * ways.
 	 */
     private void cancelSortJob() {

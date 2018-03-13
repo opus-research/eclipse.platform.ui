@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,8 @@ import java.util.HashMap;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -45,7 +47,7 @@ public abstract class ToolTip {
 
 	private ToolTipOwnerControlListener listener;
 
-	private HashMap<String, Object> data;
+	private HashMap data;
 
 	// Ensure that only one tooltip is active in time
 	private static Shell CURRENT_TOOLTIP;
@@ -100,15 +102,22 @@ public abstract class ToolTip {
 	public ToolTip(Control control, int style, boolean manualActivation) {
 		this.control = control;
 		this.style = style;
+		this.control.addDisposeListener(new DisposeListener() {
+
+			public void widgetDisposed(DisposeEvent e) {
+				data = null;
+				deactivate();
+			}
+
+		});
+
 		this.listener = new ToolTipOwnerControlListener();
 		this.shellListener = new Listener() {
-			@Override
 			public void handleEvent(final Event event) {
 				if (ToolTip.this.control != null
 						&& !ToolTip.this.control.isDisposed()) {
 					ToolTip.this.control.getDisplay().asyncExec(new Runnable() {
 
-						@Override
 						public void run() {
 							// Check if the new active shell is the tooltip
 							// itself
@@ -138,7 +147,7 @@ public abstract class ToolTip {
 	 */
 	public void setData(String key, Object value) {
 		if (data == null) {
-			data = new HashMap<String, Object>();
+			data = new HashMap();
 		}
 		data.put(key, value);
 	}
@@ -444,10 +453,6 @@ public abstract class ToolTip {
 			CURRENT_TOOLTIP = null;
 			afterHideToolTip(event);
 		}
-		if (event != null && event.type == SWT.Dispose) {
-			deactivate();
-			data = null;
-		}
 	}
 
 	private void passOnEvent(Shell tip, Event event) {
@@ -470,7 +475,6 @@ public abstract class ToolTip {
 
 		if (popupDelay > 0) {
 			control.getDisplay().timerExec(popupDelay, new Runnable() {
-				@Override
 				public void run() {
 					toolTipShow(shell, event);
 				}
@@ -483,7 +487,6 @@ public abstract class ToolTip {
 			control.getDisplay().timerExec(popupDelay + hideDelay,
 					new Runnable() {
 
-						@Override
 						public void run() {
 							toolTipHide(shell, null);
 						}
@@ -592,7 +595,6 @@ public abstract class ToolTip {
 			if (hideOnMouseDown != this.hideOnMouseDown) {
 				control.getDisplay().syncExec(new Runnable() {
 
-					@Override
 					public void run() {
 						if (CURRENT_TOOLTIP != null
 								&& CURRENT_TOOLTIP.isDisposed()) {
@@ -616,7 +618,6 @@ public abstract class ToolTip {
 	}
 
 	private class ToolTipOwnerControlListener implements Listener {
-		@Override
 		public void handleEvent(Event event) {
 			switch (event.type) {
 			case SWT.Dispose:
@@ -648,7 +649,6 @@ public abstract class ToolTip {
 	}
 
 	private class TooltipHideListener implements Listener {
-		@Override
 		public void handleEvent(Event event) {
 			if (event.widget instanceof Control) {
 

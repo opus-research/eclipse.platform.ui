@@ -30,15 +30,13 @@ public class WorkingSetLabelProvider extends LabelProvider {
         images = new LocalResourceManager(JFaceResources.getResources());
     }
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         images.dispose();
 
         super.dispose();
     }
 
-    @Override
-	public Image getImage(Object object) {
+    public Image getImage(Object object) {
         Assert.isTrue(object instanceof IWorkingSet);
         IWorkingSet workingSet = (IWorkingSet) object;
         ImageDescriptor imageDescriptor = workingSet.getImageDescriptor();
@@ -51,8 +49,7 @@ public class WorkingSetLabelProvider extends LabelProvider {
         return icon;
     }
 
-    @Override
-	public String getText(Object object) {
+    public String getText(Object object) {
         Assert.isTrue(object instanceof IWorkingSet);
         IWorkingSet workingSet = (IWorkingSet) object;
         return workingSet.getLabel();

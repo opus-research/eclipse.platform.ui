@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,9 +43,6 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  * A <code>BaseNewWizardMenu</code> is used to populate a menu manager with
  * New Wizard actions for the current perspective's new wizard shortcuts,
  * including an Other... action to open the new wizard dialog.
- * <p>
- * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
- * </p>
  * 
  * @since 3.1
  */
@@ -64,8 +61,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         /* (non-Javadoc)
          * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
          */
-        @Override
-		public void removeExtension(IExtension source, Object[] objects) {
+        public void removeExtension(IExtension source, Object[] objects) {
             for (int i = 0; i < objects.length; i++) {
                 if (objects[i] instanceof NewWizardShortcutAction) {
                     actions.values().remove(objects[i]);
@@ -76,8 +72,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         /* (non-Javadoc)
          * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
          */
-        @Override
-		public void addExtension(IExtensionTracker tracker, IExtension extension) {
+        public void addExtension(IExtensionTracker tracker, IExtension extension) {
             // Do nothing
         }
     };
@@ -87,8 +82,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
      */
     private final IRegistryChangeListener registryListener = new IRegistryChangeListener() {
 
-        @Override
-		public void registryChanged(IRegistryChangeEvent event) {
+        public void registryChanged(IRegistryChangeEvent event) {
             // reset the reader.
             // TODO This is expensive.  Can we be more selective?
             if (getParent() != null) {
@@ -104,9 +98,6 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
     /**
      * Creates a new wizard shortcut menu for the IDE.
-     * <p>
-     * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
-     * </p>
      * 
      * @param window
      *            the window containing the menu
@@ -167,8 +158,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
      * 
      * @see org.eclipse.jface.action.IContributionItem#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow != null) {
             super.dispose();
             unregisterListeners();
@@ -210,8 +200,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
      * 
      * @see org.eclipse.ui.actions.CompoundContributionItem#getContributionItems()
      */
-    @Override
-	protected IContributionItem[] getContributionItems() {
+    protected IContributionItem[] getContributionItems() {
         ArrayList list = new ArrayList();
         if (workbenchWindow != null && workbenchWindow.getActivePage() != null
                 && workbenchWindow.getActivePage().getPerspective() != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * 
 	 * @see org.eclipse.ui.IWorkingSetManager
 	 */
-	@Override
 	public void addRecentWorkingSet(IWorkingSet workingSet) {
 		internalAddRecentWorkingSet(workingSet);
 		saveState();
@@ -63,7 +62,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * 
 	 * @see org.eclipse.ui.IWorkingSetManager
 	 */
-	@Override
 	public void addWorkingSet(IWorkingSet workingSet) {
 		super.addWorkingSet(workingSet);
 		saveState();
@@ -89,7 +87,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * 
 	 * @see org.eclipse.ui.IWorkingSetManager
 	 */
-	@Override
 	public void removeWorkingSet(IWorkingSet workingSet) {
 		if (internalRemoveWorkingSet(workingSet)) {
 			saveState();
@@ -156,7 +153,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 *            the changed property. one of CHANGE_WORKING_SET_CONTENT_CHANGE
 	 *            and CHANGE_WORKING_SET_NAME_CHANGE
 	 */
-	@Override
 	public void workingSetChanged(IWorkingSet changedWorkingSet,
 			String propertyChangeId, Object oldValue) {
 		saveState();
@@ -173,11 +169,5 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		sa.setProperty(IStatusAdapterConstants.TITLE_PROPERTY, title);
 		StatusManager.getManager().handle(sa,
 				StatusManager.SHOW | StatusManager.LOG);
-	}
-
-	@Override
-	protected void restoreWorkingSetState(IMemento memento) {
-		super.restoreWorkingSetState(memento);
-		saveState();
 	}
 }

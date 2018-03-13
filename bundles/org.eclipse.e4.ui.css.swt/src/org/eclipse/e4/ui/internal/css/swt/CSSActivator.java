@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2010, 2013 IBM Corporation and others.
+ *  Copyright (c) 2010 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *      IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.css.swt;
-
-import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -26,7 +24,6 @@ public class CSSActivator implements BundleActivator {
 	private BundleContext context;
 	private ServiceTracker pkgAdminTracker;
 	private ServiceTracker logTracker;
-	private ServiceTracker colorAndFontProviderTracker;
 
 	public static CSSActivator getDefault() {
 		return activator;
@@ -68,13 +65,11 @@ public class CSSActivator implements BundleActivator {
 		return context;
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		if (pkgAdminTracker != null) {
 			pkgAdminTracker.close();
@@ -83,10 +78,6 @@ public class CSSActivator implements BundleActivator {
 		if (logTracker != null) {
 			logTracker.close();
 			logTracker = null;
-		}
-		if (colorAndFontProviderTracker != null) {
-			colorAndFontProviderTracker.close();
-			colorAndFontProviderTracker = null;
 		}
 		context = null;
 	}
@@ -109,16 +100,5 @@ public class CSSActivator implements BundleActivator {
 		}
 	}	
 	
-	public IColorAndFontProvider getColorAndFontProvider() {
-		if (colorAndFontProviderTracker == null) {
-			if (context == null) {
-				return null;
-			}
-			colorAndFontProviderTracker = new ServiceTracker(context,
-					IColorAndFontProvider.class.getName(), null);
-			colorAndFontProviderTracker.open();
-		}
-		return (IColorAndFontProvider) colorAndFontProviderTracker.getService();
-	}
 
 }

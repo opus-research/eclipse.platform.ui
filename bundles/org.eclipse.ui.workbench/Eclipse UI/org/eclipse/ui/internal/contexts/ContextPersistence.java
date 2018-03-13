@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -121,7 +121,6 @@ public final class ContextPersistence extends RegistryPersistence {
 		this.contextManager = contextManager;
 	}
 
-	@Override
 	protected final boolean isChangeImportant(final IRegistryChangeEvent event) {
 		final IExtensionDelta[] acceleratorScopeDeltas = event
 				.getExtensionDeltas(PlatformUI.PLUGIN_ID,
@@ -150,7 +149,6 @@ public final class ContextPersistence extends RegistryPersistence {
 	 *            The context manager which should be populated with the values
 	 *            from the registry; must not be <code>null</code>.
 	 */
-	@Override
 	protected final void read() {
 		super.read();
 		reRead();

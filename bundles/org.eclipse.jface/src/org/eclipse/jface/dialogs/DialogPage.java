@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -209,8 +209,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * image if it has one. 
      * Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // deallocate SWT resources
         if (image != null) {
             image.dispose();
@@ -223,16 +222,14 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * 
      * @return the top level control
      */
-    @Override
-	public Control getControl() {
+    public Control getControl() {
         return control;
     }
 
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -248,8 +245,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public String getErrorMessage() {
+    public String getErrorMessage() {
         return errorMessage;
     }
 
@@ -265,8 +261,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public Image getImage() {
+    public Image getImage() {
         if (image == null) {
             if (imageDescriptor != null) {
                 image = imageDescriptor.createImage();
@@ -278,16 +273,14 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public String getMessage() {
+    public String getMessage() {
         return message;
     }
 
     /*
      * (non-Javadoc) Method declared on IMessageProvider.
      */
-    @Override
-	public int getMessageType() {
+    public int getMessageType() {
         return messageType;
     }
 
@@ -305,8 +298,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public String getTitle() {
+    public String getTitle() {
         return title;
     }
 
@@ -322,8 +314,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * @return the tool tip text, or <code>null</code> if none
      * @deprecated 
      */
-    @Deprecated
-	protected final String getToolTipText(int widgetId) {
+    protected final String getToolTipText(int widgetId) {
         // return nothing by default
         return null;
     }
@@ -381,8 +372,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * nothing. Subclasses should override to take some action in response to a
      * help request.
      */
-    @Override
-	public void performHelp() {
+    public void performHelp() {
         //No default help
     }
 
@@ -397,8 +387,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public void setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -415,8 +404,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
     /*
      * (non-Javadoc) Method declared on IDialogPage.
      */
-    @Override
-	public void setImageDescriptor(ImageDescriptor desc) {
+    public void setImageDescriptor(ImageDescriptor desc) {
         imageDescriptor = desc;
         if (image != null) {
             image.dispose();
@@ -469,8 +457,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <code>IDialogPage</code> method remembers the title in an internal
      * state variable. Subclasses may extend.
      */
-    @Override
-	public void setTitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -479,8 +466,7 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
      * <code>IDialogPage</code> method sets the control to the given
      * visibility state. Subclasses may extend.
      */
-    @Override
-	public void setVisible(boolean visible) {
+    public void setVisible(boolean visible) {
         control.setVisible(visible);
     }
 }

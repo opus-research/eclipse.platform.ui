@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
@@ -30,7 +29,14 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContributions;
@@ -244,15 +250,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int ITEM__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -280,31 +277,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int ITEM__TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int ITEM__LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__ENABLED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
+	public static final int ITEM__ENABLED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The feature id for the '<em><b>Selected</b></em>' attribute.
@@ -313,7 +292,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__SELECTED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
+	public static final int ITEM__SELECTED = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -322,7 +301,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM__TYPE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 7;
+	public static final int ITEM__TYPE = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
 
 	/**
 	 * The number of structural features of the '<em>Item</em>' class.
@@ -331,16 +310,34 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 8;
+	public static final int ITEM_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int ITEM___GET_LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int ITEM___GET_LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
 
 	/**
 	 * The number of operations of the '<em>Item</em>' class.
@@ -349,7 +346,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int ITEM_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+	public static final int ITEM_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.HandledItemImpl <em>Handled Item</em>}' class.
@@ -497,15 +494,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -531,24 +519,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -614,13 +584,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Handled Item</em>' class.
@@ -777,15 +765,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -813,31 +792,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ELEMENT__TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ELEMENT__LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
-
-	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT__MNEMONICS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 5;
+	public static final int MENU_ELEMENT__MNEMONICS = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
 	 * The number of structural features of the '<em>Element</em>' class.
@@ -846,16 +807,34 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 6;
+	public static final int MENU_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 4;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ELEMENT___GET_LOCALIZED_LABEL = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ELEMENT___GET_LOCALIZED_TOOLTIP = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -864,7 +843,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT___GET_LOCALIZED_MNEMONICS = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
+	public static final int MENU_ELEMENT___GET_LOCALIZED_MNEMONICS = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 2;
 
 	/**
 	 * The number of operations of the '<em>Element</em>' class.
@@ -873,7 +852,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 1;
+	public static final int MENU_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.MenuItemImpl <em>Item</em>}' class.
@@ -1021,15 +1000,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1055,24 +1025,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -1120,13 +1072,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1292,15 +1262,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR__ACCESSIBILITY_PHRASE = MENU_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1328,24 +1289,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR__TOOLTIP = MENU_ELEMENT__TOOLTIP;
 
 	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_LABEL = MENU_ELEMENT__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_SEPARATOR__LOCALIZED_TOOLTIP = MENU_ELEMENT__LOCALIZED_TOOLTIP;
-
-	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1364,13 +1307,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_SEPARATOR_FEATURE_COUNT = MENU_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_SEPARATOR___UPDATE_LOCALIZATION = MENU_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_LABEL = MENU_ELEMENT___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP = MENU_ELEMENT___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1536,15 +1497,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU__ACCESSIBILITY_PHRASE = MENU_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1570,24 +1522,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int MENU__TOOLTIP = MENU_ELEMENT__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_LABEL = MENU_ELEMENT__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU__LOCALIZED_TOOLTIP = MENU_ELEMENT__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -1635,13 +1569,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_FEATURE_COUNT = MENU_ELEMENT_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU___UPDATE_LOCALIZATION = MENU_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU___GET_LOCALIZED_LABEL = MENU_ELEMENT___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int MENU___GET_LOCALIZED_TOOLTIP = MENU_ELEMENT___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -1807,15 +1759,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int MENU_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1861,13 +1804,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int MENU_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int MENU_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Contribution</em>' class.
@@ -2024,15 +1967,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int POPUP_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_ACCESSIBILITY_PHRASE = MENU__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2058,24 +1992,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int POPUP_MENU__TOOLTIP = MENU__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_LABEL = MENU__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int POPUP_MENU__LOCALIZED_TOOLTIP = MENU__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -2150,13 +2066,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int POPUP_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int POPUP_MENU___UPDATE_LOCALIZATION = MENU___UPDATE_LOCALIZATION;
+	public static final int POPUP_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int POPUP_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int POPUP_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2322,15 +2256,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2356,24 +2281,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIRECT_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -2439,13 +2346,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIRECT_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2611,15 +2536,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2645,24 +2561,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_MENU_ITEM__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -2737,13 +2635,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_MENU_ITEM___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -2909,15 +2825,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_ITEM__ACCESSIBILITY_PHRASE = ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -2943,24 +2850,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int TOOL_ITEM__TOOLTIP = ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_LABEL = ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_ITEM__LOCALIZED_TOOLTIP = ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -3008,13 +2897,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_ITEM_FEATURE_COUNT = ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_ITEM___UPDATE_LOCALIZATION = ITEM___UPDATE_LOCALIZATION;
+	public static final int TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_ITEM___GET_LOCALIZED_LABEL = ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int TOOL_ITEM___GET_LOCALIZED_TOOLTIP = ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Tool Item</em>' class.
@@ -3171,15 +3078,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3207,13 +3105,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar</em>' class.
@@ -3370,15 +3268,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Tool Bar Element</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3388,13 +3277,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_ELEMENT_FEATURE_COUNT = UiPackageImpl.UI_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION = UiPackageImpl.UI_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.UI_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Element</em>' class.
@@ -3551,15 +3440,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_CONTROL__ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_CONTROL__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3587,13 +3467,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_CONTROL_FEATURE_COUNT = TOOL_BAR_ELEMENT_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_CONTROL___UPDATE_LOCALIZATION = TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_CONTROL___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Control</em>' class.
@@ -3750,15 +3630,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3784,24 +3655,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int HANDLED_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_LABEL = TOOL_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int HANDLED_TOOL_ITEM__LOCALIZED_TOOLTIP = TOOL_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -3876,13 +3729,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int HANDLED_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 3;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int HANDLED_TOOL_ITEM___UPDATE_LOCALIZATION = TOOL_ITEM___UPDATE_LOCALIZATION;
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int HANDLED_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Handled Tool Item</em>' class.
@@ -4039,15 +3910,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4073,24 +3935,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int DIRECT_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_LABEL = TOOL_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DIRECT_TOOL_ITEM__LOCALIZED_TOOLTIP = TOOL_ITEM__LOCALIZED_TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -4156,13 +4000,31 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int DIRECT_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DIRECT_TOOL_ITEM___UPDATE_LOCALIZATION = TOOL_ITEM___UPDATE_LOCALIZATION;
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIRECT_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The number of operations of the '<em>Direct Tool Item</em>' class.
@@ -4319,15 +4181,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_SEPARATOR__ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_SEPARATOR__LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The number of structural features of the '<em>Tool Bar Separator</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4337,13 +4190,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_SEPARATOR_FEATURE_COUNT = TOOL_BAR_ELEMENT_FEATURE_COUNT + 0;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_SEPARATOR___UPDATE_LOCALIZATION = TOOL_BAR_ELEMENT___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR_ELEMENT___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Separator</em>' class.
@@ -4392,6 +4245,476 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int MENU_CONTRIBUTIONS_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuImpl <em>Rendered Menu</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedMenu()
+	 * @generated
+	 */
+	public static final int RENDERED_MENU = 18;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__ELEMENT_ID = MENU__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__PERSISTED_STATE = MENU__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__TAGS = MENU__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__CONTRIBUTOR_URI = MENU__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__TRANSIENT_DATA = MENU__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__WIDGET = MENU__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__RENDERER = MENU__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__TO_BE_RENDERED = MENU__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__ON_TOP = MENU__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__VISIBLE = MENU__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__PARENT = MENU__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__CONTAINER_DATA = MENU__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__CUR_SHARED_REF = MENU__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__VISIBLE_WHEN = MENU__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__LABEL = MENU__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__ICON_URI = MENU__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__TOOLTIP = MENU__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__MNEMONICS = MENU__MNEMONICS;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__CHILDREN = MENU__CHILDREN;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__SELECTED_ELEMENT = MENU__SELECTED_ELEMENT;
+
+	/**
+	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__ENABLED = MENU__ENABLED;
+
+	/**
+	 * The feature id for the '<em><b>Contribution Manager</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU__CONTRIBUTION_MANAGER = MENU_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Rendered Menu</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU___GET_LOCALIZED_MNEMONICS = MENU___GET_LOCALIZED_MNEMONICS;
+
+	/**
+	 * The number of operations of the '<em>Rendered Menu</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU_OPERATION_COUNT = MENU_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedToolBarImpl <em>Rendered Tool Bar</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedToolBarImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedToolBar()
+	 * @generated
+	 */
+	public static final int RENDERED_TOOL_BAR = 19;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__ELEMENT_ID = TOOL_BAR__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__PERSISTED_STATE = TOOL_BAR__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__TAGS = TOOL_BAR__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__CONTRIBUTOR_URI = TOOL_BAR__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__TRANSIENT_DATA = TOOL_BAR__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__WIDGET = TOOL_BAR__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__RENDERER = TOOL_BAR__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__TO_BE_RENDERED = TOOL_BAR__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__ON_TOP = TOOL_BAR__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__VISIBLE = TOOL_BAR__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__PARENT = TOOL_BAR__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__CONTAINER_DATA = TOOL_BAR__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__CUR_SHARED_REF = TOOL_BAR__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__VISIBLE_WHEN = TOOL_BAR__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__ACCESSIBILITY_PHRASE = TOOL_BAR__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__CHILDREN = TOOL_BAR__CHILDREN;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__SELECTED_ELEMENT = TOOL_BAR__SELECTED_ELEMENT;
+
+	/**
+	 * The feature id for the '<em><b>Contribution Manager</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR__CONTRIBUTION_MANAGER = TOOL_BAR_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Rendered Tool Bar</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR_FEATURE_COUNT = TOOL_BAR_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_BAR___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The number of operations of the '<em>Rendered Tool Bar</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_TOOL_BAR_OPERATION_COUNT = TOOL_BAR_OPERATION_COUNT + 0;
+
+	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolBarContributionImpl <em>Tool Bar Contribution</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4399,7 +4722,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getToolBarContribution()
 	 * @generated
 	 */
-	public static final int TOOL_BAR_CONTRIBUTION = 18;
+	public static final int TOOL_BAR_CONTRIBUTION = 20;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -4537,15 +4860,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TOOL_BAR_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4591,13 +4905,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TOOL_BAR_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TOOL_BAR_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TOOL_BAR_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Tool Bar Contribution</em>' class.
@@ -4616,7 +4930,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getToolBarContributions()
 	 * @generated
 	 */
-	public static final int TOOL_BAR_CONTRIBUTIONS = 19;
+	public static final int TOOL_BAR_CONTRIBUTIONS = 21;
 
 	/**
 	 * The feature id for the '<em><b>Tool Bar Contributions</b></em>' containment reference list.
@@ -4653,7 +4967,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getTrimContribution()
 	 * @generated
 	 */
-	public static final int TRIM_CONTRIBUTION = 20;
+	public static final int TRIM_CONTRIBUTION = 22;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -4791,15 +5105,6 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTION__ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int TRIM_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER__LOCALIZED_ACCESSIBILITY_PHRASE;
-
-	/**
 	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4845,13 +5150,13 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTION_FEATURE_COUNT = UiPackageImpl.ELEMENT_CONTAINER_FEATURE_COUNT + 2;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int TRIM_CONTRIBUTION___UPDATE_LOCALIZATION = UiPackageImpl.ELEMENT_CONTAINER___UPDATE_LOCALIZATION;
+	public static final int TRIM_CONTRIBUTION___GET_LOCALIZED_ACCESSIBILITY_PHRASE = UiPackageImpl.ELEMENT_CONTAINER___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The number of operations of the '<em>Trim Contribution</em>' class.
@@ -4870,7 +5175,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getTrimContributions()
 	 * @generated
 	 */
-	public static final int TRIM_CONTRIBUTIONS = 21;
+	public static final int TRIM_CONTRIBUTIONS = 23;
 
 	/**
 	 * The feature id for the '<em><b>Trim Contributions</b></em>' containment reference list.
@@ -4900,14 +5205,14 @@ public class MenuPackageImpl extends EPackageImpl {
 	public static final int TRIM_CONTRIBUTIONS_OPERATION_COUNT = 0;
 
 	/**
-	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.DynamicMenuContributionImpl <em>Dynamic Menu Contribution</em>}' class.
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuItemImpl <em>Rendered Menu Item</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.DynamicMenuContributionImpl
-	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getDynamicMenuContribution()
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuItemImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedMenuItem()
 	 * @generated
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION = 22;
+	public static final int RENDERED_MENU_ITEM = 24;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -4916,7 +5221,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
+	public static final int RENDERED_MENU_ITEM__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
 
 	/**
 	 * The feature id for the '<em><b>Persisted State</b></em>' map.
@@ -4925,7 +5230,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__PERSISTED_STATE = MENU_ITEM__PERSISTED_STATE;
+	public static final int RENDERED_MENU_ITEM__PERSISTED_STATE = MENU_ITEM__PERSISTED_STATE;
 
 	/**
 	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
@@ -4934,7 +5239,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__TAGS = MENU_ITEM__TAGS;
+	public static final int RENDERED_MENU_ITEM__TAGS = MENU_ITEM__TAGS;
 
 	/**
 	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
@@ -4943,7 +5248,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__CONTRIBUTOR_URI = MENU_ITEM__CONTRIBUTOR_URI;
+	public static final int RENDERED_MENU_ITEM__CONTRIBUTOR_URI = MENU_ITEM__CONTRIBUTOR_URI;
 
 	/**
 	 * The feature id for the '<em><b>Transient Data</b></em>' map.
@@ -4952,7 +5257,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__TRANSIENT_DATA = MENU_ITEM__TRANSIENT_DATA;
+	public static final int RENDERED_MENU_ITEM__TRANSIENT_DATA = MENU_ITEM__TRANSIENT_DATA;
 
 	/**
 	 * The feature id for the '<em><b>Widget</b></em>' attribute.
@@ -4961,7 +5266,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__WIDGET = MENU_ITEM__WIDGET;
+	public static final int RENDERED_MENU_ITEM__WIDGET = MENU_ITEM__WIDGET;
 
 	/**
 	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
@@ -4970,7 +5275,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__RENDERER = MENU_ITEM__RENDERER;
+	public static final int RENDERED_MENU_ITEM__RENDERER = MENU_ITEM__RENDERER;
 
 	/**
 	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
@@ -4979,7 +5284,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__TO_BE_RENDERED = MENU_ITEM__TO_BE_RENDERED;
+	public static final int RENDERED_MENU_ITEM__TO_BE_RENDERED = MENU_ITEM__TO_BE_RENDERED;
 
 	/**
 	 * The feature id for the '<em><b>On Top</b></em>' attribute.
@@ -4988,7 +5293,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__ON_TOP = MENU_ITEM__ON_TOP;
+	public static final int RENDERED_MENU_ITEM__ON_TOP = MENU_ITEM__ON_TOP;
 
 	/**
 	 * The feature id for the '<em><b>Visible</b></em>' attribute.
@@ -4997,7 +5302,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__VISIBLE = MENU_ITEM__VISIBLE;
+	public static final int RENDERED_MENU_ITEM__VISIBLE = MENU_ITEM__VISIBLE;
 
 	/**
 	 * The feature id for the '<em><b>Parent</b></em>' container reference.
@@ -5006,7 +5311,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__PARENT = MENU_ITEM__PARENT;
+	public static final int RENDERED_MENU_ITEM__PARENT = MENU_ITEM__PARENT;
 
 	/**
 	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
@@ -5015,7 +5320,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__CONTAINER_DATA = MENU_ITEM__CONTAINER_DATA;
+	public static final int RENDERED_MENU_ITEM__CONTAINER_DATA = MENU_ITEM__CONTAINER_DATA;
 
 	/**
 	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
@@ -5024,7 +5329,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__CUR_SHARED_REF = MENU_ITEM__CUR_SHARED_REF;
+	public static final int RENDERED_MENU_ITEM__CUR_SHARED_REF = MENU_ITEM__CUR_SHARED_REF;
 
 	/**
 	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
@@ -5033,7 +5338,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__VISIBLE_WHEN = MENU_ITEM__VISIBLE_WHEN;
+	public static final int RENDERED_MENU_ITEM__VISIBLE_WHEN = MENU_ITEM__VISIBLE_WHEN;
 
 	/**
 	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
@@ -5042,16 +5347,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
-
-	/**
-	 * The feature id for the '<em><b>Localized Accessibility Phrase</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM__LOCALIZED_ACCESSIBILITY_PHRASE;
+	public static final int RENDERED_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
 
 	/**
 	 * The feature id for the '<em><b>Label</b></em>' attribute.
@@ -5060,7 +5356,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LABEL = MENU_ITEM__LABEL;
+	public static final int RENDERED_MENU_ITEM__LABEL = MENU_ITEM__LABEL;
 
 	/**
 	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
@@ -5069,7 +5365,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__ICON_URI = MENU_ITEM__ICON_URI;
+	public static final int RENDERED_MENU_ITEM__ICON_URI = MENU_ITEM__ICON_URI;
 
 	/**
 	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
@@ -5078,25 +5374,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__TOOLTIP = MENU_ITEM__TOOLTIP;
-
-	/**
-	 * The feature id for the '<em><b>Localized Label</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_LABEL = MENU_ITEM__LOCALIZED_LABEL;
-
-	/**
-	 * The feature id for the '<em><b>Localized Tooltip</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__LOCALIZED_TOOLTIP = MENU_ITEM__LOCALIZED_TOOLTIP;
+	public static final int RENDERED_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
 
 	/**
 	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
@@ -5105,7 +5383,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__ENABLED = MENU_ITEM__ENABLED;
+	public static final int RENDERED_MENU_ITEM__ENABLED = MENU_ITEM__ENABLED;
 
 	/**
 	 * The feature id for the '<em><b>Selected</b></em>' attribute.
@@ -5114,7 +5392,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__SELECTED = MENU_ITEM__SELECTED;
+	public static final int RENDERED_MENU_ITEM__SELECTED = MENU_ITEM__SELECTED;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' attribute.
@@ -5123,7 +5401,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__TYPE = MENU_ITEM__TYPE;
+	public static final int RENDERED_MENU_ITEM__TYPE = MENU_ITEM__TYPE;
 
 	/**
 	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
@@ -5132,43 +5410,52 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__MNEMONICS = MENU_ITEM__MNEMONICS;
+	public static final int RENDERED_MENU_ITEM__MNEMONICS = MENU_ITEM__MNEMONICS;
 
 	/**
-	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
+	 * The feature id for the '<em><b>Contribution Item</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__CONTRIBUTION_URI = MENU_ITEM_FEATURE_COUNT + 0;
+	public static final int RENDERED_MENU_ITEM__CONTRIBUTION_ITEM = MENU_ITEM_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Object</b></em>' attribute.
+	 * The number of structural features of the '<em>Rendered Menu Item</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION__OBJECT = MENU_ITEM_FEATURE_COUNT + 1;
+	public static final int RENDERED_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 1;
 
 	/**
-	 * The number of structural features of the '<em>Dynamic Menu Contribution</em>' class.
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 2;
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
 
 	/**
-	 * The operation id for the '<em>Update Localization</em>' operation.
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION___UPDATE_LOCALIZATION = MENU_ITEM___UPDATE_LOCALIZATION;
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
 
 	/**
 	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
@@ -5177,16 +5464,1055 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION___GET_LOCALIZED_MNEMONICS = MENU_ITEM___GET_LOCALIZED_MNEMONICS;
+	public static final int RENDERED_MENU_ITEM___GET_LOCALIZED_MNEMONICS = MENU_ITEM___GET_LOCALIZED_MNEMONICS;
 
 	/**
-	 * The number of operations of the '<em>Dynamic Menu Contribution</em>' class.
+	 * The number of operations of the '<em>Rendered Menu Item</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	public static final int DYNAMIC_MENU_CONTRIBUTION_OPERATION_COUNT = MENU_ITEM_OPERATION_COUNT + 0;
+	public static final int RENDERED_MENU_ITEM_OPERATION_COUNT = MENU_ITEM_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueToolItemImpl <em>Opaque Tool Item</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueToolItemImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueToolItem()
+	 * @generated
+	 */
+	public static final int OPAQUE_TOOL_ITEM = 25;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__ELEMENT_ID = TOOL_ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__PERSISTED_STATE = TOOL_ITEM__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__TAGS = TOOL_ITEM__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__CONTRIBUTOR_URI = TOOL_ITEM__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__TRANSIENT_DATA = TOOL_ITEM__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__WIDGET = TOOL_ITEM__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__RENDERER = TOOL_ITEM__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__TO_BE_RENDERED = TOOL_ITEM__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__ON_TOP = TOOL_ITEM__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__VISIBLE = TOOL_ITEM__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__PARENT = TOOL_ITEM__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__CONTAINER_DATA = TOOL_ITEM__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__CUR_SHARED_REF = TOOL_ITEM__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__VISIBLE_WHEN = TOOL_ITEM__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__ACCESSIBILITY_PHRASE = TOOL_ITEM__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__LABEL = TOOL_ITEM__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__ICON_URI = TOOL_ITEM__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__TOOLTIP = TOOL_ITEM__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__ENABLED = TOOL_ITEM__ENABLED;
+
+	/**
+	 * The feature id for the '<em><b>Selected</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__SELECTED = TOOL_ITEM__SELECTED;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__TYPE = TOOL_ITEM__TYPE;
+
+	/**
+	 * The feature id for the '<em><b>Menu</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__MENU = TOOL_ITEM__MENU;
+
+	/**
+	 * The feature id for the '<em><b>Opaque Item</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM__OPAQUE_ITEM = TOOL_ITEM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Opaque Tool Item</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM_FEATURE_COUNT = TOOL_ITEM_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = TOOL_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_LABEL = TOOL_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM___GET_LOCALIZED_TOOLTIP = TOOL_ITEM___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The number of operations of the '<em>Opaque Tool Item</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_TOOL_ITEM_OPERATION_COUNT = TOOL_ITEM_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuItemImpl <em>Opaque Menu Item</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuItemImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenuItem()
+	 * @generated
+	 */
+	public static final int OPAQUE_MENU_ITEM = 26;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__ELEMENT_ID = MENU_ITEM__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__PERSISTED_STATE = MENU_ITEM__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__TAGS = MENU_ITEM__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__CONTRIBUTOR_URI = MENU_ITEM__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__TRANSIENT_DATA = MENU_ITEM__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__WIDGET = MENU_ITEM__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__RENDERER = MENU_ITEM__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__TO_BE_RENDERED = MENU_ITEM__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__ON_TOP = MENU_ITEM__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__VISIBLE = MENU_ITEM__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__PARENT = MENU_ITEM__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__CONTAINER_DATA = MENU_ITEM__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__CUR_SHARED_REF = MENU_ITEM__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__VISIBLE_WHEN = MENU_ITEM__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__ACCESSIBILITY_PHRASE = MENU_ITEM__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__LABEL = MENU_ITEM__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__ICON_URI = MENU_ITEM__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__TOOLTIP = MENU_ITEM__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__ENABLED = MENU_ITEM__ENABLED;
+
+	/**
+	 * The feature id for the '<em><b>Selected</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__SELECTED = MENU_ITEM__SELECTED;
+
+	/**
+	 * The feature id for the '<em><b>Type</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__TYPE = MENU_ITEM__TYPE;
+
+	/**
+	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__MNEMONICS = MENU_ITEM__MNEMONICS;
+
+	/**
+	 * The feature id for the '<em><b>Opaque Item</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM__OPAQUE_ITEM = MENU_ITEM_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Opaque Menu Item</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM_FEATURE_COUNT = MENU_ITEM_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_ITEM___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_LABEL = MENU_ITEM___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_TOOLTIP = MENU_ITEM___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM___GET_LOCALIZED_MNEMONICS = MENU_ITEM___GET_LOCALIZED_MNEMONICS;
+
+	/**
+	 * The number of operations of the '<em>Opaque Menu Item</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_ITEM_OPERATION_COUNT = MENU_ITEM_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuSeparatorImpl <em>Opaque Menu Separator</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuSeparatorImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenuSeparator()
+	 * @generated
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR = 27;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__ELEMENT_ID = MENU_SEPARATOR__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__PERSISTED_STATE = MENU_SEPARATOR__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__TAGS = MENU_SEPARATOR__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__CONTRIBUTOR_URI = MENU_SEPARATOR__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__TRANSIENT_DATA = MENU_SEPARATOR__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__WIDGET = MENU_SEPARATOR__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__RENDERER = MENU_SEPARATOR__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__TO_BE_RENDERED = MENU_SEPARATOR__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__ON_TOP = MENU_SEPARATOR__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__VISIBLE = MENU_SEPARATOR__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__PARENT = MENU_SEPARATOR__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__CONTAINER_DATA = MENU_SEPARATOR__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__CUR_SHARED_REF = MENU_SEPARATOR__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__VISIBLE_WHEN = MENU_SEPARATOR__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__ACCESSIBILITY_PHRASE = MENU_SEPARATOR__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__LABEL = MENU_SEPARATOR__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__ICON_URI = MENU_SEPARATOR__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__TOOLTIP = MENU_SEPARATOR__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__MNEMONICS = MENU_SEPARATOR__MNEMONICS;
+
+	/**
+	 * The feature id for the '<em><b>Opaque Item</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR__OPAQUE_ITEM = MENU_SEPARATOR_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Opaque Menu Separator</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR_FEATURE_COUNT = MENU_SEPARATOR_FEATURE_COUNT + 1;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU_SEPARATOR___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_LABEL = MENU_SEPARATOR___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP = MENU_SEPARATOR___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR___GET_LOCALIZED_MNEMONICS = MENU_SEPARATOR___GET_LOCALIZED_MNEMONICS;
+
+	/**
+	 * The number of operations of the '<em>Opaque Menu Separator</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_SEPARATOR_OPERATION_COUNT = MENU_SEPARATOR_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuImpl <em>Opaque Menu</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenu()
+	 * @generated
+	 */
+	public static final int OPAQUE_MENU = 28;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__ELEMENT_ID = MENU__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__PERSISTED_STATE = MENU__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__TAGS = MENU__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__CONTRIBUTOR_URI = MENU__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__TRANSIENT_DATA = MENU__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__WIDGET = MENU__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__RENDERER = MENU__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__TO_BE_RENDERED = MENU__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__ON_TOP = MENU__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__VISIBLE = MENU__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__PARENT = MENU__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__CONTAINER_DATA = MENU__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__CUR_SHARED_REF = MENU__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__VISIBLE_WHEN = MENU__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__ACCESSIBILITY_PHRASE = MENU__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__LABEL = MENU__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__ICON_URI = MENU__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__TOOLTIP = MENU__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Mnemonics</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__MNEMONICS = MENU__MNEMONICS;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__CHILDREN = MENU__CHILDREN;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__SELECTED_ELEMENT = MENU__SELECTED_ELEMENT;
+
+	/**
+	 * The feature id for the '<em><b>Enabled</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU__ENABLED = MENU__ENABLED;
+
+	/**
+	 * The number of structural features of the '<em>Opaque Menu</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_FEATURE_COUNT = MENU_FEATURE_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE = MENU___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_LABEL = MENU___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_TOOLTIP = MENU___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Mnemonics</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU___GET_LOCALIZED_MNEMONICS = MENU___GET_LOCALIZED_MNEMONICS;
+
+	/**
+	 * The number of operations of the '<em>Opaque Menu</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int OPAQUE_MENU_OPERATION_COUNT = MENU_OPERATION_COUNT + 0;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.menu.ItemType <em>Item Type</em>}' enum.
@@ -5196,7 +6522,7 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getItemType()
 	 * @generated
 	 */
-	public static final int ITEM_TYPE = 23;
+	public static final int ITEM_TYPE = 29;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -5329,6 +6655,20 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private EClass renderedMenuEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass renderedToolBarEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	private EClass toolBarContributionEClass = null;
 
 	/**
@@ -5357,7 +6697,35 @@ public class MenuPackageImpl extends EPackageImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass dynamicMenuContributionEClass = null;
+	private EClass renderedMenuItemEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass opaqueToolItemEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass opaqueMenuItemEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass opaqueMenuSeparatorEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass opaqueMenuEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -5842,6 +7210,60 @@ public class MenuPackageImpl extends EPackageImpl {
 
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu <em>Rendered Menu</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Rendered Menu</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu
+	 * @generated
+	 */
+	public EClass getRenderedMenu() {
+		return renderedMenuEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu#getContributionManager <em>Contribution Manager</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Contribution Manager</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu#getContributionManager()
+	 * @see #getRenderedMenu()
+	 * @generated
+	 */
+	public EAttribute getRenderedMenu_ContributionManager() {
+		return (EAttribute)renderedMenuEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar <em>Rendered Tool Bar</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Rendered Tool Bar</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar
+	 * @generated
+	 */
+	public EClass getRenderedToolBar() {
+		return renderedToolBarEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar#getContributionManager <em>Contribution Manager</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Contribution Manager</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar#getContributionManager()
+	 * @see #getRenderedToolBar()
+	 * @generated
+	 */
+	public EAttribute getRenderedToolBar_ContributionManager() {
+		return (EAttribute)renderedToolBarEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
 	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution <em>Tool Bar Contribution</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -5978,15 +7400,123 @@ public class MenuPackageImpl extends EPackageImpl {
 
 
 	/**
-	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution <em>Dynamic Menu Contribution</em>}'.
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem <em>Rendered Menu Item</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Dynamic Menu Contribution</em>'.
-	 * @see org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution
+	 * @return the meta object for class '<em>Rendered Menu Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem
 	 * @generated
 	 */
-	public EClass getDynamicMenuContribution() {
-		return dynamicMenuContributionEClass;
+	public EClass getRenderedMenuItem() {
+		return renderedMenuItemEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem#getContributionItem <em>Contribution Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Contribution Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem#getContributionItem()
+	 * @see #getRenderedMenuItem()
+	 * @generated
+	 */
+	public EAttribute getRenderedMenuItem_ContributionItem() {
+		return (EAttribute)renderedMenuItemEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem <em>Opaque Tool Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Opaque Tool Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem
+	 * @generated
+	 */
+	public EClass getOpaqueToolItem() {
+		return opaqueToolItemEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem#getOpaqueItem <em>Opaque Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Opaque Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem#getOpaqueItem()
+	 * @see #getOpaqueToolItem()
+	 * @generated
+	 */
+	public EAttribute getOpaqueToolItem_OpaqueItem() {
+		return (EAttribute)opaqueToolItemEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem <em>Opaque Menu Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Opaque Menu Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem
+	 * @generated
+	 */
+	public EClass getOpaqueMenuItem() {
+		return opaqueMenuItemEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem#getOpaqueItem <em>Opaque Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Opaque Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem#getOpaqueItem()
+	 * @see #getOpaqueMenuItem()
+	 * @generated
+	 */
+	public EAttribute getOpaqueMenuItem_OpaqueItem() {
+		return (EAttribute)opaqueMenuItemEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator <em>Opaque Menu Separator</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Opaque Menu Separator</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator
+	 * @generated
+	 */
+	public EClass getOpaqueMenuSeparator() {
+		return opaqueMenuSeparatorEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator#getOpaqueItem <em>Opaque Item</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Opaque Item</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator#getOpaqueItem()
+	 * @see #getOpaqueMenuSeparator()
+	 * @generated
+	 */
+	public EAttribute getOpaqueMenuSeparator_OpaqueItem() {
+		return (EAttribute)opaqueMenuSeparatorEClass.getEStructuralFeatures().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu <em>Opaque Menu</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Opaque Menu</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu
+	 * @generated
+	 */
+	public EClass getOpaqueMenu() {
+		return opaqueMenuEClass;
 	}
 
 
@@ -6081,6 +7611,12 @@ public class MenuPackageImpl extends EPackageImpl {
 		menuContributionsEClass = createEClass(MENU_CONTRIBUTIONS);
 		createEReference(menuContributionsEClass, MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS);
 
+		renderedMenuEClass = createEClass(RENDERED_MENU);
+		createEAttribute(renderedMenuEClass, RENDERED_MENU__CONTRIBUTION_MANAGER);
+
+		renderedToolBarEClass = createEClass(RENDERED_TOOL_BAR);
+		createEAttribute(renderedToolBarEClass, RENDERED_TOOL_BAR__CONTRIBUTION_MANAGER);
+
 		toolBarContributionEClass = createEClass(TOOL_BAR_CONTRIBUTION);
 		createEAttribute(toolBarContributionEClass, TOOL_BAR_CONTRIBUTION__PARENT_ID);
 		createEAttribute(toolBarContributionEClass, TOOL_BAR_CONTRIBUTION__POSITION_IN_PARENT);
@@ -6095,7 +7631,19 @@ public class MenuPackageImpl extends EPackageImpl {
 		trimContributionsEClass = createEClass(TRIM_CONTRIBUTIONS);
 		createEReference(trimContributionsEClass, TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS);
 
-		dynamicMenuContributionEClass = createEClass(DYNAMIC_MENU_CONTRIBUTION);
+		renderedMenuItemEClass = createEClass(RENDERED_MENU_ITEM);
+		createEAttribute(renderedMenuItemEClass, RENDERED_MENU_ITEM__CONTRIBUTION_ITEM);
+
+		opaqueToolItemEClass = createEClass(OPAQUE_TOOL_ITEM);
+		createEAttribute(opaqueToolItemEClass, OPAQUE_TOOL_ITEM__OPAQUE_ITEM);
+
+		opaqueMenuItemEClass = createEClass(OPAQUE_MENU_ITEM);
+		createEAttribute(opaqueMenuItemEClass, OPAQUE_MENU_ITEM__OPAQUE_ITEM);
+
+		opaqueMenuSeparatorEClass = createEClass(OPAQUE_MENU_SEPARATOR);
+		createEAttribute(opaqueMenuSeparatorEClass, OPAQUE_MENU_SEPARATOR__OPAQUE_ITEM);
+
+		opaqueMenuEClass = createEClass(OPAQUE_MENU);
 
 		// Create enums
 		itemTypeEEnum = createEEnum(ITEM_TYPE);
@@ -6176,6 +7724,8 @@ public class MenuPackageImpl extends EPackageImpl {
 		directToolItemEClass.getESuperTypes().add(this.getToolItem());
 		directToolItemEClass.getESuperTypes().add(theApplicationPackage.getContribution());
 		toolBarSeparatorEClass.getESuperTypes().add(this.getToolBarElement());
+		renderedMenuEClass.getESuperTypes().add(this.getMenu());
+		renderedToolBarEClass.getESuperTypes().add(this.getToolBar());
 		g1 = createEGenericType(theUiPackage.getElementContainer());
 		g2 = createEGenericType(this.getToolBarElement());
 		g1.getETypeArguments().add(g2);
@@ -6184,8 +7734,11 @@ public class MenuPackageImpl extends EPackageImpl {
 		g2 = createEGenericType(theBasicPackage.getTrimElement());
 		g1.getETypeArguments().add(g2);
 		trimContributionEClass.getEGenericSuperTypes().add(g1);
-		dynamicMenuContributionEClass.getESuperTypes().add(this.getMenuItem());
-		dynamicMenuContributionEClass.getESuperTypes().add(theApplicationPackage.getContribution());
+		renderedMenuItemEClass.getESuperTypes().add(this.getMenuItem());
+		opaqueToolItemEClass.getESuperTypes().add(this.getToolItem());
+		opaqueMenuItemEClass.getESuperTypes().add(this.getMenuItem());
+		opaqueMenuSeparatorEClass.getESuperTypes().add(this.getMenuSeparator());
+		opaqueMenuEClass.getESuperTypes().add(this.getMenu());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(itemEClass, MItem.class, "Item", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -6238,6 +7791,12 @@ public class MenuPackageImpl extends EPackageImpl {
 		initEClass(menuContributionsEClass, MMenuContributions.class, "MenuContributions", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getMenuContributions_MenuContributions(), this.getMenuContribution(), null, "menuContributions", null, 0, -1, MMenuContributions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
+		initEClass(renderedMenuEClass, MRenderedMenu.class, "RenderedMenu", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getRenderedMenu_ContributionManager(), ecorePackage.getEJavaObject(), "contributionManager", null, 0, 1, MRenderedMenu.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(renderedToolBarEClass, MRenderedToolBar.class, "RenderedToolBar", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getRenderedToolBar_ContributionManager(), ecorePackage.getEJavaObject(), "contributionManager", null, 0, 1, MRenderedToolBar.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
 		initEClass(toolBarContributionEClass, MToolBarContribution.class, "ToolBarContribution", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEAttribute(getToolBarContribution_ParentId(), ecorePackage.getEString(), "parentId", null, 0, 1, MToolBarContribution.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 		initEAttribute(getToolBarContribution_PositionInParent(), ecorePackage.getEString(), "positionInParent", null, 0, 1, MToolBarContribution.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
@@ -6252,7 +7811,19 @@ public class MenuPackageImpl extends EPackageImpl {
 		initEClass(trimContributionsEClass, MTrimContributions.class, "TrimContributions", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 		initEReference(getTrimContributions_TrimContributions(), this.getTrimContribution(), null, "trimContributions", null, 0, -1, MTrimContributions.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
-		initEClass(dynamicMenuContributionEClass, MDynamicMenuContribution.class, "DynamicMenuContribution", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEClass(renderedMenuItemEClass, MRenderedMenuItem.class, "RenderedMenuItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getRenderedMenuItem_ContributionItem(), ecorePackage.getEJavaObject(), "contributionItem", null, 0, 1, MRenderedMenuItem.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(opaqueToolItemEClass, MOpaqueToolItem.class, "OpaqueToolItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getOpaqueToolItem_OpaqueItem(), ecorePackage.getEJavaObject(), "opaqueItem", null, 0, 1, MOpaqueToolItem.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(opaqueMenuItemEClass, MOpaqueMenuItem.class, "OpaqueMenuItem", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getOpaqueMenuItem_OpaqueItem(), ecorePackage.getEJavaObject(), "opaqueItem", null, 0, 1, MOpaqueMenuItem.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(opaqueMenuSeparatorEClass, MOpaqueMenuSeparator.class, "OpaqueMenuSeparator", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+		initEAttribute(getOpaqueMenuSeparator_OpaqueItem(), ecorePackage.getEJavaObject(), "opaqueItem", null, 0, 1, MOpaqueMenuSeparator.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(opaqueMenuEClass, MOpaqueMenu.class, "OpaqueMenu", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
 		// Initialize enums and add enum literals
 		initEEnum(itemTypeEEnum, ItemType.class, "ItemType"); //$NON-NLS-1$
@@ -6559,6 +8130,42 @@ public class MenuPackageImpl extends EPackageImpl {
 		public static final EReference MENU_CONTRIBUTIONS__MENU_CONTRIBUTIONS = eINSTANCE.getMenuContributions_MenuContributions();
 
 		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuImpl <em>Rendered Menu</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedMenu()
+		 * @generated
+		 */
+		public static final EClass RENDERED_MENU = eINSTANCE.getRenderedMenu();
+
+		/**
+		 * The meta object literal for the '<em><b>Contribution Manager</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute RENDERED_MENU__CONTRIBUTION_MANAGER = eINSTANCE.getRenderedMenu_ContributionManager();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedToolBarImpl <em>Rendered Tool Bar</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedToolBarImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedToolBar()
+		 * @generated
+		 */
+		public static final EClass RENDERED_TOOL_BAR = eINSTANCE.getRenderedToolBar();
+
+		/**
+		 * The meta object literal for the '<em><b>Contribution Manager</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute RENDERED_TOOL_BAR__CONTRIBUTION_MANAGER = eINSTANCE.getRenderedToolBar_ContributionManager();
+
+		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.ToolBarContributionImpl <em>Tool Bar Contribution</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -6647,14 +8254,86 @@ public class MenuPackageImpl extends EPackageImpl {
 		public static final EReference TRIM_CONTRIBUTIONS__TRIM_CONTRIBUTIONS = eINSTANCE.getTrimContributions_TrimContributions();
 
 		/**
-		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.DynamicMenuContributionImpl <em>Dynamic Menu Contribution</em>}' class.
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuItemImpl <em>Rendered Menu Item</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.DynamicMenuContributionImpl
-		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getDynamicMenuContribution()
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.RenderedMenuItemImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getRenderedMenuItem()
 		 * @generated
 		 */
-		public static final EClass DYNAMIC_MENU_CONTRIBUTION = eINSTANCE.getDynamicMenuContribution();
+		public static final EClass RENDERED_MENU_ITEM = eINSTANCE.getRenderedMenuItem();
+
+		/**
+		 * The meta object literal for the '<em><b>Contribution Item</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute RENDERED_MENU_ITEM__CONTRIBUTION_ITEM = eINSTANCE.getRenderedMenuItem_ContributionItem();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueToolItemImpl <em>Opaque Tool Item</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueToolItemImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueToolItem()
+		 * @generated
+		 */
+		public static final EClass OPAQUE_TOOL_ITEM = eINSTANCE.getOpaqueToolItem();
+
+		/**
+		 * The meta object literal for the '<em><b>Opaque Item</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute OPAQUE_TOOL_ITEM__OPAQUE_ITEM = eINSTANCE.getOpaqueToolItem_OpaqueItem();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuItemImpl <em>Opaque Menu Item</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuItemImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenuItem()
+		 * @generated
+		 */
+		public static final EClass OPAQUE_MENU_ITEM = eINSTANCE.getOpaqueMenuItem();
+
+		/**
+		 * The meta object literal for the '<em><b>Opaque Item</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute OPAQUE_MENU_ITEM__OPAQUE_ITEM = eINSTANCE.getOpaqueMenuItem_OpaqueItem();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuSeparatorImpl <em>Opaque Menu Separator</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuSeparatorImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenuSeparator()
+		 * @generated
+		 */
+		public static final EClass OPAQUE_MENU_SEPARATOR = eINSTANCE.getOpaqueMenuSeparator();
+
+		/**
+		 * The meta object literal for the '<em><b>Opaque Item</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		public static final EAttribute OPAQUE_MENU_SEPARATOR__OPAQUE_ITEM = eINSTANCE.getOpaqueMenuSeparator_OpaqueItem();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuImpl <em>Opaque Menu</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.OpaqueMenuImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getOpaqueMenu()
+		 * @generated
+		 */
+		public static final EClass OPAQUE_MENU = eINSTANCE.getOpaqueMenu();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.menu.ItemType <em>Item Type</em>}' enum.

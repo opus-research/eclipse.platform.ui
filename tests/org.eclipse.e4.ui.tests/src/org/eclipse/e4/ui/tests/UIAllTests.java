@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,12 +36,6 @@ import org.eclipse.e4.ui.tests.workbench.MWindowTest;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
-import org.eclipse.e4.ui.tests.workbench.TopoSortTests;
-import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
-import org.eclipse.e4.ui.workbench.renderers.swt.TabStateHandlerTest;
-import org.eclipse.e4.ui.workbench.renderers.swt.ThemeDefinitionChangedHandlerTest;
-
-//import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 
 /**
  *
@@ -52,8 +46,6 @@ public class UIAllTests extends TestSuite {
 	}
 
 	public UIAllTests() {
-		// Hack: bug 422676, run InjectionEventTest first
-		addTestSuite(InjectionEventTest.class);
 		addTest(StartupTestSuite.suite());
 		addTestSuite(UIEventTypesTest.class);
 		addTestSuite(Bug299755Test.class);
@@ -74,12 +66,8 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(Bug308317Test.class);
 		addTestSuite(ModelRobustnessTest.class);
 		addTestSuite(ResourceHandlerTest.class);
+		addTestSuite(InjectionEventTest.class);
 		addTestSuite(PartFocusTest.class);
 		addTestSuite(ModelElementTest.class);
-		addTestSuite(StackRendererTest.class);
-		addTestSuite(TabStateHandlerTest.class);
-		addTestSuite(ThemeDefinitionChangedHandlerTest.class);
-		addTestSuite(TopoSortTests.class);
-		// addTestSuite(SWTPartRendererTest.class);
 	}
 }

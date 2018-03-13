@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -109,8 +109,7 @@ public class Theme extends EventManager implements ITheme {
                 /* (non-Javadoc)
                  * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
                  */
-                @Override
-				public void propertyChange(PropertyChangeEvent event) {
+                public void propertyChange(PropertyChangeEvent event) {
                     String[] split = ThemeElementHelper.splitPropertyName(
                             Theme.this, event.getProperty());
                     String key = split[1];
@@ -206,8 +205,7 @@ public class Theme extends EventManager implements ITheme {
                 /* (non-Javadoc)
                  * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
                  */
-                @Override
-				public void propertyChange(PropertyChangeEvent event) {
+                public void propertyChange(PropertyChangeEvent event) {
                     firePropertyChange(event);
                 }
             };
@@ -215,8 +213,7 @@ public class Theme extends EventManager implements ITheme {
         return themeListener;
     }
 
-    @Override
-	public ColorRegistry getColorRegistry() {
+    public ColorRegistry getColorRegistry() {
 		if (themeColorRegistry != null) {
 			return themeColorRegistry;
 		}
@@ -225,8 +222,7 @@ public class Theme extends EventManager implements ITheme {
 				.getDefaultThemeColorRegistry();
 	}
 
-    @Override
-	public FontRegistry getFontRegistry() {
+    public FontRegistry getFontRegistry() {
 		if (themeFontRegistry != null) {
 			return themeFontRegistry;
 		}
@@ -235,8 +231,7 @@ public class Theme extends EventManager implements ITheme {
 				.getDefaultThemeFontRegistry();
 	}
 
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (themeColorRegistry != null) {
             themeColorRegistry.removeListener(themeListener);
             themeColorRegistry.dispose();
@@ -252,8 +247,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.ITheme#getId()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return descriptor == null ? IThemeManager.DEFAULT_THEME : descriptor
                 .getId();
     }
@@ -261,16 +255,14 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbench#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
      */
-    @Override
-	public void addPropertyChangeListener(IPropertyChangeListener listener) {
+    public void addPropertyChangeListener(IPropertyChangeListener listener) {
         addListenerObject(listener);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbench#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
      */
-    @Override
-	public void removePropertyChangeListener(IPropertyChangeListener listener) {
+    public void removePropertyChangeListener(IPropertyChangeListener listener) {
         removeListenerObject(listener);
     }
 
@@ -284,8 +276,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.ITheme#getLabel()
      */
-    @Override
-	public String getLabel() {
+    public String getLabel() {
         return descriptor == null ? RESOURCE_BUNDLE
                 .getString("DefaultTheme.label") : descriptor.getName(); //$NON-NLS-1$ 
     }
@@ -293,8 +284,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.themes.ITheme#getString(java.lang.String)
      */
-    @Override
-	public String getString(String key) {
+    public String getString(String key) {
         if (dataMap != null) {
 			return (String) dataMap.get(key);
 		}
@@ -304,8 +294,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.themes.ITheme#keySet()
      */
-    @Override
-	public Set keySet() {
+    public Set keySet() {
         if (dataMap != null) {
 			return dataMap.keySet();
 		}
@@ -316,8 +305,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.themes.ITheme#getInt(java.lang.String)
      */
-    @Override
-	public int getInt(String key) {
+    public int getInt(String key) {
         String string = getString(key);
         if (string == null) {
 			return 0;
@@ -332,8 +320,7 @@ public class Theme extends EventManager implements ITheme {
     /* (non-Javadoc)
      * @see org.eclipse.ui.themes.ITheme#getBoolean(java.lang.String)
      */
-    @Override
-	public boolean getBoolean(String key) {
+    public boolean getBoolean(String key) {
         String string = getString(key);
         if (string == null) {
 			return false;
