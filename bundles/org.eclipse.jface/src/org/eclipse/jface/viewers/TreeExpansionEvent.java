@@ -15,21 +15,23 @@ import java.util.EventObject;
 /**
  * Event object describing a tree node being expanded
  * or collapsed. The source of these events is the tree viewer.
+ * @param <E>
+ * @param <I>
  *
  * @see ITreeViewerListener
  */
-public class TreeExpansionEvent extends EventObject {
+public class TreeExpansionEvent<E,I> extends EventObject {
 
     /**
      * Generated serial version UID for this class.
      * @since 3.1
      */
     private static final long serialVersionUID = 3618414930227835185L;
-    
+
     /**
      * The element that was expanded or collapsed.
      */
-    private Object element;
+    private E element;
 
     /**
      * Creates a new event for the given source and element.
@@ -37,7 +39,7 @@ public class TreeExpansionEvent extends EventObject {
      * @param source the tree viewer
      * @param element the element
      */
-    public TreeExpansionEvent(AbstractTreeViewer source, Object element) {
+    public TreeExpansionEvent(AbstractTreeViewer<E,I> source, E element) {
         super(source);
         this.element = element;
     }
@@ -47,7 +49,7 @@ public class TreeExpansionEvent extends EventObject {
      *
      * @return the element
      */
-    public Object getElement() {
+    public E getElement() {
         return element;
     }
 
@@ -56,7 +58,7 @@ public class TreeExpansionEvent extends EventObject {
      *
      * @return the originating tree viewer
      */
-    public AbstractTreeViewer getTreeViewer() {
-        return (AbstractTreeViewer) source;
+    public AbstractTreeViewer<E,I> getTreeViewer() {
+        return (AbstractTreeViewer<E,I>) source;
     }
 }

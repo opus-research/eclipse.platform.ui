@@ -735,7 +735,7 @@ public abstract class ColumnViewer<E,I> extends StructuredViewer<E,I> {
 	}
 
 	@Override
-	protected E[] getRawChildren(I parent) {
+	protected E[] getRawChildren(Object parent) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
 		try {

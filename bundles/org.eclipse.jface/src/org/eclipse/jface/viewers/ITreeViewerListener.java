@@ -10,22 +10,24 @@
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
-/** 
+/**
  * A listener which is notified when a tree viewer expands or collapses
  * a node.
+ * @param <E>
+ * @param <I>
  */
-public interface ITreeViewerListener {
+public interface ITreeViewerListener<E,I> {
     /**
      * Notifies that a node in the tree has been collapsed.
      *
      * @param event event object describing details
      */
-    public void treeCollapsed(TreeExpansionEvent event);
+    public void treeCollapsed(TreeExpansionEvent<E,I> event);
 
     /**
      * Notifies that a node in the tree has been expanded.
      *
      * @param event event object describing details
      */
-    public void treeExpanded(TreeExpansionEvent event);
+    public void treeExpanded(TreeExpansionEvent<E,I> event);
 }
