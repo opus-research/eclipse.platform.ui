@@ -107,6 +107,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -1703,8 +1705,44 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			runnable.run(new NullProgressMonitor());
 		} else {
 			boolean wasCancelEnabled = manager.isCancelEnabled();
+
+			Shell window = getShell();
+			Shell shell = window;
+			Display display = window.getDisplay();
+
+			// Disable the rest of the shells on the current display
+			Shell[] shells = display.getShells();
+			boolean[] enabled = new boolean[shells.length];
+			for (int i = 0; i < shells.length; i++) {
+				Shell current = shells[i];
+				if (current == shell) {
+					continue;
+				}
+				if (current != null && !current.isDisposed()) {
+					enabled[i] = current.getEnabled();
+					current.setEnabled(false);
+				}
+			}
+			Control currentFocus = display.getFocusControl();
+
+			Menu menuBar = window.getMenuBar();
+			boolean menuBarWasEnabled = false;
+			if (menuBar != null) {
+				menuBarWasEnabled = menuBar.getEnabled();
+				menuBar.setEnabled(false);
+			}
+
+			final Control[] windowChildren = window.getChildren();
+			boolean[] windowChildrenEnabled = new boolean[windowChildren.length];
+			for (int i = 0; i < windowChildren.length; i++) {
+				if (windowChildren[i] != null && !windowChildren[i].isDisposed()) {
+					windowChildrenEnabled[i] = windowChildren[i].isEnabled();
+					windowChildren[i].setEnabled(false);
+				}
+			}
+
+			manager.setCancelEnabled(cancelable);
 			try {
-				manager.setCancelEnabled(cancelable);
 
 				final InvocationTargetException[] ite = new InvocationTargetException[1];
 				final InterruptedException[] ie = new InterruptedException[1];
@@ -1731,6 +1769,35 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				}
 			} finally {
 				manager.setCancelEnabled(wasCancelEnabled);
+				for (int i = 0; i < shells.length; i++) {
+					Shell current = shells[i];
+					if (current == shell) {
+						continue;
+					}
+					if (current != null && !current.isDisposed()) {
+						current.setEnabled(enabled[i]);
+					}
+				}
+
+				for (int i = 0; i < windowChildren.length; i++) {
+					if (windowChildren[i] != null && !windowChildren[i].isDisposed()) {
+						windowChildren[i].setEnabled(windowChildrenEnabled[i]);
+					}
+				}
+				if (menuBar != null && !menuBar.isDisposed()) {
+					menuBar.setEnabled(menuBarWasEnabled);
+				}
+
+				if (currentFocus != null && !currentFocus.isDisposed()) {
+					// It's necessary to restore focus after reenabling the
+					// controls
+					// because disabling them causes focus to jump elsewhere.
+					// Use forceFocus rather than setFocus to avoid SWT's
+					// search for children which can take focus, so focus
+					// ends up back on the actual control that previously had
+					// it.
+					currentFocus.forceFocus();
+				}
 			}
 		}
 	}
