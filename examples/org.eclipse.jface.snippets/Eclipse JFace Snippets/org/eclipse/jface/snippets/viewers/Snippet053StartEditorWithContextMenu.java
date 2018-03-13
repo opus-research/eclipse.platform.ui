@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2003 Marcel and others.
+ * Copyright (c) 2007, 2008 Marcel and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Marcel <emmpeegee@gmail.com> - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -39,16 +38,15 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 
-	private TreeViewer<MyModel,MyModel> viewer;
+	private TreeViewer viewer;
 
-	private class MyContentProvider implements ITreeContentProvider<MyModel,MyModel> {
+	private class MyContentProvider implements ITreeContentProvider {
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(MyModel inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.child.size()];
-			return inputElement.child.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return ((MyModel)inputElement).child.toArray();
 		}
 
 		/* (non-Javadoc)
@@ -61,40 +59,40 @@ public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends MyModel> viewer, MyModel oldInput, MyModel newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 		 */
-		public MyModel[] getChildren(MyModel parentElement) {
+		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		public MyModel getParent(MyModel element) {
+		public Object getParent(Object element) {
 			if( element == null) {
 				return null;
 			}
 
-			return element.parent;
+			return ((MyModel)element).parent;
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 		 */
-		public boolean hasChildren(MyModel element) {
-			return element.child.size() > 0;
+		public boolean hasChildren(Object element) {
+			return ((MyModel)element).child.size() > 0;
 		}
 
 	}
 
 	public class MyModel {
 		public MyModel parent;
-		public ArrayList<MyModel> child = new ArrayList<MyModel>();
+		public ArrayList child = new ArrayList();
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {
@@ -115,7 +113,7 @@ public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 	}
 
 	public Snippet053StartEditorWithContextMenu(Shell shell) {
-		viewer = new TreeViewer<MyModel,MyModel>(shell, SWT.BORDER);
+		viewer = new TreeViewer(shell, SWT.BORDER);
 		viewer.setContentProvider(new MyContentProvider());
 		viewer.setCellEditors(new CellEditor[] {new TextCellEditor(viewer.getTree())});
 		viewer.setColumnProperties(new String[] { "name" });
@@ -141,7 +139,7 @@ public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 			public void modify(Object element, String property, Object value) {
 				TreeItem item = (TreeItem)element;
 				((MyModel)item.getData()).counter = Integer.parseInt(value.toString());
-				viewer.update((MyModel)item.getData(), null);
+				viewer.update(item.getData(), null);
 			}
 
 		});

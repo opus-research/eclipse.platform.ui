@@ -38,17 +38,15 @@ import org.eclipse.swt.graphics.Image;
  * and {@link IFontDecorator} to provide foreground and background color and
  * font decoration.
  * </p>
- * @param <E> Type of an element of the model
- * @param <I> Type of the input
  * 
  * @since 3.4
  */
-public class DecoratingStyledCellLabelProvider<E,I> extends
-		DelegatingStyledCellLabelProvider<E,I> {
+public class DecoratingStyledCellLabelProvider extends
+		DelegatingStyledCellLabelProvider {
 
-	private ILabelDecorator<E> decorator;
+	private ILabelDecorator decorator;
 	private IDecorationContext decorationContext= DecorationContext.DEFAULT_CONTEXT;
-	private ILabelProviderListener<E> labelProviderListener;
+	private ILabelProviderListener labelProviderListener;
 
 	/**
 	 * Creates a {@link DecoratingStyledCellLabelProvider} that delegates the
@@ -66,7 +64,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	 *            used
 	 */
 	public DecoratingStyledCellLabelProvider(
-			IStyledLabelProvider<E> labelProvider, ILabelDecorator<E> decorator,
+			IStyledLabelProvider labelProvider, ILabelDecorator decorator,
 			IDecorationContext decorationContext) {
 		super(labelProvider);
 
@@ -74,8 +72,8 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 		this.decorationContext = decorationContext != null ? decorationContext
 				: DecorationContext.DEFAULT_CONTEXT;
 		
-		this.labelProviderListener = new ILabelProviderListener<E>() {
-			public void labelProviderChanged(LabelProviderChangedEvent<E> event) {
+		this.labelProviderListener = new ILabelProviderListener() {
+			public void labelProviderChanged(LabelProviderChangedEvent event) {
 				fireLabelProviderChanged(event);
 			}
 		};
@@ -107,19 +105,19 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 		this.decorationContext = decorationContext;
 	}
 
-	private boolean waitForPendingDecoration(ViewerCell<E> cell) {
+	private boolean waitForPendingDecoration(ViewerCell cell) {
 		if (this.decorator == null)
 			return false;
 
-		E element = cell.getElement();
+		Object element = cell.getElement();
 		String oldText = cell.getText();
 
 		boolean isDecorationPending = false;
 		if (this.decorator instanceof LabelDecorator) {
-			isDecorationPending = !((LabelDecorator<E>) this.decorator)
+			isDecorationPending = !((LabelDecorator) this.decorator)
 					.prepareDecoration(element, oldText, getDecorationContext());
 		} else if (this.decorator instanceof IDelayedLabelDecorator) {
-			isDecorationPending = !((IDelayedLabelDecorator<E>) this.decorator)
+			isDecorationPending = !((IDelayedLabelDecorator) this.decorator)
 					.prepareDecoration(element, oldText);
 		}
 		if (isDecorationPending && oldText.length() == 0) {
@@ -130,7 +128,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public void update(ViewerCell<E> cell) {
+	public void update(ViewerCell cell) {
 		if (waitForPendingDecoration(cell)) {
 			return; // wait until the decoration is ready
 		}
@@ -138,11 +136,10 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public Color getForeground(E element) {
+	public Color getForeground(Object element) {
 		if (this.decorator instanceof IColorDecorator) {
-			@SuppressWarnings("unchecked")
-			IColorDecorator<E> colorDecorator = (IColorDecorator<E>) this.decorator;
-			Color foreground = colorDecorator.decorateForeground(element);
+			Color foreground = ((IColorDecorator) this.decorator)
+					.decorateForeground(element);
 			if (foreground != null)
 				return foreground;
 		}
@@ -150,11 +147,10 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public Color getBackground(E element) {
+	public Color getBackground(Object element) {
 		if (this.decorator instanceof IColorDecorator) {
-			@SuppressWarnings("unchecked")
-			IColorDecorator<E> colorDecorator = (IColorDecorator<E>) this.decorator;
-			Color color = colorDecorator.decorateBackground(element);
+			Color color = ((IColorDecorator) this.decorator)
+					.decorateBackground(element);
 			if (color != null)
 				return color;
 		}
@@ -162,11 +158,9 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public Font getFont(E element) {
+	public Font getFont(Object element) {
 		if (this.decorator instanceof IFontDecorator) {
-			@SuppressWarnings("unchecked")
-			IFontDecorator<E> fontDecorator = (IFontDecorator<E>) this.decorator;
-			Font font = fontDecorator.decorateFont(element);
+			Font font = ((IFontDecorator) this.decorator).decorateFont(element);
 			if (font != null)
 				return font;
 		}
@@ -174,14 +168,14 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public Image getImage(E element) {
+	public Image getImage(Object element) {
 		Image image = super.getImage(element);
 		if (this.decorator == null) {
 			return image;
 		}
 		Image decorated = null;
 		if (this.decorator instanceof LabelDecorator) {
-			decorated = ((LabelDecorator<E>) this.decorator).decorateImage(image,
+			decorated = ((LabelDecorator) this.decorator).decorateImage(image,
 					element, getDecorationContext());
 		} else {
 			decorated = this.decorator.decorateImage(image, element);
@@ -200,7 +194,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	 * @return the styled text string used to label the element
 	 */
 	@Override
-	protected StyledString getStyledText(E element) {
+	protected StyledString getStyledText(Object element) {
 		StyledString styledString = super.getStyledText(element);
 		if (this.decorator == null) {
 			return styledString;
@@ -209,7 +203,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 		String label = styledString.getString();
 		String decorated;
 		if (this.decorator instanceof LabelDecorator) {
-			decorated = ((LabelDecorator<E>) this.decorator).decorateText(label,
+			decorated = ((LabelDecorator) this.decorator).decorateText(label,
 					element, getDecorationContext());
 		} else {
 			decorated = this.decorator.decorateText(label, element);
@@ -244,7 +238,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	 * 
 	 * @return the decorator or <code>null</code> if no decorator is installed
 	 */
-	public ILabelDecorator<E> getLabelDecorator() {
+	public ILabelDecorator getLabelDecorator() {
 		return this.decorator;
 	}
 
@@ -259,8 +253,8 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	 *            the label decorator, or <code>null</code> if no decorations
 	 *            are to be applied
 	 */
-	public void setLabelDecorator(ILabelDecorator<E> newDecorator) {
-		ILabelDecorator<E> oldDecorator = this.decorator;
+	public void setLabelDecorator(ILabelDecorator newDecorator) {
+		ILabelDecorator oldDecorator = this.decorator;
 		if (oldDecorator != newDecorator) {
 			if (oldDecorator != null)
 				oldDecorator.removeListener(this.labelProviderListener);
@@ -269,11 +263,11 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 				newDecorator.addListener(this.labelProviderListener);
 			}
 		}
-		fireLabelProviderChanged(new LabelProviderChangedEvent<E>(this));
+		fireLabelProviderChanged(new LabelProviderChangedEvent(this));
 	}
 
 	@Override
-	public void addListener(ILabelProviderListener<E> listener) {
+	public void addListener(ILabelProviderListener listener) {
 		super.addListener(listener);
 		if (this.decorator != null) {
 			this.decorator.addListener(this.labelProviderListener);
@@ -281,7 +275,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public void removeListener(ILabelProviderListener<E> listener) {
+	public void removeListener(ILabelProviderListener listener) {
 		super.removeListener(listener);
 		if (this.decorator != null && !isListenerAttached()) {
 			this.decorator.removeListener(this.labelProviderListener);
@@ -289,7 +283,7 @@ public class DecoratingStyledCellLabelProvider<E,I> extends
 	}
 
 	@Override
-	public boolean isLabelProperty(E element, String property) {
+	public boolean isLabelProperty(Object element, String property) {
 		if (super.isLabelProperty(element, property)) {
 			return true;
 		}

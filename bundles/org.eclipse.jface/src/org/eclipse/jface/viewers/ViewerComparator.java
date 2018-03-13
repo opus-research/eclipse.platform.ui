@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.Comparator;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.util.Policy;
 
 /**
@@ -25,8 +26,10 @@ import org.eclipse.jface.util.Policy;
  * The default <code>compare</code> method compares elements using two steps. 
  * The first step uses the values returned from <code>category</code>. 
  * By default, all elements are in the same category. 
- * The second level is based on a case insensitive compare of the strings obtained 
- * from the content viewer's label provider via <code>ILabelProvider.getText</code>.
+ * The second level uses strings obtained from the content viewer's label
+ * provider via <code>ILabelProvider.getText()</code>.
+ * The strings are compared using a comparator from {@link Policy#getComparator()}
+ * which by default does a case sensitive string comparison.
  * </p>
  * <p>
  * Subclasses may implement the <code>isSorterProperty</code> method;
@@ -34,18 +37,16 @@ import org.eclipse.jface.util.Policy;
  * categorization; and they may override the <code>compare</code> methods
  * to provide a totally different way of sorting elements.
  * </p>
- * @param <E> 
- * @param <I> 
  * @see IStructuredContentProvider
  * @see StructuredViewer
  * 
  * @since 3.2
  */
-public class ViewerComparator<E,I> {
+public class ViewerComparator {
 	/**
 	 * The comparator to use to sort a viewer's contents.
 	 */
-	private Comparator<String> comparator;
+	private Comparator comparator;
 
 	/**
      * Creates a new {@link ViewerComparator}, which uses the default comparator
@@ -62,7 +63,7 @@ public class ViewerComparator<E,I> {
      * 
 	 * @param comparator
 	 */
-	public ViewerComparator(Comparator<String> comparator){
+	public ViewerComparator(Comparator comparator){
 		this.comparator = comparator;
 	}
 
@@ -71,7 +72,7 @@ public class ViewerComparator<E,I> {
 	 * 
 	 * @return the comparator used to sort strings
 	 */
-	protected Comparator<String> getComparator() {
+	protected Comparator getComparator() {
 		if (comparator == null){
 			comparator = Policy.getComparator();
 		}
@@ -117,7 +118,7 @@ public class ViewerComparator<E,I> {
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
      */
-    public int compare(Viewer<I> viewer, E e1, E e2) {
+    public int compare(Viewer viewer, Object e1, Object e2) {
         int cat1 = category(e1);
         int cat2 = category(e2);
 
@@ -132,16 +133,15 @@ public class ViewerComparator<E,I> {
         return getComparator().compare(name1, name2);
     }
     
-	private String getLabel(Viewer<I> viewer, E e1) {
+	private String getLabel(Viewer viewer, Object e1) {
 		String name1;
 		if (viewer == null || !(viewer instanceof ContentViewer)) {
 			name1 = e1.toString();
 		} else {
-			@SuppressWarnings("unchecked")
-			ContentViewer<E,I> contentViewer = (ContentViewer<E,I>) viewer;
-			IBaseLabelProvider<E> prov = contentViewer.getLabelProvider();
+			IBaseLabelProvider prov = ((ContentViewer) viewer)
+					.getLabelProvider();
 			if (prov instanceof ILabelProvider) {
-				ILabelProvider<E> lprov = (ILabelProvider<E>) prov;
+				ILabelProvider lprov = (ILabelProvider) prov;
 				name1 = lprov.getText(e1);
 			} else {
 				name1 = e1.toString();
@@ -166,7 +166,7 @@ public class ViewerComparator<E,I> {
      * @return <code>true</code> if the sorting would be affected,
      *    and <code>false</code> if it would be unaffected
      */
-    public boolean isSorterProperty(E element, String property) {
+    public boolean isSorterProperty(Object element, String property) {
         return false;
     }
 
@@ -184,11 +184,10 @@ public class ViewerComparator<E,I> {
      * @param viewer the viewer
      * @param elements the elements to sort
      */
-	public void sort(final Viewer<I> viewer, E[] elements) {
+	public void sort(final Viewer viewer, Object[] elements) {
 		try {
-			Arrays.sort(elements, new Comparator<E>() {
-				
-				public int compare(E a, E b) {
+			Arrays.sort(elements, new Comparator() {
+				public int compare(Object a, Object b) {
 					return ViewerComparator.this.compare(viewer, a, b);
 				}
 			});

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -15,7 +14,6 @@ package org.eclipse.jface.snippets.viewers;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -41,7 +39,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * Example of adding and removing columns in conjunction with JFace-Viewers
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  * @since 3.2
  */
@@ -83,39 +81,38 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		}
 	}
 
-	private class MyContentProvider implements IStructuredContentProvider<Person,List<Person>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public Person[] getElements(List<Person> inputElement) {
-
-			Person[] persons = new Person[inputElement.size()];
-			return inputElement.toArray(persons);
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
 		}
 
 		public void dispose() {
 
 		}
 
-		public void inputChanged(Viewer<? extends List<Person>> viewer, List<Person> oldInput, List<Person> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
 	}
 
-	public class MyLabelProvider extends LabelProvider<Person> implements
-			ITableLabelProvider<Person> {
-		private TableViewer<Person,List<Person>> viewer;
+	public class MyLabelProvider extends LabelProvider implements
+			ITableLabelProvider {
+		private TableViewer viewer;
 
-		public MyLabelProvider(TableViewer<Person,List<Person>> viewer) {
+		public MyLabelProvider(TableViewer viewer) {
 			this.viewer = viewer;
 		}
 
-		public Image getColumnImage(Person element, int columnIndex) {
+		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(Person element, int columnIndex) {
-			return element.getValue(viewer.getColumnProperties()[columnIndex]
-					.toString());
+		public String getColumnText(Object element, int columnIndex) {
+			return ((Person) element)
+					.getValue(viewer.getColumnProperties()[columnIndex]
+							.toString());
 		}
 	}
 
@@ -145,7 +142,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 	private int activeColumn = -1;
 
 	public Snippet018TableViewerAddRemoveColumnsWithEditing(Shell shell) {
-		final TableViewer<Person,List<Person>> v = new TableViewer<Person,List<Person>>(shell, SWT.BORDER
+		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider(v));
 		v.setContentProvider(new MyContentProvider());
@@ -164,7 +161,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		column.setWidth(200);
 		column.setText("Surname");
 
-		List<Person> model = createModel();
+		Person[] model = createModel();
 
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
@@ -174,7 +171,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		triggerColumnSelectedColumn(v);
 	}
 
-	private void triggerColumnSelectedColumn(final TableViewer<Person,List<Person>> v) {
+	private void triggerColumnSelectedColumn(final TableViewer v) {
 		v.getTable().addMouseListener(new MouseAdapter() {
 
 			public void mouseDown(MouseEvent e) {
@@ -191,7 +188,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		});
 	}
 
-	private void addMenu(final TableViewer<Person,List<Person>> v) {
+	private void addMenu(final TableViewer v) {
 		final MenuManager mgr = new MenuManager();
 
 		final Action insertEmailBefore = new Action("Insert E-Mail before") {
@@ -229,7 +226,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		v.getControl().setMenu(mgr.createContextMenu(v.getControl()));
 	}
 
-	private void removeEmailColumn(TableViewer<Person,List<Person>> v) {
+	private void removeEmailColumn(TableViewer v) {
 		int emailIndex = -1;
 		for (int i = 0; i < v.getColumnProperties().length; i++) {
 			if (v.getColumnProperties()[i].toString().equals("email")) {
@@ -255,7 +252,7 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		v.refresh();
 	}
 
-	private void addEmailColumn(TableViewer<Person,List<Person>> v, int columnIndex) {
+	private void addEmailColumn(TableViewer v, int columnIndex) {
 		ArrayList list = new ArrayList(Arrays.asList(v.getCellEditors()));
 		list.add(columnIndex, new TextCellEditor(v.getTable()));
 		CellEditor[] editors = new CellEditor[list.size()];
@@ -280,13 +277,12 @@ public class Snippet018TableViewerAddRemoveColumnsWithEditing {
 		column.setWidth(200);
 	}
 
-	private List<Person> createModel() {
-
-		List<Person> persons = new ArrayList<Person>();
-		persons.add(new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"));
-		persons.add(new Person("Boris", "Bokowski",
-				"boris_bokowski@ca.ibm.com"));
-		persons.add(new Person("Tod", "Creasey", "tod_creasey@ca.ibm.com"));
+	private Person[] createModel() {
+		Person[] persons = new Person[3];
+		persons[0] = new Person("Tom", "Schindl", "tom.schindl@bestsolution.at");
+		persons[1] = new Person("Boris", "Bokowski",
+				"boris_bokowski@ca.ibm.com");
+		persons[2] = new Person("Tod", "Creasey", "tod_creasey@ca.ibm.com");
 
 		return persons;
 	}
