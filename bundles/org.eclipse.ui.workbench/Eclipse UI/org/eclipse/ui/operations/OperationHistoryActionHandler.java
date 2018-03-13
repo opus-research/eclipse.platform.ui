@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -366,7 +366,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=108144
 			IWorkbenchPart part = site.getPart();
 			if (part != null) {
-				return Adapters.getAdapter(part, adapter, true);
+				return Adapters.adapt(part, adapter);
 			}
 		}
 		return null;

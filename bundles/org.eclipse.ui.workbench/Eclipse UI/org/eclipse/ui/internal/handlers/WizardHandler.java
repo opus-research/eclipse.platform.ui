@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -225,7 +225,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	                        .getActivePart();
 	                if (part instanceof IEditorPart) {
 	                    IEditorInput input = ((IEditorPart) part).getEditorInput();
-						Object resource = Adapters.getAdapter(input, resourceClass, true);
+						Object resource = Adapters.adapt(input, resourceClass);
 	                    if (resource != null) {
 	                        selectionToPass = new StructuredSelection(resource);
 	                    }
