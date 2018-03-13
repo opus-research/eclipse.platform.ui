@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import static org.eclipse.e4.ui.workbench.UIEventBuilder.createEvent;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +25,9 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -128,7 +133,7 @@ public class WorkbenchSiteProgressService implements
 					cursor = getWaitCursor(control.getDisplay());
 				}
                 control.setCursor(cursor);
-				// site.getPane().setBusy(busy);
+				showBusy(busy);
                 IWorkbenchPart part = site.getPart();
                  if (part instanceof WorkbenchPart) {
 					((WorkbenchPart) part).showBusy(busy);
@@ -444,5 +449,24 @@ public class WorkbenchSiteProgressService implements
 	 */
 	public SiteUpdateJob getUpdateJob() {
 		return updateJob;
+	}
+
+	protected void showBusy(boolean busy) {
+		MPart part = site.getModel();
+		int tagsListCount = part.getTags().size();
+		boolean containsBusyTag = part.getTags().contains(CSSConstants.CSS_BUSY_CLASS);
+
+		if (busy && !containsBusyTag) {
+			part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
+		} else if (!busy && containsBusyTag) {
+			part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
+		}
+
+		if (part.getTags().size() != tagsListCount) {
+			UIEvents.publishEvent(createEvent(UIEvents.UILabel.TOPIC_BUSY)
+					.withParam(UIEvents.EventTags.ELEMENT, part)
+					.withParam(UIEvents.EventTags.ATTNAME, UIEvents.UILifeCycle.BUSY)
+					.withParam(UIEvents.EventTags.NEW_VALUE, busy));
+		}
 	}
 }
