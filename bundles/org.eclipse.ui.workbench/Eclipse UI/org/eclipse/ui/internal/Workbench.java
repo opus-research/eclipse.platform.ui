@@ -591,8 +591,11 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
+					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
+									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
+
 					IProgressMonitor progressMonitor = null;
-					if (handler != null) {
+					if (handler != null && showProgress) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -606,16 +609,12 @@ public final class Workbench extends EventManager implements IWorkbench {
 					}
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (returnCode[0] == PlatformUI.RETURN_OK) {
-						// run the e4 event loop and instantiate ... well, stuff
-						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
-								.get(IMenuService.class);
-						wms.dispose();
-					}
-					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-						e4app.saveModel();
-					}
+					// run the e4 event loop and instantiate ... well, stuff
+					e4Workbench.createAndRunUI(e4Workbench.getApplication());
+					WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext().get(
+							IMenuService.class);
+					wms.dispose();
+					e4app.saveModel();
 					e4Workbench.close();
 					returnCode[0] = workbench.returnCode;
 				}
@@ -1603,8 +1602,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 					// TODO compat: open the windows here/instantiate the model
 					// TODO compat: instantiate the WW around the model
 					initializationDone = true;
-					if (isClosing() || !advisor.openWindows()) {
-						// if (isClosing()) {
+					// if (isClosing() || !advisor.openWindows()) {
+					if (isClosing()) {
 						bail[0] = true;
 					}
 
@@ -1912,20 +1911,21 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private void setReference(MPart part, IEclipseContext context) {
 		String uri = part.getContributionURI();
-		if (CompatibilityPart.COMPATIBILITY_VIEW_URI.equals(uri)) {
-			WorkbenchPage page = getWorkbenchPage(part);
-			ViewReference ref = page.getViewReference(part);
-			if (ref == null) {
-				ref = createViewReference(part, page);
-			}
-			context.set(ViewReference.class.getName(), ref);
-		} else if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
+		if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
 			WorkbenchPage page = getWorkbenchPage(part);
 			EditorReference ref = page.getEditorReference(part);
 			if (ref == null) {
 				ref = createEditorReference(part, page);
 			}
 			context.set(EditorReference.class.getName(), ref);
+		} else {
+			// Create View References for 'e4' parts as well
+			WorkbenchPage page = getWorkbenchPage(part);
+			ViewReference ref = page.getViewReference(part);
+			if (ref == null) {
+				ref = createViewReference(part, page);
+			}
+			context.set(ViewReference.class.getName(), ref);
 		}
 	}
 
@@ -2781,9 +2781,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// runEventLoop(handler, display);
 			}
 			returnCode = PlatformUI.RETURN_OK;
-			if (!initOK[0]) {
-				returnCode = PlatformUI.RETURN_UNSTARTABLE;
-			}
 		} catch (final Exception e) {
 			if (!display.isDisposed()) {
 				handler.handleException(e);
@@ -2812,18 +2809,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, null);
+		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
-			boolean checkPerspective) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
+				if (openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
+						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -2847,23 +2844,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input, true)) {
+			if (activate(perspectiveId, page, input)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input, true)) {
+			if (activate(perspectiveId, page, input)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input, false)) {
-				return page;
-			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 
