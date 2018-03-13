@@ -98,6 +98,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
@@ -105,6 +107,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -167,6 +170,7 @@ import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.menus.MenuUtil;
+import org.eclipse.ui.model.WorkbenchPartLabelProvider;
 import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IEvaluationService;
@@ -408,6 +412,108 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		perspective = pers;
 	}
 
+	private static class SaveableLabelProvider extends LabelProvider implements ITableLabelProvider {
+		private WorkbenchPartLabelProvider partLabelProvider;
+
+		/**
+		 * @param listener
+		 * @see org.eclipse.jface.viewers.BaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
+		public void addListener(ILabelProviderListener listener) {
+			partLabelProvider.addListener(listener);
+		}
+
+		public Object getObject(Object element) {
+			if (element instanceof MPart) {
+				Object obj = ((MPart) element).getObject();
+				if (obj instanceof CompatibilityPart) {
+					element = ((CompatibilityPart) obj).getPart();
+				}
+			}
+			return element;
+		}
+
+		/**
+		 * @param element
+		 * @param property
+		 * @return
+		 * @see org.eclipse.jface.viewers.BaseLabelProvider#isLabelProperty(java.lang.Object,
+		 *      java.lang.String)
+		 */
+		public boolean isLabelProperty(Object element, String property) {
+			return partLabelProvider.isLabelProperty(getObject(element), property);
+		}
+
+		/**
+		 * @param listener
+		 * @see org.eclipse.jface.viewers.BaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
+		public void removeListener(ILabelProviderListener listener) {
+			partLabelProvider.removeListener(listener);
+		}
+
+		/**
+		 * @param element
+		 * @return
+		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getImage(java.lang.Object)
+		 */
+		public final Image getImage(Object element) {
+			return partLabelProvider.getImage(getObject(element));
+		}
+
+		/**
+		 * @param element
+		 * @return
+		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getText(java.lang.Object)
+		 */
+		public final String getText(Object element) {
+			return partLabelProvider.getText(getObject(element));
+		}
+
+		/**
+		 * @param element
+		 * @param columnIndex
+		 * @return
+		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getColumnImage(java.lang.Object,
+		 *      int)
+		 */
+		public final Image getColumnImage(Object element, int columnIndex) {
+			return partLabelProvider.getColumnImage(getObject(element), columnIndex);
+		}
+
+		/**
+		 * @param element
+		 * @param columnIndex
+		 * @return
+		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getColumnText(java.lang.Object,
+		 *      int)
+		 */
+		public final String getColumnText(Object element, int columnIndex) {
+			return partLabelProvider.getColumnText(getObject(element), columnIndex);
+		}
+
+		/**
+		 * 
+		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#dispose()
+		 */
+		public void dispose() {
+			partLabelProvider.dispose();
+		}
+
+		/**
+		 * @return
+		 * @see java.lang.Object#toString()
+		 */
+		public String toString() {
+			return partLabelProvider.toString();
+		}
+
+		public SaveableLabelProvider() {
+			partLabelProvider = new WorkbenchPartLabelProvider();
+		}
+
+	}
+
 	@PostConstruct
 	public void setup() {
 		// Initialize a previous 'saved' state if applicable.
@@ -463,12 +569,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 
 			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				LabelProvider labelProvider = new LabelProvider() {
-					@Override
-					public String getText(Object element) {
-						return ((MPart) element).getLocalizedLabel();
-					}
-				};
+				LabelProvider labelProvider = new SaveableLabelProvider();
 				List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 				ListSelectionDialog dialog = new ListSelectionDialog(getShell(), parts,
 						ArrayContentProvider.getInstance(), labelProvider,
@@ -1561,7 +1662,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (!getWorkbenchImpl().isClosing()) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				return ((WorkbenchPage) page).saveAllEditors(true, true);
+				return ((WorkbenchPage) page).saveAllEditors(true, true, true);
 			}
 		}
 		return true;

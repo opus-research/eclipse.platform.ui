@@ -1655,7 +1655,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 	private boolean close(boolean save, boolean unsetPage) {
-		if (save && !saveAllEditors(true, true)) {
+		if (save && !saveAllEditors(true, true, true)) {
 			return false;
 		}
 
@@ -2284,6 +2284,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	public IWorkbenchPartReference[] getSortedParts() {
 		return getSortedParts(true, true);
+	}
+
+	public IWorkbenchPartReference[] getAllParts() {
+		List<IWorkbenchPartReference> sortedReferences = new ArrayList<IWorkbenchPartReference>(
+				getSortedEditorReferences());
+		sortedReferences.addAll(Arrays.asList(getViewReferences()));
+		return sortedReferences.toArray(new IWorkbenchPartReference[sortedReferences.size()]);
 	}
 
 	private IWorkbenchPartReference[] getSortedParts(boolean editors, boolean views) {
@@ -3350,10 +3357,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      * See IWorkbenchPage
      */
     public boolean saveAllEditors(boolean confirm) {
-        return saveAllEditors(confirm, false);
+		return saveAllEditors(confirm, false, false);
     }
 
-	boolean saveAllEditors(boolean confirm, boolean closing) {
+	boolean saveAllEditors(boolean confirm, boolean closing, boolean addNonPartSources) {
 		List<MPart> dirtyParts = new ArrayList<MPart>();
 		// find all the dirty parts in this window
 		for (MPart currentPart : modelService.findElements(window, null, MPart.class, null)) {
@@ -3365,6 +3372,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 					CompatibilityPart compatibilityPart = (CompatibilityPart) object;
 					if (closing
 							&& !((ISaveablePart) compatibilityPart.getPart()).isSaveOnCloseNeeded()) {
+						continue;
+					}
+					if (object instanceof CompatibilityView && !addNonPartSources) {
 						continue;
 					}
 				}

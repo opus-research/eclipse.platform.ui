@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISharedImages;
@@ -131,10 +130,8 @@ public class SaveAllAction extends PageEventAction implements IPropertyListener 
             return;
         }
 		IWorkbenchPage page = getActivePage();
-        if (page != null) {
-			// FIXME: need to also save saveables from non-part sources, see bug
-			// 139004.
-			page.saveAllEditors(false);
+		if (page != null && page instanceof WorkbenchPage) {
+			((WorkbenchPage) page).saveAllEditors(false, false, true);
             updateState();
         }
     }
