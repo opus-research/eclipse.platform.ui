@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -1044,21 +1043,19 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		if (activeRunningOperations++ == 0) {
 			state = aboutToStart(fork && cancelable);
 		}
-		IProgressMonitor progressMonitor = getProgressMonitor();
-		if (progressMonitor == null) {
-			progressMonitor = new NullProgressMonitor();
-		}
 		try {
 			if (!fork) {
 				lockedUI = true;
 			}
-			ModalContext.run(runnable, fork, progressMonitor, getShell()
+			ModalContext.run(runnable, fork, getProgressMonitor(), getShell()
 					.getDisplay());
 			lockedUI = false;
 		} finally {
 			// explicitly invoke done() on our progress monitor so that its
 			// label does not spill over to the next invocation, see bug 271530
-			progressMonitor.done();
+			if (getProgressMonitor() != null) {
+				getProgressMonitor().done();
+			}
 			// Stop if this is the last one
 			if (state != null) {
 				timeWhenLastJobFinished= System.currentTimeMillis();
