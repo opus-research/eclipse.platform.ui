@@ -10,9 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.CellEditor;
@@ -36,23 +33,22 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example of showing how easy cell-navigation with hidden cells is in 3.4
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  */
 public class Snippet057TableViewerSkipHiddenCells {
 
-	private class MyContentProvider implements IStructuredContentProvider<Person,List<Person>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public Person[] getElements(List<Person> inputElement) {
-			Person[] persons = new Person[inputElement.size()];
-			return inputElement.toArray(persons);
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
 		}
 
 		public void dispose() {
 
 		}
 
-		public void inputChanged(Viewer<? extends List<Person>> viewer, List<Person> oldInput, List<Person> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
@@ -99,7 +95,7 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 	public Snippet057TableViewerSkipHiddenCells(Shell shell) {
 
-		final TableViewer<Person,List<Person>> tableviewer = new TableViewer<Person,List<Person>>(shell, SWT.BORDER
+		final TableViewer tableviewer = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		tableviewer.setContentProvider(new MyContentProvider());
 		MenuManager mgr = new MenuManager();
@@ -109,23 +105,23 @@ public class Snippet057TableViewerSkipHiddenCells {
 				if( tableviewer.getTable().getColumn(1).getWidth() == 0) {
 					tableviewer.getTable().getColumn(1).setWidth(200);
 				} else {
-					tableviewer.getTable().getColumn(1).setWidth(0);
+					tableviewer.getTable().getColumn(1).setWidth(0);	
 				}
-
+				
 			}
-
+			
 		});
-		tableviewer.getControl().setMenu(mgr.createContextMenu(tableviewer.getControl()));
+		tableviewer.getControl().setMenu(mgr.createContextMenu(tableviewer.getControl())); 
 
 		// Column 1
-		TableViewerColumn<Person,List<Person>> column = new TableViewerColumn<Person,List<Person>>(tableviewer, SWT.NONE);
+		TableViewerColumn column = new TableViewerColumn(tableviewer, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Givenname");
 		column.getColumn().setMoveable(false);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.givenname;
+			public String getText(Object element) {
+				return ((Person) element).givenname;
 			}
 
 		});
@@ -143,15 +139,15 @@ public class Snippet057TableViewerSkipHiddenCells {
 		});
 
 		// Column 2 is zero-width hidden
-		column = new TableViewerColumn<Person,List<Person>>(tableviewer, SWT.NONE);
+		column = new TableViewerColumn(tableviewer, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Surname");
 		column.getColumn().setMoveable(false);
 		column.getColumn().setResizable(false);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.surname;
+			public String getText(Object element) {
+				return ((Person) element).surname;
 			}
 
 		});
@@ -169,14 +165,14 @@ public class Snippet057TableViewerSkipHiddenCells {
 		});
 
 		// column 3
-		column = new TableViewerColumn<Person,List<Person>>(tableviewer, SWT.NONE);
+		column = new TableViewerColumn(tableviewer, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("E-Mail");
 		column.getColumn().setMoveable(false);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.email;
+			public String getText(Object element) {
+				return ((Person) element).email;
 			}
 
 		});
@@ -193,7 +189,7 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 		});
 
-		List<Person> model = this.createModel();
+		Person[] model = this.createModel();
 		tableviewer.setInput(model);
 		tableviewer.getTable().setLinesVisible(true);
 		tableviewer.getTable().setHeaderVisible(true);
@@ -226,12 +222,14 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 	}
 
-	private List<Person>  createModel() {
-		List<Person> elements = new ArrayList<Person>(4);
-		elements.add(new Person("Tom", "Schindl",
-				"tom.schindl@bestsolution.at"));
-		elements.add(new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com"));
-		elements.add(new Person("Wayne", "Beaton", "wayne@eclipse.org"));
+	private Person[] createModel() {
+		Person[] elements = new Person[4];
+		elements[0] = new Person("Tom", "Schindl",
+				"tom.schindl@bestsolution.at");
+		elements[1] = new Person("Boris", "Bokowski",
+				"Boris_Bokowski@ca.ibm.com");
+		elements[2] = new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com");
+		elements[3] = new Person("Wayne", "Beaton", "wayne@eclipse.org");
 
 		return elements;
 

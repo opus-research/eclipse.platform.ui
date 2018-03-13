@@ -56,11 +56,11 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public class Snippet061FakedNativeCellEditor {
 	public abstract class EmulatedNativeCheckBoxLabelProvider extends
-			OwnerDrawLabelProvider<File,File> {
+			OwnerDrawLabelProvider {
 		private static final String CHECKED_KEY = "CHECKED";
 		private static final String UNCHECK_KEY = "UNCHECKED";
 
-		public EmulatedNativeCheckBoxLabelProvider(ColumnViewer<File,File> viewer) {
+		public EmulatedNativeCheckBoxLabelProvider(ColumnViewer viewer) {
 			if (JFaceResources.getImageRegistry().getDescriptor(CHECKED_KEY) == null) {
 				JFaceResources.getImageRegistry().put(UNCHECK_KEY,
 						makeShot(viewer.getControl(), false));
@@ -123,7 +123,7 @@ public class Snippet061FakedNativeCellEditor {
 			return img;
 		}
 
-		public Image getImage(File element) {
+		public Image getImage(Object element) {
 			if (isChecked(element)) {
 				return JFaceResources.getImageRegistry().get(CHECKED_KEY);
 			} else {
@@ -131,11 +131,11 @@ public class Snippet061FakedNativeCellEditor {
 			}
 		}
 
-		protected void measure(Event event, File element) {
+		protected void measure(Event event, Object element) {
 			event.height = getImage(element).getBounds().height;
 		}
 
-		protected void paint(Event event, File element) {
+		protected void paint(Event event, Object element) {
 
 			Image img = getImage(element);
 
@@ -166,11 +166,11 @@ public class Snippet061FakedNativeCellEditor {
 			}
 		}
 
-		protected abstract boolean isChecked(File element);
+		protected abstract boolean isChecked(Object element);
 	}
 
 	public Snippet061FakedNativeCellEditor(final Shell shell) {
-		final TreeViewer<File,File> v = new TreeViewer<File,File>(shell, SWT.BORDER
+		final TreeViewer v = new TreeViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.getTree().setLinesVisible(true);
 		v.getTree().setBackgroundMode(SWT.INHERIT_DEFAULT);
@@ -207,17 +207,17 @@ public class Snippet061FakedNativeCellEditor {
 				.getTree());
 		booleanCellEditor.setChangeOnActivation(true);
 
-		TreeViewerColumn<File,File> column = new TreeViewerColumn<File,File>(v, SWT.NONE);
+		TreeViewerColumn column = new TreeViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setMoveable(true);
 		column.getColumn().setText("File");
-		column.setLabelProvider(new OwnerDrawLabelProvider<File,File>() {
+		column.setLabelProvider(new OwnerDrawLabelProvider() {
 
-			protected void measure(Event event, File element) {
+			protected void measure(Event event, Object element) {
 
 			}
 
-			protected void paint(Event event, File element) {
+			protected void paint(Event event, Object element) {
 				((TreeItem) event.item).setText(element.toString());
 			}
 
@@ -237,18 +237,18 @@ public class Snippet061FakedNativeCellEditor {
 
 			protected void setValue(Object element, Object value) {
 				((File) element).counter = Integer.parseInt(value.toString());
-				v.update((File)element, null);
+				v.update(element, null);
 			}
 		});
 
-		column = new TreeViewerColumn<File,File>(v, SWT.CENTER);
+		column = new TreeViewerColumn(v, SWT.CENTER);
 		column.getColumn().setWidth(200);
 		column.getColumn().setMoveable(true);
 		column.getColumn().setText("Read");
 		column.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(v) {
 
-			protected boolean isChecked(File element) {
-				return element.read;
+			protected boolean isChecked(Object element) {
+				return ((File) element).read;
 			}
 
 		});
@@ -267,7 +267,7 @@ public class Snippet061FakedNativeCellEditor {
 
 			protected void setValue(Object element, Object value) {
 				((File) element).read = ((Boolean) value).booleanValue();
-				v.update((File)element, null);
+				v.update(element, null);
 			}
 		});
 
@@ -277,8 +277,8 @@ public class Snippet061FakedNativeCellEditor {
 		column.getColumn().setText("Write");
 		column.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(v) {
 
-			protected boolean isChecked(File element) {
-				return element.write;
+			protected boolean isChecked(Object element) {
+				return ((File) element).write;
 			}
 
 		});
@@ -297,7 +297,7 @@ public class Snippet061FakedNativeCellEditor {
 
 			protected void setValue(Object element, Object value) {
 				((File) element).write = ((Boolean) value).booleanValue();
-				v.update((File)element, null);
+				v.update(element, null);
 			}
 		});
 
@@ -307,8 +307,8 @@ public class Snippet061FakedNativeCellEditor {
 		column.getColumn().setText("Execute");
 		column.setLabelProvider(new EmulatedNativeCheckBoxLabelProvider(v) {
 
-			protected boolean isChecked(File element) {
-				return element.execute;
+			protected boolean isChecked(Object element) {
+				return ((File) element).execute;
 			}
 
 		});
@@ -327,7 +327,7 @@ public class Snippet061FakedNativeCellEditor {
 
 			protected void setValue(Object element, Object value) {
 				((File) element).execute = ((Boolean) value).booleanValue();
-				v.update((File)element, null);
+				v.update(element, null);
 			}
 		});
 
@@ -376,32 +376,31 @@ public class Snippet061FakedNativeCellEditor {
 		}
 	}
 
-	private class MyContentProvider implements ITreeContentProvider<File,File> {
+	private class MyContentProvider implements ITreeContentProvider {
 
-		public File[] getElements(File inputElement) {
-			File[] files = new File[inputElement.child.size()];
-			return inputElement.child.toArray(files);
+		public Object[] getElements(Object inputElement) {
+			return ((File) inputElement).child.toArray();
 		}
 
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer<? extends File> viewer, File oldInput, File newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
-		public File[] getChildren(File parentElement) {
+		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		public File getParent(File element) {
+		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
 			}
 			return ((File) element).parent;
 		}
 
-		public boolean hasChildren(File element) {
-			return element.child.size() > 0;
+		public boolean hasChildren(Object element) {
+			return ((File) element).child.size() > 0;
 		}
 
 	}
@@ -409,7 +408,7 @@ public class Snippet061FakedNativeCellEditor {
 	public class File {
 		public File parent;
 
-		public ArrayList<File> child = new ArrayList<File>();
+		public ArrayList child = new ArrayList();
 
 		public int counter;
 

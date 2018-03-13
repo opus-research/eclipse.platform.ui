@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -28,11 +25,11 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class Snippet047VirtualLazyTreeViewer {
-	private class MyContentProvider implements ILazyTreeContentProvider<Object,List<IntermediateNode>>  {
-		private TreeViewer<Object,List<IntermediateNode>>  viewer;
-		private List<IntermediateNode> elements;
+	private class MyContentProvider implements ILazyTreeContentProvider {
+		private TreeViewer viewer;
+		private IntermediateNode[] elements;
 
-		public MyContentProvider(TreeViewer<Object,List<IntermediateNode>>  viewer) {
+		public MyContentProvider(TreeViewer viewer) {
 			this.viewer = viewer;
 		}
 
@@ -40,8 +37,8 @@ public class Snippet047VirtualLazyTreeViewer {
 
 		}
 
-		public void inputChanged(Viewer<? extends List<IntermediateNode>> viewer, List<IntermediateNode> oldInput, List<IntermediateNode> newInput) {
-			this.elements = newInput;
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			this.elements = (IntermediateNode[]) newInput;
 		}
 
 		/*
@@ -66,10 +63,10 @@ public class Snippet047VirtualLazyTreeViewer {
 			int length = 0;
 			if (element instanceof IntermediateNode) {
 				IntermediateNode node = (IntermediateNode) element;
-				length =  node.children.size();
+				length =  node.children.length;
 			} 
 			if(element == elements)
-				length = elements.size();
+				length = elements.length;
 			viewer.setChildCount(element, length);
 			
 
@@ -85,10 +82,10 @@ public class Snippet047VirtualLazyTreeViewer {
 			
 			Object element;
 			if (parent instanceof IntermediateNode) 
-				element = ((IntermediateNode) parent).children.get(index);
+				element = ((IntermediateNode) parent).children[index];
 			
 			else
-				element =  elements.get(index);
+				element =  elements[index];
 			viewer.replace(parent, index, element);
 			updateChildCount(element, -1);
 			
@@ -112,7 +109,7 @@ public class Snippet047VirtualLazyTreeViewer {
 
 	public class IntermediateNode {
 		public int counter;
-		public List<LeafNode> children = new ArrayList<LeafNode>();
+		public LeafNode[] children = new LeafNode[0];
 
 		public IntermediateNode(int counter) {
 			this.counter = counter;
@@ -123,30 +120,31 @@ public class Snippet047VirtualLazyTreeViewer {
 		}
 
 		public void generateChildren(int i) {
+			children = new LeafNode[i];
 			for (int j = 0; j < i; j++) {
-				children.add(j, new LeafNode(j, this));
+				children[j] = new LeafNode(j, this);
 			}
 
 		}
 	}
 
 	public Snippet047VirtualLazyTreeViewer(Shell shell) {
-		final TreeViewer<Object,List<IntermediateNode>> v = new TreeViewer<Object,List<IntermediateNode>>(shell, SWT.VIRTUAL | SWT.BORDER);
-		v.setLabelProvider(new LabelProvider<Object>());
+		final TreeViewer v = new TreeViewer(shell, SWT.VIRTUAL | SWT.BORDER);
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider(v));
 		v.setUseHashlookup(true);
-		List<IntermediateNode> model = createModel();
+		IntermediateNode[] model = createModel();
 		v.setInput(model);
-		v.getTree().setItemCount(model.size());
+		v.getTree().setItemCount(model.length);
 
 	}
 
-	private List<IntermediateNode> createModel() {
-		List<IntermediateNode> elements = new ArrayList<IntermediateNode>();
+	private IntermediateNode[] createModel() {
+		IntermediateNode[] elements = new IntermediateNode[10];
 
 		for (int i = 0; i < 10; i++) {
-			elements.add(i,new IntermediateNode(i));
-			elements.get(i).generateChildren(1000);
+			elements[i] = new IntermediateNode(i);
+			elements[i].generateChildren(1000);
 		}
 
 		return elements;

@@ -11,10 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -39,18 +35,26 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public class Snippet025TabEditing {
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[])inputElement;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 			
 		}
 
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+		 */
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			
 		}
 		
@@ -111,16 +115,18 @@ public class Snippet025TabEditing {
 		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()), new TextCellEditor(v.getTable()) });
 		TableViewerEditor.create(v,new ColumnViewerEditorActivationStrategy(v),ColumnViewerEditor.TABBING_HORIZONTAL|ColumnViewerEditor.TABBING_MOVE_TO_ROW_NEIGHBOR|ColumnViewerEditor.TABBING_VERTICAL);
 		
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 	}
 	
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+		
 		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+		
 		return elements;
 	}
 	

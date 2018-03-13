@@ -30,12 +30,12 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.3M2
  */
 public class Snippet015CustomTooltipsForTree {
-	private static class MyContentProvider implements ITreeContentProvider<String,Object> {
+	private static class MyContentProvider implements ITreeContentProvider {
 
 		private static final String ROOT = "Root";
 
-		public String[] getElements(Object inputElement) {
-			return new String[]{ROOT};
+		public Object[] getElements(Object inputElement) {
+			return new Object[]{ROOT};
 		}
 
 		public void dispose() {
@@ -47,17 +47,17 @@ public class Snippet015CustomTooltipsForTree {
 			
 		}
 
-		public String[] getChildren(String parentElement) {
+		public Object[] getChildren(Object parentElement) {
 			if(parentElement.equals(ROOT))
 				return new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" };
-			return new String[0];
+			return new Object[0];
 		}
 
-		public String getParent(String element) {
+		public Object getParent(Object element) {
 			return null;
 		}
 
-		public boolean hasChildren(String element) {
+		public boolean hasChildren(Object element) {
 			return element.equals(ROOT);
 		}
 	}
@@ -70,44 +70,44 @@ public class Snippet015CustomTooltipsForTree {
 		Shell shell = new Shell (display);
 	    shell.setLayout(new FillLayout());
 	    
-	    TreeViewer<String,Object> v = new TreeViewer<String,Object>(shell,SWT.FULL_SELECTION);
+	    TreeViewer v = new TreeViewer(shell,SWT.FULL_SELECTION);
 	    v.getTree().setLinesVisible(true);
 	    v.getTree().setHeaderVisible(true);
 	    ColumnViewerToolTipSupport.enableFor(v);
 	    
 	    v.setContentProvider(new MyContentProvider());
 	    
-	    CellLabelProvider<String,Object> labelProvider = new CellLabelProvider<String,Object>() {
+	    CellLabelProvider labelProvider = new CellLabelProvider() {
 
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ViewerLabelProvider#getTooltipText(java.lang.Object)
 			 */
-			public String getToolTipText(String element) {
+			public String getToolTipText(Object element) {
 				return "Tooltip (" + element + ")";
 			}
 
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ViewerLabelProvider#getTooltipShift(java.lang.Object)
 			 */
-			public Point getToolTipShift(String object) {
+			public Point getToolTipShift(Object object) {
 				return new Point(5,5);
 			}
 
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ViewerLabelProvider#getTooltipDisplayDelayTime(java.lang.Object)
 			 */
-			public int getToolTipDisplayDelayTime(String object) {
+			public int getToolTipDisplayDelayTime(Object object) {
 				return 2000;
 			}
 
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ViewerLabelProvider#getTooltipTimeDisplayed(java.lang.Object)
 			 */
-			public int getToolTipTimeDisplayed(String object) {
+			public int getToolTipTimeDisplayed(Object object) {
 				return 5000;
 			}
 			
-			public void update(ViewerCell<String> cell) {
+			public void update(ViewerCell cell) {
 				cell.setText(cell.getElement().toString());
 				
 			}

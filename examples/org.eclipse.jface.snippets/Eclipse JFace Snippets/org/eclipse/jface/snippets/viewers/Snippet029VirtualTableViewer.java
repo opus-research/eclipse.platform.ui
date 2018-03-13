@@ -11,10 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -32,17 +28,16 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 public class Snippet029VirtualTableViewer {
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
-		private List<MyModel> elements;
+	private class MyContentProvider implements IStructuredContentProvider {
+		private MyModel[] elements;
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return elements.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return elements;
 		}
 
 		/*
@@ -60,8 +55,8 @@ public class Snippet029VirtualTableViewer {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
-			this.elements = newInput;
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			this.elements = (MyModel[]) newInput;
 		}
 	}
 
@@ -78,21 +73,23 @@ public class Snippet029VirtualTableViewer {
 	}
 
 	public Snippet029VirtualTableViewer(Shell shell) {
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.VIRTUAL);
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		final TableViewer v = new TableViewer(shell, SWT.VIRTUAL);
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
 		v.setUseHashlookup(true);
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 
 		v.getTable().setLinesVisible(true);
 	}
-	
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10000);
-		for( int i = 0; i < 10000; i++ ) {
-			elements.add(i,new MyModel(i));
+
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10000];
+
+		for (int i = 0; i < 10000; i++) {
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

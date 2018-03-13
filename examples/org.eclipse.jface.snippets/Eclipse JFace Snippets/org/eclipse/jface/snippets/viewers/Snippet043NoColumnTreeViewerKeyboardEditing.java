@@ -45,7 +45,7 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 	public Snippet043NoColumnTreeViewerKeyboardEditing(final Shell shell) {
 		Button b = new Button(shell, SWT.PUSH);
 		b.setText("BBB");
-		final TreeViewer<MyModel,MyModel> v = new TreeViewer<MyModel,MyModel>(shell, SWT.BORDER
+		final TreeViewer v = new TreeViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		b.addSelectionListener(new SelectionListener() {
 
@@ -54,7 +54,7 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 			}
 
 			public void widgetSelected(SelectionEvent e) {
-				MyModel root = v.getInput();
+				MyModel root = (MyModel) v.getInput();
 				TreePath path = new TreePath(new Object[] { root,
 						root.child.get(1),
 						((MyModel) root.child.get(1)).child.get(0) });
@@ -76,9 +76,10 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 			}
 
 			public void modify(Object element, String property, Object value) {
-				MyModel myModel = (MyModel)((Item) element).getData();
-				myModel.counter = Integer.parseInt(value.toString());
-				v.update(myModel, null);
+				element = ((Item) element).getData();
+				((MyModel) element).counter = Integer
+						.parseInt(value.toString());
+				v.update(element, null);
 			}
 
 		});
@@ -142,32 +143,31 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 		display.dispose();
 	}
 
-	private class MyContentProvider implements ITreeContentProvider<MyModel,MyModel> {
+	private class MyContentProvider implements ITreeContentProvider {
 
-		public MyModel[] getElements(MyModel inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.child.size()];
-			return inputElement.child.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return ((MyModel) inputElement).child.toArray();
 		}
 
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer<? extends MyModel> viewer, MyModel oldInput, MyModel newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
-		public MyModel[] getChildren(MyModel parentElement) {
+		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		public MyModel getParent(MyModel element) {
+		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
 			}
 			return ((MyModel) element).parent;
 		}
 
-		public boolean hasChildren(MyModel element) {
-			return element.child.size() > 0;
+		public boolean hasChildren(Object element) {
+			return ((MyModel) element).child.size() > 0;
 		}
 
 	}
@@ -175,7 +175,7 @@ public class Snippet043NoColumnTreeViewerKeyboardEditing {
 	public class MyModel {
 		public MyModel parent;
 
-		public ArrayList<MyModel> child = new ArrayList<MyModel>();
+		public ArrayList child = new ArrayList();
 
 		public int counter;
 

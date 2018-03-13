@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
@@ -27,18 +24,17 @@ import org.eclipse.swt.widgets.Shell;
  * Demonstrate a simple ListViewer
  */
 public class Snippet039ListViewer {
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[])inputElement;
 		}
 
 		public void dispose() {
 			
 		}
 
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			
 		}
 		
@@ -57,18 +53,20 @@ public class Snippet039ListViewer {
 	}
 	
 	public Snippet039ListViewer(Shell shell) {
-		final ListViewer<MyModel,List<MyModel>> v = new ListViewer<MyModel,List<MyModel>>(shell,SWT.H_SCROLL|SWT.V_SCROLL);
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		final ListViewer v = new ListViewer(shell,SWT.H_SCROLL|SWT.V_SCROLL);
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);	
 	}
 	
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+		
 		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+		
 		return elements;
 	}
 	

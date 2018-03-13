@@ -12,12 +12,8 @@
 package org.eclipse.jface.snippets.viewers;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.snippets.viewers.Snippet001TableViewer.MyModel;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -94,16 +90,15 @@ public class Snippet017TableViewerHideShowColumns {
 		}
 	}
 	
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			return (MyModel[]) inputElement;
 		}
 
 		/*
@@ -121,7 +116,7 @@ public class Snippet017TableViewerHideShowColumns {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
@@ -139,20 +134,20 @@ public class Snippet017TableViewerHideShowColumns {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider<MyModel> implements
-			ITableLabelProvider<MyModel> {
+	public class MyLabelProvider extends LabelProvider implements
+			ITableLabelProvider {
 
-		public Image getColumnImage(MyModel element, int columnIndex) {
+		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(MyModel element, int columnIndex) {
+		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 	}
 
 	public Snippet017TableViewerHideShowColumns(Shell shell) {
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.BORDER
+		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(new MyContentProvider());
@@ -169,7 +164,7 @@ public class Snippet017TableViewerHideShowColumns {
 		column.setWidth(200);
 		column.setText("Column 3");
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
@@ -204,11 +199,13 @@ public class Snippet017TableViewerHideShowColumns {
 	
 	
 	
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
-		for( int i = 0; i < 10; i++ ) {
-			elements.add(i,new MyModel(i));
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+
+		for (int i = 0; i < 10; i++) {
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

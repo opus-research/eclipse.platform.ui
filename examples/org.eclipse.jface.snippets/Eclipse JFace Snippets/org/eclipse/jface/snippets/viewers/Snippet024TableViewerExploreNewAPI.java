@@ -11,9 +11,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -29,23 +26,22 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example usage of ITableLabelProvider using images and labels
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet024TableViewerExploreNewAPI {
 
-	private class MyContentProvider implements IStructuredContentProvider<Person,List<Person>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public Person[] getElements(List<Person> inputElement) {
-			Person[] persons = new Person[inputElement.size()];
-			return inputElement.toArray(persons);
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
 		}
 
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer<? extends List<Person>> viewer, List<Person> oldInput, List<Person> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}
@@ -88,17 +84,17 @@ public class Snippet024TableViewerExploreNewAPI {
 	}
 
 	public Snippet024TableViewerExploreNewAPI(Shell shell) {
-		TableViewer<Person,List<Person>> v = new TableViewer<Person,List<Person>>(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		v.setContentProvider(new MyContentProvider());
 
-		TableViewerColumn<Person,List<Person>> column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Givenname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.givenname;
+			public String getText(Object element) {
+				return ((Person) element).givenname;
 			}
 		});
 
@@ -114,14 +110,14 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Surname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.surname;
+			public String getText(Object element) {
+				return ((Person) element).surname;
 			}
 
 		});
@@ -138,14 +134,14 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("E-Mail");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.email;
+			public String getText(Object element) {
+				return ((Person) element).email;
 			}
 
 		});
@@ -162,19 +158,22 @@ public class Snippet024TableViewerExploreNewAPI {
 
 		});
 
-		List<Person> model = createModel();
+		Person[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private List<Person> createModel() {
+	private Person[] createModel() {
+		Person[] elements = new Person[4];
+		elements[0] = new Person("Tom", "Schindl",
+				"tom.schindl@bestsolution.at");
+		elements[1] = new Person("Boris", "Bokowski",
+				"Boris_Bokowski@ca.ibm.com");
+		elements[2] = new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com");
+		elements[3] = new Person("Wayne", "Beaton", "wayne@eclipse.org");
 
-		List<Person> persons = new ArrayList<Person>();
-		persons.add(new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"));
-		persons.add(new Person("Tod", "Creasey", "tod_creasey@ca.ibm.com"));
-		persons.add(new Person("Wayne", "Beaton", "wayne@eclipse.org"));
-		return persons;
+		return elements;
 	}
 
 	/**
