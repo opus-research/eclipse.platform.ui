@@ -609,13 +609,23 @@ public class PartRenderingEngine implements IPresentationEngine {
 			if (ctxt.getContext() == null) {
 				IEclipseContext lclContext = parentContext
 						.createChild(getContextName(element));
-				populateContext(element, ctxt, lclContext);
-			} else if (ctxt.getContext().get(getClass().getName()) == null) {
-				IEclipseContext lclContext = ctxt.getContext();
-				// Somebody else has created a context already. Just create the
-				// delta that's not there yet.
-				// (see bug https://bugs.eclipse.org/420817)
-				populateContext(element, ctxt, lclContext);
+				populateModelInterfaces(ctxt, lclContext, element.getClass()
+						.getInterfaces());
+				ctxt.setContext(lclContext);
+
+				// System.out.println("New Context: " + lclContext.toString()
+				// + " parent: " + parentContext.toString());
+
+				// make sure the context knows about these variables that have
+				// been defined in the model
+				for (String variable : ctxt.getVariables()) {
+					lclContext.declareModifiable(variable);
+				}
+
+				Map<String, String> props = ctxt.getProperties();
+				for (String key : props.keySet()) {
+					lclContext.set(key, props.get(key));
+				}
 			}
 		}
 
@@ -659,31 +669,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		return newWidget;
-	}
-
-	private void populateContext(MUIElement element, MContext ctxt,
-			IEclipseContext lclContext) {
-		populateModelInterfaces(ctxt, lclContext, element.getClass()
-				.getInterfaces());
-		ctxt.setContext(lclContext);
-
-		// System.out.println("New Context: " + lclContext.toString()
-		// + " parent: " + parentContext.toString());
-
-		// make sure the context knows about these variables that have
-		// been defined in the model
-		for (String variable : ctxt.getVariables()) {
-			lclContext.declareModifiable(variable);
-		}
-
-		Map<String, String> props = ctxt.getProperties();
-		for (String key : props.keySet()) {
-			lclContext.set(key, props.get(key));
-		}
-
-		// Mark the context instance to be initialized by us for
-		// https://bugs.eclipse.org/420817
-		lclContext.set(getClass().getName(), "INIT"); //$NON-NLS-1$
 	}
 
 	private IEclipseContext getContext(MUIElement parent) {
