@@ -1121,13 +1121,11 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
 	 */
 	@Override
-	protected E[] getRawChildren(Object parent) {
+	protected E[] getRawChildren(I parent) {
 
 		Assert.isTrue(!(getContentProvider() instanceof ILazyContentProvider),
 				"Cannot get raw children with an ILazyContentProvider");//$NON-NLS-1$
-		@SuppressWarnings("unchecked")
-		I input = (I) parent;
-		return super.getRawChildren(input);
+		return super.getRawChildren(parent);
 
 	}
 
