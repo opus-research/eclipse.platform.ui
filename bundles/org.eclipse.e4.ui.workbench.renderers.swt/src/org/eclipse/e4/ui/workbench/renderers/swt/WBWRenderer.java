@@ -151,6 +151,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	@PostConstruct
 	public void init() {
+
 		topWindowHandler = new EventHandler() {
 
 			public void handleEvent(Event event) {
