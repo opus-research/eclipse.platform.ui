@@ -11,7 +11,6 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -985,7 +984,6 @@ public class StackRenderer extends LazyStackRenderer {
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack,
-				getPartToVisibilityMap(ctf),
 				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
@@ -1015,17 +1013,6 @@ public class StackRenderer extends LazyStackRenderer {
 				});
 			}
 		});
-	}
-
-	private Map<MPart, Boolean> getPartToVisibilityMap(CTabFolder tabFolder) {
-		Map<MPart, Boolean> ret = new HashMap<MPart, Boolean>();
-		int numItems = tabFolder.getItemCount();
-		for (int i = 0; i < numItems; i++) {
-			CTabItem item = tabFolder.getItem(i);
-			MPart data = (MPart) item.getData(OWNING_ME);
-			ret.put(data, item.isShowing());
-		}
-		return ret;
 	}
 
 	private Point getChevronLocation(CTabFolder tabFolder) {
