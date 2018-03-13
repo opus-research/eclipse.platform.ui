@@ -13,6 +13,9 @@ package org.eclipse.ui.internal.ide.handlers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -91,9 +94,9 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 								StatusManager.SHOW | StatusManager.LOG);
 				return null;
 			}
-			String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
+			String[] launchCmd = formCommandParts(canonicalPath);
 
-			if ("".equals(launchCmd)) { //$NON-NLS-1$
+			if (launchCmd.length == 0) {
 				StatusManager
 						.getManager()
 						.handle(new Status(
@@ -112,7 +115,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 			if (retCode != 0 && !Util.isWindows()) {
 				log.log(new Status(IStatus.ERROR, IDEWorkbenchPlugin
 						.getDefault().getBundle().getSymbolicName(),
-						logMsgPrefix + "Execution of '" + launchCmd //$NON-NLS-1$
+						logMsgPrefix + "Execution of '" + Util.toString(launchCmd) //$NON-NLS-1$
 								+ "' failed with return code: " + retCode)); //$NON-NLS-1$
 			}
 		} catch (Exception e) {
@@ -129,17 +132,30 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	 * 
 	 * @param path
 	 *            the path to show
-	 * @return the command that shows the path
+	 * @return the command part array that shows the path
 	 */
-	private String formShowInSytemExplorerCommand(File path) throws IOException {
+	private String[] formCommandParts(File path) throws IOException {
+		List commandParts = new ArrayList();
 		String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
 				.getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
-		command = Util.replaceAll(command, VARIABLE_RESOURCE, path.getCanonicalPath());
+		// Split the command before replacing variables with paths, as the paths
+		// can contain spaces and we want a path to be a complete part.
+		StringTokenizer tokenizer = new StringTokenizer(command);
+		while (tokenizer.hasMoreTokens()) {
+			String token = tokenizer.nextToken();
+			String replacedCommandPart = replaceVariables(token, path);
+			commandParts.add(replacedCommandPart);
+		}
+		return (String[]) commandParts.toArray(new String[commandParts.size()]);
+	}
+
+	private String replaceVariables(String commandPart, File path) throws IOException {
+		commandPart = Util.replaceAll(commandPart, VARIABLE_RESOURCE, path.getCanonicalPath());
 		File parent = path.getParentFile();
 		if (parent != null) {
-			command = Util.replaceAll(command, VARIABLE_FOLDER, parent.getCanonicalPath());
+			commandPart = Util.replaceAll(commandPart, VARIABLE_FOLDER, parent.getCanonicalPath());
 		}
-		return command;
+		return commandPart;
 	}
 
 	/**
@@ -169,11 +185,11 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	 */
 	public static String getDefaultCommand() {
 		if (Util.isGtk()) {
-			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://${selected_resource_loc}\" string:\"\""; //$NON-NLS-1$
+			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:file://${selected_resource_loc} string:"; //$NON-NLS-1$
 		} else if (Util.isWindows()) {
 			return "explorer /E,/select=${selected_resource_loc}"; //$NON-NLS-1$
 		} else if (Util.isMac()) {
-			return "open -R '${selected_resource_loc}'"; //$NON-NLS-1$
+			return "open -R ${selected_resource_loc}"; //$NON-NLS-1$
 		}
 
 		// if all else fails, return empty default
