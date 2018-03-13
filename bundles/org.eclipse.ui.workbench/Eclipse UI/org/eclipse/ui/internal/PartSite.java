@@ -235,7 +235,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 
 		e4Context.set(IWorkbenchSiteProgressService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (progressService == null) {
 					progressService = new WorkbenchSiteProgressService(PartSite.this);
 				}
@@ -244,7 +244,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(IProgressService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (progressService == null) {
 					progressService = new WorkbenchSiteProgressService(PartSite.this);
 				}
@@ -253,7 +253,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(IKeyBindingService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (keyBindingService == null) {
 					keyBindingService = new KeyBindingService(PartSite.this);
 				}
@@ -263,7 +263,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(IPageService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (pageService == null) {
 					pageService = new SlavePageService(context.getParent().get(IPageService.class));
 				}
@@ -273,7 +273,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(IPartService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (partService == null) {
 					partService = new SlavePartService(context.getParent().get(IPartService.class));
 				}
@@ -282,7 +282,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(ISelectionService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (selectionService == null) {
 					selectionService = new SlaveSelectionService(context.getParent().get(
 							ISelectionService.class));
@@ -292,7 +292,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		});
 		e4Context.set(IContextService.class.getName(), new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				if (contextService == null) {
 					contextService = new SlaveContextService(context.getParent().get(
 							IContextService.class), new ActivePartExpression(part));

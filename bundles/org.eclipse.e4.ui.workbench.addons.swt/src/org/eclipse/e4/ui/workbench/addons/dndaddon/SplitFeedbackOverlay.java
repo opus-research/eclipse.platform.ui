@@ -135,7 +135,6 @@ public class SplitFeedbackOverlay {
 	 * 
 	 * @param visible
 	 *            make visible if {@code true} or invisible if {@code false}
-	 * @since 0.11
 	 */
 	public void setVisible(boolean visible) {
 		if (feedbackShell != null) {

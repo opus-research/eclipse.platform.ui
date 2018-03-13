@@ -22,8 +22,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 /**
  * Provide the command and handler service as an add-on. Must be instantiated against the
  * application level context.
- * 
- * @noinstantiate
  */
 public class CommandServiceAddon {
 	@PostConstruct

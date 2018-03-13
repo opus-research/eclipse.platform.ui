@@ -19,7 +19,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
  */
 public class StatusReporterCreationFunction extends ContextFunction {
 
-	public Object compute(IEclipseContext context, String contextKey) {
+	public Object compute(IEclipseContext context) {
 		return ContextInjectionFactory.make(WorkbenchStatusReporter.class,
 				context);
 	}
