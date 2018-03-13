@@ -47,7 +47,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MPart extends MUIElement, MPartSashContainerElement, MStackElement, MContribution, MContext, MUILabel, MHandlerContainer, MDirtyable, MBindings, MWindowElement {
 	/**

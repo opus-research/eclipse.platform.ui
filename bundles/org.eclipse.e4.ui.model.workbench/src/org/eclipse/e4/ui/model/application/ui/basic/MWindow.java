@@ -49,7 +49,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MContext, MHandlerContainer, MBindings, MSnippetContainer {
 	/**

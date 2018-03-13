@@ -40,7 +40,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MPerspective extends MElementContainer<MPartSashContainerElement>, MUILabel, MContext {
 	/**

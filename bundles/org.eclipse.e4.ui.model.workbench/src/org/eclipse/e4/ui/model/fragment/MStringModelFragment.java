@@ -37,7 +37,6 @@ package org.eclipse.e4.ui.model.fragment;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MStringModelFragment extends MModelFragment {
 	/**

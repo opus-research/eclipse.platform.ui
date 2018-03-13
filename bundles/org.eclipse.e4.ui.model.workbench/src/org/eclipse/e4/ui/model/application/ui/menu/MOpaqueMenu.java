@@ -22,9 +22,9 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  * @noreference
  * <!-- end-model-doc -->
  *
+ *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MOpaqueMenu extends MMenu {
 } // MOpaqueMenu
