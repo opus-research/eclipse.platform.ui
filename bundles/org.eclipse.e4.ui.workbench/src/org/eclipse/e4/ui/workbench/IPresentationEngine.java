@@ -101,22 +101,6 @@ public interface IPresentationEngine {
 	public static String ORIENTATION_VERTICAL = "Vertical"; //$NON-NLS-1$
 
 	/**
-	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
-	 * be split with the result being side by side.
-	 * 
-	 * @since 1.1
-	 */
-	public static String SPLIT_HORIZONTAL = "Split Horizontal"; //$NON-NLS-1$
-
-	/**
-	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
-	 * be split with the result being one above the other.
-	 * 
-	 * @since 1.1
-	 */
-	public static String SPLIT_VERTICAL = "Split Vertical"; //$NON-NLS-1$
-
-	/**
 	 * This key should be used to add an optional String to an element that is a URI to the elements
 	 * disabled icon. This is used, for example, by Toolbar Items which, in Eclipse SDK, provide a
 	 * unique icon for disabled tool items that look better than the OS default graying on the
@@ -130,8 +114,6 @@ public interface IPresentationEngine {
 	 * This key should be used to add an optional org.eclipse.swt.graphics.Image to an elements
 	 * TRANSIENTDATA. If present, the image will be used to override that elements iconURI. An
 	 * example is drawing the error icon on a minimized problems view stack.
-	 * 
-	 * NOTE: This image must be checked to ensure that it hasn't been disposed on retrieval.
 	 */
 	public static final String OVERRIDE_ICON_IMAGE_KEY = "e4_override_icon_image_key"; //$NON-NLS-1$
 

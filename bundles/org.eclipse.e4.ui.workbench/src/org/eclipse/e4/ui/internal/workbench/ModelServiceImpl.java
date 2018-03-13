@@ -19,8 +19,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
@@ -42,8 +40,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -106,20 +102,26 @@ public class ModelServiceImpl implements EModelService {
 		IEventBroker eventBroker = appContext.get(IEventBroker.class);
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, hostedElementHandler);
 
-		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(
-				appContext.get(IExtensionRegistry.class));
+		mApplicationElementFactory = new GenericMApplicationElementFactoryImpl(appContext.get(IExtensionRegistry.class));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#createModelElement(java.lang.Class)
+	/**
+	 * @see EModelService#createModelElement(Class)
+	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T extends MApplicationElement> T createModelElement(Class<T> elementType) {
 		if (elementType == null) {
 			throw new NullPointerException("Argument cannot be null."); //$NON-NLS-1$
 		}
+
+		/*
+		 * TODO: We can even tune the performance of this method if we add the previous generated
+		 * if-else-if-else... block. The eObjectFactory#createEObject(Class) could afterwards be the
+		 * fallback if a user specific model element should be created. But for this we need to
+		 * adapt the generator of Paul Elder and to be honest I wasn't able to find it (either its
+		 * call during the build nor its template) ;-( .
+		 */
 
 		T back = (T) mApplicationElementFactory.createEObject(elementType);
 		if (back != null) {
@@ -220,13 +222,7 @@ public class ModelServiceImpl implements EModelService {
 			for (MWindow dw : window.getWindows()) {
 				findElementsRecursive(dw, id, type, tagsToMatch, elements, searchFlags);
 			}
-
-			MMenu menu = window.getMainMenu();
-			if (menu != null && (searchFlags & IN_MAIN_MENU) != 0) {
-				findElementsRecursive(menu, id, type, tagsToMatch, elements, searchFlags);
-			}
 		}
-
 		if (searchRoot instanceof MPerspective) {
 			MPerspective persp = (MPerspective) searchRoot;
 			for (MWindow dw : persp.getWindows()) {
@@ -241,19 +237,6 @@ public class ModelServiceImpl implements EModelService {
 			if (ph.getRef() != null
 					&& (!(ph.getRef() instanceof MArea) || (searchFlags & IN_SHARED_AREA) != 0)) {
 				findElementsRecursive(ph.getRef(), id, type, tagsToMatch, elements, searchFlags);
-			}
-		}
-
-		if (searchRoot instanceof MPart && (searchFlags & IN_PART) != 0) {
-			MPart part = (MPart) searchRoot;
-
-			for (MMenu menu : part.getMenus()) {
-				findElementsRecursive(menu, id, type, tagsToMatch, elements, searchFlags);
-			}
-
-			MToolBar toolBar = part.getToolbar();
-			if (toolBar != null) {
-				findElementsRecursive(toolBar, id, type, tagsToMatch, elements, searchFlags);
 			}
 		}
 	}
@@ -360,10 +343,6 @@ public class ModelServiceImpl implements EModelService {
 				snippetContainer.getSnippets().remove(snippet);
 			snippetContainer.getSnippets().add(clone);
 		}
-
-		// Cache the original element in the clone's transientData
-		clone.getTransientData().put(CLONED_FROM_KEY, element);
-
 		return clone;
 	}
 
@@ -419,26 +398,6 @@ public class ModelServiceImpl implements EModelService {
 		for (MUIElement snippet : snippets) {
 			if (id.equals(snippet.getElementId()))
 				return snippet;
-		}
-
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#findHandler(org.eclipse.e4.ui.model.
-	 * application.commands.MHandlerContainer, java.lang.String)
-	 */
-	public MHandler findHandler(MHandlerContainer handlerContainer, String id) {
-		if (handlerContainer == null || id == null || id.length() == 0) {
-			return null;
-		}
-
-		for (MHandler handler : handlerContainer.getHandlers()) {
-			if (id.equals(handler.getElementId())) {
-				return handler;
-			}
 		}
 
 		return null;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -145,12 +145,14 @@ public class ShellActivationListener implements Listener {
 		SafeRunner.run(new ISafeRunnable() {
 			public void run() throws Exception {
 				if (prevChild == null) {
-					IEclipseContext activeChild = parentContext.getActiveChild();
+					IEclipseContext activeChild = parentContext
+							.getActiveChild();
 					if (activeChild != null) {
 						activeChild.deactivate();
 					}
 				} else {
-					prevChild.activate();
+					// Bug 412001. Don't do this!
+					// prevChild.activate();
 				}
 			}
 
