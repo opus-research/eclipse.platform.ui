@@ -102,24 +102,4 @@ public interface MBasicFactory {
 	 */
 	MTrimBar createTrimBar();
 
-	/**
-	 * Returns a new object of class '<em>Dialog</em>'.
-	 * <!-- begin-user-doc -->
-	 * @since 1.1
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Dialog</em>'.
-	 * @generated
-	 */
-	MDialog createDialog();
-
-	/**
-	 * Returns a new object of class '<em>Wizard Dialog</em>'.
-	 * <!-- begin-user-doc -->
-	 * @since 1.1
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Wizard Dialog</em>'.
-	 * @generated
-	 */
-	MWizardDialog createWizardDialog();
-
 } //MBasicFactory
