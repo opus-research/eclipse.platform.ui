@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -82,8 +82,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 	private RadioGroupFieldEditor openReferencesEditor;
 
-	private StringFieldEditor systemExplorer;
-
     /*
      * (non-Javadoc)
      * 
@@ -117,10 +115,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		createSpace(composite);
 		
 		createOpenPrefControls(composite);
-
-		createSpace(composite);
-		createSystemExplorerGroup(composite);
-		createSpace(composite);
 		
 		Composite lower = new Composite(composite,SWT.NONE);
 		GridLayout lowerLayout = new GridLayout();
@@ -329,41 +323,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		lineSeparatorEditor = new LineDelimiterEditor(lineComposite);
 		lineSeparatorEditor.doLoad();
     }
-
-	/**
-	 * Create the widget for the system explorer command.
-	 * 
-	 * @param composite
-	 */
-	protected void createSystemExplorerGroup(Composite composite) {
-		Composite groupComposite = new Composite(composite, SWT.LEFT);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		groupComposite.setLayout(layout);
-		GridData gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		groupComposite.setLayoutData(gd);
-
-		systemExplorer = new StringFieldEditor(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER,
-				IDEWorkbenchMessages.IDEWorkbenchPreference_workbenchSystemExplorer, 40, groupComposite);
-		gd = (GridData) systemExplorer.getTextControl(groupComposite).getLayoutData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		systemExplorer.setPreferenceStore(getIDEPreferenceStore());
-		systemExplorer.setPage(this);
-
-		systemExplorer.load();
-
-		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(systemExplorer.isValid());
-				}
-			}
-		});
-	}
-
     /**
      * Returns the IDE preference store.
      * @return the preference store.
@@ -449,8 +408,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		lineSeparatorEditor.loadDefault();
 		openReferencesEditor.loadDefault();
 
-		systemExplorer.loadDefault();
-
         super.performDefaults();
     }
 
@@ -502,9 +459,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         }
         
         workspaceName.store();
-
-		systemExplorer.store();
-
+        
         Preferences preferences = ResourcesPlugin.getPlugin()
                 .getPluginPreferences();
 
@@ -523,8 +478,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         encodingEditor.store();
 		lineSeparatorEditor.store();
 		openReferencesEditor.store();
-
-		return super.performOk();
+        return super.performOk();
     }
 
 }
