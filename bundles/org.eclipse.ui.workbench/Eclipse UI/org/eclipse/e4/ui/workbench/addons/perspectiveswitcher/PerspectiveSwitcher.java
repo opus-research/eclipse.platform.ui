@@ -796,7 +796,7 @@ public class PerspectiveSwitcher {
 	private void fixSize() {
 		psTB.pack();
 		psTB.getParent().pack();
-		psTB.getShell().layout(new Control[] { psTB }, SWT.DEFER);
+		psTB.getShell().layout(new Control[] { psTB });
 	}
 
 	private void removePerspectiveItem(MPerspective toRemove) {

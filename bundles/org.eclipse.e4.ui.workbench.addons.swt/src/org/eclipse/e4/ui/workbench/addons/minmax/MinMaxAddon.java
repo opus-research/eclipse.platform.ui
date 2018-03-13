@@ -338,7 +338,7 @@ public class MinMaxAddon {
 			winShell.getDisplay().asyncExec(new Runnable() {
 				public void run() {
 					if (!winShell.isDisposed()) {
-						winShell.layout(true, true);
+						winShell.layout();
 					}
 				}
 			});
@@ -665,6 +665,7 @@ public class MinMaxAddon {
 		}
 
 		Shell hostShell = (Shell) modelService.getTopLevelWindowFor(element).getWidget();
+		hostShell.setRedraw(false);
 		FaderAnimationFeedback fader = new FaderAnimationFeedback(hostShell);
 		AnimationEngine engine = new AnimationEngine(win.getContext(), fader, 300);
 		engine.schedule();
@@ -678,6 +679,7 @@ public class MinMaxAddon {
 		}
 
 		adjustCTFButtons(element);
+		hostShell.setRedraw(true);
 	}
 
 	/**
@@ -735,6 +737,8 @@ public class MinMaxAddon {
 		MPerspective persp = modelService.getActivePerspective(win);
 
 		Shell hostShell = (Shell) win.getWidget();
+		hostShell.setRedraw(false);
+
 		FaderAnimationFeedback fader = new FaderAnimationFeedback(hostShell);
 		AnimationEngine engine = new AnimationEngine(win.getContext(), fader, 300);
 		engine.schedule();
@@ -771,6 +775,7 @@ public class MinMaxAddon {
 		}
 
 		adjustCTFButtons(element);
+		hostShell.setRedraw(true);
 	}
 
 	private void createTrim(MUIElement element) {

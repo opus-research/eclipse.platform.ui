@@ -10,11 +10,10 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
@@ -140,7 +139,7 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		}
 		ToolBar toolbar = (ToolBar) getUIContainer(child);
 		if (toolbar != null && !toolbar.isDisposed()) {
-			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+			toolbar.getShell().layout(new Control[] { toolbar });
 		}
 		disposeToolbarIfNecessary(parentElement);
 	}
@@ -175,7 +174,7 @@ public class ToolBarRenderer extends SWTPartRenderer {
 		super.childRendered(parentElement, element);
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
-			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+			toolbar.getShell().layout(new Control[] { toolbar });
 		}
 	}
 
