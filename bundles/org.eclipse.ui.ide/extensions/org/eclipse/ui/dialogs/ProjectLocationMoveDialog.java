@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    IBM Corporation - initial API and implementation
+ *    IBM Corporation - initial API and implementation 
  *    Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *        font should be activated and used by other components.
  *    Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
@@ -48,7 +48,7 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/**
 	 * Create a ProjectLocationMoveDialog on the supplied project parented by
 	 * the parentShell.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -58,7 +58,11 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 		this.project = existingProject;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.SelectionDialog#setMessage(java.lang.String)
+	 */
 	public void setMessage(String message) {
 		super.setMessage(message);
 		if (statusMessageLabel != null) {
@@ -76,21 +80,27 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected Control createContents(Composite parent) {
 		Control content = super.createContents(parent);
 		getOkButton().setEnabled(false);
 		return content;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	protected Control createDialogArea(Composite parent) {
 		// page group
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -121,7 +131,15 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return (errorMessage, notError) -> setMessage(errorMessage);
+		return new IErrorMessageReporter(){
+			/* (non-Javadoc)
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
+			public void reportError(String errorMessage, boolean notError) {
+				setMessage(errorMessage);
+				
+			}
+		};
 	}
 
 	/**
@@ -136,7 +154,6 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * <code>Dialog</code> method builds a two element list - the first
 	 * element is the project name and the second one is the location.
 	 */
-	@Override
 	protected void okPressed() {
 
 		ArrayList list = new ArrayList();

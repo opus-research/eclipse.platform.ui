@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,7 +60,6 @@ public class BindingTable {
 			return this.activeSchemeIds;
 		}
 
-		@Override
 		public int compare(Binding o1, Binding o2) {
 			int rc = compareSchemes(activeSchemeIds, o1.getSchemeId(), o2.getSchemeId());
 			if (rc != 0) {
@@ -326,7 +325,6 @@ public class BindingTable {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<Binding> getSequencesFor(ParameterizedCommand command) {
 		ArrayList<Binding> triggers = bindingsByCommand.get(command);
 		return (Collection<Binding>) (triggers == null ? Collections.EMPTY_LIST : triggers.clone());

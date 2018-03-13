@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.core.commands.common.NotDefinedException;
  * dependent. In the Eclipse workbench, the trigger is an SWT event, and the
  * application context contains information about the selection and active part.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ExecutionEvent {
@@ -50,7 +50,7 @@ public final class ExecutionEvent {
 	 * prompt for additional information, these can be used to avoid prompting.
 	 * This value may be empty, but it is never <code>null</code>.
 	 */
-	private final Map<String, String> parameters;
+	private final Map parameters;
 
 	/**
 	 * The object that triggered the execution. In an event-driven architecture,
@@ -63,7 +63,7 @@ public final class ExecutionEvent {
 	 * Constructs a new instance of <code>ExecutionEvent</code> with no
 	 * parameters, no trigger and no application context. This is just a
 	 * convenience method.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	public ExecutionEvent() {
@@ -72,7 +72,7 @@ public final class ExecutionEvent {
 
 	/**
 	 * Constructs a new instance of <code>ExecutionEvent</code>.
-	 *
+	 * 
 	 * @param parameters
 	 *            The parameters to qualify the execution; must not be
 	 *            <code>null</code>. This must be a map of parameter ids (<code>String</code>)
@@ -86,15 +86,14 @@ public final class ExecutionEvent {
 	 * @deprecated use
 	 *             {@link ExecutionEvent#ExecutionEvent(Command, Map, Object, Object)}
 	 */
-	@Deprecated
-	public ExecutionEvent(@SuppressWarnings("rawtypes") final Map parameters, final Object trigger,
+	public ExecutionEvent(final Map parameters, final Object trigger,
 			final Object applicationContext) {
 		this(null, parameters, trigger, applicationContext);
 	}
 
 	/**
 	 * Constructs a new instance of <code>ExecutionEvent</code>.
-	 *
+	 * 
 	 * @param command
 	 *            The command being executed; may be <code>null</code>.
 	 * @param parameters
@@ -109,11 +108,11 @@ public final class ExecutionEvent {
 	 *            triggered; may be <code>null</code>.
 	 * @since 3.2
 	 */
-	@SuppressWarnings("unchecked")
-	public ExecutionEvent(final Command command, @SuppressWarnings("rawtypes") final Map parameters,
+	public ExecutionEvent(final Command command, final Map parameters,
 			final Object trigger, final Object applicationContext) {
 		if (parameters == null) {
-			throw new NullPointerException("An execution event must have a non-null map of parameters"); //$NON-NLS-1$
+			throw new NullPointerException(
+					"An execution event must have a non-null map of parameters"); //$NON-NLS-1$
 		}
 
 		this.command = command;
@@ -125,7 +124,7 @@ public final class ExecutionEvent {
 	/**
 	 * Returns the state of the application at the time the execution was
 	 * triggered.
-	 *
+	 * 
 	 * @return The application context; may be <code>null</code>.
 	 */
 	public final Object getApplicationContext() {
@@ -134,7 +133,7 @@ public final class ExecutionEvent {
 
 	/**
 	 * Returns the command being executed.
-	 *
+	 * 
 	 * @return The command being executed.
 	 * @since 3.2
 	 */
@@ -150,7 +149,7 @@ public final class ExecutionEvent {
 	 * {@link IHandler#execute(ExecutionEvent)} method, so any problem getting
 	 * the object value causes <code>ExecutionException</code> to be thrown.
 	 * </p>
-	 *
+	 * 
 	 * @param parameterId
 	 *            The id of a parameter to retrieve the object value of.
 	 * @return The object value of the parameter with the provided id.
@@ -159,55 +158,62 @@ public final class ExecutionEvent {
 	 *             reason
 	 * @since 3.2
 	 */
-	public final Object getObjectParameterForExecution(final String parameterId) throws ExecutionException {
+	public final Object getObjectParameterForExecution(final String parameterId)
+			throws ExecutionException {
 		if (command == null) {
-			throw new ExecutionException("No command is associated with this execution event"); //$NON-NLS-1$
+			throw new ExecutionException(
+					"No command is associated with this execution event"); //$NON-NLS-1$
 		}
 
 		try {
-			final ParameterType parameterType = command.getParameterType(parameterId);
+			final ParameterType parameterType = command
+					.getParameterType(parameterId);
 			if (parameterType == null) {
-				throw new ExecutionException("Command does not have a parameter type for the given parameter"); //$NON-NLS-1$
+				throw new ExecutionException(
+						"Command does not have a parameter type for the given parameter"); //$NON-NLS-1$
 			}
-			final AbstractParameterValueConverter valueConverter = parameterType.getValueConverter();
+			final AbstractParameterValueConverter valueConverter = parameterType
+					.getValueConverter();
 			if (valueConverter == null) {
-				throw new ExecutionException("Command does not have a value converter"); //$NON-NLS-1$
+				throw new ExecutionException(
+						"Command does not have a value converter"); //$NON-NLS-1$
 			}
 			final String stringValue = getParameter(parameterId);
-			final Object objectValue = valueConverter.convertToObject(stringValue);
+			final Object objectValue = valueConverter
+					.convertToObject(stringValue);
 			return objectValue;
 		} catch (final NotDefinedException e) {
 			throw new ExecutionException("Command is not defined", e); //$NON-NLS-1$
 		} catch (final ParameterValueConversionException e) {
-			throw new ExecutionException("The parameter string could not be converted to an object", e); //$NON-NLS-1$
+			throw new ExecutionException(
+					"The parameter string could not be converted to an object", e); //$NON-NLS-1$
 		}
 	}
 
 	/**
 	 * Returns the value of the parameter with the given id.
-	 *
+	 * 
 	 * @param parameterId
 	 *            The id of the parameter to retrieve; may be <code>null</code>.
 	 * @return The parameter value; <code>null</code> if the parameter cannot
 	 *         be found.
 	 */
 	public final String getParameter(final String parameterId) {
-		return parameters.get(parameterId);
+		return (String) parameters.get(parameterId);
 	}
 
 	/**
 	 * Returns all of the parameters.
-	 *
+	 * 
 	 * @return The parameters; never <code>null</code>, but may be empty.
 	 */
-	@SuppressWarnings("rawtypes")
 	public final Map getParameters() {
 		return parameters;
 	}
 
 	/**
 	 * Returns the object that triggered the execution
-	 *
+	 * 
 	 * @return The trigger; <code>null</code> if there was no trigger.
 	 */
 	public final Object getTrigger() {
@@ -217,10 +223,9 @@ public final class ExecutionEvent {
 	/**
 	 * The string representation of this execution event -- for debugging
 	 * purposes only. This string should not be shown to an end user.
-	 *
+	 * 
 	 * @return The string representation; never <code>null</code>.
 	 */
-	@Override
 	public final String toString() {
 		final StringBuffer stringBuffer = new StringBuffer();
 		stringBuffer.append("ExecutionEvent("); //$NON-NLS-1$

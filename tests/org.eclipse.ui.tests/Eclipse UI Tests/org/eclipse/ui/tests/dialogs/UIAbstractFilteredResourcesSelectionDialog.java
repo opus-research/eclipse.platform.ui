@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
@@ -71,7 +71,7 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 	/**
 	 * A hook for subclasses - provides means to change filesystem tree.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String getProjectName() {
@@ -80,7 +80,7 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 	/**
 	 * A hook for subclasses - provides means to change filesystem tree.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String getFirstFolderName() {
@@ -89,7 +89,7 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 	/**
 	 * A hook for subclasses - provides means to change filesystem tree.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String getSecondFolderName() {
@@ -98,7 +98,7 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 	/**
 	 * A hook for subclasses - provides means to change filesystem tree.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String[] getHistoryFiles() {
@@ -107,14 +107,18 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 	/**
 	 * A hook for subclasses - provides means to change filesystem tree.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String[] getNonHistoryFiles() {
 		return NONHISTORY_FILES;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -138,7 +142,8 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 
 		IMemento historyMemento = memento.createChild(DEFAULT_ROOT_NODE_NAME);
 
-		for (IResource item : historyResources) {
+		for (int i = 0; i < historyResources.length; i++) {
+			IResource item = historyResources[i];
 			IMemento elementMemento = historyMemento
 					.createChild(DEFAULT_INFO_NODE_NAME);
 			ResourceFactory resourceFactory = new ResourceFactory(item);
@@ -151,7 +156,11 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 		settings.put(HISTORY_SETTINGS, writer.getBuffer().toString());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 		finalizeProject();
@@ -163,8 +172,8 @@ public class UIAbstractFilteredResourcesSelectionDialog extends TestCase {
 		project = root.getProject(getProjectName());
 
 		IProject[] projects = root.getProjects();
-		for (IProject project2 : projects) {
-			project2.delete(true, null);
+		for (int i = 0; i < projects.length; i++) {
+			projects[i].delete(true, null);
 		}
 
 		project.create(null);

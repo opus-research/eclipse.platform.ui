@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,25 +21,22 @@ import java.util.Map;
  * <p>
  * This interface is not intended to be extended by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.IHandler
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface IHandler {
 
     /**
      * Registers an instance of <code>IHandlerListener</code> to listen for
      * changes to properties of this instance.
-     *
+     * 
      * @param handlerListener
      *            the instance to register. Must not be <code>null</code>. If
      *            an attempt is made to register an instance which is already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void addHandlerListener(IHandlerListener handlerListener);
 
     /**
@@ -47,12 +44,11 @@ public interface IHandler {
      * longer referenced. This can be used as an opportunity to unhook listeners
      * from other objects.
      */
-	@Deprecated
     public void dispose();
 
     /**
      * Executes with the map of parameter values by name.
-     *
+     * 
      * @param parameterValuesByName
      *            the map of parameter values by name. Reserved for future use,
      *            must be <code>null</code>.
@@ -61,7 +57,6 @@ public interface IHandler {
      * @throws ExecutionException
      *             if an exception occurred during execution.
      */
-	@Deprecated
     Object execute(Map parameterValuesByName) throws ExecutionException;
 
     /**
@@ -70,25 +65,23 @@ public interface IHandler {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the map of attribute values by name. This map may be empty, but
      *         is guaranteed not to be <code>null</code>. If this map is not
      *         empty, its collection of keys is guaranteed to only contain
      *         instances of <code>String</code>.
      */
-	@Deprecated
     Map getAttributeValuesByName();
 
     /**
      * Unregisters an instance of <code>IPropertyListener</code> listening for
      * changes to properties of this instance.
-     *
+     * 
      * @param handlerListener
      *            the instance to unregister. Must not be <code>null</code>.
      *            If an attempt is made to unregister an instance which is not
      *            already registered with this instance, no operation is
      *            performed.
      */
-	@Deprecated
     void removeHandlerListener(IHandlerListener handlerListener);
 }

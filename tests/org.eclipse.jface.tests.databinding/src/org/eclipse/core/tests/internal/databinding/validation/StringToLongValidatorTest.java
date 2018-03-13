@@ -22,27 +22,37 @@ import com.ibm.icu.text.NumberFormat;
  * @since 1.1
  */
 public class StringToLongValidatorTest extends StringToNumberValidatorTestHarness {
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInRangeNumber()
+	 */
 	protected Number getInRangeNumber() {
 		return new Long(1);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getInvalidString()
+	 */
 	protected String getInvalidString() {
 		return "1.1";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#getOutOfRangeNumber()
+	 */
 	protected Number getOutOfRangeNumber() {
 		return new Double(Double.MAX_VALUE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupNumberFormat()
+	 */
 	protected NumberFormat setupNumberFormat() {
 		return NumberFormat.getIntegerInstance();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.StringToNumberValidatorTestHarness#setupValidator()
+	 */
 	protected IValidator setupValidator(NumberFormat numberFormat) {
 		NumberFormatConverter converter = StringToNumberConverter.toInteger(numberFormat, false);
 		return new StringToLongValidator(converter);

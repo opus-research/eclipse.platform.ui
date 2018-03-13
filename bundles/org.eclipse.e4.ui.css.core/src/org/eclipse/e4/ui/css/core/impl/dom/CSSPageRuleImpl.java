@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,26 +26,38 @@ public class CSSPageRuleImpl extends CSSRuleImpl implements CSSPageRule {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getType()
+	 */
 	public short getType() {
 		return CSSRule.PAGE_RULE;
 	}
-
+	
 	// W3C CSSPageRule API methods
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPageRule#getSelectorText()
+	 */
 	public String getSelectorText() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPageRule#getStyle()
+	 */
 	public CSSStyleDeclaration getStyle() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPageRule#setSelectorText(String)
+	 */
 	public void setSelectorText(String arg0) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");

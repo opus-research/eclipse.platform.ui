@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,8 +58,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see PreferencePage#createContents(Composite)
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -87,7 +86,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         return mainComposite;
     }
 
-    /**
+    /** 
      * Creates the widgets for the list of decorators.
      */
     private void createDecoratorsArea(Composite mainComposite) {
@@ -112,8 +111,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
                 new GridData(GridData.FILL_BOTH));
         checkboxViewer.getTable().setFont(decoratorsComposite.getFont());
         checkboxViewer.setLabelProvider(new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 return ((DecoratorDefinition) element).getName();
             }
         });
@@ -123,26 +121,22 @@ public class DecoratorsPreferencePage extends PreferencePage implements
             private final Comparator comparer = new Comparator() {
                 private Collator collator = Collator.getInstance();
 
-                @Override
-				public int compare(Object arg0, Object arg1) {
+                public int compare(Object arg0, Object arg1) {
                     String s1 = ((DecoratorDefinition) arg0).getName();
                     String s2 = ((DecoratorDefinition) arg1).getName();
                     return collator.compare(s1, s2);
                 }
             };
 
-            @Override
-			public void dispose() {
+            public void dispose() {
                 //Nothing to do on dispose
             }
 
-            @Override
-			public void inputChanged(Viewer viewer, Object oldInput,
+            public void inputChanged(Viewer viewer, Object oldInput,
                     Object newInput) {
             }
 
-            @Override
-			public Object[] getElements(Object inputElement) {
+            public Object[] getElements(Object inputElement) {
                 //Make an entry for each decorator definition
                 Object[] elements = (Object[]) inputElement;
                 Object[] results = new Object[elements.length];
@@ -155,8 +149,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
 
         checkboxViewer
                 .addSelectionChangedListener(new ISelectionChangedListener() {
-                    @Override
-					public void selectionChanged(SelectionChangedEvent event) {
+                    public void selectionChanged(SelectionChangedEvent event) {
                         if (event.getSelection() instanceof IStructuredSelection) {
                             IStructuredSelection sel = (IStructuredSelection) event
                                     .getSelection();
@@ -172,15 +165,14 @@ public class DecoratorsPreferencePage extends PreferencePage implements
                 });
 
         checkboxViewer.addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
+            public void checkStateChanged(CheckStateChangedEvent event) {
                 checkboxViewer.setSelection(new StructuredSelection(event
                         .getElement()));
             }
         });
     }
 
-    /**
+    /** 
      * Creates the widgets for the description.
      */
     private void createDescriptionArea(Composite mainComposite) {
@@ -195,7 +187,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
         textComposite.setFont(mainFont);
 
         Label descriptionLabel = new Label(textComposite, SWT.NONE);
-        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description);
+        descriptionLabel.setText(WorkbenchMessages.DecoratorsPreferencePage_description); 
         descriptionLabel.setFont(mainFont);
 
         descriptionText = new Text(textComposite, SWT.MULTI | SWT.WRAP
@@ -244,8 +236,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see PreferencePage#performDefaults()
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
         super.performDefaults();
         DecoratorManager manager = WorkbenchPlugin.getDefault()
 				.getDecoratorManager();
@@ -260,8 +251,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see IPreferencePage#performOk()
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         if (super.performOk()) {
             DecoratorManager manager = getDecoratorManager();
             //Clear the caches first to avoid unneccessary updates
@@ -285,8 +275,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
     /**
      * @see IWorkbenchPreferencePage#init(IWorkbench)
      */
-    @Override
-	public void init(IWorkbench workbench) {
+    public void init(IWorkbench workbench) {
     }
 
     /**
@@ -298,7 +287,7 @@ public class DecoratorsPreferencePage extends PreferencePage implements
 
     /**
      * Get the DecoratorManager being used for this page.
-     *
+     * 
      * @return the decorator manager
      */
     private DecoratorManager getDecoratorManager() {

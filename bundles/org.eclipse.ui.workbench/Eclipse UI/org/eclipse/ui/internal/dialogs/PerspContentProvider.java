@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,21 +23,34 @@ public class PerspContentProvider implements IStructuredContentProvider {
         //no-op
     }
 
-    @Override
-	public void dispose() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
+    public void dispose() {
         //no-op
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
+    public Object[] getElements(Object element) {
         if (element instanceof IPerspectiveRegistry) {
             return ((IPerspectiveRegistry) element).getPerspectives();
         }
         return null;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+     *      java.lang.Object, java.lang.Object)
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //no-op
     }
 }

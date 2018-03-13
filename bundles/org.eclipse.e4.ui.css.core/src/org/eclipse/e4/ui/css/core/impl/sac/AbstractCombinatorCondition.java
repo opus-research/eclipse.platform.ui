@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002, 2014  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -50,11 +50,10 @@ public abstract class AbstractCombinatorCondition implements
 
 	/**
 	 * Indicates whether some other object is "equal to" this one.
-	 *
+	 * 
 	 * @param obj
 	 *            the reference object with which to compare.
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || (obj.getClass() != getClass())) {
 			return false;
@@ -67,7 +66,6 @@ public abstract class AbstractCombinatorCondition implements
 	/**
 	 * Returns the specificity of this condition.
 	 */
-	@Override
 	public int getSpecificity() {
 		return ((ExtendedCondition) getFirstCondition()).getSpecificity()
 				+ ((ExtendedCondition) getSecondCondition()).getSpecificity();
@@ -77,7 +75,6 @@ public abstract class AbstractCombinatorCondition implements
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.CombinatorCondition#getFirstCondition()}.
 	 */
-	@Override
 	public Condition getFirstCondition() {
 		return firstCondition;
 	}
@@ -86,7 +83,6 @@ public abstract class AbstractCombinatorCondition implements
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.CombinatorCondition#getSecondCondition()}.
 	 */
-	@Override
 	public Condition getSecondCondition() {
 		return secondCondition;
 	}

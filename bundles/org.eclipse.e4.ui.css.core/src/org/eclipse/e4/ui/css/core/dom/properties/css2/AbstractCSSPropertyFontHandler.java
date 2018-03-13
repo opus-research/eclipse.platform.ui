@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		AbstractCSSPropertyFontCompositeHandler implements
 		ICSSPropertyFontHandler {
 
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if ("font".equals(property))
@@ -41,7 +40,6 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		if ("font-family".equals(property)) {
@@ -68,13 +66,11 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		return null;
 	}
 
-	@Override
 	public void applyCSSPropertyFont(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		super.applyCSSPropertyComposite(element, "font", value, pseudo, engine);
 	}
 
-	@Override
 	public void applyCSSPropertyFontFamily(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof CSS2FontProperties) {
@@ -92,7 +88,6 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyFontSize(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof CSS2FontProperties) {
@@ -110,19 +105,16 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyFontSizeAdjust(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		throw new UnsupportedPropertyException("font-adjust");
 	}
 
-	@Override
 	public void applyCSSPropertyFontStretch(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		throw new UnsupportedPropertyException("font-stretch");
 	}
 
-	@Override
 	public void applyCSSPropertyFontStyle(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof CSS2FontProperties) {
@@ -140,13 +132,11 @@ public abstract class AbstractCSSPropertyFontHandler extends
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyFontVariant(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		throw new UnsupportedPropertyException("font-variant");
 	}
 
-	@Override
 	public void applyCSSPropertyFontWeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (element instanceof CSS2FontProperties) {

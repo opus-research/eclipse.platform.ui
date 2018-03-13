@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,15 +26,18 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private boolean readOnly;
 	private CSSRule parentRule;
-	private List<CSSProperty> properties = new ArrayList<CSSProperty>();
+	private List<CSSProperty> properties = new ArrayList<CSSProperty>(); 
 
 	public CSSStyleDeclarationImpl(CSSRule parentRule) {
 		this.parentRule = parentRule;
 	}
 
 	// W3C CSSStyleDeclaration API methods
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getCSSText()
+	 */
 	public String getCssText() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < properties.size(); i++) {
@@ -49,17 +52,26 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		return sb.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getLength()
+	 */
 	public int getLength() {
 		return properties.size();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getParentRule()
+	 */
 	public CSSRule getParentRule() {
 		return parentRule;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyCSSValue(String)
+	 */
 	public CSSValue getPropertyCSSValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
@@ -67,15 +79,21 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 			: property.getValue();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyPriority(String)
+	 */
 	public String getPropertyPriority(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property != null && property.isImportant())
 			? CSSPropertyImpl.IMPORTANT_IDENTIFIER
-			: "";
+			: "";			
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyValue(String)
+	 */
 	public String getPropertyValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
@@ -83,12 +101,18 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 			: property.getValue().toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#item(int)
+	 */
 	public String item(int index) {
 		return properties.get(index).getName();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#removeProperty(String)
+	 */
 	public String removeProperty(String propertyName) throws DOMException {
 		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
@@ -102,16 +126,22 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		return "";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration#setCssText(String)
+	 */
 	public void setCssText(String cssText) throws DOMException {
 		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if cssText is unparsable
-		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
+		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");		
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleDeclaration.setProperty(String, String, String)
+	 */
 	public void setProperty(String propertyName, String value, String priority) throws DOMException {
 		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
@@ -120,9 +150,9 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-
+	
 	// Additional
-
+	
 	public void addProperty(CSSProperty  property) {
 		properties.add(property);
 	}
@@ -134,7 +164,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		}
 		return propertyList;
 	}
-
+	
 	protected void setReadOnly(boolean readOnly) {
 		//TODO ViewCSS.getComputedStyle() should provide a read only access to the computed values
 		this.readOnly = readOnly;

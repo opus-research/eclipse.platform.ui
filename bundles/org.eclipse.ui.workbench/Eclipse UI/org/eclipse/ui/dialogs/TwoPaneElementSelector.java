@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,14 +40,14 @@ import org.eclipse.jface.viewers.ILabelProvider;
 /**
  * A list selection dialog with two panes. Duplicated entries will be folded
  * together and are displayed in the lower pane (qualifier).
- *
+ * 
  * @since 2.0
  */
 public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     private String fUpperListLabel;
 
     private String fLowerListLabel;
-
+    
     /**
      * The comparator used to sort the list in the lower pane.
      * @since 3.5
@@ -64,7 +64,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 
     /**
      * Creates the two pane element selector.
-     *
+     * 
      * @param parent
      *            the parent shell.
      * @param elementRenderer
@@ -83,7 +83,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * Sets the upper list label. If the label is <code>null</code> (default),
      * no label is created.
-     *
+     * 
      * @param label
      */
     public void setUpperListLabel(String label) {
@@ -92,7 +92,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 
     /**
      * Sets the lower list label.
-     *
+     * 
      * @param label
      *            String or <code>null</code>. If the label is
      *            <code>null</code> (default), no label is created.
@@ -107,7 +107,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
      * Note: the comparator might want to honor
      * {@link AbstractElementListSelectionDialog#isCaseIgnored()}.
      * </p>
-     *
+     * 
      * @param comparator
      *            a Comparator or <code>null</code> if <code>String</code>'s
      *            comparison methods should be used
@@ -119,7 +119,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 
     /**
      * Sets the elements to be displayed.
-     *
+     * 
      * @param elements
      *            the elements to be displayed.
      */
@@ -130,8 +130,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /*
      * @see Dialog#createDialogArea(Composite)
      */
-    @Override
-	public Control createDialogArea(Composite parent) {
+    public Control createDialogArea(Composite parent) {
         Composite contents = (Composite) super.createDialogArea(parent);
         createMessageArea(contents);
         createFilterText(contents);
@@ -151,7 +150,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 
     /**
      * Creates a label if name was not <code>null</code>.
-     *
+     * 
      * @param parent
      *            the parent composite.
      * @param name
@@ -171,7 +170,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 
     /**
      * Creates the list widget and sets layout data.
-     *
+     * 
      * @param parent
      *            the parent composite.
      * @return returns the list table widget.
@@ -179,20 +178,17 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     protected Table createLowerList(Composite parent) {
         Table list = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
         list.addListener(SWT.Selection, new Listener() {
-            @Override
-			public void handleEvent(Event evt) {
+            public void handleEvent(Event evt) {
                 handleLowerSelectionChanged();
             }
         });
         list.addListener(SWT.MouseDoubleClick, new Listener() {
-            @Override
-			public void handleEvent(Event evt) {
+            public void handleEvent(Event evt) {
                 handleDefaultSelected();
             }
         });
         list.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 fQualifierRenderer.dispose();
             }
         });
@@ -212,8 +208,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see SelectionStatusDialog#computeResult()
      */
-    @Override
-	protected void computeResult() {
+    protected void computeResult() {
         Object[] results = new Object[] { getLowerSelectedElement() };
         setResult(Arrays.asList(results));
     }
@@ -221,8 +216,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see AbstractElementListSelectionDialog#handleDefaultSelected()
      */
-    @Override
-	protected void handleDefaultSelected() {
+    protected void handleDefaultSelected() {
         if (validateCurrentSelection() && (getLowerSelectedElement() != null)) {
 			buttonPressed(IDialogConstants.OK_ID);
 		}
@@ -231,8 +225,7 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /**
      * @see AbstractElementListSelectionDialog#handleSelectionChanged()
      */
-    @Override
-	protected void handleSelectionChanged() {
+    protected void handleSelectionChanged() {
         handleUpperSelectionChanged();
     }
 
@@ -313,14 +306,14 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
 			}
             qualifiers[i] = text;
         }
-
+        
         TwoArrayQuickSorter sorter;
         if (fLowerListComparator == null) {
         	sorter = new TwoArrayQuickSorter(isCaseIgnored());
         } else {
         	sorter = new TwoArrayQuickSorter(fLowerListComparator);
         }
-
+        
         sorter.sort(qualifiers, elements);
         for (int i = 0; i != length; i++) {
             TableItem item = new TableItem(fLowerList, SWT.NONE);
@@ -335,21 +328,19 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
     /*
      * @see AbstractElementListSelectionDialog#handleEmptyList()
      */
-    @Override
-	protected void handleEmptyList() {
+    protected void handleEmptyList() {
         super.handleEmptyList();
         fLowerList.setEnabled(false);
     }
-
+    
     /**
      * @see AbstractElementListSelectionDialog#validateCurrentSelection()
      * @since 3.5
      */
-    @Override
-	protected boolean validateCurrentSelection() {
+    protected boolean validateCurrentSelection() {
     	ISelectionStatusValidator validator = getValidator();
     	Object lowerSelection = getLowerSelectedElement();
-
+    	
     	if (validator != null && lowerSelection != null) {
     		IStatus status = validator.validate(new Object [] {lowerSelection});
     		updateStatus(status);

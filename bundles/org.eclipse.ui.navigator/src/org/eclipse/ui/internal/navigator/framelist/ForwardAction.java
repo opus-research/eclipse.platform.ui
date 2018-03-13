@@ -24,7 +24,7 @@ public class ForwardAction extends FrameAction {
 
 	/**
      * Constructs a new action for the specified frame list.
-     *
+     * 
      * @param frameList the frame list
      */
     public ForwardAction(FrameList frameList) {
@@ -59,8 +59,7 @@ public class ForwardAction extends FrameAction {
     /**
      * Calls <code>forward()</code> on the frame list.
      */
-    @Override
-	public void run() {
+    public void run() {
         getFrameList().forward();
     }
 
@@ -70,8 +69,7 @@ public class ForwardAction extends FrameAction {
      * The tool tip text is "Forward to " plus the tool tip text for the next
      * frame.
      */
-    @Override
-	public void update() {
+    public void update() {
         super.update();
         Frame nextFrame = getNextFrame();
         setEnabled(nextFrame != null);

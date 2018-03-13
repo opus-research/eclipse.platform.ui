@@ -53,7 +53,8 @@ public class BookmarkMessages extends NLS {
 	public static String ColumnFolder_text;
 	public static String ColumnLocation_text;
 	public static String ColumnCreationTime_text;
-
+	
+	public static String Error_text;
 
 	public static String LineIndicator_text;
 
@@ -62,6 +63,11 @@ public class BookmarkMessages extends NLS {
 	public static String ColumnResource_header;
 	public static String ColumnFolder_header;
 	public static String ColumnLocation_header;
+
+	public static String ColumnDescription_dialogText;
+	public static String ColumnResource_dialogText;
+	public static String ColumnFolder_dialogText;
+	public static String ColumnLocation_dialogText;
 
 	public static String SortMenuGroup_text;
 	public static String SortDirectionAscending_text;
@@ -74,7 +80,7 @@ public class BookmarkMessages extends NLS {
 	public static String CopyToClipboardProblemDialog_message;
 
 	public static String CreateBookmark_undoText;
-	public static String ModifyBookmark_undoText;
+	public static String ModifyBookmark_undoText;	
 
 	static {
 		// load message values from bundle file

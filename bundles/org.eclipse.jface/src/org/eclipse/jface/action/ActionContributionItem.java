@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,12 +49,12 @@ import org.eclipse.swt.widgets.Widget;
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class ActionContributionItem extends ContributionItem {
-
+ 
 	/**
 	 * Mode bit: Show text on tool items or buttons, even if an image is
 	 * present. If this mode bit is not set, text is only shown on tool items if
 	 * there is no image present.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	public static int MODE_FORCE_TEXT = 1;
@@ -71,7 +71,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns whether color icons should be used in toolbars.
-	 *
+	 * 
 	 * @return <code>true</code> if color icons should be used in toolbars,
 	 *         <code>false</code> otherwise
 	 */
@@ -81,7 +81,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Sets whether color icons should be used in toolbars.
-	 *
+	 * 
 	 * @param useColorIcons
 	 *            <code>true</code> if color icons should be used in toolbars,
 	 *            <code>false</code> otherwise
@@ -104,7 +104,15 @@ public class ActionContributionItem extends ContributionItem {
 	 * The listener for changes to the text of the action contributed by an
 	 * external source.
 	 */
-	private final IPropertyChangeListener actionTextListener = event -> update(event.getProperty());
+	private final IPropertyChangeListener actionTextListener = new IPropertyChangeListener() {
+
+		/**
+		 * @see IPropertyChangeListener#propertyChange(PropertyChangeEvent)
+		 */
+		public void propertyChange(PropertyChangeEvent event) {
+			update(event.getProperty());
+		}
+	};
 
 	/**
 	 * Remembers all images in use by this contribution item
@@ -124,7 +132,11 @@ public class ActionContributionItem extends ContributionItem {
 	/**
 	 * Listener for action property change notifications.
 	 */
-	private final IPropertyChangeListener propertyListener = event -> actionPropertyChange(event);
+	private final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+		public void propertyChange(PropertyChangeEvent event) {
+			actionPropertyChange(event);
+		}
+	};
 
 	/**
 	 * Listener for SWT tool item widget events.
@@ -142,7 +154,7 @@ public class ActionContributionItem extends ContributionItem {
 	/**
 	 * Creates a new contribution item from the given action. The id of the
 	 * action is used as the id of the item.
-	 *
+	 * 
 	 * @param action
 	 *            the action
 	 */
@@ -163,7 +175,11 @@ public class ActionContributionItem extends ContributionItem {
 			if (display.getThread() == Thread.currentThread()) {
 				update(e.getProperty());
 			} else {
-				display.asyncExec(() -> update(e.getProperty()));
+				display.asyncExec(new Runnable() {
+					public void run() {
+						update(e.getProperty());
+					}
+				});
 			}
 
 		}
@@ -267,7 +283,7 @@ public class ActionContributionItem extends ContributionItem {
 			}
 
 			if (flags == SWT.CASCADE) {
-				// just create a proxy for now, if the user shows it then
+				// just create a proxy for now, if the user shows it then 
 				// fill it in
 				Menu subMenu = new Menu(parent);
 				subMenu.addListener(SWT.Show, getMenuCreatorListener());
@@ -346,7 +362,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns the action associated with this contribution item.
-	 *
+	 * 
 	 * @return the action
 	 */
 	public IAction getAction() {
@@ -355,23 +371,25 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns the listener for SWT button widget events.
-	 *
+	 * 
 	 * @return a listener for button events
 	 */
 	private Listener getButtonListener() {
 		if (buttonListener == null) {
-			buttonListener = event -> {
-				switch (event.type) {
-				case SWT.Dispose:
-					handleWidgetDispose(event);
-					break;
-				case SWT.Selection:
-					Widget ew = event.widget;
-					if (ew != null) {
-						handleWidgetSelection(event, ((Button) ew)
-								.getSelection());
+			buttonListener = new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						handleWidgetDispose(event);
+						break;
+					case SWT.Selection:
+						Widget ew = event.widget;
+						if (ew != null) {
+							handleWidgetSelection(event, ((Button) ew)
+									.getSelection());
+						}
+						break;
 					}
-					break;
 				}
 			};
 		}
@@ -380,23 +398,25 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns the listener for SWT menu item widget events.
-	 *
+	 * 
 	 * @return a listener for menu item events
 	 */
 	private Listener getMenuItemListener() {
 		if (menuItemListener == null) {
-			menuItemListener = event -> {
-				switch (event.type) {
-				case SWT.Dispose:
-					handleWidgetDispose(event);
-					break;
-				case SWT.Selection:
-					Widget ew = event.widget;
-					if (ew != null) {
-						handleWidgetSelection(event, ((MenuItem) ew)
-								.getSelection());
+			menuItemListener = new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						handleWidgetDispose(event);
+						break;
+					case SWT.Selection:
+						Widget ew = event.widget;
+						if (ew != null) {
+							handleWidgetSelection(event, ((MenuItem) ew)
+									.getSelection());
+						}
+						break;
 					}
-					break;
 				}
 			};
 		}
@@ -408,9 +428,9 @@ public class ActionContributionItem extends ContributionItem {
 	 * <code>MODE_*</code> constants. The default mode setting is 0, meaning
 	 * that for menu items, both text and image are shown (if present), but for
 	 * tool items, the text is shown only if there is no image.
-	 *
+	 * 
 	 * @return the presentation mode settings
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	public int getMode() {
@@ -419,23 +439,25 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns the listener for SWT tool item widget events.
-	 *
+	 * 
 	 * @return a listener for tool item events
 	 */
 	private Listener getToolItemListener() {
 		if (toolItemListener == null) {
-			toolItemListener = event -> {
-				switch (event.type) {
-				case SWT.Dispose:
-					handleWidgetDispose(event);
-					break;
-				case SWT.Selection:
-					Widget ew = event.widget;
-					if (ew != null) {
-						handleWidgetSelection(event, ((ToolItem) ew)
-								.getSelection());
+			toolItemListener = new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Dispose:
+						handleWidgetDispose(event);
+						break;
+					case SWT.Selection:
+						Widget ew = event.widget;
+						if (ew != null) {
+							handleWidgetSelection(event, ((ToolItem) ew)
+									.getSelection());
+						}
+						break;
 					}
-					break;
 				}
 			};
 		}
@@ -545,15 +567,17 @@ public class ActionContributionItem extends ContributionItem {
 				if (trace) {
 					ms = System.currentTimeMillis();
 					System.out.println("Running action: " + action.getText()); //$NON-NLS-1$
-				}
-
+				}				
+				
 				IPropertyChangeListener resultListener = null;
 				if (callback != null) {
-					resultListener = event -> {
-						// Check on result
-						if (event.getProperty().equals(IAction.RESULT)) {
-							if (event.getNewValue() instanceof Boolean) {
-								result = (Boolean) event.getNewValue();
+					resultListener = new IPropertyChangeListener() {
+						public void propertyChange(PropertyChangeEvent event) {
+							// Check on result
+							if (event.getProperty().equals(IAction.RESULT)) {
+								if (event.getNewValue() instanceof Boolean) {
+									result = (Boolean) event.getNewValue();
+								}
 							}
 						}
 					};
@@ -591,6 +615,9 @@ public class ActionContributionItem extends ContributionItem {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Object.
+	 */
 	@Override
 	public int hashCode() {
 		return action.hashCode();
@@ -598,7 +625,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Returns whether the given action has any images.
-	 *
+	 * 
 	 * @param actionToCheck
 	 *            the action
 	 * @return <code>true</code> if the action has any images,
@@ -650,6 +677,9 @@ public class ActionContributionItem extends ContributionItem {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IContributionItem.
+	 */
 	@Override
 	public boolean isEnabled() {
 		return action != null && action.isEnabled();
@@ -658,7 +688,7 @@ public class ActionContributionItem extends ContributionItem {
 	/**
 	 * Returns <code>true</code> if this item is allowed to enable,
 	 * <code>false</code> otherwise.
-	 *
+	 * 
 	 * @return if this item is allowed to be enabled
 	 * @since 2.0
 	 */
@@ -684,10 +714,10 @@ public class ActionContributionItem extends ContributionItem {
 	/**
 	 * Sets the presentation mode, which is the bitwise-or of the
 	 * <code>MODE_*</code> constants.
-	 *
+	 * 
 	 * @param mode
 	 *            the presentation mode settings
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	public void setMode(int mode) {
@@ -706,7 +736,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Synchronizes the UI with the given property.
-	 *
+	 * 
 	 * @param propertyName
 	 *            the name of the property, or <code>null</code> meaning all
 	 *            applicable properties
@@ -987,7 +1017,7 @@ public class ActionContributionItem extends ContributionItem {
 
 	/**
 	 * Updates the images for this action.
-	 *
+	 * 
 	 * @param forceImage
 	 *            <code>true</code> if some form of image is compulsory, and
 	 *            <code>false</code> if it is acceptable for this item to have
@@ -1125,13 +1155,13 @@ public class ActionContributionItem extends ContributionItem {
 	 * the width of the given ToolItem.The default implementation replaces
 	 * characters in the center of the original string with an ellipsis ("...").
 	 * Override if you need a different strategy.
-	 *
+	 * 
 	 * @param textValue
 	 *            the text to shorten
 	 * @param item
 	 *            the tool item the text belongs to
 	 * @return the shortened string
-	 *
+	 * 
 	 */
 	protected String shortenText(String textValue, ToolItem item) {
 		if (textValue == null) {
@@ -1161,6 +1191,11 @@ public class ActionContributionItem extends ContributionItem {
 		return textValue;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -1169,30 +1204,32 @@ public class ActionContributionItem extends ContributionItem {
 		}
 		holdMenu = null;
 	}
-
+	
 	/**
 	 * Handle show and hide on the proxy menu for IAction.AS_DROP_DOWN_MENU
 	 * actions.
-	 *
+	 * 
 	 * @return the appropriate listener
 	 * @since 3.4
 	 */
 	private Listener getMenuCreatorListener() {
 		if (menuCreatorListener == null) {
-			menuCreatorListener = event -> {
-				switch (event.type) {
-				case SWT.Show:
-					handleShowProxy((Menu) event.widget);
-					break;
-				case SWT.Hide:
-					handleHideProxy((Menu) event.widget);
-					break;
+			menuCreatorListener = new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Show:
+						handleShowProxy((Menu) event.widget);
+						break;
+					case SWT.Hide:
+						handleHideProxy((Menu) event.widget);
+						break;
+					}
 				}
 			};
 		}
 		return menuCreatorListener;
 	}
-
+	
 	/**
 	 * This is the easiest way to hold the menu until we can swap it in to the
 	 * proxy.
@@ -1200,10 +1237,10 @@ public class ActionContributionItem extends ContributionItem {
 	private Menu holdMenu = null;
 
 	private boolean menuCreatorCalled = false;
-
+	
 	/**
 	 * The proxy menu is being shown, we better get the real menu.
-	 *
+	 * 
 	 * @param proxy
 	 *            the proxy menu
 	 * @since 3.4
@@ -1225,7 +1262,7 @@ public class ActionContributionItem extends ContributionItem {
 	/**
 	 * Create MenuItems in the proxy menu that can execute the real menu items
 	 * if selected. Create proxy menus for any real item submenus.
-	 *
+	 * 
 	 * @param realMenu
 	 *            the real menu to copy from
 	 * @param proxy
@@ -1236,25 +1273,27 @@ public class ActionContributionItem extends ContributionItem {
 		if (realMenu.isDisposed() || proxy.isDisposed()) {
 			return;
 		}
-
+		
 		// we notify the real menu so it can populate itself if it was
 		// listening for SWT.Show
 		realMenu.notifyListeners(SWT.Show, null);
 
-		final Listener passThrough = event -> {
-			if (!event.widget.isDisposed()) {
-				Widget realItem = (Widget) event.widget.getData();
-				if (!realItem.isDisposed()) {
-					int style = event.widget.getStyle();
-					if (event.type == SWT.Selection
-							&& ((style & (SWT.TOGGLE | SWT.CHECK | SWT.RADIO)) != 0)
-							&& realItem instanceof MenuItem) {
-						((MenuItem) realItem)
-								.setSelection(((MenuItem) event.widget)
-										.getSelection());
+		final Listener passThrough = new Listener() {
+			public void handleEvent(Event event) {
+				if (!event.widget.isDisposed()) {
+					Widget realItem = (Widget) event.widget.getData();
+					if (!realItem.isDisposed()) {
+						int style = event.widget.getStyle();
+						if (event.type == SWT.Selection
+								&& ((style & (SWT.TOGGLE | SWT.CHECK | SWT.RADIO)) != 0)
+								&& realItem instanceof MenuItem) {
+							((MenuItem) realItem)
+									.setSelection(((MenuItem) event.widget)
+											.getSelection());
+						}
+						event.widget = realItem;
+						realItem.notifyListeners(event.type, event);
 					}
-					event.widget = realItem;
-					realItem.notifyListeners(event.type, event);
 				}
 			}
 		};
@@ -1282,7 +1321,6 @@ public class ActionContributionItem extends ContributionItem {
 				subMenu.setData(itemMenu);
 				proxyItem.setMenu(subMenu);
 				subMenu.addListener(SWT.Show, new Listener() {
-					@Override
 					public void handleEvent(Event event) {
 						event.widget.removeListener(SWT.Show, this);
 						if (event.type == SWT.Show) {
@@ -1295,29 +1333,31 @@ public class ActionContributionItem extends ContributionItem {
 			}
 		}
 	}
-
+	
 	/**
 	 * The proxy menu is being hidden, so we need to make it go away.
-	 *
+	 * 
 	 * @param proxy
 	 *            the proxy menu
 	 * @since 3.4
 	 */
 	private void handleHideProxy(final Menu proxy) {
 		proxy.removeListener(SWT.Hide, getMenuCreatorListener());
-		proxy.getDisplay().asyncExec(() -> {
-			if (!proxy.isDisposed()) {
-				MenuItem parentItem = proxy.getParentItem();
-				proxy.dispose();
-				parentItem.setMenu(holdMenu);
+		proxy.getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				if (!proxy.isDisposed()) {
+					MenuItem parentItem = proxy.getParentItem();
+					proxy.dispose();
+					parentItem.setMenu(holdMenu);
+				}
+				if (holdMenu != null && !holdMenu.isDisposed()) {
+					holdMenu.notifyListeners(SWT.Hide, null);
+				}
+				holdMenu = null;
 			}
-			if (holdMenu != null && !holdMenu.isDisposed()) {
-				holdMenu.notifyListeners(SWT.Hide, null);
-			}
-			holdMenu = null;
 		});
 	}
-
+	
 	/**
 	 * Return the widget associated with this contribution item. It should not
 	 * be cached, as it can be disposed and re-created by its containing
@@ -1327,7 +1367,7 @@ public class ActionContributionItem extends ContributionItem {
 	 * actual type of the widget can be any valid control for this
 	 * ContributionItem's current ContributionManager.
 	 * </p>
-	 *
+	 * 
 	 * @return the widget, or <code>null</code> depending on the lifecycle.
 	 * @since 3.4
 	 */

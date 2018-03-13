@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class InstallationDialog extends TrayDialog implements
 		IInstallationPageContainer {
@@ -156,7 +156,13 @@ public class InstallationDialog extends TrayDialog implements
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
+	 * .Shell)
+	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		String productName = ""; //$NON-NLS-1$
@@ -167,12 +173,22 @@ public class InstallationDialog extends TrayDialog implements
 				WorkbenchMessages.InstallationDialog_ShellTitle, productName));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	protected boolean isResizable() {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -186,7 +202,6 @@ public class InstallationDialog extends TrayDialog implements
 		folder.setLayoutData(folderData);
 		folder.addSelectionListener(createFolderSelectionListener());
 		folder.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				releaseContributions();
 			}
@@ -212,7 +227,6 @@ public class InstallationDialog extends TrayDialog implements
 		}
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
 		Control control = super.createContents(parent);
 		boolean selected = false;
@@ -239,7 +253,6 @@ public class InstallationDialog extends TrayDialog implements
 	private SelectionAdapter createFolderSelectionListener() {
 		return new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				tabSelected((TabItem) e.item);
 			}
@@ -272,7 +285,6 @@ public class InstallationDialog extends TrayDialog implements
 				item.setData(page);
 				item.addDisposeListener(new DisposeListener() {
 
-					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						page.dispose();
 					}
@@ -311,7 +323,13 @@ public class InstallationDialog extends TrayDialog implements
 		lastSelectedTabId = pageId;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse
+	 * .swt.widgets.Composite)
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		// The button manager will handle the correct sizing of the buttons.
 		// We do not want columns equal width because we are going to add some
@@ -330,7 +348,6 @@ public class InstallationDialog extends TrayDialog implements
 		return point.getConfigurationElements();
 	}
 
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = WorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -345,21 +362,18 @@ public class InstallationDialog extends TrayDialog implements
 		buttonManager.clear();
 	}
 
-	@Override
 	public void closeModalContainers() {
 		close();
 		if (modalParent != null)
 			modalParent.close();
 	}
 
-	@Override
 	protected void buttonPressed(int buttonId) {
 		if (IDialogConstants.CLOSE_ID == buttonId) {
 			okPressed();
 		}
 	}
 
-	@Override
 	public void registerPageButton(InstallationPage page, Button button) {
 		buttonManager.addPageButton(pageToId(page), button);
 	}
@@ -374,11 +388,11 @@ public class InstallationDialog extends TrayDialog implements
 	 * Set the modal parent dialog that was used to launch this dialog. This
 	 * should be used by any launching dialog so that the {
 	 * {@link #closeModalContainers()} method can be properly implemented.
-	 *
+	 * 
 	 * @param parent
 	 *            the modal parent dialog that launched this dialog, or
 	 *            <code>null</code> if there was no parent.
-	 *
+	 * 
 	 *            This is an internal method and should not be used outside of
 	 *            platform UI.
 	 */

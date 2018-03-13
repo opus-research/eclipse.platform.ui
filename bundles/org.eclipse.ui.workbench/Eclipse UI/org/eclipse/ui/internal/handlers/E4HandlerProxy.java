@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,7 @@ import org.eclipse.ui.menus.UIElement;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class E4HandlerProxy implements IHandler2, IHandlerListener, IElementUpdater {
 	public HandlerActivation activation = null;
@@ -97,7 +97,6 @@ public class E4HandlerProxy implements IHandler2, IHandlerListener, IElementUpda
 		return handler;
 	}
 
-	@Override
 	public void handlerChanged(HandlerEvent handlerEvent) {
 		IHandler handler = command.getHandler();
 		if (handler instanceof HandlerServiceHandler) {
@@ -109,7 +108,13 @@ public class E4HandlerProxy implements IHandler2, IHandlerListener, IElementUpda
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
+	 * menus.UIElement, java.util.Map)
+	 */
 	public void updateElement(UIElement element, Map parameters) {
 		if (handler instanceof IElementUpdater) {
 			((IElementUpdater) handler).updateElement(element, parameters);
@@ -126,17 +131,33 @@ public class E4HandlerProxy implements IHandler2, IHandlerListener, IElementUpda
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#addHandlerListener(org.eclipse.core
+	 * .commands.IHandlerListener)
+	 */
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		handler.addHandlerListener(handlerListener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#dispose()
+	 */
 	public void dispose() {
 		handler.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
+	 * ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (logExecute) {
 			logExecute = false;
@@ -147,22 +168,40 @@ public class E4HandlerProxy implements IHandler2, IHandlerListener, IElementUpda
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return handler.isEnabled();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#isHandled()
+	 */
 	public boolean isHandled() {
 		return handler.isHandled();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.commands.IHandler#removeHandlerListener(org.eclipse.
+	 * core.commands.IHandlerListener)
+	 */
 	public void removeHandlerListener(IHandlerListener handlerListener) {
 		handler.removeHandlerListener(handlerListener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler2#setEnabled(java.lang.Object)
+	 */
 	public void setEnabled(Object evaluationContext) {
 		if (logSetEnabled) {
 			logSetEnabled = false;

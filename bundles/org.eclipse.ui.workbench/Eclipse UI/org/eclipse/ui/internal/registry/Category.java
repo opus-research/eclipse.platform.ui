@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
     /**
      * Creates an instance of <code>Category</code> with
      * an ID and label.
-     *
+     * 
      * @param id the unique identifier for the category
      * @param label the presentation label for this category
      */
@@ -80,7 +80,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
     /**
      * Creates an instance of <code>Category</code> using the
      * information from the specified configuration element.
-     *
+     * 
      * @param configElement the <code>IConfigurationElement<code> containing
      * 		the ID, label, and optional parent category path.
      * @throws WorkbenchException if the ID or label is <code>null</code
@@ -98,7 +98,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Add an element to this category.
-     *
+     * 
      * @param element the element to add
      */
     public void addElement(Object element) {
@@ -108,8 +108,10 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
         elements.add(element);
     }
 
-    @Override
-	public Object getAdapter(Class adapter) {
+    /* (non-Javadoc)
+     * Method declared on IAdaptable.
+     */
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		} else if (adapter == IConfigurationElement.class) {
@@ -119,18 +121,24 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 		}
     }
 
-    @Override
-	public Object[] getChildren(Object o) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
+    public Object[] getChildren(Object o) {
         return getElements().toArray();
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
         return WorkbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
     }
 
-    @Override
-	public String getLabel(Object o) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchAdapter.
+     */
+    public String getLabel(Object o) {
         return getLabel();
     }
 
@@ -144,7 +152,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Return the label for this category.
-     *
+     * 
      * @return the label
      */
     public String getLabel() {
@@ -154,14 +162,14 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Return the parent path for this category.
-     *
+     * 
      * @return the parent path
      */
     public String[] getParentPath() {
     	if (parentPath != null) {
 			return parentPath;
 		}
-
+    	
     	String unparsedPath = getRawParentPath();
         if (unparsedPath != null) {
             StringTokenizer stok = new StringTokenizer(unparsedPath, "/"); //$NON-NLS-1$
@@ -173,10 +181,10 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
         return parentPath;
     }
-
+    
     /**
      * Return the unparsed parent path.  May be <code>null</code>.
-     *
+     * 
      * @return the unparsed parent path or <code>null</code>
      */
     public String getRawParentPath() {
@@ -186,7 +194,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Return the root path for this category.
-     *
+     * 
      * @return the root path
      */
     public String getRootPath() {
@@ -194,13 +202,13 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
         if (path != null && path.length > 0) {
 			return path[0];
 		}
-
+        
         return id;
     }
 
     /**
      * Return the elements contained in this category.
-     *
+     * 
      * @return the elements
      */
     public ArrayList getElements() {
@@ -209,7 +217,7 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Return whether a given object exists in this category.
-     *
+     * 
      * @param o the object to search for
      * @return whether the object is in this category
      */
@@ -225,41 +233,47 @@ public class Category implements IWorkbenchAdapter, IPluginContribution, IAdapta
 
     /**
      * Return whether this category has child elements.
-     *
+     * 
      * @return whether this category has child elements
      */
     public boolean hasElements() {
         if (elements != null) {
 			return !elements.isEmpty();
 		}
-
+        
         return false;
     }
 
-    @Override
-	public Object getParent(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+     */
+    public Object getParent(Object o) {
         return null;
     }
 
-    @Override
-	public String getLocalId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
         return id;
     }
 
-    @Override
-	public String getPluginId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
         return configurationElement == null ? pluginId : configurationElement
 				.getNamespace();
     }
 
 	/**
 	 * Clear all elements from this category.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void clear() {
 		if (elements != null) {
 			elements.clear();
-		}
+		}	
 	}
 }

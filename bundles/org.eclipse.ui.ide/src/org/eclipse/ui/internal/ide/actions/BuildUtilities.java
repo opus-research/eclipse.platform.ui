@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,13 +37,13 @@ import org.eclipse.ui.ide.ResourceUtil;
  * This class contains convenience methods used by the various build commands
  * to determine enablement.  These utilities cannot be factored into a common
  * class because some build actions are API and some are not.
- *
+ * 
  * @since 3.1
  */
 public class BuildUtilities {
 	/**
 	 * Extracts the selected projects from a selection.
-	 *
+	 * 
 	 * @param selection The selection to analyze
 	 * @return The selected projects
 	 */
@@ -57,17 +57,14 @@ public class BuildUtilities {
 			} else {
 				ResourceMapping mapping = ResourceUtil.getResourceMapping(element);
 				if (mapping != null) {
-					IProject[] theProjects = mapping.getProjects();
+					IProject[] theProjects = mapping.getProjects();					
 					for (int j = 0; j < theProjects.length; j++) {
 						projects.add(theProjects[j]);
 					}
 				} else {
 					Object marker = ResourceUtil.getAdapter(element, IMarker.class, false);
 					if (marker instanceof IMarker) {
-						IProject project = ((IMarker) marker).getResource().getProject();
-						if (project != null) {
-							projects.add(project);
-						}
+						projects.add(((IMarker) marker).getResource().getProject());
 					}
 				}
 			}
@@ -77,7 +74,7 @@ public class BuildUtilities {
 
 	/**
 	 * Finds and returns the selected projects in the given window
-	 *
+	 * 
 	 * @param window The window to find the selection in
 	 * @return The selected projects, or an empty array if no selection could be found.
 	 */
@@ -138,7 +135,7 @@ public class BuildUtilities {
 	/**
 	 * Returns whether one of the projects has a builder whose trigger setting
 	 * for the given trigger matches the given value.
-	 *
+	 * 
 	 * @param projects The projects to check
 	 * @param trigger The trigger to look for
 	 * @param value The trigger value to look for

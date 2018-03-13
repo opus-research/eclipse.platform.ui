@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import java.util.Iterator;
 
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.internal.databinding.provisional.swt.MenuUpdater;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -29,14 +29,12 @@ import org.eclipse.swt.widgets.Shell;
 public class Snippet005MenuUpdater {
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				Shell shell = new Shell(display);
 
 				final WritableList menuItemStrings = new WritableList();
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						System.out.println("adding item");
 						menuItemStrings.add(new Date().toString());
@@ -51,7 +49,6 @@ public class Snippet005MenuUpdater {
 				final Menu submenu = new Menu(shell, SWT.DROP_DOWN);
 				fileItem.setMenu(submenu);
 				new MenuUpdater(submenu) {
-					@Override
 					protected void updateMenu() {
 						System.out.println("updating menu");
 						MenuItem[] items = submenu.getItems();

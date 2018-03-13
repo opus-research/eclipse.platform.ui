@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,11 +36,11 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * This class is used to prompt the user for a file name & extension.
  */
 public class FileExtensionDialog extends TitleAreaDialog {
-
+	
 	private static final String DIALOG_SETTINGS_SECTION = "FileExtensionDialogSettings"; //$NON-NLS-1$
-
+	
     private String filename = ""; //$NON-NLS-1$
-
+    
     private String initialValue;
 
     private Text filenameField;
@@ -69,10 +69,10 @@ public class FileExtensionDialog extends TitleAreaDialog {
 				WorkbenchMessages.FileExtension_fileTypeLabel);
 		setShellStyle(getShellStyle() | SWT.SHEET);
 	}
-
+    
     /**
      * Constructs a new file extension dialog.
-     *
+     * 
      * @param parentShell the parent shell
      * @param title the dialog title
      * @param helpContextId the help context for this dialog
@@ -91,17 +91,21 @@ public class FileExtensionDialog extends TitleAreaDialog {
 
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
-
-    @Override
-	protected void configureShell(Shell shell) {
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(title);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, helpContextId);
     }
 
-
-    @Override
-	protected Control createDialogArea(Composite parent) {
+   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
+    protected Control createDialogArea(Composite parent) {
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
 
 		Composite contents = new Composite(parentComposite, SWT.NONE);
@@ -118,7 +122,6 @@ public class FileExtensionDialog extends TitleAreaDialog {
 			filenameField.setText(initialValue);
 		}
 		filenameField.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent event) {
 				if (event.widget == filenameField) {
 					filename = filenameField.getText().trim();
@@ -133,13 +136,15 @@ public class FileExtensionDialog extends TitleAreaDialog {
 		Point defaultMargins = LayoutConstants.getMargins();
 		GridLayoutFactory.fillDefaults().numColumns(2).margins(
 				defaultMargins.x, defaultMargins.y).generateLayout(contents);
-
+		
 		return contents;
 	}
 
-
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
+    protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         okButton.setEnabled(false);
@@ -163,19 +168,19 @@ public class FileExtensionDialog extends TitleAreaDialog {
         int index = filename.lastIndexOf('.');
         if (index == filename.length() - 1) {
             if (index == 0 || (index == 1 && filename.charAt(0) == '*')) {
-                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage);
+                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage); 
                 return false;
             }
         }
 
-        // check for characters before *
+        // check for characters before * 
         // or no other characters
         // or next chatacter not '.'
         // or another *
         index = filename.indexOf('*');
         if (index > -1) {
             if (filename.length() == 1) {
-                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage);
+                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage); 
                 return false;
             }
             if (index != 0 || filename.charAt(1) != '.') {
@@ -183,7 +188,7 @@ public class FileExtensionDialog extends TitleAreaDialog {
                 return false;
             }
             if (filename.length() > index && filename.indexOf('*', index + 1) != -1) {
-            	setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage);
+            	setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage); 
             	return false;
             }
         }
@@ -194,7 +199,7 @@ public class FileExtensionDialog extends TitleAreaDialog {
 
     /**
      * Get the extension.
-     *
+     * 
      * @return the extension
      */
     public String getExtension() {
@@ -212,7 +217,7 @@ public class FileExtensionDialog extends TitleAreaDialog {
 
     /**
      * Get the name.
-     *
+     * 
      * @return the name
      */
     public String getName() {
@@ -227,10 +232,10 @@ public class FileExtensionDialog extends TitleAreaDialog {
 		}
         return filename.substring(0, index);
     }
-
+    
     /**
 	 * Sets the initial value that should be prepopulated in this dialog.
-	 *
+	 * 
 	 * @param initialValue
 	 *            the value to be displayed to the user
 	 * @since 3.4
@@ -238,17 +243,22 @@ public class FileExtensionDialog extends TitleAreaDialog {
     public void setInitialValue(String initialValue) {
     	this.initialValue = initialValue;
     }
-
-    @Override
-	protected IDialogSettings getDialogBoundsSettings() {
+   
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
+     */
+    protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = WorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
         if (section == null) section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
         return section;
     }
-
-    @Override
-	protected boolean isResizable() {
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
+    protected boolean isResizable() {
     	return true;
     }
 }

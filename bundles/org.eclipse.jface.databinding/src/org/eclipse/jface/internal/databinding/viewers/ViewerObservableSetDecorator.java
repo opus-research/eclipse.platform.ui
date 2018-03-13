@@ -18,7 +18,7 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ViewerObservableSetDecorator extends DecoratingObservableSet
 		implements IViewerObservableSet {
@@ -33,7 +33,6 @@ public class ViewerObservableSetDecorator extends DecoratingObservableSet
 		this.viewer = viewer;
 	}
 
-	@Override
 	public Viewer getViewer() {
 		return viewer;
 	}

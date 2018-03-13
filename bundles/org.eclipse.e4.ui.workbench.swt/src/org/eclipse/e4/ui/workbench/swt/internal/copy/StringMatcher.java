@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -59,17 +59,17 @@ public class StringMatcher {
 	 * StringMatcher constructor takes in a String object that is a simple
 	 * pattern which may contain '*' for 0 and many characters and '?' for
 	 * exactly one character.
-	 *
+	 * 
 	 * Literal '*' and '?' characters must be escaped in the pattern e.g.,
 	 * "\*" means literal "*", etc.
-	 *
+	 * 
 	 * Escaping any other character (including the escape character itself),
 	 * just results in that character in the pattern. e.g., "\a" means "a" and
 	 * "\\" means "\"
-	 *
+	 * 
 	 * If invoking the StringMatcher with string literals in Java, don't forget
 	 * escape characters are represented by "\\".
-	 *
+	 * 
 	 * @param pattern
 	 *            the pattern to match text against
 	 * @param ignoreCase
@@ -98,7 +98,7 @@ public class StringMatcher {
 	/**
 	 * Find the first occurrence of the pattern between <code>start</code
 	 * )(inclusive) and <code>end</code>(exclusive).
-	 *
+	 * 
 	 * @param text
 	 *            the String object to search in
 	 * @param start
@@ -167,7 +167,7 @@ public class StringMatcher {
 
 	/**
 	 * match the given <code>text</code> with the pattern
-	 *
+	 * 
 	 * @return true if matched otherwise false
 	 * @param text
 	 *            a String object
@@ -183,7 +183,7 @@ public class StringMatcher {
 	 * Given the starting (inclusive) and the ending (exclusive) positions in
 	 * the <code>text</code>, determine if the given substring matches with
 	 * aPattern
-	 *
+	 * 
 	 * @return true if the specified portion of the text matches the pattern
 	 * @param text
 	 *            a String object that contains the substring to match
@@ -238,9 +238,10 @@ public class StringMatcher {
 		if (!fHasLeadingStar) {
 			if (!regExpRegionMatches(text, start, current, 0, segLength)) {
 				return false;
+			} else {
+				++i;
+				tCurPos = tCurPos + segLength;
 			}
-			++i;
-			tCurPos = tCurPos + segLength;
 		}
 		if ((fSegments.length == 1) && (!fHasLeadingStar)
 				&& (!fHasTrailingStar)) {
@@ -289,7 +290,7 @@ public class StringMatcher {
 	/**
 	 * Parses the given pattern into segments seperated by wildcard '*'
 	 * characters.
-	 *
+	 * 
 	 * @param p
 	 *            , a String object that is a simple regular expression with '*'
 	 *            and/or '?'
@@ -305,7 +306,7 @@ public class StringMatcher {
 			}
 		}
 
-		Vector<String> temp = new Vector<>();
+		Vector temp = new Vector();
 
 		int pos = 0;
 		StringBuffer buf = new StringBuffer();
@@ -410,7 +411,7 @@ public class StringMatcher {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return boolean
 	 * @param text
 	 *            a String to match

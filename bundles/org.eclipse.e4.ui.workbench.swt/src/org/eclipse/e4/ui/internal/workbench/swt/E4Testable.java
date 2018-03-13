@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.testing.TestableObject;
 
 /**
  * The Workbench's testable object facade to a test harness.
- *
+ * 
  * @since 3.0
  */
 public class E4Testable extends TestableObject {
@@ -44,7 +44,7 @@ public class E4Testable extends TestableObject {
 	/**
 	 * Initializes the workbench testable with the display and workbench, and
 	 * notifies all listeners that the tests can be run.
-	 *
+	 * 
 	 * @param display
 	 *            the display
 	 * @param workbench
@@ -59,7 +59,6 @@ public class E4Testable extends TestableObject {
 			// don't use a job, since tests often wait for all jobs to complete
 			// before proceeding
 			Runnable runnable = new Runnable() {
-				@Override
 				public void run() {
 					// Some tests (notably the startup performance tests) do not
 					// want to wait for early startup.
@@ -95,7 +94,6 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method ensures that the workbench has been
 	 * set.
 	 */
-	@Override
 	public void testingStarting() {
 		Assert.isNotNull(workbench);
 		oldAutomatedMode = ErrorDialog.AUTOMATED_MODE;
@@ -109,7 +107,6 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method flushes the event queue, runs the test
 	 * in a <code>syncExec</code>, then flushes the event queue again.
 	 */
-	@Override
 	public void runTest(Runnable testRunnable) {
 		Assert.isNotNull(workbench);
 		display.syncExec(testRunnable);
@@ -120,12 +117,10 @@ public class E4Testable extends TestableObject {
 	 * <code>TestableObject</code> method flushes the event queue, then closes
 	 * the workbench.
 	 */
-	@Override
 	public void testingFinished() {
 		// force events to be processed, and ensure the close is done in the UI
 		// thread
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				Assert.isTrue(workbench.close());
 			}

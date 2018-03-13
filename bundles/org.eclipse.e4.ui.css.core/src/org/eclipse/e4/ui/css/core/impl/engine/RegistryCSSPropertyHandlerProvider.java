@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 Brian de Alwis and others.
+ * Copyright (c) 2012 Brian de Alwis and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Brian de Alwis - cobbled together from other sources
+ *     Brian de Alwis - cobbled together from other sources  
  *     Angelo Zerr <angelo.zerr@gmail.com> - likely source of initial implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
@@ -138,7 +138,6 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return true;
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
@@ -152,7 +151,16 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return handlers;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.
+	 * AbstractCSSPropertyHandlerProvider
+	 * #getDefaultCSSStyleDeclaration(org.eclipse
+	 * .e4.ui.css.core.engine.CSSEngine,
+	 * org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
+	 * org.w3c.dom.css.CSSStyleDeclaration)
+	 */
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
@@ -197,7 +205,6 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return stylableElement.getDefaultStyleDeclaration(pseudoE);
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
@@ -215,7 +222,6 @@ public class RegistryCSSPropertyHandlerProvider extends
 		return handlers;
 	}
 
-	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		// don't include deprecated elements
 		Set<String> properties = new HashSet<String>();
@@ -258,7 +264,6 @@ public class RegistryCSSPropertyHandlerProvider extends
 			this.message = message;
 		}
 
-		@Override
 		public boolean applyCSSProperty(Object element, String property,
 				CSSValue value, String pseudo, CSSEngine engine)
 				throws Exception {
@@ -267,7 +272,6 @@ public class RegistryCSSPropertyHandlerProvider extends
 					engine);
 		}
 
-		@Override
 		public String retrieveCSSProperty(Object element, String property,
 				String pseudo, CSSEngine engine) throws Exception {
 			logIfNecessary(property);

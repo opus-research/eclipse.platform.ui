@@ -16,8 +16,10 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
@@ -35,7 +37,7 @@ class PasteBookmarkAction extends BookmarkAction {
 
     /**
      * The constructor.
-     *
+     * 
      * @param view the view
      */
     public PasteBookmarkAction(BookmarkNavigator view) {
@@ -49,8 +51,7 @@ class PasteBookmarkAction extends BookmarkAction {
     /**
      * Copies the marker(s) from the clipboard to the bookmark navigator view.
      */
-    @Override
-	public void run() {
+    public void run() {
         // Get the markers from the clipboard
         MarkerTransfer transfer = MarkerTransfer.getInstance();
         final IMarker[] markerData = (IMarker[]) view.getClipboard()
@@ -61,18 +62,20 @@ class PasteBookmarkAction extends BookmarkAction {
 		}
         final ArrayList newMarkerAttributes = new ArrayList();
         final ArrayList newMarkerResources = new ArrayList();
-        try {
-            ResourcesPlugin.getWorkspace().run(monitor -> {
-				for (int i = 0; i < markerData.length; i++) {
-					// Collect the info about the markers to be pasted.
-					// Ignore any markers that aren't bookmarks.
-					if (!markerData[i].getType().equals(IMarker.BOOKMARK)) {
-						continue;
+        try {   
+            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                public void run(IProgressMonitor monitor) throws CoreException {
+					for (int i = 0; i < markerData.length; i++) {
+						// Collect the info about the markers to be pasted.
+						// Ignore any markers that aren't bookmarks.
+						if (!markerData[i].getType().equals(IMarker.BOOKMARK)) {
+							continue;
+						}
+						newMarkerResources.add(markerData[i].getResource());
+						newMarkerAttributes.add(markerData[i].getAttributes());
 					}
-					newMarkerResources.add(markerData[i].getResource());
-					newMarkerAttributes.add(markerData[i].getAttributes());
-				}
-			}, null);
+                }
+            }, null);
         } catch (CoreException e) {
             ErrorDialog.openError(view.getShell(), BookmarkMessages.PasteBookmark_errorTitle,
                     null, e.getStatus());
@@ -91,11 +94,13 @@ class PasteBookmarkAction extends BookmarkAction {
         // Must be done outside the create marker operation above since notification for add is
         // sent after the operation is executed.
         if (op.getMarkers() != null) {
-            view.getShell().getDisplay().asyncExec(() -> {
-			    view.getViewer().setSelection(
-			            new StructuredSelection(op.getMarkers()));
-			    view.updatePasteEnablement();
-			});
+            view.getShell().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    view.getViewer().setSelection(
+                            new StructuredSelection(op.getMarkers()));
+                    view.updatePasteEnablement();
+                }
+            });
         }
     }
 

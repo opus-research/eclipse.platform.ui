@@ -16,22 +16,20 @@ import org.eclipse.swt.custom.CCombo;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class CComboSelectionProperty extends WidgetStringValueProperty {
 	/**
-	 *
+	 * 
 	 */
 	public CComboSelectionProperty() {
 		super(SWT.Modify);
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((CCombo) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		CCombo ccombo = (CCombo) source;
 		String items[] = ccombo.getItems();
@@ -53,7 +51,6 @@ public class CComboSelectionProperty extends WidgetStringValueProperty {
 		}
 	}
 
-	@Override
 	public String toString() {
 		return "CCombo.selection <String>"; //$NON-NLS-1$
 	}

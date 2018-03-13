@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,15 +29,15 @@ import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
  * </p>
  * <p>
  * The various <code>setHelp</code> methods allow context help to be hooked in
- * to SWT menus, menu items, and controls, and into JFace actions. This involves
- * furnishing a help context id. When the user requests help for one of the
+ * to SWT menus, menu items, and controls, and into JFace actions. This involves 
+ * furnishing a help context id. When the user requests help for one of the 
  * established widgets (for instance, by hitting F1), the context id is
- * retrieved and passed to the help UI using
+ * retrieved and passed to the help UI using 
  * <code>WorkbenchHelp.displayContext(helpContext, xposition, yposition)</code>.
  * </p>
  * <p>
  * In cases more dynamic situations, clients may hook their own help listener
- * and call <code>WorkbenchHelp.displayContext</code> with an
+ * and call <code>WorkbenchHelp.displayContext</code> with an 
  * <code>IContext</code>.
  * </p>
  * <p>
@@ -46,14 +46,13 @@ import org.eclipse.ui.internal.help.WorkbenchHelpSystem;
  * </p>
  *
  * @deprecated clients should use <code>IWorkbenchHelpSystem</code> instead
- *
+ * 
  * @see org.eclipse.help.HelpSystem
  * @see org.eclipse.ui.help.IWorkbenchHelpSystem
  * @see org.eclipse.ui.IWorkbench#getHelpSystem()
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class WorkbenchHelp {
 
     /**
@@ -67,7 +66,7 @@ public class WorkbenchHelp {
      * <p>
      * Ignored if no help UI is available.
      * </p>
-     *
+     * 
      * @since 3.0
      */
     public static void displayHelp() {
@@ -77,16 +76,16 @@ public class WorkbenchHelp {
     /**
      * Displays context-sensitive help for the given context.
      * <p>
-     * (x,y) coordinates specify the location where the context sensitive
-     * help UI will be presented. These coordinates are screen-relative
+     * (x,y) coordinates specify the location where the context sensitive 
+     * help UI will be presented. These coordinates are screen-relative 
      * (ie: (0,0) is the top left-most screen corner).
-     * The platform is responsible for calling this method and supplying the
+     * The platform is responsible for calling this method and supplying the 
      * appropriate location.
      * </p>
      * <p>
      * Ignored if no help UI is available.
      * </p>
-     *
+     * 
      * @param context the context to display
      * @param x horizontal position
      * @param y verifical position
@@ -101,16 +100,16 @@ public class WorkbenchHelp {
      * <p>
      * This method is called by the platform to launch the help system UI, displaying
      * the documentation identified by the <code>href</code> parameter.
-     * </p>
+     * </p> 
      * <p>
      * The help system makes no guarantee that all the help resources can be displayed or how they are displayed.
      * </p>
      * <p>
      * Ignored if no help UI is available.
      * </p>
-     *
+     * 
      * @param href the URL of the help resource.
-     * <p>Valid href are as described in
+     * <p>Valid href are as described in 
      * 	{@link  org.eclipse.help.IHelpResource#getHref() IHelpResource.getHref()}
      * </p>
      * @since 3.0
@@ -123,7 +122,7 @@ public class WorkbenchHelp {
      * Creates a new help listener for the given command. This retrieves the
      * help context ID from the command, and creates an appropriate listener
      * based on this.
-     *
+     * 
      * @param command
      *            The command for which the listener should be created; must
      *            not be <code>null</code>.
@@ -143,7 +142,7 @@ public class WorkbenchHelp {
      * @since 2.0
      */
     public static void displayHelp(String contextId) {
-    	PlatformUI.getWorkbench().getHelpSystem().displayHelp(contextId);
+    	PlatformUI.getWorkbench().getHelpSystem().displayHelp(contextId);    	
     }
 
     /**
@@ -173,8 +172,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(Control control) {
+    public static Object getHelp(Control control) {
         return control.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -192,8 +190,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(Menu menu) {
+    public static Object getHelp(Menu menu) {
         return menu.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -211,8 +208,7 @@ public class WorkbenchHelp {
      *   <code>null</code> if no contexts have been set.
      * @deprecated as context computers are no longer supported
      */
-    @Deprecated
-	public static Object getHelp(MenuItem menuItem) {
+    public static Object getHelp(MenuItem menuItem) {
         return menuItem.getData(WorkbenchHelpSystem.HELP_KEY);
     }
 
@@ -224,17 +220,16 @@ public class WorkbenchHelp {
      * {@link org.eclipse.help.HelpSystem HelpSystem} instead of the IHelp methods
      * on the object returned by this method.
      */
-    @Deprecated
-	public static IHelp getHelpSupport() {
+    public static IHelp getHelpSupport() {
     	return WorkbenchHelpSystem.getInstance().getHelpSupport();
     }
 
-
+    
     /**
      * Returns whether the context-sensitive help window is currently being
      * displayed. Returns <code>false</code> if the help UI has not been
      * activated yet.
-     *
+     * 
      * @return <code>true</code> if the context-sensitive help
      * window is currently being displayed, <code>false</code> otherwise
      */
@@ -256,8 +251,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with a single context id parameter
      */
-    @Deprecated
-	public static void setHelp(IAction action, final Object[] contexts) {
+    public static void setHelp(IAction action, final Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(action, contexts);
     }
 
@@ -275,8 +269,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(IAction action, final IContextComputer computer) {
+    public static void setHelp(IAction action, final IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(action, computer);
     }
 
@@ -294,8 +287,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(Control control, Object[] contexts) {
+    public static void setHelp(Control control, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(control, contexts);
     }
 
@@ -313,8 +305,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(Control control, IContextComputer computer) {
+    public static void setHelp(Control control, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(control, computer);
     }
 
@@ -332,8 +323,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(Menu menu, Object[] contexts) {
+    public static void setHelp(Menu menu, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(menu, contexts);
     }
 
@@ -351,8 +341,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(Menu menu, IContextComputer computer) {
+    public static void setHelp(Menu menu, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(menu, computer);
     }
 
@@ -370,8 +359,7 @@ public class WorkbenchHelp {
      *   <code>IContext</code>)
      * @deprecated use setHelp with single context id parameter
      */
-    @Deprecated
-	public static void setHelp(MenuItem item, Object[] contexts) {
+    public static void setHelp(MenuItem item, Object[] contexts) {
     	WorkbenchHelpSystem.getInstance().setHelp(item, contexts);
     }
 
@@ -389,8 +377,7 @@ public class WorkbenchHelp {
      * @deprecated context computers are no longer supported, clients should implement
      *  their own help listener
      */
-    @Deprecated
-	public static void setHelp(MenuItem item, IContextComputer computer) {
+    public static void setHelp(MenuItem item, IContextComputer computer) {
     	WorkbenchHelpSystem.getInstance().setHelp(item, computer);
     }
 
@@ -413,7 +400,7 @@ public class WorkbenchHelp {
      * @since 2.0
      */
     public static void setHelp(Control control, String contextId) {
-    	PlatformUI.getWorkbench().getHelpSystem().setHelp(control, contextId);
+    	PlatformUI.getWorkbench().getHelpSystem().setHelp(control, contextId);    	
     }
 
     /**

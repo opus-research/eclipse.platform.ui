@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,20 +16,30 @@ import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class AllowGrabFocus extends GrabFocus {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.tweaklets.GrabFocusManager#allowGrabFocus(org.eclipse.ui.IWorkbenchPart)
+	 */
 	public boolean grabFocusAllowed(IWorkbenchPart part) {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.tweaklets.GrabFocusManager#init(Display)
+	 */
 	public void init(Display display) {
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.tweaklets.GrabFocusManager#dispose()
+	 */
 	public void dispose() {
 	}
 }

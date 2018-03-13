@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,13 +25,12 @@ import org.eclipse.ui.internal.util.Util;
  * This class is only intended for use within the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class EvaluationResultCacheComparator implements Comparator {
 
-	@Override
 	public final int compare(final Object object1, final Object object2) {
 		if (Util.equals(object2, object1)) {
 			return 0;

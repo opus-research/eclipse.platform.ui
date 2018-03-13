@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,6 @@ public class WorkbenchKeyboard {
 		 * @param event
 		 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 		 */
-		@Override
 		public void handleEvent(Event event) {
 			delegate.handleEvent(event);
 		}
@@ -40,7 +39,6 @@ public class WorkbenchKeyboard {
 		 * @return
 		 * @see java.lang.Object#toString()
 		 */
-		@Override
 		public String toString() {
 			return delegate.toString();
 		}
@@ -56,7 +54,6 @@ public class WorkbenchKeyboard {
 	 * @return
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	@Override
 	public boolean equals(Object o) {
 		return delegate.equals(o);
 	}
@@ -65,7 +62,6 @@ public class WorkbenchKeyboard {
 	 * @return
 	 * @see java.lang.Object#hashCode()
 	 */
-	@Override
 	public int hashCode() {
 		return delegate.hashCode();
 	}
@@ -74,7 +70,6 @@ public class WorkbenchKeyboard {
 	 * @return
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		return delegate.toString();
 	}

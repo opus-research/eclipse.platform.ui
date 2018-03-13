@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,23 +16,20 @@ import org.eclipse.ui.views.IStickyViewDescriptor;
 
 /**
  * Utility class that will test various view properties.
- *
+ * 
  * @since 3.0
  */
 public final class ViewUtils {
 
     public static boolean findInStack(IViewPart[] stack, IViewPart target) {
-        for (IViewPart element : stack) {
-            if (element == target) {
-				return true;
-			}
+        for (int i = 0; i < stack.length; i++) {
+            if (stack[i] == target)
+                return true;
         }
         return false;
     }
 
-	/**
-	 * @param part the view part
-	 */
+    @SuppressWarnings("unused")
 	public static boolean isCloseable(IViewPart part) {
 //        IWorkbenchPartSite viewSite = part.getSite();
 //        IViewReference ref = (IViewReference) viewSite.getPage().getReference(part);
@@ -40,9 +37,7 @@ public final class ViewUtils {
         return false;
     }
 
-	/**
-	 * @param part the view part
-	 */
+    @SuppressWarnings("unused")
 	public static boolean isMoveable(IViewPart part) {
 //    	IWorkbenchPartSite viewSite = part.getSite();
 //        IViewReference ref = (IViewReference) viewSite.getPage().getReference(part);
@@ -54,16 +49,15 @@ public final class ViewUtils {
         String id = part.getSite().getId();
         IStickyViewDescriptor[] descs = PlatformUI.getWorkbench()
                 .getViewRegistry().getStickyViews();
-        for (IStickyViewDescriptor desc : descs) {
-            if (desc.getId().equals(id)) {
-				return true;
-			}
+        for (int i = 0; i < descs.length; i++) {
+            if (descs[i].getId().equals(id))
+                return true;
         }
         return false;
     }
 
     /**
-     *
+     * 
      */
     protected ViewUtils() {
         //no-op

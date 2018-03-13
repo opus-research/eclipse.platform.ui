@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.about.InstallationPage;
  * the InstallationDialog. These dialogs contain a single installation page, and
  * scope the page to something more specific than it would be in the standard
  * installation dialog.
- *
+ * 
  * It is important that the visibility and enablement expressions of
  * contributions to this dialog, and the source variables that drive them, do
  * not conflict with those used inside the normal InstallationDialog. Otherwise,
@@ -54,7 +54,6 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 		this.helpContextId = helpContextId;
 	}
 
-	@Override
 	protected void createFolderItems(TabFolder folder) {
 		TabItem item = new TabItem(folder, SWT.NONE);
 		item.setText(title);
@@ -67,21 +66,25 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 		page.setPageContainer(this);
 		item.addDisposeListener(new DisposeListener() {
 
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				page.dispose();
 			}
 		});
 		control.layout(true, true);
 	}
-
-	@Override
+	
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
 		createButtons(page);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
+	 * .Shell)
+	 */
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(title);
@@ -89,8 +92,7 @@ public abstract class ProductInfoDialog extends InstallationDialog {
 			PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
 					helpContextId);
 	}
-
-	@Override
+	
 	protected String pageToId(InstallationPage page) {
 		Assert.isLegal(page == this.page);
 		return this.page.getId();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,8 +39,7 @@ public class PageBook extends Composite {
      */
     public class PageBookLayout extends Layout {
 
-        @Override
-		protected Point computeSize(Composite composite, int wHint, int hHint,
+        protected Point computeSize(Composite composite, int wHint, int hHint,
                 boolean flushCache) {
             if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 				return new Point(wHint, hHint);
@@ -63,8 +62,7 @@ public class PageBook extends Composite {
             return result;
         }
 
-        @Override
-		protected void layout(Composite composite, boolean flushCache) {
+        protected void layout(Composite composite, boolean flushCache) {
 			if (currentPage != null && !currentPage.isDisposed()) {
                 currentPage.setBounds(composite.getClientArea());
             }

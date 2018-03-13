@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,8 +41,10 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
                 .create(workbenchWindow));
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.ContributionItem#dispose()
+     */
+    public void dispose() {
         super.dispose();
         if (image != null && !image.isDisposed()) {
             image.dispose();
@@ -50,12 +52,10 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
         }
     }
 
-    @Override
-	public void fill(final ToolBar parent, int index) {
+    public void fill(final ToolBar parent, int index) {
         if (toolItem == null && parent != null) {
             parent.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent e) {
+                public void widgetDisposed(DisposeEvent e) {
                     //toolItem.getImage().dispose();
                     toolItem.dispose();
                     toolItem = null;
@@ -71,11 +71,10 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
             toolItem.setImage(image);
 
             toolItem.setText(""); //$NON-NLS-1$
-            toolItem.setToolTipText(WorkbenchMessages.PerspectiveBarNewContributionItem_toolTip);
+            toolItem.setToolTipText(WorkbenchMessages.PerspectiveBarNewContributionItem_toolTip); 
             toolItem.addSelectionListener(new SelectionAdapter() {
 
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     menuManager.update(true);
                     Point point = new Point(event.x, event.y);
                     if (event.widget instanceof ToolItem) {

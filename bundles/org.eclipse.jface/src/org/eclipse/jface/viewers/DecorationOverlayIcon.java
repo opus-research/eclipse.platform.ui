@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,22 +14,20 @@ import java.util.Arrays;
 
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.*;
 
 /**
  * A <code>DecorationOverlayIcon</code> is an image descriptor that can be used
  * to overlay decoration images on to the 4 corner quadrants of a base image.
  * The four quadrants are {@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
  * {@link IDecoration#BOTTOM_LEFT} and {@link IDecoration#BOTTOM_RIGHT}. Additionally,
- * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY}.
- *
+ * the overlay can be used to provide an underlay corresponding to {@link IDecoration#UNDERLAY}. 
+ * 
  * @since 3.3
  * @see IDecoration
  */
 public class DecorationOverlayIcon extends CompositeImageDescriptor {
-
+	
     // the base image
     private Image base;
 
@@ -42,11 +40,11 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 5 overlay constants defined on {@link IDecoration} 
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT} 
      * and{@link IDecoration#UNDERLAY}).
-     *
+     * 
      * @param baseImage the base image
      * @param overlaysArray the overlay images
      * @param sizeValue the size of the resulting image
@@ -57,15 +55,15 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
         this.overlays = overlaysArray;
         this.size = sizeValue;
     }
-
+    
     /**
      * Create the decoration overlay for the base image using the array of
      * provided overlays. The indices of the array correspond to the values
-     * of the 5 overlay constants defined on {@link IDecoration}
+     * of the 5 overlay constants defined on {@link IDecoration} 
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT} 
      * and {@link IDecoration#UNDERLAY}).
-     *
+     * 
      * @param baseImage the base image
      * @param overlaysArray the overlay images
      */
@@ -78,9 +76,9 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
      * the given quadrant of the base image.
 	 * @param baseImage the base image
 	 * @param overlayImage the overlay image
-	 * @param quadrant the quadrant (one of {@link IDecoration}
+	 * @param quadrant the quadrant (one of {@link IDecoration} 
      * ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT}
+     * {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT} 
      * or {@link IDecoration#UNDERLAY})
 	 */
 	public DecorationOverlayIcon(Image baseImage, ImageDescriptor overlayImage, int quadrant) {
@@ -102,7 +100,7 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 
 	/**
      * Draw the overlays for the receiver.
-     * @param overlaysArray
+     * @param overlaysArray 
      */
     private void drawOverlays(ImageDescriptor[] overlaysArray) {
 
@@ -135,6 +133,9 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
         }
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
 	public boolean equals(Object o) {
         if (!(o instanceof DecorationOverlayIcon)) {
@@ -145,6 +146,9 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
                 && Arrays.equals(overlays, other.overlays);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
 	public int hashCode() {
         int code = System.identityHashCode(base);
@@ -156,6 +160,9 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
         return code;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
+     */
     @Override
 	protected void drawCompositeImage(int width, int height) {
     	if (overlays.length > IDecoration.UNDERLAY) {
@@ -172,11 +179,17 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
         drawOverlays(overlays);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
+     */
     @Override
 	protected Point getSize() {
         return size;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.CompositeImageDescriptor#getTransparentPixel()
+     */
     @Override
 	protected int getTransparentPixel() {
     	return base.getImageData().transparentPixel;

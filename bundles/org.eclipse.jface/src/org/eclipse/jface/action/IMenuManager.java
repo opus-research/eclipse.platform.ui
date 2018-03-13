@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public interface IMenuManager extends IContributionManager, IContributionItem {
 
     /**
      * Finds the manager for the menu at the given path. A path
-     * consists of contribution item ids separated by the separator
+     * consists of contribution item ids separated by the separator 
      * character.  The path separator character is <code>'/'</code>.
      * <p>
      * Convenience for <code>findUsingPath(path)</code> which
@@ -52,7 +52,7 @@ public interface IMenuManager extends IContributionManager, IContributionItem {
 
     /**
      * Finds the contribution item at the given path. A path
-     * consists of contribution item ids separated by the separator
+     * consists of contribution item ids separated by the separator 
      * character. The path separator character is <code>'/'</code>.
      *
      * @param path the path string
@@ -65,7 +65,7 @@ public interface IMenuManager extends IContributionManager, IContributionItem {
 	 * Returns whether all items should be removed when the menu is about to
 	 * show, but before notifying menu listeners. The default is
 	 * <code>false</code>.
-	 *
+	 * 
 	 * @return <code>true</code> if all items should be removed when shown,
 	 *         <code>false</code> if not
 	 */
@@ -77,8 +77,7 @@ public interface IMenuManager extends IContributionManager, IContributionItem {
      * @return <code>true</code> if enabled, and
      *   <code>false</code> if disabled
      */
-    @Override
-	public boolean isEnabled();
+    public boolean isEnabled();
 
     /**
      * Removes the given menu listener from this menu.
@@ -91,7 +90,7 @@ public interface IMenuManager extends IContributionManager, IContributionItem {
     /**
 	 * Sets whether all items should be removed when the menu is about to show,
 	 * but before notifying menu listeners.
-	 *
+	 * 
 	 * @param removeAll
 	 *            <code>true</code> if all items should be removed when shown,
 	 *            <code>false</code> if not

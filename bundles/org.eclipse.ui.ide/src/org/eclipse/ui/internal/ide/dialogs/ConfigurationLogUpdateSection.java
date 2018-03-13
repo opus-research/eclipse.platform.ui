@@ -34,7 +34,7 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * Writes information about the update configurer into the system summary.
- *
+ * 
  * @since 3.0
  */
 public class ConfigurationLogUpdateSection implements ISystemSummarySection {
@@ -122,7 +122,9 @@ public class ConfigurationLogUpdateSection implements ISystemSummarySection {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.about.ISystemSummarySection#write(java.io.PrintWriter)
+	 */
 	public void write(PrintWriter writer) {
 		writeInstalledIUs(writer);
 		writer.println();

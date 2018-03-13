@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,65 +84,101 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
      * NE: Copied from ContentViewer.  We don't want the OpenStrategy hooked
      * in StructuredViewer.hookControl otherwise the canvas will take focus
      * since it has a key listener.  We don't want this included in the window's
-     * tab traversal order.  Defeating it here is more self-contained then
+     * tab traversal order.  Defeating it here is more self-contained then 
      * setting the tab list on the shell or other parent composite.
      */
-    @Override
-	protected void hookControl(Control control) {
+    protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
         });
     }
 
-    @Override
-	protected Widget doFindInputItem(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
+     */
+    protected Widget doFindInputItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    @Override
-	protected Widget doFindItem(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
+     */
+    protected Widget doFindItem(Object element) {
         return null; // No widgets associated with items
     }
 
-    @Override
-	protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
+     *      java.lang.Object, boolean)
+     */
+    protected void doUpdateItem(Widget item, Object element, boolean fullMap) {
         canvas.redraw();
     }
 
-    @Override
-	protected List getSelectionFromWidget() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+     */
+    protected List getSelectionFromWidget() {
         //No selection on a Canvas
         return EMPTY_LIST;
     }
 
-    @Override
-	protected void internalRefresh(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
+     */
+    protected void internalRefresh(Object element) {
         displayedItems = getSortedChildren(getRoot());
         canvas.redraw();
     }
 
-    @Override
-	public void reveal(Object element) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
+     */
+    public void reveal(Object element) {
         //Nothing to do here as we do not scroll
     }
 
-    @Override
-	protected void setSelectionToWidget(List l, boolean reveal) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
+     *      boolean)
+     */
+    protected void setSelectionToWidget(List l, boolean reveal) {
         //Do nothing as there is no selection
     }
 
-    @Override
-	public Control getControl() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.Viewer#getControl()
+     */
+    public Control getControl() {
         return canvas;
     }
 
     private void initializeListeners() {
         canvas.addPaintListener(new PaintListener() {
-            @Override
-			public void paintControl(PaintEvent event) {
+            /*
+             * (non-Javadoc)
+             * 
+             * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
+             */
+            public void paintControl(PaintEvent event) {
 
                 GC gc = event.gc;
                 Transform transform = null;
@@ -188,14 +224,16 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         });
     }
 
-    @Override
-	public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
+     */
+    public void setLabelProvider(IBaseLabelProvider labelProvider) {
         Assert.isTrue(labelProvider instanceof ILabelProvider);
         super.setLabelProvider(labelProvider);
     }
 
     /**
-     * Get the size hints for the receiver. These are used for
+     * Get the size hints for the receiver. These are used for 
      * layout data.
      * @return Point - the preferred x and y coordinates
      */
@@ -221,16 +259,20 @@ public class ProgressCanvasViewer extends AbstractProgressViewer {
         return new Point(fontWidth, fontHeight);
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#add(java.lang.Object[])
+	 */
 	public void add(Object[] elements) {
 		refresh(true);
-
+		
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.progress.AbstractProgressViewer#remove(java.lang.Object[])
+	 */
 	public void remove(Object[] elements) {
 		refresh(true);
-
+		
 	}
 
 

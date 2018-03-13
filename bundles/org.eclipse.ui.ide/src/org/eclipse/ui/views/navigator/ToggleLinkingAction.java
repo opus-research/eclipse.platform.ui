@@ -16,17 +16,16 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 /**
  * This action toggles whether this navigator links its selection to the active
  * editor.
- *
+ * 
  * @since 2.1
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ToggleLinkingAction extends ResourceNavigatorAction {
 
 
 	/**
 	 * Constructs a new action.
-	 *
+	 * 
 	 * @param navigator the resource navigator
 	 * @param label the label
 	 */
@@ -39,8 +38,7 @@ public class ToggleLinkingAction extends ResourceNavigatorAction {
     /**
      * Runs the action.
      */
-    @Override
-	public void run() {
+    public void run() {
         getNavigator().setLinkingEnabled(isChecked());
     }
 

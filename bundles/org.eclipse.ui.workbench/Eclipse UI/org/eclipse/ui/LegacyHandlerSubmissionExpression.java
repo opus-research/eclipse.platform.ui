@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Shell;
  * An expression encapsulating all of the information from legacy handler
  * submissions.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class LegacyHandlerSubmissionExpression extends Expression {
@@ -57,7 +57,7 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 	/**
 	 * Constructs a new instance of
 	 * <code>LegacyHandlerSubmissionExpression</code>
-	 *
+	 * 
 	 * @param activePartId
 	 *            The part identifier to match with the active part;
 	 *            <code>null</code> if it will match any active part.
@@ -77,13 +77,12 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 	}
 
 	/**
-	 * Collect expression info for a legacy handler submission.  Namely
+	 * Collect expression info for a legacy handler submission.  Namely 
 	 * the active part id and name, active shell name, active workbench
 	 * window shell name and the active site name.
-	 *
+	 * 
 	 * @since 3.2
 	 */
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		if (activePartId != null) {
 			info.addVariableNameAccess(ISources.ACTIVE_PART_ID_NAME);
@@ -98,7 +97,6 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 		}
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		int hashCode = HASH_INITIAL * HASH_FACTOR + hashCode(activePartId);
 		hashCode = hashCode * HASH_FACTOR + hashCode(activeShell);
@@ -106,7 +104,6 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyHandlerSubmissionExpression) {
 			final LegacyHandlerSubmissionExpression that = (LegacyHandlerSubmissionExpression) object;
@@ -123,14 +120,13 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 	 * current state of the application (as defined by <code>context</code>).
 	 * If a condition is <code>null</code>, then it matches any possible
 	 * value (i.e., it is not tested at all).
-	 *
+	 * 
 	 * @param context
 	 *            The context providing the current workbench state; must not be
 	 *            <code>null</code>.
 	 * @return <code>EvaluationResult.TRUE</code> if the conditions all
 	 *         matches; <code>EvaluationResult.FALSE</code> otherwise.
 	 */
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context) {
 		if (activePartId != null) {
 			final Object value = context
@@ -161,7 +157,6 @@ public final class LegacyHandlerSubmissionExpression extends Expression {
 		return EvaluationResult.TRUE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyHandlerSubmission("); //$NON-NLS-1$

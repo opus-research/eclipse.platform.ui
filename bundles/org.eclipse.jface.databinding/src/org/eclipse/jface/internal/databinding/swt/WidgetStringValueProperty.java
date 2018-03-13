@@ -16,7 +16,7 @@ import org.eclipse.jface.databinding.swt.WidgetValueProperty;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public abstract class WidgetStringValueProperty extends WidgetValueProperty {
 	WidgetStringValueProperty() {
@@ -35,17 +35,14 @@ public abstract class WidgetStringValueProperty extends WidgetValueProperty {
 		super(events, staleEvents);
 	}
 
-	@Override
 	public Object getValueType() {
 		return String.class;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return doGetStringValue(source);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		doSetStringValue(source, (String) value);
 	}

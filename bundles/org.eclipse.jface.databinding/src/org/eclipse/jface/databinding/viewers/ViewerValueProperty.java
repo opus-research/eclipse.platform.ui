@@ -15,7 +15,7 @@ package org.eclipse.jface.databinding.viewers;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.value.SimpleValueProperty;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.internal.databinding.viewers.ViewerObservableValueDecorator;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -29,12 +29,11 @@ import org.eclipse.jface.viewers.Viewer;
  * <li>All <code>observe()</code> methods should return an
  * {@link IViewerObservableValue}
  * </ul>
- *
+ * 
  * @since 1.3
  */
 public abstract class ViewerValueProperty extends SimpleValueProperty implements
 		IViewerValueProperty {
-	@Override
 	public IObservableValue observe(Object source) {
 		if (source instanceof Viewer) {
 			return observe((Viewer) source);
@@ -42,7 +41,6 @@ public abstract class ViewerValueProperty extends SimpleValueProperty implements
 		return super.observe(source);
 	}
 
-	@Override
 	public IObservableValue observe(Realm realm, Object source) {
 		IObservableValue observable = super.observe(realm, source);
 		if (source instanceof Viewer)
@@ -51,13 +49,11 @@ public abstract class ViewerValueProperty extends SimpleValueProperty implements
 		return observable;
 	}
 
-	@Override
 	public IViewerObservableValue observe(Viewer viewer) {
-		return (IViewerObservableValue) observe(DisplayRealm.getRealm(viewer
+		return (IViewerObservableValue) observe(SWTObservables.getRealm(viewer
 				.getControl().getDisplay()), viewer);
 	}
 
-	@Override
 	public IViewerObservableValue observeDelayed(int delay, Viewer viewer) {
 		return ViewersObservables.observeDelayedValue(delay, observe(viewer));
 	}

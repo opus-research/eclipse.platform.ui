@@ -25,7 +25,6 @@ public class DefaultBrowser extends AbstractWebBrowser {
 	/**
 	 * @see org.eclipse.help.browser.IBrowser#displayURL(String)
 	 */
-	@Override
 	public void openURL(URL url2) {
 		String url = url2.toExternalForm();
 		/*

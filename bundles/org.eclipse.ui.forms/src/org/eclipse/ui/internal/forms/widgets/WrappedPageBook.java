@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,9 +11,7 @@
 package org.eclipse.ui.internal.forms.widgets;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.*;
 import org.eclipse.ui.forms.widgets.ILayoutExtension;
 
 /**
@@ -25,7 +23,6 @@ import org.eclipse.ui.forms.widgets.ILayoutExtension;
  */
 public class WrappedPageBook extends Composite {
 	class PageBookLayout extends Layout implements ILayoutExtension {
-		@Override
 		protected Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
 			if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT)
@@ -38,33 +35,37 @@ public class WrappedPageBook extends Composite {
 			}
 			return result;
 		}
-
-		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 			if (currentPage != null) {
 				currentPage.setBounds(composite.getClientArea());
 			}
 		}
-
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMaximumWidth(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		public int computeMaximumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 		}
-
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.forms.widgets.ILayoutExtension#computeMinimumWidth(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		public int computeMinimumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
 	}
-
 	/**
 	 * The current control; <code>null</code> if none.
 	 */
-	private Control currentPage;
-
+	private Control currentPage = null;
 	/**
 	 * Creates a new empty pagebook.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param style
@@ -74,11 +75,10 @@ public class WrappedPageBook extends Composite {
 		super(parent, style);
 		setLayout(new PageBookLayout());
 	}
-
 	/**
 	 * Shows the given page. This method has no effect if the given page is not
 	 * contained in this pagebook.
-	 *
+	 * 
 	 * @param page
 	 *            the page to show
 	 */
@@ -102,8 +102,6 @@ public class WrappedPageBook extends Composite {
 		if (oldPage != null && !oldPage.isDisposed())
 			oldPage.setVisible(false);
 	}
-
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		return ((PageBookLayout) getLayout()).computeSize(this, wHint, hHint,
 				changed);

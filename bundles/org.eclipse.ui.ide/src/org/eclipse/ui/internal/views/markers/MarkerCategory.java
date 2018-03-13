@@ -17,9 +17,9 @@ import org.eclipse.ui.views.markers.MarkerItem;
 import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 class MarkerCategory extends MarkerSupportItem {
-
+	
 	boolean refreshing;
-
+	
 	int start;
 
 	int end;
@@ -35,7 +35,7 @@ class MarkerCategory extends MarkerSupportItem {
 	/**
 	 * Create a new instance of the receiver that has the markers between
 	 * startIndex and endIndex showing.
-	 *
+	 * 
 	 * @param markers
 	 * @param startIndex
 	 * @param endIndex
@@ -50,7 +50,12 @@ class MarkerCategory extends MarkerSupportItem {
 		name = categoryName;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildren()
+	 */
 	MarkerSupportItem[] getChildren() {
 		if (children == null) {
 			MarkerItem[] allMarkers = markers.getMarkerEntryArray();
@@ -64,12 +69,23 @@ class MarkerCategory extends MarkerSupportItem {
 		return children;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildrenCount
+	 * ()
+	 */
 	int getChildrenCount() {
 		return end - start + 1;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.views.markers.MarkerSupportItem#getDescription()
+	 */
 	String getDescription() {
 		//see Bug 294959
 		//if(refreshing){
@@ -99,7 +115,7 @@ class MarkerCategory extends MarkerSupportItem {
 
 	/**
 	 * Get the highest severity in the receiver.
-	 *
+	 * 
 	 * @return int
 	 */
 	int getHighestSeverity() {
@@ -122,19 +138,27 @@ class MarkerCategory extends MarkerSupportItem {
 
 	/**
 	 * Return the name of the receiver.
-	 *
+	 * 
 	 * @return String
 	 */
 	String getName() {
 		return name;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getParent()
+	 */
 	MarkerSupportItem getParent() {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#isConcrete()
+	 */
 	boolean isConcrete() {
 		return false;
 	}
@@ -142,7 +166,6 @@ class MarkerCategory extends MarkerSupportItem {
 	/**
 	 * Clear the cached values for performance reasons.
 	 */
-	@Override
 	void clearCache() {
 		MarkerSupportItem[] entries = getChildren();
 		for (int i = 0; i < entries.length; i++) {
@@ -150,7 +173,9 @@ class MarkerCategory extends MarkerSupportItem {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -160,7 +185,9 @@ class MarkerCategory extends MarkerSupportItem {
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

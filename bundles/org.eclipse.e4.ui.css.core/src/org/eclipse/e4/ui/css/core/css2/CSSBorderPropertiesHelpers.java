@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,17 +16,17 @@ import org.w3c.dom.css.CSSValue;
 
 /**
  * CSS2 Border Helper.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSSBorderPropertiesHelpers {
 
 	/**
 	 * Update the <code>property of</code> <code>borderProperties</code>
 	 * instance with the <code>value</code>.
-	 *
+	 * 
 	 * @param border
 	 * @param property
 	 * @param value
@@ -44,7 +44,7 @@ public class CSSBorderPropertiesHelpers {
 	/**
 	 * Update <code>borderProperties</code> instance with border-style
 	 * <code>value</code>.
-	 *
+	 * 
 	 * @param borderProperties
 	 * @param value
 	 */
@@ -59,7 +59,7 @@ public class CSSBorderPropertiesHelpers {
 	/**
 	 * Update <code>borderProperties</code> instance with border-color
 	 * <code>value</code>.
-	 *
+	 * 
 	 * @param borderProperties
 	 * @param value
 	 */
@@ -73,7 +73,7 @@ public class CSSBorderPropertiesHelpers {
 	/**
 	 * Update <code>borderProperties</code> instance with border-width
 	 * <code>value</code>.
-	 *
+	 * 
 	 * @param borderProperties
 	 * @param value
 	 */

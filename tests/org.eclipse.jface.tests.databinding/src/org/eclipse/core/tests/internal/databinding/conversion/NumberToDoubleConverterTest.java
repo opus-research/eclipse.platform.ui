@@ -22,22 +22,30 @@ import com.ibm.icu.text.NumberFormat;
  * @since 1.1
  */
 public class NumberToDoubleConverterTest extends NumberToNumberTestHarness {
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
+	 */
 	protected Number doGetOutOfRangeNumber() {
 		return new BigDecimal(Double.MAX_VALUE).add(new BigDecimal(Double.MAX_VALUE));
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
+	 */
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, false);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
+	 */
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, true);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType(boolean)
+	 */
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? Double.TYPE : Double.class;
 	}

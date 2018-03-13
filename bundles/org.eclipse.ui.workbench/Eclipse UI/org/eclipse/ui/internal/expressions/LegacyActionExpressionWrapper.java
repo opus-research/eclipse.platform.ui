@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.ActionExpression;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class LegacyActionExpressionWrapper extends
@@ -49,7 +49,7 @@ public final class LegacyActionExpressionWrapper extends
 
 	/**
 	 * Constructs a new instance of {@link LegacyActionExpressionWrapper}.
-	 *
+	 * 
 	 * @param expression
 	 *            The expression to wrap; must not be <code>null</code>.
 	 * @param window
@@ -68,20 +68,17 @@ public final class LegacyActionExpressionWrapper extends
 		this.expression = expression;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		super.collectExpressionInfo(info);
 		info.markDefaultVariableAccessed();
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		int hashCode = HASH_INITIAL * HASH_FACTOR + hashCode(getWindow());
 		hashCode = hashCode * HASH_FACTOR + hashCode(expression);
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyActionExpressionWrapper) {
 			final LegacyActionExpressionWrapper that = (LegacyActionExpressionWrapper) object;
@@ -92,7 +89,6 @@ public final class LegacyActionExpressionWrapper extends
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context)
 			throws CoreException {
 		final EvaluationResult result = super.evaluate(context);
@@ -114,7 +110,6 @@ public final class LegacyActionExpressionWrapper extends
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("LegacyActionExpressionWrapper("); //$NON-NLS-1$

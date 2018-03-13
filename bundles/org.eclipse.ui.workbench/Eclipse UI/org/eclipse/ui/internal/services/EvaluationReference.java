@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.services.IEvaluationReference;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class EvaluationReference extends RunAndTrack implements IEvaluationReference {
 	final IEclipseContext context;
@@ -49,21 +49,43 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 		this.sourcePriority = SourcePriorityNameMapping.computeSourcePriority(expression);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#clearResult()
+	 */
 	public void clearResult() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getExpression()
+	 */
 	public Expression getExpression() {
 		return expression;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#getSourcePriority
+	 * ()
+	 */
 	public int getSourcePriority() {
 		return sourcePriority;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#evaluate(org.
+	 * eclipse.core.expressions.IEvaluationContext)
+	 */
 	public boolean evaluate(IEvaluationContext context) {
 		if (expression == null) {
 			cache = true;
@@ -77,12 +99,24 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 		return cache;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.services.IEvaluationResultCache#setResult(boolean
+	 * )
+	 */
 	public void setResult(boolean result) {
 		cache = result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.core.services.context.IRunAndTrack#notify(org.eclipse.
+	 * e4.core.services.context.ContextChangeEvent)
+	 */
 	public boolean changed(IEclipseContext context) {
 		if (!participating) {
 			return false;
@@ -113,12 +147,20 @@ public class EvaluationReference extends RunAndTrack implements IEvaluationRefer
 		hasRun = true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IEvaluationReference#getListener()
+	 */
 	public IPropertyChangeListener getListener() {
 		return listener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IEvaluationReference#getProperty()
+	 */
 	public String getProperty() {
 		return property;
 	}

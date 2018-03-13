@@ -35,8 +35,10 @@ public class ViewDropTarget extends WorkbenchWindowDropTarget {
         return getPage().findView(targetPart);
     }
 
-    @Override
-	public String toString() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
+     */
+    public String toString() {
         IViewDescriptor desc = WorkbenchPlugin.getDefault().getViewRegistry()
                 .find(targetPart);
         String title = desc.getLabel();
@@ -44,14 +46,15 @@ public class ViewDropTarget extends WorkbenchWindowDropTarget {
         return DragOperations.nameForConstant(side) + " of " + title;
     }
 
-    @Override
-	public Point getLocation() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
+     */
+    public Point getLocation() {
         return DragOperations.getLocation(DragOperations.getPane(getPart()),
                 side);
     }
-
-    @Override
-	public Shell getShell() {
+    
+    public Shell getShell() {
     	return getPart().getSite().getShell();
     }
 }

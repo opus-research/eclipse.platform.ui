@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     private int offset;
 
     /**
-     * Creates a new ImageDescriptor. The image is loaded
+     * Creates a new ImageDescriptor. The image is loaded 
      * from a file with the given name <code>name</code>.
      */
     public ProgramImageDescriptor(String fullPath, int offsetInFile) {
@@ -36,8 +36,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#equals
      */
-    @Override
-	public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (!(o instanceof ProgramImageDescriptor)) {
             return false;
         }
@@ -55,10 +54,9 @@ public class ProgramImageDescriptor extends ImageDescriptor {
 
     /**
      * Returns an SWT Image that is described by the information
-     * in this descriptor.
+     * in this descriptor. 
      */
-    @Override
-	public ImageData getImageData() {
+    public ImageData getImageData() {
         /*This is a user defined offset into the file which always
          *returns us the defualt - return the default regardless*/
 
@@ -69,8 +67,7 @@ public class ProgramImageDescriptor extends ImageDescriptor {
     /**
      * @see Object#hashCode
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return filename.hashCode() + offset;
     }
 }

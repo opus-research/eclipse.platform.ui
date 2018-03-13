@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -31,7 +31,6 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicPackageImp
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.impl.ElementContainerImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -63,7 +62,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getVariables <em>Variables</em>}</li>
@@ -80,8 +78,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCommands <em>Commands</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCategories <em>Categories</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
@@ -245,16 +243,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * @ordered
 	 */
 	protected EList<MCategory> categories;
-
-	/**
-	 * The cached value of the '{@link #getDialogs() <em>Dialogs</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDialogs()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MDialog> dialogs;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -494,18 +482,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MDialog> getDialogs() {
-		if (dialogs == null) {
-			dialogs = new EObjectResolvingEList<MDialog>(MDialog.class, this, ApplicationPackageImpl.APPLICATION__DIALOGS);
-		}
-		return dialogs;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -576,8 +552,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return getAddons();
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				return getCategories();
-			case ApplicationPackageImpl.APPLICATION__DIALOGS:
-				return getDialogs();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -649,10 +623,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				getCategories().clear();
 				getCategories().addAll((Collection<? extends MCategory>)newValue);
 				return;
-			case ApplicationPackageImpl.APPLICATION__DIALOGS:
-				getDialogs().clear();
-				getDialogs().addAll((Collection<? extends MDialog>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -710,9 +680,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				getCategories().clear();
 				return;
-			case ApplicationPackageImpl.APPLICATION__DIALOGS:
-				getDialogs().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -755,8 +722,6 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 				return addons != null && !addons.isEmpty();
 			case ApplicationPackageImpl.APPLICATION__CATEGORIES:
 				return categories != null && !categories.isEmpty();
-			case ApplicationPackageImpl.APPLICATION__DIALOGS:
-				return dialogs != null && !dialogs.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

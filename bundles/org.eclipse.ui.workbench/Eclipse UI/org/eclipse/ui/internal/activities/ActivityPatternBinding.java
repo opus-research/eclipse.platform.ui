@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,13 +27,13 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
     private transient int hashCode = HASH_INITIAL;
 
     private Pattern pattern;
-
+    
     private String patternString;
-
+    
     private boolean isEqualityPattern;
 
     private transient String string;
-
+    
     /**
      * @param activityId The id.
      * @param pattern A string that will be compiled to a pattern matcher.
@@ -41,30 +41,30 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
     public ActivityPatternBinding(String activityId, String pattern) {
     	this(activityId, Pattern.compile(pattern));
     }
-
+    
     /**
-     *
+     *  
      * @param activityId The id
      * @param pattern This string will be used as plain string, or as pattern-
      * 		  matcher pattern. The use depends on parameter <code>nonRegExp</code>.
      * @param isEqualityPattern If true the <code>pattern</code> string will be
-     * 	      interpreted as normal string, not as pattern.
+     * 	      interpreted as normal string, not as pattern. 
      */
     public ActivityPatternBinding(String activityId, String pattern, boolean
     		isEqualityPattern) {
     	if (pattern == null) {
 			throw new NullPointerException();
 		}
-
+    	
     	this.activityId = activityId;
     	this.isEqualityPattern = isEqualityPattern;
     	if (isEqualityPattern) {
-    		this.patternString = pattern;
+    		this.patternString = pattern;    		
     		this.pattern = null;
-    	} else {
+    	} else {    		
     		this.patternString = null;
     		this.pattern = Pattern.compile(pattern);
-    	}
+    	}    
     }
 
     public ActivityPatternBinding(String activityId, Pattern pattern) {
@@ -78,15 +78,14 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
         this.patternString = null;
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         ActivityPatternBinding castedObject = (ActivityPatternBinding) object;
         int compareTo = Util.compare(activityId, castedObject.activityId);
 
-        if (compareTo == 0) {
+        if (compareTo == 0) {        	
         	compareTo = Util.compare(isEqualityPattern,
 					castedObject.isEqualityPattern);
-
+        	
         	if (compareTo == 0)
 				compareTo = Util.compare(getPattern().pattern(), castedObject
 						.getPattern().pattern());
@@ -95,8 +94,7 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityPatternBinding)) {
 			return false;
 		}
@@ -105,7 +103,7 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
         if (!Util.equals(activityId, castedObject.activityId)) {
             return false;
         }
-
+        
         if (!Util.equals(isEqualityPattern, castedObject.isEqualityPattern)) {
             return false;
         }
@@ -113,35 +111,42 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
         return Util.equals(getPattern(), castedObject.getPattern());
     }
 
-    @Override
-	public String getActivityId() {
+    public String getActivityId() {
         return activityId;
     }
-
-    @Override
-	public Pattern getPattern() {
+    
+    /*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.activities.IActivityPatternBinding#getPattern()
+	 */
+    public Pattern getPattern() {
     	if (pattern == null) {
-    		pattern = Pattern.compile(PatternUtil.quotePattern(patternString));
+    		pattern = Pattern.compile(PatternUtil.quotePattern(patternString));    		
     	}
     	return pattern;
     }
-
-    @Override
-	public String getString() {
+    
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.ui.activities.IActivityPatternBinding#getString()
+     */
+    public String getString() {
     	if (isEqualityPattern) {
     		return patternString;
     	}
     	return getPattern().pattern();
     }
-
-	@Override
+    
+    /* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IActivityPatternBinding#isEqualityPattern()
+	 */
 	public boolean isEqualityPattern() {
 		return isEqualityPattern;
 	}
+    
 
-
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityId);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(pattern);
@@ -153,8 +158,7 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');
@@ -172,7 +176,7 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
 
 	/**
 	 * Returns whether this binding's pattern matches the given string.
-	 *
+	 * 
 	 * @param toMatch the string to match
 	 * @return <code>true</code> if it matches, <code>false</code> if not
      * @since 3.1
@@ -181,6 +185,6 @@ public final class ActivityPatternBinding implements IActivityPatternBinding {
 		if (isEqualityPattern) {
 			return patternString.equals(toMatch);
 		}
-		return pattern.matcher(toMatch).matches();
-	}
+		return pattern.matcher(toMatch).matches();		
+	}	
 }

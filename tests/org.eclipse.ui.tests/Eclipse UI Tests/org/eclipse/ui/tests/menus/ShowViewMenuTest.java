@@ -26,7 +26,6 @@ public class ShowViewMenuTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		// open a workbench window with the empty perspective, since it defines
@@ -34,7 +33,7 @@ public class ShowViewMenuTest extends UITestCase {
 		// action tests
 		workbenchWindow = openTestWindow();
 	}
-
+	
 	/***********************************
 	 * Tests for Bug 56368 starts here *
 	 ***********************************/
@@ -59,7 +58,7 @@ public class ShowViewMenuTest extends UITestCase {
 		// action, the item count should simply be one
 		assertEquals("Only the 'Other...' action should be available", 1, swtMenu.getItemCount());
 	}
-
+	
 	/*********************************
 	 * Tests for Bug 56368 ends here *
 	 *********************************/

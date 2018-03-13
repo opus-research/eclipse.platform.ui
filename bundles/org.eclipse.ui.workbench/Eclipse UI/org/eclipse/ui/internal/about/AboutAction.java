@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class AboutAction extends Action implements
 
     /**
      * Creates a new <code>AboutAction</code>.
-     *
+     * 
      * @param window the window
      */
     public AboutAction(IWorkbenchWindow window) {
@@ -65,16 +65,20 @@ public class AboutAction extends Action implements
 				IWorkbenchHelpContextIds.ABOUT_ACTION);
     }
 
-    @Override
-	public void run() {
+    /*
+     * (non-Javadoc) Method declared on IAction.
+     */
+    public void run() {
         // make sure action is not disposed
         if (workbenchWindow != null) {
 			new AboutDialog(workbenchWindow.getShell()).open();
 		}
     }
 
-    @Override
-	public void dispose() {
+    /*
+     * (non-Javadoc) Method declared on ActionFactory.IWorkbenchAction.
+     */
+    public void dispose() {
         workbenchWindow = null;
     }
 }

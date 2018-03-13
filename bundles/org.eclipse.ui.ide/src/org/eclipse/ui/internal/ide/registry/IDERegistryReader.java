@@ -40,13 +40,15 @@ public abstract class IDERegistryReader {
 
     protected static Hashtable extensionPoints = new Hashtable();
 
-    private static final Comparator comparer = (arg0, arg1) -> {
-		IExtension i1 = (IExtension) arg0;
-		String s1 = i1.getNamespace();
-		IExtension i2 = (IExtension) arg1;
-		String s2 = i2.getNamespace();
-		return s1.compareToIgnoreCase(s2);
-	};
+    private static final Comparator comparer = new Comparator() {
+        public int compare(Object arg0, Object arg1) {
+			IExtension i1 = (IExtension) arg0;
+			String s1 = i1.getNamespace();
+			IExtension i2 = (IExtension) arg1;
+			String s2 = i2.getNamespace();
+			return s1.compareToIgnoreCase(s2);
+		}
+    };
 
     /**
      * The constructor.
@@ -127,7 +129,7 @@ public abstract class IDERegistryReader {
      * Implement this method to read element's attributes.
      * If children should also be read, then implementor
      * is responsible for calling <code>readElementChildren</code>.
-     * Implementor is also responsible for logging missing
+     * Implementor is also responsible for logging missing 
      * attributes.
      *
      * @return true if element was recognized, false if not.

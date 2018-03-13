@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,21 +19,20 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
+
+import org.eclipse.core.runtime.Assert;
 
 /**
  * This is a widget independent class implementors of
  * {@link org.eclipse.swt.widgets.Table} like widgets can use to provide a
  * viewer on top of their widget implementations.
- * <p>
- * <strong> This class is not intended to be subclassed outside of the JFace
- * viewers framework.</strong>
- * </p>
  *
  * @since 3.3
  */
@@ -61,31 +60,39 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * Add the listener for SetData on the table
 		 */
 		private void addTableListener() {
-			getControl().addListener(SWT.SetData, event -> {
-				Item item = (Item) event.item;
-				final int index = doIndexOf(item);
-
-				if (index == -1) {
-					// Should not happen, but the spec for doIndexOf allows returning -1.
-					// See bug 241117.
-					return;
-				}
-
-				Object element = resolveElement(index);
-				if (element == null) {
-					// Didn't find it so make a request
-					// Keep looking if it is not in the cache.
-					IContentProvider contentProvider = getContentProvider();
-					// If we are building lazily then request lookup now
-					if (contentProvider instanceof ILazyContentProvider) {
-						((ILazyContentProvider) contentProvider)
-								.updateElement(index);
+			getControl().addListener(SWT.SetData, new Listener() {
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+				 */
+				public void handleEvent(Event event) {
+					Item item = (Item) event.item;
+					final int index = doIndexOf(item);
+					
+					if (index == -1) {
+						// Should not happen, but the spec for doIndexOf allows returning -1.
+						// See bug 241117.
 						return;
 					}
+					
+					Object element = resolveElement(index);
+					if (element == null) {
+						// Didn't find it so make a request
+						// Keep looking if it is not in the cache.
+						IContentProvider contentProvider = getContentProvider();
+						// If we are building lazily then request lookup now
+						if (contentProvider instanceof ILazyContentProvider) {
+							((ILazyContentProvider) contentProvider)
+									.updateElement(index);
+							return;
+						}
+					}
+
+					associate(element, item);
+					updateItem(item, element);
 				}
 
-				associate(element, item);
-				updateItem(item, element);
 			});
 		}
 
@@ -213,7 +220,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		super.hookControl(control);
 		initializeVirtualManager(getControl().getStyle());
 	}
-
+	
 	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
@@ -311,6 +318,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		add(new Object[] { element });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
+	 */
 	@Override
 	protected Widget doFindInputItem(Object element) {
 		if (equals(element, getRoot())) {
@@ -319,6 +331,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
+	 */
 	@Override
 	protected Widget doFindItem(Object element) {
 
@@ -334,6 +351,12 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
+	 *      java.lang.Object, boolean)
+	 */
 	@Override
 	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
 		boolean oldBusy = isBusy();
@@ -399,6 +422,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
+	 */
 	@Override
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		int columnCount = doGetColumnCount();
@@ -451,6 +479,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		return super.getLabelProvider();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
+	 */
 	@Override
 	protected List getSelectionFromWidget() {
 		if (virtualManager != null) {
@@ -554,11 +587,21 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		return min;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		getControl().setRedraw(false);
 		try {
-			preservingSelection(() -> internalRefresh(getRoot()));
+			preservingSelection(new Runnable() {
+				public void run() {
+					internalRefresh(getRoot());
+				}
+			});
 		} finally {
 			getControl().setRedraw(true);
 		}
@@ -594,11 +637,22 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		createItem(element, position);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
+	 */
 	@Override
 	protected void internalRefresh(Object element) {
 		internalRefresh(element, true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object,
+	 *      boolean)
+	 */
 	@Override
 	protected void internalRefresh(Object element, boolean updateLabels) {
 		applyEditorValue();
@@ -787,7 +841,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		if (elements.length == 0) {
 			return;
 		}
-		preservingSelection(() -> internalRemove(elements));
+		preservingSelection(new Runnable() {
+			public void run() {
+				internalRemove(elements);
+			}
+		});
 	}
 
 	/**
@@ -810,6 +868,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		remove(new Object[] { element });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
+	 */
 	@Override
 	public void reveal(Object element) {
 		Assert.isNotNull(element);
@@ -819,6 +882,12 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
+	 *      boolean)
+	 */
 	@Override
 	protected void setSelectionToWidget(List list, boolean reveal) {
 		if (list == null) {
@@ -992,11 +1061,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Replace the element at the given index with the given element. This
 	 * method will not call the content provider to verify. <strong>Note that
 	 * this method will materialize a TableItem the given index.</strong>.
-	 *
+	 * 
 	 * @param element
 	 * @param index
 	 * @see ILazyContentProvider
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void replace(Object element, int index) {
@@ -1022,6 +1091,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		doClear(index);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
+	 */
 	@Override
 	protected Object[] getRawChildren(Object parent) {
 
@@ -1031,18 +1105,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 
 	}
 
-	/**
-	 * Sets the content provider used by this <code>AbstractTableViewer</code>.
-	 * <p>
-	 * Content providers for abstract table viewers must implement either
-	 * {@link IStructuredContentProvider} or {@link ILazyContentProvider}.
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.StructuredViewer#assertContentProviderType(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	@Override
-	public void setContentProvider(IContentProvider provider) {
-		// the actual check is in assertContentProviderType
-		super.setContentProvider(provider);
-	}
-
 	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		Assert.isTrue(provider instanceof IStructuredContentProvider
@@ -1238,11 +1305,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Items that are not in the receiver are ignored. If the receiver is single-select and multiple
 	 * items are specified, then all items are ignored.
 	 * </p>
-	 *
+	 * 
 	 * @param items the array of items
-	 *
+	 * 
 	 * @exception IllegalArgumentException - if the array of items is null
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(Item[] items);
@@ -1264,11 +1331,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Indices that are out of range and duplicate indices are ignored. If the receiver is
 	 * single-select and multiple indices are specified, then all indices are ignored.
 	 * </p>
-	 *
+	 * 
 	 * @param indices the indices of the items to select
-	 *
+	 * 
 	 * @exception IllegalArgumentException - if the array of indices is null
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(int[] indices);

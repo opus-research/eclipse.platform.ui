@@ -32,9 +32,9 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * NON-API - This class can be used to update a composite with automatic
  * dependency tracking.
- *
+ * 
  * @since 1.1
- *
+ * 
  */
 public abstract class CompositeUpdater {
 
@@ -54,7 +54,6 @@ public abstract class CompositeUpdater {
 		// Runnable implementation. This method runs at most once per repaint
 		// whenever the
 		// value gets marked as dirty.
-		@Override
 		public void run() {
 			if (theComposite != null && !theComposite.isDisposed()
 					&& widget != null && !widget.isDisposed()) {
@@ -65,7 +64,6 @@ public abstract class CompositeUpdater {
 		private void updateIfNecessary() {
 			if (dirty) {
 				dependencies = ObservableTracker.runAndMonitor(new Runnable() {
-					@Override
 					public void run() {
 						updateWidget(widget, element);
 					}
@@ -75,7 +73,6 @@ public abstract class CompositeUpdater {
 		}
 
 		// IChangeListener implementation (listening to any dependency)
-		@Override
 		public void handleChange(ChangeEvent event) {
 			// Whenever this updator becomes dirty, schedule the run() method
 			makeDirty();
@@ -113,7 +110,6 @@ public abstract class CompositeUpdater {
 			}
 		}
 
-		@Override
 		public void run() {
 			posted = false;
 			theComposite.getShell().layout(
@@ -129,7 +125,7 @@ public abstract class CompositeUpdater {
 	 * To be called from {@link #updateWidget(Widget, Object)} or
 	 * {@link #createWidget(int)} if this updater's composite's layout may need
 	 * to be updated.
-	 *
+	 * 
 	 * @param control
 	 * @since 1.2
 	 */
@@ -141,12 +137,10 @@ public abstract class CompositeUpdater {
 			IListChangeListener {
 
 		// DisposeListener implementation
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			CompositeUpdater.this.dispose();
 		}
 
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiffEntry[] diffs = event.diff.getDifferences();
 			for (int i = 0; i < diffs.length; i++) {
@@ -173,7 +167,7 @@ public abstract class CompositeUpdater {
 	 * Creates an updater for the given control and list. For each element of
 	 * the list, a child widget of the composite will be created using
 	 * {@link #createWidget(int)}.
-	 *
+	 * 
 	 * @param toUpdate
 	 *            composite to update
 	 * @param model
@@ -219,7 +213,7 @@ public abstract class CompositeUpdater {
 
 	/**
 	 * Creates a new child widget for the target composite at the given index.
-	 *
+	 * 
 	 * <p>
 	 * Subclasses should implement this method to provide the code that creates
 	 * a child widget at a specific index. Note that
@@ -227,7 +221,7 @@ public abstract class CompositeUpdater {
 	 * returns. Only those properties of the widget that don't change over time
 	 * should be set in this method.
 	 * </p>
-	 *
+	 * 
 	 * @param index
 	 *            the at which to create the widget
 	 * @return the widget
@@ -238,12 +232,12 @@ public abstract class CompositeUpdater {
 	 * Updates the given widget based on the element found in the model list.
 	 * This method will be invoked once after the widget is created, and once
 	 * before any repaint during which the control is visible and dirty.
-	 *
+	 * 
 	 * <p>
 	 * Subclasses should implement this method to provide any code that changes
 	 * the appearance of the widget.
 	 * </p>
-	 *
+	 * 
 	 * @param widget
 	 *            the widget to update
 	 * @param element

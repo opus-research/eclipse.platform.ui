@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,9 +32,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 public class HandlerServiceHandler extends AbstractHandler {
 
 	private static final String FAILED_TO_FIND_HANDLER_DURING_EXECUTION = "Failed to find handler during execution"; //$NON-NLS-1$
-	private static final String HANDLER_MISSING_EXECUTE_ANNOTATION = "Handler is missing @Execute"; //$NON-NLS-1$
-	private static final Object missingExecute = new Object();
-
 	protected String commandId;
 
 	public HandlerServiceHandler(String commandId) {
@@ -45,7 +42,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 	public boolean isEnabled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
 		// setEnabled(contexts);
-		IEclipseContext executionContext = contexts != null ? contexts.context : null; // getExecutionContext(contexts);
+		IEclipseContext executionContext = contexts.context; // getExecutionContext(contexts);
 		if (executionContext == null) {
 			return super.isEnabled();
 		}
@@ -61,6 +58,11 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return super.isEnabled();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
+	 */
 	@Override
 	public void setEnabled(Object evaluationContext) {
 		boolean createContext = false;
@@ -115,6 +117,11 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isHandled()
+	 */
 	@Override
 	public boolean isHandled() {
 		ExecutionContexts contexts = HandlerServiceImpl.peek();
@@ -129,7 +136,11 @@ public class HandlerServiceHandler extends AbstractHandler {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IEclipseContext executionContext = getExecutionContext(event.getApplicationContext());
 		if (executionContext == null) {
@@ -137,33 +148,21 @@ public class HandlerServiceHandler extends AbstractHandler {
 					new NotHandledException(FAILED_TO_FIND_HANDLER_DURING_EXECUTION));
 		}
 
+		IEclipseContext staticContext = getStaticContext(executionContext);
 		Object handler = HandlerServiceImpl.lookUpHandler(executionContext, commandId);
 		if (handler == null) {
 			return null;
 		}
-		IEclipseContext staticContext = getStaticContext(executionContext);
-		IEclipseContext localStaticContext = null;
-		try {
-			if (staticContext == null) {
-				staticContext = localStaticContext = EclipseContextFactory
-						.create(HandlerServiceImpl.TMP_STATIC_CONTEXT);
-				staticContext.set(HandlerServiceImpl.PARM_MAP, event.getParameters());
-			}
-			Object result = ContextInjectionFactory.invoke(handler, Execute.class,
- executionContext,
-					staticContext, missingExecute);
-			if (result == missingExecute) {
-				throw new ExecutionException(HANDLER_MISSING_EXECUTE_ANNOTATION,
-						new NotHandledException(getClass().getName()));
-			}
-			return result;
-		} finally {
-			if (localStaticContext != null) {
-				localStaticContext.dispose();
-			}
-		}
+		return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
+				staticContext, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#fireHandlerChanged(org.eclipse.core.commands.
+	 * HandlerEvent)
+	 */
 	@Override
 	public void fireHandlerChanged(HandlerEvent handlerEvent) {
 		super.fireHandlerChanged(handlerEvent);

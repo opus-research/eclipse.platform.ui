@@ -18,7 +18,7 @@ import org.eclipse.core.internal.databinding.conversion.NumberToNumberConverter;
  * <p>
  * Class is thread safe.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public class NumberToUnboundedNumberValidator extends NumberToNumberValidator {
@@ -29,7 +29,11 @@ public class NumberToUnboundedNumberValidator extends NumberToNumberValidator {
 		super(converter, null, null);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.internal.databinding.validation.NumberToNumberValidator#inRange(java.lang.Number)
+	 */
 	protected boolean inRange(Number number) {
 		return true;
 	}

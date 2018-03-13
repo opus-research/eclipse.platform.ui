@@ -29,7 +29,7 @@ import org.eclipse.ui.part.MarkerTransfer;
  * Copies a task to the clipboard.
  */
 class CopyTaskAction extends TaskAction {
-
+ 
 	/**
      * Creates the action.
 	 * @param tasklist the task list
@@ -44,8 +44,7 @@ class CopyTaskAction extends TaskAction {
     /**
      * Performs this action.
      */
-    @Override
-	public void run() {
+    public void run() {
         // Get the selected markers
         TaskList taskList = getTaskList();
         TableViewer viewer = taskList.getTableViewer();

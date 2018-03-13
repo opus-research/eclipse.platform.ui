@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,10 @@ package org.eclipse.ui.keys;
  * <code>ParseException</code> objects are immutable. Clients are not
  * permitted to extend this class.
  * </p>
- *
+ * 
  * @deprecated Please use org.eclipse.jface.bindings.keys.ParseException
  * @since 3.0
  */
-@Deprecated
 public final class ParseException extends Exception {
 
     /**
@@ -36,7 +35,7 @@ public final class ParseException extends Exception {
     /**
      * Constructs a <code>ParseException</code> with the specified detail
      * message.
-     *
+     * 
      * @param s
      *            the detail message.
      */

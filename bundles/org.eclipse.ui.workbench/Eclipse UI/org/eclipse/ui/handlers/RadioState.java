@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  * (i.e., using the class name followed by a colon), then it is assumed to be
  * the <code>default</code> parameter.
  * </p>
- *
+ * 
  * @see HandlerUtil#updateRadioState(org.eclipse.core.commands.Command, String)
  * @see HandlerUtil#matchesRadioState(org.eclipse.core.commands.ExecutionEvent)
  * @since 3.5
@@ -56,7 +56,6 @@ public final class RadioState extends PersistentState implements
 		setShouldPersist(true);
 	}
 
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) {
 
@@ -79,7 +78,13 @@ public final class RadioState extends PersistentState implements
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.commands.PersistentState#load(org.eclipse.jface.preference
+	 * .IPreferenceStore, java.lang.String)
+	 */
 	public void load(IPreferenceStore store, String preferenceKey) {
 		if (!shouldPersist())
 			return;
@@ -88,7 +93,13 @@ public final class RadioState extends PersistentState implements
 			setValue(value);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.commands.PersistentState#save(org.eclipse.jface.preference
+	 * .IPreferenceStore, java.lang.String)
+	 */
 	public void save(IPreferenceStore store, String preferenceKey) {
 		if (!shouldPersist())
 			return;
@@ -98,7 +109,11 @@ public final class RadioState extends PersistentState implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.State#setValue(java.lang.Object)
+	 */
 	public void setValue(Object value) {
 		if (!(value instanceof String))
 			return; // we set only String values

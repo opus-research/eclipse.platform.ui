@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -40,7 +41,7 @@ import org.eclipse.swt.widgets.ToolItem;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 3.0
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -105,7 +106,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Convenience method equivalent to <code>ToolBarContributionItem(toolBarManager, null)</code>.
-     *
+     * 
      * @param toolBarManager
      *            the tool bar manager
      */
@@ -115,7 +116,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Creates a tool bar contribution item.
-     *
+     * 
      * @param toolBarManager
      *            the tool bar manager to wrap
      * @param id
@@ -131,10 +132,10 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * Checks whether this contribution item has been disposed. If it has, and
      * the tracing options are active, then it prints some debugging
      * information.
-     *
+     * 
      * @return <code>true</code> if the item is disposed; <code>false</code>
      *         otherwise.
-     *
+     *  
      */
     private final boolean checkDisposed() {
         if (disposed) {
@@ -150,6 +151,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
     @Override
 	public void dispose() {
         // Dispose of the ToolBar and all its contributions
@@ -171,6 +177,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         disposed = true;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
+     *      int)
+     */
     @Override
 	public void fill(CoolBar coolBar, int index) {
         if (checkDisposed()) {
@@ -204,13 +216,16 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // ToolBarManager.createControl can actually return a pre-existing control.
             // Only add the listener if the toolbar was newly created (bug 62097).
             if (oldToolBar != toolBar) {
-	            toolBar.addListener(SWT.MenuDetect, event -> {
-				    // if the toolbar does not have its own context menu then
-				    // handle the event
-				    if (toolBarManager.getContextMenuManager() == null) {
-				        handleContextMenu(event);
-				    }
-				});
+	            toolBar.addListener(SWT.MenuDetect, new Listener() {
+	
+	                public void handleEvent(Event event) {
+	                    // if the toolbar does not have its own context menu then
+	                    // handle the event
+	                    if (toolBarManager.getContextMenuManager() == null) {
+	                        handleContextMenu(event);
+	                    }
+	                }
+	            });
             }
 
             // Handle for chevron clicking
@@ -228,7 +243,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             }
 
             // Handle for disposal
-            coolItem.addDisposeListener(event -> handleWidgetDispose(event));
+            coolItem.addDisposeListener(new DisposeListener() {
+
+                public void widgetDisposed(DisposeEvent event) {
+                    handleWidgetDispose(event);
+                }
+            });
 
             // Sets the size of the coolItem
             updateSize(true);
@@ -261,11 +281,10 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Returns the current height of the corresponding cool item.
-     *
+     * 
      * @return the current height
      */
-    @Override
-	public int getCurrentHeight() {
+    public int getCurrentHeight() {
         if (checkDisposed()) {
             return -1;
         }
@@ -274,11 +293,10 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Returns the current width of the corresponding cool item.
-     *
+     * 
      * @return the current size
      */
-    @Override
-	public int getCurrentWidth() {
+    public int getCurrentWidth() {
         if (checkDisposed()) {
             return -1;
         }
@@ -287,13 +305,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Returns the minimum number of tool items to show in the cool item.
-     *
+     * 
      * @return the minimum number of tool items to show, or <code>SHOW_ALL_ITEMS</code>
      *         if a value was not set
      * @see #setMinimumItemsToShow(int)
      */
-    @Override
-	public int getMinimumItemsToShow() {
+    public int getMinimumItemsToShow() {
         if (checkDisposed()) {
             return -1;
         }
@@ -302,13 +319,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Returns the internal tool bar manager of the contribution item.
-     *
+     * 
      * @return the tool bar manager, or <code>null</code> if one is not
      *         defined.
      * @see IToolBarManager
      */
-    @Override
-	public IToolBarManager getToolBarManager() {
+    public IToolBarManager getToolBarManager() {
         if (checkDisposed()) {
             return null;
         }
@@ -317,12 +333,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Returns whether chevron support is enabled.
-     *
+     * 
      * @return <code>true</code> if chevron support is enabled, <code>false</code>
      *         otherwise
      */
-    @Override
-	public boolean getUseChevron() {
+    public boolean getUseChevron() {
         if (checkDisposed()) {
             return false;
         }
@@ -342,7 +357,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         ToolBar toolBar = (ToolBar) control;
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
-        ArrayList<ToolItem> hidden = new ArrayList<>();
+        ArrayList<ToolItem> hidden = new ArrayList<ToolItem>();
         for (int i = 0; i < items.length; ++i) {
             Rectangle itemBounds = items[i].getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
@@ -384,7 +399,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
     /**
      * Handles the event when the toobar item does not have its own context
      * menu.
-     *
+     * 
      * @param event
      *            the event object
      */
@@ -397,8 +412,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // Hook listener to remove menu once it has disapeared
             parentMenu.addListener(SWT.Hide, new Listener() {
 
-                @Override
-				public void handleEvent(Event innerEvent) {
+                public void handleEvent(Event innerEvent) {
                     ToolBar innerToolBar = toolBarManager.getControl();
                     if (innerToolBar != null) {
                         innerToolBar.setMenu(null);
@@ -415,7 +429,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
 
     /**
      * Handles the disposal of the widget.
-     *
+     * 
      * @param event
      *            the event object
      */
@@ -427,7 +441,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * A contribution item is visible iff its internal state is visible <em>or</em>
      * the tool bar manager contains something other than group markers and
      * separators.
-     *
+     * 
      * @return <code>true</code> if the tool bar manager contains something
      *         other than group marks and separators, and the internal state is
      *         set to be visible.
@@ -454,6 +468,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return (visibleItem || super.isVisible());
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
+     */
     @Override
 	public void saveWidgetState() {
         if (checkDisposed()) {
@@ -503,12 +522,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
     /**
      * Sets the current height of the cool item. Update(SIZE) should be called
      * to adjust the widget.
-     *
+     * 
      * @param currentHeight
      *            the current height to set
      */
-    @Override
-	public void setCurrentHeight(int currentHeight) {
+    public void setCurrentHeight(int currentHeight) {
         if (checkDisposed()) {
             return;
         }
@@ -518,12 +536,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
     /**
      * Sets the current width of the cool item. Update(SIZE) should be called
      * to adjust the widget.
-     *
+     * 
      * @param currentWidth
      *            the current width to set
      */
-    @Override
-	public void setCurrentWidth(int currentWidth) {
+    public void setCurrentWidth(int currentWidth) {
         if (checkDisposed()) {
             return;
         }
@@ -535,14 +552,13 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * number is less than the total tool items, a chevron will appear and the
      * hidden tool items appear in a drop down menu. By default, all the tool
      * items are shown in the cool item.
-     *
+     * 
      * @param minimumItemsToShow
      *            the minimum number of tool items to show.
      * @see #getMinimumItemsToShow()
      * @see #setUseChevron(boolean)
      */
-    @Override
-	public void setMinimumItemsToShow(int minimumItemsToShow) {
+    public void setMinimumItemsToShow(int minimumItemsToShow) {
         if (checkDisposed()) {
             return;
         }
@@ -552,19 +568,23 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
     /**
      * Enables or disables chevron support for the cool item. By default,
      * chevron support is enabled.
-     *
+     * 
      * @param value
      *            <code>true</code> to enable chevron support, <code>false</code>
      *            otherwise.
      */
-    @Override
-	public void setUseChevron(boolean value) {
+    public void setUseChevron(boolean value) {
         if (checkDisposed()) {
             return;
         }
         useChevron = value;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
+     */
     @Override
 	public void update(String propertyName) {
         if (checkDisposed()) {
@@ -586,7 +606,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
     /**
      * Updates the cool items' preferred, minimum, and current size. The
      * preferred size is calculated based on the tool bar size and extra trim.
-     *
+     * 
      * @param changeCurrentSize
      *            <code>true</code> if the current size should be changed to
      *            the preferred size, <code>false</code> to not change the

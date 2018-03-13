@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,14 +26,13 @@ public class PropertiesElement extends QuickAccessElement {
 
 	private Object selectedElement;
 	private IPreferenceNode preferenceNode;
-
+	
 	/* package */PropertiesElement(Object selectedElement, IPreferenceNode preferenceNode, PropertiesProvider propertiesProvider) {
 		super(propertiesProvider);
 		this.selectedElement = selectedElement;
 		this.preferenceNode = preferenceNode;
 	}
-
-	@Override
+	
 	public void execute() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -44,12 +43,10 @@ public class PropertiesElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return preferenceNode.getId();
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		Image image = preferenceNode.getLabelImage();
 		if (image != null) {
@@ -59,12 +56,10 @@ public class PropertiesElement extends QuickAccessElement {
 		return null;
 	}
 
-	@Override
 	public String getLabel() {
 		return preferenceNode.getLabelText();
 	}
-
-	@Override
+	
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -73,7 +68,6 @@ public class PropertiesElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -88,5 +82,5 @@ public class PropertiesElement extends QuickAccessElement {
 		} else if (!preferenceNode.equals(other.preferenceNode))
 			return false;
 		return true;
-	}
+	}	
 }

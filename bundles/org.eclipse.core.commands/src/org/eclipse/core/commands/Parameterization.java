@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ package org.eclipse.core.commands;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.internal.commands.util.Util;
 
@@ -23,7 +22,7 @@ import org.eclipse.core.internal.commands.util.Util;
  * <code>ParameterizedCommand</code>, which is used to refer to a command
  * with a collection of parameterizations.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class Parameterization {
@@ -42,7 +41,8 @@ public final class Parameterization {
 	/**
 	 * The seed for the hash code for all parameterized commands.
 	 */
-	private static final int HASH_INITIAL = Parameterization.class.getName().hashCode();
+	private static final int HASH_INITIAL = Parameterization.class.getName()
+			.hashCode();
 
 	/**
 	 * The hash code for this object. This value is computed lazily, and marked
@@ -64,7 +64,7 @@ public final class Parameterization {
 
 	/**
 	 * Constructs a new instance of <code>Parameterization</code>.
-	 *
+	 * 
 	 * @param parameter
 	 *            The parameter that is being parameterized; must not be
 	 *            <code>null</code>.
@@ -73,14 +73,17 @@ public final class Parameterization {
 	 */
 	public Parameterization(final IParameter parameter, final String value) {
 		if (parameter == null) {
-			throw new NullPointerException("You cannot parameterize a null parameter"); //$NON-NLS-1$
+			throw new NullPointerException(
+					"You cannot parameterize a null parameter"); //$NON-NLS-1$
 		}
 
 		this.parameter = parameter;
 		this.value = value;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -91,7 +94,8 @@ public final class Parameterization {
 		}
 
 		final Parameterization parameterization = (Parameterization) object;
-		if (!(Util.equals(this.parameter.getId(), parameterization.parameter.getId()))) {
+		if (!(Util.equals(this.parameter.getId(), parameterization.parameter
+				.getId()))) {
 			return false;
 		}
 
@@ -100,7 +104,7 @@ public final class Parameterization {
 
 	/**
 	 * Returns the parameter that is being parameterized.
-	 *
+	 * 
 	 * @return The parameter; never <code>null</code>.
 	 */
 	public final IParameter getParameter() {
@@ -109,7 +113,7 @@ public final class Parameterization {
 
 	/**
 	 * Returns the value for the parameter in this parameterization.
-	 *
+	 * 
 	 * @return The value; may be <code>null</code>.
 	 */
 	public final String getValue() {
@@ -120,17 +124,18 @@ public final class Parameterization {
 	 * Returns the human-readable name for the current value, if any. If the
 	 * name cannot be found, then it simply returns the value. It also ensures
 	 * that any <code>null</code> values are converted into an empty string.
-	 *
+	 * 
 	 * @return The human-readable name of the value; never <code>null</code>.
 	 * @throws ParameterValuesException
 	 *             If the parameter needed to be initialized, but couldn't be.
 	 */
 	public final String getValueName() throws ParameterValuesException {
-		final Map<?, ?> parameterValues = parameter.getValues().getParameterValues();
-		final Iterator<?> parameterValueItr = parameterValues.entrySet().iterator();
+		final Map parameterValues = parameter.getValues().getParameterValues();
+		final Iterator parameterValueItr = parameterValues.entrySet()
+				.iterator();
 		String returnValue = null;
 		while (parameterValueItr.hasNext()) {
-			final Entry<?, ?> entry = (Entry<?, ?>) parameterValueItr.next();
+			final Map.Entry entry = (Map.Entry) parameterValueItr.next();
 			final String currentValue = (String) entry.getValue();
 			if (Util.equals(value, currentValue)) {
 				returnValue = (String) entry.getKey();
@@ -145,7 +150,9 @@ public final class Parameterization {
 		return returnValue;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(parameter);

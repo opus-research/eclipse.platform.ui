@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
@@ -16,8 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobFunction;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
@@ -32,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ConfigurationInfo;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * Displays system information about the eclipse application. The content of
@@ -49,7 +47,6 @@ public final class AboutSystemPage extends ProductInfoPage {
 
 	private Text text;
 
-	@Override
 	public void createControl(Composite parent) {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.SYSTEM_SUMMARY_DIALOG);
@@ -72,7 +69,6 @@ public final class AboutSystemPage extends ProductInfoPage {
 		setControl(outer);
 	}
 
-	@Override
 	public void createPageButtons(Composite parent) {
 		Button button = createButton(parent, BROWSE_ERROR_LOG_BUTTON,
 				WorkbenchMessages.AboutSystemDialog_browseErrorLogName);
@@ -83,7 +79,11 @@ public final class AboutSystemPage extends ProductInfoPage {
 				WorkbenchMessages.AboutSystemDialog_copyToClipboardName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.about.ProductInfoPage#getId()
+	 */
 	String getId() {
 		return ID;
 	}
@@ -108,7 +108,11 @@ public final class AboutSystemPage extends ProductInfoPage {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
 		case BROWSE_ERROR_LOG_BUTTON:
@@ -144,23 +148,15 @@ public final class AboutSystemPage extends ProductInfoPage {
 
 	private void fetchConfigurationInfo(final Text text) {
 		text.setText(WorkbenchMessages.AboutSystemPage_RetrievingSystemInfo);
-		Job job = Job.create(WorkbenchMessages.AboutSystemPage_FetchJobTitle, new IJobFunction() {
-			@Override
-			public IStatus run(IProgressMonitor monitor) {
-				final String info = ConfigurationInfo.getSystemSummary();
-				if (!text.isDisposed()) {
-					text.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (!text.isDisposed()) {
-								text.setText(info);
-							}
-						}
-					});
-				}
+		WorkbenchJob job = new WorkbenchJob(
+				WorkbenchMessages.AboutSystemPage_FetchJobTitle) {
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				String info = ConfigurationInfo.getSystemSummary();
+				if (!text.isDisposed())
+					text.setText(info);
 				return Status.OK_STATUS;
 			}
-		});
+		};
 		job.schedule();
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -38,7 +38,7 @@ public class PageListenerList extends EventManager {
 
     /**
      * Calls a page listener with associated performance event instrumentation
-     *
+     * 
      * @param runnable
      * @param listener
      * @param page
@@ -50,7 +50,7 @@ public class PageListenerList extends EventManager {
     		label = description + page.getLabel();
     		UIStats.start(UIStats.NOTIFY_PAGE_LISTENERS, label);
     	}
-    	SafeRunner.run(runnable);
+    	Platform.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PAGE_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PAGE_LISTENERS, listener, label);
 		}
@@ -64,8 +64,7 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.pageActivated(page);
                 }
             }, l, page, "activated::"); //$NON-NLS-1$
@@ -80,8 +79,7 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.pageClosed(page);
                 }
             }, l, page, "closed::"); //$NON-NLS-1$
@@ -96,8 +94,7 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < listeners.length; i++) {
             final IPageListener l = (IPageListener) listeners[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.pageOpened(page);
                 }
             }, l, page, "opened::"); //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
+
+import org.eclipse.e4.core.commands.ExpressionContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +22,6 @@ import java.util.List;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.OrExpression;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -43,10 +43,10 @@ public class ContributionRecord {
 	static final String STATIC_CONTEXT = "ContributionFactoryContext"; //$NON-NLS-1$
 
 	MMenu menuModel;
-	private MMenuContribution menuContribution;
-	private ArrayList<MMenuElement> generatedElements = new ArrayList<>();
-	private HashSet<MMenuElement> sharedElements = new HashSet<>();
-	private MenuManagerRenderer renderer;
+	MMenuContribution menuContribution;
+	ArrayList<MMenuElement> generatedElements = new ArrayList<MMenuElement>();
+	HashSet<MMenuElement> sharedElements = new HashSet<MMenuElement>();
+	MenuManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
 	private Runnable factoryDispose;
@@ -68,7 +68,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 *
+	 * 
 	 * @return the shared elements collection
 	 */
 	public Collection<MMenuElement> getSharedElements() {
@@ -77,7 +77,7 @@ public class ContributionRecord {
 
 	/**
 	 * Access to analyze for tests. For Looking, not touching!
-	 *
+	 * 
 	 * @return the generated elements collection
 	 */
 	public Collection<MMenuElement> getGeneratedElements() {
@@ -90,7 +90,7 @@ public class ContributionRecord {
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
-		HashSet<ContributionRecord> recentlyUpdated = new HashSet<>();
+		HashSet<ContributionRecord> recentlyUpdated = new HashSet<ContributionRecord>();
 		recentlyUpdated.add(this);
 		boolean changed = false;
 		for (MMenuElement item : generatedElements) {
@@ -188,9 +188,6 @@ public class ContributionRecord {
 			// implied to always be visible
 			return null;
 		}
-		if (coreExpressionA.equals(coreExpressionB)) {
-			return expressionA;
-		}
 
 		// combine the two expressions
 		OrExpression expression = new OrExpression();
@@ -213,7 +210,7 @@ public class ContributionRecord {
 		if (menuContribution.getTransientData().get(FACTORY) != null) {
 			copyElements = mergeFactoryIntoModel();
 		} else {
-			copyElements = new ArrayList<>();
+			copyElements = new ArrayList<MMenuElement>();
 			for (MMenuElement item : menuContribution.getChildren()) {
 				MMenuElement copy = (MMenuElement) EcoreUtil
 						.copy((EObject) item);
@@ -251,7 +248,8 @@ public class ContributionRecord {
 				menuModel.getChildren().add(idx++, copy);
 			}
 			if (copy instanceof MMenu || copy instanceof MMenuSeparator) {
-				renderer.addRecord(copy, this);
+				ArrayList<ContributionRecord> array = renderer.getList(copy);
+				array.add(this);
 			}
 		}
 		return true;
@@ -267,8 +265,8 @@ public class ContributionRecord {
 		}
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
-		factoryDispose = (Runnable) ((IContextFunction) obj).compute(
-				staticContext, null);
+		factoryDispose = (Runnable) ((IContextFunction) obj)
+				.compute(staticContext, null);
 		return staticContext.get(List.class);
 	}
 
@@ -317,8 +315,8 @@ public class ContributionRecord {
 			menuModel.getChildren().remove(copy);
 		}
 		for (MMenuElement shared : sharedElements) {
-			renderer.removeRecord(shared, this);
 			ArrayList<ContributionRecord> array = renderer.getList(shared);
+			array.remove(this);
 			if (array.isEmpty()) {
 				menuModel.getChildren().remove(shared);
 			}

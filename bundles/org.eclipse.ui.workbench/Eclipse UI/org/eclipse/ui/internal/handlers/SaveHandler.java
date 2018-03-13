@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,9 +28,9 @@ import org.eclipse.ui.internal.WorkbenchPage;
  * <p>
  * Replacement for SaveAction
  * </p>
- *
+ * 
  * @since 3.7
- *
+ * 
  */
 public class SaveHandler extends AbstractSaveHandler {
 
@@ -38,7 +38,6 @@ public class SaveHandler extends AbstractSaveHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		ISaveablePart saveablePart = getSaveablePart(event);
@@ -64,7 +63,6 @@ public class SaveHandler extends AbstractSaveHandler {
 
 	}
 
-	@Override
 	protected EvaluationResult evaluate(IEvaluationContext context) {
 
 		IWorkbenchWindow window = InternalHandlerUtil.getActiveWorkbenchWindow(context);

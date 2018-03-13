@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,12 +27,20 @@ public class ActivityContentProvider implements IStructuredContentProvider {
     public ActivityContentProvider() {
     }
 
-    @Override
-	public void dispose() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
+    public void dispose() {
     }
 
-    @Override
-	public Object[] getElements(Object inputElement) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
+    public Object[] getElements(Object inputElement) {
         Object[] activities = new Object[0];
         if (inputElement instanceof IActivityManager) {
             activities = ((IActivityManager) inputElement)
@@ -43,7 +51,12 @@ public class ActivityContentProvider implements IStructuredContentProvider {
         return activities;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+     *      java.lang.Object, java.lang.Object)
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 }

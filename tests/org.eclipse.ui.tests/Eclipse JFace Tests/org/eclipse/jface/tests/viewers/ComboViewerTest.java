@@ -23,22 +23,19 @@ public class ComboViewerTest extends StructuredViewerTest {
         super(name);
     }
 
-    @Override
-	protected StructuredViewer createViewer(Composite parent) {
+    protected StructuredViewer createViewer(Composite parent) {
         ComboViewer viewer = new ComboViewer(parent);
         viewer.setContentProvider(new TestModelContentProvider());
         return viewer;
     }
 
-    @Override
-	protected int getItemCount() {
+    protected int getItemCount() {
         TestElement first = fRootElement.getFirstChild();
         Combo list = (Combo) fViewer.testFindItem(first);
         return list.getItemCount();
     }
 
-    @Override
-	protected String getItemText(int at) {
+    protected String getItemText(int at) {
         Combo list = (Combo) fViewer.getControl();
         return list.getItem(at);
     }
@@ -48,10 +45,9 @@ public class ComboViewerTest extends StructuredViewerTest {
     }
 
     /**
-     * TODO: Determine if this test is applicable to ComboViewer
+     * TODO: Determine if this test is applicable to ComboViewer 
      */
-    @Override
-	public void testInsertChild() {
+    public void testInsertChild() {
 
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 
 	private SelectorList selectors;
 	private CSSStyleDeclarationImpl styleDeclaration;
-
+	
 	public CSSStyleRuleImpl(CSSStyleSheet parentStyleSheet, CSSRule parentRule,
 			SelectorList selectors) {
 		super(parentStyleSheet, parentRule);
@@ -35,43 +35,57 @@ public class CSSStyleRuleImpl extends CSSRuleImpl implements CSSStyleRule, Exten
 	//----------------------------------------
 	// W3C CSSRule API methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule.getType()
+	 */
 	public short getType() {
 		return CSSRule.STYLE_RULE;
 	}
-
-
+	
+	
 	//----------------------------------------
 	// W3C CSSStyleRule API methods
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleRule#getSelectorText()
+	 */
 	public String getSelectorText() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleRule#getStyle()
+	 */
 	public CSSStyleDeclaration getStyle() {
 		return styleDeclaration;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSStyleRule#setSelectorText(String)
+	 */
 	public void setSelectorText(String selectorText) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-
+	
 	//----------------------------------------
 	// Additional methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.e4.ui.css.core.dom#ExtendedCSSRule#getSelectorList()
+	 */
 	public SelectorList getSelectorList() {
 		return selectors;
 	}
 
 
-	@Override
 	public CSSPropertyList getCSSPropertyList() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");

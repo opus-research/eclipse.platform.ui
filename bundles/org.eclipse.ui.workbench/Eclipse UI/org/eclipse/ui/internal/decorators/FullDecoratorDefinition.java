@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
- * The RunnableDecoratorDefinition is the definition for
+ * The RunnableDecoratorDefinition is the definition for 
  * decorators that have an ILabelDecorator class to instantiate.
  */
 
@@ -57,9 +57,8 @@ class FullDecoratorDefinition extends DecoratorDefinition {
         if (decorator == null) {
             Platform
                     .run(new SafeRunnable(
-                            NLS.bind(WorkbenchMessages.DecoratorManager_ErrorActivatingDecorator, getName() )) {
-                        @Override
-						public void run() {
+                            NLS.bind(WorkbenchMessages.DecoratorManager_ErrorActivatingDecorator, getName() )) { 
+                        public void run() {
                             try {
                                 decorator = (ILabelDecorator) WorkbenchPlugin
                                         .createExtension(
@@ -88,8 +87,10 @@ class FullDecoratorDefinition extends DecoratorDefinition {
         return decorator;
     }
 
-    @Override
-	protected void refreshDecorator() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#refreshDecorator()
+     */
+    protected void refreshDecorator() {
         //Only do something if disabled so as to prevent
         //gratutitous activation
         if (!this.enabled && decorator != null) {
@@ -140,21 +141,25 @@ class FullDecoratorDefinition extends DecoratorDefinition {
 
     /**
      * Returns the decorator, or <code>null</code> if not enabled.
-     *
+     * 
      * @return the decorator, or <code>null</code> if not enabled
      */
     public ILabelDecorator getDecorator() {
         return decorator;
     }
 
-    @Override
-	protected IBaseLabelProvider internalGetLabelProvider()
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#internalGetLabelProvider()
+     */
+    protected IBaseLabelProvider internalGetLabelProvider()
             throws CoreException {
         return internalGetDecorator();
     }
 
-    @Override
-	public boolean isFull() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#isFull()
+     */
+    public boolean isFull() {
         return true;
     }
 

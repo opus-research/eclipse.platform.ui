@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,9 +18,9 @@ import org.eclipse.core.expressions.IEvaluationContext;
 /**
  * An expression that simply returns <code>true</code> at all times. A shared
  * instance of this expression is provided.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public final class AlwaysEnabledExpression extends Expression {
 
@@ -33,7 +33,11 @@ public final class AlwaysEnabledExpression extends Expression {
 	private AlwaysEnabledExpression() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	public EvaluationResult evaluate(IEvaluationContext context) {
 		return EvaluationResult.TRUE;
 	}

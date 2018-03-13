@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,9 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 
 /**
  * The registry of status handlers extensions.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class StatusHandlerRegistry implements IExtensionChangeHandler {
 
@@ -38,7 +38,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	private static final String TAG_STATUSHANDLER = "statusHandler"; //$NON-NLS-1$
 
 	private static final String TAG_STATUSHANDLER_PRODUCTBINDING = "statusHandlerProductBinding"; //$NON-NLS-1$
-
+	
 	private static final String STATUSHANDLER_ARG = "-statushandler"; //$NON-NLS-1$
 
 	private ArrayList statusHandlerDescriptors = new ArrayList();
@@ -83,7 +83,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Returns StatusHandlerRegistry singleton instance.
-	 *
+	 * 
 	 * @return StatusHandlerRegistry instance
 	 */
 	public static StatusHandlerRegistry getDefault() {
@@ -93,7 +93,12 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 		return instance;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement[] configElements = extension
 				.getConfigurationElements();
@@ -116,7 +121,12 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 		buildHandlersStructure();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
+	 *      java.lang.Object[])
+	 */
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
 			if (objects[i] instanceof StatusHandlerDescriptor) {
@@ -131,7 +141,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	/**
 	 * Returns the default product handler descriptor, or null if the product is
 	 * not defined or there is no product binding
-	 *
+	 * 
 	 * @return the default handler
 	 */
 	public StatusHandlerDescriptor getDefaultHandlerDescriptor() {
@@ -141,7 +151,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	/**
 	 * Returns a list of handler descriptors which should be used for statuses
 	 * with given plugin id.
-	 *
+	 * 
 	 * @param pluginId
 	 * @return list of handler descriptors
 	 */
@@ -151,7 +161,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 
 	/**
 	 * Returns status handler descriptor for given id.
-	 *
+	 * 
 	 * @param statusHandlerId
 	 *            the id to get for
 	 * @return the status handler descriptor
@@ -183,13 +193,13 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 	/**
 	 * It is possible since Eclipse 3.5 to configure custom status handling
 	 * using the -statushandler parameter.
-	 *
+	 * 
 	 * @return the id of the statushandler
 	 * @since 3.5
 	 */
 	private String resolveUserStatusHandlerId(){
 		String[] parameters = Platform.getCommandLineArgs();
-
+		
 		for(int i = 0; i < parameters.length - 1; i++){
 			if(STATUSHANDLER_ARG.equals(parameters[i])){
 				return parameters[i + 1];
@@ -197,7 +207,7 @@ public class StatusHandlerRegistry implements IExtensionChangeHandler {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Sets the default product handler descriptor if product exists and binding
 	 * is defined and creates handler descriptors tree due to the prefix policy.

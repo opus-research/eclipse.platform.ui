@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.ui.internal.tweaklets.Tweaklets.TweakKey;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public abstract class InterceptContributions {
 	public static TweakKey KEY = new Tweaklets.TweakKey(
@@ -26,11 +26,9 @@ public abstract class InterceptContributions {
 	static {
 		Tweaklets.setDefault(InterceptContributions.KEY,
 				new InterceptContributions() {
-					@Override
 					public IViewPart tweakView(Object viewContribution) {
 						return (IViewPart) viewContribution;
 					}
-					@Override
 					public IEditorPart tweakEditor(Object editorContribution) {
 						return (IEditorPart) editorContribution;
 					}
@@ -43,7 +41,7 @@ public abstract class InterceptContributions {
 
 	/**
 	 * Tweak the given view contribution.
-	 *
+	 * 
 	 * @param viewContribution
 	 *            The contributed instance
 	 * @return The view part to use
@@ -52,7 +50,7 @@ public abstract class InterceptContributions {
 
 	/**
 	 * Tweak the given editor contribution.
-	 *
+	 * 
 	 * @param editorContribution
 	 *            The contributed instance
 	 * @return The editor part to use

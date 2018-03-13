@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2010 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.css.swt.helpers.SWTElementHelpers;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 
@@ -30,10 +31,11 @@ public class CSSPropertyBorderSWTHandler extends
 
 	public final static ICSSPropertyBorderHandler INSTANCE = new CSSPropertyBorderSWTHandler();
 
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
-
+		
+		Widget widget = SWTElementHelpers.getWidget(element);
+		
 		Control control = SWTElementHelpers.getControl(element);
 		if (control != null) {
 			Composite parent = control.getParent();
@@ -48,7 +50,7 @@ public class CSSPropertyBorderSWTHandler extends
 						.createBorderPaintListener(engine, control));
 			}
 			super.applyCSSProperty(border, property, value, pseudo, engine);
-			if((parent.getData("CSS_SUPPORTS_BORDERS") != null) &&
+			if((parent.getData("CSS_SUPPORTS_BORDERS") != null) && 
 					(value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE)) {
 				int pixelValue = (int) ((CSSPrimitiveValue) value).getFloatValue(CSSPrimitiveValue.CSS_PT);
 				if(property.equals("border-width")) {
@@ -68,8 +70,7 @@ public class CSSPropertyBorderSWTHandler extends
 		return false;
 
 	}
-
-	@Override
+	
 	public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine)
 			throws Exception {
 		Control control = SWTElementHelpers.getControl(element);

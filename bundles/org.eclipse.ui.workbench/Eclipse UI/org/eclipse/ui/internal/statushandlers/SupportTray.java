@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,11 @@ public class SupportTray extends DialogTray implements
 
 	private StatusAdapter lastSelectedStatus;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogTray#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createContents(Composite parent) {
 		Composite container = new Composite(parent, SWT.NONE);
 
@@ -101,7 +105,6 @@ public class SupportTray extends DialogTray implements
 		container.setLayoutData(layoutData);
 
 		container.addListener(SWT.Dispose, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				destroyImages();
 			}
@@ -143,7 +146,7 @@ public class SupportTray extends DialogTray implements
 		Point shellSize = supportArea.getShell().getSize();
 		Point desiredSize = supportArea.getShell().computeSize(SWT.DEFAULT,
 				SWT.DEFAULT);
-
+		
 		if(desiredSize.y > shellSize.y){
 			supportArea.getShell().setSize(shellSize.x,
 					Math.min(desiredSize.y, 500));
@@ -196,14 +199,13 @@ public class SupportTray extends DialogTray implements
 
 		backgroundHot.dispose();
 	}
-
+	
 	/**
 	 * Creates any actions needed by the tray.
 	 */
 	private void createActions() {
 		createImages();
 		closeAction = new ContributionItem() {
-			@Override
 			public void fill(ToolBar parent, int index) {
 				final ToolItem item = new ToolItem(parent, SWT.PUSH);
 				item.setImage(normal);
@@ -221,7 +223,7 @@ public class SupportTray extends DialogTray implements
 
 	/**
 	 * Create the area for extra error support information.
-	 *
+	 * 
 	 * @param parent
 	 *            A composite on which should be the support area created.
 	 * @param statusAdapter
@@ -294,7 +296,7 @@ public class SupportTray extends DialogTray implements
 
 	/**
 	 * Checks if the support dialog has any support areas.
-	 *
+	 * 
 	 * @param adapter
 	 *            - a parameter for which we area checking the status adapter
 	 * @return true if support dialog has any support areas to display, false
@@ -312,7 +314,11 @@ public class SupportTray extends DialogTray implements
 		return provider;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		lastSelectedStatus = getStatusAdapterFromEvent(event);
 		if (supportArea != null && !supportArea.isDisposed()) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,7 +23,7 @@ import org.eclipse.ui.ISources;
  * element. This caches the evaluation result so that it is only re-computed as
  * necessary.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public abstract class EvaluationResultCache implements IEvaluationResultCache {
@@ -47,7 +47,7 @@ public abstract class EvaluationResultCache implements IEvaluationResultCache {
 
 	/**
 	 * Constructs a new instance of <code>EvaluationResultCache</code>.
-	 *
+	 * 
 	 * @param expression
 	 *            The expression that must evaluate to <code>true</code>
 	 *            before this handler is active. This value may be
@@ -60,12 +60,10 @@ public abstract class EvaluationResultCache implements IEvaluationResultCache {
 				.computeSourcePriority(expression);
 	}
 
-	@Override
 	public final void clearResult() {
 		evaluationResult = null;
 	}
 
-	@Override
 	public final boolean evaluate(final IEvaluationContext context) {
 		if (expression == null) {
 			return true;
@@ -90,17 +88,14 @@ public abstract class EvaluationResultCache implements IEvaluationResultCache {
 		return evaluationResult != EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final Expression getExpression() {
 		return expression;
 	}
 
-	@Override
 	public final int getSourcePriority() {
 		return sourcePriority;
 	}
 
-	@Override
 	public final void setResult(final boolean result) {
 		if (result) {
 			evaluationResult = EvaluationResult.TRUE;

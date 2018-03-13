@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.tweaklets;
@@ -31,16 +30,14 @@ import org.eclipse.ui.internal.registry.EditorDescriptor;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class TabBehaviourMRU extends TabBehaviour {
 
-	@Override
 	public boolean alwaysShowPinAction() {
 		return false;
 	}
 
-	@Override
 	public IEditorReference findReusableEditor(WorkbenchPage page) {
 		boolean reuse = WorkbenchPlugin.getDefault().getPreferenceStore()
 				.getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN);
@@ -53,8 +50,8 @@ public class TabBehaviourMRU extends TabBehaviour {
 		if (length < page.getEditorReuseThreshold()) {
 			return null;
 		} else if (length > page.getEditorReuseThreshold()) {
-			List<IEditorReference> refs = new ArrayList<>();
-			List<IEditorReference> keep = new ArrayList<>(Arrays.asList(editors));
+			List<IEditorReference> refs = new ArrayList<IEditorReference>();
+			List<IEditorReference> keep = new ArrayList<IEditorReference>(Arrays.asList(editors));
 			int extra = length - page.getEditorReuseThreshold();
 			// look for extra editors that should be closed
 			for (int i = 0; i < editors.length; i++) {
@@ -117,7 +114,6 @@ public class TabBehaviourMRU extends TabBehaviour {
 				MessageDialog.QUESTION, new String[] { IDialogConstants.YES_LABEL,
 						IDialogConstants.NO_LABEL,
 						WorkbenchMessages.EditorManager_openNewEditorLabel }, 0) {
-			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
 			}
@@ -134,7 +130,6 @@ public class TabBehaviourMRU extends TabBehaviour {
 		return dirtyEditor;
 	}
 
-	@Override
 	public IEditorReference reuseInternalEditor(WorkbenchPage page,
  Object manager,
 			Object editorPresentation,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.jface.util.Util;
  * <code>IKeyFormatter</code> subclass from here, rather than implementing
  * <code>IKeyFormatter</code> directly.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public abstract class AbstractKeyFormatter implements IKeyFormatter {
@@ -75,7 +75,11 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keysKeyFormatter#format(org.eclipse.jface.bindings.keys.KeySequence)
+	 */
 	public String format(final int key) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
 		final String name = lookup.formalNameLookup(key);
@@ -83,11 +87,15 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 		if (resourceBundleKeys.contains(name)) {
 			return Util.translateString(RESOURCE_BUNDLE, name, name);
 		}
-
+		
 		return name;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.KeyFormatter#format(org.eclipse.jface.bindings.keys.KeySequence)
+	 */
 	public String format(KeySequence keySequence) {
 		StringBuffer stringBuffer = new StringBuffer();
 
@@ -104,7 +112,11 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 		return stringBuffer.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.KeyFormatter#formatKeyStroke(org.eclipse.jface.bindings.keys.KeyStroke)
+	 */
 	public String format(final KeyStroke keyStroke) {
 		final String keyDelimiter = getKeyDelimiter();
 
@@ -135,7 +147,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 	/**
 	 * An accessor for the delimiter you wish to use between keys. This is used
 	 * by the default format implementations to determine the key delimiter.
-	 *
+	 * 
 	 * @return The delimiter to use between keys; should not be
 	 *         <code>null</code>.
 	 */
@@ -145,7 +157,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 	 * An accessor for the delimiter you wish to use between key strokes. This
 	 * used by the default format implementations to determine the key stroke
 	 * delimiter.
-	 *
+	 * 
 	 * @return The delimiter to use between key strokes; should not be
 	 *         <code>null</code>.
 	 */
@@ -155,7 +167,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
 	 * Separates the modifier keys from each other, and then places them in an
 	 * array in some sorted order. The sort order is dependent on the type of
 	 * formatter.
-	 *
+	 * 
 	 * @param modifierKeys
 	 *            The modifier keys from the key stroke.
 	 * @return An array of modifier key values -- separated and sorted in some

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,12 +28,10 @@ public final class AndExpression extends CompositeExpression {
 	private static final int HASH_INITIAL = AndExpression.class.getName()
 			.hashCode();
 
-	@Override
 	protected final int computeHashCode() {
 		return HASH_INITIAL * HASH_FACTOR + hashCode(fExpressions);
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof AndExpression) {
 			final AndExpression that = (AndExpression) object;
@@ -43,13 +41,11 @@ public final class AndExpression extends CompositeExpression {
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context)
 			throws CoreException {
 		return evaluateAnd(context);
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("AndExpression("); //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -116,10 +114,10 @@ public abstract class QuickAccessContents {
 
 	/**
 	 * Refreshes the contents of the quick access shell
-	 *
+	 * 
 	 * @param filter
 	 *            The filter text to apply to results
-	 *
+	 * 
 	 */
 	public void refresh(String filter) {
 		if (table != null) {
@@ -150,7 +148,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Allows the quick access content owner to mark a quick access element as
 	 * being a perfect match, putting it at the start of the table.
-	 *
+	 * 
 	 * @param filter
 	 *            the filter text used to find a match
 	 * @return an element to be put at the top of the table or <code>null</code>
@@ -160,19 +158,19 @@ public abstract class QuickAccessContents {
 	/**
 	 * Notifies the quick access content owner that the contents of the table
 	 * have been changed.
-	 *
+	 * 
 	 * @param filterTextEmpty
 	 *            whether the filter text used to calculate matches was empty
 	 * @param showAllMatches
 	 *            whether the results were constrained by the size of the dialog
-	 *
+	 * 
 	 */
 	protected abstract void updateFeedback(boolean filterTextEmpty, boolean showAllMatches);
 
 	/**
 	 * Sets whether to display all matches to the current filter or limit the
 	 * results. Will refresh the table contents and update the info label.
-	 *
+	 * 
 	 * @param showAll
 	 *            whether to display all matches
 	 */
@@ -183,7 +181,7 @@ public abstract class QuickAccessContents {
 			refresh(filterText.getText().toLowerCase());
 		}
 	}
-
+	
 	private void updateInfoLabel() {
 		if (infoLabel != null) {
 			TriggerSequence sequence = getTriggerSequence();
@@ -207,14 +205,14 @@ public abstract class QuickAccessContents {
 	 * Returns the trigger sequence that can be used to open the quick access
 	 * dialog as well as toggle the show all results feature. Can return
 	 * <code>null</code> if no trigger sequence is known.
-	 *
+	 * 
 	 * @return the trigger sequence used to open the quick access or
 	 *         <code>null</code>
 	 */
 	public TriggerSequence getTriggerSequence() {
 		if (keySequence == null) {
-			IBindingService bindingService =
-					Adapters.adapt(PlatformUI.getWorkbench(), IBindingService.class);
+			IBindingService bindingService = (IBindingService) PlatformUI.getWorkbench()
+					.getAdapter(IBindingService.class);
 			keySequence = bindingService.getBestActiveBindingFor(QUICK_ACCESS_COMMAND_ID);
 		}
 		return keySequence;
@@ -223,7 +221,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Return whether the shell is currently set to display all matches or limit
 	 * the results.
-	 *
+	 * 
 	 * @return whether all matches will be displayed
 	 */
 	public boolean getShowAllMatches() {
@@ -284,7 +282,7 @@ public abstract class QuickAccessContents {
 	 * match entry that should be given priority. The number of items returned
 	 * is affected by {@link #getShowAllMatches()} and the size of the table's
 	 * composite.
-	 *
+	 * 
 	 * @param filter
 	 *            the string text filter to apply, possibly empty
 	 * @param perfectMatch
@@ -318,15 +316,15 @@ public abstract class QuickAccessContents {
 			for (int i = 0; i < providers.length
 					&& (showAllMatches || countTotal < maxCount); i++) {
 				if (entries[i] == null) {
-					entries[i] = new ArrayList<>();
+					entries[i] = new ArrayList<QuickAccessEntry>();
 					indexPerProvider[i] = 0;
 				}
 				int count = 0;
 				QuickAccessProvider provider = providers[i];
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
-					List<QuickAccessEntry> poorFilterMatches = new ArrayList<>();
-
+					List<QuickAccessEntry> poorFilterMatches = new ArrayList<QuickAccessEntry>();
+					
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
@@ -392,7 +390,7 @@ public abstract class QuickAccessContents {
 			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
 				if (entries[0] == null) {
-					entries[0] = new ArrayList<>();
+					entries[0] = new ArrayList<QuickAccessEntry>();
 					indexPerProvider[0] = 0;
 				}
 				entries[0].add(entry);
@@ -490,7 +488,6 @@ public abstract class QuickAccessContents {
 	public void hookFilterText(Text filterText) {
 		this.filterText = filterText;
 		filterText.addKeyListener(new KeyListener() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.keyCode) {
 				case SWT.CR:
@@ -515,13 +512,11 @@ public abstract class QuickAccessContents {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
 		});
 		filterText.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				String text = ((Text) e.widget).getText().toLowerCase();
 				refresh(text);
@@ -531,14 +526,13 @@ public abstract class QuickAccessContents {
 
 	/**
 	 * Creates the table providing the contents for the quick access dialog
-	 *
+	 * 
 	 * @param composite parent composite with {@link GridLayout}
 	 * @param defaultOrientation the window orientation to use for the table {@link SWT#RIGHT_TO_LEFT} or {@link SWT#LEFT_TO_RIGHT}
 	 * @return the created table
 	 */
 	public Table createTable(Composite composite, int defaultOrientation) {
 		composite.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				doDispose();
 			}
@@ -569,13 +563,11 @@ public abstract class QuickAccessContents {
 		tableColumnLayout.setColumnData(new TableColumn(table, SWT.NONE), new ColumnWeightData(100,
 				100));
 		table.getShell().addControlListener(new ControlAdapter() {
-			@Override
 			public void controlResized(ControlEvent e) {
 				if (!showAllMatches) {
 					if (!resized) {
 						resized = true;
 						e.display.timerExec(100, new Runnable() {
-							@Override
 							public void run() {
 								if (table != null && !table.isDisposed()) {
 									refresh(filterText.getText().toLowerCase());
@@ -589,7 +581,6 @@ public abstract class QuickAccessContents {
 		});
 
 		table.addKeyListener(new KeyListener() {
-			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.keyCode == SWT.ARROW_UP && table.getSelectionIndex() == 0) {
 					filterText.setFocus();
@@ -598,13 +589,11 @@ public abstract class QuickAccessContents {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// do nothing
 			}
 		});
 		table.addMouseListener(new MouseAdapter() {
-			@Override
 			public void mouseUp(MouseEvent e) {
 
 				if (table.getSelectionCount() < 1)
@@ -625,7 +614,6 @@ public abstract class QuickAccessContents {
 		table.addMouseMoveListener(new MouseMoveListener() {
 			TableItem lastItem = null;
 
-			@Override
 			public void mouseMove(MouseEvent e) {
 				if (table.equals(e.getSource())) {
 					Object o = table.getItem(new Point(e.x, e.y));
@@ -646,12 +634,10 @@ public abstract class QuickAccessContents {
 		});
 
 		table.addSelectionListener(new SelectionListener() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// do nothing
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				handleSelection();
 			}
@@ -667,7 +653,6 @@ public abstract class QuickAccessContents {
 			boldStyle = null;
 		}
 		Listener listener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				QuickAccessEntry entry = (QuickAccessEntry) event.item.getData();
 				if (entry != null) {
@@ -695,7 +680,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Creates a label which will display the key binding to expand
 	 * the search results.
-	 *
+	 * 
 	 * @param parent parent composite with {@link GridLayout}
 	 * @return the created label
 	 */

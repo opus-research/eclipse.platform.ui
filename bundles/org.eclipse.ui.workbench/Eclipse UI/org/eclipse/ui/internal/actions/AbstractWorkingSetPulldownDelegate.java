@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ import org.eclipse.ui.internal.registry.WorkingSetRegistry;
 
 /**
  * Baseclass for working set pulldown actions.
- *
+ * 
  * @since 3.3
  */
 public abstract class AbstractWorkingSetPulldownDelegate implements
@@ -49,13 +49,12 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 	private IWorkbenchWindow window;
 
 	/**
-	 *
+	 * 
 	 */
 	public AbstractWorkingSetPulldownDelegate() {
 		super();
 	}
 
-	@Override
 	public void dispose() {
 		if (menubarMenu != null) {
 			menubarMenu.dispose();
@@ -67,7 +66,6 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 		}
 	}
 
-	@Override
 	public Menu getMenu(Control parent) {
 		if (toolbarMenu != null) {
 			toolbarMenu.dispose();
@@ -77,7 +75,6 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 		return toolbarMenu;
 	}
 
-	@Override
 	public Menu getMenu(Menu parent) {
 		if (menubarMenu != null) {
 			menubarMenu.dispose();
@@ -92,7 +89,6 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 	 */
 	private void initMenu(Menu menu) {
 		menu.addMenuListener(new MenuAdapter() {
-			@Override
 			public void menuShown(MenuEvent e) {
 				Menu m = (Menu) e.widget;
 				MenuItem[] items = m.getItems();
@@ -113,7 +109,7 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 	/**
 	 * Split the working sets known by the manager into arrays based on their
 	 * defining page Id.
-	 *
+	 * 
 	 * @return an array of arrays
 	 */
 	protected IWorkingSet[][] splitSets() {
@@ -148,7 +144,6 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 		return typedSets;
 	}
 
-	@Override
 	public void init(IWorkbenchWindow window) {
 		this.window = window;
 	}
@@ -157,7 +152,6 @@ public abstract class AbstractWorkingSetPulldownDelegate implements
 		return window;
 	}
 
-	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		this.selection = selection;
 	}

@@ -67,16 +67,20 @@ public class FileSystemImportWizard extends Wizard implements IImportWizard {
         setDialogSettings(section);
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardFileSystemResourceImportPage1(workbench, selection);
         addPage(mainPage);
     }
 
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         this.workbench = workbench;
         this.selection = currentSelection;
 
@@ -90,8 +94,10 @@ public class FileSystemImportWizard extends Wizard implements IImportWizard {
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }

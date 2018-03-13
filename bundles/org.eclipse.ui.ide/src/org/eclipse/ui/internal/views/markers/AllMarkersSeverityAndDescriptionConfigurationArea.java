@@ -24,9 +24,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 /**
  * {@link ProblemsSeverityAndDescriptionConfigurationArea} is the configuration
  * area for the all markers view.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 		SeverityAndDescriptionConfigurationArea {
@@ -34,7 +34,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 	boolean filterOnSeverity;
 	private Button enablementButton;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.DescriptionConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createContents(Composite parent) {
 
 		super.createContents(parent);
@@ -56,7 +60,11 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 		buttons.setLayoutData(buttonData);
 
 		enablementButton.addSelectionListener(new SelectionAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
 				setFilterOnSeverity(enablementButton.getSelection());
 			}
@@ -64,17 +72,25 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionConfigurationArea#apply(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	public void apply(MarkerFieldFilter filter) {
 		super.apply(filter);
 		((AllMarkersSeverityAndDescriptionFieldFilter) filter)
 				.setFilterOnSeverity(filterOnSeverity);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionConfigurationArea#initialize(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	public void initialize(MarkerFieldFilter filter) {
 		super.initialize(filter);
-
+		
 		setFilterOnSeverity(((AllMarkersSeverityAndDescriptionFieldFilter) filter)
 				.getFilterOnSeverity());
 	}
@@ -87,7 +103,7 @@ public class AllMarkersSeverityAndDescriptionConfigurationArea extends
 		filterOnSeverity = filtering;
 		enablementButton.setSelection(filtering);
 		setSeverityButtonsEnabled(filterOnSeverity);
-
+		
 	}
 
 }

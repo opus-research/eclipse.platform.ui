@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ package org.eclipse.ui.commands;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see ICategoryListener
  * @see ICommandManager
@@ -46,14 +46,12 @@ package org.eclipse.ui.commands;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICategory extends Comparable {
 
     /**
      * Registers an instance of <code>ICategoryListener</code> to listen for
      * changes to attributes of this instance.
-     *
+     * 
      * @param categoryListener
      *            the instance of <code>ICategoryListener</code> to register.
      *            Must not be <code>null</code>. If an attempt is made to
@@ -61,7 +59,6 @@ public interface ICategory extends Comparable {
      *            which is already registered with this instance, no operation
      *            is performed.
      */
-	@Deprecated
     void addCategoryListener(ICategoryListener categoryListener);
 
     /**
@@ -73,21 +70,19 @@ public interface ICategory extends Comparable {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return the description of the category represented by this handle.
      *         Guaranteed not to be <code>null</code>.
      * @throws NotDefinedException
      *             if the category represented by this handle is not defined.
      */
-	@Deprecated
     String getDescription() throws NotDefinedException;
 
     /**
      * Returns the identifier of this handle.
-     *
+     * 
      * @return the identifier of this handle. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     String getId();
 
     /**
@@ -99,13 +94,12 @@ public interface ICategory extends Comparable {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return the name of the category represented by this handle. Guaranteed
      *         not to be <code>null</code>.
      * @throws NotDefinedException
      *             if the category represented by this handle is not defined.
      */
-	@Deprecated
     String getName() throws NotDefinedException;
 
     /**
@@ -117,17 +111,16 @@ public interface ICategory extends Comparable {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return <code>true</code>, iff the category represented by this
      *         handle is defined.
      */
-	@Deprecated
     boolean isDefined();
 
     /**
      * Unregisters an instance of <code>ICategoryListener</code> listening
      * for changes to attributes of this instance.
-     *
+     * 
      * @param categoryListener
      *            the instance of <code>ICategoryListener</code> to
      *            unregister. Must not be <code>null</code>. If an attempt
@@ -135,6 +128,5 @@ public interface ICategory extends Comparable {
      *            which is not already registered with this instance, no
      *            operation is performed.
      */
-	@Deprecated
     void removeCategoryListener(ICategoryListener categoryListener);
 }

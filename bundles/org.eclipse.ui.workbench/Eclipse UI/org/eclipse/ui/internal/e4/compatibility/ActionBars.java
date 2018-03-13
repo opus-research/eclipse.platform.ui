@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,11 @@ public class ActionBars extends SubActionBars {
 		this.part = part;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#getMenuManager()
+	 */
 	public IMenuManager getMenuManager() {
 		if (menuManager == null) {
 			menuManager = new MenuManager();
@@ -54,7 +58,11 @@ public class ActionBars extends SubActionBars {
 	}
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#getToolBarManager()
+	 */
 	public IToolBarManager getToolBarManager() {
 		if (toolbarManager == null) {
 			toolbarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT | SWT.WRAP);
@@ -62,7 +70,11 @@ public class ActionBars extends SubActionBars {
 		return toolbarManager;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionBars#updateActionBars()
+	 */
 	public void updateActionBars() {
 		// FIXME compat: updateActionBars : should do something useful
 		getStatusLineManager().update(false);
@@ -108,7 +120,9 @@ public class ActionBars extends SubActionBars {
 			if (renderer instanceof StackRenderer) {
 				StackRenderer stackRenderer = (StackRenderer) renderer;
 				CTabFolder folder = (CTabFolder) parent.getWidget();
-				stackRenderer.adjustTopRight(folder);
+				stackRenderer.disposeViewMenu(folder);
+				stackRenderer.setupMenuButton(part, folder);
+				stackRenderer.layoutTopRight(folder);
 			}
 		}
 
@@ -170,6 +184,11 @@ public class ActionBars extends SubActionBars {
 				: parent != null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.SubActionBars#dispose()
+	 */
 	@Override
 	public void dispose() {
 		menuManager.dispose();

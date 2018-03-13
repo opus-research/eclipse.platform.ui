@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 The Pampered Chef and others.
+ * Copyright (c) 2006 The Pampered Chef and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
 package org.eclipse.jface.examples.databinding.mask.internal;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 
@@ -22,22 +21,22 @@ import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 public class EditMaskParser {
 	private EditMaskLexerAndToken[] expectedTokens;
 	private char placeholder = ' ';
-
+	
 	/**
-	 * @param editMask The complete edit mask
+	 * @param editMask The complete edit mask 
 	 * @throws EditMaskParseException
 	 */
 	public EditMaskParser(String editMask) throws EditMaskParseException {
-		List<EditMaskLexerAndToken> tokens = new LinkedList<>();
+		LinkedList tokens = new LinkedList();
 		int position = 0;
 		while (position < editMask.length()) {
 			EditMaskLexerAndToken token = new EditMaskLexerAndToken();
 			position += token.initializeEditMask(editMask, position);
 			tokens.add(token);
 		}
-		expectedTokens = tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
+		expectedTokens = (EditMaskLexerAndToken[]) tokens.toArray(new EditMaskLexerAndToken[tokens.size()]);
 	}
-
+	
 	/**
 	 * @param input the user input which may or may not be in valid format
 	 */
@@ -49,8 +48,8 @@ public class EditMaskParser {
 		int inputPosition = 0;
 		while (inputPosition < input.length() && tokenPosition < expectedTokens.length) {
 			while (tokenPosition < expectedTokens.length &&
-					(expectedTokens[tokenPosition].isComplete() ||
-					 expectedTokens[tokenPosition].isReadOnly()))
+					(expectedTokens[tokenPosition].isComplete() || 
+					 expectedTokens[tokenPosition].isReadOnly())) 
 			{
 				++tokenPosition;
 			}
@@ -63,7 +62,7 @@ public class EditMaskParser {
 			}
 		}
 	}
-
+	
 	/**
 	 * @return the formatted version of the user input
 	 */
@@ -78,7 +77,7 @@ public class EditMaskParser {
 		}
 		return result.toString();
 	}
-
+	
 	/**
 	 * @return the user input with all literals removed
 	 */
@@ -108,7 +107,7 @@ public class EditMaskParser {
 		}
 		return true;
 	}
-
+	
 	/**
 	 * @param startingAt The current index within the user input string
 	 * @return The first non-read-only index greater than or equal to startingAt
@@ -119,7 +118,7 @@ public class EditMaskParser {
 		}
 		return startingAt;
 	}
-
+	
 	/**
 	 * @return the first input position whose token is not marked as complete.  Returns -1 if all are complete
 	 */

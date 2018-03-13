@@ -25,7 +25,7 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
 
 	public  static final int SEED = 1001001;
 	private IStructuredSelection selection;
-
+	
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Object contribution performance");
         suite.addTest(new ObjectContributionsPerformance(
@@ -39,13 +39,12 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
                         BasicPerformanceTest.NONE));
         return suite;
 	}
-
+	
 	public ObjectContributionsPerformance(String label, IStructuredSelection selection, int tagging) {
 		super("testObjectContributions:" + label, tagging);
 		this.selection = selection;
 	}
 
-	@Override
 	protected void runTest() {
 		ObjectContributionTest tests = new ObjectContributionTest(
                 "testObjectContributions");
@@ -60,7 +59,7 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
         commitMeasurements();
         assertPerformance();
 	}
-
+	
 	protected static IStructuredSelection generateAdaptableSelection(int seed, int size) {
 		Random rand = new Random(seed);
 		List selection = new ArrayList();

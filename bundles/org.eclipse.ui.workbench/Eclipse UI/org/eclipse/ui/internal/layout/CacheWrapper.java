@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,13 +30,13 @@ import org.eclipse.swt.widgets.Layout;
  * should be attached to the wrapper instead:
  * </p>
  * <code>
- *
+ * 
  *   // Unoptimized code
  *   Toolbar myToolbar = new Toolbar(someParent, SWT.WRAP);
  *   myToolbar.setLayoutData(someLayoutData);
  * </code>
  * <code>
- *
+ * 
  *   // Optimized code
  *   CacheWrapper myWrapper = new CacheWrapper(someParent);
  *   Toolbar myToolbar = new Toolbar(myWrapper.getControl(), SWT.WRAP);
@@ -49,9 +49,9 @@ import org.eclipse.swt.widgets.Layout;
  * this class is to workaround layouts with poor caching, and such layouts will typically
  * be too eager about flushing the caches of their children. However, this means that you
  * MUST manually call flushCache() whenver the child's preferred size changes (and before
- * the parent is layed out).
+ * the parent is layed out).  
  * </p>
- *
+ * 
  * @since 3.0
  */
 public class CacheWrapper {
@@ -62,8 +62,7 @@ public class CacheWrapper {
     private Rectangle lastBounds = new Rectangle(0, 0, 0, 0);
 
     private class WrapperLayout extends Layout implements ICachingLayout {
-        @Override
-		protected Point computeSize(Composite composite, int wHint, int hHint,
+        protected Point computeSize(Composite composite, int wHint, int hHint,
                 boolean flushCache) {
             Control[] children = composite.getChildren();
             if (children.length != 1) {
@@ -75,8 +74,7 @@ public class CacheWrapper {
             return cache.computeSize(wHint, hHint);
         }
 
-        @Override
-		protected void layout(Composite composite, boolean flushCache) {
+        protected void layout(Composite composite, boolean flushCache) {
             Control[] children = composite.getChildren();
             if (children.length != 1) {
                 return;
@@ -91,15 +89,17 @@ public class CacheWrapper {
 
         }
 
-        @Override
-		public void flush(Control dirtyControl) {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.layout.ICachingLayout#flush(org.eclipse.swt.widgets.Control)
+         */
+        public void flush(Control dirtyControl) {
             CacheWrapper.this.flushCache();
         }
     }
 
     /**
      * Creates a <code>CacheWrapper</code> with the given parent
-     *
+     * 
      * @param parent
      */
     public CacheWrapper(Composite parent) {
@@ -118,7 +118,7 @@ public class CacheWrapper {
 
     /**
      * Use this as the parent of the real control.
-     *
+     * 
      * @return the proxy contol. It should be given exactly one child.
      */
     public Composite getControl() {

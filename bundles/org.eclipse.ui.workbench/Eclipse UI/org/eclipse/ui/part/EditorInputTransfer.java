@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.ui.XMLMemento;
  * The <code>EditorInputTransfer</code> class is used to transfer an
  * <code>IEditorInput</code> and corresponding editorId from one part to another
  * in a drag and drop operation.  Only opening of internal editors is supported.
- * <p>
+ * <p> 
  * In every drag and drop operation there is a <code>DragSource</code> and a
  * <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is used
  * to marshall the drag data from the source into a byte array.  If a drop
@@ -42,13 +42,13 @@ import org.eclipse.ui.XMLMemento;
  * </p>
  * <p>
  * This class can be used for a <code>Viewer</code> or an SWT component directly.
- * A singleton is provided which may be serially reused (see <code>getInstance</code>).
+ * A singleton is provided which may be serially reused (see <code>getInstance</code>).  
  * For an implementor of <code>IEditorInput</code> to be supported by
  * <code>EditorInputTransfer</code>, it must provide a proper implementation of
  * <code>IEditorInput</code>.<code>getPersistable</code>.  For further details,
  * consult the <code>org.eclipse.ui.elementFactories</code> extension point.
  * </p>
- * <p>
+ * <p> 
  * The data for a transfer is represented by the <code>EditorInputData</code>
  * class, and a convenience method <code>createEditorInputData</code> is
  * provided.  A <code>DragSource</code>.<code>dragSetData</code> implementation
@@ -63,8 +63,8 @@ import org.eclipse.ui.XMLMemento;
  * <pre>
  * public void dragSetData(DragSourceEvent event) {
  * 		if (EditorInputTransfer.getInstance().isSupportedType(event.dataType)) {
- *
- * 			EditorInputTransfer.EditorInputData data =
+ * 
+ * 			EditorInputTransfer.EditorInputData data = 
  * 				EditorInputTransfer.
  * 				createEditorInputData(EDITOR_ID, getEditorInput());
  * 			event.data = new EditorInputTransfer.EditorInputData [] {data};
@@ -120,18 +120,26 @@ public class EditorInputTransfer extends ByteArrayTransfer {
         return instance;
     }
 
-    @Override
-	protected int[] getTypeIds() {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected int[] getTypeIds() {
         return new int[] { TYPEID };
     }
 
-    @Override
-	protected String[] getTypeNames() {
+    /* (non-Javadoc)
+     * Returns the type names.
+     *
+     * @return the list of type names
+     */
+    protected String[] getTypeNames() {
         return new String[] { TYPE_NAME };
     }
 
-    @Override
-	public void javaToNative(Object data, TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    public void javaToNative(Object data, TransferData transferData) {
 
         if (!(data instanceof EditorInputData[])) {
             return;
@@ -143,7 +151,7 @@ public class EditorInputTransfer extends ByteArrayTransfer {
          * (int)	number of editor inputs
          * Then, the following for each editor input:
          * (String)	editorId
-         * (String)	factoryId
+         * (String)	factoryId 
          * (String)	data used to recreate the IEditorInput
          */
 
@@ -170,8 +178,10 @@ public class EditorInputTransfer extends ByteArrayTransfer {
         }
     }
 
-    @Override
-	public Object nativeToJava(TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    public Object nativeToJava(TransferData transferData) {
 
         byte[] bytes = (byte[]) super.nativeToJava(transferData);
         if (bytes == null) {

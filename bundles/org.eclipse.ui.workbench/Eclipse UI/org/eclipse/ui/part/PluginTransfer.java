@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,19 +23,19 @@ import org.eclipse.swt.dnd.TransferData;
  * This class can be used to transfer an instance of <code>PluginTransferData</code>
  * between two parts in a workbench in a drag and drop operation.
  * <p>
- * In every drag and drop operation there is a <code>DragSource</code> and
- * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is
- * used to marshall the drag data from the source into a byte array.  If a drop
+ * In every drag and drop operation there is a <code>DragSource</code> and 
+ * a <code>DropTarget</code>.  When a drag occurs a <code>Transfer</code> is 
+ * used to marshall the drag data from the source into a byte array.  If a drop 
  * occurs another <code>Transfer</code> is used to marshall the byte array into
  * drop data for the target.
  * </p><p>
- * A <code>PluginTransferData</code> contains the id of a drop action extension.
- * If a drop occurs the extension is invoked to perform a drop action.  As a benefit,
- * the destination viewer doesn't need to have any knowledge of the items being
- * dropped into it.
+ * A <code>PluginTransferData</code> contains the id of a drop action extension.  
+ * If a drop occurs the extension is invoked to perform a drop action.  As a benefit, 
+ * the destination viewer doesn't need to have any knowledge of the items being 
+ * dropped into it.  
  * </p><p>
  * This class can be used for a <code>Viewer<code> or an SWT component directly.
- * A singleton is provided which may be serially reused (see <code>getInstance</code>).
+ * A singleton is provided which may be serially reused (see <code>getInstance</code>).  
  * It is not intended to be subclassed.
  * </p>
  *
@@ -70,18 +70,26 @@ public class PluginTransfer extends ByteArrayTransfer {
         return instance;
     }
 
-    @Override
-	protected int[] getTypeIds() {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected int[] getTypeIds() {
         return new int[] { TYPEID };
     }
 
-    @Override
-	protected String[] getTypeNames() {
+    /* (non-Javadoc)
+     * Returns the type names.
+     *
+     * @return the list of type names
+     */
+    protected String[] getTypeNames() {
         return new String[] { TYPE_NAME };
     }
 
-    @Override
-	protected void javaToNative(Object data, TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected void javaToNative(Object data, TransferData transferData) {
         PluginTransferData realData = (PluginTransferData) data;
         if (data == null) {
 			return;
@@ -99,8 +107,10 @@ public class PluginTransfer extends ByteArrayTransfer {
         }
     }
 
-    @Override
-	protected Object nativeToJava(TransferData transferData) {
+    /* (non-Javadoc)
+     * Method declared on Transfer.
+     */
+    protected Object nativeToJava(TransferData transferData) {
         try {
             byte[] bytes = (byte[]) super.nativeToJava(transferData);
             ByteArrayInputStream in = new ByteArrayInputStream(bytes);

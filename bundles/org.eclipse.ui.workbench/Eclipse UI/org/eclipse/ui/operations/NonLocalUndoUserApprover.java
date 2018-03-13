@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 package org.eclipse.ui.operations;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.commands.operations.IAdvancedUndoableOperation;
 import org.eclipse.core.commands.operations.IOperationApprover;
 import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,6 +26,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * <p>
@@ -48,8 +49,8 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * <p>
  * This class may be instantiated by clients.
  * </p>
- *
- *
+ * 
+ * 
  * @since 3.1
  */
 public final class NonLocalUndoUserApprover implements IOperationApprover {
@@ -67,7 +68,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 	/**
 	 * Create a NonLocalUndoUserApprover associated with the specified editor
 	 * and undo context
-	 *
+	 * 
 	 * @param context
 	 *            the undo context of operations in question.
 	 * @param part
@@ -99,7 +100,13 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		this.elements = affectedObjects;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedRedoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus proceedRedoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
@@ -114,7 +121,13 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		return proceedWithOperation(operation, message, WorkbenchMessages.Operations_discardRedo, WorkbenchMessages.Workbench_redoToolTip);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.IOperationApprover#proceedUndoing(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	public IStatus proceedUndoing(IUndoableOperation operation,
 			IOperationHistory history, IAdaptable uiInfo) {
 
@@ -173,7 +186,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 					// preferred
 					// comparison class has been provided.
 					if (affectedObjectsClass != null) {
-						Object adapter = Adapters.adapt(modifiedElement, affectedObjectsClass);
+						Object adapter = Util.getAdapter(modifiedElement, 
+								affectedObjectsClass);
 						if (adapter != null && elementsContains(adapter)) {
 							local = true;
 						}
@@ -196,7 +210,6 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// a background thread.
 		final int[] answer = new int[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
 						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
@@ -236,7 +249,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Adapters.adapt(uiInfo, IUndoContext.class);
+			IUndoContext originatingContext = (IUndoContext) Util.getAdapter(uiInfo, 
+					IUndoContext.class);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;
@@ -264,7 +278,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {
-					Object adapter = Adapters.adapt(element, affectedObjectsClass);
+					Object adapter = Util.getAdapter(element, affectedObjectsClass);
 					if (adapter != null) {
 						elementsAndAdapters.add(adapter);
 					}

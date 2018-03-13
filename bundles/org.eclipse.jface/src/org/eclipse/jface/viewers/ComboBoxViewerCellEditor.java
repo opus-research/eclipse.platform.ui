@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2010 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -72,6 +74,9 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		setValueValid(true);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on CellEditor.
+	 */
 	@Override
 	protected Control createControl(Composite parent) {
 
@@ -105,10 +110,12 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 			}
 		});
 
-		comboBox.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_ESCAPE
-					|| e.detail == SWT.TRAVERSE_RETURN) {
-				e.doit = false;
+		comboBox.addTraverseListener(new TraverseListener() {
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE
+						|| e.detail == SWT.TRAVERSE_RETURN) {
+					e.doit = false;
+				}
 			}
 		});
 
@@ -134,6 +141,9 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		return selectedValue;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on CellEditor.
+	 */
 	@Override
 	protected void doSetFocus() {
 		viewer.getControl().setFocus();
@@ -205,7 +215,6 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @deprecated As of 3.7, replaced by
 	 *             {@link #setContentProvider(IStructuredContentProvider)}
 	 */
-	@Deprecated
 	public void setContenProvider(IStructuredContentProvider provider) {
 		viewer.setContentProvider(provider);
 	}
@@ -253,6 +262,11 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		deactivate();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#focusLost()
+	 */
 	@Override
 	protected void focusLost() {
 		if (isActivated()) {
@@ -260,6 +274,11 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#keyReleaseOccured(org.eclipse.swt.events.KeyEvent)
+	 */
 	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.character == '\u001b') { // Escape character

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public class RegistryTriggerPoint extends AbstractTriggerPoint {
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param id the id of the trigger point
      * @param element the defining configuration element
      */
@@ -39,24 +39,36 @@ public class RegistryTriggerPoint extends AbstractTriggerPoint {
         this.element = element;
     }
 
-    @Override
-	public String getId() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.ITriggerPoint#getId()
+     */
+    public String getId() {
         return id;
     }
 
-    @Override
-	public String getStringHint(String key) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.ITriggerPoint#getStringHint(java.lang.String)
+     */
+    public String getStringHint(String key) {
         return (String) getHints().get(key);
     }
 
-    @Override
-	public boolean getBooleanHint(String key) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.activities.ITriggerPoint#getBooleanHint(java.lang.String)
+     */
+    public boolean getBooleanHint(String key) {
         return Boolean.valueOf(getStringHint(key)).booleanValue();
     }
 
     /**
      * Lazily create the hints.
-     *
+     * 
      * @return the hint map
      */
     private Map getHints() {

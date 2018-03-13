@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.ui.IWorkbenchPart;
  * This class is not intended for use outside of the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class ActivePartExpression extends Expression {
@@ -45,7 +45,7 @@ public final class ActivePartExpression extends Expression {
 
 	/**
 	 * Constructs a new instance of <code>ActivePartExpression</code>
-	 *
+	 * 
 	 * @param activePart
 	 *            The part to match with the active part; may be
 	 *            <code>null</code>
@@ -57,17 +57,14 @@ public final class ActivePartExpression extends Expression {
 		this.activePart = activePart;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		info.addVariableNameAccess(ISources.ACTIVE_PART_NAME);
 	}
 
-	@Override
 	protected final int computeHashCode() {
 		return HASH_INITIAL * HASH_FACTOR + hashCode(activePart);
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof ActivePartExpression) {
 			final ActivePartExpression that = (ActivePartExpression) object;
@@ -77,7 +74,6 @@ public final class ActivePartExpression extends Expression {
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context) {
 		final Object variable = context.getVariable(ISources.ACTIVE_PART_NAME);
 		if (equals(activePart, variable)) {
@@ -86,7 +82,6 @@ public final class ActivePartExpression extends Expression {
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActivePartExpression("); //$NON-NLS-1$

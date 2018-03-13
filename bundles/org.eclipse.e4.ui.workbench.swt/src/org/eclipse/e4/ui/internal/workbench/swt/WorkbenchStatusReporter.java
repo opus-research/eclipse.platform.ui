@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,6 @@ public class WorkbenchStatusReporter extends StatusReporter {
 	@Inject
 	private IEclipseContext context;
 
-	@Override
 	public void report(IStatus status, int style, Object... information) {
 		int action = style & (IGNORE | LOG | SHOW | BLOCK);
 		if (action == 0) {
@@ -111,7 +110,6 @@ public class WorkbenchStatusReporter extends StatusReporter {
 				status.getMessage(),
 				status.getException() != null ? exceptionStatus : status, ERROR
 						| WARNING | INFO) {
-			@Override
 			protected void configureShell(Shell shell) {
 				super.configureShell(shell);
 				shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
@@ -124,7 +122,6 @@ public class WorkbenchStatusReporter extends StatusReporter {
 		dialog.open();
 	}
 
-	@Override
 	public IStatus newStatus(int severity, String message, Throwable exception) {
 		return new Status(severity, getPluginId(), message, exception);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,6 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 		super(Color.class);
 	}
 
-	@Override
 	public Color convert(CSSValue value, CSSEngine engine, Object context)
 			throws DOMException {
 		Display display = (Display) context;
@@ -51,7 +50,6 @@ public class CSSValueSWTColorConverterImpl extends AbstractCSSValueConverter {
 		return color;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		Color color = (Color) value;

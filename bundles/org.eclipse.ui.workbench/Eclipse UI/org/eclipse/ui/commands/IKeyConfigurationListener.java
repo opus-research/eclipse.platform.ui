@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ package org.eclipse.ui.commands;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see IKeyConfiguration#addKeyConfigurationListener(IKeyConfigurationListener)
  * @see IKeyConfiguration#removeKeyConfigurationListener(IKeyConfigurationListener)
@@ -29,17 +29,14 @@ package org.eclipse.ui.commands;
  * plug-in instead.
  * @see org.eclipse.jface.bindings.ISchemeListener
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface IKeyConfigurationListener {
 
     /**
      * Notifies that one or more attributes of an instance of <code>IKeyConfiguration</code>
      * have changed. Specific details are described in the <code>KeyConfigurationEvent</code>.
-     *
+     * 
      * @param keyConfigurationEvent
      *            the keyConfiguration event. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     void keyConfigurationChanged(KeyConfigurationEvent keyConfigurationEvent);
 }

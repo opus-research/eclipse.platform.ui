@@ -68,7 +68,7 @@ public class PerspectiveTests extends DynamicTestCase {
 		removeBundle();
 		MPerspective persp = findPerspective(window, desc.getId());
 		assertNull(persp);
-
+		
 
 		assertFalse(window.getActivePage().getPerspective().getId().equals(
 				desc.getId()));
@@ -101,30 +101,46 @@ public class PerspectiveTests extends DynamicTestCase {
 		assertEquals(IDE.RESOURCE_PERSPECTIVE_ID, window.getActivePage()
 				.getPerspective().getId());
 	}
-
+	
 	private MPerspective findPerspective(IWorkbenchWindow window, String id) {
-		EModelService modelService = window
+		EModelService modelService = (EModelService) window
 				.getService(EModelService.class);
 		return (MPerspective) modelService.find(id,
 				((WorkbenchWindow) window).getModel());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newPerspective1";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_PERSPECTIVES;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newPerspective1.testDynamicPerspectiveAddition";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicPerspective";
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -31,24 +30,21 @@ public class ModelReconcilingService implements IModelReconcilingService {
 	@Inject
 	private Logger logger;
 
-	@Override
 	public ModelReconciler createModelReconciler() {
 		return new XMLModelReconciler();
 	}
 
-	@Override
 	public IStatus applyDeltas(Collection<ModelDelta> deltas) {
 		return applyDeltas(deltas, null);
 	}
 
-	@Override
 	public IStatus applyDeltas(Collection<ModelDelta> deltas, String[] filters) {
 		if (filters == null) {
 			filters = new String[0];
 		}
 
 		MultiStatus multiStatus = new MultiStatus(Activator.PI_WORKBENCH, 0, "", null); //$NON-NLS-1$
-		LinkedList<ModelDelta> delayedDeltas = new LinkedList<>();
+		LinkedList<ModelDelta> delayedDeltas = new LinkedList<ModelDelta>();
 
 		deltaIterationLoop: for (final ModelDelta delta : deltas) {
 			for (String filter : filters) {
@@ -59,12 +55,10 @@ public class ModelReconcilingService implements IModelReconcilingService {
 
 			final IStatus[] status = new IStatus[1];
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					status[0] = delta.apply();
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					status[0] = new Status(IStatus.ERROR, Activator.PI_WORKBENCH,
 							"Failed to apply delta", exception); //$NON-NLS-1$
@@ -94,12 +88,10 @@ public class ModelReconcilingService implements IModelReconcilingService {
 			final ModelDelta delta = it.next();
 			final IStatus[] status = new IStatus[1];
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					status[0] = delta.apply();
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					status[0] = new Status(IStatus.ERROR, Activator.PI_WORKBENCH,
 							"Failed to apply delta", exception); //$NON-NLS-1$

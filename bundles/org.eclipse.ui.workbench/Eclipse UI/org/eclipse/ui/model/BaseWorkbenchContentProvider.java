@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ui.model;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * Tree content provider for objects that can be adapted to the interface
@@ -20,7 +20,7 @@ import org.eclipse.jface.viewers.Viewer;
  * <p>
  * This class may be instantiated, or subclassed.
  * </p>
- *
+ * 
  * @see IWorkbenchAdapter
  * @since 3.0
  */
@@ -34,8 +34,10 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         super();
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
+    public void dispose() {
         // do nothing
     }
 
@@ -45,16 +47,18 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
      * object is not adaptable.
      * <p>
      * </p>
-     *
+     * 
      * @param element the element
      * @return the corresponding workbench adapter object
      */
     protected IWorkbenchAdapter getAdapter(Object element) {
-        return Adapters.adapt(element, IWorkbenchAdapter.class);
+        return (IWorkbenchAdapter)Util.getAdapter(element, IWorkbenchAdapter.class);
     }
 
-    @Override
-	public Object[] getChildren(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
+    public Object[] getChildren(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getChildren(element);
@@ -62,13 +66,17 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         return new Object[0];
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    /* (non-Javadoc)
+     * Method declared on IStructuredContentProvider.
+     */
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    @Override
-	public Object getParent(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
+    public Object getParent(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter != null) {
             return adapter.getParent(element);
@@ -76,13 +84,17 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         return null;
     }
 
-    @Override
-	public boolean hasChildren(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
+    public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // do nothing
     }
 

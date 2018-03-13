@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.Display;
 /**
  * NON-API - Utility methods, mainly having to do with posting runnables to the
  * UI thread in a particular way.
- *
+ * 
  * @since 1.1
- *
+ * 
  */
 public class SWTUtil {
 	/**
@@ -37,11 +37,11 @@ public class SWTUtil {
 	 * Runs the given runnable on the given display as soon as possible. Use
 	 * this method to schedule work that will affect the way one or more wigdets
 	 * are drawn, but that should only happen once.
-	 *
+	 * 
 	 * <p>
 	 * This is threadsafe.
 	 * </p>
-	 *
+	 * 
 	 * @param d
 	 *            display
 	 * @param r
@@ -60,7 +60,7 @@ public class SWTUtil {
 	 * Cancels a greedyExec or runOnce that was previously scheduled on the
 	 * given display. Has no effect if the given runnable is not in the queue
 	 * for the given display
-	 *
+	 * 
 	 * @param d
 	 *            target display
 	 * @param r
@@ -77,7 +77,7 @@ public class SWTUtil {
 	/**
 	 * Returns the work queue for the given display. Creates a work queue if
 	 * none exists yet.
-	 *
+	 * 
 	 * @param d
 	 *            display to return queue for
 	 * @return a work queue (never null)
@@ -94,10 +94,8 @@ public class SWTUtil {
 				final WorkQueue q = result;
 				mapDisplayOntoWorkQueue.put(d, result);
 				d.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						d.disposeExec(new Runnable() {
-							@Override
 							public void run() {
 								synchronized (mapDisplayOntoWorkQueue) {
 									q.cancelAll();
@@ -136,22 +134,19 @@ public class SWTUtil {
 	 * Logs an exception as though it was thrown by a SafeRunnable being run
 	 * with the default ISafeRunnableRunner. Will not open modal dialogs or spin
 	 * the event loop.
-	 *
+	 * 
 	 * @param t
 	 *            throwable to log
 	 * @deprecated
 	 * @noreference This method is not intended to be referenced by clients. It
 	 *              remains here for API backwards compatibility.
 	 */
-	@Deprecated
 	public static void logException(final Exception t) {
 		SafeRunnable.run(new SafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				throw t;
 			}
 
-			@Override
 			public void handleException(Throwable e) {
 				// IMPORTANT: Do not call the super implementation, since
 				// it opens a modal dialog, and may cause *syncExecs to run

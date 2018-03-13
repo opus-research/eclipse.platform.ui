@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.commands;
 
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.ui.keys.KeySequence;
 
 /**
@@ -24,7 +25,7 @@ import org.eclipse.ui.keys.KeySequence;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see org.eclipse.ui.commands.ICommand
  * @see org.eclipse.ui.commands.ICommandManagerListener
@@ -32,14 +33,12 @@ import org.eclipse.ui.keys.KeySequence;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICommandManager {
 
     /**
      * Registers an instance of <code>ICommandManagerListener</code> to listen
      * for changes to attributes of this instance.
-     *
+     * 
      * @param commandManagerListener
      *            the instance of <code>ICommandManagerListener</code> to
      *            register. Must not be <code>null</code>. If an attempt is
@@ -47,7 +46,6 @@ public interface ICommandManager {
      *            <code>ICommandManagerListener</code> which is already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void addCommandManagerListener(
             ICommandManagerListener commandManagerListener);
 
@@ -57,13 +55,12 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to active contexts. This set may be
      *         empty, but is guaranteed not to be <code>null</code>. If this
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getActiveContextIds();
 
     /**
@@ -72,13 +69,12 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the active key configuration identifier. This set may be empty,
      *         but it is guaranteed to not be <code>null</code>. If this set
      *         is not empty, it is guaranteed to only contains instances of
      *         <code>String</code>.
      */
-	@Deprecated
     String getActiveKeyConfigurationId();
 
     /**
@@ -89,10 +85,9 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the active locale. May be <code>null</code>.
      */
-	@Deprecated
     String getActiveLocale();
 
     /**
@@ -103,30 +98,27 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the active platform. May be <code>null</code>.
      */
-	@Deprecated
     String getActivePlatform();
 
     /**
      * Returns a handle to a category given an identifier.
-     *
+     * 
      * @param categoryId
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a category.
      */
-	@Deprecated
     ICategory getCategory(String categoryId);
 
     /**
      * Returns a handle to a command given an identifier.
-     *
+     * 
      * @param commandId
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a command; never <code>null</code>.
      */
-	@Deprecated
     ICommand getCommand(String commandId);
 
     /**
@@ -137,13 +129,12 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to defined categories. This set may be
      *         empty, but is guaranteed not to be <code>null</code>. If this
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getDefinedCategoryIds();
 
     /**
@@ -154,13 +145,12 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to defined commands. This set may be
      *         empty, but is guaranteed not to be <code>null</code>. If this
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-	@Deprecated
     Set getDefinedCommandIds();
 
     /**
@@ -171,29 +161,27 @@ public interface ICommandManager {
      * Notification is sent to all registered listeners if this attribute
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to defined key configurations. This set
      *         may be empty, but is guaranteed not to be <code>null</code>.
      *         If this set is not empty, it is guaranteed to only contain
      *         instances of <code>String</code>.
      */
-	@Deprecated
     Set getDefinedKeyConfigurationIds();
 
     /**
      * Returns a handle to a key configuration given an identifier.
-     *
+     * 
      * @param keyConfigurationId
      *            an identifier. Must not be <code>null</code>
      * @return a handle to a key configuration.
      */
-	@Deprecated
     IKeyConfiguration getKeyConfiguration(String keyConfigurationId);
 
     /**
      * Finds all of the commands which have key bindings that start with the
      * given key sequence.
-     *
+     * 
      * @param keySequence
      *            The prefix to look for; must not be <code>null</code>.
      * @return A map of all of the matching key sequences (
@@ -201,50 +189,46 @@ public interface ICommandManager {
      *         <code>String</code>). This map may be empty, but it is never
      *         <code>null</code>.
      */
-	@Deprecated
     Map getPartialMatches(KeySequence keySequence);
 
     /**
      * Finds the command which has the given key sequence as one of its key
      * bindings.
-     *
+     * 
      * @param keySequence
      *            The key binding to look for; must not be <code>null</code>.
      * @return The command id for the matching command, if any;
      *         <code>null</code> if none.
      */
-	@Deprecated
     String getPerfectMatch(KeySequence keySequence);
 
     /**
      * Checks to see whether there are any commands which have key bindings that
      * start with the given key sequence.
-     *
+     * 
      * @param keySequence
      *            The prefix to look for; must not be <code>null</code>.
      * @return <code>true</code> if at least one command has a key binding
      *         that starts with <code>keySequence</code>;<code>false</code>
      *         otherwise.
      */
-	@Deprecated
     boolean isPartialMatch(KeySequence keySequence);
 
     /**
      * Checks to see if there is a command with the given key sequence as one of
      * its key bindings.
-     *
+     * 
      * @param keySequence
      *            The key binding to look for; must not be <code>null</code>.
      * @return <code>true</code> if a command has a matching key binding;
      *         <code>false</code> otherwise.
      */
-	@Deprecated
     boolean isPerfectMatch(KeySequence keySequence);
 
     /**
      * Unregisters an instance of <code>ICommandManagerListener</code>
      * listening for changes to attributes of this instance.
-     *
+     * 
      * @param commandManagerListener
      *            the instance of <code>ICommandManagerListener</code> to
      *            unregister. Must not be <code>null</code>. If an attempt is
@@ -252,7 +236,6 @@ public interface ICommandManager {
      *            <code>ICommandManagerListener</code> which is not already
      *            registered with this instance, no operation is performed.
      */
-	@Deprecated
     void removeCommandManagerListener(
             ICommandManagerListener commandManagerListener);
 }

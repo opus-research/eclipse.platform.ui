@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.help.IWorkbenchHelpSystem;
 /**
  * Displays the help resource specified in the <code>href</code> command
  * parameter or simply displays the help bookshelf if no parameter was passed.
- *
+ * 
  * @since 3.2
  */
 public final class DisplayHelpHandler extends AbstractHandler {
@@ -28,7 +28,6 @@ public final class DisplayHelpHandler extends AbstractHandler {
 	 */
 	private static final String PARAM_ID_HREF = "href"; //$NON-NLS-1$
 
-	@Override
 	public final Object execute(final ExecutionEvent event) {
 		final IWorkbenchHelpSystem helpSystem = PlatformUI.getWorkbench()
 				.getHelpSystem();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,19 +23,18 @@ import java.util.SortedSet;
  * <p>
  * This interface is not intended to be extended or implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.contexts.ContextManager
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
 public interface IContextManager {
 
     /**
      * Registers an instance of <code>IContextManagerListener</code> to listen
      * for changes to properties of this instance.
-     *
+     * 
      * @param contextManagerListener
      *            the instance to register. Must not be <code>null</code>. If
      *            an attempt is made to register an instance which is already
@@ -46,7 +45,7 @@ public interface IContextManager {
 
     /**
      * Returns an instance of <code>IContext</code> given an identifier.
-     *
+     * 
      * @param contextId
      *            an identifier. Must not be <code>null</code>
      * @return an instance of <code>IContext</code>.
@@ -61,7 +60,7 @@ public interface IContextManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to defined contexts. This set may be
      *         empty, but is guaranteed not to be <code>null</code>. If this
      *         set is not empty, it is guaranteed to only contain instances of
@@ -77,7 +76,7 @@ public interface IContextManager {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     *
+     * 
      * @return the set of identifiers to enabled contexts. This set may be
      *         empty, but is guaranteed not to be <code>null</code>. If this
      *         set is not empty, it is guaranteed to only contain instances of
@@ -88,7 +87,7 @@ public interface IContextManager {
     /**
      * Unregisters an instance of <code>IContextManagerListener</code>
      * listening for changes to properties of this instance.
-     *
+     * 
      * @param contextManagerListener
      *            the instance to unregister. Must not be <code>null</code>.
      *            If an attempt is made to unregister an instance which is not

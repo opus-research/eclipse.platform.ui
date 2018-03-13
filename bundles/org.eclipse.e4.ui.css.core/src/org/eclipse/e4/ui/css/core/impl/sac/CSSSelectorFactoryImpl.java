@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002, 2014  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -53,7 +53,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createConditionalSelector(SimpleSelector,Condition)}.
 	 */
-	@Override
 	public ConditionalSelector createConditionalSelector(
 			SimpleSelector selector, Condition condition) throws CSSException {
 		return new CSSConditionalSelectorImpl(selector, condition);
@@ -63,7 +62,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createAnyNodeSelector()}.
 	 */
-	@Override
 	public SimpleSelector createAnyNodeSelector() throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
 	}
@@ -72,7 +70,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createRootNodeSelector()}.
 	 */
-	@Override
 	public SimpleSelector createRootNodeSelector() throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
 	}
@@ -81,7 +78,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createNegativeSelector(SimpleSelector)}.
 	 */
-	@Override
 	public NegativeSelector createNegativeSelector(SimpleSelector selector)
 			throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
@@ -91,7 +87,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createElementSelector(String,String)}.
 	 */
-	@Override
 	public ElementSelector createElementSelector(String namespaceURI,
 			String tagName) throws CSSException {
 		return new CSSElementSelectorImpl(namespaceURI, tagName);
@@ -101,7 +96,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createTextNodeSelector(String)}.
 	 */
-	@Override
 	public CharacterDataSelector createTextNodeSelector(String data)
 			throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
@@ -111,7 +105,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createCDataSectionSelector(String)}.
 	 */
-	@Override
 	public CharacterDataSelector createCDataSectionSelector(String data)
 			throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
@@ -121,7 +114,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createProcessingInstructionSelector(String,String)}.
 	 */
-	@Override
 	public ProcessingInstructionSelector createProcessingInstructionSelector(
 			String target, String data) throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
@@ -131,7 +123,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.SelectorFactory#createCommentSelector(String)}.
 	 */
-	@Override
 	public CharacterDataSelector createCommentSelector(String data)
 			throws CSSException {
 		throw new CSSException("Not implemented in CSS2");
@@ -141,7 +132,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createPseudoElementSelector(String,String)}.
 	 */
-	@Override
 	public ElementSelector createPseudoElementSelector(String namespaceURI,
 			String pseudoName) throws CSSException {
 		return new CSSPseudoElementSelectorImpl(namespaceURI, pseudoName);
@@ -151,7 +141,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createDescendantSelector(Selector,SimpleSelector)}.
 	 */
-	@Override
 	public DescendantSelector createDescendantSelector(Selector parent,
 			SimpleSelector descendant) throws CSSException {
 		return new CSSDescendantSelectorImpl(parent, descendant);
@@ -161,7 +150,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createChildSelector(Selector,SimpleSelector)}.
 	 */
-	@Override
 	public DescendantSelector createChildSelector(Selector parent,
 			SimpleSelector child) throws CSSException {
 		return new CSSChildSelectorImpl(parent, child);
@@ -171,7 +159,6 @@ public class CSSSelectorFactoryImpl implements SelectorFactory {
 	 * <b>SAC</b>: Implements {@link
 	 * SelectorFactory#createDirectAdjacentSelector(short,Selector,SimpleSelector)}.
 	 */
-	@Override
 	public SiblingSelector createDirectAdjacentSelector(short nodeType,
 			Selector child, SimpleSelector directAdjacent) throws CSSException {
 		return new CSSDirectAdjacentSelectorImpl(nodeType, child,

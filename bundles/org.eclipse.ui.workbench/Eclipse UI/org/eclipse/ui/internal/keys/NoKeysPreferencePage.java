@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,11 +21,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class NoKeysPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	public void init(IWorkbench workbench) {
 		// do nothing, we don't have content
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		Label info = new Label(parent, SWT.NONE);

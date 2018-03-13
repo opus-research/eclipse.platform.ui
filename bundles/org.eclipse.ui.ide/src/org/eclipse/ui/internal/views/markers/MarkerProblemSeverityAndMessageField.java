@@ -20,14 +20,19 @@ import org.eclipse.ui.views.markers.MarkerItem;
 
 /**
  * MarkerSeverityAndMessageField is the field for severity and messages.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class MarkerProblemSeverityAndMessageField extends
 		MarkerDescriptionField {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.provisional.views.markers.IMarkerField#compare(org.eclipse.ui.provisional.views.markers.MarkerItem,
+	 *      org.eclipse.ui.provisional.views.markers.MarkerItem)
+	 */
 	public int compare(MarkerItem item1, MarkerItem item2) {
 
 		int severity1 = MarkerSupportInternalUtilities.getSeverity(item1);
@@ -39,7 +44,7 @@ public class MarkerProblemSeverityAndMessageField extends
 
 	/**
 	 * Return the image for the receiver.
-	 *
+	 * 
 	 * @param item
 	 * @return Image or <code>null</code>
 	 */
@@ -69,7 +74,11 @@ public class MarkerProblemSeverityAndMessageField extends
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerField#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	public void update(ViewerCell cell) {
 		super.update(cell);
 

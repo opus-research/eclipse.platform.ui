@@ -18,7 +18,7 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * Class is thread safe.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public class NumberToDoubleConverter extends NumberToNumberConverter {
@@ -33,12 +33,14 @@ public class NumberToDoubleConverter extends NumberToNumberConverter {
 		super(numberFormat, fromType, (primitive) ? Double.TYPE : Double.class);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.conversion.NumberToNumberConverter#doConvert(java.lang.Number)
+	 */
 	protected Number doConvert(Number number) {
 		if (StringToNumberParser.inDoubleRange(number)) {
 			return new Double(number.doubleValue());
 		}
-
+		
 		return null;
 	}
 }

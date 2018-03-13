@@ -22,15 +22,17 @@ import org.eclipse.ui.navigator.ILinkHelper;
 import org.eclipse.ui.part.FileEditorInput;
 
 /**
- *
+ * 
  * Links IFileEditorInput to IFiles, and vice versa.
- *
+ * 
  * @since 3.2
  *
  */
 public class ResourceLinkHelper implements ILinkHelper {
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#findSelection(org.eclipse.ui.IEditorInput)
+	 */
 	public IStructuredSelection findSelection(IEditorInput anInput) {
 		IFile file = ResourceUtil.getFile(anInput);
 		if (file != null) {
@@ -39,7 +41,9 @@ public class ResourceLinkHelper implements ILinkHelper {
 		return StructuredSelection.EMPTY;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ILinkHelper#activateEditor(org.eclipse.ui.IWorkbenchPage, org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	public void activateEditor(IWorkbenchPage aPage,
 			IStructuredSelection aSelection) {
 		if (aSelection == null || aSelection.isEmpty())

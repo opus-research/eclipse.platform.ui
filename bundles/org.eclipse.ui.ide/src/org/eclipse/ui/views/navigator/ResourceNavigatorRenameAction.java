@@ -27,7 +27,6 @@ import org.eclipse.ui.actions.RenameResourceAction;
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class ResourceNavigatorRenameAction extends RenameResourceAction {
     private TreeViewer viewer;
 
@@ -44,8 +43,10 @@ public class ResourceNavigatorRenameAction extends RenameResourceAction {
         this.viewer = treeViewer;
     }
 
-    @Override
-	protected void runWithNewPath(IPath path, IResource resource) {
+    /* (non-Javadoc)
+     * Run the action to completion using the supplied path.
+     */
+    protected void runWithNewPath(IPath path, IResource resource) {
         IWorkspaceRoot root = resource.getProject().getWorkspace().getRoot();
         super.runWithNewPath(path, resource);
         if (this.viewer != null) {
