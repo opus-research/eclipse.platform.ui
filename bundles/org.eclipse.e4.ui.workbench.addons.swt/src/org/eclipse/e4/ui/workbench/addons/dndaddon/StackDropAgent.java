@@ -255,7 +255,7 @@ public class StackDropAgent extends DropAgent {
 			MPartStack stack = (MPartStack) dragElement;
 			MStackElement curSel = stack.getSelectedElement();
 			List<MStackElement> kids = stack.getChildren();
-
+			
 			// First move over all *non-selected* elements
 			int selIndex = kids.indexOf(curSel);
 			boolean curSelProcessed = false;
