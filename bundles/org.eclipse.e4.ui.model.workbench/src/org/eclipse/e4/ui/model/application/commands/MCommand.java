@@ -18,15 +18,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  * A representation of the model object '<em><b>Command</b></em>'.
  * <!-- end-user-doc -->
  *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * <!-- end-model-doc -->
- *
  * <p>
  * The following features are supported:
  * <ul>
@@ -44,15 +35,11 @@ public interface MCommand extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Command Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Command Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Command Name</em>' attribute.
 	 * @see #setCommandName(String)
 	 * @model
@@ -73,15 +60,11 @@ public interface MCommand extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Description</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Description</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
 	 * @model
@@ -103,15 +86,11 @@ public interface MCommand extends MApplicationElement {
 	 * Returns the value of the '<em><b>Parameters</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.commands.MCommandParameter}.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Parameters</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Parameters</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated
@@ -121,15 +100,11 @@ public interface MCommand extends MApplicationElement {
 	/**
 	 * Returns the value of the '<em><b>Category</b></em>' reference.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Category</em>' reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Category</em>' reference.
 	 * @see #setCategory(MCategory)
 	 * @model
@@ -150,14 +125,6 @@ public interface MCommand extends MApplicationElement {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */
@@ -166,14 +133,6 @@ public interface MCommand extends MApplicationElement {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */

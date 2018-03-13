@@ -16,15 +16,6 @@ package org.eclipse.e4.ui.model.application.ui;
  * A representation of the model object '<em><b>UI Label</b></em>'.
  * <!-- end-user-doc -->
  *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * <!-- end-model-doc -->
- *
  * <p>
  * The following features are supported:
  * <ul>
@@ -41,15 +32,11 @@ public interface MUILabel {
 	/**
 	 * Returns the value of the '<em><b>Label</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Label</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Label</em>' attribute.
 	 * @see #setLabel(String)
 	 * @model
@@ -70,15 +57,11 @@ public interface MUILabel {
 	/**
 	 * Returns the value of the '<em><b>Icon URI</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Icon URI</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Icon URI</em>' attribute.
 	 * @see #setIconURI(String)
 	 * @model
@@ -99,15 +82,11 @@ public interface MUILabel {
 	/**
 	 * Returns the value of the '<em><b>Tooltip</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Tooltip</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Tooltip</em>' attribute.
 	 * @see #setTooltip(String)
 	 * @model
@@ -128,14 +107,6 @@ public interface MUILabel {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */
@@ -144,14 +115,6 @@ public interface MUILabel {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */
