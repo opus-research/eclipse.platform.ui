@@ -98,6 +98,19 @@ public class FileSystemImportWizard extends Wizard implements IImportWizard {
      * Method declared on IWizard.
      */
     public boolean performFinish() {
-        return mainPage.finish();
+    	if (this.mainPage.useNestedWizard()) {
+    		return this.mainPage.getNestedWizard().performFinish();
+    	} else {
+    		return mainPage.finish();
+    	}
     }
+    
+    public boolean canFinish() {
+    	if (this.mainPage.useNestedWizard()) {
+    		return this.mainPage.getNestedWizard().canFinish();
+    	} else {
+    		return super.canFinish();
+    	}
+    }
+    
 }
