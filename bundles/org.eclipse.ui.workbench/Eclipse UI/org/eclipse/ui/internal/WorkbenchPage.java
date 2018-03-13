@@ -64,7 +64,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -211,7 +210,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
-			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
+			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
+			if (!wwindow.isClosing()) {
+				wwindow.getStatusLineManager().update(false);
+			}
 		}
 
 		public void partHidden(MPart part) {
@@ -557,7 +559,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		private IEditorPart topEditor;
 
-		private ArrayList oldActionSets = new ArrayList();
+		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -622,7 +624,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newPart, true);
 			}
 
-			ArrayList newActionSets = null;
+			List<IActionSetDescriptor> newActionSets = null;
 			if (isNewPartAnEditor || (activePart == topEditor && newPart == null)) {
 				newActionSets = calculateActionSets(newPart, null);
 			} else {
@@ -684,7 +686,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newEditor, false);
 			}
 
-			ArrayList newActionSets = calculateActionSets(activePart, newEditor);
+			List<IActionSetDescriptor> newActionSets = calculateActionSets(activePart, newEditor);
 			if (!updateActionSets(newActionSets)) {
 				updateActionBars();
 			}
@@ -734,8 +736,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            active part
 		 * @return the new action sets
 		 */
-		private ArrayList calculateActionSets(IWorkbenchPart part, IEditorPart editor) {
-			ArrayList newActionSets = new ArrayList();
+		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
+				IEditorPart editor) {
+			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -761,7 +764,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            the action sets to show
 		 * @return <code>true</code> if the action sets changed
 		 */
-		private boolean updateActionSets(ArrayList newActionSets) {
+		private boolean updateActionSets(List<IActionSetDescriptor> newActionSets) {
 			if (oldActionSets.equals(newActionSets)) {
 				return false;
 			}
@@ -2610,13 +2613,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
-
-			MPerspective persp = perspectiveStack.getSelectedElement();
-			List<String> newIds = ModeledPageLayout.getIds(persp, ModeledPageLayout.ACTION_SET_TAG);
-			EContextService contextService = window.getContext().get(EContextService.class);
-			for (String id : newIds) {
-				contextService.activateContext(id);
-			}
 		}
 
 		IPerspectiveRegistry registry = getWorkbenchWindow().getWorkbench()
@@ -3960,8 +3956,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
-		if (_perspectiveStack != null)
-			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -5300,5 +5294,21 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void resetToolBarLayout() {
 		ICoolBarManager2 mgr = (ICoolBarManager2) legacyWindow.getCoolBarManager2();
 		mgr.resetItemOrder();
+	}
+
+	/**
+	 * Call {@link #firePartDeactivated(MPart)} if the passed part is the
+	 * currently active part according to the part service. This method should
+	 * only be called in the case of workbench shutdown, where E4 does not fire
+	 * deactivate listeners on the active part.
+	 * 
+	 * @param part
+	 */
+	public void firePartDeactivatedIfActive(MPart part) {
+		if (partService.getActivePart() == part) {
+			// At shutdown, e4 doesn't fire part deactivated on the active
+			// part.
+			firePartDeactivated(part);
+		}
 	}
 }
