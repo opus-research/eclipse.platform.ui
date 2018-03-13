@@ -20,7 +20,7 @@ import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
 
 /**
- * @noreference This class is not intended to be referenced by clients.
+ * @noreference
  * @since 1.0
  */
 public abstract class ModelReconciler {

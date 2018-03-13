@@ -26,7 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
  * </p>
  * 
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface EPartService {
 
@@ -320,7 +319,8 @@ public interface EPartService {
 	 * @param perspective
 	 *            the perspective to switch to, must not be <code>null</code> and it must be a
 	 *            perspective that's being managed by this service
-	 * @noreference This method is not intended to be referenced by clients.
+	 * @noreference This method is not intended to be referenced by clients as it may be removed or
+	 *              moved to another interface.
 	 */
 	public void switchPerspective(MPerspective perspective);
 }
