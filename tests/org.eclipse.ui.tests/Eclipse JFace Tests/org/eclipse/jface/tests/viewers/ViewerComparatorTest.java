@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -31,17 +30,17 @@ import org.eclipse.jface.viewers.Viewer;
  */
 public abstract class ViewerComparatorTest extends ViewerTestCase {
 	protected String UI = "UI";
-	protected String[] TEAM1 = {"Karice", "Tod", "Eric", "Paul",
+	protected String[] TEAM1 = {"Karice", "Tod", "Eric", "Paul", 
 				"Mike", "Michael", "Andrea", "Kim", "Boris", "Susan"};
-	protected String[] TEAM1_SORTED = {"Andrea", "Boris", "Eric", "Karice", "Kim",
+	protected String[] TEAM1_SORTED = {"Andrea", "Boris", "Eric", "Karice", "Kim", 
 			"Michael", "Mike", "Paul", "Susan", "Tod"};
-	protected String[] TEAM1_SORTED_WITH_INSERT = {"Andrea", "Boris", "Duong", "Eric", "Karice", "Kim",
+	protected String[] TEAM1_SORTED_WITH_INSERT = {"Andrea", "Boris", "Duong", "Eric", "Karice", "Kim", 
 			"Michael", "Mike", "Paul", "Susan", "Tod"};
-
+	
 	protected String RUNTIME = "Runtime";
 	protected String[] TEAM2 = {"Pascal", "DJ", "Jeff", "Andrew", "Oleg"};
 	protected String[] TEAM2_SORTED = {"Andrew", "DJ", "Jeff", "Oleg", "Pascal"};
-
+	
 	protected String CORE = "Core";
 	protected String[] TEAM3 = {"John", "Michael", "Bogdan"};
 	protected String[] TEAM3_SORTED = {"Bogdan", "John", "Michael"};
@@ -49,25 +48,23 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	protected Team team1 = new Team(UI, TEAM1);
 	protected Team team2 = new Team(RUNTIME, TEAM2);
 	protected Team team3 = new Team(CORE, TEAM3);
-
-	protected StructuredViewer<Object, Object> comparatorTestViewer;
-
+	
 	/*
 	 * model object - parent
 	 */
 	protected class Team {
-		Vector<IComparatorModelListener> fListeners = new Vector<IComparatorModelListener>();
-
+		Vector fListeners = new Vector();
+		
 		TeamMember[] members;
 		String name;
-
+		
 		public Team(String name, String[] members){
 			this.name = name;
 			this.members = new TeamMember[members.length];
 			for (int i = 0; i < members.length; i++)
 				this.members[i] = new TeamMember(members[i], this);
 		}
-
+		
 		public void addMember(String person){
 			TeamMember newMember = new TeamMember(person, this);
 			TeamMember[] newMembers = new TeamMember[members.length + 1];
@@ -80,7 +77,7 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 			newMembers = null;
 			fireModelChanged(new ComparatorModelChange(TestModelChange.INSERT, this, newMember));
 		}
-
+		
 	    public void addListener(IComparatorModelListener listener) {
 	        fListeners.addElement(listener);
 	    }
@@ -90,7 +87,7 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	     */
 	    public void fireModelChanged(ComparatorModelChange change) {
 	        for (int i = 0; i < fListeners.size(); ++i) {
-	        	IComparatorModelListener listener = fListeners
+	        	IComparatorModelListener listener = (IComparatorModelListener) fListeners
 	                    .get(i);
 	            listener.modelChanged(change);
 	        }
@@ -100,24 +97,24 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	        fListeners.removeElement(listener);
 	    }
 	}
-
+	
 	/*
 	 * model object - child
 	 */
 	protected class TeamMember {
 		String name;
 		Team team;
-
+		
 		public TeamMember(String name, Team team){
 			this.name = name;
 			this.team = team;
 		}
 	}
-
+	
 	/*
 	 * label provider
 	 */
-	protected class TeamModelLabelProvider extends LabelProvider<Object>{
+	protected class TeamModelLabelProvider extends LabelProvider{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
@@ -128,13 +125,13 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 				return ((TeamMember)element).name;
 			}
 			return element.toString();
-		}
+		}			
 	}
-
+	
 	/*
 	 * content provider
 	 */
-	protected class TeamModelContentProvider implements IComparatorModelListener,IStructuredContentProvider<Object,Object>{
+	protected class TeamModelContentProvider implements IComparatorModelListener,IStructuredContentProvider{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
@@ -154,11 +151,11 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<Object> viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			if (oldInput != null){
 				((Team) oldInput).removeListener(this);;
 			}
-
+	       
 	        if (newInput != null){
 	        	((Team) newInput).addListener(this);
 	        }
@@ -185,62 +182,62 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	        StructuredSelection selection = new StructuredSelection(change
 	                .getChildren());
 	        if ((change.getModifiers() & TestModelChange.SELECT) != 0) {
-	            comparatorTestViewer.setSelection(selection);
+	            fViewer.setSelection(selection);
 	        }
 	        if ((change.getModifiers() & TestModelChange.REVEAL) != 0) {
 	            Object element = selection.getFirstElement();
 	            if (element != null) {
-	                comparatorTestViewer.reveal(element);
+	                fViewer.reveal(element);
 	            }
 	        }
 	    }
-
+	    
 	    protected void doInsert(ComparatorModelChange change) {
-	        if (comparatorTestViewer instanceof ListViewer) {
+	        if (fViewer instanceof ListViewer) {
 	            if (change.getParent() != null
-	                    && change.getParent().equals(comparatorTestViewer.getInput())) {
-	                ((ListViewer<Object,Object>) comparatorTestViewer).add(change.getChildren());
+	                    && change.getParent().equals(fViewer.getInput())) {
+	                ((ListViewer) fViewer).add(change.getChildren());
 	            }
-	        } else if (comparatorTestViewer instanceof TableViewer) {
+	        } else if (fViewer instanceof TableViewer) {
 	            if (change.getParent() != null
-	                    && change.getParent().equals(comparatorTestViewer.getInput())) {
-	                ((TableViewer<Object,Object>) comparatorTestViewer).add(change.getChildren());
+	                    && change.getParent().equals(fViewer.getInput())) {
+	                ((TableViewer) fViewer).add(change.getChildren());
 	            }
-	        } else if (comparatorTestViewer instanceof AbstractTreeViewer) {
-	            ((AbstractTreeViewer<Object,Object>) comparatorTestViewer).add(change.getParent(), change
+	        } else if (fViewer instanceof AbstractTreeViewer) {
+	            ((AbstractTreeViewer) fViewer).add(change.getParent(), change
 	                    .getChildren());
-	        } else if (comparatorTestViewer instanceof ComboViewer) {
-	            ((ComboViewer<Object,Object>) comparatorTestViewer).add(change.getChildren());
+	        } else if (fViewer instanceof ComboViewer) {
+	            ((ComboViewer) fViewer).add(change.getChildren());
 	        } else {
 	            Assert.isTrue(false, "Unknown kind of viewer");
 	        }
 	    }
 
 	    protected void doNonStructureChange(ComparatorModelChange change) {
-           comparatorTestViewer.update(change.getParent(),
+           fViewer.update(change.getParent(),
                     new String[] { IBasicPropertyConstants.P_TEXT });
 	    }
 
 	    protected void doRemove(ComparatorModelChange change) {
-	        if (comparatorTestViewer instanceof ListViewer) {
-	            ((ListViewer<Object,Object>) comparatorTestViewer).remove(change.getChildren());
-	        } else if (comparatorTestViewer instanceof TableViewer) {
-	            ((TableViewer<Object,Object>) comparatorTestViewer).remove(change.getChildren());
-	        } else if (comparatorTestViewer instanceof AbstractTreeViewer) {
-	            ((AbstractTreeViewer<Object,Object>) comparatorTestViewer).remove(change.getChildren());
-	        } else if (comparatorTestViewer instanceof ComboViewer) {
-	            ((ComboViewer<Object,Object>) comparatorTestViewer).remove(change.getChildren());
+	        if (fViewer instanceof ListViewer) {
+	            ((ListViewer) fViewer).remove(change.getChildren());
+	        } else if (fViewer instanceof TableViewer) {
+	            ((TableViewer) fViewer).remove(change.getChildren());
+	        } else if (fViewer instanceof AbstractTreeViewer) {
+	            ((AbstractTreeViewer) fViewer).remove(change.getChildren());
+	        } else if (fViewer instanceof ComboViewer) {
+	            ((ComboViewer) fViewer).remove(change.getChildren());
 	        } else {
 	            Assert.isTrue(false, "Unknown kind of viewer");
 	        }
 	    }
 
 	    protected void doStructureChange(ComparatorModelChange change) {
-            comparatorTestViewer.refresh(change.getParent());
+            fViewer.refresh(change.getParent());
 	    }
-
+	    
 	}
-
+	
 	public ViewerComparatorTest(String name) {
 		super(name);
 	}

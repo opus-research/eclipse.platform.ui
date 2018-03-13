@@ -23,8 +23,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 public class TestModelContentProvider implements ITestModelListener,
-        IStructuredContentProvider<TestElement,TestElement>, ITreeContentProvider<TestElement,TestElement> {
-    Viewer<TestElement> fViewer;
+        IStructuredContentProvider, ITreeContentProvider {
+    Viewer fViewer;
 
     public void dispose() {
     }
@@ -33,18 +33,18 @@ public class TestModelContentProvider implements ITestModelListener,
         if (fViewer instanceof ListViewer) {
             if (change.getParent() != null
                     && change.getParent().equals(fViewer.getInput())) {
-                ((ListViewer<TestElement,TestElement>) fViewer).add(change.getChildren());
+                ((ListViewer) fViewer).add(change.getChildren());
             }
         } else if (fViewer instanceof TableViewer) {
             if (change.getParent() != null
                     && change.getParent().equals(fViewer.getInput())) {
-                ((TableViewer<TestElement,TestElement>) fViewer).add(change.getChildren());
+                ((TableViewer) fViewer).add(change.getChildren());
             }
         } else if (fViewer instanceof AbstractTreeViewer) {
-            ((AbstractTreeViewer<TestElement,TestElement>) fViewer).add(change.getParent(), change
+            ((AbstractTreeViewer) fViewer).add(change.getParent(), change
                     .getChildren());
         } else if (fViewer instanceof ComboViewer) {
-            ((ComboViewer<TestElement,TestElement>) fViewer).add(change.getChildren());
+            ((ComboViewer) fViewer).add(change.getChildren());
         } else {
             Assert.isTrue(false, "Unknown kind of viewer");
         }
@@ -52,7 +52,7 @@ public class TestModelContentProvider implements ITestModelListener,
 
     protected void doNonStructureChange(TestModelChange change) {
         if (fViewer instanceof StructuredViewer) {
-            ((StructuredViewer<TestElement,TestElement>) fViewer).update(change.getParent(),
+            ((StructuredViewer) fViewer).update(change.getParent(),
                     new String[] { IBasicPropertyConstants.P_TEXT });
         } else {
             Assert.isTrue(false, "Unknown kind of viewer");
@@ -61,13 +61,13 @@ public class TestModelContentProvider implements ITestModelListener,
 
     protected void doRemove(TestModelChange change) {
         if (fViewer instanceof ListViewer) {
-            ((ListViewer<TestElement,TestElement>) fViewer).remove(change.getChildren());
+            ((ListViewer) fViewer).remove(change.getChildren());
         } else if (fViewer instanceof TableViewer) {
-            ((TableViewer<TestElement,TestElement>) fViewer).remove(change.getChildren());
+            ((TableViewer) fViewer).remove(change.getChildren());
         } else if (fViewer instanceof AbstractTreeViewer) {
-            ((AbstractTreeViewer<TestElement,TestElement>) fViewer).remove(change.getChildren());
+            ((AbstractTreeViewer) fViewer).remove(change.getChildren());
         } else if (fViewer instanceof ComboViewer) {
-            ((ComboViewer<TestElement,TestElement>) fViewer).remove(change.getChildren());
+            ((ComboViewer) fViewer).remove(change.getChildren());
         } else {
             Assert.isTrue(false, "Unknown kind of viewer");
         }
@@ -75,14 +75,14 @@ public class TestModelContentProvider implements ITestModelListener,
 
     protected void doStructureChange(TestModelChange change) {
         if (fViewer instanceof StructuredViewer) {
-            ((StructuredViewer<TestElement,TestElement>) fViewer).refresh(change.getParent());
+            ((StructuredViewer) fViewer).refresh(change.getParent());
         } else {
             Assert.isTrue(false, "Unknown kind of viewer");
         }
     }
 
-    public TestElement[] getChildren(TestElement element) {
-        TestElement testElement = element;
+    public Object[] getChildren(Object element) {
+        TestElement testElement = (TestElement) element;
         int count = testElement.getChildCount();
         TestElement[] children = new TestElement[count];
         for (int i = 0; i < count; ++i)
@@ -90,25 +90,25 @@ public class TestModelContentProvider implements ITestModelListener,
         return children;
     }
 
-    public TestElement[] getElements(TestElement element) {
+    public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
-    public TestElement getParent(TestElement element) {
-        return element.getContainer();
+    public Object getParent(Object element) {
+        return ((TestElement) element).getContainer();
     }
 
-    public boolean hasChildren(TestElement element) {
-        return element.getChildCount() > 0;
+    public boolean hasChildren(Object element) {
+        return ((TestElement) element).getChildCount() > 0;
     }
 
-    public void inputChanged(Viewer<TestElement> viewer, TestElement oldInput, TestElement newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         fViewer = viewer;
-        TestElement oldElement = oldInput;
+        TestElement oldElement = (TestElement) oldInput;
         if (oldElement != null) {
             oldElement.getModel().removeListener(this);
         }
-        TestElement newElement = newInput;
+        TestElement newElement = (TestElement) newInput;
         if (newElement != null) {
             newElement.getModel().addListener(this);
         }

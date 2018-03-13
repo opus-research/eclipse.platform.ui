@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * Tests TreeViewer's VIRTUAL support with a lazy content provider.
- *
+ * 
  * @since 3.2
  */
 public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
@@ -40,18 +40,16 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 
 	private int updateElementCallCount = 0;
 
-	private TreeViewer<String,String> treeViewer;
-
-	private class LazyTreeContentProvider implements ILazyTreeContentProvider<String,String> {
+	private class LazyTreeContentProvider implements ILazyTreeContentProvider {
 		/**
-		 *
+		 * 
 		 */
-		private String input;
+		private Object input;
 
-		public void updateElement(String parent, int index) {
+		public void updateElement(Object parent, int index) {
 			updateElementCallCount++;
-			String parentString = parent;
-			String childElement = parentString + "-" + (index+offset);
+			String parentString = (String) parent;
+			Object childElement = parentString + "-" + (index+offset);
 			if (printCallbacks)
 				System.out.println("updateElement called for " + parent + " at " + index);
 			if (callbacksEnabled) {
@@ -64,18 +62,18 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			// do nothing
 		}
 
-		public void inputChanged(Viewer<String> viewer, String oldInput, String newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			this.input = newInput;
 		}
 
-		public String getParent(String element) {
+		public Object getParent(Object element) {
 			return null;
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateChildCount(java.lang.Object, int)
 		 */
-		public void updateChildCount(String element, int currentChildCount) {
+		public void updateChildCount(Object element, int currentChildCount) {
 			if (printCallbacks)
 				System.out.println("updateChildCount called for " + element + " with " + currentChildCount);
 			if (callbacksEnabled) {
@@ -88,17 +86,17 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		super(name);
 	}
 
-	public TreeViewer<String,String> getTreeViewer() {
-		return treeViewer;
+	public TreeViewer getTreeViewer() {
+		return (TreeViewer) fViewer;
 	}
-
+	
 	/**
 	 * Checks if the virtual tree / table functionality can be tested in the current settings.
 	 * The virtual trees and tables rely on SWT.SetData event which is only sent if OS requests
 	 * information about the tree / table. If the window is not visible (obscured by another window,
 	 * outside of visible area, or OS determined that it can skip drawing), then OS request won't
-	 * be send, causing automated tests to fail.
-	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=118919 .
+	 * be send, causing automated tests to fail. 
+	 * See https://bugs.eclipse.org/bugs/show_bug.cgi?id=118919 .  
 	 */
 	protected boolean setDataCalled = false;
 
@@ -106,7 +104,7 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 		super.setUp();
 		processEvents(); // run events for SetData precondition test
 	}
-
+	
 	protected void setInput() {
 		String letterR = "R";
 		getTreeViewer().setInput(letterR);
@@ -114,7 +112,7 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 
 	protected StructuredViewer createViewer(Composite parent) {
 		Tree tree = new Tree(fShell, SWT.VIRTUAL | SWT.MULTI);
-		treeViewer = new TreeViewer<String,String>(tree);
+		TreeViewer treeViewer = new TreeViewer(tree);
 		treeViewer.setContentProvider(new LazyTreeContentProvider());
 		tree.addListener(SWT.SetData, new Listener() {
 			public void handleEvent(Event event) {
@@ -172,18 +170,18 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			tree.setRedraw(true);
 		}
 	}
-
+	
 	public void testSetSorterOnNullInput() {
-		treeViewer.setInput(null);
-		treeViewer.setSorter(new ViewerSorter());
+		fViewer.setInput(null);
+		fViewer.setSorter(new ViewerSorter());
 	}
-
+	
 	public void testSetComparatorOnNullInput(){
-		treeViewer.setInput(null);
-		treeViewer.setComparator(new ViewerComparator<String,String>());
+		fViewer.setInput(null);
+		fViewer.setComparator(new ViewerComparator());		
 	}
-
-	/* test TreeViewer.remove(parent, index) */
+	
+	/* test TreeViewer.remove(parent, index) */ 
 	public void testRemoveAt() {
 		if (disableTestsBug347491)
 			return;
@@ -191,6 +189,7 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
+		TreeViewer treeViewer = (TreeViewer) fViewer;
 		// correct what the content provider is answering with
 		treeViewer.getTree().update();
 		offset = 1;

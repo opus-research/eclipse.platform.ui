@@ -28,7 +28,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 
 	private Shell shell;
 
-	private TreeViewer<TreeNode,TreeNode> viewer;
+	private TreeViewer viewer;
 
 	private TreeNode rootNode;
 
@@ -40,13 +40,13 @@ public class Bug205700TreeViewerTest extends TestCase {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		shell = new Shell();
 
-		viewer = new TreeViewer<TreeNode,TreeNode>(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer = new TreeViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		viewer.setContentProvider(new InternalContentProvider());
 		viewer.setLabelProvider(new InternalLabelProvider());
@@ -58,7 +58,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
@@ -76,8 +76,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 		rootNode.add(new TreeNode("Child8"));
 		rootNode.add(new TreeNode("Child9"));
 
-		TreeNode[] children = new TreeNode[rootNode.getChildren().size()];
-		viewer.add(rootNode, rootNode.getChildren().toArray(children));
+		viewer.add(rootNode, rootNode.getChildren().toArray());
 
 		assertItemNames(new String[] { "Child1", "Child5", "Child10", "Child2",
 				"Child3", "Child4", "Child6", "Child7", "Child8", "Child9" });
@@ -114,8 +113,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 		rootNode.add(new TreeNode("Child8"));
 		rootNode.add(new TreeNode("Child9"));
 
-		TreeNode[] children = new TreeNode[rootNode.getChildren().size()];
-		viewer.add(rootNode, rootNode.getChildren().toArray(children));
+		viewer.add(rootNode, rootNode.getChildren().toArray());
 
 		assertItemNames(new String[] { "Child1", "Child10", "Child2", "Child3",
 				"Child4", "Child5", "Child6", "Child7", "Child8", "Child9" });
@@ -129,14 +127,13 @@ public class Bug205700TreeViewerTest extends TestCase {
 		// add before the existing "Child1" node
 		rootNode.getChildren().add(0, new TreeNode("Child1"));
 
-		TreeNode[] children = new TreeNode[rootNode.getChildren().size()];
-		viewer.add(rootNode, rootNode.getChildren().toArray(children));
+		viewer.add(rootNode, rootNode.getChildren().toArray());
 
 		assertItemNames(new String[] { "Child1", "Child1", "Child10",
 				"Child5" });
 	}
 
-	private TreeNode createInput() {
+	private Object createInput() {
 		rootNode = new TreeNode("Root");
 
 		rootNode.add(child1);
@@ -152,7 +149,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 
 		private TreeNode parent = null;
 
-		private final List<TreeNode> children = new ArrayList<TreeNode>();
+		private final List children = new ArrayList();
 
 		public TreeNode(String name) {
 			this.name = name;
@@ -164,7 +161,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 			}
 		}
 
-		public List<TreeNode> getChildren() {
+		public List getChildren() {
 			return children;
 		}
 
@@ -181,39 +178,38 @@ public class Bug205700TreeViewerTest extends TestCase {
 		}
 	}
 
-	private class InternalLabelProvider extends LabelProvider<TreeNode> {
-		public String getText(TreeNode element) {
-			if (element != null) {
-				return element.getName();
+	private class InternalLabelProvider extends LabelProvider {
+		public String getText(Object element) {
+			if (element instanceof TreeNode) {
+				return ((TreeNode) element).getName();
 			}
 			return null;
 		}
 	}
 
-	private class InternalContentProvider implements ITreeContentProvider<TreeNode,TreeNode> {
-		public TreeNode[] getChildren(TreeNode parentElement) {
-			if (parentElement != null) {
-				TreeNode[] children = new TreeNode[parentElement.getChildren().size()];
-				return parentElement.getChildren().toArray(children);
+	private class InternalContentProvider implements ITreeContentProvider {
+		public Object[] getChildren(Object parentElement) {
+			if (parentElement instanceof TreeNode) {
+				return ((TreeNode) parentElement).getChildren().toArray();
 			}
-			return new TreeNode[0];
+			return new Object[0];
 		}
 
-		public TreeNode getParent(TreeNode element) {
-			if (element != null) {
-				return element.getParent();
+		public Object getParent(Object element) {
+			if (element instanceof TreeNode) {
+				return ((TreeNode) element).getParent();
 			}
 			return null;
 		}
 
-		public boolean hasChildren(TreeNode element) {
-			if (element != null) {
-				return !element.getChildren().isEmpty();
+		public boolean hasChildren(Object element) {
+			if (element instanceof TreeNode) {
+				return !((TreeNode) element).getChildren().isEmpty();
 			}
 			return false;
 		}
 
-		public TreeNode[] getElements(TreeNode inputElement) {
+		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
 
@@ -221,7 +217,7 @@ public class Bug205700TreeViewerTest extends TestCase {
 			// nothing
 		}
 
-		public void inputChanged(Viewer<TreeNode> viewer, TreeNode oldInput, TreeNode newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			// nothing
 		}
 	}
