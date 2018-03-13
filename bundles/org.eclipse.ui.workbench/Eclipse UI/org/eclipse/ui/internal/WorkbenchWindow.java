@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Zhongwei Zhao - Bug 379495 - Two "Run" on top menu
+ *     Patrick Chuong - Bug 391481 - Contributing perspectiveExtension, hiddenMenuItem 
+ *     								 removes a menu from multiple perspectives
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -75,7 +77,6 @@ import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRendererFilter;
 import org.eclipse.e4.ui.workbench.renderers.swt.TrimBarLayout;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.AbstractGroupMarker;
-import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -86,6 +87,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.StatusLineManager;
+import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.commands.ActionHandler;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.internal.provisional.action.CoolBarManager2;
@@ -98,8 +100,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
@@ -107,7 +107,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -153,6 +152,7 @@ import org.eclipse.ui.internal.layout.IWindowTrim;
 import org.eclipse.ui.internal.menus.IActionSetsListener;
 import org.eclipse.ui.internal.menus.LegacyActionPersistence;
 import org.eclipse.ui.internal.menus.MenuHelper;
+import org.eclipse.ui.internal.menus.SlaveMenuService;
 import org.eclipse.ui.internal.menus.WorkbenchMenuService;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressRegion;
@@ -169,8 +169,6 @@ import org.eclipse.ui.internal.services.WorkbenchLocationService;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.IMenuService;
-import org.eclipse.ui.menus.MenuUtil;
-import org.eclipse.ui.model.WorkbenchPartLabelProvider;
 import org.eclipse.ui.presentations.AbstractPresentationFactory;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.ui.services.IEvaluationService;
@@ -412,115 +410,29 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		perspective = pers;
 	}
 
-	private static class SaveableLabelProvider extends LabelProvider implements ITableLabelProvider {
-		private WorkbenchPartLabelProvider partLabelProvider;
-
-		/**
-		 * @param listener
-		 * @see org.eclipse.jface.viewers.BaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
-		public void addListener(ILabelProviderListener listener) {
-			partLabelProvider.addListener(listener);
-		}
-
-		public Object getObject(Object element) {
-			if (element instanceof MPart) {
-				Object obj = ((MPart) element).getObject();
-				if (obj instanceof CompatibilityPart) {
-					element = ((CompatibilityPart) obj).getPart();
-				}
-			}
-			return element;
-		}
-
-		/**
-		 * @param element
-		 * @param property
-		 * @return
-		 * @see org.eclipse.jface.viewers.BaseLabelProvider#isLabelProperty(java.lang.Object,
-		 *      java.lang.String)
-		 */
-		public boolean isLabelProperty(Object element, String property) {
-			return partLabelProvider.isLabelProperty(getObject(element), property);
-		}
-
-		/**
-		 * @param listener
-		 * @see org.eclipse.jface.viewers.BaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-		 */
-		public void removeListener(ILabelProviderListener listener) {
-			partLabelProvider.removeListener(listener);
-		}
-
-		/**
-		 * @param element
-		 * @return
-		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getImage(java.lang.Object)
-		 */
-		public final Image getImage(Object element) {
-			return partLabelProvider.getImage(getObject(element));
-		}
-
-		/**
-		 * @param element
-		 * @return
-		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getText(java.lang.Object)
-		 */
-		public final String getText(Object element) {
-			return partLabelProvider.getText(getObject(element));
-		}
-
-		/**
-		 * @param element
-		 * @param columnIndex
-		 * @return
-		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getColumnImage(java.lang.Object,
-		 *      int)
-		 */
-		public final Image getColumnImage(Object element, int columnIndex) {
-			return partLabelProvider.getColumnImage(getObject(element), columnIndex);
-		}
-
-		/**
-		 * @param element
-		 * @param columnIndex
-		 * @return
-		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#getColumnText(java.lang.Object,
-		 *      int)
-		 */
-		public final String getColumnText(Object element, int columnIndex) {
-			return partLabelProvider.getColumnText(getObject(element), columnIndex);
-		}
-
-		/**
-		 * 
-		 * @see org.eclipse.ui.model.WorkbenchPartLabelProvider#dispose()
-		 */
-		public void dispose() {
-			partLabelProvider.dispose();
-		}
-
-		/**
-		 * @return
-		 * @see java.lang.Object#toString()
-		 */
-		public String toString() {
-			return partLabelProvider.toString();
-		}
-
-		public SaveableLabelProvider() {
-			partLabelProvider = new WorkbenchPartLabelProvider();
-		}
-
-	}
-
 	@PostConstruct
 	public void setup() {
-		// Initialize a previous 'saved' state if applicable.
-		this.coolBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
-				IPreferenceConstants.COOLBAR_VISIBLE);
-		this.perspectiveBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
-				IPreferenceConstants.PERSPECTIVEBAR_VISIBLE);
+		// Initialize a previous 'saved' state if applicable. We no longer
+		// update the
+		// preference store.
+		if (getModel().getPersistedState().containsKey(IPreferenceConstants.COOLBAR_VISIBLE)) {
+			this.coolBarVisible = Boolean.parseBoolean(getModel().getPersistedState().get(
+					IPreferenceConstants.COOLBAR_VISIBLE));
+		} else {
+			this.coolBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
+					IPreferenceConstants.COOLBAR_VISIBLE);
+			getModel().getPersistedState().put(IPreferenceConstants.COOLBAR_VISIBLE,
+					Boolean.toString(this.coolBarVisible));
+		}
+		if (getModel().getPersistedState().containsKey(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE)) {
+			this.perspectiveBarVisible = Boolean.parseBoolean(getModel().getPersistedState().get(
+					IPreferenceConstants.PERSPECTIVEBAR_VISIBLE));
+		} else {
+			this.perspectiveBarVisible = PrefUtil.getInternalPreferenceStore().getBoolean(
+					IPreferenceConstants.PERSPECTIVEBAR_VISIBLE);
+			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
+					Boolean.toString(this.perspectiveBarVisible));
+		}
 
 		final IEclipseContext windowContext = model.getContext();
 		IServiceLocatorCreator slc = (IServiceLocatorCreator) workbench
@@ -538,7 +450,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		windowContext.set(IExtensionTracker.class.getName(), new ContextFunction() {
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				if (tracker == null) {
 					tracker = new UIExtensionTracker(getWorkbench().getDisplay());
 				}
@@ -569,7 +481,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 
 			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				LabelProvider labelProvider = new SaveableLabelProvider();
+				LabelProvider labelProvider = new LabelProvider() {
+					@Override
+					public String getText(Object element) {
+						return ((MPart) element).getLocalizedLabel();
+					}
+				};
 				List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 				ListSelectionDialog dialog = new ListSelectionDialog(getShell(), parts,
 						ArrayContentProvider.getInstance(), labelProvider,
@@ -735,6 +652,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					false);
 			PrefUtil.saveAPIPrefs();
 		}
+		getWindowAdvisor().postWindowCreate();
 		getWindowAdvisor().openIntro();
 
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
@@ -1246,10 +1164,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		try {
 			// Tag the currently active part so we can restore focus on startup
-			WorkbenchPartReference ref = (WorkbenchPartReference) getActivePage()
-					.getActivePartReference();
-			if (ref != null) {
-				ref.getModel().getTags().add(EPartService.ACTIVE_ON_CLOSE_TAG);
+			IWorkbenchPage activePage = getActivePage();
+			if (activePage != null) {
+				WorkbenchPartReference ref = (WorkbenchPartReference) activePage
+						.getActivePartReference();
+				if (ref != null) {
+					ref.getModel().getTags().add(EPartService.ACTIVE_ON_CLOSE_TAG);
+				}
 			}
 
 			// Only do the check if it is OK to close if we are not closing
@@ -1272,8 +1193,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
-			}
- else {
+			} else {
 				firePageClosed();
 				fireWindowClosed();
 			}
@@ -1357,9 +1277,31 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
+	 * Mark contributions dirty for future update.
+	 */
+	private void allowUpdates(IMenuManager menuManager) {
+		menuManager.markDirty();
+		final IContributionItem[] items = menuManager.getItems();
+		for (int i = 0; i < items.length; i++) {
+			if (items[i] instanceof IMenuManager) {
+				allowUpdates((IMenuManager) items[i]);
+			} else if (items[i] instanceof SubContributionItem) {
+				final IContributionItem innerItem = ((SubContributionItem) items[i]).getInnerItem();
+				if (innerItem instanceof IMenuManager) {
+					allowUpdates((IMenuManager) innerItem);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Fires perspective activated
 	 */
 	void firePerspectiveActivated(IWorkbenchPage page, IPerspectiveDescriptor perspective) {
+		IMenuManager windowManager = ((WorkbenchPage) page).getActionBars().getMenuManager();
+		allowUpdates(windowManager);
+		windowManager.update(false);
+
 		UIListenerLogging.logPerspectiveEvent(this, page, perspective,
 				UIListenerLogging.PLE_PERSP_ACTIVATED);
 		perspectiveListeners.firePerspectiveActivated(page, perspective);
@@ -1464,20 +1406,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return actionBars;
 	}
 
-	/**
-	 * Returns the active page.
-	 * 
-	 * @return the active page
-	 */
 	public IWorkbenchPage getActivePage() {
 		return page;
 	}
 
-	/**
-	 * Returns an array of the pages in the workbench window.
-	 * 
-	 * @return an array of pages
-	 */
 	public IWorkbenchPage[] getPages() {
 		return page == null ? new IWorkbenchPage[0] : new IWorkbenchPage[] { page };
 	}
@@ -1602,13 +1534,16 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			contextService.unregisterShell(getShell());
 
 			// time to wipe our our populate
-			IMenuService menuService = (IMenuService) workbench.getService(IMenuService.class);
-			menuService.releaseContributions(((ContributionManager) getActionBars()
-					.getMenuManager()));
-			ICoolBarManager coolbar = getActionBars().getCoolBarManager();
-			if (coolbar != null) {
-				menuService.releaseContributions(((ContributionManager) coolbar));
-			}
+			// IMenuService menuService = (IMenuService)
+			// workbench.getService(IMenuService.class);
+			// menuService.releaseContributions(((ContributionManager)
+			// getActionBars()
+			// .getMenuManager()));
+			// ICoolBarManager coolbar = getActionBars().getCoolBarManager();
+			// if (coolbar != null) {
+			// menuService.releaseContributions(((ContributionManager)
+			// coolbar));
+			// }
 
 			getActionBarAdvisor().dispose();
 			getWindowAdvisor().dispose();
@@ -1662,7 +1597,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (!getWorkbenchImpl().isClosing()) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				return ((WorkbenchPage) page).saveAllEditors(true, true, true);
+				return ((WorkbenchPage) page).saveAllEditors(true, true);
 			}
 		}
 		return true;
@@ -1800,13 +1735,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		}
 	}
 
-	/**
-	 * Sets the active page within the window.
-	 * 
-	 * @param in
-	 *            identifies the new active page, or <code>null</code> for no
-	 *            active page
-	 */
 	public void setActivePage(final IWorkbenchPage in) {
 		if (getActivePage() != in) {
 			if (in == null) {
@@ -2161,18 +2089,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		workbench.largeUpdateStart();
 		try {
 			getActionBarAdvisor().fillActionBars(flags);
-			//
-			// 3.3 start
-			final IMenuService menuService = (IMenuService) serviceLocator
-					.getService(IMenuService.class);
-			menuService.populateContributionManager((ContributionManager) getActionBars()
-					.getMenuManager(), MenuUtil.MAIN_MENU);
-			ICoolBarManager coolbar = getActionBars().getCoolBarManager();
-			if (coolbar != null) {
-				menuService.populateContributionManager((ContributionManager) coolbar,
-						MenuUtil.MAIN_TOOLBAR);
-			}
-			// 3.3 end
 		} finally {
 			workbench.largeUpdateEnd();
 		}
@@ -2214,6 +2130,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = coolBarVisible;
 		coolBarVisible = visible;
 		if (oldValue != coolBarVisible) {
+			getModel().getPersistedState().put(IPreferenceConstants.COOLBAR_VISIBLE,
+					Boolean.toString(visible));
 			updateLayoutDataForContents();
 			firePropertyChanged(PROP_COOLBAR_VISIBLE, oldValue ? Boolean.TRUE : Boolean.FALSE,
 					coolBarVisible ? Boolean.TRUE : Boolean.FALSE);
@@ -2253,6 +2171,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = perspectiveBarVisible;
 		perspectiveBarVisible = visible;
 		if (oldValue != perspectiveBarVisible) {
+			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
+					Boolean.toString(visible));
 			updateLayoutDataForContents();
 			firePropertyChanged(PROP_PERSPECTIVEBAR_VISIBLE, oldValue ? Boolean.TRUE
 					: Boolean.FALSE, perspectiveBarVisible ? Boolean.TRUE : Boolean.FALSE);
@@ -2309,7 +2229,9 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		boolean oldValue = statusLineVisible;
 		statusLineVisible = visible;
 		if (oldValue != statusLineVisible) {
-
+			getModel().getPersistedState().put(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE,
+					Boolean.toString(visible));
+			updateLayoutDataForContents();
 			firePropertyChanged(PROP_STATUS_LINE_VISIBLE, oldValue ? Boolean.TRUE : Boolean.FALSE,
 					statusLineVisible ? Boolean.TRUE : Boolean.FALSE);
 		}
@@ -2466,6 +2388,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		IContextService cxs = ContextInjectionFactory
 				.make(ContextService.class, model.getContext());
 		serviceLocator.registerService(IContextService.class, cxs);
+
+		IMenuService parent = (IMenuService) getWorkbench().getService(IMenuService.class);
+		IMenuService msvs = new SlaveMenuService(parent, model);
+		serviceLocator.registerService(IMenuService.class, msvs);
 	}
 
 	public final Object getService(final Class key) {
@@ -2486,17 +2412,14 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	public void toggleToolbarVisibility() {
 		boolean coolbarVisible = getCoolBarVisible();
 		boolean perspectivebarVisible = getPerspectiveBarVisible();
-		IPreferenceStore prefs = PrefUtil.getInternalPreferenceStore();
 
 		// only toggle the visibility of the components that
 		// were on initially
 		if (getWindowConfigurer().getShowCoolBar()) {
 			setCoolBarVisible(!coolbarVisible);
-			prefs.setValue(IPreferenceConstants.COOLBAR_VISIBLE, !coolbarVisible);
 		}
 		if (getWindowConfigurer().getShowPerspectiveBar()) {
 			setPerspectiveBarVisible(!perspectivebarVisible);
-			prefs.setValue(IPreferenceConstants.PERSPECTIVEBAR_VISIBLE, !perspectivebarVisible);
 		}
 		ICommandService commandService = (ICommandService) getService(ICommandService.class);
 		Map filter = new HashMap();

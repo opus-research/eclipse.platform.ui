@@ -22,7 +22,6 @@ import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UISynchronize;
-import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.UIEventPublisher;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
@@ -1108,9 +1107,9 @@ public class ESelectionServiceTest extends UITest {
 			}
 		});
 		application.setContext(applicationContext);
-		E4Workbench.processHierarchy(application);
-		((Notifier) application).eAdapters().add(
-				new UIEventPublisher(applicationContext));
+		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
+		((Notifier) application).eAdapters().add(ep);
+		applicationContext.set(UIEventPublisher.class, ep);
 	}
 
 	static class SelectionListener implements ISelectionListener {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 221662 [Contributions] Extension point org.eclipse.ui.menus: sub menu contribution does not have icon even if specified
+ *     Christian Walther (Indel AG) - Bug 398631: Use correct menu item icon from commandImages
+ *     Christian Walther (Indel AG) - Bug 384056: Use disabled icon from extension definition
  *******************************************************************************/
 
 package org.eclipse.ui.internal.menus;
@@ -19,7 +21,6 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
@@ -38,11 +39,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.activities.IActivityManager;
-import org.eclipse.ui.activities.IIdentifier;
-import org.eclipse.ui.activities.IIdentifierListener;
-import org.eclipse.ui.activities.IdentifierEvent;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
@@ -80,9 +76,7 @@ public class MenuAdditionCacheEntry {
 	private IConfigurationElement configElement;
 	private MenuLocationURI location;
 
-	private String namespaceIdentifier;
-
-	private IActivityManager activityManager;
+	// private String namespaceIdentifier;
 
 	public MenuAdditionCacheEntry(MApplication application, IEclipseContext appContext,
 			IConfigurationElement configElement, String attribute, String namespaceIdentifier) {
@@ -91,10 +85,7 @@ public class MenuAdditionCacheEntry {
 		assert appContext.equals(this.application.getContext());
 		this.configElement = configElement;
 		this.location = new MenuLocationURI(attribute);
-		this.namespaceIdentifier = namespaceIdentifier;
-
-		IWorkbench workbench = application.getContext().get(IWorkbench.class);
-		activityManager = workbench.getActivitySupport().getActivityManager();
+		// this.namespaceIdentifier = namespaceIdentifier;
 	}
 
 	private boolean inToolbar() {
@@ -209,7 +200,7 @@ public class MenuAdditionCacheEntry {
 			} else if (IWorkbenchRegistryConstants.TAG_DYNAMIC.equals(itemType)) {
 				ContextFunction generator = new ContextFunction() {
 					@Override
-					public Object compute(IEclipseContext context) {
+					public Object compute(IEclipseContext context, String contextKey) {
 						ServiceLocator sl = new ServiceLocator();
 						sl.setContext(context);
 						DynamicMenuContributionItem item = new DynamicMenuContributionItem(
@@ -258,7 +249,11 @@ public class MenuAdditionCacheEntry {
 			ICommandImageService commandImageService = application.getContext().get(
 					ICommandImageService.class);
 			ImageDescriptor descriptor = commandImageService == null ? null : commandImageService
-					.getImageDescriptor(item.getElementId());
+					.getImageDescriptor(commandId);
+			if (descriptor == null) {
+				descriptor = commandImageService == null ? null : commandImageService
+						.getImageDescriptor(item.getElementId());
+			}
 			if (descriptor != null) {
 				item.setIconURI(MenuHelper.getImageUrl(descriptor));
 			}
@@ -270,29 +265,7 @@ public class MenuAdditionCacheEntry {
 		item.setTooltip(MenuHelper.getTooltip(commandAddition));
 		item.setType(MenuHelper.getStyle(commandAddition));
 		item.setVisibleWhen(MenuHelper.getVisibleWhen(commandAddition));
-		createIdentifierTracker(item);
 		return item;
-	}
-
-	private class IdListener implements IIdentifierListener {
-		public void identifierChanged(IdentifierEvent identifierEvent) {
-			application.getContext().set(identifierEvent.getIdentifier().getId(),
-					identifierEvent.getIdentifier().isEnabled());
-		}
-	}
-
-	private IdListener idUpdater = new IdListener();
-
-	private void createIdentifierTracker(MApplicationElement item) {
-		if (item.getElementId() != null && item.getElementId().length() > 0) {
-			String id = namespaceIdentifier + "/" + item.getElementId(); //$NON-NLS-1$
-			item.getPersistedState().put(MenuManagerRenderer.VISIBILITY_IDENTIFIER, id);
-			final IIdentifier identifier = activityManager.getIdentifier(id);
-			if (identifier != null) {
-				application.getContext().set(identifier.getId(), identifier.isEnabled());
-				identifier.addIdentifierListener(idUpdater);
-			}
-		}
 	}
 
 	private MMenuElement createMenuSeparatorAddition(final IConfigurationElement sepAddition) {
@@ -410,7 +383,6 @@ public class MenuAdditionCacheEntry {
 		control.setContributionURI(CompatibilityWorkbenchWindowControlContribution.CONTROL_CONTRIBUTION_URI);
 		ControlContributionRegistry.add(id, element);
 		control.setVisibleWhen(MenuHelper.getVisibleWhen(element));
-		createIdentifierTracker(control);
 		return control;
 	}
 
@@ -453,10 +425,11 @@ public class MenuAdditionCacheEntry {
 			ICommandImageService commandImageService = application.getContext().get(
 					ICommandImageService.class);
 			ImageDescriptor descriptor = commandImageService == null ? null : commandImageService
-					.getImageDescriptor(commandId);
+					.getImageDescriptor(commandId, ICommandImageService.IMAGE_STYLE_TOOLBAR);
 			if (descriptor == null) {
 				descriptor = commandImageService == null ? null : commandImageService
-						.getImageDescriptor(item.getElementId());
+						.getImageDescriptor(item.getElementId(),
+								ICommandImageService.IMAGE_STYLE_TOOLBAR);
 				if (descriptor == null) {
 					item.setLabel(MenuHelper.getLabel(commandAddition));
 				} else {
@@ -468,6 +441,30 @@ public class MenuAdditionCacheEntry {
 		} else {
 			item.setIconURI(iconUrl);
 		}
+
+		iconUrl = MenuHelper.getIconURI(commandAddition,
+				IWorkbenchRegistryConstants.ATT_DISABLEDICON);
+		if (iconUrl == null) {
+			ICommandImageService commandImageService = application.getContext().get(
+					ICommandImageService.class);
+			if (commandImageService != null) {
+				ImageDescriptor descriptor = commandImageService.getImageDescriptor(commandId,
+						ICommandImageService.TYPE_DISABLED,
+						ICommandImageService.IMAGE_STYLE_TOOLBAR);
+				if (descriptor == null) {
+					descriptor = commandImageService.getImageDescriptor(item.getElementId(),
+							ICommandImageService.TYPE_DISABLED,
+							ICommandImageService.IMAGE_STYLE_TOOLBAR);
+				}
+				if (descriptor != null) {
+					iconUrl = MenuHelper.getImageUrl(descriptor);
+				}
+			}
+		}
+		if (iconUrl != null) {
+			MenuHelper.setDisabledIconURI(item, iconUrl);
+		}
+
 		item.setTooltip(MenuHelper.getTooltip(commandAddition));
 		item.setType(MenuHelper.getStyle(commandAddition));
 		if (MenuHelper.hasPulldownStyle(commandAddition)) {
@@ -477,7 +474,6 @@ public class MenuAdditionCacheEntry {
 			item.setMenu(element);
 		}
 		item.setVisibleWhen(MenuHelper.getVisibleWhen(commandAddition));
-		createIdentifierTracker(item);
 		return item;
 	}
 }

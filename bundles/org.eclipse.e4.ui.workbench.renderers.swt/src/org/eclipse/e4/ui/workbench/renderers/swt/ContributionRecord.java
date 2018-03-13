@@ -11,6 +11,8 @@
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import org.eclipse.e4.core.commands.ExpressionContext;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +34,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.MenuManager;
@@ -152,16 +153,6 @@ public class ContributionRecord {
 			}
 		}
 		if (currentVisibility
-				&& item.getPersistedState().get(
-						MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
-			String identifier = item.getPersistedState().get(
-					MenuManagerRenderer.VISIBILITY_IDENTIFIER);
-			Object rc = exprContext.eclipseContext.get(identifier);
-			if (rc instanceof Boolean) {
-				currentVisibility = ((Boolean) rc).booleanValue();
-			}
-		}
-		if (currentVisibility
 				&& item.getVisibleWhen() instanceof MCoreExpression) {
 			boolean val = ContributionsAnalyzer.isVisible(
 					(MCoreExpression) item.getVisibleWhen(), exprContext);
@@ -225,8 +216,7 @@ public class ContributionRecord {
 					renderer.linkElementToContributionRecord(copy, this);
 					menuModel.getChildren().add(idx++, copy);
 				} else {
-					shared.setVisibleWhen(merge(
-							menuContribution.getVisibleWhen(),
+					shared.setVisibleWhen(merge(copy.getVisibleWhen(),
 							shared.getVisibleWhen()));
 					copy = shared;
 				}
@@ -266,7 +256,7 @@ public class ContributionRecord {
 		IEclipseContext staticContext = getStaticContext();
 		staticContext.remove(List.class);
 		factoryDispose = (Runnable) ((IContextFunction) obj)
-				.compute(staticContext);
+				.compute(staticContext, null);
 		return staticContext.get(List.class);
 	}
 
