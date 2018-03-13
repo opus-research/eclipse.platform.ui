@@ -554,7 +554,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				workbenchTrimElements.remove(child);
 
 				child.setToBeRendered(false);
-				child.getParent().getChildren().remove(child);
+				child.getParent().getChildren().remove(i);
 				return (IContributionItem) obj;
 			}
 			if (item.getId() != null && item.getId().equals(child.getElementId())) {
