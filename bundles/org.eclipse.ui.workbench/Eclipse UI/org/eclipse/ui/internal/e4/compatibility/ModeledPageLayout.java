@@ -591,7 +591,12 @@ public class ModeledPageLayout implements IPageLayout {
 			if (relTo.isToBeRendered() || toInsert.isToBeRendered()) {
 				// one of the items to be inserted should be rendered, render
 				// all parent elements as well
-				resetToBeRenderedFlag(psc, true);
+				MUIElement parent = psc.getParent();
+				while (parent != null && !(parent instanceof MPerspective)) {
+					parent.setToBeRendered(true);
+					parent = parent.getParent();
+				}
+				psc.setToBeRendered(true);
 			} else {
 				// no child elements need to be rendered, the parent part sash
 				// container does not need to be rendered either then
@@ -678,20 +683,11 @@ public class ModeledPageLayout implements IPageLayout {
 				stack.setSelectedElement(viewModel);
 			}
 
-			if (visible || viewModel.isToBeRendered()) {
+			if (visible) {
 				// ensure that the parent is being rendered, it may have been a
 				// placeholder folder so its flag may actually be false
-				resetToBeRenderedFlag(viewModel, true);
+				refModel.setToBeRendered(true);
 			}
 		}
-	}
-
-	private static void resetToBeRenderedFlag(MUIElement element, boolean toBeRendered) {
-		MUIElement parent = element.getParent();
-		while (parent != null && !(parent instanceof MPerspective)) {
-			parent.setToBeRendered(toBeRendered);
-			parent = parent.getParent();
-		}
-		element.setToBeRendered(toBeRendered);
 	}
 }

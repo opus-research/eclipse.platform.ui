@@ -21,8 +21,11 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
@@ -32,7 +35,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
@@ -47,6 +51,7 @@ import org.eclipse.ui.internal.ErrorEditorPart;
 import org.eclipse.ui.internal.ErrorViewPart;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.SaveableHelper;
+import org.eclipse.ui.internal.ViewSite;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPartReference;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -322,10 +327,8 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		// Only update 'valid' parts
 		if (!(wrapped instanceof ErrorEditorPart) && !(wrapped instanceof ErrorViewPart)) {
 			part.setLabel(computeLabel());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
-					wrapped.getTitleToolTip());
-			part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-					wrapped.getTitleImage());
+			part.setTooltip(wrapped.getTitleToolTip());
+			updateImages(part);
 		}
 
 		if (wrapped instanceof ISaveablePart) {
@@ -337,17 +340,11 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				switch (propId) {
 				case IWorkbenchPartConstants.PROP_TITLE:
 					part.setLabel(computeLabel());
+					part.setTooltip(wrapped.getTitleToolTip());
+					part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+							wrapped.getTitle());
 
-					if (wrapped.getTitleImage() != null) {
-						Image newImage = wrapped.getTitleImage();
-						part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
-								newImage);
-					}
-					if (wrapped.getTitleToolTip() != null && wrapped.getTitleToolTip().length() > 0) {
-						part.getTransientData()
-								.put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
-								wrapped.getTitleToolTip());
-					}
+					updateImages(part);
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
 					if (wrapped instanceof ISaveablePart) {
@@ -362,6 +359,32 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 			}
 		});
 	}
+
+	void updateTabImages(MUIElement element) {
+		// Try to update the image if we're using a CTF
+		MUIElement refParent = element.getParent();
+		if (!(refParent instanceof MPartStack)) {
+			return;
+		}
+
+		if (!(refParent.getWidget() instanceof CTabFolder)) {
+			return;
+		}
+
+		CTabFolder ctf = (CTabFolder) refParent.getWidget();
+		if (ctf.isDisposed()) {
+			return;
+		}
+
+		CTabItem[] items = ctf.getItems();
+		for (CTabItem item : items) {
+			if (item.getData(AbstractPartRenderer.OWNING_ME) == element) {
+				item.setImage(wrapped.getTitleImage());
+			}
+		}
+	}
+
+	abstract void updateImages(MPart part);
 
 	@PreDestroy
 	void destroy() {
@@ -388,6 +411,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 	 * but must call <code>super.disposeSite()</code> in its implementation.
 	 */
 	void disposeSite(PartSite site) {
+		site.deactivateActionBars(site instanceof ViewSite);
 		site.dispose();
 	}
 

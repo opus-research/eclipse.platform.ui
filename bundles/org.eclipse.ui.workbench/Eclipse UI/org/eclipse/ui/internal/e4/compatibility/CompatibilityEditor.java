@@ -33,11 +33,9 @@ import org.eclipse.ui.internal.WorkbenchPartReference;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.part.AbstractMultiEditor;
 import org.eclipse.ui.part.MultiEditor;
 import org.eclipse.ui.part.MultiEditorInput;
-import org.eclipse.ui.testing.ContributionInfo;
 
 public class CompatibilityEditor extends CompatibilityPart {
 
@@ -109,10 +107,6 @@ public class CompatibilityEditor extends CompatibilityPart {
 						IWorkbenchRegistryConstants.ATT_ICON);
 				part.setIconURI(iconURI);
 			}
-			if (descriptor.getPluginId() != null) {
-				parent.setData(new ContributionInfo(descriptor.getPluginId(),
-						ContributionInfoMessages.ContributionInfo_Editor, null));
-			}
 		}
 
 		if (legacyPart instanceof AbstractMultiEditor && !(legacyPart instanceof MultiEditor)) {
@@ -140,6 +134,11 @@ public class CompatibilityEditor extends CompatibilityPart {
 	@Override
 	public WorkbenchPartReference getReference() {
 		return reference;
+	}
+
+	@Override
+	void updateImages(MPart part) {
+		updateTabImages(part);
 	}
 
 	@Override

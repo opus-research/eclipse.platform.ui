@@ -24,7 +24,6 @@ import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferenceContentProvider;
 import org.eclipse.jface.preference.PreferenceDialog;
-import org.eclipse.jface.preference.PreferenceLabelProvider;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -282,7 +281,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 	 */
 	protected void setContentAndLabelProviders(TreeViewer treeViewer) {
 		if (hasAtMostOnePage()) {
-			treeViewer.setLabelProvider(new PreferenceLabelProvider());
+			treeViewer.setLabelProvider(new PreferenceLabelProviderWithTooltip());
 		} else {
 			treeViewer.setLabelProvider(new PreferenceBoldLabelProvider(filteredTree));
 		}

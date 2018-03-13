@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -545,9 +544,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			if (currentWidget instanceof Control) {
 				Control control = (Control) currentWidget;
 				// make sure the control is visible
-				MUIElement elementParent = element.getParent();
-				if (!(element instanceof MPlaceholder)
-						|| !(elementParent instanceof MPartStack))
+				if (!(element instanceof MPlaceholder))
 					control.setVisible(true);
 
 				if (parentWidget instanceof Composite) {
@@ -630,12 +627,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					lclContext.set(key, props.get(key));
 				}
 			}
-		}
-
-		// We check the widget again since it could be created by some UI event.
-		// See Bug 417399
-		if (element.getWidget() != null) {
-			return safeCreateGui(element, parentWidget, parentContext);
 		}
 
 		// Create a control appropriate to the part
@@ -1253,12 +1244,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public void style(Object widget) {
@@ -1266,14 +1257,14 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
-					return engine.getStyle(widget);
+					return engine.getStyle((Widget) widget);
 				}
 
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 			});
@@ -1291,16 +1282,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public void style(Object widget) {
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
@@ -1316,7 +1307,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					engine.applyStyles(widget, true);
+					engine.applyStyles((Widget) widget, true);
 				}
 
 			});

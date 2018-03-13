@@ -64,29 +64,6 @@ public interface IPresentationEngine {
 	public static final String NO_MOVE = "NoMove"; //$NON-NLS-1$
 
 	/**
-	 * This key is used to store information in the 'persistentData' map which will be used to
-	 * override the initial style of an element at rendering time. For example the SWT renderer will
-	 * expect to see an integer (as a string) which defines the initial SWT style bits.
-	 * 
-	 * @since 1.1
-	 */
-	public static String STYLE_OVERRIDE_KEY = "styleOverride"; //$NON-NLS-1$
-
-	/**
-	 * When applied to an MWindow causes the renderer to minimize the resulting control.
-	 * 
-	 * @since 1.1
-	 */
-	public static String WINDOW_MINIMIZED_TAG = "shellMinimized"; //$NON-NLS-1$
-
-	/**
-	 * When applied to an MWindow causes the renderer to maximize the resulting control.
-	 * 
-	 * @since 1.1
-	 */
-	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
-
-	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
 	 * the trim. In the default implementation you can only apply this tag to an MPartStack or the
 	 * MPlaceholder of the MArea.
@@ -124,22 +101,6 @@ public interface IPresentationEngine {
 	public static String ORIENTATION_VERTICAL = "Vertical"; //$NON-NLS-1$
 
 	/**
-	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
-	 * be split with the result being side by side.
-	 * 
-	 * @since 1.1
-	 */
-	public static String SPLIT_HORIZONTAL = "Split Horizontal"; //$NON-NLS-1$
-
-	/**
-	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
-	 * be split with the result being one above the other.
-	 * 
-	 * @since 1.1
-	 */
-	public static String SPLIT_VERTICAL = "Split Vertical"; //$NON-NLS-1$
-
-	/**
 	 * This key should be used to add an optional String to an element that is a URI to the elements
 	 * disabled icon. This is used, for example, by Toolbar Items which, in Eclipse SDK, provide a
 	 * unique icon for disabled tool items that look better than the OS default graying on the
@@ -153,8 +114,6 @@ public interface IPresentationEngine {
 	 * This key should be used to add an optional org.eclipse.swt.graphics.Image to an elements
 	 * TRANSIENTDATA. If present, the image will be used to override that elements iconURI. An
 	 * example is drawing the error icon on a minimized problems view stack.
-	 * 
-	 * NOTE: This image must be checked to ensure that it hasn't been disposed on retrieval.
 	 */
 	public static final String OVERRIDE_ICON_IMAGE_KEY = "e4_override_icon_image_key"; //$NON-NLS-1$
 
@@ -164,14 +123,6 @@ public interface IPresentationEngine {
 	 * ToolTip of a minimized problems view stack to the number of errors and warnings in the view.
 	 */
 	public static final String OVERRIDE_TITLE_TOOL_TIP_KEY = "e4_override_title_tool_tip_key"; //$NON-NLS-1$
-
-	/**
-	 * This is a Tag that when applied to an MUILabel element will cause whatever Image is to be
-	 * shown to be adorned with the 'pinned' affordance.
-	 * 
-	 * @since 1.1
-	 */
-	public static final String ADORNMENT_PIN = "Pin Adornment"; //$NON-NLS-1$
 
 	/**
 	 * This is a <b>Boolean</b> preference used to control animations in the application
