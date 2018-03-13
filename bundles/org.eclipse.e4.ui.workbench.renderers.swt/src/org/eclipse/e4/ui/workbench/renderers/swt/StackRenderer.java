@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.eclipse.core.internal.commands.util.Util;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -422,8 +423,7 @@ public class StackRenderer extends LazyStackRenderer {
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			cti.setImage(getImage(part));
 		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
-			String newTTip = (String) newValue;
-			cti.setToolTipText(newTTip);
+			updateTooltip(cti, (String) newValue);
 		} else if (UIEvents.Dirtyable.DIRTY.equals(attName)) {
 			Boolean dirtyState = (Boolean) newValue;
 			String text = cti.getText();
@@ -678,13 +678,29 @@ public class StackRenderer extends LazyStackRenderer {
 		cti.setData(OWNING_ME, element);
 		cti.setText(getLabel(part, part.getLocalizedLabel()));
 		cti.setImage(getImage(part));
-		cti.setToolTipText(part.getLocalizedTooltip());
+		updateTooltip(cti, part.getLocalizedTooltip());
+
 		if (element.getWidget() != null) {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
 			Control ctrl = (Control) element.getWidget();
 			if (ctrl.getParent() == ctf)
 				cti.setControl((Control) element.getWidget());
+		}
+	}
+
+	private void updateTooltip(CTabItem cti, String tooltip) {
+		// We should set not empty tooltip only.
+		// Otherwise we should skip the default value that is null.
+		// The SWT handles the null tooltips like below:
+		// - when the title of part is not truncated the SWT doesn't show the
+		// tooltip at all
+		// - when it is truncated the SWT displays the tooltip with the
+		// CTabItem.shortenedText value inside
+		// See the bug 407511 for more details
+
+		if (!Util.ZERO_LENGTH_STRING.equals(tooltip)) {
+			cti.setToolTipText(tooltip);
 		}
 	}
 
