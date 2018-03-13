@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
@@ -28,7 +27,6 @@ import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.SaveableHelper;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchPartReference;
 
@@ -36,7 +34,7 @@ public class APITestUtils {
 	private static Map<IEclipseContext, ISaveHandler> originalHandlers = new HashMap<IEclipseContext, ISaveHandler>();
 	private static TestSaveHandler testSaveHandler = new TestSaveHandler();
 
-	static class TestSaveHandler extends PartServiceSaveHandler {
+	static class TestSaveHandler implements ISaveHandler {
 		private int response;
 		
 		public void setResponse(int response) {
@@ -60,7 +58,6 @@ public class APITestUtils {
 			Arrays.fill(prompt, save);
 			return prompt;
 		}
-
 	}
 	
 	public static boolean isFastView(IViewReference ref) {
@@ -82,7 +79,6 @@ public class APITestUtils {
 	}
 	
 	public static void saveableHelperSetAutomatedResponse(final int response) {
-		SaveableHelper.testSetAutomatedResponse(response);
 		Workbench workbench = (Workbench) PlatformUI.getWorkbench();
 		MApplication application = workbench.getApplication();
 		
