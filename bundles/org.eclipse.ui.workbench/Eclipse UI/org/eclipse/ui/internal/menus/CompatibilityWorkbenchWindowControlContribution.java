@@ -67,6 +67,10 @@ public class CompatibilityWorkbenchWindowControlContribution {
 					parent = parent.getParent();
 				}
 
+				// default position
+				contribution.setCurSide(SWT.TOP);
+
+				if (parent instanceof MTrimBar) {
 				switch (((MTrimBar) parent).getSide()) {
 				case BOTTOM:
 					contribution.setCurSide(SWT.BOTTOM);
@@ -80,6 +84,7 @@ public class CompatibilityWorkbenchWindowControlContribution {
 				case TOP:
 					contribution.setCurSide(SWT.TOP);
 					break;
+				}
 				}
 
 				contribution.delegateCreateControl(composite);
