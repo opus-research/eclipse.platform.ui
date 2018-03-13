@@ -209,7 +209,7 @@ public abstract class Dialog extends Window {
 	/**
 	 * Collection of buttons created by the <code>createButton</code> method.
 	 */
-	private HashMap<Integer, Button> buttons = new HashMap<Integer, Button>();
+	private HashMap buttons = new HashMap();
 
 	/**
 	 * Font metrics to use for determining pixel sizes.
@@ -839,7 +839,7 @@ public abstract class Dialog extends Window {
 	 * @since 2.0
 	 */
 	protected Button getButton(int id) {
-		return buttons.get(new Integer(id));
+		return (Button) buttons.get(new Integer(id));
 	}
 
 	/**
@@ -997,7 +997,7 @@ public abstract class Dialog extends Window {
 
 		boolean returnValue = super.close();
 		if (returnValue) {
-			buttons = new HashMap<Integer, Button>();
+			buttons = new HashMap();
 			buttonBar = null;
 			dialogArea = null;
 		}
