@@ -85,13 +85,11 @@ public class SashRenderer extends SWTPartRenderer {
 		// layout the containing Composite
 		while (!(pscModel.getWidget() instanceof Control))
 			pscModel = pscModel.getParent();
-
 		Control ctrl = (Control) pscModel.getWidget();
-		Control[] ca = { ctrl };
 		if (ctrl instanceof Shell)
-			((Shell) ctrl).layout(ca);
+			((Shell) ctrl).layout(null, SWT.ALL | SWT.CHANGED | SWT.DEFER);
 		else
-			ctrl.getParent().layout(ca);
+			ctrl.getParent().layout(null, SWT.ALL | SWT.CHANGED | SWT.DEFER);
 	}
 
 	@PreDestroy
@@ -158,6 +156,24 @@ public class SashRenderer extends SWTPartRenderer {
 		if (weight == UNDEFINED_WEIGHT) {
 			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
 		}
+
+		forceLayout(parentElement);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer,
+	 * org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
+	@Override
+	public void hideChild(MElementContainer<MUIElement> parentElement,
+			MUIElement child) {
+		super.hideChild(parentElement, child);
+
+		forceLayout(parentElement);
 	}
 
 	/*

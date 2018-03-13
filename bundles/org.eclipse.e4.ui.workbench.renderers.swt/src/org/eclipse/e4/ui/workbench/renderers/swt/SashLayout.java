@@ -143,6 +143,7 @@ public class SashLayout extends Layout {
 
 	public void setRootElemenr(MUIElement newRoot) {
 		root = newRoot;
+		host.layout(null, SWT.DEFER);
 	}
 
 	@Override
