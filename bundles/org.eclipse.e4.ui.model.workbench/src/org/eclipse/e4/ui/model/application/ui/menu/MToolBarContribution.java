@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,14 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
  * A representation of the model object '<em><b>Tool Bar Contribution</b></em>'.
  * <!-- end-user-doc -->
  *
+ * <!-- begin-model-doc -->
+ * <p>
+ * Provisional for 4.3.
+ * </p>
+ * @noreference
+ * @since 1.0
+ * <!-- end-model-doc -->
+ *
  * <p>
  * The following features are supported:
  * <ul>
@@ -33,11 +41,15 @@ public interface MToolBarContribution extends MElementContainer<MToolBarElement>
 	/**
 	 * Returns the value of the '<em><b>Parent Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Parent Id</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
 	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * <p>
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
+	 * </p>
+	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Parent Id</em>' attribute.
 	 * @see #setParentId(String)
 	 * @model
@@ -58,11 +70,15 @@ public interface MToolBarContribution extends MElementContainer<MToolBarElement>
 	/**
 	 * Returns the value of the '<em><b>Position In Parent</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Position In Parent</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
 	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * <p>
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
+	 * </p>
+	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Position In Parent</em>' attribute.
 	 * @see #setPositionInParent(String)
 	 * @model
