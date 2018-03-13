@@ -63,28 +63,28 @@ public class CompatibilityWorkbenchWindowControlContribution {
 				}
 
 				MUIElement parent = toolControl.getParent();
-				while (!(parent instanceof MTrimBar)) {
+				while (!(parent instanceof MTrimBar) && parent != null) {
 					parent = parent.getParent();
 				}
 
-				// default position
-				contribution.setCurSide(SWT.TOP);
-
 				if (parent instanceof MTrimBar) {
-				switch (((MTrimBar) parent).getSide()) {
-				case BOTTOM:
-					contribution.setCurSide(SWT.BOTTOM);
-					break;
-				case LEFT:
-					contribution.setCurSide(SWT.LEFT);
-					break;
-				case RIGHT:
-					contribution.setCurSide(SWT.RIGHT);
-					break;
-				case TOP:
+					switch (((MTrimBar) parent).getSide()) {
+					case BOTTOM:
+						contribution.setCurSide(SWT.BOTTOM);
+						break;
+					case LEFT:
+						contribution.setCurSide(SWT.LEFT);
+						break;
+					case RIGHT:
+						contribution.setCurSide(SWT.RIGHT);
+						break;
+					case TOP:
+						contribution.setCurSide(SWT.TOP);
+						break;
+					}
+				} else {
+					// default position
 					contribution.setCurSide(SWT.TOP);
-					break;
-				}
 				}
 
 				contribution.delegateCreateControl(composite);
