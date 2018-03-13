@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010,2012 Tom Schindl and others.
+ * Copyright (c) 2010, 2013 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package org.eclipse.e4.ui.css.swt.internal.theme;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -586,7 +585,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 	
 	public void resetModifiedStylesheets(ITheme selection) {
-		List<String> ss = modifiedStylesheets.remove(selection.getId());
+		modifiedStylesheets.remove(selection.getId());
 	}
 
 	public void addCSSEngine(CSSEngine cssEngine) {

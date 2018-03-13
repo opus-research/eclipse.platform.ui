@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,6 +111,7 @@ public class CompatibilityView extends CompatibilityPart {
 	 */
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
+		clearMenuItems();
 		part.getContext().set(IViewPart.class, (IViewPart) legacyPart);
 
 		final IEclipseContext partContext = getModel().getContext();
@@ -128,7 +129,8 @@ public class CompatibilityView extends CompatibilityPart {
 		if (menu == null) {
 			menu = MenuFactoryImpl.eINSTANCE.createMenu();
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
@@ -150,13 +152,19 @@ public class CompatibilityView extends CompatibilityPart {
 		if (toolbar == null) {
 			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
 
-			// Only use the substring before the ':'
+			// If the id contains a ':' use the part before it as the descriptor
+			// id
 			String partId = part.getElementId();
 			int colonIndex = partId.indexOf(':');
 			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
 			toolbar.setElementId(descId);
 
 			part.setToolbar(toolbar);
+		} else {
+			// clear out the model entries so they can be re-created by
+			// contributions
+			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=402561
+			toolbar.getChildren().clear();
 		}
 		apr = rendererFactory.getRenderer(toolbar, parent);
 		if (apr instanceof ToolBarManagerRenderer) {
@@ -185,7 +193,7 @@ public class CompatibilityView extends CompatibilityPart {
 
 		final IContextFunction func = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				final ViewActionBuilder actionBuilder = new ViewActionBuilder();
 				actionBuilder.readActionExtensions(getView());
 				ActionDescriptor[] actionDescriptors = actionBuilder.getExtendedActions();
@@ -218,7 +226,7 @@ public class CompatibilityView extends CompatibilityPart {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_FUNCTION, func);
 		} else {
 			toolbar.getTransientData().put(ToolBarManagerRenderer.POST_PROCESSING_DISPOSE,
-					func.compute(partContext));
+					func.compute(partContext, null));
 		}
 
 		return true;
