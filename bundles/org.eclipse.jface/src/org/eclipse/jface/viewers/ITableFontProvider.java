@@ -13,13 +13,12 @@ package org.eclipse.jface.viewers;
 import org.eclipse.swt.graphics.Font;
 
 /**
- * The ITableFontProvider is a font provider that provides fonts to
+ * The ITableFontProvider is a font provider that provides fonts to 
  * individual cells within tables.
- * @param <E> Type of an single element of the model
  * @since 3.1
  */
-public interface ITableFontProvider<E> {
-
+public interface ITableFontProvider {
+	
 	/**
 	 * Provides a font for the given element at index
 	 * columnIndex.
@@ -27,6 +26,6 @@ public interface ITableFontProvider<E> {
 	 * @param columnIndex The index of the column being displayed
 	 * @return Font
 	 */
-	public Font getFont(E element, int columnIndex);
+	public Font getFont(Object element, int columnIndex);
 
 }
