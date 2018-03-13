@@ -27,7 +27,6 @@ public class CSSParserFactoryImpl extends CSSParserFactory {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.parsers.ICSSParserFactory#makeCSSParser()
 	 */
-	@Override
 	public CSSParser makeCSSParser() {
 		return new CSSParserImpl();
 	}

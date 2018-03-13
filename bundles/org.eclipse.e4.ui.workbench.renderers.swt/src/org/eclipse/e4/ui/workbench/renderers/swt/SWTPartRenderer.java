@@ -47,7 +47,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
 	private ISWTResourceUtilities resUtils;
 
-	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// EMF gives us null lists if empty
 		if (container == null)
@@ -81,12 +80,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	}
 
 	public void setCSSInfo(MUIElement me, Object widget) {
-		// No SWT widget, nothing to style...
-		if (widget == null)
-			return;
-
 		// Set up the CSS Styling parameters; id & class
 		IEclipseContext ctxt = getContext(me);
+		if (ctxt == null) {
+			ctxt = getContext(me);
+		}
 		if (ctxt == null) {
 			return;
 		}
@@ -118,7 +116,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	@Override
 	public void bindWidget(MUIElement me, Object widget) {
 		if (widget instanceof Widget) {
 			((Widget) widget).setData(OWNING_ME, me);
@@ -129,7 +126,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			// Ensure that disposed widgets are unbound form the model
 			Widget swtWidget = (Widget) widget;
 			swtWidget.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					MUIElement element = (MUIElement) e.widget
 							.getData(OWNING_ME);
@@ -157,12 +153,10 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return widget;
 	}
 
-	@Override
 	protected Widget getParentWidget(MUIElement element) {
 		return (Widget) element.getParent().getWidget();
 	}
 
-	@Override
 	public void disposeWidget(MUIElement element) {
 
 		if (element.getWidget() instanceof Widget) {
@@ -188,7 +182,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		element.setWidget(null);
 	}
 
-	@Override
 	public void hookControllerLogic(final MUIElement me) {
 		Object widget = me.getWidget();
 
@@ -197,7 +190,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		if (widget instanceof Control && me instanceof MUILabel) {
 			((Control) widget).getAccessible().addAccessibleListener(
 					new AccessibleAdapter() {
-						@Override
 						public void getName(AccessibleEvent e) {
 							e.result = ((MUILabel) me).getLocalizedLabel();
 						}
@@ -224,7 +216,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return image;
 	}
 
-	@Override
 	public Image getImage(MUILabel element) {
 		Image image = (Image) ((MUIElement) element).getTransientData().get(
 				IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY);
@@ -324,7 +315,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		pinImage = getImageFromURI(pinURI);
 
 		Display.getCurrent().disposeExec(new Runnable() {
-			@Override
 			public void run() {
 				for (Image image : imageMap.values()) {
 					image.dispose();

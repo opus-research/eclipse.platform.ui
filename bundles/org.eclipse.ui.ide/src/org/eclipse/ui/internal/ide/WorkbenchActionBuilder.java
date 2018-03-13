@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 180308
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -91,6 +90,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 
     private IWorkbenchAction newWindowAction;
     
+    private IWorkbenchAction newEditorAction;
+
     private IWorkbenchAction helpContentsAction;
 
     private IWorkbenchAction helpSearchAction;
@@ -368,9 +369,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             fileToolBar.add(saveAllAction);
             fileToolBar
                     .add(new GroupMarker(IWorkbenchActionConstants.SAVE_EXT));
-            IContributionItem printItem = getPrintItem();
-            fileToolBar.add(printItem);
-			printItem.setVisible(false);
+            fileToolBar.add(getPrintItem());
             fileToolBar
                     .add(new GroupMarker(IWorkbenchActionConstants.PRINT_EXT));
 
@@ -621,6 +620,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         addMacWindowMenuItems(menu);
         
         menu.add(newWindowAction);
+		menu.add(newEditorAction);
 		
         menu.add(new Separator());
         addPerspectiveActions(menu);
@@ -825,6 +825,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         saveAction = null;
         saveAllAction = null;
         newWindowAction = null;
+		newEditorAction = null;
         helpContentsAction = null;
         helpSearchAction = null;
 		dynamicHelpAction = null;
@@ -974,11 +975,18 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         newWindowAction.setText(IDEWorkbenchMessages.Workbench_openNewWindow);
         register(newWindowAction);
 
+		newEditorAction = ActionFactory.NEW_EDITOR.create(window);
+		register(newEditorAction);
+
         undoAction = ActionFactory.UNDO.create(window);
         register(undoAction);
 
         redoAction = ActionFactory.REDO.create(window);
         register(redoAction);
+
+
+
+
 
 
         closeAction = ActionFactory.CLOSE.create(window);
