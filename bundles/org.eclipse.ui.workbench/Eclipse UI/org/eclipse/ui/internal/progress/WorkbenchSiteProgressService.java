@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -130,7 +128,7 @@ public class WorkbenchSiteProgressService implements
 					cursor = getWaitCursor(control.getDisplay());
 				}
                 control.setCursor(cursor);
-				showBusy(busy);
+				// site.getPane().setBusy(busy);
                 IWorkbenchPart part = site.getPart();
                  if (part instanceof WorkbenchPart) {
 					((WorkbenchPart) part).showBusy(busy);
@@ -446,16 +444,5 @@ public class WorkbenchSiteProgressService implements
 	 */
 	public SiteUpdateJob getUpdateJob() {
 		return updateJob;
-	}
-
-	protected void showBusy(boolean busy) {
-		MPart part = site.getModel();
-		boolean containsBusyTag = part.getTags().contains(CSSConstants.CSS_BUSY_CLASS);
-
-		if (busy && !containsBusyTag) {
-			part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
-		} else if (!busy && containsBusyTag) {
-			part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
-		}
 	}
 }
