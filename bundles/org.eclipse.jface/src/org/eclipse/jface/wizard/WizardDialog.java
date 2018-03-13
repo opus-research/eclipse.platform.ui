@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ControlEnableState;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -638,6 +639,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		// Insert a progress monitor
 		progressMonitorPart= createProgressMonitorPart(composite, new GridLayout());
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+		if (!wizard.needsProgressMonitor()) {
+			gridData.exclude = true;
+		}
 		progressMonitorPart.setLayoutData(gridData);
 		progressMonitorPart.setVisible(false);
 		// Build the separator line
@@ -1040,19 +1044,21 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		if (activeRunningOperations++ == 0) {
 			state = aboutToStart(fork && cancelable);
 		}
+		IProgressMonitor progressMonitor = getProgressMonitor();
+		if (progressMonitor == null) {
+			progressMonitor = new NullProgressMonitor();
+		}
 		try {
 			if (!fork) {
 				lockedUI = true;
 			}
-			ModalContext.run(runnable, fork, getProgressMonitor(), getShell()
+			ModalContext.run(runnable, fork, progressMonitor, getShell()
 					.getDisplay());
 			lockedUI = false;
 		} finally {
 			// explicitly invoke done() on our progress monitor so that its
 			// label does not spill over to the next invocation, see bug 271530
-			if (getProgressMonitor() != null) {
-				getProgressMonitor().done();
-			}
+			progressMonitor.done();
 			// Stop if this is the last one
 			if (state != null) {
 				timeWhenLastJobFinished= System.currentTimeMillis();
