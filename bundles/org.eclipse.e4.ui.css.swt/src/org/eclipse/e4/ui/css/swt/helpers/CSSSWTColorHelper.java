@@ -13,20 +13,20 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.helpers;
 
-import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
+import static org.eclipse.e4.ui.css.swt.helpers.ThemeElementDefinitionHelper.normalizeId;
 
-import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import org.eclipse.swt.SWT;
 import java.util.List;
 import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
 import org.eclipse.e4.ui.css.core.css2.CSS2RGBColorImpl;
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.core.resources.CSSResourcesHelpers;
-import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
+import org.eclipse.e4.ui.css.swt.resources.ColorByDefinition;
+import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
+import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -34,10 +34,11 @@ import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
 import org.w3c.dom.css.RGBColor;
-import static org.eclipse.e4.ui.css.swt.helpers.ThemeElementDefinitionHelper.normalizeId;
 
 public class CSSSWTColorHelper {
 	public static final String COLOR_DEFINITION_MARKER = "#";
+	
+	private static final String HEX_COLOR_VALUE_PATTERN = "#[a-fA-F0-9]{6}";
 	
 	private static Field[] cachedFields;
 	
@@ -57,12 +58,26 @@ public class CSSSWTColorHelper {
 		if (rgb != null) color = new Color(display, rgb.red, rgb.green, rgb.blue);
 		return color;
 	}
+	
+	public static Color getSWTColor(ColorByDefinition colorByDefinition) {
+		Color color = colorByDefinition.getResource();
+		IColorAndFontProvider provider = CSSActivator.getDefault().getColorAndFontProvider();		
+		if (provider == null) {
+			return color;
+		}				
+		
+		RGB colorFromDefinition = provider.getColor(colorByDefinition.getSymbolicName());		
+		if (colorFromDefinition != null && !colorFromDefinition.equals(color.getRGB())) {
+			color = new Color(color.getDevice(), colorFromDefinition);
+		}		
+		return color;
+	}
 
 	private static RGB getRGB(CSSPrimitiveValue value, Display display) {
 		RGB rgb = getRGB(value);
 		if (rgb == null && display != null) {
 			String name = value.getStringValue();			
-			if (name.startsWith(COLOR_DEFINITION_MARKER)) {
+			if (hasColorDefinitionAsValue(name)) {
 				rgb = findColorByDefinition(name);
 			} else if (name.contains("-")) {
 				name = name.replace('-', '_');
@@ -72,6 +87,23 @@ public class CSSSWTColorHelper {
 		return rgb;
 	}
 
+	public static boolean hasColorDefinitionAsValue(CSSValue value) {
+		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
+			CSSPrimitiveValue primitiveValue = (CSSPrimitiveValue) value;
+			if (primitiveValue.getPrimitiveType() == CSSPrimitiveValue.CSS_STRING) {
+				return hasColorDefinitionAsValue(primitiveValue.getStringValue());
+			}
+		}
+		return false;
+	}
+	
+	public static boolean hasColorDefinitionAsValue(String name) {
+		if (name.startsWith(COLOR_DEFINITION_MARKER)) {
+			return !name.matches(HEX_COLOR_VALUE_PATTERN);
+		}
+		return false;
+	}
+	
 	/**
 	 * Process the given string and return a corresponding RGB object.
 	 * 
@@ -216,17 +248,13 @@ public class CSSSWTColorHelper {
 		return gradient;
 	}
 
-	public static Color[] getSWTColors(Gradient grad, Display display, CSSEngine engine) {
-		List values = grad.getValues();
-		IResourcesRegistry registry = engine.getResourcesRegistry();
+	public static Color[] getSWTColors(Gradient grad, Display display, CSSEngine engine) throws Exception {
+		List<?> values = grad.getValues();
 		Color[] colors = new Color[values.size()];
-		
-		for (int i = 0; i < values.size(); i++) {		
+
+		for (int i = 0; i < values.size(); i++) {
 			CSSPrimitiveValue value = (CSSPrimitiveValue) values.get(i);
-			//We rely on the fact that when a gradient is created, it's colors are converted and in the registry
-			//TODO see bug #278077
-			Color color = (Color) registry.getResource(Color.class, CSSResourcesHelpers.getCSSPrimitiveValueKey(value));
-			colors[i] = color;
+			colors[i] = (Color) engine.convert(value, Color.class, display);
 		}
 		return colors;
 	}

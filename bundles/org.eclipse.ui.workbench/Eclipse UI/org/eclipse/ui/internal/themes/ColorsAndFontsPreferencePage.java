@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -689,6 +691,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     
 	private Text descriptionText;
 
+	private IEventBroker eventBroker;
+
     /**
      * Create a new instance of the receiver.
      */
@@ -1230,6 +1234,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
      */
     public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
+		eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
@@ -1383,8 +1388,10 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         getApplyButton().setFont(appliedDialogFont);
         getDefaultsButton().setFont(appliedDialogFont);
 
-        if (oldFont != null)
+		if (oldFont != null) {
 			oldFont.dispose();
+		}
+		publishThemeChangedEvent(true);
     }
 
     private void performColorDefaults() {
@@ -1468,8 +1475,11 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     	saveTreeExpansion();
     	saveTreeSelection();
         boolean result =  performColorOk() && performFontOk();
-        if(result)
+		if (result) {
 			PrefUtil.savePrefs();
+			publishThemeChangedEvent(false);
+		}
+
         return result;
     }
 
@@ -2085,5 +2095,14 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		data.widthHint = convertWidthInCharsToPixels(30);
 		descriptionText.setLayoutData(data);
 		myApplyDialogFont(descriptionText);
+	}
+
+	private void publishThemeChangedEvent(boolean partialThemeChanges) {
+		if (eventBroker != null) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put(UIEvents.EventTags.ELEMENT, workbench.getApplication());
+			params.put(UIEvents.EventTypes.ADD_MANY, partialThemeChanges);
+			eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED, params);
+		}
 	}
 }
