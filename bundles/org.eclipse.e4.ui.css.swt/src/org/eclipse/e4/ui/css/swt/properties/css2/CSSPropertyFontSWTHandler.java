@@ -8,7 +8,7 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
- *     IBM Corporation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.css2;
 
@@ -50,18 +50,6 @@ implements ICSSPropertyHandler2 {
 			((CTabItem) widget).setFont(font);
 		} else if (widget instanceof Control) {
 			((Control) widget).setFont(font);
-			if (widget instanceof CTabFolder) {
-				updateChildrenFonts((CTabFolder) widget, font);
-			}
-		}
-	}
-
-	private static void updateChildrenFonts(CTabFolder folder, Font font) {
-		for (CTabItem item : folder.getItems()) {
-			Font itemFont = item.getFont();
-			if (itemFont == null || itemFont.isDisposed()) {
-				item.setFont(font);
-			}
 		}
 	}
 
@@ -112,7 +100,7 @@ implements ICSSPropertyHandler2 {
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
 				.getCSS2FontProperties(widget, engine
 						.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
+		if (fontProperties != null) {
 			applyCSSPropertyFontFamily(fontProperties, value,
 					pseudo, engine);
 			return;
@@ -127,7 +115,7 @@ implements ICSSPropertyHandler2 {
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
 				.getCSS2FontProperties(widget, engine
 						.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
+		if (fontProperties != null) {
 			applyCSSPropertyFontSize(fontProperties, value,
 					pseudo, engine);
 			return;
@@ -142,7 +130,7 @@ implements ICSSPropertyHandler2 {
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
 				.getCSS2FontProperties(widget, engine
 						.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
+		if (fontProperties != null) {
 			applyCSSPropertyFontWeight(fontProperties, value,
 					pseudo, engine);
 			return;
@@ -157,7 +145,7 @@ implements ICSSPropertyHandler2 {
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
 				.getCSS2FontProperties(widget, engine
 						.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
+		if (fontProperties != null) {
 			applyCSSPropertyFontStyle(fontProperties, value,
 					pseudo, engine);
 			return;
@@ -266,7 +254,7 @@ implements ICSSPropertyHandler2 {
 		 * is running, it is not desirable to restyle the items unless there is
 		 * a need. This method can be used to force the next paint event to be
 		 * processed as a restyling request.
-		 * 
+		 *
 		 * @param shouldStyle
 		 *            whether the tab items should be restyled on the next paint
 		 *            event or not
@@ -278,7 +266,7 @@ implements ICSSPropertyHandler2 {
 		/**
 		 * Applies the styles defined in the provided declaration onto the item.
 		 * Pseudo classes will be considered if one has been specified.
-		 * 
+		 *
 		 * @param styleDeclaration
 		 *            the style declaration to be used to style the specified
 		 *            item
@@ -327,7 +315,7 @@ implements ICSSPropertyHandler2 {
 
 		/**
 		 * Applies the regular unselected styles to the specified items.
-		 * 
+		 *
 		 * @param items
 		 *            the items to style
 		 */
@@ -347,7 +335,7 @@ implements ICSSPropertyHandler2 {
 		/**
 		 * Applies the style declaration for selected items to the specified
 		 * item if one has been defined.
-		 * 
+		 *
 		 * @param selection
 		 *            the item to style
 		 */
