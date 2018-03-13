@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.action.IAction;
@@ -744,32 +743,22 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 */
 	public void partActivated(IWorkbenchPart part) {
 		// Is this an important part? If not just return.
-		if (isImportant(part)) {
-			hiddenPart = null;
+		if (!isImportant(part)) {
+			return;
+		}
+		hiddenPart = null;
 
-			// Create a page for the part.
-			PageRec rec = getPageRec(part);
-			if (rec == null) {
-				rec = createPage(part);
-			}
-
-			// Show the page.
-			if (rec != null) {
-				showPageRec(rec);
-			} else {
-				showPageRec(defaultPageRec);
-			}
+		// Create a page for the part.
+		PageRec rec = getPageRec(part);
+		if (rec == null) {
+			rec = createPage(part);
 		}
 
-		// If *we* are activating then activate the context
-		if (part == this) {
-			PageSite pageSite = getPageSite(getCurrentPage());
-			if (pageSite != null) {
-				IEclipseContext pageContext = pageSite.getSiteContext();
-				if (pageContext != null) {
-					pageContext.activate();
-				}
-			}
+		// Show the page.
+		if (rec != null) {
+			showPageRec(rec);
+		} else {
+			showPageRec(defaultPageRec);
 		}
 	}
 
