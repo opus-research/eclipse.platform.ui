@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -20,30 +19,28 @@ import org.eclipse.core.runtime.Assert;
  * <p>
  * Clients may instantiate this class. Not intended to be subclassed.
  * </p>
- * @param <E> Type of an single element of the model
- *
+ * 
  * @since 3.2
  */
-public final class TreePath<E> {
-
+public final class TreePath {
+	
 	/**
 	 * Constant for representing an empty tree path.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static final TreePath EMPTY = new TreePath(new Object[0]);
-
-	private E[] segments;
+	
+	private Object[] segments;
 
 	private int hash;
 
 	/**
 	 * Constructs a path identifying a leaf node in a tree.
-	 *
+	 * 
 	 * @param segments
 	 *            path of elements to a leaf node in a tree, starting with the
 	 *            root element
 	 */
-	public TreePath(E[] segments) {
+	public TreePath(Object[] segments) {
 		Assert.isNotNull(segments);
 		for (int i = 0; i < segments.length; i++) {
 			Assert.isNotNull(segments[i]);
@@ -53,18 +50,18 @@ public final class TreePath<E> {
 
 	/**
 	 * Returns the element at the specified index in this path.
-	 *
+	 * 
 	 * @param index
 	 *            index of element to return
 	 * @return element at the specified index
 	 */
-	public E getSegment(int index) {
+	public Object getSegment(int index) {
 		return segments[index];
 	}
 
 	/**
 	 * Returns the number of elements in this path.
-	 *
+	 * 
 	 * @return the number of elements in this path
 	 */
 	public int getSegmentCount() {
@@ -74,10 +71,10 @@ public final class TreePath<E> {
 	/**
 	 * Returns the first element in this path, or <code>null</code> if this
 	 * path has no segments.
-	 *
+	 * 
 	 * @return the first element in this path
 	 */
-	public E getFirstSegment() {
+	public Object getFirstSegment() {
 		if (segments.length == 0) {
 			return null;
 		}
@@ -87,10 +84,10 @@ public final class TreePath<E> {
 	/**
 	 * Returns the last element in this path, or <code>null</code> if this
 	 * path has no segments.
-	 *
+	 * 
 	 * @return the last element in this path
 	 */
-	public E getLastSegment() {
+	public Object getLastSegment() {
 		if (segments.length == 0) {
 			return null;
 		}
@@ -99,7 +96,7 @@ public final class TreePath<E> {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -107,14 +104,12 @@ public final class TreePath<E> {
 		if (!(other instanceof TreePath)) {
 			return false;
 		}
-		@SuppressWarnings("unchecked")
-		TreePath<E> treePath = (TreePath<E>) other;
-		return equals(treePath, null);
+		return equals((TreePath) other, null);
 	}
 
 	/**
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -128,7 +123,7 @@ public final class TreePath<E> {
 	/**
 	 * Returns a hash code computed from the hash codes of the segments, using
 	 * the given comparer to compute the hash codes of the segments.
-	 *
+	 * 
 	 * @param comparer
 	 *            comparer to use or <code>null</code> if the segments' hash
 	 *            codes should be computed by calling their hashCode() methods.
@@ -149,7 +144,7 @@ public final class TreePath<E> {
 	/**
 	 * Returns whether this path is equivalent to the given path using the
 	 * specified comparer to compare individual elements.
-	 *
+	 * 
 	 * @param otherPath
 	 *            tree path to compare to
 	 * @param comparer
@@ -157,7 +152,7 @@ public final class TreePath<E> {
 	 *            compared using equals()
 	 * @return whether the paths are equal
 	 */
-	public boolean equals(TreePath<E> otherPath, IElementComparer comparer) {
+	public boolean equals(TreePath otherPath, IElementComparer comparer) {
 		if (otherPath == null) {
 			return false;
 		}
@@ -181,7 +176,7 @@ public final class TreePath<E> {
 	/**
 	 * Returns whether this path starts with the same segments as the given
 	 * path, using the given comparer to compare segments.
-	 *
+	 * 
 	 * @param treePath
 	 *            path to compare to
 	 * @param comparer
@@ -190,7 +185,7 @@ public final class TreePath<E> {
 	 * @return whether the given path is a prefix of this path, or the same as
 	 *         this path
 	 */
-	public boolean startsWith(TreePath<E> treePath, IElementComparer comparer) {
+	public boolean startsWith(TreePath treePath, IElementComparer comparer) {
 		int thisSegmentCount = getSegmentCount();
 		int otherSegmentCount = treePath.getSegmentCount();
 		if (otherSegmentCount == thisSegmentCount) {
@@ -200,7 +195,7 @@ public final class TreePath<E> {
 			return false;
 		}
 		for (int i = 0; i < otherSegmentCount; i++) {
-			E otherSegment = treePath.getSegment(i);
+			Object otherSegment = treePath.getSegment(i);
 			if (comparer == null) {
 				if (!otherSegment.equals(segments[i])) {
 					return false;
@@ -219,32 +214,30 @@ public final class TreePath<E> {
 	 * or <code>null</code> if this tree path has no segments.
 	 * @return a tree path
 	 */
-	public TreePath<E> getParentPath() {
+	public TreePath getParentPath() {
 		int segmentCount = getSegmentCount();
 		if (segmentCount < 1) {
 			return null;
 		} else if (segmentCount == 1) {
 			return EMPTY;
 		}
-		@SuppressWarnings("unchecked")
-		E[] parentSegments = (E[]) new Object[segmentCount - 1];
+		Object[] parentSegments = new Object[segmentCount - 1];
 		System.arraycopy(segments, 0, parentSegments, 0, segmentCount - 1);
-		return new TreePath<E>(parentSegments);
+		return new TreePath(parentSegments);
 	}
 
 	/**
 	 * Returns a copy of this tree path with the given segment added at the end.
-	 * @param newSegment
+	 * @param newSegment 
 	 * @return a tree path
 	 */
-	public TreePath<E> createChildPath(E newSegment) {
+	public TreePath createChildPath(Object newSegment) {
 		int segmentCount = getSegmentCount();
-		@SuppressWarnings("unchecked")
-		E[] childSegments = (E[]) new Object[segmentCount + 1];
+		Object[] childSegments = new Object[segmentCount + 1];
 		if(segmentCount>0) {
 			System.arraycopy(segments, 0, childSegments, 0, segmentCount);
 		}
 		childSegments[segmentCount] = newSegment;
-		return new TreePath<E>(childSegments);
+		return new TreePath(childSegments);
 	}
 }

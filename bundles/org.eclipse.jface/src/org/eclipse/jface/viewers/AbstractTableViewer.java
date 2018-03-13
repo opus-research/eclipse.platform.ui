@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation bug 154329
  *                                               - fixes in bug 170381, 198665, 200731
- *	    *     Hendrik Still <hendrik.still@gammas.de> - b *     Hendrik Still <hendrik.still@gammas.de> - bug 413973, bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -90,8 +89,8 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 						IContentProvider<I> contentProvider = getContentProvider();
 						// If we are building lazily then request lookup now
 						if (contentProvider instanceof ILazyContentProvider) {
-							ILazyContentProvider<I> lazyContentProvider = ((ILazyContentProvider<I>) contentProvider);
-							lazyContentProvider.updateElement(index);
+							((ILazyContentProvider) contentProvider)
+									.updateElement(index);
 							return;
 						}
 					}
@@ -531,7 +530,6 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 		List<E> result = new ArrayList<E>();
 		int[] selectionIndices = doGetSelectionIndices();
 		if (getContentProvider() instanceof ILazyContentProvider) {
-			@SuppressWarnings("rawtypes")
 			ILazyContentProvider lazy = (ILazyContentProvider) getContentProvider();
 			for (int i = 0; i < selectionIndices.length; i++) {
 				int selectionIndex = selectionIndices[i];
@@ -1004,7 +1002,6 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 		}
 
 		if (getContentProvider() instanceof ILazyContentProvider) {
-			@SuppressWarnings("rawtypes")
 			ILazyContentProvider provider = (ILazyContentProvider) getContentProvider();
 
 			// Now go through it again until all is done or we are no longer
@@ -1124,13 +1121,11 @@ public abstract class AbstractTableViewer<E,I> extends ColumnViewer<E,I> {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
 	 */
 	@Override
-	protected E[] getRawChildren(Object parent) {
+	protected E[] getRawChildren(I parent) {
 
 		Assert.isTrue(!(getContentProvider() instanceof ILazyContentProvider),
 				"Cannot get raw children with an ILazyContentProvider");//$NON-NLS-1$
-		@SuppressWarnings("unchecked")
-		I input = (I) parent;
-		return super.getRawChildren(input);
+		return super.getRawChildren(parent);
 
 	}
 
