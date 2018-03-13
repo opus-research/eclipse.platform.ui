@@ -20,7 +20,7 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.BundleTracker;
+import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class Activator implements BundleActivator {
@@ -33,15 +33,10 @@ public class Activator implements BundleActivator {
 
 	private BundleContext context;
 	private ServiceTracker locationTracker;
+	private ServiceTracker pkgAdminTracker;
 
 	private ServiceTracker debugTracker;
 	private ServiceTracker logTracker;
-
-	/** Tracks all bundles which are in the state: RESOLVED, STARTING, ACTIVE or STOPPING. */
-	private BundleTracker resolvedBundles;
-
-	/** A BundleTrackerCustomizer which is able to resolve a bundle to the a symbolic name. */
-	private final BundleFinder bundleFinder = new BundleFinder();
 
 	private DebugTrace trace;
 
@@ -62,12 +57,34 @@ public class Activator implements BundleActivator {
 	}
 
 	/**
+	 * @return the PackageAdmin service from this bundle
+	 */
+	public PackageAdmin getBundleAdmin() {
+		if (pkgAdminTracker == null) {
+			if (context == null)
+				return null;
+			pkgAdminTracker = new ServiceTracker(context, PackageAdmin.class.getName(), null);
+			pkgAdminTracker.open();
+		}
+		return (PackageAdmin) pkgAdminTracker.getService();
+	}
+
+	/**
 	 * @param bundleName
-	 *            the bundle symbolic name
+	 *            the bundle id
 	 * @return A bundle if found, or <code>null</code>
 	 */
 	public Bundle getBundleForName(String bundleName) {
-		return bundleFinder.findBundle(bundleName);
+		Bundle[] bundles = getBundleAdmin().getBundles(bundleName, null);
+		if (bundles == null)
+			return null;
+		// Return the first bundle that is not installed or uninstalled
+		for (int i = 0; i < bundles.length; i++) {
+			if ((bundles[i].getState() & (Bundle.INSTALLED | Bundle.UNINSTALLED)) == 0) {
+				return bundles[i];
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -98,14 +115,13 @@ public class Activator implements BundleActivator {
 	public void start(BundleContext context) throws Exception {
 		activator = this;
 		this.context = context;
-
-		// track required bundles
-		resolvedBundles = new BundleTracker(context, Bundle.RESOLVED | Bundle.STARTING
-				| Bundle.ACTIVE | Bundle.STOPPING, bundleFinder);
-		resolvedBundles.open();
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		if (pkgAdminTracker != null) {
+			pkgAdminTracker.close();
+			pkgAdminTracker = null;
+		}
 		if (locationTracker != null) {
 			locationTracker.close();
 			locationTracker = null;
@@ -118,11 +134,6 @@ public class Activator implements BundleActivator {
 		if (logTracker != null) {
 			logTracker.close();
 			logTracker = null;
-		}
-		if (resolvedBundles != null) {
-			// the close of the BundleTracker will also remove all entries form the BundleFinder
-			resolvedBundles.close();
-			resolvedBundles = null;
 		}
 	}
 
