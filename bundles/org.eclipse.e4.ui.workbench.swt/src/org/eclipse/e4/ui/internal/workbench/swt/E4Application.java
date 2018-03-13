@@ -328,9 +328,6 @@ public class E4Application implements IApplication {
 			IEclipseContext eclipseContext) {
 		MApplication theApp = null;
 
-		Location instanceLocation = WorkbenchSWTActivator.getDefault()
-				.getInstanceLocation();
-
 		String appModelPath = getArgValue(IWorkbench.XMI_URI_ARG, appContext,
 				false);
 		if (appModelPath == null || appModelPath.length() == 0) {
@@ -355,6 +352,9 @@ public class E4Application implements IApplication {
 
 		eclipseContext.set(IWorkbench.PERSIST_STATE,
 				Boolean.valueOf(saveAndRestore));
+
+		Location instanceLocation = WorkbenchSWTActivator.getDefault()
+				.getInstanceLocation();
 
 		// when -data @none or -data @noDefault options
 		if (instanceLocation != null && instanceLocation.getURL() != null) {
