@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -121,6 +121,7 @@ public class JFaceResources {
 	 * 
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static final String VIEWER_FONT = "org.eclipse.jface.viewerfont"; //$NON-NLS-1$
 
 	/**
@@ -129,6 +130,7 @@ public class JFaceResources {
 	 * 
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static final String WINDOW_FONT = "org.eclipse.jface.windowfont"; //$NON-NLS-1$
 
 	/**
@@ -560,6 +562,7 @@ public class JFaceResources {
 	 * @return the font
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static Font getViewerFont() {
 		return getFontRegistry().get(VIEWER_FONT);
 	}
