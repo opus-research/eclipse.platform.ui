@@ -50,8 +50,6 @@ public class UIAllTests extends TestSuite {
 	}
 
 	public UIAllTests() {
-		// Hack: bug 422676, run InjectionEventTest first
-		addTestSuite(InjectionEventTest.class);
 		addTest(StartupTestSuite.suite());
 		addTestSuite(UIEventTypesTest.class);
 		addTestSuite(Bug299755Test.class);
@@ -72,6 +70,7 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(Bug308317Test.class);
 		addTestSuite(ModelRobustnessTest.class);
 		addTestSuite(ResourceHandlerTest.class);
+		addTestSuite(InjectionEventTest.class);
 		addTestSuite(PartFocusTest.class);
 		addTestSuite(ModelElementTest.class);
 		addTestSuite(StackRendererTest.class);

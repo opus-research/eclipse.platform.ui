@@ -30,7 +30,6 @@ import java.util.List;
  * 'StackElement' (which is an empty stub used only to constran the stack's types.
  * </p>
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -47,6 +46,7 @@ import java.util.List;
 public interface MElementContainer<T extends MUIElement> extends MUIElement {
 	/**
 	 * Returns the value of the '<em><b>Children</b></em>' containment reference list.
+	 * The list contents are of type {@link T}.
 	 * It is bidirectional and its opposite is '{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getParent <em>Parent</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

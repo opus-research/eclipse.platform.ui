@@ -7,17 +7,17 @@
  *
  * Contributors:
  *     Hendrik Still<hendrik.still@gammas.de> - initial implementation
- *     Lars Vogel <lars.vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -26,9 +26,25 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * A simple ComboViewer to demonstrate usage
  *
+ * @author Hendrik Still <hendrik.still@gammas.de>
+ *
  */
-
 public class Snippet063ComboViewer {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,MyModel[]> {
+
+		public void dispose() {
+
+		}
+
+		public void inputChanged(Viewer<? extends MyModel[]> viewer, MyModel[] oldInput,
+				MyModel[] newInput) {
+		}
+
+		public MyModel[] getElements(MyModel[] inputElement) {
+			return inputElement;
+		}
+
+	}
 
 	public class MyModel {
 		public int counter;
@@ -50,9 +66,9 @@ public class Snippet063ComboViewer {
 
 		final Label l = new Label(shell, SWT.None);
 		l.setText("Choose Item:");
-		final ComboViewer v = new ComboViewer(shell);
-		v.setLabelProvider(new LabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance());
+		final ComboViewer<MyModel,MyModel[]> v = new ComboViewer<MyModel,MyModel[]>(shell);
+		v.setLabelProvider(new LabelProvider<MyModel>());
+		v.setContentProvider(new MyContentProvider());
 
 		MyModel[] model = createModel();
 		v.setInput(model);
@@ -74,6 +90,9 @@ public class Snippet063ComboViewer {
 		return elements;
 	}
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Display display = new Display();
 		Shell shell = new Shell(display);
