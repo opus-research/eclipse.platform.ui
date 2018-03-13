@@ -99,6 +99,7 @@
     <module>bundles/org.eclipse.ui</module>
     <module>bundles/org.eclipse.ui.browser</module>
     <module>bundles/org.eclipse.ui.forms</module>
+    <module>bundles/org.eclipse.ui.images.renderer</module>
     <module>bundles/org.eclipse.ui.images</module>
     <module>bundles/org.eclipse.ui.views</module>
     <module>bundles/org.eclipse.ui.views.properties.tabbed</module>
