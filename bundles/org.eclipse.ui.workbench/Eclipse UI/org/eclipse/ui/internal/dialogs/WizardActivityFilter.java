@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
-import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import java.util.ArrayList;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
@@ -29,12 +29,6 @@ public class WizardActivityFilter extends ViewerFilter {
      * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
      */
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-        Object[] children = ((ITreeContentProvider) ((AbstractTreeViewer) viewer)
-                .getContentProvider()).getChildren(element);
-        if (children.length > 0) {
-			return filter(viewer, element, children).length > 0;
-		}
-
         if (parentElement.getClass().equals(AdaptableList.class)) {
 			return true; //top-level ("primary") wizards should always be returned
 		}
@@ -45,4 +39,37 @@ public class WizardActivityFilter extends ViewerFilter {
 
         return true;
     }
+
+	@Override
+	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+		int size = elements.length;
+		ArrayList<Object> out = new ArrayList<Object>(size);
+		for (int i = 0; i < size; ++i) {
+			Object element = elements[i];
+			if (element instanceof WizardCollectionElement) {
+				WizardCollectionElement wcElem = filterWizardCollectionElement((WizardCollectionElement) element);
+				if (wcElem.getWizardAdaptableList().size() > 0) {
+					out.add(wcElem);
+				}
+			} else if (select(viewer, parent, element)) {
+				out.add(element);
+			}
+		}
+		return out.toArray();
+	}
+
+	private WizardCollectionElement filterWizardCollectionElement(
+			WizardCollectionElement inputCollection) {
+		WizardCollectionElement modifiedCollection = null;
+		for (Object child : inputCollection.getWizardAdaptableList().getChildren()) {
+			if (WorkbenchActivityHelper.filterItem(child)) {
+				if (modifiedCollection == null) {
+					modifiedCollection = (WizardCollectionElement) inputCollection.clone();
+				}
+				modifiedCollection.getWizardAdaptableList().remove((IAdaptable) child);
+			}
+		}
+
+		return modifiedCollection != null ? modifiedCollection : inputCollection;
+	}
 }
