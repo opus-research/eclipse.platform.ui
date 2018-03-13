@@ -704,12 +704,10 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				container, null);
 
 		for (IContributionItem item : manager.getItems()) {
-			if (item == null) {
+			if (item == null || !isChildVisible(item)) {
 				continue;
 			}
-			if (renderer.getToolElement(item) != null) {
-				continue;
-			}
+
 			if (item instanceof IToolBarContributionItem) {
 				IToolBarManager manager2 = ((IToolBarContributionItem) item).getToolBarManager();
 				//new Exception("fill(MToolBar container, IContributionManager manager) with " //$NON-NLS-1$
@@ -737,5 +735,21 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				renderer.linkModelToContribution(toolItem, item);
 			}
 		}
+	}
+
+	private boolean isChildVisible(IContributionItem item) {
+		Boolean v;
+
+		IContributionManagerOverrides overrides = getOverrides();
+		if (overrides == null) {
+			v = null;
+		} else {
+			v = getOverrides().getVisible(item);
+		}
+
+		if (v != null) {
+			return v.booleanValue();
+		}
+		return item.isVisible();
 	}
 }

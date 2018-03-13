@@ -21,7 +21,7 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
  * <p>
  * Provisional for 4.3.
  * </p>
- * @noreference This interface is not intended to be referenced by clients
+ * @noreference
  * @since 1.0
  * <!-- end-model-doc -->
  *
