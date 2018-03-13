@@ -529,7 +529,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
 					if (workbenchPart instanceof ISaveablePart) {
 						ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-						return page.saveSaveable(saveablePart, workbenchPart, confirm, true);
+						return page.saveSaveable(saveablePart, workbenchPart, confirm, false);
 					}
 				}
 				return super.save(dirtyPart, confirm);
@@ -698,6 +698,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
 
 		getShell().setData(this);
+		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 		trackShellActivation();
 	}
 
