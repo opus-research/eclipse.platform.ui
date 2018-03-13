@@ -194,8 +194,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 	protected boolean deleteSelectedElements() {
 		Object selectedElement = getSelectedElement();
 		if (selectedElement != null) {
-			if (partService.savePart((MPart) selectedElement, false))
-				partService.hidePart((MPart) selectedElement);
+			partService.hidePart((MPart) selectedElement);
 
 			if (getInput().isEmpty()) {
 				getShell().dispose();

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.content.IContentType;
@@ -39,7 +40,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IFileEditorMapping;
-import org.eclipse.ui.IFileTypeProcessor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
@@ -50,7 +50,6 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.EditorRegistry;
 import org.eclipse.ui.internal.registry.FileEditorMapping;
-import org.eclipse.ui.internal.registry.FileTypeProcessor;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
@@ -93,53 +92,6 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     protected List imagesToDispose;
 
     protected Map editorsToImages;
-
-	public void addResourceType(String pattern) {
-		IFileTypeProcessor fileTypeProcessor = new FileTypeProcessor();
-		if (!fileTypeProcessor.isValidSuffixPattern(pattern)
-				&& !fileTypeProcessor.isValidFileType(pattern)) {
-			throw new IllegalArgumentException("Pattern does not seem to be valid for mapping."); //$NON-NLS-1$
-		}
-
-		// Find the index at which to insert the new entry.
-		IFileEditorMapping resourceType;
-		TableItem[] items = resourceTypeTable.getItems();
-		boolean found = false;
-		int i = 0;
-
-		while (i < items.length && !found) {
-			resourceType = (IFileEditorMapping) items[i].getData();
-			int result = pattern.compareToIgnoreCase(resourceType.getLabel());
-			if (result == 0) {
-				// Same resource type not allowed!
-				MessageDialog.openInformation(getControl().getShell(),
-						WorkbenchMessages.FileEditorPreference_existsTitle,
-						WorkbenchMessages.FileEditorPreference_existsMessage);
-				return;
-			}
-
-			if (result < 0) {
-				found = true;
-			} else {
-				i++;
-			}
-		}
-
-		// Create the new type and insert it
-		if (fileTypeProcessor.isValidSuffixPattern(pattern)) {
-			String prefix = fileTypeProcessor.getPrefix(pattern);
-			String suffix = fileTypeProcessor.getSuffix(pattern);
-			resourceType = new FileEditorMapping(prefix, suffix);
-		} else {
-			String newName = fileTypeProcessor.getName(pattern);
-			String newExtension = fileTypeProcessor.getExtension(pattern);
-			resourceType = new FileEditorMapping(newName, newExtension);
-		}
-		TableItem item = newResourceTableItem(resourceType, i, true);
-		resourceTypeTable.setFocus();
-		resourceTypeTable.showItem(item);
-		fillEditorTable();
-	}
 
     /**
      * Add a new resource type to the collection shown in the top of the page.
@@ -601,7 +553,9 @@ public class FileEditorsPreferencePage extends PreferencePage implements
 				WorkbenchMessages.FileExtension_fileTypeMessage,
 				WorkbenchMessages.FileExtension_fileTypeLabel);
         if (dialog.open() == Window.OK) {
-            addResourceType(dialog.getPattern());
+            String name = dialog.getName();
+            String extension = dialog.getExtension();
+            addResourceType(name, extension);
         }
     }
 

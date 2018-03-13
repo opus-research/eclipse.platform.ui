@@ -52,7 +52,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IFileEditorMapping;
-import org.eclipse.ui.IFileTypeProcessor;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISharedImages;
@@ -1449,39 +1448,36 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 				return anImage;				
 			}
 		}
-
-		IFileTypeProcessor processor = new FileTypeProcessor();
-		Iterator<String> it = processor.suffixIterator(filename);
-		while (it.hasNext()) {
-			String pattern = it.next();
-			// Lookup in the cache first...
-			String key = mappingKeyFor(pattern);
-			ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(key);
-			if (anImage != null) {
-				return anImage;
-			}
-
-			FileEditorMapping mapping = getMappingFor(pattern);
-
-			if (mapping != null) {
-					// Lookup in the cache first...
-				String mappingKey = mappingKeyFor(mapping);
-				ImageDescriptor mappingImage = (ImageDescriptor) extensionImages.get(key);
-				if (mappingImage != null) {
-					return mappingImage;
-				}
-				// Create it and cache it
-				IEditorDescriptor editor = mapping.getDefaultEditor();
-				if (editor != null) {
-					mappingImage = editor.getImageDescriptor();
-					extensionImages.put(mappingKey, mappingImage);
-					return mappingImage;
-				}
-			}
+        // Lookup in the cache first...
+        String key = mappingKeyFor(filename);
+        ImageDescriptor anImage = (ImageDescriptor) extensionImages.get(key);
+        if (anImage != null) {
+			return anImage;
 		}
 
+        // See if we have a mapping for the filename or extension
+        FileEditorMapping[] mapping = getMappingForFilename(filename);
+        for (int i = 0; i < 2; i++) {
+            if (mapping[i] != null) {
+                // Lookup in the cache first...
+                String mappingKey = mappingKeyFor(mapping[i]);
+                ImageDescriptor mappingImage = (ImageDescriptor) extensionImages
+                        .get(key);
+                if (mappingImage != null) {
+					return mappingImage;
+				}
+                // Create it and cache it
+                IEditorDescriptor editor = mapping[i].getDefaultEditor();
+                if (editor != null) {
+                    mappingImage = editor.getImageDescriptor();
+                    extensionImages.put(mappingKey, mappingImage);
+                    return mappingImage;
+                }
+            }
+        }
+
         // Nothing - time to look externally for the icon
-		ImageDescriptor anImage = getSystemExternalEditorImageDescriptor(filename);
+        anImage = getSystemExternalEditorImageDescriptor(filename);
         if (anImage == null) {
 			anImage = getDefaultImage();
 		}
@@ -1509,14 +1505,31 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 		IEditorDescriptor [] related;
 		
 		if (fileName != null) {
-			IFileTypeProcessor processor = new FileTypeProcessor();
-			Iterator<String> it = processor.suffixIterator(fileName);
-			while (it.hasNext()) {
-				String suffix = it.next();
-				FileEditorMapping mapping = getMappingFor(suffix);
+			FileEditorMapping mapping = getMappingFor(fileName);
+			if (mapping != null) {
+				// backwards compatibility - add editors flagged as "default"
+				related = mapping.getDeclaredDefaultEditors();
+				for (int i = 0; i < related.length; i++) {
+					// we don't want to return duplicates
+					if (!allRelated.contains(related[i])) {
+						// if it's not filtered, add it to the list
+						if (!WorkbenchActivityHelper.filterItem(related[i])) {
+							allRelated.add(related[i]);
+						}
+					}
+				}
+				
+				// add all filename editors to the nonDefaultList
+				// we'll later try to add them all after content types are resolved
+				// duplicates (ie: default editors) will be ignored
+				nonDefaultFileEditors.addAll(Arrays.asList(mapping.getEditors()));
+			}
+			
+			int index = fileName.lastIndexOf('.');
+			if (index > -1) {
+				String extension = "*" + fileName.substring(index); //$NON-NLS-1$
+				mapping = getMappingFor(extension);
 				if (mapping != null) {
-					// backwards compatibility - add editors flagged as
-					// "default"
 					related = mapping.getDeclaredDefaultEditors();
 					for (int i = 0; i < related.length; i++) {
 						// we don't want to return duplicates
@@ -1527,10 +1540,6 @@ public class EditorRegistry extends EventManager implements IEditorRegistry,
 							}
 						}
 					}
-
-					// add all filename editors to the nonDefaultList
-					// we'll later try to add them all after content types are
-					// resolved duplicates (ie: default editors) will be ignored
 					nonDefaultFileEditors.addAll(Arrays.asList(mapping.getEditors()));
 				}
 			}

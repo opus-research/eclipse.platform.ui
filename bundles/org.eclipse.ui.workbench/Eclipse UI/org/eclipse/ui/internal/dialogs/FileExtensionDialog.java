@@ -27,12 +27,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.FileTypeValidationException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.registry.FileTypeProcessor;
 
 /**
  * This class is used to prompt the user for a file name & extension.
@@ -58,8 +56,6 @@ public class FileExtensionDialog extends TitleAreaDialog {
 	private final String message2;
 
 	private final String label;
-
-	private final FileTypeProcessor fileTypeProcessor;
 
     /**
      * Constructs a new file extension dialog.
@@ -87,7 +83,6 @@ public class FileExtensionDialog extends TitleAreaDialog {
      */
     public FileExtensionDialog(Shell parentShell, String title, String helpContextId, String headerTitle, String message, String label) {
     	super(parentShell);
-		this.fileTypeProcessor = new FileTypeProcessor();
     	this.title = title;
     	this.helpContextId = helpContextId;
 		this.headerTitle = headerTitle;
@@ -161,40 +156,82 @@ public class FileExtensionDialog extends TitleAreaDialog {
      * Validate the user input for a file type
      */
     private boolean validateFileType() {
-    	try {
-			fileTypeProcessor.validateFileTypePattern(filename);
-		} catch (FileTypeValidationException.PatternIsEmptyException e) {
+        // We need kernel api to validate the extension or a filename
+
+        // check for empty name and extension
+        if (filename.length() == 0) {
             setErrorMessage(null);
             return false;
-		} catch (FileTypeValidationException.EmptyExtensionWithNoNameException e) {
-			setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage);
-			return false;
-		} catch (FileTypeValidationException.PatternIsSingleWildCharException e) {
-			setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage);
-			return false;
-		} catch (FileTypeValidationException.IllegalWildCharPositionException e) {
-			setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage);
-			return false;
-		} catch (FileTypeValidationException.MultipleWildCharsException e) {
-			setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage);
-			return false;
-		} catch (FileTypeValidationException e) {
-			// maybe add a generic message?
-			return false;
-		}
+        }
+
+        // check for empty extension if there is no name
+        int index = filename.lastIndexOf('.');
+        if (index == filename.length() - 1) {
+            if (index == 0 || (index == 1 && filename.charAt(0) == '*')) {
+                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage); 
+                return false;
+            }
+        }
+
+        // check for characters before * 
+        // or no other characters
+        // or next chatacter not '.'
+        // or another *
+        index = filename.indexOf('*');
+        if (index > -1) {
+            if (filename.length() == 1) {
+                setErrorMessage(WorkbenchMessages.FileExtension_extensionEmptyMessage); 
+                return false;
+            }
+            if (index != 0 || filename.charAt(1) != '.') {
+                setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage);
+                return false;
+            }
+            if (filename.length() > index && filename.indexOf('*', index + 1) != -1) {
+            	setErrorMessage(WorkbenchMessages.FileExtension_fileNameInvalidMessage); 
+            	return false;
+            }
+        }
 
         setErrorMessage(null);
         return true;
     }
 
-	/**
-	 * Get the pattern.
-	 * 
-	 * @return the pattern
-	 */
-	public String getPattern() {
-		return filename;
-	}
+    /**
+     * Get the extension.
+     * 
+     * @return the extension
+     */
+    public String getExtension() {
+        // We need kernel api to validate the extension or a filename
+
+        int index = filename.lastIndexOf('.');
+        if (index == -1) {
+			return ""; //$NON-NLS-1$
+		}
+        if (index == filename.length()) {
+			return ""; //$NON-NLS-1$
+		}
+        return filename.substring(index + 1, filename.length());
+    }
+
+    /**
+     * Get the name.
+     * 
+     * @return the name
+     */
+    public String getName() {
+        // We need kernel api to validate the extension or a filename
+
+        int index = filename.lastIndexOf('.');
+        if (index == -1) {
+			return filename;
+		}
+        if (index == 0) {
+			return "*"; //$NON-NLS-1$
+		}
+        return filename.substring(0, index);
+    }
     
     /**
 	 * Sets the initial value that should be prepopulated in this dialog.
