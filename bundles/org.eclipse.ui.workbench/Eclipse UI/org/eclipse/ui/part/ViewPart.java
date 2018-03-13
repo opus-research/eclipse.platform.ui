@@ -10,8 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ui.part;
 
+import static org.eclipse.e4.ui.workbench.UIEventBuilder.createEvent;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewPart;
@@ -190,4 +193,12 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         super.checkSite(site);
         Assert.isTrue(site instanceof IViewSite, "The site for a view must be an IViewSite"); //$NON-NLS-1$
     }    
+
+	@Override
+	public void showBusy(boolean busy) {
+		UIEvents.publishEvent(createEvent(UIEvents.UILabel.TOPIC_BUSY)
+				.withParam(UIEvents.EventTags.ELEMENT, getModel())
+				.withParam(UIEvents.EventTags.ATTNAME, UIEvents.UILifeCycle.BUSY)
+				.withParam(UIEvents.EventTags.NEW_VALUE, busy));
+	}
 }

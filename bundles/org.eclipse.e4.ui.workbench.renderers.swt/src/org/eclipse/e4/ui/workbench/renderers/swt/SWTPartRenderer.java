@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -34,6 +35,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 
 public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
@@ -83,6 +85,14 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 			id = id.replace(".", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		engine.setClassnameAndId(widget, cssClassStr, id);
+	}
+
+	@SuppressWarnings("restriction")
+	protected void reapplyStyles(Widget widget) {
+		CSSEngine engine = WidgetElement.getEngine(widget);
+		if (engine != null) {
+			engine.reapply();
+		}
 	}
 
 	public void bindWidget(MUIElement me, Object widget) {
