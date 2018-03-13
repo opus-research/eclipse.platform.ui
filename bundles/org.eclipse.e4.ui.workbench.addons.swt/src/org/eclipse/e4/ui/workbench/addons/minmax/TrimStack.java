@@ -29,14 +29,11 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
-import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
-import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
@@ -83,12 +80,6 @@ public class TrimStack {
 	private static final String LAYOUT_ICON_URI = "platform:/plugin/org.eclipse.e4.ui.workbench.addons.swt/icons/full/obj16/layout_co.gif"; //$NON-NLS-1$
 
 	private static final String RESTORE_ICON_URI = "platform:/plugin/org.eclipse.e4.ui.workbench.addons.swt/icons/full/etool16/fastview_restore.gif"; //$NON-NLS-1$
-
-	/**
-	 * If the minimized shared editor area is empty, the editor area tool item will have a non null
-	 * data entry with this key (toolItem.getData(EMPTY_EDITOR_AREA) != null)
-	 */
-	private static final String EMPTY_EDITOR_AREA = "KEY_EMPTY_EDITOR_AREA"; //$NON-NLS-1$
 
 	static final String STATE_XSIZE = "XSize"; //$NON-NLS-1$
 
@@ -525,7 +516,8 @@ public class TrimStack {
 				} else if (data instanceof MPerspective) {
 					// A perspective in a perspective stack (for now we just support restore)
 					createEmtpyEditorAreaMenu();
-				} else if (isEditorStack() && selectedToolItem.getData(EMPTY_EDITOR_AREA) != null) {
+				} else if (isEditorStack()) {
+					// An empty editor area
 					createEmtpyEditorAreaMenu();
 				}
 			}
@@ -664,10 +656,6 @@ public class TrimStack {
 		}
 	}
 
-	public MUIElement getMinimizedElement() {
-		return minimizedElement;
-	}
-
 	private MUIElement findElement() {
 		MUIElement result;
 		List<MPerspectiveStack> ps = modelService.findElements(window, null,
@@ -744,16 +732,9 @@ public class TrimStack {
 		}
 
 		if (isEditorStack() && trimStackTB.getItemCount() == 1) {
-			MPart data = getLeafPart(minimizedElement);
 			ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
 			ti.setToolTipText(Messages.TrimStack_SharedAreaTooltip);
 			ti.setImage(getLayoutImage());
-			if (data != null) {
-				ti.setData(data);
-			} else {
-				// empty editor area, add keyed data so we can recognize it
-				ti.setData(EMPTY_EDITOR_AREA, EMPTY_EDITOR_AREA);
-			}
 			ti.addSelectionListener(toolItemSelectionListener);
 		} else if (minimizedElement instanceof MGenericStack<?>) {
 			// Handle *both* PartStacks and PerspectiveStacks here...
@@ -826,60 +807,14 @@ public class TrimStack {
 			hostPane.layout(true);
 			hostPane.moveAbove(null);
 			hostPane.setVisible(true);
+
 			isShowing = true;
-
-			// Activate the part that is being brought up...
-			if (minimizedElement instanceof MPartStack) {
-				MPartStack theStack = (MPartStack) minimizedElement;
-				MStackElement curSel = theStack.getSelectedElement();
-				if (curSel instanceof MPart) {
-					partService.activate((MPart) curSel);
-				} else if (curSel instanceof MPlaceholder) {
-					MPlaceholder ph = (MPlaceholder) curSel;
-					if (ph.getRef() instanceof MPart) {
-						partService.activate((MPart) ph.getRef());
-					}
-				}
-			} else if (minimizedElement instanceof MPlaceholder
-					&& ((MPlaceholder) minimizedElement).getRef() instanceof MArea) {
-				MArea area = (MArea) ((MPlaceholder) minimizedElement).getRef();
-
-				// See if we can find an element to activate...
-				MPart partToActivate = null;
-				MElementContainer<MPartSashContainerElement> curContainer = area;
-				while (partToActivate == null && curContainer.getSelectedElement() != null) {
-					if (curContainer.getSelectedElement() instanceof MPart) {
-						partToActivate = (MPart) curContainer.getSelectedElement();
-					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
-						if (ph.getRef() instanceof MPart) {
-							partToActivate = (MPart) ph.getRef();
-						}
-					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
-						curContainer = (MElementContainer<MPartSashContainerElement>) curContainer
-								.getSelectedElement();
-					}
-				}
-
-				// If we haven't found one then use the first
-				if (partToActivate == null) {
-					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					if (parts.size() > 0)
-						partToActivate = parts.get(0);
-				}
-
-				if (partToActivate != null) {
-					partService.activate(partToActivate);
-				}
-			}
-
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
 			// Check to ensure that the client area is non-null since the
 			// trimstack may be currently hosted in the limbo shell
-			if (clientArea != null) {
+			if (clientArea != null)
 				clientArea.removeControlListener(caResizeListener);
-			}
 
 			if (hostPane != null && hostPane.isVisible()) {
 				hostPane.setVisible(false);

@@ -43,7 +43,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -158,9 +157,6 @@ public class ModelServiceImpl implements EModelService {
 		}
 		if (MCommandParameter.class.equals(elementType)) {
 			return (T) MCommandsFactory.INSTANCE.createCommandParameter();
-		}
-		if (MCompositePart.class.equals(elementType)) {
-			return (T) MBasicFactory.INSTANCE.createCompositePart();
 		}
 		if (MCoreExpression.class.equals(elementType)) {
 			return (T) MUiFactory.INSTANCE.createCoreExpression();
@@ -755,10 +751,6 @@ public class ModelServiceImpl implements EModelService {
 		} else {
 			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			newSash.setHorizontal(horizontal);
-			
-			// Maintain the existing weight in the new sash
-			newSash.setContainerData(relTo.getContainerData());
-			
 			combine(toInsert, relTo, newSash, insertBefore, ratio);
 		}
 
@@ -847,13 +839,26 @@ public class ModelServiceImpl implements EModelService {
 	 * .MPartSashContainerElement)
 	 */
 	public void detach(MPartSashContainerElement element, int x, int y, int width, int height) {
-		// If we're showing through a placehoilder then detach it...
-		if (element.getCurSharedRef() != null)
-			element = element.getCurSharedRef();
-
 		// Determine the correct parent for the new window
+		MUIElement curParent = element.getParent();
+		MUIElement current = element;
 		MWindow window = getTopLevelWindowFor(element);
-		MPerspective thePersp = getPerspectiveFor(element);
+		while (!(curParent instanceof MPerspective) && !(curParent instanceof MWindow)) {
+			if (curParent == null) {
+				// no parent, maybe we're being represented by a placeholder
+				current = findPlaceholderFor(window, current);
+				if (current == null) {
+					return; // log??
+				}
+
+				curParent = current.getParent();
+				if (curParent == null) {
+					return; // log??
+				}
+			}
+			current = curParent;
+			curParent = current.getParent();
+		}
 
 		MTrimmedWindow newWindow = MBasicFactory.INSTANCE.createTrimmedWindow();
 
@@ -867,10 +872,11 @@ public class ModelServiceImpl implements EModelService {
 		MWindowElement uiRoot = wrapElementForWindow(element);
 		newWindow.getChildren().add(uiRoot);
 
-		if (thePersp != null) {
-			thePersp.getWindows().add(newWindow);
-		} else if (window != null) {
-			window.getWindows().add(newWindow);
+		if (curParent instanceof MPerspective) {
+			MPerspective persp = (MPerspective) curParent;
+			persp.getWindows().add(newWindow);
+		} else if (curParent instanceof MWindow) {
+			((MWindow) curParent).getWindows().add(newWindow);
 		}
 	}
 

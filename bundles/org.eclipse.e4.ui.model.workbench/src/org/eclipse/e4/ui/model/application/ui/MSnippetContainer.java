@@ -19,9 +19,10 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This provides a collection of model fragments that can be subsequently cloned and
- * inserterd into the model using the EModelService. For example saving a customized
- * Perspective will create a clone and store it in this container.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->

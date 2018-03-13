@@ -13,7 +13,7 @@ package org.eclipse.e4.ui.workbench.modeling;
 import org.eclipse.core.runtime.IAdapterManager;
 
 /**
- * @noreference This class is not intended to be referenced by clients.
+ * @noreference
  * @since 1.0
  */
 public class ModelService extends ModelHandlerBase {
