@@ -96,7 +96,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 						// delegate an attempt to set the focus here to the
 						// part's implementation (if there is one)
 						Object object = part.getObject();
-						if (object != null && isEnabled()) {
+						if (object != null) {
 							IPresentationEngine pe = part.getContext().get(
 									IPresentationEngine.class);
 							pe.focusGui(part);
@@ -106,6 +106,18 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 					} finally {
 						// we are done, unset our flag
 						beingFocused = false;
+					}
+				}
+
+				if (logger != null) {
+					String id = part.getElementId();
+					if (id == null) {
+						logger.warn(new IllegalStateException(),
+								"Blocked recursive attempt to activate part " //$NON-NLS-1$
+										+ id);
+					} else {
+						logger.warn(new IllegalStateException(),
+								"Blocked recursive attempt to activate part"); //$NON-NLS-1$
 					}
 				}
 

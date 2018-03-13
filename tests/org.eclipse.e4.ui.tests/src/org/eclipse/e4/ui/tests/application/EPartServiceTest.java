@@ -7440,13 +7440,11 @@ public class EPartServiceTest extends UITest {
 
 		EPartService partService = window.getContext().get(EPartService.class);
 		partService.activate(partB);
-		assertEquals("partB should be the active part", partB,
-				partService.getActivePart());
 
 		partService.switchPerspective(perspectiveB);
-		// assertEquals(
-		// "partB is in both perspectives, but since partB is obscured by partA, partA should be the active part",
-		// partA, partService.getActivePart());
+		assertEquals(
+				"partB is in both perspectives, but since partB is obscured by partA, partA should be the active part",
+				partA, partService.getActivePart());
 
 		partService.hidePart(partB);
 		assertEquals("partA should still be the active part", partA,
@@ -9644,13 +9642,13 @@ public class EPartServiceTest extends UITest {
 		EPartService windowPartServiceB = windowB.getContext().get(
 				EPartService.class);
 
-		assertEquals(windowB.getContext(), application.getContext()
+		assertEquals(windowA.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB1.getContext(), windowB.getContext()
 				.getActiveChild());
 
 		windowPartServiceB.switchPerspective(perspectiveB2);
-		assertEquals(windowB.getContext(), application.getContext()
+		assertEquals(windowA.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB2.getContext(), windowB.getContext()
 				.getActiveChild());
@@ -9712,7 +9710,7 @@ public class EPartServiceTest extends UITest {
 		getEngine().createGui(window1);
 		getEngine().createGui(window2);
 
-		assertEquals(window2.getContext(), application.getContext()
+		assertEquals(window1.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveA.getContext(), window2.getContext()
 				.getActiveChild());
@@ -9720,7 +9718,7 @@ public class EPartServiceTest extends UITest {
 		EPartService partService = window2.getContext().get(EPartService.class);
 		partService.switchPerspective(perspectiveB);
 
-		assertEquals(window2.getContext(), application.getContext()
+		assertEquals(window1.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveB.getContext(), window2.getContext()
 				.getActiveChild());
@@ -9798,7 +9796,7 @@ public class EPartServiceTest extends UITest {
 
 		partService.switchPerspective(perspectiveA);
 
-		assertEquals(window2.getContext(), application.getContext()
+		assertEquals(window1.getContext(), application.getContext()
 				.getActiveChild());
 		assertEquals(perspectiveA.getContext(), window2.getContext()
 				.getActiveChild());
