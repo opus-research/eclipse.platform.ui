@@ -322,25 +322,4 @@ public class ColorRegistry extends ResourceRegistry {
 			staleColors.add(oldColor);
 		}
     }
-    
-    /**
-     * Remove a color by the symbolic name from this color registry
-     * 
-     * @param symbolicName the symbolic color name
-     * @since 3.10
-     */
-    public void remove(String symbolicName) {
-        Assert.isNotNull(symbolicName);
-
-        RGB existing = stringToRGB.remove(symbolicName);
-        if (existing == null) {
-			return;
-		}
-
-        fireMappingChanged(symbolicName, existing, null);
-        Color oldColor = stringToColor.remove(symbolicName);
-        if (oldColor != null) {
-			staleColors.add(oldColor);
-		}
-    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.ui.themes.IThemeManager;
 
 /**
@@ -71,15 +72,6 @@ public class ThemeRegistry implements IThemeRegistry {
     void add(ColorDefinition desc) {
     	addOrReplaceDescriptor(colors, desc);
     }
-
-	/**
-	 * Remove a definition from the registry.
-	 * 
-	 * @param definition
-	 */
-	protected void remove(ColorDefinition definition) {
-		removeDescriptor(colors, definition);
-	}
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeRegistry#findCategory(java.lang.String)
@@ -136,21 +128,6 @@ public class ThemeRegistry implements IThemeRegistry {
         return null;
     }
     
-	/*
-	 * Add newElement to descriptors. If one with the same id already exists,
-	 * replace it. Return the existing element in the case of replacing, null in
-	 * the case of adding.
-	 */
-	private void removeDescriptor(List descriptors, IThemeElementDefinition element) {
-		String id = element.getId();
-		for (int i = 0; i < descriptors.size(); i++) {
-			IThemeElementDefinition existingElement = (IThemeElementDefinition) descriptors.get(i);
-			if (existingElement.getId().equals(id)) {
-				descriptors.remove(i);
-			}
-		}
-	}
-
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IThemeRegistry#getLookNFeels()
      */
@@ -250,18 +227,6 @@ public class ThemeRegistry implements IThemeRegistry {
 		}
         fonts.add(definition);
     }
-
-	/**
-	 * Remove definition from the registry
-	 * 
-	 * @param definition
-	 */
-	protected void remove(FontDefinition definition) {
-		if (findFont(definition.getId()) == null) {
-			return;
-		}
-		fonts.remove(definition);
-	}
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeRegistry#getGradients()
