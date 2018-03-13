@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.jface.viewers.CellNavigationStrategy;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -39,7 +40,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerRow;
-import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -214,7 +214,7 @@ public class Snippet059CellNavigationIn33 {
 
 		});
 
-		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) v)
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(v
 				.getTable(), new String[] { "M", "F" });
 		column.setEditingSupport(new AbstractEditingSupport(v, editor) {
 
