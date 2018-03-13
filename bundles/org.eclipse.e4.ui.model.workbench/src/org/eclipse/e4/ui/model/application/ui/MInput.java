@@ -22,7 +22,6 @@ package org.eclipse.e4.ui.model.application.ui;
  * reference an external resource (files...).
  * </p>
  * @since 1.0
- * @deprecated No longer used
  * <!-- end-model-doc -->
  *
  * <p>
