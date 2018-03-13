@@ -215,7 +215,6 @@ public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 	 * @deprecated As of 3.7, replaced by
 	 *             {@link #setContentProvider(IStructuredContentProvider)}
 	 */
-	@Deprecated
 	public void setContenProvider(IStructuredContentProvider provider) {
 		viewer.setContentProvider(provider);
 	}

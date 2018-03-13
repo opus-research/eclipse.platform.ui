@@ -68,8 +68,7 @@ public class OpenStrategy {
      * 
      * @deprecated
      */
-    @Deprecated
-	public static final int NO_TIMER = SINGLE_CLICK;
+    public static final int NO_TIMER = SINGLE_CLICK;
 
     /** A single click will generate an open
      * event and key arrows will generate an open event after a
@@ -77,16 +76,14 @@ public class OpenStrategy {
      * 
      * @deprecated
      */
-    @Deprecated
-	public static final int FILE_EXPLORER = SINGLE_CLICK | ARROW_KEYS_OPEN;
+    public static final int FILE_EXPLORER = SINGLE_CLICK | ARROW_KEYS_OPEN;
 
     /** Pointing to an item will change the selection
      * and a single click will gererate an open event
      * 
      * @deprecated
      */
-    @Deprecated
-	public static final int ACTIVE_DESKTOP = SINGLE_CLICK | SELECT_ON_HOVER;
+    public static final int ACTIVE_DESKTOP = SINGLE_CLICK | SELECT_ON_HOVER;
 
     // Time used in FILE_EXPLORER and ACTIVE_DESKTOP
     // Not declared final, see bug 246209

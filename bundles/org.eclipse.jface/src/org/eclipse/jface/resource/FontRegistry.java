@@ -386,8 +386,7 @@ public class FontRegistry extends ResourceRegistry {
 	 * @deprecated use bestDataArray in order to support Motif multiple entry
 	 *             fonts.
 	 */
-    @Deprecated
-	public FontData bestData(FontData[] fonts, Display display) {
+    public FontData bestData(FontData[] fonts, Display display) {
         for (int i = 0; i < fonts.length; i++) {
             FontData fd = fonts[i];
 
@@ -427,8 +426,7 @@ public class FontRegistry extends ResourceRegistry {
      * @deprecated use filterData in order to preserve 
      * multiple entry fonts on Motif
      */
-    @Deprecated
-	public FontData[] bestDataArray(FontData[] fonts, Display display) {
+    public FontData[] bestDataArray(FontData[] fonts, Display display) {
 
         FontData bestData = bestData(fonts, display);
         if (bestData == null) {

@@ -990,7 +990,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * widget relative implementation like {@link ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)}.
 	 *  
 	 */
-	@Deprecated
 	protected Item getItem(int x, int y) {
 		return null;
 	}
