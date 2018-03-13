@@ -378,6 +378,9 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		if (currentPage != null) {
 			if (activeEditor != null) {
 				lastEditorTitle = activeEditor.getTitleToolTip();
+				if (lastEditorTitle == null) {
+					lastEditorTitle = ""; //$NON-NLS-1$
+				}
 				title = NLS.bind(
 						IDEWorkbenchMessages.WorkbenchWindow_shellTitle,
 						lastEditorTitle, title);
