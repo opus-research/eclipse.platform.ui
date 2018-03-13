@@ -34,11 +34,12 @@ package org.eclipse.jface.viewers;
  * it is the responsibility of the user to ensure <code>dispose</code>
  * is called when the provider is no longer needed.
  * </p>
+ * @param <E> Type of an element of the model
  *
  * @see ILabelProvider
  * @see ITableLabelProvider
  */
-public interface IBaseLabelProvider {
+public interface IBaseLabelProvider<E> {
     /**
      * Adds a listener to this label provider.
      * Has no effect if an identical listener is already registered.
