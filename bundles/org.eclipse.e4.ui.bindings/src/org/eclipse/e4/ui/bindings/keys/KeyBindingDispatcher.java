@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.CommandException;
 import org.eclipse.e4.core.commands.EHandlerService;
@@ -268,18 +267,11 @@ public class KeyBindingDispatcher {
 
 		final boolean commandDefined = command.isDefined();
 		// boolean commandEnabled;
-		boolean commandHandled = false;
+		boolean commandHandled;
 
 		try {
 			// commandEnabled = handlerService.canExecute(parameterizedCommand, staticContext);
-			Object obj = HandlerServiceImpl.lookUpHandler(context, command.getId());
-			if (obj != null) {
-				if (obj instanceof IHandler) {
-					commandHandled = ((IHandler) obj).isHandled();
-				} else {
-					commandHandled = true;
-				}
-			}
+			commandHandled = HandlerServiceImpl.lookUpHandler(context, command.getId()) != null;
 
 			try {
 				handlerService.executeHandler(parameterizedCommand, staticContext);
