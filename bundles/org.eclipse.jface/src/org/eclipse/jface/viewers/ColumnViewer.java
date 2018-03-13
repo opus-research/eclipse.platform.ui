@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,21 +13,17 @@
 
 package org.eclipse.jface.viewers;
 
-import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.internal.InternalPolicy;
+import org.eclipse.jface.util.Policy;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Widget;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
-import org.eclipse.jface.internal.InternalPolicy;
-import org.eclipse.jface.util.Policy;
 
 /**
  * The ColumnViewer is the abstract superclass of viewers that have columns
@@ -58,8 +54,6 @@ public abstract class ColumnViewer extends StructuredViewer {
 	private boolean busy;
 	private boolean logWhenBusy = true; // initially true, set to false
 
-	private MouseListener mouseListener;
-
 	// after logging for the first
 	// time
 
@@ -88,7 +82,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 		// their
 		// own impl
 		if (viewerEditor != null) {
-			mouseListener = new MouseAdapter() {
+			control.addMouseListener(new MouseAdapter() {
 				public void mouseDown(MouseEvent e) {
 					// Workaround for bug 185817
 					if (e.count != 2) {
@@ -99,8 +93,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 				public void mouseDoubleClick(MouseEvent e) {
 					handleMouseDown(e);
 				}
-			};
-			control.addMouseListener(mouseListener);
+			});
 		}
 	}
 
@@ -671,17 +664,6 @@ public abstract class ColumnViewer extends StructuredViewer {
 			triggerEditorActivationEvent(new ColumnViewerEditorActivationEvent(
 					cell, e));
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ContentViewer#handleDispose(org.eclipse.swt.events.DisposeEvent)
-	 */
-	protected void handleDispose(DisposeEvent event) {
-		if (mouseListener != null && event.widget instanceof Control) {
-			((Control)event.widget).removeMouseListener(mouseListener);
-			mouseListener = null;
-		}
-		super.handleDispose(event);
 	}
 
 	/**
