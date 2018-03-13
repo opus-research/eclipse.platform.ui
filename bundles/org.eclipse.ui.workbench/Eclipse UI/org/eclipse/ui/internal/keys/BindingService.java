@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.keys;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -270,7 +271,28 @@ public final class BindingService implements IBindingService {
 	 * .bindings.TriggerSequence)
 	 */
 	public Map getPartialMatches(TriggerSequence trigger) {
-		return manager.getPartialMatches(trigger);
+		final TriggerSequence[] prefixes = trigger.getPrefixes();
+		final int prefixesLength = prefixes.length;
+		if (prefixesLength == 0) {
+			return Collections.EMPTY_MAP;
+		}
+
+		Collection<Binding> partialMatches = bindingService.getPartialMatches(trigger);
+		Map<TriggerSequence, Object> prefixTable = new HashMap<TriggerSequence, Object>();
+		for (Binding binding : partialMatches) {
+			for (int i = 0; i < prefixesLength; i++) {
+				final TriggerSequence prefix = prefixes[i];
+				final Object value = prefixTable.get(prefix);
+				if ((prefixTable.containsKey(prefix)) && (value instanceof Map)) {
+					((Map) value).put(prefixTable, binding);
+				} else {
+					final Map map = new HashMap();
+					prefixTable.put(prefix, map);
+					map.put(prefixTable, binding);
+				}
+			}
+		}
+		return prefixTable;
 	}
 
 	/*
