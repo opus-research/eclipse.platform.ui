@@ -29,6 +29,7 @@ import org.eclipse.e4.ui.model.application.ui.MInput;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MInputPart extends MPart, MInput {
 } // MInputPart
