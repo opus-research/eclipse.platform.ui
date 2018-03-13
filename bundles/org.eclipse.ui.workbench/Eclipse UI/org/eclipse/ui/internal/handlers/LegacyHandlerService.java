@@ -143,8 +143,6 @@ public class LegacyHandlerService implements IHandlerService {
 
 	private static IHandlerActivation systemHandlerActivation;
 
-
-
 	public static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
 			String id, final String cmdId, IHandler handler, Expression activeWhen) {
 
@@ -641,57 +639,69 @@ public class LegacyHandlerService implements IHandlerService {
 				.get(IExtensionRegistry.class.getName());
 		IExtensionPoint extPoint = registry
 				.getExtensionPoint(IWorkbenchRegistryConstants.EXTENSION_HANDLERS);
+
 		IConfigurationElement[] elements = extPoint.getConfigurationElements();
+
 		for (IConfigurationElement configElement : elements) {
-			String commandId = configElement
-					.getAttribute(IWorkbenchRegistryConstants.ATT_COMMAND_ID);
-			if (commandId == null || commandId.length() == 0) {
-				continue;
+			readHandler(extPoint, configElement);
+		}
+	}
+
+	/**
+	 * @param extPoint
+	 * @param configElement
+	 */
+	private void readHandler(IExtensionPoint extPoint, IConfigurationElement configElement) {
+
+		String commandId = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_COMMAND_ID);
+		if (commandId == null || commandId.length() == 0) {
+			return;
+		}
+		String defaultHandler = configElement.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
+		if ((defaultHandler == null)
+				&& (configElement.getChildren(IWorkbenchRegistryConstants.TAG_CLASS).length == 0)) {
+			return;
+		}
+		Expression activeWhen = null;
+		final IConfigurationElement[] awChildren = configElement
+				.getChildren(IWorkbenchRegistryConstants.TAG_ACTIVE_WHEN);
+		if (awChildren.length > 0) {
+			final IConfigurationElement[] subChildren = awChildren[0].getChildren();
+			if (subChildren.length != 1) {
+				Activator.trace(Policy.DEBUG_CMDS,
+						"Incorrect activeWhen element " + commandId, null); //$NON-NLS-1$
+				return;
 			}
-			String defaultHandler = configElement
-					.getAttribute(IWorkbenchRegistryConstants.ATT_CLASS);
-			if ((defaultHandler == null)
-					&& (configElement.getChildren(IWorkbenchRegistryConstants.TAG_CLASS).length == 0)) {
-				continue;
+			final ElementHandler elementHandler = ElementHandler.getDefault();
+			final ExpressionConverter converter = ExpressionConverter.getDefault();
+			try {
+				activeWhen = elementHandler.create(converter, subChildren[0]);
+			} catch (CoreException e) {
+				Activator.trace(Policy.DEBUG_CMDS, "Incorrect activeWhen element " + commandId, e); //$NON-NLS-1$
 			}
-			Expression activeWhen = null;
-			final IConfigurationElement[] awChildren = configElement
-					.getChildren(IWorkbenchRegistryConstants.TAG_ACTIVE_WHEN);
-			if (awChildren.length > 0) {
-				final IConfigurationElement[] subChildren = awChildren[0].getChildren();
-				if (subChildren.length != 1) {
-					Activator.trace(Policy.DEBUG_CMDS,
-							"Incorrect activeWhen element " + commandId, null); //$NON-NLS-1$
-					continue;
-				}
-				final ElementHandler elementHandler = ElementHandler.getDefault();
-				final ExpressionConverter converter = ExpressionConverter.getDefault();
-				try {
-					activeWhen = elementHandler.create(converter, subChildren[0]);
-				} catch (CoreException e) {
-					Activator.trace(Policy.DEBUG_CMDS,
-							"Incorrect activeWhen element " + commandId, e); //$NON-NLS-1$
-				}
+		}
+		Expression enabledWhen = null;
+		final IConfigurationElement[] ewChildren = configElement
+				.getChildren(IWorkbenchRegistryConstants.TAG_ENABLED_WHEN);
+		if (ewChildren.length > 0) {
+			final IConfigurationElement[] subChildren = ewChildren[0].getChildren();
+			if (subChildren.length != 1) {
+				Activator.trace(Policy.DEBUG_CMDS,
+						"Incorrect enableWhen element " + commandId, null); //$NON-NLS-1$
+				return;
 			}
-			Expression enabledWhen = null;
-			final IConfigurationElement[] ewChildren = configElement
-					.getChildren(IWorkbenchRegistryConstants.TAG_ENABLED_WHEN);
-			if (ewChildren.length > 0) {
-				final IConfigurationElement[] subChildren = ewChildren[0].getChildren();
-				if (subChildren.length != 1) {
-					Activator.trace(Policy.DEBUG_CMDS,
-							"Incorrect enableWhen element " + commandId, null); //$NON-NLS-1$
-					continue;
-				}
-				final ElementHandler elementHandler = ElementHandler.getDefault();
-				final ExpressionConverter converter = ExpressionConverter.getDefault();
-				try {
-					enabledWhen = elementHandler.create(converter, subChildren[0]);
-				} catch (CoreException e) {
-					Activator.trace(Policy.DEBUG_CMDS,
-							"Incorrect enableWhen element " + commandId, e); //$NON-NLS-1$
-				}
+			final ElementHandler elementHandler = ElementHandler.getDefault();
+			final ExpressionConverter converter = ExpressionConverter.getDefault();
+			try {
+				enabledWhen = elementHandler.create(converter, subChildren[0]);
+			} catch (CoreException e) {
+				Activator.trace(Policy.DEBUG_CMDS, "Incorrect enableWhen element " + commandId, e); //$NON-NLS-1$
 			}
+		}
+		if (configElement.getName().equals("e4handler")) { //$NON-NLS-1$
+			registerE4Handler(eclipseContext, commandId, commandId, null);
+			
+		} else {
 			registerLegacyHandler(
 					eclipseContext,
 					commandId,
@@ -700,6 +710,19 @@ public class LegacyHandlerService implements IHandlerService {
 							IWorkbenchRegistryConstants.ATT_CLASS, enabledWhen, eclipseContext
 									.get(IEvaluationService.class)), activeWhen);
 		}
+
+	}
+
+	/**
+	 * @param eclipseContext2
+	 * @param commandId
+	 * @param commandId2
+	 * @param object
+	 */
+	private void registerE4Handler(IEclipseContext eclipseContext2, String commandId,
+			String commandId2, Object object) {
+		// TODO Register the E4 handler
+
 	}
 
 	private void readDefaultHandlers() {
@@ -719,6 +742,8 @@ public class LegacyHandlerService implements IHandlerService {
 					&& (configElement.getChildren(IWorkbenchRegistryConstants.TAG_DEFAULT_HANDLER).length == 0)) {
 				continue;
 			}
+			// TODO check if class is instance of IHandler and if not register
+			// the POJO
 			registerLegacyHandler(eclipseContext, id, id,
 					new org.eclipse.ui.internal.handlers.HandlerProxy(id, configElement,
 							IWorkbenchRegistryConstants.ATT_DEFAULT_HANDLER), null);
