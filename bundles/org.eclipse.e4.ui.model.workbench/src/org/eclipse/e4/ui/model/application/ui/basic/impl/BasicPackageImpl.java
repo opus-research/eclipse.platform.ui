@@ -14,6 +14,8 @@ import org.eclipse.e4.ui.model.application.commands.impl.CommandsPackageImpl;
 import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
+import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
+import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -25,6 +27,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
 import org.eclipse.emf.ecore.EAttribute;
@@ -102,7 +105,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getInputPart()
 	 * @generated
 	 */
-	public static final int INPUT_PART = 1;
+	public static final int INPUT_PART = 2;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartStackImpl <em>Part Stack</em>}' class.
@@ -112,7 +115,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getPartStack()
 	 * @generated
 	 */
-	public static final int PART_STACK = 2;
+	public static final int PART_STACK = 3;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartSashContainerImpl <em>Part Sash Container</em>}' class.
@@ -122,7 +125,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getPartSashContainer()
 	 * @generated
 	 */
-	public static final int PART_SASH_CONTAINER = 3;
+	public static final int PART_SASH_CONTAINER = 4;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WindowImpl <em>Window</em>}' class.
@@ -132,7 +135,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWindow()
 	 * @generated
 	 */
-	public static final int WINDOW = 4;
+	public static final int WINDOW = 5;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.TrimmedWindowImpl <em>Trimmed Window</em>}' class.
@@ -142,7 +145,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getTrimmedWindow()
 	 * @generated
 	 */
-	public static final int TRIMMED_WINDOW = 5;
+	public static final int TRIMMED_WINDOW = 6;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.TrimElementImpl <em>Trim Element</em>}' class.
@@ -152,7 +155,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getTrimElement()
 	 * @generated
 	 */
-	public static final int TRIM_ELEMENT = 6;
+	public static final int TRIM_ELEMENT = 7;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement <em>Part Sash Container Element</em>}' class.
@@ -162,7 +165,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getPartSashContainerElement()
 	 * @generated
 	 */
-	public static final int PART_SASH_CONTAINER_ELEMENT = 7;
+	public static final int PART_SASH_CONTAINER_ELEMENT = 8;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.MWindowElement <em>Window Element</em>}' class.
@@ -172,7 +175,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWindowElement()
 	 * @generated
 	 */
-	public static final int WINDOW_ELEMENT = 8;
+	public static final int WINDOW_ELEMENT = 9;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.TrimBarImpl <em>Trim Bar</em>}' class.
@@ -182,7 +185,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getTrimBar()
 	 * @generated
 	 */
-	public static final int TRIM_BAR = 9;
+	public static final int TRIM_BAR = 10;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.MStackElement <em>Stack Element</em>}' class.
@@ -192,7 +195,7 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getStackElement()
 	 * @generated
 	 */
-	public static final int STACK_ELEMENT = 10;
+	public static final int STACK_ELEMENT = 11;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -517,6 +520,367 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @ordered
 	 */
 	public static final int PART_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 3;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl <em>Composite Part</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getCompositePart()
+	 * @generated
+	 */
+	public static final int COMPOSITE_PART = 1;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__ELEMENT_ID = PART__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__PERSISTED_STATE = PART__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__TAGS = PART__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CONTRIBUTOR_URI = PART__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__TRANSIENT_DATA = PART__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__WIDGET = PART__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__RENDERER = PART__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__TO_BE_RENDERED = PART__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__ON_TOP = PART__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__VISIBLE = PART__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__PARENT = PART__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CONTAINER_DATA = PART__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CUR_SHARED_REF = PART__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__VISIBLE_WHEN = PART__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__ACCESSIBILITY_PHRASE = PART__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Contribution URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CONTRIBUTION_URI = PART__CONTRIBUTION_URI;
+
+	/**
+	 * The feature id for the '<em><b>Object</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__OBJECT = PART__OBJECT;
+
+	/**
+	 * The feature id for the '<em><b>Context</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CONTEXT = PART__CONTEXT;
+
+	/**
+	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__VARIABLES = PART__VARIABLES;
+
+	/**
+	 * The feature id for the '<em><b>Properties</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__PROPERTIES = PART__PROPERTIES;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__LABEL = PART__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__ICON_URI = PART__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__TOOLTIP = PART__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__HANDLERS = PART__HANDLERS;
+
+	/**
+	 * The feature id for the '<em><b>Dirty</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__DIRTY = PART__DIRTY;
+
+	/**
+	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__BINDING_CONTEXTS = PART__BINDING_CONTEXTS;
+
+	/**
+	 * The feature id for the '<em><b>Menus</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__MENUS = PART__MENUS;
+
+	/**
+	 * The feature id for the '<em><b>Toolbar</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__TOOLBAR = PART__TOOLBAR;
+
+	/**
+	 * The feature id for the '<em><b>Closeable</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CLOSEABLE = PART__CLOSEABLE;
+
+	/**
+	 * The feature id for the '<em><b>Description</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__DESCRIPTION = PART__DESCRIPTION;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__CHILDREN = PART_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__SELECTED_ELEMENT = PART_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Horizontal</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART__HORIZONTAL = PART_FEATURE_COUNT + 2;
+
+	/**
+	 * The number of structural features of the '<em>Composite Part</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART_FEATURE_COUNT = PART_FEATURE_COUNT + 3;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE = PART___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_LABEL = PART___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_TOOLTIP = PART___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The operation id for the '<em>Get Localized Description</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART___GET_LOCALIZED_DESCRIPTION = PART___GET_LOCALIZED_DESCRIPTION;
+
+	/**
+	 * The number of operations of the '<em>Composite Part</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int COMPOSITE_PART_OPERATION_COUNT = PART_OPERATION_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
@@ -2760,11 +3124,722 @@ public class BasicPackageImpl extends EPackageImpl {
 	public static final int STACK_ELEMENT_OPERATION_COUNT = UiPackageImpl.UI_ELEMENT_OPERATION_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.DialogImpl <em>Dialog</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.DialogImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getDialog()
+	 * @generated
+	 */
+	public static final int DIALOG = 12;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__ELEMENT_ID = WINDOW__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__PERSISTED_STATE = WINDOW__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__TAGS = WINDOW__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__CONTRIBUTOR_URI = WINDOW__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__TRANSIENT_DATA = WINDOW__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__WIDGET = WINDOW__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__RENDERER = WINDOW__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__TO_BE_RENDERED = WINDOW__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__ON_TOP = WINDOW__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__VISIBLE = WINDOW__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__PARENT = WINDOW__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__CONTAINER_DATA = WINDOW__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__CUR_SHARED_REF = WINDOW__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__VISIBLE_WHEN = WINDOW__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__ACCESSIBILITY_PHRASE = WINDOW__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__CHILDREN = WINDOW__CHILDREN;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__SELECTED_ELEMENT = WINDOW__SELECTED_ELEMENT;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__LABEL = WINDOW__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__ICON_URI = WINDOW__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__TOOLTIP = WINDOW__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Context</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__CONTEXT = WINDOW__CONTEXT;
+
+	/**
+	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__VARIABLES = WINDOW__VARIABLES;
+
+	/**
+	 * The feature id for the '<em><b>Properties</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__PROPERTIES = WINDOW__PROPERTIES;
+
+	/**
+	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__HANDLERS = WINDOW__HANDLERS;
+
+	/**
+	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__BINDING_CONTEXTS = WINDOW__BINDING_CONTEXTS;
+
+	/**
+	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__SNIPPETS = WINDOW__SNIPPETS;
+
+	/**
+	 * The feature id for the '<em><b>Main Menu</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__MAIN_MENU = WINDOW__MAIN_MENU;
+
+	/**
+	 * The feature id for the '<em><b>X</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__X = WINDOW__X;
+
+	/**
+	 * The feature id for the '<em><b>Y</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__Y = WINDOW__Y;
+
+	/**
+	 * The feature id for the '<em><b>Width</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__WIDTH = WINDOW__WIDTH;
+
+	/**
+	 * The feature id for the '<em><b>Height</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__HEIGHT = WINDOW__HEIGHT;
+
+	/**
+	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__WINDOWS = WINDOW__WINDOWS;
+
+	/**
+	 * The feature id for the '<em><b>Shared Elements</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG__SHARED_ELEMENTS = WINDOW__SHARED_ELEMENTS;
+
+	/**
+	 * The number of structural features of the '<em>Dialog</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_FEATURE_COUNT = WINDOW_FEATURE_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE = WINDOW___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG___GET_LOCALIZED_LABEL = WINDOW___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG___GET_LOCALIZED_TOOLTIP = WINDOW___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The number of operations of the '<em>Dialog</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int DIALOG_OPERATION_COUNT = WINDOW_OPERATION_COUNT + 0;
+
+	/**
+	 * The meta object id for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl <em>Wizard Dialog</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardDialog()
+	 * @generated
+	 */
+	public static final int WIZARD_DIALOG = 13;
+
+	/**
+	 * The feature id for the '<em><b>Element Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__ELEMENT_ID = DIALOG__ELEMENT_ID;
+
+	/**
+	 * The feature id for the '<em><b>Persisted State</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__PERSISTED_STATE = DIALOG__PERSISTED_STATE;
+
+	/**
+	 * The feature id for the '<em><b>Tags</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__TAGS = DIALOG__TAGS;
+
+	/**
+	 * The feature id for the '<em><b>Contributor URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__CONTRIBUTOR_URI = DIALOG__CONTRIBUTOR_URI;
+
+	/**
+	 * The feature id for the '<em><b>Transient Data</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__TRANSIENT_DATA = DIALOG__TRANSIENT_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Widget</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__WIDGET = DIALOG__WIDGET;
+
+	/**
+	 * The feature id for the '<em><b>Renderer</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__RENDERER = DIALOG__RENDERER;
+
+	/**
+	 * The feature id for the '<em><b>To Be Rendered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__TO_BE_RENDERED = DIALOG__TO_BE_RENDERED;
+
+	/**
+	 * The feature id for the '<em><b>On Top</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__ON_TOP = DIALOG__ON_TOP;
+
+	/**
+	 * The feature id for the '<em><b>Visible</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__VISIBLE = DIALOG__VISIBLE;
+
+	/**
+	 * The feature id for the '<em><b>Parent</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__PARENT = DIALOG__PARENT;
+
+	/**
+	 * The feature id for the '<em><b>Container Data</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__CONTAINER_DATA = DIALOG__CONTAINER_DATA;
+
+	/**
+	 * The feature id for the '<em><b>Cur Shared Ref</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__CUR_SHARED_REF = DIALOG__CUR_SHARED_REF;
+
+	/**
+	 * The feature id for the '<em><b>Visible When</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__VISIBLE_WHEN = DIALOG__VISIBLE_WHEN;
+
+	/**
+	 * The feature id for the '<em><b>Accessibility Phrase</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__ACCESSIBILITY_PHRASE = DIALOG__ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The feature id for the '<em><b>Children</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__CHILDREN = DIALOG__CHILDREN;
+
+	/**
+	 * The feature id for the '<em><b>Selected Element</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__SELECTED_ELEMENT = DIALOG__SELECTED_ELEMENT;
+
+	/**
+	 * The feature id for the '<em><b>Label</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__LABEL = DIALOG__LABEL;
+
+	/**
+	 * The feature id for the '<em><b>Icon URI</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__ICON_URI = DIALOG__ICON_URI;
+
+	/**
+	 * The feature id for the '<em><b>Tooltip</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__TOOLTIP = DIALOG__TOOLTIP;
+
+	/**
+	 * The feature id for the '<em><b>Context</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__CONTEXT = DIALOG__CONTEXT;
+
+	/**
+	 * The feature id for the '<em><b>Variables</b></em>' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__VARIABLES = DIALOG__VARIABLES;
+
+	/**
+	 * The feature id for the '<em><b>Properties</b></em>' map.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__PROPERTIES = DIALOG__PROPERTIES;
+
+	/**
+	 * The feature id for the '<em><b>Handlers</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__HANDLERS = DIALOG__HANDLERS;
+
+	/**
+	 * The feature id for the '<em><b>Binding Contexts</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__BINDING_CONTEXTS = DIALOG__BINDING_CONTEXTS;
+
+	/**
+	 * The feature id for the '<em><b>Snippets</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__SNIPPETS = DIALOG__SNIPPETS;
+
+	/**
+	 * The feature id for the '<em><b>Main Menu</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__MAIN_MENU = DIALOG__MAIN_MENU;
+
+	/**
+	 * The feature id for the '<em><b>X</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__X = DIALOG__X;
+
+	/**
+	 * The feature id for the '<em><b>Y</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__Y = DIALOG__Y;
+
+	/**
+	 * The feature id for the '<em><b>Width</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__WIDTH = DIALOG__WIDTH;
+
+	/**
+	 * The feature id for the '<em><b>Height</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__HEIGHT = DIALOG__HEIGHT;
+
+	/**
+	 * The feature id for the '<em><b>Windows</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__WINDOWS = DIALOG__WINDOWS;
+
+	/**
+	 * The feature id for the '<em><b>Shared Elements</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG__SHARED_ELEMENTS = DIALOG__SHARED_ELEMENTS;
+
+	/**
+	 * The number of structural features of the '<em>Wizard Dialog</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG_FEATURE_COUNT = DIALOG_FEATURE_COUNT + 0;
+
+	/**
+	 * The operation id for the '<em>Get Localized Accessibility Phrase</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE = DIALOG___GET_LOCALIZED_ACCESSIBILITY_PHRASE;
+
+	/**
+	 * The operation id for the '<em>Get Localized Label</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_LABEL = DIALOG___GET_LOCALIZED_LABEL;
+
+	/**
+	 * The operation id for the '<em>Get Localized Tooltip</em>' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG___GET_LOCALIZED_TOOLTIP = DIALOG___GET_LOCALIZED_TOOLTIP;
+
+	/**
+	 * The number of operations of the '<em>Wizard Dialog</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	public static final int WIZARD_DIALOG_OPERATION_COUNT = DIALOG_OPERATION_COUNT + 0;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	private EClass partEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass compositePartEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -2835,6 +3910,20 @@ public class BasicPackageImpl extends EPackageImpl {
 	 * @generated
 	 */
 	private EClass stackElementEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass dialogEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass wizardDialogEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -2993,6 +4082,19 @@ public class BasicPackageImpl extends EPackageImpl {
 	 */
 	public EOperation getPart__GetLocalizedDescription() {
 		return partEClass.getEOperations().get(0);
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MCompositePart <em>Composite Part</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Composite Part</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MCompositePart
+	 * @generated
+	 */
+	public EClass getCompositePart() {
+		return compositePartEClass;
 	}
 
 
@@ -3237,6 +4339,32 @@ public class BasicPackageImpl extends EPackageImpl {
 
 
 	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialog <em>Dialog</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Dialog</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialog
+	 * @generated
+	 */
+	public EClass getDialog() {
+		return dialogEClass;
+	}
+
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog <em>Wizard Dialog</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Wizard Dialog</em>'.
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog
+	 * @generated
+	 */
+	public EClass getWizardDialog() {
+		return wizardDialogEClass;
+	}
+
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -3273,6 +4401,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		createEAttribute(partEClass, PART__DESCRIPTION);
 		createEOperation(partEClass, PART___GET_LOCALIZED_DESCRIPTION);
 
+		compositePartEClass = createEClass(COMPOSITE_PART);
+
 		inputPartEClass = createEClass(INPUT_PART);
 
 		partStackEClass = createEClass(PART_STACK);
@@ -3301,6 +4431,10 @@ public class BasicPackageImpl extends EPackageImpl {
 		createEReference(trimBarEClass, TRIM_BAR__PENDING_CLEANUP);
 
 		stackElementEClass = createEClass(STACK_ELEMENT);
+
+		dialogEClass = createEClass(DIALOG);
+
+		wizardDialogEClass = createEClass(WIZARD_DIALOG);
 	}
 
 	/**
@@ -3347,10 +4481,16 @@ public class BasicPackageImpl extends EPackageImpl {
 		partEClass.getESuperTypes().add(theUiPackage.getDirtyable());
 		partEClass.getESuperTypes().add(theCommandsPackage.getBindings());
 		partEClass.getESuperTypes().add(this.getWindowElement());
+		EGenericType g1 = createEGenericType(this.getPart());
+		compositePartEClass.getEGenericSuperTypes().add(g1);
+		g1 = createEGenericType(theUiPackage.getGenericTile());
+		EGenericType g2 = createEGenericType(this.getPartSashContainerElement());
+		g1.getETypeArguments().add(g2);
+		compositePartEClass.getEGenericSuperTypes().add(g1);
 		inputPartEClass.getESuperTypes().add(this.getPart());
 		inputPartEClass.getESuperTypes().add(theUiPackage.getInput());
-		EGenericType g1 = createEGenericType(theUiPackage.getGenericStack());
-		EGenericType g2 = createEGenericType(this.getStackElement());
+		g1 = createEGenericType(theUiPackage.getGenericStack());
+		g2 = createEGenericType(this.getStackElement());
 		g1.getETypeArguments().add(g2);
 		partStackEClass.getEGenericSuperTypes().add(g1);
 		g1 = createEGenericType(this.getPartSashContainerElement());
@@ -3390,6 +4530,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		g1 = createEGenericType(theUiPackage.getUIElement());
 		trimBarEClass.getEGenericSuperTypes().add(g1);
 		stackElementEClass.getESuperTypes().add(theUiPackage.getUIElement());
+		dialogEClass.getESuperTypes().add(this.getWindow());
+		wizardDialogEClass.getESuperTypes().add(this.getDialog());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(partEClass, MPart.class, "Part", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
@@ -3399,6 +4541,8 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEAttribute(getPart_Description(), ecorePackage.getEString(), "description", null, 0, 1, MPart.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEOperation(getPart__GetLocalizedDescription(), ecorePackage.getEString(), "getLocalizedDescription", 0, 1, IS_UNIQUE, IS_ORDERED); //$NON-NLS-1$
+
+		initEClass(compositePartEClass, MCompositePart.class, "CompositePart", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
 		initEClass(inputPartEClass, MInputPart.class, "InputPart", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 
@@ -3428,6 +4572,10 @@ public class BasicPackageImpl extends EPackageImpl {
 		initEReference(getTrimBar_PendingCleanup(), this.getTrimElement(), null, "pendingCleanup", null, 0, -1, MTrimBar.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED); //$NON-NLS-1$
 
 		initEClass(stackElementEClass, MStackElement.class, "StackElement", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
+		initEClass(dialogEClass, MDialog.class, "Dialog", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
+
+		initEClass(wizardDialogEClass, MWizardDialog.class, "WizardDialog", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS); //$NON-NLS-1$
 	}
 
 	/**
@@ -3492,6 +4640,16 @@ public class BasicPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EOperation PART___GET_LOCALIZED_DESCRIPTION = eINSTANCE.getPart__GetLocalizedDescription();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl <em>Composite Part</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.CompositePartImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getCompositePart()
+		 * @generated
+		 */
+		public static final EClass COMPOSITE_PART = eINSTANCE.getCompositePart();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.InputPartImpl <em>Input Part</em>}' class.
@@ -3664,6 +4822,26 @@ public class BasicPackageImpl extends EPackageImpl {
 		 * @generated
 		 */
 		public static final EClass STACK_ELEMENT = eINSTANCE.getStackElement();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.DialogImpl <em>Dialog</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.DialogImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getDialog()
+		 * @generated
+		 */
+		public static final EClass DIALOG = eINSTANCE.getDialog();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl <em>Wizard Dialog</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.WizardDialogImpl
+		 * @see org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl#getWizardDialog()
+		 * @generated
+		 */
+		public static final EClass WIZARD_DIALOG = eINSTANCE.getWizardDialog();
 
 	}
 

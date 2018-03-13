@@ -228,27 +228,28 @@ public final class ContributionsAnalyzer {
 		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
 	}
 
-	public static boolean isVisible(MCoreExpression exp, ExpressionContext eContext) {
-		Expression ref = null;
+	public static boolean isVisible(MCoreExpression exp, final ExpressionContext eContext) {
+		final Expression ref;
 		if (exp.getCoreExpression() instanceof Expression) {
 			ref = (Expression) exp.getCoreExpression();
 		} else {
 			ref = new ReferenceExpression(exp.getCoreExpressionId());
 			exp.setCoreExpression(ref);
 		}
+		// Creates dependency on a predefined value that can be "poked" by the evaluation
+		// service
+		ExpressionInfo info = ref.computeExpressionInfo();
+		String[] names = info.getAccessedPropertyNames();
+		for (String name : names) {
+			eContext.getVariable(name + ".evaluationServiceLink"); //$NON-NLS-1$
+		}
+		boolean ret = false;
 		try {
-			// Creates dependency on a predefined value that can be "poked" by the evaluation
-			// service
-			ExpressionInfo info = ref.computeExpressionInfo();
-			String[] names = info.getAccessedPropertyNames();
-			for (String name : names) {
-				eContext.getVariable(name + ".evaluationServiceLink"); //$NON-NLS-1$
-			}
-			return ref.evaluate(eContext) != EvaluationResult.FALSE;
+			ret = ref.evaluate(eContext) != EvaluationResult.FALSE;
 		} catch (Exception e) {
 			trace("isVisible exception", e); //$NON-NLS-1$
 		}
-		return false;
+		return ret;
 	}
 
 	public static void addMenuContributions(final MMenu menuModel,

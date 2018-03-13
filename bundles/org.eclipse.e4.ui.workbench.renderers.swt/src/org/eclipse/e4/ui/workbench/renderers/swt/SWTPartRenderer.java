@@ -18,6 +18,7 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
+import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -41,6 +42,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 
 	Map<String, Image> imageMap = new HashMap<String, Image>();
 
+	String pinURI = "platform:/plugin/org.eclipse.e4.ui.workbench.renderers.swt/icons/full/ovr16/pinned_ovr.gif"; //$NON-NLS-1$
+	Image pinImage;
+
+	private ISWTResourceUtilities resUtils;
+
 	public void processContents(MElementContainer<MUIElement> container) {
 		// EMF gives us null lists if empty
 		if (container == null)
@@ -61,6 +67,16 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 				renderer.createGui(childME);
 			}
 		}
+	}
+
+	public void styleElement(MUIElement element, boolean active) {
+		if (!active)
+			element.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
+		else
+			element.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+
+		if (element.getWidget() != null)
+			setCSSInfo(element, element.getWidget());
 	}
 
 	public void setCSSInfo(MUIElement me, Object widget) {
@@ -181,21 +197,63 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	protected Image getImage(MUILabel element) {
-		IEclipseContext localContext = context;
-		String iconURI = element.getIconURI();
-		if (iconURI != null && iconURI.length() > 0) {
-			Image image = imageMap.get(iconURI);
-			if (image == null) {
-				ISWTResourceUtilities resUtils = (ISWTResourceUtilities) localContext
-						.get(IResourceUtilities.class.getName());
-				image = resUtils.imageDescriptorFromURI(URI.createURI(iconURI))
-						.createImage();
-				imageMap.put(iconURI, image);
-			}
-			return image;
+	protected String getToolTip(MUILabel element) {
+		String overrideTip = (String) ((MUIElement) element).getTransientData()
+				.get(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
+		return overrideTip == null ? element.getTooltip() : overrideTip;
+	}
+
+	protected Image getImageFromURI(String iconURI) {
+		if (iconURI == null || iconURI.length() == 0)
+			return null;
+
+		Image image = imageMap.get(iconURI);
+		if (image == null) {
+			image = resUtils.imageDescriptorFromURI(URI.createURI(iconURI))
+					.createImage();
+			imageMap.put(iconURI, image);
 		}
-		return null;
+		return image;
+	}
+
+	public Image getImage(MUILabel element) {
+		Image image = (Image) ((MUIElement) element).getTransientData().get(
+				IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY);
+		if (image == null || image.isDisposed()) {
+			String iconURI = element.getIconURI();
+			image = getImageFromURI(iconURI);
+		}
+
+		if (image != null) {
+			image = adornImage((MUIElement) element, image);
+		}
+
+		return image;
+	}
+
+	/**
+	 * @param element
+	 * @param image
+	 * @return
+	 */
+	private Image adornImage(MUIElement element, Image image) {
+		// Remove and dispose any previous adorned image
+		Image previouslyAdornedImage = (Image) element.getTransientData().get(
+				"previouslyAdorned"); //$NON-NLS-1$
+		if (previouslyAdornedImage != null
+				&& !previouslyAdornedImage.isDisposed())
+			previouslyAdornedImage.dispose();
+		element.getTransientData().remove(IPresentationEngine.ADORNMENT_PIN);
+
+		Image adornedImage = image;
+		if (element.getTags().contains(IPresentationEngine.ADORNMENT_PIN)) {
+			adornedImage = resUtils.adornImage(image, pinImage);
+			if (adornedImage != image)
+				element.getTransientData().put(
+						"previouslyAdorned", adornedImage); //$NON-NLS-1$
+		}
+
+		return adornedImage;
 	}
 
 	/**
@@ -251,6 +309,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
+
+		resUtils = (ISWTResourceUtilities) context.get(IResourceUtilities.class
+				.getName());
+		pinImage = getImageFromURI(pinURI);
+
 		Display.getCurrent().disposeExec(new Runnable() {
 			public void run() {
 				for (Image image : imageMap.values()) {
