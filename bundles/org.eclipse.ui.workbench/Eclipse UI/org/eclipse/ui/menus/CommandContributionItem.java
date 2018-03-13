@@ -164,6 +164,8 @@ public class CommandContributionItem extends ContributionItem {
 	// items contributed
 	private String contributedLabel;
 
+	private String contributedTooltip;
+
 	private ImageDescriptor contributedIcon;
 
 	private ImageDescriptor contributedDisabledIcon;
@@ -187,6 +189,7 @@ public class CommandContributionItem extends ContributionItem {
 		contributedIcon = contributionParameters.icon;
 		contributedDisabledIcon = contributionParameters.disabledIcon;
 		contributedHoverIcon = contributionParameters.hoverIcon;
+		contributedTooltip = contributionParameters.tooltip;
 		this.serviceLocator = contributionParameters.serviceLocator;
 
 
@@ -335,6 +338,7 @@ public class CommandContributionItem extends ContributionItem {
 						icon = contributedIcon;
 						disabledIcon = contributedDisabledIcon;
 						hoverIcon = contributedHoverIcon;
+						tooltip = contributedTooltip;
 					}
 				}
 				if (commandEvent.getCommand().isDefined()) {
