@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,7 +116,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /*
      * Extends this method to update check box states.
      */
-    protected void doUpdateItem(Item item, Object element) {
+    @Override
+	protected void doUpdateItem(Item item, Object element) {
     	super.doUpdateItem(item, element);
     	if(!item.isDisposed() && checkStateProvider != null) {
 			setChecked(element, checkStateProvider.isChecked(element));
@@ -267,7 +268,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on StructuredViewer.
      */
-    protected void handleDoubleSelect(SelectionEvent event) {
+    @Override
+	protected void handleDoubleSelect(SelectionEvent event) {
 
         if (lastClickedItem != null) {
             TreeItem item = lastClickedItem;
@@ -287,7 +289,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on StructuredViewer.
      */
-    protected void handleSelect(SelectionEvent event) {
+    @Override
+	protected void handleSelect(SelectionEvent event) {
 
         lastClickedItem = null;
         if (event.detail == SWT.CHECK) {
@@ -393,7 +396,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on Viewer.
      */
-    protected void preservingSelection(Runnable updateCode) {
+    @Override
+	protected void preservingSelection(Runnable updateCode) {
     	if (!getPreserveSelection()) {
     		return;
     	}
@@ -643,6 +647,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
 	}
 	
+	@Override
 	boolean optionallyPruneChildren(Item item, Object element) {
 		return false;
 	}
