@@ -141,18 +141,15 @@ public class ConfigureColumns {
 			this.moveableColumnsFound = createColumnObjects();
 		}
 
-		@Override
 		protected boolean isResizable() {
 			return true;
 		}
 
-		@Override
 		public void create() {
 			super.create();
 			getShell().setText(JFaceResources.getString("ConfigureColumnsDialog_Title")); //$NON-NLS-1$
 		}
 
-		@Override
 		protected void initializeBounds() {
 			super.initializeBounds();
 			table.setSelection(0);
@@ -232,7 +229,6 @@ public class ConfigureColumns {
 			return false;
 		}
 
-		@Override
 		protected Control createDialogArea(Composite parent) {
 			Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -397,7 +393,6 @@ public class ConfigureColumns {
 			}
 		}
 
-		@Override
 		protected void okPressed() {
 			int[] columnOrder = new int[columnObjects.length];
 			for (int i = 0; i < columnObjects.length; i++) {

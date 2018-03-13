@@ -773,10 +773,6 @@ public class CTabRendering extends CTabFolderRenderer {
 	}
 
 	void createShadow(final Display display) {
-		if (shadowImage != null) {
-			shadowImage.dispose();
-			shadowImage = null;
-		}
 		ImageData data = new ImageData(60, 60, 32, new PaletteData(0xFF0000,
 				0xFF00, 0xFF));
 		Image tmpImage = shadowImage = new Image(display, data);

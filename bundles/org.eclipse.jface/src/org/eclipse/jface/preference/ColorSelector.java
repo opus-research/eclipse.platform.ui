@@ -75,8 +75,7 @@ public class ColorSelector extends EventManager {
         gc.dispose();
         fButton.setImage(fImage);
         fButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
+            public void widgetSelected(SelectionEvent event) {
                 open();
             }
         });
@@ -98,8 +97,7 @@ public class ColorSelector extends EventManager {
              * 
              * @see org.eclipse.swt.accessibility.AccessibleAdapter#getName(org.eclipse.swt.accessibility.AccessibleEvent)
              */
-            @Override
-			public void getName(AccessibleEvent e) {
+            public void getName(AccessibleEvent e) {
                 e.result = JFaceResources.getString("ColorSelector.Name"); //$NON-NLS-1$
             }
         });

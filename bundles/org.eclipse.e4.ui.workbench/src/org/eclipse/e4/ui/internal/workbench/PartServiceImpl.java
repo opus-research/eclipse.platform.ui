@@ -155,7 +155,15 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			activate(p, true, true);
+			MPart lastActivePart = activePart;
+			activePart = p;
+
+			// no need to do anything if we have no listeners
+			if (constructed && !listeners.isEmpty()) {
+				if (lastActivePart != null && lastActivePart != activePart) {
+					firePartDeactivated(lastActivePart);
+				}
+			}
 		}
 	}
 
@@ -540,14 +548,6 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void activate(MPart part, boolean requiresFocus, boolean activateBranch) {
-		if (part == null) {
-			if (constructed && activePart != null) {
-				firePartDeactivated(activePart);
-			}
-			activePart = part;
-			return;
-		}
-
 		// only activate parts that is under our control
 		if (!isInContainer(part)) {
 			return;
@@ -566,14 +566,6 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
-
-		MPart lastActivePart = activePart;
-		activePart = part;
-
-		if (constructed && lastActivePart != null && lastActivePart != activePart) {
-			firePartDeactivated(lastActivePart);
-		}
-
 		try {
 			// record any sibling into the activation history if necessary, this will allow it to be
 			// reselected again in the future as it will be an activation candidate in the future,

@@ -156,8 +156,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * 
      * @see org.eclipse.jface.action.IContributionItem#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // Dispose of the ToolBar and all its contributions
         if (toolBarManager != null) {
             toolBarManager.dispose();
@@ -183,8 +182,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
      *      int)
      */
-    @Override
-	public void fill(CoolBar coolBar, int index) {
+    public void fill(CoolBar coolBar, int index) {
         if (checkDisposed()) {
             return;
         }
@@ -233,8 +231,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
                 // Chevron Support
                 coolItem.addSelectionListener(new SelectionAdapter() {
 
-                    @Override
-					public void widgetSelected(SelectionEvent event) {
+                    public void widgetSelected(SelectionEvent event) {
                         if (event.detail == SWT.ARROW) {
                             handleChevron(event);
                         }
@@ -446,8 +443,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      *         other than group marks and separators, and the internal state is
      *         set to be visible.
      */
-    @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         if (checkDisposed()) {
             return false;
         }
@@ -473,8 +469,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * 
      * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
      */
-    @Override
-	public void saveWidgetState() {
+    public void saveWidgetState() {
         if (checkDisposed()) {
             return;
         }
@@ -585,8 +580,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * 
      * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
      */
-    @Override
-	public void update(String propertyName) {
+    public void update(String propertyName) {
         if (checkDisposed()) {
             return;
         }

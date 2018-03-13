@@ -215,13 +215,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		super();
 	}
 
-	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		initializeVirtualManager(getControl().getStyle());
 	}
 	
-	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
 		virtualManager = null;
@@ -323,7 +321,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindInputItem(java.lang.Object)
 	 */
-	@Override
 	protected Widget doFindInputItem(Object element) {
 		if (equals(element, getRoot())) {
 			return getControl();
@@ -336,7 +333,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doFindItem(java.lang.Object)
 	 */
-	@Override
 	protected Widget doFindItem(Object element) {
 
 		Item[] children = doGetItems();
@@ -357,7 +353,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#doUpdateItem(org.eclipse.swt.widgets.Widget,
 	 *      java.lang.Object, boolean)
 	 */
-	@Override
 	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
 		boolean oldBusy = isBusy();
 		setBusy(true);
@@ -427,7 +422,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.ColumnViewer#getColumnViewerOwner(int)
 	 */
-	@Override
 	protected Widget getColumnViewerOwner(int columnIndex) {
 		int columnCount = doGetColumnCount();
 
@@ -474,7 +468,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * then it provides only the label text and image for the first column, and
 	 * any remaining columns are blank.
 	 */
-	@Override
 	public IBaseLabelProvider getLabelProvider() {
 		return super.getLabelProvider();
 	}
@@ -484,7 +477,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getSelectionFromWidget()
 	 */
-	@Override
 	protected List getSelectionFromWidget() {
 		if (virtualManager != null) {
 			return getVirtualSelection();
@@ -593,7 +585,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.Viewer#inputChanged(java.lang.Object,
 	 *      java.lang.Object)
 	 */
-	@Override
 	protected void inputChanged(Object input, Object oldInput) {
 		getControl().setRedraw(false);
 		try {
@@ -642,7 +633,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object)
 	 */
-	@Override
 	protected void internalRefresh(Object element) {
 		internalRefresh(element, true);
 	}
@@ -653,7 +643,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#internalRefresh(java.lang.Object,
 	 *      boolean)
 	 */
-	@Override
 	protected void internalRefresh(Object element, boolean updateLabels) {
 		applyEditorValue();
 		if (element == null || equals(element, getRoot())) {
@@ -873,7 +862,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#reveal(java.lang.Object)
 	 */
-	@Override
 	public void reveal(Object element) {
 		Assert.isNotNull(element);
 		Widget w = findItem(element);
@@ -888,7 +876,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * @see org.eclipse.jface.viewers.StructuredViewer#setSelectionToWidget(java.util.List,
 	 *      boolean)
 	 */
-	@Override
 	protected void setSelectionToWidget(List list, boolean reveal) {
 		if (list == null) {
 			doDeselectAll();
@@ -1096,7 +1083,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#getRawChildren(java.lang.Object)
 	 */
-	@Override
 	protected Object[] getRawChildren(Object parent) {
 
 		Assert.isTrue(!(getContentProvider() instanceof ILazyContentProvider),
@@ -1110,7 +1096,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 *
 	 * @see org.eclipse.jface.viewers.StructuredViewer#assertContentProviderType(org.eclipse.jface.viewers.IContentProvider)
 	 */
-	@Override
 	protected void assertContentProviderType(IContentProvider provider) {
 		Assert.isTrue(provider instanceof IStructuredContentProvider
 				|| provider instanceof ILazyContentProvider);
