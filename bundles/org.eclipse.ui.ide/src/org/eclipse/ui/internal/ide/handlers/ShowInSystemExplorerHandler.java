@@ -26,13 +26,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.ide.IDEInternalPreferences;
-import org.eclipse.ui.internal.ide.IDEPreferenceInitializer;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -61,7 +56,16 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ILog log = IDEWorkbenchPlugin.getDefault().getLog();
 
-		IResource item = getResource(event);
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if ((selection == null) || (selection.isEmpty())
+				|| (!(selection instanceof IStructuredSelection))) {
+			return null;
+		}
+
+		Object selectedObject = ((IStructuredSelection) selection)
+				.getFirstElement();
+		IResource item = (IResource) org.eclipse.ui.internal.util.Util
+				.getAdapter(selectedObject, IResource.class);
 		if (item == null) {
 			return null;
 		}
@@ -126,40 +130,6 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		return null;
 	}
 
-	private IResource getResource(ExecutionEvent event) {
-		IResource resource = getSelectionResource(event);
-		if (resource==null) {
-			resource = getEditorInputResource(event);
-		}
-		return resource;
-	}
-	
-	private IResource getSelectionResource(ExecutionEvent event) {
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if ((selection == null) || (selection.isEmpty())
-				|| (!(selection instanceof IStructuredSelection))) {
-			return null;
-		}
-
-		Object selectedObject = ((IStructuredSelection) selection)
-				.getFirstElement();
-		IResource item = (IResource) org.eclipse.ui.internal.util.Util
-				.getAdapter(selectedObject, IResource.class);
-		return item;
-	}
-
-	private IResource getEditorInputResource(ExecutionEvent event) {
-		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		if (!(activePart instanceof IEditorPart)) {
-			return null;
-		}
-		IEditorInput input = ((IEditorPart)activePart).getEditorInput();
-		if (input instanceof IFileEditorInput) {
-			return ((IFileEditorInput)input).getFile();
-		}
-		return (IResource) input.getAdapter(IResource.class);
-	}
-
 	/**
 	 * Prepare command for launching system explorer to show a path
 	 * 
@@ -211,11 +181,19 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * The default command for launching the system explorer on this platform.
 	 * 
-	 * @return The default command which launches the system explorer on this system, or an empty
-	 *         string if no default exists
+	 * @return The default command which launches the system explorer on this
+	 *         system, or an empty string if no default exists.
 	 */
 	public static String getDefaultCommand() {
-		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer 
-		return IDEPreferenceInitializer.getShowInSystemExplorerCommand();
+		if (Util.isGtk()) {
+			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"${selected_resource_uri}\" string:\"\""; //$NON-NLS-1$
+		} else if (Util.isWindows()) {
+			return "explorer /E,/select=${selected_resource_loc}"; //$NON-NLS-1$
+		} else if (Util.isMac()) {
+			return "open -R \"${selected_resource_loc}\""; //$NON-NLS-1$
+		}
+
+		// if all else fails, return empty default
+		return ""; //$NON-NLS-1$
 	}
 }

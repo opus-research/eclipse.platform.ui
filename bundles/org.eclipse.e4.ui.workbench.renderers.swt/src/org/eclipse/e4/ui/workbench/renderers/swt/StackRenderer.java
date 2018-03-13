@@ -31,7 +31,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -109,11 +108,6 @@ public class StackRenderer extends LazyStackRenderer {
 	 * tabs using the keyboard.
 	 */
 	private static final String INHIBIT_FOCUS = "InhibitFocus"; //$NON-NLS-1$
-
-	/**
-	 * Add this tag to render the part stack below the (active) part.
-	 */
-	private static final String STACK_BOTTOM = "StackBottom"; //$NON-NLS-1$
 
 	// Minimum characters in for stacks outside the shared area
 	private static int MIN_VIEW_CHARS = 1;
@@ -378,11 +372,6 @@ public class StackRenderer extends LazyStackRenderer {
 						&& newActivePart.getCurSharedRef() != null)
 					partParent = newActivePart.getCurSharedRef().getParent();
 
-				// Skip sash containers
-				while (partParent != null
-						&& partParent instanceof MPartSashContainer)
-					partParent = partParent.getParent();
-
 				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
 						: null);
 
@@ -466,8 +455,7 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	private String getToolTip(String newToolTip) {
-		return newToolTip == null ? null : LegacyActionTools
-				.escapeMnemonics(newToolTip);
+		return newToolTip == null ? null : LegacyActionTools.escapeMnemonics(newToolTip);
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -484,9 +472,7 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		// TBD: need to define attributes to handle this
-		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER
-				| (element.getTags().contains(STACK_BOTTOM) ? SWT.BOTTOM
-						: SWT.NONE));
+		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER);
 		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
