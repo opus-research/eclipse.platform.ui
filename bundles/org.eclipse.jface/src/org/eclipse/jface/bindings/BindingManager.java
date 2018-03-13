@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2045,7 +2045,13 @@ public final class BindingManager extends HandleObjectManager implements
 			if (!currentContext.equals(bestContext)) {
 				boolean goToNextBinding = false;
 
-				// Ascend the current's context tree.
+				/* 
+				 * Ascend the current's context tree.
+				 * 
+				 * Handles the case when we have:
+				 *   currentContext -> bestContext (context id -> parent context id)
+				 *   bestContext -> More general context
+				 */
 				String contextPointer = currentContext;
 				while (contextPointer != null) {
 					if (contextPointer.equals(bestContext)) {
@@ -2059,7 +2065,13 @@ public final class BindingManager extends HandleObjectManager implements
 							.get(contextPointer);
 				}
 
-				// Ascend the best match's context tree.
+				/* 
+				 * Ascend the best match's context tree.
+				 * 
+				 * Handles the case when we have:
+				 *   bestContext -> currentContext (context id -> parent context id)
+				 *   currentContext -> More general context
+				 */
 				contextPointer = bestContext;
 				while (contextPointer != null) {
 					if (contextPointer.equals(currentContext)) {
@@ -2069,6 +2081,45 @@ public final class BindingManager extends HandleObjectManager implements
 					}
 					contextPointer = (String) activeContextTree
 							.get(contextPointer);
+				}
+				
+				/* 
+				 * Compare context path length to the common ancestor. The context with the longer path wins that is the more specific one
+				 * 
+				 * Handles the cases like below:
+				 *   bestContext -> More general context -> Common ancestor (context id -> parent context id -> ancestor context id)
+				 *   currentContext -> Common ancestor
+				 *   
+				 *   see also the bug 387951
+				 */
+				if (!goToNextBinding) {
+					contextPointer = currentContext;
+					String contextPointer2 = bestContext;
+					String lastContextPointer = contextPointer, lastContextPointer2 = contextPointer2;
+					int currentContextLength = 0, bestContextLength = 0;
+					
+					while (contextPointer != null || contextPointer2 != null) {
+						contextPointer = (String) activeContextTree.get(contextPointer);
+						if (contextPointer != null) {
+							lastContextPointer = contextPointer;
+							currentContextLength++;
+						}
+						contextPointer2 = (String) activeContextTree.get(contextPointer2);
+						if (contextPointer2 != null) {
+							lastContextPointer2 = contextPointer2;
+							bestContextLength++;
+						}						
+					}
+					
+					if (lastContextPointer.equals(lastContextPointer2)) {
+						if (currentContextLength > bestContextLength) {
+							bestMatch = current;
+							conflict = false;
+							goToNextBinding = true;
+						} else if (bestContextLength > currentContextLength) {
+							goToNextBinding = true;
+						}
+					}					
 				}
 
 				if (goToNextBinding) {
