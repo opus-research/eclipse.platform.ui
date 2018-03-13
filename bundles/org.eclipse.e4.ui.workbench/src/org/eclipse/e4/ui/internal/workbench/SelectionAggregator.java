@@ -97,10 +97,7 @@ public class SelectionAggregator {
 
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) final MPart part) {
-		if (part == null) {
-			activePart = null;
-			context.set(IServiceConstants.ACTIVE_SELECTION, null);
-		} else if (activePart != part) {
+		if ((part != null) && (activePart != part)) {
 			activePart = part;
 			IEclipseContext partContext = part.getContext();
 			if (partContext.containsKey(OUT_POST_SELECTION)) {
