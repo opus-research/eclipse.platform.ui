@@ -14,11 +14,13 @@ package org.eclipse.jface.viewers;
 /**
  * An interface to content providers for tree-structure-oriented viewers that
  * provides content based on the path of elements in the tree viewer.
- * 
+ * @param <E> Type of an element of the model
+ * @param <I> Type of the input
+ *
  * @see AbstractTreeViewer
  * @since 3.2
  */
-public interface ITreePathContentProvider extends IStructuredContentProvider {
+public interface ITreePathContentProvider<E,I> extends IStructuredContentProvider<E,I> {
 
 	/**
 	 * {@inheritDoc}
@@ -29,7 +31,7 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * <a href="https://bugs.eclipse.org/9262">bug 9262</a>).
 	 * </p>
 	 */
-	public Object[] getElements(Object inputElement);
+	public E[] getElements(I inputElement);
 
 	/**
 	 * Returns the child elements of the last element in the given path.
@@ -41,12 +43,12 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * {@link IStructuredContentProvider#getElements(Object)}.
 	 * </p>
 	 * The result is not modified by the viewer.
-	 * 
+	 *
 	 * @param parentPath
 	 *            the path of the parent element
 	 * @return an array of child elements
 	 */
-	public Object[] getChildren(TreePath parentPath);
+	public E[] getChildren(TreePath<E> parentPath);
 
 	/**
 	 * Returns whether the last element of the given path has children.
@@ -55,23 +57,23 @@ public interface ITreePathContentProvider extends IStructuredContentProvider {
 	 * children. Clients may be able to implement this more efficiently than
 	 * <code>getChildren</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param path
 	 *            the path
 	 * @return <code>true</code> if the lat element of the path has children,
 	 *         and <code>false</code> if it has no children
 	 */
-	public boolean hasChildren(TreePath path);
+	public boolean hasChildren(TreePath<E> path);
 
 	/**
 	 * Return the possible parent paths for the given element. An empty array
-	 * can be returned if the paths cannot be computed. If the element is 
+	 * can be returned if the paths cannot be computed. If the element is
 	 * a potential child of the input of the viewer, an empty tree path
 	 * should be an entry in the returned array.
-	 * 
+	 *
 	 * @param element
 	 *            the element
 	 * @return the possible parent paths for the given element
 	 */
-	public TreePath[] getParents(Object element);
+	public TreePath<E>[] getParents(E element);
 }

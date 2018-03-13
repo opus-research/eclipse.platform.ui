@@ -27,11 +27,12 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * TreeViewerRow is the Tree implementation of ViewerRow.
+ * @param <E> Type of an element of the model
  *
  * @since 3.3
  *
  */
-public class TreeViewerRow extends ViewerRow {
+public class TreeViewerRow<E> extends ViewerRow<E> {
 	private TreeItem item;
 
 	/**
@@ -201,7 +202,7 @@ public class TreeViewerRow extends ViewerRow {
 	}
 
 	@Override
-	public ViewerRow getNeighbor(int direction, boolean sameLevel) {
+	public ViewerRow<E> getNeighbor(int direction, boolean sameLevel) {
 		if (direction == ViewerRow.ABOVE) {
 			return getRowAbove(sameLevel);
 		} else if (direction == ViewerRow.BELOW) {
@@ -212,7 +213,7 @@ public class TreeViewerRow extends ViewerRow {
 		}
 	}
 
-	private ViewerRow getRowBelow(boolean sameLevel) {
+	private ViewerRow<E> getRowBelow(boolean sameLevel) {
 		Tree tree = item.getParent();
 
 		// This means we have top-level item
@@ -221,10 +222,10 @@ public class TreeViewerRow extends ViewerRow {
 				int index = tree.indexOf(item) + 1;
 
 				if (index < tree.getItemCount()) {
-					return new TreeViewerRow(tree.getItem(index));
+					return new TreeViewerRow<E>(tree.getItem(index));
 				}
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow(item.getItem(0));
+				return new TreeViewerRow<E>(item.getItem(0));
 			}
 		} else {
 			if (sameLevel || !item.getExpanded()) {
@@ -243,18 +244,18 @@ public class TreeViewerRow extends ViewerRow {
 				}
 
 				if (itemAfter != null) {
-					return new TreeViewerRow(itemAfter);
+					return new TreeViewerRow<E>(itemAfter);
 				}
 
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow(item.getItem(0));
+				return new TreeViewerRow<E>(item.getItem(0));
 			}
 		}
 
 		return null;
 	}
 
-	private ViewerRow getRowAbove(boolean sameLevel) {
+	private ViewerRow<E> getRowAbove(boolean sameLevel) {
 		Tree tree = item.getParent();
 
 		// This means we have top-level item
@@ -268,10 +269,10 @@ public class TreeViewerRow extends ViewerRow {
 
 			if (nextTopItem != null) {
 				if (sameLevel) {
-					return new TreeViewerRow(nextTopItem);
+					return new TreeViewerRow<E>(nextTopItem);
 				}
 
-				return new TreeViewerRow(findLastVisibleItem(nextTopItem));
+				return new TreeViewerRow<E>(findLastVisibleItem(nextTopItem));
 			}
 		} else {
 			TreeItem parentItem = item.getParentItem();
@@ -290,7 +291,7 @@ public class TreeViewerRow extends ViewerRow {
 			}
 
 			if (itemBefore != null) {
-				return new TreeViewerRow(itemBefore);
+				return new TreeViewerRow<E>(itemBefore);
 			}
 		}
 
@@ -343,15 +344,15 @@ public class TreeViewerRow extends ViewerRow {
 	@Override
 	public TreePath getTreePath() {
 		TreeItem tItem = item;
-		LinkedList segments = new LinkedList();
+		LinkedList<E> segments = new LinkedList<E>();
 		while (tItem != null) {
-			Object segment = tItem.getData();
+			E segment = (E) tItem.getData();
 			Assert.isNotNull(segment);
 			segments.addFirst(segment);
 			tItem = tItem.getParentItem();
 		}
 
-		return new TreePath(segments.toArray());
+		return new TreePath<E>((E[]) segments.toArray());
 	}
 
 	void setItem(TreeItem item) {
@@ -360,12 +361,12 @@ public class TreeViewerRow extends ViewerRow {
 
 	@Override
 	public Object clone() {
-		return new TreeViewerRow(item);
+		return new TreeViewerRow<E>(item);
 	}
 
 	@Override
-	public Object getElement() {
-		return item.getData();
+	public E getElement() {
+		return (E) item.getData();
 	}
 
 	@Override
@@ -396,15 +397,15 @@ public class TreeViewerRow extends ViewerRow {
 	public Rectangle getTextBounds(int index) {
 		return item.getTextBounds(index);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ViewerRow#getImageBounds(int)
 	 */
 	@Override
 	public Rectangle getImageBounds(int index) {
 		return item.getImageBounds(index);
-	}	
-	
+	}
+
 	private boolean hasColumns() {
 		return this.item.getParent().getColumnCount() != 0;
 	}
@@ -417,12 +418,12 @@ public class TreeViewerRow extends ViewerRow {
 	int getWidth(int columnIndex) {
 		return item.getParent().getColumn(columnIndex).getWidth();
 	}
-	
+
 	@Override
 	protected boolean scrollCellIntoView(int columnIndex) {
 		item.getParent().showItem(item);
 		if( hasColumns() ) {
-			item.getParent().showColumn(item.getParent().getColumn(columnIndex));	
+			item.getParent().showColumn(item.getParent().getColumn(columnIndex));
 		}
 		return true;
 	}
