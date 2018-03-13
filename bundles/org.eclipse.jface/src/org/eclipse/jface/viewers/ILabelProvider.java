@@ -16,8 +16,9 @@ import org.eclipse.swt.graphics.Image;
  * Extends <code>IBaseLabelProvider</code> with the methods
  * to provide the text and/or image for the label of a given element. 
  * Used by most structured viewers, except table viewers.
+ * @param <E> Type of an element of the model
  */
-public interface ILabelProvider extends IBaseLabelProvider {
+public interface ILabelProvider<E> extends IBaseLabelProvider<E> {
     /**
      * Returns the image for the label of the given element.  The image
      * is owned by the label provider and must not be disposed directly.
@@ -27,7 +28,7 @@ public interface ILabelProvider extends IBaseLabelProvider {
      * @return the image used to label the element, or <code>null</code>
      *   if there is no image for the given object
      */
-    public Image getImage(Object element);
+    public Image getImage(E element);
 
     /**
      * Returns the text for the label of the given element.
@@ -36,5 +37,5 @@ public interface ILabelProvider extends IBaseLabelProvider {
      * @return the text string used to label the element, or <code>null</code>
      *   if there is no text label for the given object
      */
-    public String getText(Object element);
+    public String getText(E element);
 }

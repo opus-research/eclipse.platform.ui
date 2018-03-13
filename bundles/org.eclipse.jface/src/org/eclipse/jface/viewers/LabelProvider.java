@@ -26,8 +26,9 @@ import org.eclipse.swt.graphics.Image;
  * <li><code>dispose</code></li>
  * </ul>
  * </p>
+ * @param <E> Type of an element of the model
  */
-public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
+public class LabelProvider<E> extends BaseLabelProvider<E> implements ILabelProvider<E> {
 
 	/**
 	 * Creates a new label provider.
@@ -41,7 +42,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * <code>ILabelProvider</code> method returns <code>null</code>.
 	 * Subclasses may override.
 	 */
-	public Image getImage(Object element) {
+	public Image getImage(E element) {
 		return null;
 	}
 
@@ -50,7 +51,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * <code>ILabelProvider</code> method returns the element's
 	 * <code>toString</code> string. Subclasses may override.
 	 */
-	public String getText(Object element) {
+	public String getText(E element) {
 		return element == null ? "" : element.toString();//$NON-NLS-1$
 	}
 }
