@@ -159,7 +159,7 @@ public class PluginActionContributionItem extends ActionContributionItem
      * 
      * @since 3.1
      */
-	protected void invalidateParent() {
+    private void invalidateParent() {
         IContributionManager parent = getParent();
         if (parent != null) {
 			parent.markDirty();
