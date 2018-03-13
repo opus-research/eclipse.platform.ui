@@ -826,6 +826,28 @@ public class FontRegistry extends ResourceRegistry {
 			oldFont.addAllocatedFontsToStale(defaultFontRecord().getBaseFont());
 		}
     }
+    
+    /**
+     * Remove a font by symbolicName from font registry
+     *
+     * @param symbolicName the symbolic font name
+     * @since 3.10
+     */
+    public void remove(String symbolicName) {
+    	Assert.isNotNull(symbolicName);
+    	
+        FontData[] existing = stringToFontData.remove(symbolicName);
+        if (existing == null) {
+        	return;
+ 		}
+
+ 		fireMappingChanged(symbolicName, existing, null);
+
+        FontRecord oldFont = stringToFontRecord.remove(symbolicName);
+        if (oldFont != null) {
+ 			oldFont.addAllocatedFontsToStale(defaultFontRecord().getBaseFont());
+ 		}
+    }
 
     /**
      * Reads the resource bundle.  This puts FontData[] objects

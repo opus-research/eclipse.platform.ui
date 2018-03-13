@@ -447,10 +447,6 @@ public class ThemeEngine implements IThemeEngine {
 					e.printStackTrace();
 				}
 			}
-
-			for (CSSEngine engine : cssEngines) {
-				engine.reapply();
-			}
 		}
 
 		if (restore) {
@@ -464,6 +460,10 @@ public class ThemeEngine implements IThemeEngine {
 			}
 		}
 		sendThemeChangeEvent(restore);
+
+		for (CSSEngine engine : cssEngines) {
+			engine.reapply();
+		}
 	}
 
 	@SuppressWarnings("restriction")
