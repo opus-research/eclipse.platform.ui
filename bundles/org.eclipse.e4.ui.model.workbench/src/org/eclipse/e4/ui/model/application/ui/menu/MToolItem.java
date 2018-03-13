@@ -33,7 +33,6 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  *
  * @model abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MToolItem extends MItem, MToolBarElement {
 

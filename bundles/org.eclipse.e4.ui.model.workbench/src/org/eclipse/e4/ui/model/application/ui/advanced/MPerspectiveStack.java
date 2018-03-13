@@ -29,9 +29,9 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
  * </p>
  * <!-- end-model-doc -->
  *
+ *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MPerspectiveStack extends MUIElement, MGenericStack<MPerspective>, MPartSashContainerElement, MWindowElement {
 } // MPerspectiveStack

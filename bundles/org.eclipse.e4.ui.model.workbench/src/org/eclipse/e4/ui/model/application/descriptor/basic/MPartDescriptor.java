@@ -48,7 +48,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandlerContainer, MBindings {
 	/**

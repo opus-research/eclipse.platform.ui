@@ -29,7 +29,6 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MPopupMenu extends MMenu, MContext {
 } // MPopupMenu

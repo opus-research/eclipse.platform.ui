@@ -39,7 +39,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MCommand extends MApplicationElement {
 	/**

@@ -35,7 +35,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MTrimContribution extends MElementContainer<MTrimElement> {
 
