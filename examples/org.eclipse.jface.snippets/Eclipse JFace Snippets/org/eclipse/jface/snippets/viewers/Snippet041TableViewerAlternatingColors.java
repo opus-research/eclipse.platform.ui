@@ -11,6 +11,9 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -36,15 +39,16 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class Snippet041TableViewerAlternatingColors {
 
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 		
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[]) inputElement;
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
 		/*
@@ -62,7 +66,7 @@ public class Snippet041TableViewerAlternatingColors {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 		}
 
 	}
@@ -114,19 +118,19 @@ public class Snippet041TableViewerAlternatingColors {
 	}
 	
 	public Snippet041TableViewerAlternatingColors(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.BORDER
 				| SWT.FULL_SELECTION|SWT.VIRTUAL);
 		v.setContentProvider(new MyContentProvider());
 
 		final OptimizedIndexSearcher searcher = new OptimizedIndexSearcher();
 		
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		TableViewerColumn<MyModel,List<MyModel>> column = new TableViewerColumn<MyModel,List<MyModel>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Column 1");
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<MyModel,List<MyModel>>() {
 			boolean even = true;
 			
-			public Color getBackground(Object element) {
+			public Color getBackground(MyModel element) {
 				if( even ) {
 					return null;
 				} else {
@@ -134,19 +138,19 @@ public class Snippet041TableViewerAlternatingColors {
 				}
 			}
 			
-			public void update(ViewerCell cell) {
+			public void update(ViewerCell<MyModel> cell) {
 				even = searcher.isEven((TableItem)cell.getItem());
 				super.update(cell);
 			}
 		});
 
-		column = new TableViewerColumn(v, SWT.NONE);
+		column = new TableViewerColumn<MyModel,List<MyModel>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Column 2");
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<MyModel,List<MyModel>>() {
 			boolean even = true;
 
-			public Color getBackground(Object element) {
+			public Color getBackground(MyModel element) {
 				if( even ) {
 					return null;
 				} else {
@@ -154,23 +158,23 @@ public class Snippet041TableViewerAlternatingColors {
 				}
 			}
 			
-			public void update(ViewerCell cell) {
+			public void update(ViewerCell<MyModel> cell) {
 				even = searcher.isEven((TableItem)cell.getItem());
 				super.update(cell);
 			}
 			
 		});
 
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 		
-		final ViewerFilter filter = new ViewerFilter() {
+		final ViewerFilter<MyModel,List<MyModel>> filter = new ViewerFilter<MyModel,List<MyModel>>() {
 
-			public boolean select(Viewer viewer, Object parentElement,
-					Object element) {
-				return ((MyModel)element).counter % 2 == 0;
+			public boolean select(Viewer<List<MyModel>> viewer, Object parentElement,
+					MyModel element) {
+				return element.counter % 2 == 0;
 			}
 			
 		};
@@ -181,7 +185,7 @@ public class Snippet041TableViewerAlternatingColors {
 			
 			public void widgetSelected(SelectionEvent e) {
 				if( b ) {
-					v.setFilters(new ViewerFilter[] {filter});
+					v.addFilter(filter);
 					b = false;
 				} else {
 					v.setFilters(new ViewerFilter[0]);
@@ -192,11 +196,11 @@ public class Snippet041TableViewerAlternatingColors {
 		});
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[100000];
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>(100000);
 
 		for (int i = 0; i < 100000; i++) {
-			elements[i] = new MyModel(i);
+			elements.add(i,new MyModel(i));
 		}
 
 		return elements;

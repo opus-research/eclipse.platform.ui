@@ -37,15 +37,17 @@ import org.eclipse.swt.widgets.TreeItem;
  * 
  */
 public class Snippet038TreeViewerInlinelEditingOldAPI {
-	private class MyContentProvider implements ITreeContentProvider {
+	private class MyContentProvider implements ITreeContentProvider<MyModel,MyModel> {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			return ((MyModel) inputElement).child.toArray();
+		public MyModel[] getElements(MyModel inputElement) {
+			
+			MyModel[] myModels = new MyModel[inputElement.child.size()];
+			return inputElement.child.toArray(myModels);
 		}
 
 		/*
@@ -63,7 +65,7 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends MyModel> viewer, MyModel oldInput, MyModel newInput) {
 
 		}
 
@@ -72,7 +74,7 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 		 * 
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 		 */
-		public Object[] getChildren(Object parentElement) {
+		public MyModel[] getChildren(MyModel parentElement) {
 			return getElements(parentElement);
 		}
 
@@ -81,12 +83,12 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 		 * 
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		public Object getParent(Object element) {
+		public MyModel getParent(MyModel element) {
 			if (element == null) {
 				return null;
 			}
 
-			return ((MyModel) element).parent;
+			return element.parent;
 		}
 
 		/*
@@ -94,8 +96,8 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 		 * 
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 		 */
-		public boolean hasChildren(Object element) {
-			return ((MyModel) element).child.size() > 0;
+		public boolean hasChildren(MyModel element) {
+			return element.child.size() > 0;
 		}
 
 	}
@@ -103,7 +105,7 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 	public class MyModel {
 		public MyModel parent;
 
-		public ArrayList child = new ArrayList();
+		public ArrayList<MyModel> child = new ArrayList<MyModel>();
 
 		public int counter;
 
@@ -124,21 +126,21 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
+	public class MyLabelProvider extends LabelProvider<MyModel> implements
+			ITableLabelProvider<MyModel> {
 		FontRegistry registry = new FontRegistry();
 
-		public Image getColumnImage(Object element, int columnIndex) {
+		public Image getColumnImage(MyModel element, int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(Object element, int columnIndex) {
+		public String getColumnText(MyModel element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 	}
 
 	public Snippet038TreeViewerInlinelEditingOldAPI(Shell shell) {
-		final TreeViewer v = new TreeViewer(shell,SWT.FULL_SELECTION);
+		final TreeViewer<MyModel,MyModel> v = new TreeViewer<MyModel,MyModel>(shell,SWT.FULL_SELECTION);
 		
 		TreeColumn column = new TreeColumn(v.getTree(),SWT.NONE);
 		column.setWidth(200);
@@ -162,7 +164,7 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 
 			public void modify(Object element, String property, Object value) {
 				((MyModel)((TreeItem)element).getData()).counter = Integer.parseInt(value.toString());
-				v.update(((TreeItem)element).getData(), null);
+				v.update((MyModel)((TreeItem)element).getData(), null);
 			}
 			
 		});

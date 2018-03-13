@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
@@ -40,7 +43,7 @@ public class Snippet034CellEditorPerRowNewAPI {
 		
 		private CellEditor dropDownEditor;
 		
-		public MyEditingSupport(TableViewer viewer) {
+		public MyEditingSupport(TableViewer<MyModel,List<MyModel>> viewer) {
 			super(viewer);
 			textEditor = new TextCellEditor(viewer.getTable());
 			
@@ -80,15 +83,16 @@ public class Snippet034CellEditorPerRowNewAPI {
 		
 	}
 	
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[]) inputElement;
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
 		/*
@@ -106,7 +110,7 @@ public class Snippet034CellEditorPerRowNewAPI {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 
 		}
 
@@ -138,14 +142,14 @@ public class Snippet034CellEditorPerRowNewAPI {
 	public Snippet034CellEditorPerRowNewAPI(Shell shell) {
 		final Table table = new Table(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		
-		final TableViewer v = new TableViewer(table);
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(table);
 		v.getTable().setLinesVisible(true);
 		
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		TableViewerColumn<MyModel,List<MyModel>> column = new TableViewerColumn<MyModel,List<MyModel>>(v, SWT.NONE);
 		column.getColumn().setWidth(200);
-		column.setLabelProvider(new ColumnLabelProvider() {
+		column.setLabelProvider(new ColumnLabelProvider<MyModel,List<MyModel>>() {
 
-			public String getText(Object element) {
+			public String getText(MyModel element) {
 				return element.toString();
 			}
 			
@@ -155,19 +159,19 @@ public class Snippet034CellEditorPerRowNewAPI {
 		
 		v.setContentProvider(new MyContentProvider());
 		
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[20];
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>(20);
 
 		for (int i = 0; i < 10; i++) {
-			elements[i] = new MyModel(i);
+			elements.add(i,new MyModel(i));
 		}
 
 		for (int i = 0; i < 10; i++) {
-			elements[i+10] = new MyModel2(i);
+			elements.add(i+10,new MyModel2(i));
 		}
 		
 		return elements;

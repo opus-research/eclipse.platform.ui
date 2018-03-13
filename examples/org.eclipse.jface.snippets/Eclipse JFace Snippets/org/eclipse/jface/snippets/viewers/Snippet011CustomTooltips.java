@@ -34,9 +34,9 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class Snippet011CustomTooltips {
 	private static class MyContentProvider implements
-			IStructuredContentProvider {
+			IStructuredContentProvider<String,Object> {
 
-		public Object[] getElements(Object inputElement) {
+		public String[] getElements(Object inputElement) {
 			return new String[] { "one", "two", "three", "four", "five", "six",
 					"seven", "eight", "nine", "ten" };
 		}
@@ -45,7 +45,7 @@ public class Snippet011CustomTooltips {
 
 		}
 
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends Object> viewer, Object oldInput, Object newInput) {
 
 		}
 	}
@@ -58,37 +58,37 @@ public class Snippet011CustomTooltips {
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 
-		TableViewer v = new TableViewer(shell, SWT.FULL_SELECTION);
+		TableViewer<String,Object> v = new TableViewer<String,Object>(shell, SWT.FULL_SELECTION);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 		v.setContentProvider(new MyContentProvider());
 		ColumnViewerToolTipSupport.enableFor(v,ToolTip.NO_RECREATE);
 		
-		CellLabelProvider labelProvider = new CellLabelProvider() {
+		CellLabelProvider<String,Object> labelProvider = new CellLabelProvider<String,Object>() {
 
-			public String getToolTipText(Object element) {
+			public String getToolTipText(String element) {
 				return "Tooltip (" + element + ")";
 			}
 
-			public Point getToolTipShift(Object object) {
+			public Point getToolTipShift(String object) {
 				return new Point(5, 5);
 			}
 
-			public int getToolTipDisplayDelayTime(Object object) {
+			public int getToolTipDisplayDelayTime(String object) {
 				return 2000;
 			}
 
-			public int getToolTipTimeDisplayed(Object object) {
+			public int getToolTipTimeDisplayed(String object) {
 				return 5000;
 			}
 
-			public void update(ViewerCell cell) {
+			public void update(ViewerCell<String> cell) {
 				cell.setText(cell.getElement().toString());
 
 			}
 		};
 
-		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
+		TableViewerColumn<String,Object> column = new TableViewerColumn<String,Object>(v, SWT.NONE);
 		column.setLabelProvider(labelProvider);
 		column.getColumn().setText("Column 1");
 		column.getColumn().setWidth(100);

@@ -11,6 +11,9 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
@@ -26,26 +29,18 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public class Snippet008RevealElement {
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[])inputElement;
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-		 */
 		public void dispose() {
 			
 		}
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 			
 		}
 		
@@ -64,22 +59,20 @@ public class Snippet008RevealElement {
 	}
 	
 	public Snippet008RevealElement(Shell shell) {
-		final TableViewer v = new TableViewer(shell);
-		v.setLabelProvider(new LabelProvider());
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell);
+		v.setLabelProvider(new LabelProvider<MyModel>());
 		v.setContentProvider(new MyContentProvider());
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
-		v.reveal(model[99]);
+		v.reveal(model.get(99));
 	}
-	
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[100];
 		
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>(100);
 		for( int i = 0; i < 100; i++ ) {
-			elements[i] = new MyModel(i);
+			elements.add(i,new MyModel(i));
 		}
-		
 		return elements;
 	}
 	

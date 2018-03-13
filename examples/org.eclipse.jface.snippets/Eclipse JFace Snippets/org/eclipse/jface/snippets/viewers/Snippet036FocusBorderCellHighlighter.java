@@ -11,6 +11,9 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -44,15 +47,16 @@ import org.eclipse.swt.widgets.TableColumn;
  */
 public class Snippet036FocusBorderCellHighlighter {
 
-	private class MyContentProvider implements IStructuredContentProvider {
+	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
 
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public Object[] getElements(Object inputElement) {
-			return (MyModel[]) inputElement;
+		public MyModel[] getElements(List<MyModel> inputElement) {
+			MyModel[] myModels = new MyModel[inputElement.size()];
+			return inputElement.toArray(myModels);
 		}
 
 		/*
@@ -70,7 +74,7 @@ public class Snippet036FocusBorderCellHighlighter {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
 
 		}
 
@@ -90,34 +94,34 @@ public class Snippet036FocusBorderCellHighlighter {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider implements
-			ITableLabelProvider, ITableFontProvider, ITableColorProvider {
+	public class MyLabelProvider extends LabelProvider<MyModel> implements
+			ITableLabelProvider<MyModel>, ITableFontProvider<MyModel>, ITableColorProvider<MyModel> {
 		FontRegistry registry = new FontRegistry();
 
-		public Image getColumnImage(Object element, int columnIndex) {
+		public Image getColumnImage(MyModel element, int columnIndex) {
 			return null;
 		}
 
-		public String getColumnText(Object element, int columnIndex) {
+		public String getColumnText(MyModel element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
-		public Font getFont(Object element, int columnIndex) {
+		public Font getFont(MyModel element, int columnIndex) {
 			return null;
 		}
 
-		public Color getBackground(Object element, int columnIndex) {
+		public Color getBackground(MyModel element, int columnIndex) {
 			return null;
 		}
 
-		public Color getForeground(Object element, int columnIndex) {
+		public Color getForeground(MyModel element, int columnIndex) {
 			return null;
 		}
 
 	}
 
 	public Snippet036FocusBorderCellHighlighter(Shell shell) {
-		final TableViewer v = new TableViewer(shell, SWT.BORDER|SWT.FULL_SELECTION);
+		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.BORDER|SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(new MyContentProvider());
 
@@ -172,17 +176,17 @@ public class Snippet036FocusBorderCellHighlighter {
 		column.setText("Column 3");
 
 		
-		MyModel[] model = createModel();
+		List<MyModel> model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private MyModel[] createModel() {
-		MyModel[] elements = new MyModel[10];
+	private List<MyModel> createModel() {
+		List<MyModel> elements = new ArrayList<MyModel>(10);
 
 		for (int i = 0; i < 10; i++) {
-			elements[i] = new MyModel(i);
+			elements.add(i,new MyModel(i));
 		}
 
 		return elements;
