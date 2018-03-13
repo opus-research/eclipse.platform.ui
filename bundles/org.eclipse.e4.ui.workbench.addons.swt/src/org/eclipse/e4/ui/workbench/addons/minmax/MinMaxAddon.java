@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -407,26 +407,28 @@ public class MinMaxAddon {
 					|| modelService.getTopLevelWindowFor(changedElement) == null)
 				return;
 
-			String eventType = (String) event.getProperty(UIEvents.EventTags.TYPE);
-			if (UIEvents.EventTypes.REMOVE.equals(eventType)) {
-				MUIElement removed = (MUIElement) event.getProperty(UIEvents.EventTags.OLD_VALUE);
-				String perspectiveId = removed.getElementId();
-				MWindow window = modelService.getTopLevelWindowFor(changedElement);
-				MTrimBar bar = modelService.getTrim((MTrimmedWindow) window, SideValue.TOP);
+			if (UIEvents.isREMOVE(event)) {
+				for (Object removedElement : UIEvents.asIterable(event,
+						UIEvents.EventTags.OLD_VALUE)) {
+					MUIElement removed = (MUIElement) removedElement;
+					String perspectiveId = removed.getElementId();
+					MWindow window = modelService.getTopLevelWindowFor(changedElement);
+					MTrimBar bar = modelService.getTrim((MTrimmedWindow) window, SideValue.TOP);
 
-				// gather up any minimized stacks for this perspective...
-				List<MToolControl> toRemove = new ArrayList<MToolControl>();
-				for (MUIElement child : bar.getChildren()) {
-					String trimElementId = child.getElementId();
-					if (child instanceof MToolControl && trimElementId.contains(perspectiveId)) {
-						toRemove.add((MToolControl) child);
+					// gather up any minimized stacks for this perspective...
+					List<MToolControl> toRemove = new ArrayList<MToolControl>();
+					for (MUIElement child : bar.getChildren()) {
+						String trimElementId = child.getElementId();
+						if (child instanceof MToolControl && trimElementId.contains(perspectiveId)) {
+							toRemove.add((MToolControl) child);
+						}
 					}
-				}
 
-				// ...and remove them
-				for (MToolControl minStack : toRemove) {
-					minStack.setToBeRendered(false);
-					bar.getChildren().remove(minStack);
+					// ...and remove them
+					for (MToolControl minStack : toRemove) {
+						minStack.setToBeRendered(false);
+						bar.getChildren().remove(minStack);
+					}
 				}
 			}
 		}
@@ -634,7 +636,7 @@ public class MinMaxAddon {
 
 				loc = modelService.getElementLocation(theStack);
 				if (loc != EModelService.IN_SHARED_AREA && theStack.getWidget() != null
-						&& !theStack.getTags().contains(MINIMIZED)) {
+						&& theStack.isVisible() && !theStack.getTags().contains(MINIMIZED)) {
 					elementsToMinimize.add(theStack);
 				}
 			}
@@ -644,7 +646,7 @@ public class MinMaxAddon {
 				MPlaceholder eaPlaceholder = (MPlaceholder) modelService
 						.find(ID_EDITOR_AREA, persp);
 				if (element != eaPlaceholder && eaPlaceholder != null
-						&& eaPlaceholder.isToBeRendered()) {
+						&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
 					elementsToMinimize.add(eaPlaceholder);
 				}
 			}

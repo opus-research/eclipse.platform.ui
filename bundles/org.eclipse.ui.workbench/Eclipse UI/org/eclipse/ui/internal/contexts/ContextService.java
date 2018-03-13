@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.contexts;
+
+import org.eclipse.e4.core.commands.ExpressionContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,9 +24,7 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.ui.di.UISynchronize;
 import org.eclipse.e4.ui.services.EContextService;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -60,9 +60,6 @@ public final class ContextService implements IContextService {
 
 	@Inject
 	private IEclipseContext eclipseContext;
-
-	@Inject
-	private UISynchronize synchService;
 
 	/**
 	 * The persistence class for this context service.
