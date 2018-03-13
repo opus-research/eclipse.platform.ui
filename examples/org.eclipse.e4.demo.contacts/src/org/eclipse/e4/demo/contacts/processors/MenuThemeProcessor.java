@@ -9,22 +9,26 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     Kai Tödter - Adoption to contacts demo
- *     Lars Vogel <lars.vogel@gmail.com> - Bug https://bugs.eclipse.org/413431
  ******************************************************************************/
 package org.eclipse.e4.demo.contacts.processors;
 
 import java.util.List;
+import org.eclipse.e4.core.di.annotations.Execute;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
+import org.eclipse.emf.ecore.EObject;
 
 public class MenuThemeProcessor extends AbstractThemeProcessor {
+	// should be bundleclass, see bug 374961
+	// private static final String BUNDLE_ID =
+	// "bundleclass://org.eclipse.e4.demo.contacts/org.eclipse.e4.demo.contacts.processors.MenuThemeProcessor
 	private static final String BUNDLE_ID = "platform:/plugin/org.eclipse.e4.demo.contacts"; //$NON-NLS-1$
 	
 	@Inject
@@ -34,25 +38,21 @@ public class MenuThemeProcessor extends AbstractThemeProcessor {
 	
 	private final static String PROCESSOR_ID = "org.eclipse.e4.demo.contacts.processor.menu"; 
 
-	@Override
 	@Execute
-	public void process(MApplication app) {
-		if (menu == null) {
+	public void process() {
+		if (menu == null)
 			return;
-		}
 		
-		List<String> tags = app.getTags();
+		MApplication theApp = getApplication(); 
+		List<String> tags = theApp.getTags();
 		for(String tag : tags) {
 			if (PROCESSOR_ID.equals(tag))
-			 {
 				return; // already processed
-			}
 		}
-		if (!check()) {
+		if (!check())
 			return;
-		}
 		tags.add(PROCESSOR_ID);
-		super.process(app);
+		super.process();
 	}
 
 	@Override
@@ -88,4 +88,8 @@ public class MenuThemeProcessor extends AbstractThemeProcessor {
 		menu.getChildren().add(themesMenu);
 	}
 
+	@Override
+	protected MApplication getApplication() {
+		return (MApplication) (((EObject) menu).eContainer()).eContainer();
+	}
 }
