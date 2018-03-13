@@ -513,11 +513,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_openReferencedProjects;
 	public static String IDEWorkspacePreference_closeUnrelatedProjectsToolTip;
 	public static String IDEWorkspacePreference_workspaceName;
-	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
-
-	public static String ShowInSystemExplorerHandler_LinuxDefaultCommand;
-	public static String ShowInSystemExplorerHandler_MacOSXDefaultCommand;
-	public static String ShowInSystemExplorerHandler_Win32DefaultCommand;
 
 	// --- Linked Resources ---
 	public static String LinkedResourcesPreference_explanation;
