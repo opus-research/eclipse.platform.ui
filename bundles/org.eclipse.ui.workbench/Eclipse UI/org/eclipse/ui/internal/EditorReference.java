@@ -245,7 +245,12 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		}
 
 		// Get the input element.
-		input = factory.createElement(inputMem);
+		try {
+			input = factory.createElement(inputMem);
+		} catch (IllegalArgumentException exc) {
+			return new NullEditorInput(exc.getMessage());
+		}
+
 		if (input == null) {
 			throw new PartInitException(NLS.bind(
 					WorkbenchMessages.EditorManager_create_element_returned_null, new Object[] {
@@ -308,6 +313,12 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 		try {
 			if (descriptor == null) {
 				return createErrorPart();
+			} else if (getEditorInput() instanceof NullEditorInput) {
+				String errorMessage = ((NullEditorInput) getEditorInput()).getErrorMessage();
+				if (errorMessage != null) {
+					return createErrorPart(NLS.bind(
+							WorkbenchMessages.EditorManager_unableToCreateEditor, errorMessage));
+				}
 			} else if (descriptor.getId().equals(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID)) {
 				IEditorPart part = ComponentSupport.getSystemInPlaceEditor();
 				if (part == null) {
@@ -325,8 +336,12 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 	@Override
 	IWorkbenchPart createErrorPart() {
+		return createErrorPart(WorkbenchMessages.EditorManager_missing_editor_descriptor);
+	}
+
+	private IWorkbenchPart createErrorPart(String errorMessage) {
 		IStatus status = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, NLS.bind(
-				WorkbenchMessages.EditorManager_missing_editor_descriptor, descriptorId));
+				errorMessage, descriptorId));
 		IEditorRegistry registry = getPage().getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry();
 		descriptor = (EditorDescriptor) registry.findEditor(EditorRegistry.EMPTY_EDITOR_ID);
