@@ -26,8 +26,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.ide.IDEInternalPreferences;
+import org.eclipse.ui.internal.ide.IDEPreferenceInitializer;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -43,7 +48,8 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	public static final String ID = "org.eclipse.ui.showIn.systemExplorer"; //$NON-NLS-1$
 
 	private static final String VARIABLE_RESOURCE = "${selected_resource_loc}"; //$NON-NLS-1$
-	private static final String VARIABLE_FOLDER = "${selected_resource_parent}"; //$NON-NLS-1$
+	private static final String VARIABLE_RESOURCE_URI = "${selected_resource_uri}"; //$NON-NLS-1$
+	private static final String VARIABLE_FOLDER = "${selected_resource_parent_loc}"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -55,16 +61,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ILog log = IDEWorkbenchPlugin.getDefault().getLog();
 
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if ((selection == null) || (selection.isEmpty())
-				|| (!(selection instanceof IStructuredSelection))) {
-			return null;
-		}
-
-		Object selectedObject = ((IStructuredSelection) selection)
-				.getFirstElement();
-		IResource item = (IResource) org.eclipse.ui.internal.util.Util
-				.getAdapter(selectedObject, IResource.class);
+		IResource item = getResource(event);
 		if (item == null) {
 			return null;
 		}
@@ -106,8 +103,13 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 				return null;
 			}
 
-			Process p = Runtime.getRuntime().exec(launchCmd, null,
-					item.getWorkspace().getRoot().getLocation().toFile());
+			File dir = item.getWorkspace().getRoot().getLocation().toFile();
+			Process p;
+			if (Util.isLinux() || Util.isMac()) {
+				p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", launchCmd }, null, dir); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				p = Runtime.getRuntime().exec(launchCmd, null, dir);
+			}
 			int retCode = p.waitFor();
 			if (retCode != 0 && !Util.isWindows()) {
 				log.log(new Status(IStatus.ERROR, IDEWorkbenchPlugin
@@ -124,6 +126,40 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		return null;
 	}
 
+	private IResource getResource(ExecutionEvent event) {
+		IResource resource = getSelectionResource(event);
+		if (resource==null) {
+			resource = getEditorInputResource(event);
+		}
+		return resource;
+	}
+	
+	private IResource getSelectionResource(ExecutionEvent event) {
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if ((selection == null) || (selection.isEmpty())
+				|| (!(selection instanceof IStructuredSelection))) {
+			return null;
+		}
+
+		Object selectedObject = ((IStructuredSelection) selection)
+				.getFirstElement();
+		IResource item = (IResource) org.eclipse.ui.internal.util.Util
+				.getAdapter(selectedObject, IResource.class);
+		return item;
+	}
+
+	private IResource getEditorInputResource(ExecutionEvent event) {
+		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
+		if (!(activePart instanceof IEditorPart)) {
+			return null;
+		}
+		IEditorInput input = ((IEditorPart)activePart).getEditorInput();
+		if (input instanceof IFileEditorInput) {
+			return ((IFileEditorInput)input).getFile();
+		}
+		return (IResource) input.getAdapter(IResource.class);
+	}
+
 	/**
 	 * Prepare command for launching system explorer to show a path
 	 * 
@@ -134,12 +170,23 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	private String formShowInSytemExplorerCommand(File path) throws IOException {
 		String command = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
 				.getString(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER);
-		command = Util.replaceAll(command, VARIABLE_RESOURCE, path.getCanonicalPath());
+		
+		command = Util.replaceAll(command, VARIABLE_RESOURCE, quotePath(path.getCanonicalPath()));
+		command = Util.replaceAll(command, VARIABLE_RESOURCE_URI, path.getCanonicalFile().toURI().toString());
 		File parent = path.getParentFile();
 		if (parent != null) {
-			command = Util.replaceAll(command, VARIABLE_FOLDER, parent.getCanonicalPath());
+			command = Util.replaceAll(command, VARIABLE_FOLDER, quotePath(parent.getCanonicalPath()));
 		}
 		return command;
+	}
+
+	private String quotePath(String path) {
+		if (Util.isLinux() || Util.isMac()) {
+			// Quote for usage inside "", man sh, topic QUOTING:
+			path = path.replaceAll("[\"$`]", "\\\\$0"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		// Windows: Can't quote, since explorer.exe has a very special command line parsing strategy.
+		return path;
 	}
 
 	/**
@@ -164,19 +211,11 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * The default command for launching the system explorer on this platform.
 	 * 
-	 * @return The default command which launches the system explorer on this
-	 *         system, or an empty string if no default exists.
+	 * @return The default command which launches the system explorer on this system, or an empty
+	 *         string if no default exists
 	 */
 	public static String getDefaultCommand() {
-		if (Util.isGtk()) {
-			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"file://${selected_resource_loc}\" string:\"\""; //$NON-NLS-1$
-		} else if (Util.isWindows()) {
-			return "explorer /E,/select=${selected_resource_loc}"; //$NON-NLS-1$
-		} else if (Util.isMac()) {
-			return "open -R '${selected_resource_loc}'"; //$NON-NLS-1$
-		}
-
-		// if all else fails, return empty default
-		return ""; //$NON-NLS-1$
+		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer 
+		return IDEPreferenceInitializer.getShowInSystemExplorerCommand();
 	}
 }

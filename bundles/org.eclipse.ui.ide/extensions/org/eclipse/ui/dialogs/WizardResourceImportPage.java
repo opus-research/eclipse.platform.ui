@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -23,6 +24,8 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.equinox.bidi.StructuredTextTypeHandlerFactory;
+import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -34,13 +37,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.ide.dialogs.IElementFilter;
+import org.eclipse.ui.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.internal.ide.DialogUtil;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
-import org.eclipse.ui.internal.ide.dialogs.ResourceTreeAndListGroup;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.model.WorkbenchViewerComparator;
 
@@ -78,16 +82,15 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     protected java.util.List selectedTypes = new ArrayList();
 
     // widgets
-    protected Text containerNameField;
+    private Text containerNameField;
 
-	protected Button newProjectRadio;
-	protected Button existingProjectRadio;
-	protected Button resourcesRadio;
-    protected Button containerBrowseButton;
-    
+    private Button containerBrowseButton;
+
     /**
 	 * The <code>selectionGroup</code> field should have been created with a
 	 * private modifier. Subclasses should not access this field directly.
+	 * 
+	 * @noreference This field is not intended to be referenced by clients.
 	 */
     protected ResourceTreeAndListGroup selectionGroup;
 
@@ -97,7 +100,6 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     private static final String EMPTY_PROJECT_MESSAGE = IDEWorkbenchMessages.WizardImportPage_specifyProject;
     
     private static final String INACCESSABLE_FOLDER_MESSAGE = IDEWorkbenchMessages.WizardImportPage_folderMustExist;
-
 
     /**
      * Creates an import wizard page. If the initial resource selection 
@@ -110,7 +112,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     protected WizardResourceImportPage(String name,
             IStructuredSelection selection) {
         super(name);
-        
+
         //Initialize to null
         currentResourceSelection = null;
         if (selection.size() == 1) {
@@ -188,21 +190,15 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
         containerGroup.setFont(parent.getFont());
 
-        this.newProjectRadio = new Button(containerGroup, SWT.RADIO);
-        this.newProjectRadio.setText(IDEWorkbenchMessages.WizardImportPage_ImportAsNewProject);
-        this.newProjectRadio.setFont(parent.getFont());
-        this.newProjectRadio.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 3, 1));
-        
-        this.existingProjectRadio = new Button(containerGroup, SWT.RADIO);
-        this.existingProjectRadio.setText(IDEWorkbenchMessages.WizardImportPage_ImportExistingProject);
-        this.existingProjectRadio.setFont(parent.getFont());
-        this.existingProjectRadio.setLayoutData(new GridData(SWT.NONE, SWT.NONE, false, false, 3, 1));
-        
-        resourcesRadio = new Button(containerGroup, SWT.RADIO);
-        resourcesRadio.setText(IDEWorkbenchMessages.WizardImportPage_folder);
-        resourcesRadio.setFont(parent.getFont());
+        // container label
+        Label resourcesLabel = new Label(containerGroup, SWT.NONE);
+        resourcesLabel.setText(IDEWorkbenchMessages.WizardImportPage_folder);
+        resourcesLabel.setFont(parent.getFont());
+
         // container name entry field
         containerNameField = new Text(containerGroup, SWT.SINGLE | SWT.BORDER);
+        BidiUtils.applyBidiProcessing(containerNameField, StructuredTextTypeHandlerFactory.FILE);
+
         containerNameField.addListener(SWT.Modify, this);
         GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
                 | GridData.GRAB_HORIZONTAL);
@@ -218,14 +214,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         containerBrowseButton.addListener(SWT.Selection, this);
         containerBrowseButton.setFont(parent.getFont());
         setButtonLayoutData(containerBrowseButton);
-   
-        newProjectRadio.setSelection(false);
-        existingProjectRadio.setSelection(false);
-        resourcesRadio.setSelection(true);
-        
-        newProjectRadio.addListener(SWT.Selection, this);
-        existingProjectRadio.addListener(SWT.Selection, this);
-        resourcesRadio.addListener(SWT.Selection, this);
+
         initialPopulateContainerField();
     }
 
@@ -233,7 +222,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      *	Create the import source selection widget
      */
     protected void createFileSelectionGroup(Composite parent) {
-    	
+
         //Just create with a dummy root.
         this.selectionGroup = new ResourceTreeAndListGroup(parent,
                 new FileSystemElement("Dummy", null, true),//$NON-NLS-1$
@@ -251,6 +240,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         this.selectionGroup.setTreeComparator(comparator);
         this.selectionGroup.setListComparator(comparator);
         this.selectionGroup.addCheckStateListener(listener);
+
     }
 
     /**
@@ -335,10 +325,19 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
      * Returns this page's list of currently-specified resources to be 
      * imported filtered by the IElementFilter.
-     *
+     * @since 3.10
      */
-    protected void getSelectedResources(IElementFilter filter,
-            IProgressMonitor monitor) throws InterruptedException {
+    protected void getSelectedResources(IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
+        this.selectionGroup.getAllCheckedListItems(filter, monitor);
+    }
+
+    /**
+     * <bold>DO NOT USE THIS METHOD</bold>
+     * Returns this page's list of currently-specified resources to be 
+     * imported filtered by the IElementFilter.
+     * @deprecated Should use the API {@link IElementFilter}
+     */
+    protected void getSelectedResources(org.eclipse.ui.internal.ide.dialogs.IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
         this.selectionGroup.getAllCheckedListItems(filter, monitor);
     }
 
@@ -490,12 +489,7 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
      * Check if widgets are enabled or disabled by a change in the dialog.
      */
     protected void updateWidgetEnablements() {
-    	this.containerNameField.setEnabled(this.resourcesRadio.getSelection());
-    	this.containerBrowseButton.setEnabled(this.resourcesRadio.getSelection());
-    	if (this.selectionGroup != null) {
-    		this.selectionGroup.setEnabled(this.resourcesRadio.getSelection());
-    	}
-    	
+
         boolean pageComplete = determinePageCompletion();
         setPageComplete(pageComplete);
         if (pageComplete) {
@@ -582,4 +576,31 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
         return false;
     }
 
+    /*
+     * @see WizardDataTransferPage.determinePageCompletion.
+     */
+    protected boolean determinePageCompletion() {
+        //Check for valid projects before making the user do anything 
+        if (noOpenProjects()) {
+            setErrorMessage(IDEWorkbenchMessages.WizardImportPage_noOpenProjects);
+            return false;
+        }
+        return super.determinePageCompletion();
+    }
+
+    /**
+     * Returns whether or not the passed workspace has any 
+     * open projects
+     * @return boolean
+     */
+    private boolean noOpenProjects() {
+        IProject[] projects = IDEWorkbenchPlugin.getPluginWorkspace().getRoot()
+                .getProjects();
+        for (int i = 0; i < projects.length; i++) {
+            if (projects[i].isOpen()) {
+				return false;
+			}
+        }
+        return true;
+    }
 }
