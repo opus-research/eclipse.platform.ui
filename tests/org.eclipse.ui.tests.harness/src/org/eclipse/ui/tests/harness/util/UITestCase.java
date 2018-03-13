@@ -314,10 +314,10 @@ public abstract class UITestCase extends TestCase {
      */
     public IWorkbenchPage openTestPage(IWorkbenchWindow win) {
         IWorkbenchPage[] pages = openTestPage(win, 1);
-        if (pages != null) {
+        if (pages != null)
             return pages[0];
-        }        
-        return null;
+        else
+            return null;
     }
 
     /**
