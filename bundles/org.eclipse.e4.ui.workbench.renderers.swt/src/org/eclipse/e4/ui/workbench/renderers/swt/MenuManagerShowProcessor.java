@@ -155,12 +155,12 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 				IEclipseContext dynamicMenuContext = EclipseContextFactory
 						.create();
-				dynamicMenuContext.setParent(modelService
-						.getContainingContext(currentMenuElement));
 				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
 				dynamicMenuContext.set(List.class, mel);
+				IEclipseContext parentContext = modelService
+						.getContainingContext(currentMenuElement);
 				ContextInjectionFactory.invoke(contribution, AboutToShow.class,
-						dynamicMenuContext);
+						dynamicMenuContext, parentContext, null);
 
 				// remove existing entries for this dynamic contribution item if
 				// there are any
