@@ -66,6 +66,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @since 2.0
 	 * @deprecated
 	 */
+	@Deprecated
 	public final static String INFO_MESSAGE = "INFO_MESSAGE"; //$NON-NLS-1$
 
 	/**
@@ -74,6 +75,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @since 2.0
 	 * @deprecated
 	 */
+	@Deprecated
 	public final static String WARNING_MESSAGE = "WARNING_MESSAGE"; //$NON-NLS-1$
 
 	// Space between an image and a label
@@ -134,6 +136,7 @@ public class TitleAreaDialog extends TrayDialog {
 	/*
 	 * @see Dialog.createContents(Composite)
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 		// create the overall composite
 		Composite contents = new Composite(parent, SWT.NONE);
@@ -185,6 +188,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 *            The parent composite to contain the dialog area
 	 * @return the dialog area control
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		// create the top level composite for the dialog area
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -275,6 +279,7 @@ public class TitleAreaDialog extends TrayDialog {
 		// Bug 248410 -  This snippet will only work with Windows screen readers.
 		messageLabel.getAccessible().addAccessibleAttributeListener(
 				new AccessibleAttributeAdapter() {
+					@Override
 					public void getAttributes(AccessibleAttributeEvent e) {
 						e.attributes = new String[] { "container-live", //$NON-NLS-1$
 								"polite", "live", "polite",   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
@@ -353,6 +358,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * 
 	 * @return the initial size of the dialog
 	 */
+	@Override
 	protected Point getInitialSize() {
 		Point shellSize = super.getInitialSize();
 		return new Point(Math.max(
@@ -370,6 +376,7 @@ public class TitleAreaDialog extends TrayDialog {
 	 * @return Composite
 	 * @deprecated
 	 */
+	@Deprecated
 	protected Composite getTitleArea() {
 		return getShell();
 	}
@@ -501,6 +508,7 @@ public class TitleAreaDialog extends TrayDialog {
 		if (messageLabelClipped) {
 			ToolTip tooltip = new ToolTip(messageLabel, ToolTip.NO_RECREATE, false) {
 				
+				@Override
 				protected Composite createToolTipContentArea(Event event, Composite parent) {
 					Composite result = new Composite(parent, SWT.NONE);
 					result.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
@@ -515,6 +523,7 @@ public class TitleAreaDialog extends TrayDialog {
 					Dialog.applyDialogFont(result);
 					return result;
 				}
+				@Override
 				public Point getLocation(Point tipSize, Event event) {
 					return messageLabel.getShell().toDisplay(messageLabel.getLocation());
 				}
