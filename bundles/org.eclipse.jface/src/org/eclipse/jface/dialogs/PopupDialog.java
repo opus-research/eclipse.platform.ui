@@ -111,6 +111,7 @@ public class PopupDialog extends Window {
 	 * 
 	 * @deprecated Since 3.4, this is retained only for backward compatibility.
 	 */
+	@Deprecated
 	private static final String DIALOG_USE_PERSISTED_BOUNDS = "DIALOG_USE_PERSISTED_BOUNDS"; //$NON-NLS-1$
 
 	/**
@@ -121,6 +122,7 @@ public class PopupDialog extends Window {
 	 * @deprecated This is marked deprecated at its introduction to discourage
 	 *             future dependency
 	 */
+	@Deprecated
 	private static final String DIALOG_VALUE_MIGRATED_TO_34 = "hasBeenMigratedTo34"; //$NON-NLS-1$
 
 	/**
@@ -453,6 +455,7 @@ public class PopupDialog extends Window {
 	 * @deprecated As of 3.4, replaced by
 	 *             {@link #PopupDialog(Shell, int, boolean, boolean, boolean, boolean, boolean, String, String)}
 	 */
+	@Deprecated
 	public PopupDialog(Shell parent, int shellStyle, boolean takeFocusOnOpen,
 			boolean persistBounds, boolean showDialogMenu,
 			boolean showPersistActions, String titleText, String infoText) {
@@ -1090,6 +1093,7 @@ public class PopupDialog extends Window {
 	 *             {@link #getPersistSize()} to determine separately whether
 	 *             size or location should be persisted.
 	 */
+	@Deprecated
 	protected boolean getPersistBounds() {
 		return persistLocation && persistSize;
 	}
@@ -1488,7 +1492,7 @@ public class PopupDialog extends Window {
 	 *            color assigned
 	 */
 	private void applyForegroundColor(Color color, Control control,
-			List exclusions) {
+			List<Control> exclusions) {
 		if (!exclusions.contains(control)) {
 			control.setForeground(color);
 		}
@@ -1513,7 +1517,7 @@ public class PopupDialog extends Window {
 	 *            color assigned
 	 */
 	private void applyBackgroundColor(Color color, Control control,
-			List exclusions) {
+			List<Control> exclusions) {
 		if (!exclusions.contains(control)) {
 			control.setBackground(color);
 		}
@@ -1567,8 +1571,8 @@ public class PopupDialog extends Window {
 	 * 
 	 * @return the List of controls
 	 */
-	protected List getForegroundColorExclusions() {
-		List list = new ArrayList(3);
+	protected List<Control> getForegroundColorExclusions() {
+		List<Control> list = new ArrayList<Control>(3);
 		if (infoLabel != null) {
 			list.add(infoLabel);
 		}
@@ -1588,8 +1592,8 @@ public class PopupDialog extends Window {
 	 * 
 	 * @return the List of controls
 	 */
-	protected List getBackgroundColorExclusions() {
-		List list = new ArrayList(2);
+	protected List<Control> getBackgroundColorExclusions() {
+		List<Control> list = new ArrayList<Control>(2);
 		if (titleSeparator != null) {
 			list.add(titleSeparator);
 		}
