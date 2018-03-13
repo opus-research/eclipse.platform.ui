@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 403083
+ *     Marco Descher <marco@descher.at> - Bug403081
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -22,6 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -37,6 +38,9 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 
 	@Inject
 	private MenuManagerRenderer renderer;
+
+	@Inject
+	private EModelService modelService;
 
 	/*
 	 * (non-Javadoc)
@@ -90,9 +94,11 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 									.getTransientData()
 									.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
 							dynamicMenuContext.set(List.class, mel);
-							ContextInjectionFactory
-									.invoke(contribution, AboutToHide.class,
-											dynamicMenuContext, null);
+							IEclipseContext parentContext = modelService
+									.getContainingContext(currentMenuElement);
+							ContextInjectionFactory.invoke(contribution,
+									AboutToHide.class, parentContext,
+									dynamicMenuContext, null);
 						}
 
 					}

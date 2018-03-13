@@ -7,11 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 403083
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug403081
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +19,7 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.InjectionException;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.AboutToShow;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.Policy;
@@ -65,10 +61,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	@Inject
 	private IContributionFactory contributionFactory;
-
-	@Inject
-	@Optional
-	private Logger logger;
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
@@ -165,17 +157,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 						.create();
 				ArrayList<MMenuElement> mel = new ArrayList<MMenuElement>();
 				dynamicMenuContext.set(List.class, mel);
-				try {
-					ContextInjectionFactory.invoke(contribution,
-							AboutToShow.class, dynamicMenuContext);
-				} catch (InjectionException injex) {
-					if (logger != null
-							&& missingAboutToShowMethod(contribution)) {
-						logger.error("Missing @AboutToShow method in " + contribution); //$NON-NLS-1$
-					} else {
-						throw injex;
-					}
-				}
+				IEclipseContext parentContext = modelService
+						.getContainingContext(currentMenuElement);
+				ContextInjectionFactory.invoke(contribution, AboutToShow.class,
+						parentContext, dynamicMenuContext, null);
 
 				// remove existing entries for this dynamic contribution item if
 				// there are any
@@ -219,21 +204,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 				}
 			}
 		}
-	}
-
-	/**
-	 * @param contribution
-	 * @return <code>true</code> if an {@link AboutToShow} annotated method is
-	 *         available, else <code>false</code>
-	 */
-	private boolean missingAboutToShowMethod(Object contribution) {
-		boolean result = true;
-		for (Method method : contribution.getClass().getMethods()) {
-			if (method.isAnnotationPresent(AboutToShow.class)) {
-				result = false;
-			}
-		}
-		return result;
 	}
 
 	private void cleanUp(final Menu menu, MMenu menuModel,
