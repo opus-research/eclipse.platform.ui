@@ -890,11 +890,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacySep.setVisible(item.isVisible());
 					legacySep.setOpaqueItem(item);
 					linkModelToContribution(legacySep, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacySep);
-					} else {
-						modelChildren.add(legacySep);
-					}
+					modelChildren.add(dest, legacySep);
 				} else if (menuElement instanceof MOpaqueMenuSeparator) {
 					MOpaqueMenuSeparator legacySep = (MOpaqueMenuSeparator) menuElement;
 					oldSeps.remove(legacySep);
@@ -916,11 +912,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					legacyItem.setVisible(item.isVisible());
 					legacyItem.setOpaqueItem(item);
 					linkModelToContribution(legacyItem, item);
-					if (modelChildren.size() > dest) {
-						modelChildren.add(dest, legacyItem);
-					} else {
-						modelChildren.add(legacyItem);
-					}
+					modelChildren.add(dest, legacyItem);
 				} else if (menuElement instanceof MOpaqueMenuItem) {
 					MOpaqueMenuItem legacyItem = (MOpaqueMenuItem) menuElement;
 					oldModelItems.remove(legacyItem);
@@ -990,13 +982,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		for (MMenuElement mMenuElement : dump) {
 			IContributionItem ici = getContribution(mMenuElement);
 			if (ici == null && mMenuElement instanceof MMenu) {
-				MMenu menuElement = (MMenu) mMenuElement;
-				ici = getManager(menuElement);
-				clearModelToManager(menuElement, (MenuManager) ici);
-			} else {
-				clearModelToContribution(menuModel, ici);
+				ici = getManager((MMenu) mMenuElement);
 			}
 			menuManager.remove(ici);
+			clearModelToContribution(mMenuElement, ici);
 		}
 	}
 }
