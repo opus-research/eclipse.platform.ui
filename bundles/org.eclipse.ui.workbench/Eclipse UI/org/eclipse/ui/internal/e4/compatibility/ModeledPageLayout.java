@@ -285,8 +285,9 @@ public class ModeledPageLayout implements IPageLayout {
 
 	public IPlaceholderFolderLayout createPlaceholderFolder(String folderId,
 			int relationship, float ratio, String refId) {
-		MPartStack stack = insertStack(folderId, relationship, ratio, refId, true);
-		return new ModeledPlaceholderFolderLayout(this, application, stack);
+		MPartStack Stack = insertStack(folderId, relationship, ratio, refId,
+				false);
+		return new ModeledPlaceholderFolderLayout(this, application, Stack);
 	}
 
 	public IPerspectiveDescriptor getDescriptor() {
