@@ -65,13 +65,8 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	};
 
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MPart) || !(parent instanceof Composite)) {
+		if (!(element instanceof MPart) || !(parent instanceof Composite))
 			return null;
-		}
-
-		if (element.getWidget() != null) {
-			return element.getWidget();
-		}
 
 		Widget parentWidget = (Widget) parent;
 		Widget newWidget = null;
