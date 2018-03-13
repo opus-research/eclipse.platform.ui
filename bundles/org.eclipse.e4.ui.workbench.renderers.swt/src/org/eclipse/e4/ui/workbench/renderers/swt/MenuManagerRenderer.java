@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471							  
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866							  
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -989,11 +989,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		removeMenuContributions(menuModel, dump);
 		for (MMenuElement mMenuElement : dump) {
 			IContributionItem ici = getContribution(mMenuElement);
-			if (ici == null && mMenuElement instanceof MMenu) {
-				ici = getManager((MMenu) mMenuElement);
-			}
 			menuManager.remove(ici);
-			clearModelToContribution(mMenuElement, ici);
+			clearModelToContribution(menuModel, ici);
 		}
 	}
 }
