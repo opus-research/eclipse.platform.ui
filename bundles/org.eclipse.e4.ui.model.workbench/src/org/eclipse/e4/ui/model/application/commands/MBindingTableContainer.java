@@ -36,6 +36,7 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MBindingTableContainer {
 	/**

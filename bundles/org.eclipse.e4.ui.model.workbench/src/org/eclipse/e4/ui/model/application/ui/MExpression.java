@@ -27,9 +27,9 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  * </p>
  * <!-- end-model-doc -->
  *
- *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MExpression extends MApplicationElement {
 } // MExpression

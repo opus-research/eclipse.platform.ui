@@ -40,6 +40,7 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MHandledItem extends MItem {
 	/**

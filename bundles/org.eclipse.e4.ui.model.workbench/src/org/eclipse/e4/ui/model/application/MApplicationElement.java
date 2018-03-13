@@ -17,7 +17,6 @@ import java.util.Map;
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Element</b></em>'.
  * <!-- end-user-doc -->
- *
  * <!-- begin-model-doc -->
  * <p>
  * <strong>Developers</strong>:
@@ -40,6 +39,7 @@ import java.util.Map;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MApplicationElement {
 	/**
