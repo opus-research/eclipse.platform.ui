@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,11 +35,9 @@ import org.eclipse.e4.ui.tests.workbench.MToolItemTest;
 import org.eclipse.e4.ui.tests.workbench.MWindowTest;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
+import org.eclipse.e4.ui.tests.workbench.SWTPartRendererTest;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
-import org.eclipse.e4.ui.workbench.renderers.swt.TabStateHandlerTest;
-
-//import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 
 /**
  *
@@ -74,7 +72,6 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(PartFocusTest.class);
 		addTestSuite(ModelElementTest.class);
 		addTestSuite(StackRendererTest.class);
-		addTestSuite(TabStateHandlerTest.class);
-		// addTestSuite(SWTPartRendererTest.class);
+		addTestSuite(SWTPartRendererTest.class);
 	}
 }

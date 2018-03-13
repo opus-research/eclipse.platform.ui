@@ -17,7 +17,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
 /**
- * @noreference This class is not intended to be referenced by clients.
+ * @noreference
  * @since 1.0
  */
 public class EObjModelHandler extends ModelHandlerBase implements IAdapterFactory {

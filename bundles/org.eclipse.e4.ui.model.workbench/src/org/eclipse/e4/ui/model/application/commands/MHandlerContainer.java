@@ -19,10 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This provides a container in which to store lists of Handlers. 
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -34,6 +35,7 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MHandlerContainer {
 	/**

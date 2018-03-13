@@ -22,8 +22,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
@@ -35,7 +33,9 @@ import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
+import org.eclipse.core.commands.CommandManagerEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.ICommandManagerListener;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.common.EventManager;
@@ -59,7 +59,6 @@ import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -90,13 +89,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -144,7 +140,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.ILocalWorkingSetManager;
-import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveableFilter;
@@ -165,7 +160,6 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.Saveable;
 import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.activities.IWorkbenchActivitySupport;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -268,10 +262,6 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public final class Workbench extends EventManager implements IWorkbench {
 
-	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
-
-	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
-
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
 		private final IProgressMonitor progressMonitor;
@@ -365,8 +355,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 	 * @since 3.0
 	 */
 	private Display display;
-
-	private boolean workbenchAutoSave = true;
 
 
 	private EditorHistory editorHistory;
@@ -591,11 +579,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 
 					AbstractSplashHandler handler = getSplash();
 
-					boolean showProgress = PrefUtil.getAPIPreferenceStore().getBoolean(
-									IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP);
-
 					IProgressMonitor progressMonitor = null;
-					if (handler != null && showProgress) {
+					if (handler != null) {
 						progressMonitor = handler.getBundleProgressMonitor();
 						if (progressMonitor != null) {
 							double cutoff = 0.95;
@@ -1155,28 +1140,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 			}
 		});
 
-		// persist workbench state
-		if (getWorkbenchConfigurer().getSaveAndRestore()) {
-			SafeRunner.run(new SafeRunnable() {
-				public void run() {
-					persistWorkbenchState();
-				}
-
-				public void handleException(Throwable e) {
-					String message;
-					if (e.getMessage() == null) {
-						message = WorkbenchMessages.ErrorClosingNoArg;
-					} else {
-						message = NLS.bind(WorkbenchMessages.ErrorClosingOneArg, e.getMessage());
-					}
-
-					if (!MessageDialog.openQuestion(null, WorkbenchMessages.Error, message)) {
-						isClosing = false;
-					}
-				}
-			});
-		}
-
 		// persist view states
 		SafeRunner.run(new SafeRunnable() {
 			public void run() {
@@ -1215,7 +1178,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
-				cleanUpCopy(appCopy, e4Context);
+				cleanUpCopy(appCopy);
 				try {
 					res.save(null);
 				} catch (IOException e) {
@@ -1233,12 +1196,10 @@ public final class Workbench extends EventManager implements IWorkbench {
 		cleanAndSaveJob.schedule();
 	}
 
-	private static void cleanUpCopy(MApplication appCopy, IEclipseContext context) {
+	private static void cleanUpCopy(MApplication appCopy) {
 		// clean up all trim bars that come from trim bar contributions
 		// the trim elements that need to be removed are stored in the trimBar.
-		EModelService modelService = context.get(EModelService.class);
-		List<MWindow> windows = modelService.findElements(appCopy, null, MWindow.class, null);
-		for (MWindow window : windows) {
+		for (MWindow window : appCopy.getChildren()) {
 			if (window instanceof MTrimmedWindow) {
 				MTrimmedWindow trimmedWindow = (MTrimmedWindow) window;
 				// clean up the main menu to avoid duplicate menu items
@@ -1253,17 +1214,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 		appCopy.getMenuContributions().clear();
 		appCopy.getToolBarContributions().clear();
 		appCopy.getTrimContributions().clear();
-
-		List<MPart> parts = modelService.findElements(appCopy, null, MPart.class, null);
-		for (MPart part : parts) {
-			for (MMenu menu : part.getMenus()) {
-				menu.getChildren().clear();
-			}
-			MToolBar tb = part.getToolbar();
-			if (tb != null) {
-				tb.getChildren().clear();
-			}
-		}
 	}
 
 	private static void cleanUpTrimBar(MTrimBar element) {
@@ -1286,7 +1236,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
 			if (page != null) {
-				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing, false)) {
+				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing)) {
 					return false;
 				}
 			}
@@ -1606,8 +1556,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 					if (isClosing()) {
 						bail[0] = true;
 					}
-
-					restoreWorkbenchState();
 				}
 			});
 
@@ -1664,8 +1612,9 @@ public final class Workbench extends EventManager implements IWorkbench {
 			public void runWithException() {
 				ColorDefinition[] colorDefinitions = WorkbenchPlugin.getDefault()
 						.getThemeRegistry().getColors();
-				ThemeElementHelper.populateRegistry(getThemeManager().getCurrentTheme(),
-						colorDefinitions, PrefUtil.getInternalPreferenceStore());
+				ThemeElementHelper.populateRegistry(getThemeManager().getTheme(
+						IThemeManager.DEFAULT_THEME), colorDefinitions, PrefUtil
+						.getInternalPreferenceStore());
 			}
 		});
 	}
@@ -1911,21 +1860,20 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private void setReference(MPart part, IEclipseContext context) {
 		String uri = part.getContributionURI();
-		if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
-			WorkbenchPage page = getWorkbenchPage(part);
-			EditorReference ref = page.getEditorReference(part);
-			if (ref == null) {
-				ref = createEditorReference(part, page);
-			}
-			context.set(EditorReference.class.getName(), ref);
-		} else {
-			// Create View References for 'e4' parts as well
+		if (CompatibilityPart.COMPATIBILITY_VIEW_URI.equals(uri)) {
 			WorkbenchPage page = getWorkbenchPage(part);
 			ViewReference ref = page.getViewReference(part);
 			if (ref == null) {
 				ref = createViewReference(part, page);
 			}
 			context.set(ViewReference.class.getName(), ref);
+		} else if (CompatibilityPart.COMPATIBILITY_EDITOR_URI.equals(uri)) {
+			WorkbenchPage page = getWorkbenchPage(part);
+			EditorReference ref = page.getEditorReference(part);
+			if (ref == null) {
+				ref = createEditorReference(part, page);
+			}
+			context.set(EditorReference.class.getName(), ref);
 		}
 	}
 
@@ -2025,6 +1973,21 @@ UIEvents.Context.TOPIC_CONTEXT,
 		appContext.set(IUpdateService.class, service);
 		service.readRegistry();
 
+		Command[] cmds = commandManager.getAllCommands();
+		for (int i = 0; i < cmds.length; i++) {
+			Command cmd = cmds[i];
+			cmd.setHandler(new MakeHandlersGo(this, cmd.getId()));
+		}
+
+		commandManager.addCommandManagerListener(new ICommandManagerListener() {
+			public void commandManagerChanged(CommandManagerEvent commandManagerEvent) {
+				if (commandManagerEvent.isCommandDefined()) {
+					Command cmd = commandManagerEvent.getCommandManager().getCommand(
+							commandManagerEvent.getCommandId());
+					cmd.setHandler(new MakeHandlersGo(Workbench.this, cmd.getId()));
+				}
+			}
+		});
 		return service;
 	}
 
@@ -2256,6 +2219,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 			public void runWithException() {
 				handlerService[0] = new LegacyHandlerService(e4Context);
+				((LegacyHandlerService) handlerService[0]).initPreExecuteHook();
 				e4Context.set(IHandlerService.class.getName(), handlerService[0]);
 				handlerService[0].readRegistry();
 			}
@@ -2569,16 +2533,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	/**
-	 * Disable the Workbench Auto-Save job on startup during tests.
-	 * 
-	 * @param b
-	 *            <code>false</code> to disable the tests.
-	 */
-	public void setEnableAutoSave(boolean b) {
-		workbenchAutoSave = b;
-	}
-
-	/**
 	 * Internal method for running the workbench UI. This entails processing and
 	 * dispatching events until the workbench is closed or restarted.
 	 * 
@@ -2724,36 +2678,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 				e4Context.set(PartRenderingEngine.EARLY_STARTUP_HOOK, earlyStartup);
 				// start workspace auto-save
 				final int millisecondInterval = getAutoSaveJobTime();
-				if (millisecondInterval > 0 && workbenchAutoSave) {
-					autoSaveJob = new WorkbenchJob(WORKBENCH_AUTO_SAVE_JOB) {
+				if (millisecondInterval > 0) {
+					autoSaveJob = new WorkbenchJob("Workbench Auto-Save Job") { //$NON-NLS-1$
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (monitor.isCanceled()) {
-								return Status.CANCEL_STATUS;
-							}
 							final int nextDelay = getAutoSaveJobTime();
-							try {
-								persist(false);
-								monitor.done();
-							} finally {
-								// repeat
-								if (nextDelay > 0 && workbenchAutoSave) {
-									this.schedule(nextDelay);
-								}
+							persist(false);
+							monitor.done();
+							// repeat
+							if (nextDelay > 0) {
+								this.schedule(nextDelay);
 							}
 							return Status.OK_STATUS;
-						}
-
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see
-						 * org.eclipse.core.runtime.jobs.Job#belongsTo(java.
-						 * lang.Object)
-						 */
-						@Override
-						public boolean belongsTo(Object family) {
-							return WORKBENCH_AUTO_SAVE_JOB == family;
 						}
 					};
 					autoSaveJob.setSystem(true);
@@ -2809,18 +2745,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, advisor.getDefaultPageInput());
+		return showPerspective(perspectiveId, window, null);
 	}
 
-	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input) {
+	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
+			boolean checkPerspective) {
 		if (page != null) {
 			for (IPerspectiveDescriptor openedPerspective : page.getOpenPerspectives()) {
-				if (openedPerspective.getId().equals(perspectiveId)) {
+				if (!checkPerspective || openedPerspective.getId().equals(perspectiveId)) {
 					if (page.getInput() == input) {
 						WorkbenchWindow wwindow = (WorkbenchWindow) page.getWorkbenchWindow();
 						MWindow model = wwindow.getModel();
 						application.setSelectedElement(model);
-						page.setPerspective(openedPerspective);
 						return true;
 					}
 				}
@@ -2844,20 +2780,23 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		for (IWorkbenchWindow window : getWorkbenchWindows()) {
 			IWorkbenchPage page = window.getActivePage();
-			if (activate(perspectiveId, page, input)) {
+			if (activate(perspectiveId, page, input, true)) {
 				return page;
 			}
 		}
 
 		if (targetWindow != null) {
 			IWorkbenchPage page = targetWindow.getActivePage();
+			if (activate(perspectiveId, page, input, false)) {
+				return page;
+			}
 			IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 			int mode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 
@@ -2896,7 +2835,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		cancelEarlyStartup();
 		if (workbenchService != null)
 			workbenchService.unregister();
-		workbenchService = null;
 
 		// for dynamic UI
 		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);
@@ -3558,76 +3496,5 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	public MApplication getApplication() {
 		return application;
-	}
-
-	/*
-	 * Record the workbench UI in a document
-	 */
-	private void persistWorkbenchState() {
-		try {
-			XMLMemento memento = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKBENCH);
-			IStatus status = saveWorkbenchState(memento);
-
-			if (status.getSeverity() == IStatus.OK) {
-				StringWriter writer = new StringWriter();
-				memento.save(writer);
-				application.getPersistedState().put(MEMENTO_KEY, writer.toString());
-			} else {
-				WorkbenchPlugin.log(new Status(status.getSeverity(), PlatformUI.PLUGIN_ID,
-						WorkbenchMessages.Workbench_problemsSavingMsg));
-			}
-		} catch (IOException e) {
-			WorkbenchPlugin.log(new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, 0,
-					WorkbenchMessages.Workbench_problemsSavingMsg, e));
-		}
-	}
-
-	/*
-	 * Saves the current state of the workbench so it can be restored later on
-	 */
-	private IStatus saveWorkbenchState(IMemento memento) {
-		MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-				WorkbenchMessages.Workbench_problemsSaving, null);
-
-		// TODO: Currently we store the editors history only. Add more if needed
-
-		result.add(getEditorHistory().saveState(
-				memento.createChild(IWorkbenchConstants.TAG_MRU_LIST)));
-		return result;
-	}
-
-	private void restoreWorkbenchState() {
-		try {
-			String persistedState = application.getPersistedState().get(MEMENTO_KEY);
-			if (persistedState != null) {
-				XMLMemento memento = XMLMemento.createReadRoot(new StringReader(persistedState));
-				IStatus status = readWorkbenchState(memento);
-
-				if (status.getSeverity() != IStatus.OK) {
-					WorkbenchPlugin.log(new Status(status.getSeverity(), PlatformUI.PLUGIN_ID,
-							WorkbenchMessages.Workbench_problemsRestoring));
-				}
-			}
-		} catch (Exception e) {
-			WorkbenchPlugin.log(new Status(
-					IStatus.ERROR, PlatformUI.PLUGIN_ID, 0,
-					WorkbenchMessages.Workbench_problemsRestoring, e));
-		}
-	}
-
-	private IStatus readWorkbenchState(IMemento memento) {
-		MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-				WorkbenchMessages.Workbench_problemsRestoring, null);
-
-		try {
-			UIStats.start(UIStats.RESTORE_WORKBENCH, "MRUList"); //$NON-NLS-1$
-			IMemento mruMemento = memento.getChild(IWorkbenchConstants.TAG_MRU_LIST);
-			if (mruMemento != null) {
-				result.add(getEditorHistory().restoreState(mruMemento));
-			}
-		} finally {
-			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "MRUList"); //$NON-NLS-1$
-		}
-		return result;
 	}
 }

@@ -19,17 +19,17 @@ import org.eclipse.e4.ui.model.application.MContribution;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is a concrete class used to represent a menu item that replaces itself through
- * the execution of the associated client code.  The supplied contribution will
- * provide the appropriate MMenuElement model elements when queried.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MDynamicMenuContribution extends MMenuItem, MContribution {
 } // MDynamicMenuContribution

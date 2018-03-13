@@ -19,9 +19,7 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  * <!-- begin-model-doc -->
  * Do no use! This class will be removed at the beginning of Luna (4.4) development.
  * @deprecated Use MMenuItem
- * @noreference This interface is not intended to be referenced by clients.
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
+ * @noreference
  * <!-- end-model-doc -->
  *
  * <p>
@@ -33,6 +31,7 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MOpaqueMenuItem extends MMenuItem {
 	/**

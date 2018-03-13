@@ -20,10 +20,11 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the base type for various menu and toolbar items.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -37,6 +38,7 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MItem extends MUIElement, MUILabel {
 	/**
@@ -46,7 +48,10 @@ public interface MItem extends MUIElement, MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Defines the current enablement state of a given menu or toolbar item.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Enabled</em>' attribute.
@@ -72,7 +77,10 @@ public interface MItem extends MUIElement, MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Defines the current selection state for a menu or tool item
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Selected</em>' attribute.
@@ -99,7 +107,10 @@ public interface MItem extends MUIElement, MUILabel {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Defines the item type for this item.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Type</em>' attribute.

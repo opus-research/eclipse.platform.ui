@@ -15,7 +15,6 @@ import java.net.URI;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
@@ -25,6 +24,7 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.ServiceRegistration;
@@ -71,14 +71,6 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>dir</code>
 	 */
 	public static final String RTL_MODE = "dir"; //$NON-NLS-1$
-	/**
-	 * The argument for the perspective to activate <br>
-	 * <br>
-	 * Value is: <code>perspectiveId</code>
-	 */
-	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
-
-	public static final String NO_SAVED_MODEL_FOUND = "NO_SAVED_MODEL_FOUND"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;
@@ -118,7 +110,6 @@ public class E4Workbench implements IWorkbench {
 		}
 
 		uiEventPublisher = new UIEventPublisher(appContext);
-		appContext.set(UIEventPublisher.class, uiEventPublisher);
 		((Notifier) uiRoot).eAdapters().add(uiEventPublisher);
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", getId()); //$NON-NLS-1$

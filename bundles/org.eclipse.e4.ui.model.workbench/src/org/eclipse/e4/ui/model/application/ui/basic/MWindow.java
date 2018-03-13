@@ -27,11 +27,11 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the concrete class representing a bare bones window in the UI Model. Unless
- * specifically desired it's likely better to use the TrimmedWindow instead.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -49,6 +49,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
  *
  * @model
  * @generated
+ * @since 1.0
  */
 public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MContext, MHandlerContainer, MBindings, MSnippetContainer {
 	/**
@@ -57,7 +58,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The main menu (if any) for this window.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Main Menu</em>' containment reference.
@@ -84,7 +88,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The 'X' position of this window
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>X</em>' attribute.
@@ -111,7 +118,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The 'Y' position of this window
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Y</em>' attribute.
@@ -138,7 +148,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The width of this window
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Width</em>' attribute.
@@ -165,7 +178,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The heigfht of this window
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Height</em>' attribute.
@@ -192,7 +208,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The collection of 'Detached' windows associated with this window.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Windows</em>' containment reference list.
@@ -208,8 +227,10 @@ public interface MWindow extends MElementContainer<MWindowElement>, MUILabel, MC
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is the collection of UI Elements that are referenced by Placeholders, allowing
-	 * the re-use of these elements in different Perspectives.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Shared Elements</em>' containment reference list.

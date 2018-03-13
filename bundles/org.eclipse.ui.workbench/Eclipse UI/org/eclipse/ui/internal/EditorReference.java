@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -28,6 +26,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.jface.internal.provisional.action.ICoolBarManager2;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
@@ -41,7 +40,6 @@ import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPart3;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
@@ -78,15 +76,19 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 							.getEditorRegistry();
 					descriptorId = createReadRoot.getString(IWorkbenchConstants.TAG_ID);
 					this.descriptor = (EditorDescriptor) registry.findEditor(descriptorId);
+				}
 
-					boolean pinnedVal = "true".equals(createReadRoot.getString(IWorkbenchConstants.TAG_PINNED)); //$NON-NLS-1$
-					setPinned(pinnedVal);
+				if (this.descriptor == null) {
+					setImageDescriptor(ImageDescriptor.getMissingImageDescriptor());
+				} else {
+					setImageDescriptor(this.descriptor.getImageDescriptor());
 				}
 			} catch (WorkbenchException e) {
 				WorkbenchPlugin.log(e);
 			}
 		} else {
 			descriptorId = this.descriptor.getId();
+			setImageDescriptor(this.descriptor.getImageDescriptor());
 		}
 	}
 
@@ -137,42 +139,19 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 			return null;
 		}
 
-		XMLMemento editorMem = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_EDITOR);
-		editorMem.putString(IWorkbenchConstants.TAG_ID, descriptor.getId());
-		editorMem.putString(IWorkbenchConstants.TAG_TITLE, getTitle());
-		editorMem.putString(IWorkbenchConstants.TAG_NAME, getName());
-		editorMem.putString(IWorkbenchConstants.TAG_ID, getId());
-		editorMem.putString(IWorkbenchConstants.TAG_TOOLTIP, getTitleToolTip());
-		editorMem.putString(IWorkbenchConstants.TAG_PART_NAME, getPartName());
+		XMLMemento root = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_EDITOR);
+		root.putString(IWorkbenchConstants.TAG_ID, descriptor.getId());
 
-		if (editor instanceof IWorkbenchPart3) {
-			Map properties = ((IWorkbenchPart3) editor).getPartProperties();
-			if (!properties.isEmpty()) {
-				IMemento propBag = editorMem.createChild(IWorkbenchConstants.TAG_PROPERTIES);
-				Iterator i = properties.entrySet().iterator();
-				while (i.hasNext()) {
-					Map.Entry entry = (Map.Entry) i.next();
-					IMemento p = propBag.createChild(IWorkbenchConstants.TAG_PROPERTY,
-							(String) entry.getKey());
-					p.putTextData((String) entry.getValue());
-				}
-			}
-		}
-
-		if (isPinned()) {
-			editorMem.putString(IWorkbenchConstants.TAG_PINNED, "true"); //$NON-NLS-1$
-		}
-
-		IMemento inputMem = editorMem.createChild(IWorkbenchConstants.TAG_INPUT);
+		IMemento inputMem = root.createChild(IWorkbenchConstants.TAG_INPUT);
 		inputMem.putString(IWorkbenchConstants.TAG_FACTORY_ID, persistable.getFactoryId());
 		persistable.saveState(inputMem);
 
 		if (editor instanceof IPersistableEditor) {
-			IMemento editorStateMem = editorMem.createChild(IWorkbenchConstants.TAG_EDITOR_STATE);
+			IMemento editorStateMem = root.createChild(IWorkbenchConstants.TAG_EDITOR_STATE);
 			((IPersistableEditor) editor).saveState(editorStateMem);
 		}
 
-		return editorMem;
+		return root;
 	}
 
 	public EditorDescriptor getDescriptor() {
@@ -418,10 +397,7 @@ public class EditorReference extends WorkbenchPartReference implements IEditorRe
 
 	@Override
 	public PartSite getSite() {
-		if (legacyPart != null) {
-			return (PartSite) legacyPart.getSite();
-		}
-		return null;
+		return (PartSite) legacyPart.getSite();
 	}
 
 	private static HashMap<String, Set<EditorActionBars>> actionCache = new HashMap<String, Set<EditorActionBars>>();

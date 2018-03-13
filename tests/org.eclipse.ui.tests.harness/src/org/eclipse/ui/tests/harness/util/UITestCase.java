@@ -163,7 +163,7 @@ public abstract class UITestCase extends TestCase {
      * @param msg the trace message
      */
     protected void trace(String msg) {
-        System.out.println(msg);
+        System.err.println(msg);
     }
 
     /**
@@ -273,7 +273,7 @@ public abstract class UITestCase extends TestCase {
 			waitOnShell(window.getShell());
 			return window;
 		} catch (WorkbenchException e) {
-			fail("Problem opening test window", e);
+			fail();
 			return null;
 		}
 	}
@@ -333,7 +333,7 @@ public abstract class UITestCase extends TestCase {
             }
             return pages;
         } catch (WorkbenchException e) {
-        	fail("Problem opening test page", e);
+            fail();
             return null;
         }
     }

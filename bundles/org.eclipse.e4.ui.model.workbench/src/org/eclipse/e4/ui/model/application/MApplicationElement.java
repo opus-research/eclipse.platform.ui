@@ -17,23 +17,13 @@ import java.util.Map;
  * <!-- begin-user-doc -->
  * A representation of the model object '<em><b>Element</b></em>'.
  * <!-- end-user-doc -->
- *
  * <!-- begin-model-doc -->
  * <p>
- * This is the root element for all UI Model elements, defining attribtues common
- * to every element; the element's id as well as three general storage elements:
- * <ul>
- * <li>Tags: This is a set of strings which can be used to stereotype a particular
- * element. Tags may be specified in element searches and can also be referred
- * to in the CSS styling definition.</li>
- * <li>PersistedState: A string to string map used to store information that nneds
- * to be persisted between sessions.</li>
- * <li>TransientData: A string to object map which can be used to store runtime data
- * relevant to a particular model element.</li>
- * </ul>
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -49,6 +39,7 @@ import java.util.Map;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MApplicationElement {
 	/**
@@ -88,10 +79,10 @@ public interface MApplicationElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is a Strimg to String map that can be used to persist information avout model
-	 * elements across program sessions. The format of the 'value' string is defined by
-	 * the code setting the value into the map. Information stored in this map is part of
-	 * the model and will be persisted and restored as such.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Persisted State</em>' map.
@@ -107,10 +98,10 @@ public interface MApplicationElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Tags are a list of Strings that are persistent parts of the UI Model. They can be used to 'refine' a particular
-	 * model element, supplying extra 'meta' information. These tags interact with the CSS engine so that it's
-	 * possible to write CSS specific to a particular tag. The platform currently uses this mechanism to cause the
-	 * color change in the stack comtaining the currently active part
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Tags</em>' attribute list.
@@ -125,8 +116,10 @@ public interface MApplicationElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This field is used to track the bundle (if any) from which the UI element was
-	 * derived in order to faciliate its removal should the bundle go away or be updated.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Contributor URI</em>' attribute.
@@ -154,9 +147,10 @@ public interface MApplicationElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is a String to Object map into which any desired runtime information realted to a particular element
-	 * may be stored. It is <i>not</i> persisted across sessions so it is not necessary that the 'values' be
-	 * serializable.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Transient Data</em>' map.

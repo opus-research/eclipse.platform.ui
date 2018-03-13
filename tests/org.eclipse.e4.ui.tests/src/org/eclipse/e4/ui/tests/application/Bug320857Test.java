@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,9 +55,8 @@ public class Bug320857Test extends TestCase {
 			MApplication application) {
 		applicationContext.set(MApplication.class.getName(), application);
 		application.setContext(applicationContext);
-		final UIEventPublisher ep = new UIEventPublisher(applicationContext);
-		((Notifier) application).eAdapters().add(ep);
-		applicationContext.set(UIEventPublisher.class, ep);
+		((Notifier) application).eAdapters().add(
+				new UIEventPublisher(applicationContext));
 	}
 
 	private IPresentationEngine getEngine() {

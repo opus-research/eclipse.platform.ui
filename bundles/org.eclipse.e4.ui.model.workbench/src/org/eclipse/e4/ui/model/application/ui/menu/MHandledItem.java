@@ -22,10 +22,11 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the base class for menu and tool items associated with Commands.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -39,6 +40,7 @@ import org.eclipse.e4.ui.model.application.commands.MParameter;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MHandledItem extends MItem {
 	/**
@@ -47,7 +49,10 @@ public interface MHandledItem extends MItem {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * A reference to the Command associated with this item.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Command</em>' reference.
@@ -73,9 +78,11 @@ public interface MHandledItem extends MItem {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is used for low level implementation and is not intended to be used by clients
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
-	 * @noreference
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Wb Command</em>' attribute.
 	 * @see #setWbCommand(ParameterizedCommand)
@@ -101,7 +108,10 @@ public interface MHandledItem extends MItem {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Defines the specific parameters to use when executing the command through this item.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Parameters</em>' containment reference list.

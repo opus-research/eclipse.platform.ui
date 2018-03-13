@@ -104,8 +104,6 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
-	private static final String PERSPECTIVE_ARG_NAME = "perspective";
-	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
 
 	private String[] args;
 
@@ -124,12 +122,10 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * 
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
-	 * IApplicationContext)
-	 */
+	 * IApplicationContext) */
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -154,8 +150,8 @@ public class E4Application implements IApplication {
 				// place it off so it's not visible
 				shell.setLocation(0, 10000);
 			}
-			if (!checkInstanceLocation(instanceLocation, shell,
-					workbench.getContext()))
+
+			if (!checkInstanceLocation(instanceLocation, shell))
 				return EXIT_OK;
 
 			IEclipseContext workbenchContext = workbench.getContext();
@@ -213,10 +209,6 @@ public class E4Application implements IApplication {
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
 
-		// This context will be used by the injector for its
-		// extended data suppliers
-		ContextInjectionFactory.setDefault(appContext);
-
 		// Check if DS is running
 		if (!appContext
 				.containsKey("org.eclipse.e4.ui.workbench.modeling.EPartService")) {
@@ -240,14 +232,6 @@ public class E4Application implements IApplication {
 						PostContextCreate.class, appContext, null);
 			}
 		}
-
-		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
-				applicationContext, false);
-		if (forcedPerspectiveId != null) {
-			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
-					forcedPerspectiveId);
-		}
-
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext,
 				appContext);
@@ -267,6 +251,10 @@ public class E4Application implements IApplication {
 
 		// Set the app's context after adding itself
 		appContext.set(MApplication.class.getName(), appModel);
+
+		// This context will be used by the injector for its
+		// extended data suppliers
+		ContextInjectionFactory.setDefault(appContext);
 
 		// adds basic services to the contexts
 		initializeServices(appModel);
@@ -293,7 +281,10 @@ public class E4Application implements IApplication {
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
-		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
+
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		appContext.set(E4Application.THEME_ID, themeId);
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
@@ -353,6 +344,7 @@ public class E4Application implements IApplication {
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
+		eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
 
 		// Save and restore
 		boolean saveAndRestore;
@@ -362,13 +354,6 @@ public class E4Application implements IApplication {
 
 		eclipseContext.set(IWorkbench.PERSIST_STATE,
 				Boolean.valueOf(saveAndRestore));
-
-		// when -data @none or -data @noDefault options
-		if (instanceLocation != null && instanceLocation.getURL() != null) {
-			eclipseContext.set(E4Workbench.INSTANCE_LOCATION, instanceLocation);
-		} else {
-			eclipseContext.set(IWorkbench.PERSIST_STATE, false);
-		}
 
 		// Persisted state
 		boolean clearPersistedState;
@@ -513,16 +498,7 @@ public class E4Application implements IApplication {
 	 * Simplified copy of IDEAplication processing that does not offer to choose
 	 * a workspace location.
 	 */
-	private boolean checkInstanceLocation(Location instanceLocation,
-			Shell shell, IEclipseContext context) {
-
-		// Eclipse has been run with -data @none or -data @noDefault options so
-		// we don't need to validate the location
-		if (instanceLocation == null
-				&& Boolean.FALSE.equals(context.get(IWorkbench.PERSIST_STATE))) {
-			return true;
-		}
-
+	private boolean checkInstanceLocation(Location instanceLocation, Shell shell) {
 		if (instanceLocation == null) {
 			MessageDialog
 					.openError(
@@ -534,8 +510,7 @@ public class E4Application implements IApplication {
 
 		// -data "/valid/path", workspace already set
 		if (instanceLocation.isSet()) {
-			// make sure the meta data version is compatible (or the user
-			// has
+			// make sure the meta data version is compatible (or the user has
 			// chosen to overwrite it).
 			if (!checkValidWorkspace(shell, instanceLocation.getURL())) {
 				return false;
@@ -576,8 +551,7 @@ public class E4Application implements IApplication {
 			}
 			return false;
 		}
-		/*
-		 * // -data @noDefault or -data not specified, prompt and set
+		/* // -data @noDefault or -data not specified, prompt and set
 		 * ChooseWorkspaceData launchData = new ChooseWorkspaceData(instanceLoc
 		 * .getDefault());
 		 * 
@@ -601,8 +575,7 @@ public class E4Application implements IApplication {
 		 * already in use -- force the user to choose again
 		 * MessageDialog.openError(shell,
 		 * IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle,
-		 * IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage); }
-		 */
+		 * IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage); } */
 		return false;
 	}
 
@@ -652,11 +625,6 @@ public class E4Application implements IApplication {
 		mbox.setText(title);
 		mbox.setMessage(message);
 		return mbox.open() == SWT.OK;
-	}
-
-	private String getThemeId(IApplicationContext appContext) {
-		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
-		return themeId != null ? themeId : DEFAULT_THEME_ID;
 	}
 
 	/**

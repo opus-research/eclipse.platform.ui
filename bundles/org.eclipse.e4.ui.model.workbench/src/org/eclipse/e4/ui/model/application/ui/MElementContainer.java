@@ -19,18 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the base for the two different types of containment used in the model;
- * 'Stacks' (where only one element would be visible at a time) and 'Tiles' (where 
- * all the ele elements are visible at the same time.
- * </p><p>
- * All containers define the type of element that they are to contain. By design this is
- * always a single type. Where different concrete types are to be contained within the
- * same container they all both mix in a container-specific type. For example both
- * MParts and MPlaceholders are valid children for an MPartStack so they both mix in
- * 'StackElement' (which is an empty stub used only to constran the stack's types.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -43,16 +36,21 @@ import java.util.List;
  *
  * @model abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MElementContainer<T extends MUIElement> extends MUIElement {
 	/**
 	 * Returns the value of the '<em><b>Children</b></em>' containment reference list.
+	 * The list contents are of type {@link T}.
 	 * It is bidirectional and its opposite is '{@link org.eclipse.e4.ui.model.application.ui.MUIElement#getParent <em>Parent</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This is the list of contained elements in this container. All elements must be of type <T>.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Children</em>' containment reference list.
@@ -68,9 +66,10 @@ public interface MElementContainer<T extends MUIElement> extends MUIElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This field contains the reference to the currently 'selected' element within a container.
-	 * Note that the element must not only be in the container's children list but must also be
-	 * visible in the presentation ("toBeRendered' == true).
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Selected Element</em>' reference.

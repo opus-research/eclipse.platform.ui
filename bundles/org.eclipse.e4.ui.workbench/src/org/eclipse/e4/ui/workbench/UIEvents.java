@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,10 +29,6 @@ import org.osgi.service.event.Event;
  * When the UI model changes org.eclipse.e4.ui.internal.workbench.swt.GenTopic should be run as an
  * Eclipse application and the console results should be pasted into this file replacing the code
  * below the "Place Generated Code Here" comment
- * 
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
- * @since 1.0
  */
 public class UIEvents {
 
@@ -259,13 +255,6 @@ public class UIEvents {
 		 * Sent when application startup is complete
 		 */
 		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
-
-		/**
-		 * Sent when the theme is changed
-		 * 
-		 * @since 1.1
-		 */
-		public static final String THEME_CHANGED = TOPIC + TOPIC_SEP + "themeChanged"; //$NON-NLS-1$
 	}
 
 	/**

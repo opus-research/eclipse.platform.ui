@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 BestSolution.at and others.
+ * Copyright (c) 2009, 2012 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
  * Implementations of this service are responsible for creating or destroying widgets corresponding
  * to model elements, as well as for running any event loop required for handling user events on
  * those widgets.
- * 
- * @noimplement This interface is not intended to be implemented by clients.
- * @since 1.0
  */
 public interface IPresentationEngine {
 	/**
@@ -44,14 +41,6 @@ public interface IPresentationEngine {
 	 * to control the affordance.
 	 */
 	public static final String NO_CLOSE = "NoClose"; //$NON-NLS-1$
-
-	/**
-	 * Declare the stack as containing a singe 'standalone' view. These stacks will not allow either
-	 * dragging the view out of the stack nor dragging other views in.
-	 * 
-	 * @since 1.1
-	 */
-	public static final String STANDALONE = "Standalone"; //$NON-NLS-1$
 
 	/**
 	 * Don't remove the element from the display even if it has no displayable children
@@ -123,14 +112,6 @@ public interface IPresentationEngine {
 	 * ToolTip of a minimized problems view stack to the number of errors and warnings in the view.
 	 */
 	public static final String OVERRIDE_TITLE_TOOL_TIP_KEY = "e4_override_title_tool_tip_key"; //$NON-NLS-1$
-
-	/**
-	 * This is a Tag that when applied to an MUILabel element will cause whatever Image is to be
-	 * shown to be adorned with the 'pinned' affordance.
-	 * 
-	 * @since 1.1
-	 */
-	public static final String ADORNMENT_PIN = "Pin Adornment"; //$NON-NLS-1$
 
 	/**
 	 * This is a <b>Boolean</b> preference used to control animations in the application
