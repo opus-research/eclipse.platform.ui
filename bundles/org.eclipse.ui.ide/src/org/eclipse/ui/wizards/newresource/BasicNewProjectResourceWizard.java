@@ -13,7 +13,6 @@
 
 package org.eclipse.ui.wizards.newresource;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -113,8 +111,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 
 	private WizardNewProjectReferencePage referencePage;
 
-	private File defaultLocation;
-	
 	// cache of newly-created project
 	private IProject newProject;
 
@@ -173,16 +169,6 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		}; 
 		mainPage.setTitle(ResourceMessages.NewProject_title);
 		mainPage.setDescription(ResourceMessages.NewProject_description);
-		if (this.defaultLocation != null) {
-			String projectName = this.defaultLocation.getName();
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			int i = 0;
-			while (root.getProject(projectName).exists()) {
-				projectName = this.defaultLocation.getName() + i;
-			}
-			this.mainPage.setInitialProjectName(projectName);
-			this.mainPage.setInitialLocation(this.defaultLocation);
-		}
 		this.addPage(mainPage);
 
 		// only add page if there are already projects in the workspace
@@ -624,12 +610,5 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 					preferenceValue);
 		}
 		return result == IDialogConstants.YES_ID;
-	}
-
-	/**
-	 * @param source
-	 */
-	public void setDefaultLocation(File source) {
-		this.defaultLocation = source;
 	}
 }
