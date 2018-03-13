@@ -749,6 +749,10 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	public CTabItem findItemForPart(MPart part) {
+		// Invisible parts don't have items
+		if (!part.isToBeRendered())
+			return null;
+
 		// is this a direct child of the stack?
 		if (part.getParent() != null
 				&& part.getParent().getRenderer() == StackRenderer.this) {
@@ -761,6 +765,10 @@ public class StackRenderer extends LazyStackRenderer {
 		// Do we have any stacks with place holders for the element
 		// that's changed?
 		MWindow win = modelService.getTopLevelWindowFor(part);
+
+		if (win == null)
+			return null;
+
 		List<MPlaceholder> refs = modelService.findElements(win, null,
 				MPlaceholder.class, null);
 		if (refs != null) {
