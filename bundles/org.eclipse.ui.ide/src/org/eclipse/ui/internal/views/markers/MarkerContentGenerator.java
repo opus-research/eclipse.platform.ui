@@ -11,6 +11,7 @@
 
 package org.eclipse.ui.internal.views.markers;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -18,11 +19,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -69,6 +72,7 @@ public class MarkerContentGenerator {
 	private static final String TAG_LEGACY_FILTER_ENTRY = "filter"; //$NON-NLS-1$
 	private static final String TAG_MARKER_LIMIT = "markerLimit"; //$NON-NLS-1$
 	private static final String TAG_MARKER_LIMIT_ENABLED = "markerLimitEnabled"; //$NON-NLS-1$
+	private static final String TAG_MARKER_SYMBOLIC_LINKS_CHECKED = "markerSymbolicLinksChecked"; //$NON-NLS-1$
 	
 	/*Use this to indicate filter change rather than a null*/
 	private final Collection FILTERS_CHANGED = Collections.EMPTY_SET;
@@ -86,6 +90,8 @@ public class MarkerContentGenerator {
 	private int markerLimits = 100;
 	private boolean markerLimitsEnabled = true;
 
+	private boolean markerSuppressLinksVisible = false;
+	private boolean markerSuppressLinksChecked = true;
 	/**
 	 * focusResources
 	 * 
@@ -229,7 +235,10 @@ public class MarkerContentGenerator {
 		if (limitsEnabled != null) {
 			markerLimitsEnabled = limitsEnabled.booleanValue();
 		}
-		
+
+		loadSupressSymbolicLinkSettings(memento);
+
+
 		if (memento.getChildren(TAG_COLUMN_VISIBILITY).length != 0) {
 
 			IMemento[] visible = memento.getChildren(TAG_COLUMN_VISIBILITY);
@@ -435,6 +444,36 @@ public class MarkerContentGenerator {
 	}
 
 	/**
+	 * @return Returns the suppressSymbolicLinksChecked boolean value.
+	 */
+	public boolean isSuppressSymbolicLinksChecked() {
+		return markerSuppressLinksChecked;
+	}
+
+	/**
+	 * @param suppressSymbolicLinksChecked The suppressSymbolsuppressSymbolicLinksChecked to set.
+	 */
+	public void setSuppressSymbolicLinksChecked(boolean suppressSymbolicLinksChecked) {
+		this.markerSuppressLinksChecked = suppressSymbolicLinksChecked;
+	}
+
+	/**
+	 * @return Returns the suppressSymbolicLinksVisible.
+	 */
+	public boolean isSuppressSymbolicLinksVisible() {
+		return markerSuppressLinksVisible;
+	}
+
+	/**
+	 * @param markerSuppressLinksVisible
+	 *            - Sets visibility for the button on FiltersConfigurationDialog
+	 *            "suppress duplicates due to file system links".
+	 */
+	public void setSuppressSymbolicLinksVisible(boolean markerSuppressLinksVisible) {
+		this.markerSuppressLinksVisible = markerSuppressLinksVisible;
+	}
+
+	/**
 	 * @return Collection of declared MarkerFieldFilterGroup(s)
 	 */
 	Collection getDeclaredFilters() {
@@ -483,7 +522,16 @@ public class MarkerContentGenerator {
 		if (limitsEnabled != null) {
 			markerLimitsEnabled = limitsEnabled.booleanValue();
 		}
-		
+	}
+
+	private void loadSupressSymbolicLinkSettings(IMemento memento) {
+		if (memento == null)
+			return;
+
+		Boolean suppressSymbolicDuplicatesChecked = memento.getBoolean(TAG_MARKER_SYMBOLIC_LINKS_CHECKED);
+		if (suppressSymbolicDuplicatesChecked != null) {
+			markerSuppressLinksChecked = suppressSymbolicDuplicatesChecked.booleanValue();
+		}
 	}
 	
 	/**
@@ -527,6 +575,7 @@ public class MarkerContentGenerator {
 			XMLMemento root = XMLMemento.createReadRoot(new StringReader(
 					mementoString));
 			loadLimitSettings(root);
+			loadSupressSymbolicLinkSettings(root);
 			loadFilterSettings(root);
 		} catch (WorkbenchException e) {
 			StatusManager.getManager().handle(e.getStatus());
@@ -697,7 +746,7 @@ public class MarkerContentGenerator {
 		
 		memento.putInteger(TAG_MARKER_LIMIT, markerLimits);
 		memento.putBoolean(TAG_MARKER_LIMIT_ENABLED, markerLimitsEnabled);
-
+		memento.putBoolean(TAG_MARKER_SYMBOLIC_LINKS_CHECKED, markerSuppressLinksChecked);
 	}
 	
 	/**
@@ -1145,10 +1194,21 @@ public class MarkerContentGenerator {
 			}
 			MarkerEntry entry = null;
 			int lenght =  markers.length;
+			Map  supppressDuplicatesMap = new HashMap();
 			for (int i = 0; i < lenght; i++) {
 				entry = new MarkerEntry(markers[i]);
-				if (select(entry, selected, filters, andFilters)) {
-					result.add(entry);
+
+				if ( markerSuppressLinksChecked ) {
+					if ( shouldDisplayAfterSuppressDuplicates(markers[i] , supppressDuplicatesMap) ) {
+						 if (select(entry, selected, filters, andFilters) ) {
+							result.add(entry);
+						 }
+					}
+				}
+				else {
+					if (select(entry, selected, filters, andFilters) ) {
+						result.add(entry);
+					}
 				}
 				entry.clearCache();
 				if (i % 500 == 0) {
@@ -1166,5 +1226,47 @@ public class MarkerContentGenerator {
 			IDEWorkbenchPlugin.getDefault().getPreferenceStore().removePropertyChangeListener(filterPreferenceListener);
 			filterPreferenceListener = null;
 		}
+	}
+
+	/**
+	 * This method filters the markers to suppress duplicates due to symbolic link.
+	 * */
+	private boolean shouldDisplayAfterSuppressDuplicates(IMarker marker, Map  supppressDuplicatesMap) {
+		try {
+			Integer lineNumber = null;
+			try {
+				lineNumber = Integer.valueOf(marker.getAttribute(IMarker.LINE_NUMBER).toString() );
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
+			File file = new File(marker.getResource().getLocation().toString());
+			String canonicalPath = file.getCanonicalPath().toString();
+			String message = marker.getAttribute(IMarker.MESSAGE).toString();
+			if (lineNumber != null) {
+				if ( supppressDuplicatesMap.containsKey(canonicalPath)) {
+					 HashMap map2 = (HashMap)supppressDuplicatesMap.get(canonicalPath);
+					 if (map2.containsKey(lineNumber+message)) {
+						// return false
+						// It should be the symbolic link marker, that contains
+						// the same message into the same line number, and it is
+						// considered as a duplicate, will be skipped and will
+						// not be displayed in the tasks view.
+					 }
+					 else {
+						 map2.put( lineNumber+message , marker);
+						 return true;
+					 }
+				}
+				else {
+					Map map2 = new HashMap();
+					map2.put( lineNumber+message , marker);
+					supppressDuplicatesMap.put(canonicalPath, map2);
+					return true;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
