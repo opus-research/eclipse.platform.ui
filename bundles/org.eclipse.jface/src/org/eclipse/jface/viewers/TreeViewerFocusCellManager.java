@@ -24,13 +24,11 @@ import org.eclipse.swt.widgets.TreeItem;
  * This class is responsible to provide the concept of cells for {@link Tree}.
  * This concept is needed to provide features like editor activation with the
  * keyboard
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  *
  */
-public class TreeViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
+public class TreeViewerFocusCellManager extends SWTFocusCellManager {
 	private static final CellNavigationStrategy TREE_NAVIGATE = new CellNavigationStrategy() {
 		@Override
 		public void collapse(ColumnViewer viewer, ViewerCell cellToCollapse,
@@ -100,8 +98,8 @@ public class TreeViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
 	 * @param focusDrawingDelegate
 	 *            the delegate responsible to highlight selected cell
 	 */
-	public TreeViewerFocusCellManager(TreeViewer<E,I> viewer,
-			FocusCellHighlighter<E,I> focusDrawingDelegate) {
+	public TreeViewerFocusCellManager(TreeViewer viewer,
+			FocusCellHighlighter focusDrawingDelegate) {
 		this(viewer, focusDrawingDelegate, TREE_NAVIGATE);
 	}
 
@@ -116,18 +114,18 @@ public class TreeViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
 	 *            the strategy used to navigate the cells
 	 * @since 3.4
 	 */
-	public TreeViewerFocusCellManager(TreeViewer<E,I> viewer,
-			FocusCellHighlighter<E,I> focusDrawingDelegate,
-			CellNavigationStrategy<E,I> navigationStrategy) {
+	public TreeViewerFocusCellManager(TreeViewer viewer,
+			FocusCellHighlighter focusDrawingDelegate,
+			CellNavigationStrategy navigationStrategy) {
 		super(viewer, focusDrawingDelegate, navigationStrategy);
 	}
 
 	@Override
-	ViewerCell<E> getInitialFocusCell() {
+	ViewerCell getInitialFocusCell() {
 		Tree tree = (Tree) getViewer().getControl();
 
 		if (! tree.isDisposed() && tree.getItemCount() > 0 && ! tree.getTopItem().isDisposed()) {
-			ViewerRow<E> aViewerRow = getViewer().getViewerRowFromItem(tree.getTopItem());
+			ViewerRow aViewerRow = getViewer().getViewerRowFromItem(tree.getTopItem());
 			if (tree.getColumnCount() == 0) {
 				return aViewerRow.getCell(0);
 			}
@@ -142,13 +140,13 @@ public class TreeViewerFocusCellManager<E,I> extends SWTFocusCellManager<E,I> {
 		return null;
 	}
 
-	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow<E> row, int colIndex) {
+	private boolean columnInVisibleArea(Rectangle clientArea, ViewerRow row, int colIndex) {
 		return row.getBounds(colIndex).x >= clientArea.x;
 	}
 
 	@Override
-	public ViewerCell<E> getFocusCell() {
-		ViewerCell<E> cell = super.getFocusCell();
+	public ViewerCell getFocusCell() {
+		ViewerCell cell = super.getFocusCell();
 		Tree t = (Tree) getViewer().getControl();
 
 		// It is possible that the selection has changed under the hood

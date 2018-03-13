@@ -132,8 +132,8 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	protected ColumnViewerEditor<E,I> createViewerEditor() {
-		return new TableViewerEditor<E,I>(this, null,
+	protected ColumnViewerEditor createViewerEditor() {
+		return new TableViewerEditor(this, null,
 				new ColumnViewerEditorActivationStrategy(this),
 				ColumnViewerEditor.DEFAULT);
 	}

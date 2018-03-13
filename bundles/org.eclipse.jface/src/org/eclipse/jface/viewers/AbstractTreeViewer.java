@@ -3229,7 +3229,7 @@ public abstract class AbstractTreeViewer<E,I> extends ColumnViewer<E,I> {
 	 * @since 3.3
 	 */
 	@Override
-	protected ColumnViewerEditor<E,I> createViewerEditor() {
+	protected ColumnViewerEditor createViewerEditor() {
 		return null;
 	}
 
