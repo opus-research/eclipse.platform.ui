@@ -211,10 +211,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
-			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
-			if (!wwindow.isClosing()) {
-				wwindow.getStatusLineManager().update(false);
-			}
+			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
 		}
 
 		public void partHidden(MPart part) {
@@ -560,7 +557,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		private IEditorPart topEditor;
 
-		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList oldActionSets = new ArrayList();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -625,7 +622,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newPart, true);
 			}
 
-			List<IActionSetDescriptor> newActionSets = null;
+			ArrayList newActionSets = null;
 			if (isNewPartAnEditor || (activePart == topEditor && newPart == null)) {
 				newActionSets = calculateActionSets(newPart, null);
 			} else {
@@ -687,7 +684,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newEditor, false);
 			}
 
-			List<IActionSetDescriptor> newActionSets = calculateActionSets(activePart, newEditor);
+			ArrayList newActionSets = calculateActionSets(activePart, newEditor);
 			if (!updateActionSets(newActionSets)) {
 				updateActionBars();
 			}
@@ -737,9 +734,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            active part
 		 * @return the new action sets
 		 */
-		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
-				IEditorPart editor) {
-			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList calculateActionSets(IWorkbenchPart part, IEditorPart editor) {
+			ArrayList newActionSets = new ArrayList();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -765,7 +761,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            the action sets to show
 		 * @return <code>true</code> if the action sets changed
 		 */
-		private boolean updateActionSets(List<IActionSetDescriptor> newActionSets) {
+		private boolean updateActionSets(ArrayList newActionSets) {
 			if (oldActionSets.equals(newActionSets)) {
 				return false;
 			}
