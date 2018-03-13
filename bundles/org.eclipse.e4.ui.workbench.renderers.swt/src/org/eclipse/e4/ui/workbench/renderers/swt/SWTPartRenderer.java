@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -62,16 +61,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 				renderer.createGui(childME);
 			}
 		}
-	}
-
-	public void styleElement(MUIElement element, boolean active) {
-		if (!active)
-			element.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
-		else
-			element.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
-
-		if (element.getWidget() != null)
-			setCSSInfo(element, element.getWidget());
 	}
 
 	public void setCSSInfo(MUIElement me, Object widget) {

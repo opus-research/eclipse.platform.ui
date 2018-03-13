@@ -19,10 +19,9 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Provisional for 4.3. This is a container aggregating the menu contributions to be
- * applied to menus.
+ * Provisional for 4.3.
  * </p>
- * @noreference This interface is not intended to be referenced by clients.
+ * @noreference
  * @since 1.0
  * <!-- end-model-doc -->
  *

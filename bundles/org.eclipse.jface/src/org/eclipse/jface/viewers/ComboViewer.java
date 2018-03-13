@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,8 +101,7 @@ public class ComboViewer extends AbstractListViewer {
         hookControl(list);
     }
 
-    @Override
-	protected void listAdd(String string, int index) {
+    protected void listAdd(String string, int index) {
         if (combo == null) {
             ccombo.add(string, index);
         } else {
@@ -110,8 +109,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listSetItem(int index, String string) {
+    protected void listSetItem(int index, String string) {
         if (combo == null) {
             ccombo.setItem(index, string);
         } else {
@@ -119,8 +117,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected int[] listGetSelectionIndices() {
+    protected int[] listGetSelectionIndices() {
         if (combo == null) {
             return new int[] { ccombo.getSelectionIndex() };
         } else {
@@ -128,8 +125,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected int listGetItemCount() {
+    protected int listGetItemCount() {
         if (combo == null) {
             return ccombo.getItemCount();
         } else {
@@ -137,8 +133,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listSetItems(String[] labels) {
+    protected void listSetItems(String[] labels) {
         if (combo == null) {
             ccombo.setItems(labels);
         } else {
@@ -146,8 +141,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listRemoveAll() {
+    protected void listRemoveAll() {
         if (combo == null) {
             ccombo.removeAll();
         } else {
@@ -155,8 +149,7 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
-    @Override
-	protected void listRemove(int index) {
+    protected void listRemove(int index) {
         if (combo == null) {
             ccombo.remove(index);
         } else {
@@ -167,8 +160,7 @@ public class ComboViewer extends AbstractListViewer {
     /* (non-Javadoc)
      * Method declared on Viewer.
      */
-    @Override
-	public Control getControl() {
+    public Control getControl() {
         if (combo == null) {
             return ccombo;
         } else {
@@ -204,15 +196,13 @@ public class ComboViewer extends AbstractListViewer {
      * we can ensure that the given element is visible without changing the selection.
      * Method defined on StructuredViewer.
      */
-    @Override
-	public void reveal(Object element) {
+    public void reveal(Object element) {
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.AbstractListViewer#listSetSelection(int[])
      */
-    @Override
-	protected void listSetSelection(int[] ixs) {
+    protected void listSetSelection(int[] ixs) {
         if (combo == null) {
             for (int idx = 0; idx < ixs.length; idx++) {
                 ccombo.select(ixs[idx]);
@@ -227,8 +217,7 @@ public class ComboViewer extends AbstractListViewer {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
      */
-    @Override
-	protected void listDeselectAll() {
+    protected void listDeselectAll() {
         if (combo == null) {
             ccombo.deselectAll();
             ccombo.clearSelection();
@@ -241,7 +230,6 @@ public class ComboViewer extends AbstractListViewer {
     /* (non-Javadoc)
      * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
      */
-    @Override
-	protected void listShowSelection() {
+    protected void listShowSelection() {
     }
 }

@@ -17,7 +17,10 @@ package org.eclipse.e4.ui.model.application.ui.menu;
  *
  * <!-- begin-model-doc -->
  * <p>
- * This is the base type for both Direct and Handled tool items.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->
@@ -40,8 +43,10 @@ public interface MToolItem extends MItem, MToolBarElement {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * When set this represents the menu that appears when the 'drop down' arrow is
-	 * clicked on this tool item.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Menu</em>' containment reference.

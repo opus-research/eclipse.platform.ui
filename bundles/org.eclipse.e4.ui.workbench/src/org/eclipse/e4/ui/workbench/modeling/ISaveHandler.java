@@ -15,7 +15,7 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 
 /**
- * @noreference This interface is not intended to be referenced by clients.
+ * @noreference
  * @since 1.0
  */
 public interface ISaveHandler {
@@ -23,10 +23,6 @@ public interface ISaveHandler {
 	public enum Save {
 		YES, NO, CANCEL
 	}
-
-	public boolean save(MPart dirtyPart, boolean confirm);
-
-	public boolean saveParts(Collection<MPart> dirtyParts, boolean confirm);
 
 	public Save promptToSave(MPart dirtyPart);
 

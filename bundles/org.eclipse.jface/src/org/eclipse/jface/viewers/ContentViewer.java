@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,8 +129,7 @@ public abstract class ContentViewer extends Viewer {
      * if none. The viewer's input provides the "model" for the viewer's
      * content.
      */
-    @Override
-	public Object getInput() {
+    public Object getInput() {
         return input;
     }
 
@@ -262,8 +261,7 @@ public abstract class ContentViewer extends Viewer {
      * <code>inputChanged</code> rather than this method, but may extend this method
      * if required.
      */
-    @Override
-	public void setInput(Object input) {
+    public void setInput(Object input) {
     	Control control = getControl();
 		if (control == null || control.isDisposed()) {
 			throw new IllegalStateException(
