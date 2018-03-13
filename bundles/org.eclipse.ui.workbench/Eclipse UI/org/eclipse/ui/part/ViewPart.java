@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.part;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewPart;
@@ -77,6 +82,8 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
             }
         }
     };
+
+	private IEventBroker eventBroker;
 
     /**
      * Creates a new view.
@@ -190,4 +197,26 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         super.checkSite(site);
         Assert.isTrue(site instanceof IViewSite, "The site for a view must be an IViewSite"); //$NON-NLS-1$
     }    
+
+	@Override
+	public void showBusy(boolean busy) {
+		MPart model = getModel();
+		IEventBroker eventBroker = getEventBroker(model);
+
+		if (eventBroker != null) {
+			Map<String, Object> data = new HashMap<String, Object>();
+			data.put(UIEvents.EventTags.ELEMENT, model);
+			data.put(UIEvents.EventTags.ATTNAME, UIEvents.UILabel.BUSY);
+			data.put(UIEvents.EventTags.NEW_VALUE, busy);
+
+			eventBroker.send(UIEvents.UILabel.TOPIC_BUSY, data);
+		}
+	}
+
+	private IEventBroker getEventBroker(MPart model) {
+		if (eventBroker == null && model != null) {
+			eventBroker = model.getContext().get(IEventBroker.class);
+		}
+		return eventBroker;
+	}
 }

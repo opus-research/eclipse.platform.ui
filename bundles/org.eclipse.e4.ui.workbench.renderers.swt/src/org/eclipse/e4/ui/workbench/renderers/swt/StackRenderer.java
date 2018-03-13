@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
+
+import static org.eclipse.e4.ui.css.swt.CSSSWTConstants.CTABITEM_BUSY_CLASSNAME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +75,8 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -530,7 +534,32 @@ public class StackRenderer extends LazyStackRenderer {
 			} else if (hasAsterisk) {
 				cti.setText(text.substring(1));
 			}
+		} else if (UIEvents.UILabel.BUSY.equals(attName)) {
+			updateBusyIndicator(cti, part, (Boolean) newValue);
 		}
+	}
+
+	@SuppressWarnings("restriction")
+	protected void updateBusyIndicator(CTabItem cti, MPart part, boolean busy) {
+		IEclipseContext context = part.getContext();
+		CSSRenderingUtils renderingUtils = context.get(CSSRenderingUtils.class);
+		if (renderingUtils == null) {
+			return;
+		}
+		if (busy && !renderingUtils.addCSSClass(cti, CTABITEM_BUSY_CLASSNAME)) {
+			cti.setFont(createFont(cti.getFont(), SWT.ITALIC));
+		} else if (!busy
+				&& !renderingUtils.removeCSSClass(cti, CTABITEM_BUSY_CLASSNAME)) {
+			cti.setFont(createFont(cti.getFont(), SWT.NONE));
+		}
+	}
+
+	protected Font createFont(Font font, int style) {
+		FontData[] fontDataArray = font.getFontData();
+		for (FontData fontData : fontDataArray) {
+			fontData.setStyle(style);
+		}
+		return new Font(font.getDevice(), fontDataArray);
 	}
 
 	@PreDestroy
@@ -777,8 +806,9 @@ public class StackRenderer extends LazyStackRenderer {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
 			Control ctrl = (Control) element.getWidget();
-			if (ctrl.getParent() == ctf)
+			if (ctrl.getParent() == ctf) {
 				cti.setControl((Control) element.getWidget());
+			}
 		}
 	}
 

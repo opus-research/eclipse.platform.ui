@@ -13,6 +13,7 @@ package org.eclipse.e4.ui.internal.workbench.swt;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.css.swt.dom.ControlElement;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
@@ -26,13 +27,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
 
 public class CSSRenderingUtils {
-
 	// NOTE: The CSS engine 'owns' the image it returns (it caches it)
 	// so we have to cache any rotated versions to match
 	private Map<Image, Image> rotatedImageMap = new HashMap<Image, Image>();
@@ -142,6 +143,48 @@ public class CSSRenderingUtils {
 			return null;
 
 		return styleDeclarations.getPropertyCSSValue(attributeName);
+	}
+
+	@SuppressWarnings("restriction")
+	public boolean addCSSClass(Widget widget, String className) {
+		CSSEngine engine = WidgetElement.getEngine(widget);
+		String cssClasses = (String) widget
+				.getData(CSSSWTConstants.CSS_CLASS_NAME_KEY);
+
+		if (cssClasses == null || engine == null) {
+			return false;
+		}
+		if (cssClasses.contains(className)) {
+			return true;
+		}
+
+		widget.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY,
+				String.format("%s %s", cssClasses, className));
+
+		engine.applyStyles(widget, false);
+
+		return true;
+	}
+
+	@SuppressWarnings("restriction")
+	public boolean removeCSSClass(Widget widget, String className) {
+		CSSEngine engine = WidgetElement.getEngine(widget);
+		String cssClasses = (String) widget
+				.getData(CSSSWTConstants.CSS_CLASS_NAME_KEY);
+
+		if (cssClasses == null || engine == null) {
+			return false;
+		}
+		if (!cssClasses.contains(className)) {
+			return true;
+		}
+
+		widget.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY,
+				cssClasses.replaceFirst(" " + className, ""));
+
+		engine.applyStyles(widget, false);
+
+		return true;
 	}
 
 	/**
