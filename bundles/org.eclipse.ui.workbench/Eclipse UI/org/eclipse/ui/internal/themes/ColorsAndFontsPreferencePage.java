@@ -22,6 +22,8 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -365,8 +367,15 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
         private IPropertyChangeListener listener = new IPropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent event) {
-                fireLabelProviderChanged(new LabelProviderChangedEvent(
-                        PresentationLabelProvider.this));
+				if (event.getNewValue() != null) {
+					fireLabelProviderChanged(new LabelProviderChangedEvent(
+							PresentationLabelProvider.this));
+				} else {
+					// Some theme definition element has been modified and we
+					// need to refresh the viewer
+					tree.getViewer().setContentProvider(new ThemeContentProvider());
+					tree.getViewer().collapseAll();
+				}
             }
         };
 
@@ -688,6 +697,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     private FilteredTree tree;
     
 	private Text descriptionText;
+
+	private IEventBroker eventBroker;
 
     /**
      * Create a new instance of the receiver.
@@ -1230,6 +1241,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
      */
     public void init(IWorkbench aWorkbench) {
         this.workbench = (Workbench) aWorkbench;
+		eventBroker = (IEventBroker) workbench.getService(IEventBroker.class);
         setPreferenceStore(PrefUtil.getInternalPreferenceStore());
 
         final IThemeManager themeManager = aWorkbench.getThemeManager();
@@ -1383,8 +1395,10 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
         getApplyButton().setFont(appliedDialogFont);
         getDefaultsButton().setFont(appliedDialogFont);
 
-        if (oldFont != null)
+		if (oldFont != null) {
 			oldFont.dispose();
+		}
+		publishThemeChangedEvent();
     }
 
     private void performColorDefaults() {
@@ -1468,8 +1482,10 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
     	saveTreeExpansion();
     	saveTreeSelection();
         boolean result =  performColorOk() && performFontOk();
-        if(result)
+		if (result) {
 			PrefUtil.savePrefs();
+			publishThemeChangedEvent();
+		}
         return result;
     }
 
@@ -2085,5 +2101,12 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 		data.widthHint = convertWidthInCharsToPixels(30);
 		descriptionText.setLayoutData(data);
 		myApplyDialogFont(descriptionText);
+	}
+
+	private void publishThemeChangedEvent() {
+		if (eventBroker != null) {
+			eventBroker.send(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
+					workbench.getApplication());
+		}
 	}
 }

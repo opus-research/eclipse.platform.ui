@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,12 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,11 +21,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
@@ -42,6 +47,8 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
+import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.emf.ecore.EObject;
@@ -51,6 +58,7 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManagerOverrides;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
@@ -69,8 +77,16 @@ import org.osgi.service.event.EventHandler;
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
 
+	private static final Selector ALL_SELECTOR = new Selector() {
+
+		public boolean select(MApplicationElement element) {
+			return true;
+		}
+	};
+
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
+	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
 
 	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
 	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
@@ -82,6 +98,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
 
+	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
+
 	// @Inject
 	// private Logger logger;
 
@@ -92,7 +110,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
 		public void handleEvent(Event event) {
-			// Ensure that this event is for a MMenuItem
+			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
 				return;
 
@@ -106,11 +124,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			String attName = (String) event
 					.getProperty(UIEvents.EventTags.ATTNAME);
-			if (UIEvents.UILabel.LABEL.equals(attName)) {
+			if (UIEvents.UILabel.LABEL.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 				ici.update();
 			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 				ici.update();
-			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+					|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 				ici.update();
 			}
 		}
@@ -159,8 +179,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					return;
 				}
 				ici.setVisible(itemModel.isVisible());
-				ToolBarManager parent = (ToolBarManager) ((ContributionItem) ici)
-						.getParent();
+
+				ToolBarManager parent = null;
+				if (ici instanceof MenuManager) {
+					parent = (ToolBarManager) ((MenuManager) ici).getParent();
+				} else if (ici instanceof ContributionItem) {
+					parent = (ToolBarManager) ((ContributionItem) ici)
+							.getParent();
+				}
+
 				if (parent != null) {
 					parent.markDirty();
 					parent.update(true);
@@ -178,7 +205,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private EventHandler selectionUpdater = new EventHandler() {
 		public void handleEvent(Event event) {
-			// Ensure that this event is for a MToolItem
+			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
 				return;
 
@@ -219,6 +246,38 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 	};
+	private HashSet<String> updateVariables = new HashSet<String>();;
+
+	@Inject
+	@Optional
+	void dirtyChanged(
+			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
+		getUpdater().updateContributionItems(ALL_SELECTOR);
+	}
+
+	@Inject
+	@Optional
+	void updateRequest(
+			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
+		final Object v = eventData.getProperty(IEventBroker.DATA);
+		Selector s;
+		if (v instanceof Selector) {
+			s = (Selector) v;
+		} else {
+			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
+				s = ALL_SELECTOR;
+			} else {
+				s = new Selector() {
+
+					public boolean select(MApplicationElement element) {
+						return v.equals(element.getElementId());
+					}
+				};
+			}
+		}
+
+		getUpdater().updateContributionItems(s);
+	}
 
 	@PostConstruct
 	public void init() {
@@ -232,6 +291,26 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		context.set(ToolBarManagerRenderer.class, this);
 
+		String[] vars = {
+				"org.eclipse.ui.internal.services.EvaluationService.evaluate", //$NON-NLS-1$
+				IServiceConstants.ACTIVE_CONTEXTS,
+				IServiceConstants.ACTIVE_PART,
+				IServiceConstants.ACTIVE_SELECTION,
+				IServiceConstants.ACTIVE_SHELL };
+		updateVariables.addAll(Arrays.asList(vars));
+		context.set(UPDATE_VARS, updateVariables);
+		RunAndTrack enablementUpdater = new RunAndTrack() {
+
+			@Override
+			public boolean changed(IEclipseContext context) {
+				for (String var : updateVariables) {
+					context.get(var);
+				}
+				getUpdater().updateContributionItems(ALL_SELECTOR);
+				return true;
+			}
+		};
+		context.runAndTrack(enablementUpdater);
 	}
 
 	@PreDestroy
@@ -243,13 +322,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(childAdditionUpdater);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
-	 */
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		if (!(element instanceof MToolBar) || !(parent instanceof Composite))
@@ -284,7 +356,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	/**
-	 * @param element
+	 * @param toolbarModel
+	 * @param elementId
 	 */
 	public void processContribution(MToolBar toolbarModel, String elementId) {
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
@@ -335,6 +408,10 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			return false;
 		}
 		if (record.anyVisibleWhen()) {
+			ExpressionInfo info = new ExpressionInfo();
+			record.collectInfo(info);
+			updateVariables.addAll(Arrays.asList(info
+					.getAccessedVariableNames()));
 			final IEclipseContext parentContext = getContext(toolbarModel);
 			parentContext.runAndTrack(new RunAndTrack() {
 				@Override
@@ -349,6 +426,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 						public void run() {
 							manager.update(false);
+							getUpdater().updateContributionItems(ALL_SELECTOR);
 						}
 					});
 					// disposeToolbarIfNecessary(toolbarModel);
@@ -362,11 +440,10 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private ToolBar createToolbar(final MUIElement element, Composite parent) {
 		int orientation = getOrientation(element);
-
+		int style = orientation | SWT.WRAP | SWT.FLAT | SWT.RIGHT;
 		ToolBarManager manager = getManager((MToolBar) element);
 		if (manager == null) {
-			manager = new ToolBarManager(orientation | SWT.WRAP | SWT.FLAT
-					| SWT.RIGHT);
+			manager = new ToolBarManager(style);
 			IContributionManagerOverrides overrides = null;
 			MApplicationElement parentElement = element.getParent();
 			if (parentElement == null) {
@@ -382,6 +459,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			manager.setOverrides(overrides);
 			linkModelToManager((MToolBar) element, manager);
+		} else {
+			ToolBar toolBar = manager.getControl();
+			if (toolBar != null && !toolBar.isDisposed()
+					&& (toolBar.getStyle() & orientation) == 0) {
+				toolBar.dispose();
+			}
+			manager.setStyle(style);
 		}
 		ToolBar bar = manager.createControl(parent);
 		bar.setData(manager);
@@ -439,13 +523,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		return SWT.HORIZONTAL;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
-	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
-	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
@@ -604,6 +681,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		AbstractGroupMarker marker = null;
 		if (itemModel.isVisible()
 				&& !itemModel.getTags().contains(
@@ -631,6 +709,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		ToolControlContribution ci = ContextInjectionFactory.make(
 				ToolControlContribution.class, lclContext);
@@ -650,6 +729,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		DirectContributionItem ci = ContextInjectionFactory.make(
 				DirectContributionItem.class, lclContext);
@@ -669,6 +749,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		HandledContributionItem ci = ContextInjectionFactory.make(
 				HandledContributionItem.class, lclContext);
@@ -684,6 +765,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
+		itemModel.setRenderer(this);
 		Object obj = itemModel.getOpaqueItem();
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -847,5 +929,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
+	}
+
+	ToolItemUpdater getUpdater() {
+		return enablementUpdater;
 	}
 }
