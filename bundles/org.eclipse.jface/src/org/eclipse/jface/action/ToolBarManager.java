@@ -93,56 +93,24 @@ public class ToolBarManager extends ContributionManager implements
 	public ToolBarManager(ToolBar toolbar) {
 		this();
 		this.toolBar = toolbar;
-		if (toolBarExist()) {
-			this.itemStyle = toolBar.getStyle();
-		}
 	}
 
 	/**
-	 * Creates and returns this manager's tool bar control. Does not create
-	 * a new control if one with the same parent control already exists.
-	 * Before creating a new control, the previous one (if any) is disposed.
-	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
-	 *
+	 * Creates and returns this manager's tool bar control. Does not create a
+	 * new control if one already exists. Also create an {@link AccessibleListener}
+	 * for the {@link ToolBar}.
+	 * 
 	 * @param parent
 	 *            the parent control
 	 * @return the tool bar control
 	 */
 	public ToolBar createControl(Composite parent) {
-		int currenOrientation = (itemStyle & SWT.VERTICAL) != 0 ? SWT.VERTICAL : SWT.HORIZONTAL;
-		return createControl(parent, currenOrientation);
-	}
-
-	/**
-	 * Creates and returns this manager's tool bar control. Does not create
-	 * a new control if one with the same parent control and orientation already exists.
-	 * Before creating a new control, the previous one (if any) is disposed.
-	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
-	 *
-	 * @param parent
-	 *            the parent control
-	 * @param orientation
-	 *            orientation of the tool bar: {@code SWT.HORIZONTAL} or {@code SWT.VERTICAL}
-	 * @return the tool bar control
-	 */
-	public ToolBar createControl(Composite parent, int orientation) {
-		if (parent != null) {
-			boolean orientationChanged = (itemStyle & orientation) == 0;
-			if (toolBarExist() && (parent != toolBar.getParent() || orientationChanged)) {
-				dispose();
-			}
-
-			if (!toolBarExist()) {
-				if (orientationChanged) {
-					itemStyle &= ~SWT.HORIZONTAL & ~SWT.VERTICAL;
-					itemStyle |= orientation;
-				}
-				toolBar = new ToolBar(parent, itemStyle);
-				toolBar.setMenu(getContextMenuControl());
-				update(true);
-
-				toolBar.getAccessible().addAccessibleListener(getAccessibleListener());
-			}
+		if (!toolBarExist() && parent != null) {
+			toolBar = new ToolBar(parent, itemStyle);
+			toolBar.setMenu(getContextMenuControl());
+			update(true);
+			
+			toolBar.getAccessible().addAccessibleListener(getAccessibleListener());
 		}
 
 		return toolBar;
