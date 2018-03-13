@@ -295,20 +295,11 @@ public class MinMaxAddon {
 
 			final MPerspective curPersp = ps.getSelectedElement();
 			if (curPersp != null) {
-				List<String> tags = new ArrayList<String>();
-				tags.add(IPresentationEngine.MINIMIZED);
-
-				List<MUIElement> minimizedElements = modelService.findElements(curPersp, null,
-						MUIElement.class, tags);
 				// Show any minimized stack from the current perspective
 				String perspId = '(' + curPersp.getElementId() + ')';
-				for (MUIElement ele : minimizedElements) {
-					String fullId = ele.getElementId() + perspId;
-
-					for (MToolControl tc : tcList) {
-						if (fullId.equals(tc.getElementId())) {
-							tc.setToBeRendered(true);
-						}
+				for (MToolControl tc : tcList) {
+					if (tc.getObject() instanceof TrimStack && tc.getElementId().contains(perspId)) {
+						tc.setVisible(true);
 					}
 				}
 
@@ -326,7 +317,7 @@ public class MinMaxAddon {
 					if (tc.getObject() instanceof TrimStack && tc.getElementId().contains(perspId)) {
 						TrimStack ts = (TrimStack) tc.getObject();
 						ts.showStack(false);
-						tc.setToBeRendered(false);
+						tc.setVisible(false);
 					}
 				}
 			}
@@ -582,7 +573,7 @@ public class MinMaxAddon {
 		MWindow window = modelService.getTopLevelWindowFor(element);
 		String trimId = element.getElementId() + getMinimizedElementSuffix(element);
 		MToolControl trimStack = (MToolControl) modelService.find(trimId, window);
-		if (trimStack == null || trimStack.getObject() == null)
+		if (trimStack == null)
 			return;
 
 		TrimStack ts = (TrimStack) trimStack.getObject();
