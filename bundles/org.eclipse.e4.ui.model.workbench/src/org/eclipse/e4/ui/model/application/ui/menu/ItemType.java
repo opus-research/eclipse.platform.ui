@@ -22,7 +22,6 @@ import java.util.List;
  * @see org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl#getItemType()
  * @model
  * @generated
- * @since 1.0
  */
 public enum ItemType implements InternalItemType {
 	/**

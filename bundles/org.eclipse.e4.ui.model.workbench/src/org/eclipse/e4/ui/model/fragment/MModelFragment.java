@@ -38,7 +38,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  *
  * @model abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MModelFragment {
 	/**

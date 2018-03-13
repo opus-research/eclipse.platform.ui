@@ -36,7 +36,6 @@ import java.util.List;
  *
  * @model abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MElementContainer<T extends MUIElement> extends MUIElement {
 	/**

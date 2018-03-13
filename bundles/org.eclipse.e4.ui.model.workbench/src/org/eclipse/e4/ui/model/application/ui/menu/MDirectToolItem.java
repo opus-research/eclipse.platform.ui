@@ -29,7 +29,6 @@ import org.eclipse.e4.ui.model.application.MContribution;
  *
  * @model
  * @generated
- * @since 1.0
  */
 public interface MDirectToolItem extends MToolItem, MContribution {
 } // MDirectToolItem

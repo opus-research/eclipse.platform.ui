@@ -34,7 +34,6 @@ package org.eclipse.e4.ui.model.application.ui;
  *
  * @model abstract="true"
  * @generated
- * @since 1.0
  */
 public interface MGenericTile<T extends MUIElement> extends MElementContainer<T> {
 	/**
