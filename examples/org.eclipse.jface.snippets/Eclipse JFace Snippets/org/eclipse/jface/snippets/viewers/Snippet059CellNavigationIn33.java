@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2008 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.AbstractTableViewer;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.jface.viewers.CellNavigationStrategy;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -41,6 +39,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerRow;
+import org.eclipse.jface.viewers.CellEditor.LayoutData;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -99,7 +98,7 @@ public class Snippet059CellNavigationIn33 {
 	}
 
 	protected abstract class AbstractEditingSupport extends EditingSupport {
-		private final CellEditor editor;
+		private CellEditor editor;
 
 		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
@@ -215,7 +214,7 @@ public class Snippet059CellNavigationIn33 {
 
 		});
 
-		ComboBoxCellEditor editor = new ComboBoxCellEditor(v
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) v)
 				.getTable(), new String[] { "M", "F" });
 		column.setEditingSupport(new AbstractEditingSupport(v, editor) {
 
@@ -405,11 +404,11 @@ public class Snippet059CellNavigationIn33 {
 		/**
 		 * This viewer's table editor.
 		 */
-		private final TableEditor tableEditor;
+		private TableEditor tableEditor;
 
-		private final TableViewerFocusCellManager focusCellManager;
+		private TableViewerFocusCellManager focusCellManager;
 
-		private final int feature;
+		private int feature;
 
 		/**
 		 * @param viewer
