@@ -28,6 +28,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IWorkbench;
@@ -98,7 +99,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * The superclass does not deal with the content description, handle it
 	 * here.
 	 * 
-	 * @noreference
+	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	public void updateTitle() {
 		super.updateTitle();
@@ -110,6 +111,11 @@ public final class ProjectExplorer extends CommonNavigator {
 		}
 
 		if (!(input instanceof IResource)) {
+			String label = ((ILabelProvider) getCommonViewer().getLabelProvider()).getText(input);
+			if (label != null) {
+				setContentDescription(label);
+				return;
+			}
 			if (input instanceof IAdaptable) {
 				IWorkbenchAdapter wbadapter = (IWorkbenchAdapter) ((IAdaptable) input)
 						.getAdapter(IWorkbenchAdapter.class);
@@ -132,7 +138,7 @@ public final class ProjectExplorer extends CommonNavigator {
 	 * @param element
 	 *            the element
 	 * @return the tooltip
-	 * @noreference
+	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	public String getFrameToolTipText(Object element) {
 		String result;

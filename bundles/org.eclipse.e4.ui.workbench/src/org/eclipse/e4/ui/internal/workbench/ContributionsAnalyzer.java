@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 
 package org.eclipse.e4.ui.internal.workbench;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +20,7 @@ import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.internal.expressions.ReferenceExpression;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
@@ -230,27 +228,28 @@ public final class ContributionsAnalyzer {
 		return isVisible((MCoreExpression) contribution.getVisibleWhen(), eContext);
 	}
 
-	public static boolean isVisible(MCoreExpression exp, ExpressionContext eContext) {
-		Expression ref = null;
+	public static boolean isVisible(MCoreExpression exp, final ExpressionContext eContext) {
+		final Expression ref;
 		if (exp.getCoreExpression() instanceof Expression) {
 			ref = (Expression) exp.getCoreExpression();
 		} else {
 			ref = new ReferenceExpression(exp.getCoreExpressionId());
 			exp.setCoreExpression(ref);
 		}
+		// Creates dependency on a predefined value that can be "poked" by the evaluation
+		// service
+		ExpressionInfo info = ref.computeExpressionInfo();
+		String[] names = info.getAccessedPropertyNames();
+		for (String name : names) {
+			eContext.getVariable(name + ".evaluationServiceLink"); //$NON-NLS-1$
+		}
+		boolean ret = false;
 		try {
-			// Creates dependency on a predefined value that can be "poked" by the evaluation
-			// service
-			ExpressionInfo info = ref.computeExpressionInfo();
-			String[] names = info.getAccessedPropertyNames();
-			for (String name : names) {
-				eContext.getVariable(name + ".evaluationServiceLink"); //$NON-NLS-1$
-			}
-			return ref.evaluate(eContext) != EvaluationResult.FALSE;
-		} catch (CoreException e) {
+			ret = ref.evaluate(eContext) != EvaluationResult.FALSE;
+		} catch (Exception e) {
 			trace("isVisible exception", e); //$NON-NLS-1$
 		}
-		return false;
+		return ret;
 	}
 
 	public static void addMenuContributions(final MMenu menuModel,

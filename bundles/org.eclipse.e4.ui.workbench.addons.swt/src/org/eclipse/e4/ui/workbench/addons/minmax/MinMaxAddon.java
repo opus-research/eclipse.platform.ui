@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,6 +50,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
+/**
+ * Workbench addon that provides methods to minimize, maximize and restore parts in the window
+ */
 public class MinMaxAddon {
 
 	/**
@@ -58,7 +61,7 @@ public class MinMaxAddon {
 	 */
 	private static final String ID_EDITOR_AREA = "org.eclipse.ui.editorss"; //$NON-NLS-1$
 
-	private static final String GLOBAL_CACHE_ID = "Global";
+	private static final String GLOBAL_CACHE_ID = "Global"; //$NON-NLS-1$
 
 	static String ID_SUFFIX = "(minimized)"; //$NON-NLS-1$
 
@@ -295,11 +298,20 @@ public class MinMaxAddon {
 
 			final MPerspective curPersp = ps.getSelectedElement();
 			if (curPersp != null) {
+				List<String> tags = new ArrayList<String>();
+				tags.add(IPresentationEngine.MINIMIZED);
+
+				List<MUIElement> minimizedElements = modelService.findElements(curPersp, null,
+						MUIElement.class, tags);
 				// Show any minimized stack from the current perspective
 				String perspId = '(' + curPersp.getElementId() + ')';
-				for (MToolControl tc : tcList) {
-					if (tc.getObject() instanceof TrimStack && tc.getElementId().contains(perspId)) {
-						tc.setVisible(true);
+				for (MUIElement ele : minimizedElements) {
+					String fullId = ele.getElementId() + perspId;
+
+					for (MToolControl tc : tcList) {
+						if (fullId.equals(tc.getElementId())) {
+							tc.setToBeRendered(true);
+						}
 					}
 				}
 
@@ -317,7 +329,7 @@ public class MinMaxAddon {
 					if (tc.getObject() instanceof TrimStack && tc.getElementId().contains(perspId)) {
 						TrimStack ts = (TrimStack) tc.getObject();
 						ts.showStack(false);
-						tc.setVisible(false);
+						tc.setToBeRendered(false);
 					}
 				}
 			}
@@ -573,7 +585,7 @@ public class MinMaxAddon {
 		MWindow window = modelService.getTopLevelWindowFor(element);
 		String trimId = element.getElementId() + getMinimizedElementSuffix(element);
 		MToolControl trimStack = (MToolControl) modelService.find(trimId, window);
-		if (trimStack == null)
+		if (trimStack == null || trimStack.getObject() == null)
 			return;
 
 		TrimStack ts = (TrimStack) trimStack.getObject();
@@ -636,7 +648,7 @@ public class MinMaxAddon {
 
 				loc = modelService.getElementLocation(theStack);
 				if (loc != EModelService.IN_SHARED_AREA && theStack.getWidget() != null
-						&& !theStack.getTags().contains(MINIMIZED)) {
+						&& theStack.isVisible() && !theStack.getTags().contains(MINIMIZED)) {
 					elementsToMinimize.add(theStack);
 				}
 			}
@@ -646,7 +658,7 @@ public class MinMaxAddon {
 				MPlaceholder eaPlaceholder = (MPlaceholder) modelService
 						.find(ID_EDITOR_AREA, persp);
 				if (element != eaPlaceholder && eaPlaceholder != null
-						&& eaPlaceholder.isToBeRendered()) {
+						&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
 					elementsToMinimize.add(eaPlaceholder);
 				}
 			}
