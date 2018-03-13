@@ -1600,7 +1600,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		if (!getWorkbenchImpl().isClosing()) {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
-				return ((WorkbenchPage) page).saveAllEditors(true, true);
+				return ((WorkbenchPage) page).saveAllEditors(true, true, true);
 			}
 		}
 		return true;
