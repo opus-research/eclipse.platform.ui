@@ -31,9 +31,12 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -42,6 +45,27 @@ import org.eclipse.swt.widgets.Table;
 public class BasicPartList extends AbstractTableInformationControl {
 
 	private class BasicStackListLabelProvider extends ColumnLabelProvider {
+
+		private Font boldFont;
+
+		public BasicStackListLabelProvider() {
+			Font font = Display.getDefault().getSystemFont();
+			FontData[] fontDatas = font.getFontData();
+			for (FontData fontData : fontDatas) {
+				fontData.setStyle(fontData.getStyle() | SWT.BOLD);
+			}
+			boldFont = new Font(Display.getDefault(), fontDatas);
+		}
+
+		@Override
+		public Font getFont(Object element) {
+			if (element instanceof MPart) {
+				if (!partToVisibilityMap.get(element)) {
+					return boldFont;
+				}
+			}
+			return super.getFont(element);
+		}
 
 		public String getText(Object element) {
 			if (element instanceof MDirtyable
@@ -66,6 +90,11 @@ public class BasicPartList extends AbstractTableInformationControl {
 		public boolean useNativeToolTip(Object object) {
 			return true;
 		}
+
+		@Override
+		public void dispose() {
+			boldFont.dispose();
+		}
 	}
 
 	private Map<String, Image> images = new HashMap<String, Image>();
@@ -76,12 +105,16 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	private EPartService partService;
 
+	private Map<MPart, Boolean> partToVisibilityMap;
+
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
+			Map<MPart, Boolean> partToVisibilityMap,
 			ISWTResourceUtilities utils, boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
+		this.partToVisibilityMap = partToVisibilityMap;
 		this.utils = utils;
 		if (alphabetical && getTableViewer() != null) {
 			getTableViewer().setComparator(new ViewerComparator());
