@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005 - 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -31,6 +30,24 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class Snippet006TableMultiLineCells {
 
+	public static void main(String[] args) {
+
+		Display display = new Display();
+		Shell shell = new Shell(display, SWT.CLOSE);
+		shell.setSize(400, 400);
+		shell.setLayout(new GridLayout());
+
+		Snippet006TableMultiLineCells example = new Snippet006TableMultiLineCells();
+		example.createPartControl(shell);
+
+		shell.open();
+
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+		display.dispose();
+	}
 
 	class LineEntry {
 
@@ -41,26 +58,50 @@ public class Snippet006TableMultiLineCells {
 		/**
 		 * Create a new instance of the receiver with name text constrained to a
 		 * column of width.
+		 * 
+		 * @param text
+		 * @param width
 		 */
-
 		LineEntry(String text, int width) {
 			line = text;
 			columnWidth = width;
 		}
 
+		/**
+		 * Get the height of the event.
+		 * 
+		 * @param index
+		 * @return int
+		 */
 		public int getHeight(Event event) {
 			event.gc.setLineWidth(columnWidth);
 			return event.gc.textExtent(line).y;
+
 		}
 
+		/**
+		 * Get the width of the event.
+		 * 
+		 * @param index
+		 * @return
+		 */
 		public int getWidth(Event event) {
+
 			return columnWidth;
 		}
 
+		/**
+		 * Get the font we are using.
+		 * 
+		 * @return Font
+		 */
 		protected Font getFont() {
 			return JFaceResources.getFont(JFaceResources.HEADER_FONT);
 		}
 
+		/**
+		 * @param event
+		 */
 		public void draw(Event event) {
 			event.gc.drawText(line, event.x, event.y);
 
@@ -110,7 +151,7 @@ public class Snippet006TableMultiLineCells {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public void createPartControl(Composite parent) {
@@ -119,7 +160,7 @@ public class Snippet006TableMultiLineCells {
 		viewer.setContentProvider(new IStructuredContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
 			public void dispose() {
@@ -127,7 +168,7 @@ public class Snippet006TableMultiLineCells {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
 			public Object[] getElements(Object inputElement) {
@@ -136,7 +177,7 @@ public class Snippet006TableMultiLineCells {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
@@ -149,7 +190,9 @@ public class Snippet006TableMultiLineCells {
 
 		viewer.setLabelProvider(new OwnerDrawLabelProvider() {
 
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#measure(org.eclipse.swt.widgets.Event, java.lang.Object)
+			 */
 			protected void measure(Event event, Object element) {
 				LineEntry line = (LineEntry) element;
 				Point size = event.gc.textExtent(line.line);
@@ -159,7 +202,12 @@ public class Snippet006TableMultiLineCells {
 
 			}
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
+			 *      java.lang.Object)
+			 */
 			protected void paint(Event event, Object element) {
 
 				LineEntry entry = (LineEntry) element;
@@ -172,6 +220,7 @@ public class Snippet006TableMultiLineCells {
 				| GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
 
 		viewer.getControl().setLayoutData(data);
+		OwnerDrawLabelProvider.setUpOwnerDraw(viewer);
 
 		viewer.setSelection(new StructuredSelection(entries[1]));
 	}
@@ -191,24 +240,8 @@ public class Snippet006TableMultiLineCells {
 
 	}
 
-	public static void main(String[] args) {
+	public void setFocus() {
 
-		Display display = new Display();
-		Shell shell = new Shell(display, SWT.CLOSE);
-		shell.setSize(400, 400);
-		shell.setLayout(new GridLayout());
-
-		Snippet006TableMultiLineCells example = new Snippet006TableMultiLineCells();
-		example.createPartControl(shell);
-
-		shell.open();
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-		display.dispose();
 	}
-
 
 }
