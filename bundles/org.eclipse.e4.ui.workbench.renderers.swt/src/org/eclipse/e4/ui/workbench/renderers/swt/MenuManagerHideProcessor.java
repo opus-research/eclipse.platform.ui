@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Marco Descher <marco@descher.at> - Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -89,8 +90,9 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 									.getTransientData()
 									.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
 							dynamicMenuContext.set(List.class, mel);
-							ContextInjectionFactory.invoke(contribution,
-									AboutToHide.class, dynamicMenuContext);
+							ContextInjectionFactory
+									.invoke(contribution, AboutToHide.class,
+											dynamicMenuContext, null);
 						}
 
 					}
