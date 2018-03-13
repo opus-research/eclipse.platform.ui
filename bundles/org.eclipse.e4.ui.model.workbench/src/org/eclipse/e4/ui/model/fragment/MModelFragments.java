@@ -19,15 +19,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
  * A representation of the model object '<em><b>Model Fragments</b></em>'.
  * <!-- end-user-doc -->
  *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * <!-- end-model-doc -->
- *
  * <p>
  * The following features are supported:
  * <ul>
@@ -45,14 +36,6 @@ public interface MModelFragments {
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.MApplicationElement}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Imports</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated
@@ -64,14 +47,6 @@ public interface MModelFragments {
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.fragment.MModelFragment}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * /org.eclipse.e4.ui.model.workbench/model/ModelFragment.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Fragments</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated

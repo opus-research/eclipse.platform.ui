@@ -19,9 +19,11 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Provisional for 4.3.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @noreference
  * <!-- end-model-doc -->
  *
  * <p>
