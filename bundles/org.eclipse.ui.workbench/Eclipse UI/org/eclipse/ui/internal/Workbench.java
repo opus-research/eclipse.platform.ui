@@ -262,8 +262,6 @@ import org.osgi.util.tracker.ServiceTracker;
  */
 public final class Workbench extends EventManager implements IWorkbench {
 
-	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
-
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
 		private final IProgressMonitor progressMonitor;
@@ -357,8 +355,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 	 * @since 3.0
 	 */
 	private Display display;
-
-	private boolean workbenchAutoSave = true;
 
 
 	private EditorHistory editorHistory;
@@ -2537,16 +2533,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	/**
-	 * Disable the Workbench Auto-Save job on startup during tests.
-	 * 
-	 * @param b
-	 *            <code>false</code> to disable the tests.
-	 */
-	public void setEnableAutoSave(boolean b) {
-		workbenchAutoSave = b;
-	}
-
-	/**
 	 * Internal method for running the workbench UI. This entails processing and
 	 * dispatching events until the workbench is closed or restarted.
 	 * 
@@ -2692,33 +2678,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 				e4Context.set(PartRenderingEngine.EARLY_STARTUP_HOOK, earlyStartup);
 				// start workspace auto-save
 				final int millisecondInterval = getAutoSaveJobTime();
-				if (millisecondInterval > 0 && workbenchAutoSave) {
-					autoSaveJob = new WorkbenchJob(WORKBENCH_AUTO_SAVE_JOB) {
+				if (millisecondInterval > 0) {
+					autoSaveJob = new WorkbenchJob("Workbench Auto-Save Job") { //$NON-NLS-1$
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
-							if (monitor.isCanceled()) {
-								return Status.CANCEL_STATUS;
-							}
 							final int nextDelay = getAutoSaveJobTime();
 							persist(false);
 							monitor.done();
 							// repeat
-							if (nextDelay > 0 && workbenchAutoSave) {
+							if (nextDelay > 0) {
 								this.schedule(nextDelay);
 							}
 							return Status.OK_STATUS;
-						}
-
-						/*
-						 * (non-Javadoc)
-						 * 
-						 * @see
-						 * org.eclipse.core.runtime.jobs.Job#belongsTo(java.
-						 * lang.Object)
-						 */
-						@Override
-						public boolean belongsTo(Object family) {
-							return WORKBENCH_AUTO_SAVE_JOB == family;
 						}
 					};
 					autoSaveJob.setSystem(true);
