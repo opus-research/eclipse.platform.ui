@@ -11,7 +11,6 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,11 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.e4.core.commands.ECommandService;
-import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
@@ -100,21 +95,6 @@ import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
 
 public class StackRenderer extends LazyStackRenderer {
-	/**
-	 * 
-	 */
-	private static final String COMMAND_FILE_CLOSE = "org.eclipse.ui.file.close"; //$NON-NLS-1$
-
-	/**
-	 * 
-	 */
-	private static final String COMMAND_FILE_CLOSE_OTHERS = "org.eclipse.ui.file.closeOthers"; //$NON-NLS-1$
-
-	/**
-	 * 
-	 */
-	private static final String COMMAND_FILE_CLOSE_ALL = "org.eclipse.ui.file.closeAll"; //$NON-NLS-1$
-
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
 	Map<MUIElement, Set<MPlaceholder>> renderedMap;
@@ -151,10 +131,6 @@ public class StackRenderer extends LazyStackRenderer {
 
 	@Inject
 	IPresentationEngine renderer;
-
-	@Inject
-	@Optional
-	ECommandService commandService;
 
 	private EventHandler itemUpdater;
 
@@ -756,7 +732,7 @@ public class StackRenderer extends LazyStackRenderer {
 		return null;
 	}
 
-	protected CTabItem findItemForPart(MPart part) {
+	public CTabItem findItemForPart(MPart part) {
 		// is this a direct child of the stack?
 		if (part.getParent() != null
 				&& part.getParent().getRenderer() == StackRenderer.this) {
@@ -1007,7 +983,7 @@ public class StackRenderer extends LazyStackRenderer {
 		IEclipseContext ctxt = getContext(stack);
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
-				ctxt.get(EPartService.class), stack,
+				ctxt.get(EPartService.class), stack, this,
 				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
@@ -1090,9 +1066,6 @@ public class StackRenderer extends LazyStackRenderer {
 		EPartService partService = (EPartService) context
 				.get(EPartService.class.getName());
 		if (partService.savePart(part, true)) {
-			// user may have approved close w/o save, make sure the part is not
-			// dirty.
-			part.setDirty(false);
 			partService.hidePart(part);
 			return true;
 		}
@@ -1322,46 +1295,43 @@ public class StackRenderer extends LazyStackRenderer {
 		final Menu menu = cachedMenu;
 
 		int closeableElements = 0;
-		final MElementContainer<MUIElement> parent = getParent(part);
 		if (isClosable(part)) {
-			if (isCommandAvailable(COMMAND_FILE_CLOSE)) {
-				MenuItem menuItemClose = new MenuItem(menu, SWT.NONE);
-				menuItemClose.setText(SWTRenderersMessages.menuClose);
-				menuItemClose.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {
-						invokeCloseCommand(COMMAND_FILE_CLOSE, parent, menu);
-					}
-				});
-			}
+			MenuItem menuItemClose = new MenuItem(menu, SWT.NONE);
+			menuItemClose.setText(SWTRenderersMessages.menuClose);
+			menuItemClose.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+					EPartService partService = getContextForParent(part).get(
+							EPartService.class);
+					if (partService.savePart(part, true))
+						partService.hidePart(part);
+				}
+			});
 			closeableElements++;
 		}
 
+		MElementContainer<MUIElement> parent = getParent(part);
 		if (parent != null) {
 			closeableElements += getCloseableSiblingParts(part).size();
 
 			if (closeableElements >= 2) {
-				if (isCommandAvailable(COMMAND_FILE_CLOSE_OTHERS)) {
-					MenuItem menuItemOthers = new MenuItem(menu, SWT.NONE);
-					menuItemOthers
-							.setText(SWTRenderersMessages.menuCloseOthers);
-					menuItemOthers.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent e) {
-							invokeCloseCommand(COMMAND_FILE_CLOSE_OTHERS,
-									parent, menu);
-						}
-					});
-				}
+				MenuItem menuItemOthers = new MenuItem(menu, SWT.NONE);
+				menuItemOthers.setText(SWTRenderersMessages.menuCloseOthers);
+				menuItemOthers.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+						closeSiblingParts(part, true);
+					}
+				});
 
-				if (isCommandAvailable(COMMAND_FILE_CLOSE_ALL)) {
-					MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
-					menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
-					menuItemAll.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent e) {
-							invokeCloseCommand(COMMAND_FILE_CLOSE_ALL, parent,
-									menu);
-						}
-					});
-				}
+				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
+				menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
+				menuItemAll.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent e) {
+						MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+						closeSiblingParts(part, false);
+					}
+				});
 			}
 		}
 
@@ -1408,6 +1378,39 @@ public class StackRenderer extends LazyStackRenderer {
 				closeableSiblings.add(otherPart);
 		}
 		return closeableSiblings;
+	}
+
+	private void closeSiblingParts(MPart part, boolean skipThisPart) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null)
+			return;
+
+		List<MPart> others = getCloseableSiblingParts(part);
+
+		// add the current part last so that we unrender obscured items first
+		if (!skipThisPart && part.isToBeRendered() && isClosable(part)) {
+			others.add(part);
+		}
+
+		// add the selected element of the stack at the end, else we may end up
+		// selecting another part when we hide it since it is the selected
+		// element
+		MUIElement selectedElement = container.getSelectedElement();
+		if (others.remove(selectedElement)) {
+			others.add((MPart) selectedElement);
+		} else if (selectedElement instanceof MPlaceholder) {
+			selectedElement = ((MPlaceholder) selectedElement).getRef();
+			if (others.remove(selectedElement)) {
+				others.add((MPart) selectedElement);
+			}
+		}
+
+		EPartService partService = getContextForParent(part).get(
+				EPartService.class);
+		for (MPart otherPart : others) {
+			if (partService.savePart(otherPart, true))
+				partService.hidePart(otherPart);
+		}
 	}
 
 	public static MMenu getViewMenu(MPart part) {
@@ -1488,33 +1491,10 @@ public class StackRenderer extends LazyStackRenderer {
 		return false;
 	}
 
-	private boolean isCommandAvailable(final String id) {
-		return commandService != null
-				&& commandService.getCommand(id).isDefined();
-	}
-
-	protected void invokeCloseCommand(final String id,
-			final MElementContainer<MUIElement> parent, final Menu menu) {
-		MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
-
-		if (parent.getSelectedElement() != part) {
-			parent.setSelectedElement(part);
-		}
-
-		final IEclipseContext eContext = modelService
-				.getContainingContext(part);
-		final ParameterizedCommand pc = commandService.createCommand(id,
-				Collections.emptyMap());
-		final EHandlerService handlerService = eContext
-				.get(EHandlerService.class);
-		handlerService.executeHandler(pc);
-	}
-
 	@SuppressWarnings("javadoc")
 	public class TabStateHandler implements EventHandler {
 		public void handleEvent(Event event) {
-			MUIElement element = (MUIElement) event
-					.getProperty(UIEvents.EventTags.ELEMENT);
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object newValue = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			Object oldValue = event.getProperty(UIEvents.EventTags.OLD_VALUE);
 
@@ -1546,7 +1526,7 @@ public class StackRenderer extends LazyStackRenderer {
 			reapplyStyles(cti.getParent());
 		}
 
-		public boolean validateElement(MUIElement element) {
+		public boolean validateElement(Object element) {
 			return element instanceof MPart || element instanceof MPartStack;
 		}
 

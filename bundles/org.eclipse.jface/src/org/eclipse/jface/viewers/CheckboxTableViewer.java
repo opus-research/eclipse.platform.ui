@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -164,7 +164,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /*
      * Extends this method to update check box states.
      */
-    protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
+    @Override
+	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
     	super.doUpdateItem(widget, element, fullMap);
     	if(!widget.isDisposed()) {
     		if(checkStateProvider != null) {
@@ -296,7 +297,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on StructuredViewer.
      */
-    public void handleSelect(SelectionEvent event) {
+    @Override
+	public void handleSelect(SelectionEvent event) {
         if (event.detail == SWT.CHECK) {
             super.handleSelect(event); // this will change the current selection
 
@@ -314,7 +316,8 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on Viewer.
      */
-    protected void preservingSelection(Runnable updateCode) {
+    @Override
+	protected void preservingSelection(Runnable updateCode) {
 		if (!getPreserveSelection()) {
 			return;
 		}

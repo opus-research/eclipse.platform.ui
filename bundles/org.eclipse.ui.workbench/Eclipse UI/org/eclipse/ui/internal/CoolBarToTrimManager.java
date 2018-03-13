@@ -554,7 +554,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				workbenchTrimElements.remove(child);
 
 				child.setToBeRendered(false);
-				child.getParent().getChildren().remove(i);
+				child.getParent().getChildren().remove(child);
 				return (IContributionItem) obj;
 			}
 			if (item.getId() != null && item.getId().equals(child.getElementId())) {
@@ -704,10 +704,12 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				container, null);
 
 		for (IContributionItem item : manager.getItems()) {
-			if (item == null || !isChildVisible(item)) {
+			if (item == null) {
 				continue;
 			}
-
+			if (renderer.getToolElement(item) != null) {
+				continue;
+			}
 			if (item instanceof IToolBarContributionItem) {
 				IToolBarManager manager2 = ((IToolBarContributionItem) item).getToolBarManager();
 				//new Exception("fill(MToolBar container, IContributionManager manager) with " //$NON-NLS-1$
@@ -735,21 +737,5 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				renderer.linkModelToContribution(toolItem, item);
 			}
 		}
-	}
-
-	private boolean isChildVisible(IContributionItem item) {
-		Boolean v;
-
-		IContributionManagerOverrides overrides = getOverrides();
-		if (overrides == null) {
-			v = null;
-		} else {
-			v = getOverrides().getVisible(item);
-		}
-
-		if (v != null) {
-			return v.booleanValue();
-		}
-		return item.isVisible();
 	}
 }
