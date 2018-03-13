@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.renderers.swt.ContributedPartRenderer;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
@@ -537,14 +536,4 @@ public abstract class WorkbenchPart extends EventManager implements
     public Map getPartProperties() {
     	return Collections.unmodifiableMap(partProperties);
     }
-
-	/**
-	 * @since 3.105 542
-	 */
-	protected MPart getModel() {
-		if (getSite() instanceof PartSite) {
-			return ((PartSite) getSite()).getModel();
-		}
-		return null;
-	}
 }
