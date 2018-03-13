@@ -38,7 +38,6 @@ import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.TabStateHandlerTest;
-import org.eclipse.e4.ui.workbench.renderers.swt.ThemeDefinitionChangedHandlerTest;
 
 //import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 
@@ -78,6 +77,5 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(StackRendererTest.class);
 		addTestSuite(TabStateHandlerTest.class);
 		// addTestSuite(SWTPartRendererTest.class);
-		addTestSuite(ThemeDefinitionChangedHandlerTest.class);
 	}
 }

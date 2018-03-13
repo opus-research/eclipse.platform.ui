@@ -11,36 +11,12 @@ package org.eclipse.e4.ui.css.swt.helpers;
 
 import static org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper.VALUE_FROM_FONT_DEFINITION;
 import static org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper.getFontData;
-import static org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper.hasFontDefinitionAsFamily;
-import static org.eclipse.e4.ui.css.swt.helpers.CSSSWTFontHelper.getFont;
 
-import org.eclipse.e4.ui.css.swt.resources.FontByDefinition;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
-import org.eclipse.swt.widgets.Display;
 
 @SuppressWarnings("restriction")
-public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {	
-	private Display display;
-	
-	@Override
-	protected void setUp() throws Exception {
-		display = Display.getDefault();
-	}
-	
-	public void testHasFontDefinitionAsFamily() throws Exception {
-		boolean result = hasFontDefinitionAsFamily(fontProperties(addFontDefinitionMarker("org-eclipse-wst-sse-ui-textfont"), 10, SWT.NORMAL));
-		
-		assertTrue(result);
-	}
-	
-	public void testHasFontDefinitionAsFamilyWhenNotDefinitionAsFamily() throws Exception {
-		boolean result = hasFontDefinitionAsFamily(fontProperties("arial", 10, SWT.NORMAL));
-		
-		assertFalse(result);
-	}
-	
+public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	public void testGetFontData() throws Exception {		
 		FontData result = getFontData(fontProperties("Times", 11, SWT.NORMAL), 
 				new FontData());
@@ -80,7 +56,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	public void testGetFontDataWhenFontFamilyFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 		
-		FontData result = getFontData(fontProperties(addFontDefinitionMarker("org-eclipse-jface-bannerfont"), 10, SWT.NORMAL), 
+		FontData result = getFontData(fontProperties(fontDefinition("org-eclipse-jface-bannerfont"), 10, SWT.NORMAL), 
 				new FontData());
 		
 		assertEquals("Arial", result.getName());
@@ -91,7 +67,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	public void testGetFontDataWhenFontFamilyAndSizeFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 		
-		FontData result = getFontData(fontProperties(addFontDefinitionMarker("org-eclipse-jface-bannerfont"), VALUE_FROM_FONT_DEFINITION, SWT.NORMAL), 
+		FontData result = getFontData(fontProperties(fontDefinition("org-eclipse-jface-bannerfont"), VALUE_FROM_FONT_DEFINITION, SWT.NORMAL), 
 				new FontData());
 		
 		assertEquals("Arial", result.getName());	
@@ -102,54 +78,11 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	public void testGetFontDataWhenFontFamilySizeAndStyleFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 		
-		FontData result = getFontData(fontProperties(addFontDefinitionMarker("org-eclipse-jface-bannerfont"), VALUE_FROM_FONT_DEFINITION, VALUE_FROM_FONT_DEFINITION), 
+		FontData result = getFontData(fontProperties(fontDefinition("org-eclipse-jface-bannerfont"), VALUE_FROM_FONT_DEFINITION, VALUE_FROM_FONT_DEFINITION), 
 				new FontData());
 		
 		assertEquals("Arial", result.getName());	
 		assertEquals(15, result.getHeight());
 		assertEquals(SWT.ITALIC, result.getStyle());
 	}		
-	
-	public void testGetFontByDefinition() throws Exception {
-		//given
-		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);		
-		Font previousFont = new Font(display, new FontData("Arial", 15, SWT.ITALIC));
-		
-		//when
-		Font currentFont = getFont(new FontByDefinition("org.eclipse.jface.bannerfont", previousFont));
-		
-		//then
-		assertEquals(previousFont, currentFont);
-		
-		previousFont.dispose();
-	}
-	
-	public void testGetFontByDefinitionWhenDefinitionHasBeenChanged() throws Exception {
-		//given
-		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);		
-		Font previousFont = new Font(display, new FontData("Times", 15, SWT.NORMAL));
-		
-		//when
-		Font currentFont = getFont(new FontByDefinition("org.eclipse.jface.bannerfont", previousFont));
-		
-		//then
-		assertNotSame(previousFont, currentFont);
-		
-		previousFont.dispose();
-		currentFont.dispose();
-	}
-	
-	public void testGetFontByDefinitionWhenDefinitionNotFound() throws Exception {
-		//given
-		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);		
-		Font previousFont = new Font(display, new FontData("Times", 15, SWT.NORMAL));
-		
-		//when
-		Font currentFont = getFont(new FontByDefinition("some not existing definition", previousFont));
-		
-		//then
-		assertEquals(previousFont, currentFont);
-		
-		previousFont.dispose();
-	}
 }
