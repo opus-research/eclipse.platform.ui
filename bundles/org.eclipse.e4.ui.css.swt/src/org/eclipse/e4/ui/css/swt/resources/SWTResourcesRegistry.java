@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,10 @@ import org.eclipse.swt.widgets.Listener;
  * dispose it.
  */
 public class SWTResourcesRegistry extends AbstractResourcesRegistry {
-
 	public SWTResourcesRegistry(Display display) {
-		if (display == null)
+		if (display == null) {
 			return;
+		}
 		// When SWT Display will dispose, all SWT resources stored
 		// into cache will be dispose it too.
 		display.addListener(SWT.Dispose, new Listener() {
@@ -39,6 +39,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		});
 	}
 
+	@Override
 	public Object getResource(Object type, Object key) {
 		Object resource = super.getResource(type, key);
 		if (resource != null) {
@@ -59,9 +60,11 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 	 * @see org.eclipse.e4.ui.core.css.resources.AbstractResourcesRegistry#registerResource(java.lang.String,
 	 *      java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public void registerResource(Object type, Object key, Object resource) {
-		if (resource == null)
+		if (resource == null) {
 			return;
+		}
 //		String hit = getResource(type, key) != null
 //			? " hit "
 //			: " ";
@@ -77,7 +80,6 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 //			System.out.println("Cache" + hit + "SWT Image key=" + key);
 //		} else
 //			System.out.println("Cache" + hit + "Resource key=" + key);
-			
 		super.registerResource(type, key, resource);
 	}
 
@@ -87,6 +89,7 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 	 * @see org.eclipse.e4.ui.core.css.resources.AbstractResourcesRegistry#disposeResource(java.lang.Object,
 	 *      java.lang.String, java.lang.Object)
 	 */
+	@Override
 	public void disposeResource(Object type, String key, Object resource) {
 		// Dispose SWT Resource
 		if (resource instanceof Color) {
@@ -109,7 +112,10 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 			//TODO replace with eclipse logging
 //			if (logger.isDebugEnabled())
 //				logger.debug("Dispose SWT Image key=" + key);
-		} 
+		} else if (resource instanceof VolatileResource && 
+				((VolatileResource<?>) resource).getResource() != null) {	
+			((VolatileResource<?>) resource).getResource().dispose();
+		}
 		//TODO replace with eclipse logging
 //		else if (logger.isDebugEnabled())
 //			logger.debug("Dispose Resource key=" + key);
@@ -124,7 +130,20 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 			return ((Image) resource).isDisposed();
 		} else if (resource instanceof Cursor) {
 			return ((Cursor) resource).isDisposed();
+		} else if (resource instanceof VolatileResource && 
+				((VolatileResource<?>) resource).getResource() != null) {
+			return ((VolatileResource<?>) resource).getResource().isDisposed();
 		}
 		return false;
+	}
+	
+	public void invalidateResources(Class<?>... clsToInvalidate) {		
+		for (Class<?> cls: clsToInvalidate) {
+			for (Object obj: getResourceByType(cls)) {
+				if (obj instanceof VolatileResource<?>) {	
+					((VolatileResource<?>) obj).setValid(false);
+				}
+			}
+		}
 	}
 }

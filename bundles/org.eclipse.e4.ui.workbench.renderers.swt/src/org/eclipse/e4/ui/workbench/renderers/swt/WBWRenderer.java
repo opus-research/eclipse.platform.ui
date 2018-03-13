@@ -21,6 +21,10 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
+import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
+import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -56,6 +60,8 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -115,6 +121,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
+	private EventHandler themeDefinitionChanged;
 
 	public WBWRenderer() {
 		super();
@@ -291,6 +298,10 @@ public class WBWRenderer extends SWTPartRenderer {
 		};
 
 		eventBroker.subscribe(UIEvents.Window.TOPIC_ALL, sizeHandler);
+
+		themeDefinitionChanged = new ThemeDefinitionChangedHandler();
+		eventBroker.subscribe(UIEvents.UILifeCycle.THEME_DEFINITION_CHANGED,
+				themeDefinitionChanged);
 	}
 
 	@PreDestroy
@@ -299,6 +310,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(shellUpdater);
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
+		eventBroker.unsubscribe(themeDefinitionChanged);
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -759,6 +771,38 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		public Object[] getCheckedElements() {
 			return checkedElements;
+		}
+
+	}
+
+	@SuppressWarnings("restriction")
+	protected static class ThemeDefinitionChangedHandler implements
+			EventHandler {
+		public void handleEvent(Event event) {
+			Object element = event.getProperty(IEventBroker.DATA);
+
+			if (!(element instanceof MApplication)) {
+				return;
+			}
+
+			for (MWindow window : ((MApplication) element).getChildren()) {
+				CSSEngine engine = getEngine(window);
+				if (engine != null) {
+					invalidateResourcesInRegistry(engine.getResourcesRegistry());
+					engine.reapply();
+				}
+			}
+		}
+
+		protected CSSEngine getEngine(MWindow window) {
+			return WidgetElement.getEngine((Widget) window.getWidget());
+		}
+
+		private void invalidateResourcesInRegistry(IResourcesRegistry registry) {
+			if (registry instanceof SWTResourcesRegistry) {
+				((SWTResourcesRegistry) registry).invalidateResources(
+						Font.class, Color.class);
+			}
 		}
 
 	}
