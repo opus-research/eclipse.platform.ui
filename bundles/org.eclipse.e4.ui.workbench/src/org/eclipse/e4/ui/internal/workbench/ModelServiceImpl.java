@@ -16,26 +16,13 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.MApplicationFactory;
-import org.eclipse.e4.ui.model.application.commands.MBindingContext;
-import org.eclipse.e4.ui.model.application.commands.MBindingTable;
-import org.eclipse.e4.ui.model.application.commands.MCategory;
-import org.eclipse.e4.ui.model.application.commands.MCommand;
-import org.eclipse.e4.ui.model.application.commands.MCommandParameter;
-import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
-import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
-import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
-import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.MUiFactory;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.advanced.MAdvancedFactory;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
@@ -43,8 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
-import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -54,28 +39,17 @@ import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MDynamicMenuContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
 import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
+import org.eclipse.e4.ui.workbench.modeling.EClassProvider;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
+import org.eclipse.emf.ecore.EAnnotation;
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osgi.service.event.Event;
@@ -135,6 +109,21 @@ public class ModelServiceImpl implements EModelService {
 		if (elementType == null) {
 			throw new NullPointerException("Argument cannot be null."); //$NON-NLS-1$
 		}
+
+		EClassProvider eclassProvider = appContext.get(EClassProvider.class); // get an instance of the OSGi-Service EClassProvider (always get it here; reason: Dynamic-Awareness)
+		if( eclassProvider != null ){
+			EClass eClass = eclassProvider.getEClass(elementType);
+	
+			if (eClass != null) {
+				checkInstantiation(eClass); // to have a better exception message if an EClass is abstract or an interface (otherwise EcoreUitl#create() will throw a generic one, i.e.: 'The class '...' is not a valid classifier')
+				checkDeprecation(eClass); // just for fun because Jonas thought about deprecated classes
+	
+				return (T) EcoreUtil.create(eClass);
+			}
+		}
+
+		/* Not needed anymore, but can be left as a kind of fallback for the basics. */
+		/*
 		if (MAddon.class.equals(elementType)) {
 			return (T) MApplicationFactory.INSTANCE.createAddon();
 		}
@@ -250,6 +239,8 @@ public class ModelServiceImpl implements EModelService {
 		if (MWindow.class.equals(elementType)) {
 			return (T) MBasicFactory.INSTANCE.createWindow();
 		}
+		*/
+		
 		throw new IllegalArgumentException(
 				"Unsupported model object type: " + elementType.getCanonicalName()); //$NON-NLS-1$
 	}
@@ -755,10 +746,10 @@ public class ModelServiceImpl implements EModelService {
 		} else {
 			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			newSash.setHorizontal(horizontal);
-			
+
 			// Maintain the existing weight in the new sash
 			newSash.setContainerData(relTo.getContainerData());
-			
+
 			combine(toInsert, relTo, newSash, insertBefore, ratio);
 		}
 
@@ -1304,5 +1295,66 @@ public class ModelServiceImpl implements EModelService {
 			return false;
 
 		return hostWindow.getSharedElements().contains(curElement);
+	}
+
+	/**
+	 * Checks if the given {@link EClass} is marked as "deprecated".
+	 * 
+	 * <p>
+	 * The method will check if the {@link EClass} was annotated with {@code "http://www.eclipse.org/ui/2010/UIModel/application/deprecated"}
+	 * and if so an exception is thrown.
+	 * </p>
+	 * 
+	 * @param eClass the class to check
+	 * @throws IllegalArgumentException If the given given {@link EClass} is marked as "deprecated".
+	 */
+	private static void checkDeprecation(EClass eClass) {
+		if (eClass == null)
+			return;
+
+		// TODO (if you want to keep it): find a good place for a constant variable and a valid "source" value
+		EAnnotation deprecated = eClass .getEAnnotation("http://www.eclipse.org/ui/2010/UIModel/application/deprecated"); //$NON-NLS-1$
+		if (deprecated != null) {
+			StringBuilder sb = new StringBuilder("The element '").append(eClass.getInstanceTypeName()).append("' is already deprecated!"); //$NON-NLS-1$ //$NON-NLS-2$
+
+			// TODO (if you want to keep it): adapted it the way you need it (or remove it, because it was just a show-case of what would be possible)
+			String since = deprecated.getDetails().get("since"); //$NON-NLS-1$
+			if (since != null) {
+				sb.append(" (since version: ").append(since).append(')'); //$NON-NLS-1$
+			}
+
+			// TODO (if you want to keep it): decide if should really be an exception or just a log-output (also possible would be flag to control the behavior) 
+			throw new IllegalArgumentException(sb.toString());
+		}
+	}
+
+	/**
+	 * Checks if the given {@link EClass} can be instantiated (not an interface or abstract).
+	 * 
+	 * <p>
+	 * This method should be used prior {@link EcoreUtil#create(EClass)} to have a better exception output,
+	 * because it will generate a detailed reason about why the class couldn't be instantiated.
+	 * </p>
+	 * 
+	 * @param eClass the class to check
+	 * @throws IllegalArgumentException If the given {@link EClass} is either an interface or an abstract class.
+	 */
+	private static void checkInstantiation(EClass eClass) {
+		if (eClass == null)
+			return;
+
+		// NEVER change the order of the if-statements! Reason: EMF automatically marks an interface as abstract.
+		if (eClass.isInterface()) {
+			/* TODO (if you want to keep it): decide if you want to use 
+			 * 		EClass#getName() (e.g.: Window) or 
+			 * 		EClass#getInstanceTypeName() (e.g.: org.eclipse.e4.ui.model.application.ui.basic.MWindow)
+			 * as shown in the #checkDeprecation(EClass) method
+			 */
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is an interface!"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		if (eClass.isAbstract()) {
+			throw new IllegalArgumentException("The class '" + eClass.getName() + "' is an abstract class!"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
 	}
 }
