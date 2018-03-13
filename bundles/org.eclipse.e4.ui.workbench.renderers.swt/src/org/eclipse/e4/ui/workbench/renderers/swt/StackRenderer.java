@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2012 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -904,6 +904,19 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 		});
 
+		// Detect activation...picks up cases where the user clicks on the
+		// (already active) tab
+		ctf.addListener(SWT.Activate, new org.eclipse.swt.widgets.Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				if (event.detail == SWT.MouseDown) {
+					CTabFolder ctf = (CTabFolder) event.widget;
+					MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) ctf
+							.getData(OWNING_ME);
+					activateStack(stack);
+				}
+			}
+		});
+
 		ctf.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -920,6 +933,21 @@ public class StackRenderer extends LazyStackRenderer {
 		});
 
 		MouseListener mouseListener = new MouseAdapter() {
+
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+				CTabItem item = ctf.getSelection();
+				if (item != null) {
+					MUIElement ele = (MUIElement) item.getData(OWNING_ME);
+					if (ele.getParent().getSelectedElement() == ele) {
+						Control ctrl = (Control) ele.getWidget();
+						if (ctrl != null) {
+							ctrl.setFocus();
+						}
+					}
+				}
+			}
+
 			@Override
 			public void mouseUp(MouseEvent e) {
 				CTabItem item = ctf.getItem(new Point(e.x, e.y));
