@@ -31,6 +31,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -372,6 +373,11 @@ public class StackRenderer extends LazyStackRenderer {
 						&& newActivePart.getCurSharedRef() != null)
 					partParent = newActivePart.getCurSharedRef().getParent();
 
+				// Skip sash containers
+				while (partParent != null
+						&& partParent instanceof MPartSashContainer)
+					partParent = partParent.getParent();
+
 				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
 						: null);
 
@@ -455,7 +461,8 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	private String getToolTip(String newToolTip) {
-		return newToolTip == null ? null : LegacyActionTools.escapeMnemonics(newToolTip);
+		return newToolTip == null || newToolTip.length() == 0 ? null
+				: LegacyActionTools.escapeMnemonics(newToolTip);
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -528,6 +535,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 		// Create a TB for the view's drop-down menu
 		ToolBar menuTB = new ToolBar(trComp, SWT.FLAT | SWT.RIGHT);
+		menuTB.setData(TAG_VIEW_MENU);
 		RowData rd = new RowData();
 		menuTB.setLayoutData(rd);
 		ToolItem ti = new ToolItem(menuTB, SWT.PUSH);
