@@ -170,7 +170,6 @@ public class WorkbenchSiteProgressService implements
 		}
 
         ProgressManager.getInstance().removeListener(this);
-		showBusy(false);
 
         if (waitCursor == null) {
 			return;
@@ -454,9 +453,11 @@ public class WorkbenchSiteProgressService implements
 
 	protected void showBusy(boolean busy) {
 		MPart part = site.getModel();
-		if (busy) {
+		boolean containsBusyTag = part.getTags().contains(CSSConstants.CSS_BUSY_CLASS);
+
+		if (busy && !containsBusyTag) {
 			part.getTags().add(CSSConstants.CSS_BUSY_CLASS);
-		} else {
+		} else if (!busy && containsBusyTag) {
 			part.getTags().remove(CSSConstants.CSS_BUSY_CLASS);
 		}
 	}
