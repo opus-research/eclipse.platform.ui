@@ -12,7 +12,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -314,10 +313,15 @@ public final class Workbench extends EventManager implements IWorkbench {
 				}
 			}
 
-			if (bundleName != null) {
-				String taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
-				progressMonitor.subTask(taskName);
+			String taskName;
+
+			if (bundleName == null) {
+				taskName = WorkbenchMessages.Startup_Loading_Workbench;
+			} else {
+				taskName = NLS.bind(WorkbenchMessages.Startup_Loading, bundleName);
 			}
+
+			progressMonitor.subTask(taskName);
 		}
 	}
 
