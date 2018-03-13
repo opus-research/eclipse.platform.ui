@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) = [37478] Import FS as project
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,13 +24,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IOperationHistory;
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -35,6 +46,9 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.FocusEvent;
@@ -62,14 +76,18 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FileSystemElement;
 import org.eclipse.ui.dialogs.WizardResourceImportPage;
-import org.eclipse.ui.ide.dialogs.IElementFilter;
+import org.eclipse.ui.ide.undo.CreateProjectOperation;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
+import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.ide.dialogs.IElementFilter;
 import org.eclipse.ui.internal.ide.dialogs.RelativePathVariableGroup;
 import org.eclipse.ui.internal.ide.filesystem.FileSystemStructureProvider;
 import org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog;
 import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.wizards.datatransfer.ExternalProjectImportWizard;
 import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
+import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
 
 /**
@@ -104,6 +122,8 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 
     //A boolean to indicate if the user has typed anything
     private boolean entryChanged = false;
+    private File lastSource;
+    private Button lastSelectedAction;
     
     private FileSystemStructureProvider fileSystemStructureProvider = new FileSystemStructureProvider();
 
@@ -143,6 +163,10 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 	private int linkedResourceGroupHeight= -1;
 
 	private Composite linkedResourceParent;
+	
+	private File source;
+	private IProjectDescription projectDescription;
+	private IWizard nestedWizard;
 
 
     /**
@@ -270,8 +294,31 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * Method declared on IDialogPage.
      */
     public void createControl(Composite parent) {
-        super.createControl(parent);
-        validateSourceGroup();
+            initializeDialogUnits(parent);
+
+            Composite composite = new Composite(parent, SWT.NULL);
+            composite.setLayout(new GridLayout());
+            composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL
+                    | GridData.HORIZONTAL_ALIGN_FILL));
+            composite.setSize(composite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            composite.setFont(parent.getFont());
+
+            createRootDirectoryGroup(composite);
+
+            createDestinationGroup(composite);
+
+            createFileSelectionGroup(composite);
+            createButtonsGroup(composite);
+            createOptionsGroup(composite);
+
+            restoreWidgetValues();
+            updateWidgetEnablements();
+            setPageComplete(determinePageCompletion());
+            setErrorMessage(null);	// should not initially have error message
+
+            setControl(composite);
+
+            validateSourceGroup();
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
                 IDataTransferHelpContextIds.FILE_SYSTEM_IMPORT_WIZARD_PAGE);
     }
@@ -392,10 +439,9 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         );
         relativePathVariableGroup.createContents(relativeGroup);
         
-        
         updateWidgetEnablements();
 		relativePathVariableGroup.setSelection(true);
-
+		
 		return linkedResourceComposite;
 
     }
@@ -460,6 +506,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 updateFromSourceField();
             }
         });
+        sourceNameField.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateFromSourceField();
+			}
+		});
 
         sourceNameField.addKeyListener(new KeyListener() {
             /*
@@ -521,8 +572,9 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      */
 
     private void updateFromSourceField() {
-
-        setSourceName(sourceNameField.getText());
+        String sourceLocation = sourceNameField.getText();
+		this.source = new File(sourceLocation);
+		setSourceName(sourceLocation);
         //Update enablements when this is selected
         updateWidgetEnablements();
         fileSystemStructureProvider.clearVisitedDirs();
@@ -568,9 +620,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      * Enable or disable the button group.
      */
     protected void enableButtonGroup(boolean enable) {
-        selectTypesButton.setEnabled(enable);
-        selectAllButton.setEnabled(enable);
-        deselectAllButton.setEnabled(enable);
+    	if (this.selectTypesButton != null) {
+	        selectTypesButton.setEnabled(enable);
+	        selectAllButton.setEnabled(enable);
+	        deselectAllButton.setEnabled(enable);
+    	}
     }
 
     /**
@@ -627,21 +681,41 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 
         saveWidgetValues();
 
-        Iterator resourcesEnum = getSelectedResources().iterator();
-        List fileSystemObjects = new ArrayList();
-        while (resourcesEnum.hasNext()) {
-            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
-                    .getFileSystemObject());
+        if (this.referenceExistingProjectRadio.getSelection()) {
+        	this.projectDescription.setLocation(new Path(this.source.getAbsolutePath()));
+        	CreateProjectOperation op = new CreateProjectOperation(this.projectDescription, this.projectDescription.getName());
+        	IOperationHistory operationHistory = PlatformUI.getWorkbench().getOperationSupport().getOperationHistory();
+        	// TODO: use project monitor inside wizard container
+        	try {
+        		IStatus status = operationHistory.execute(op, new NullProgressMonitor(), null);
+        		if (status.isOK()) {
+        			return true;
+        		} else {
+        			Platform.getLog(IDEWorkbenchPlugin.getDefault().getBundle()).log(status);
+        			return false;
+        		}
+        	} catch (ExecutionException ex) {
+        		Platform.getLog(IDEWorkbenchPlugin.getDefault().getBundle()).log(new Status(IStatus.ERROR, IDEWorkbenchPlugin.getDefault().getBundle().getSymbolicName(), ex.getMessage(), ex));
+        		return false;
+        	}
+        } else if (this.resourcesRadio.getSelection()) {
+	        Iterator resourcesEnum = getSelectedResources().iterator();
+	        List fileSystemObjects = new ArrayList();
+	        while (resourcesEnum.hasNext()) {
+	            fileSystemObjects.add(((FileSystemElement) resourcesEnum.next())
+	                    .getFileSystemObject());
+	        }
+	
+	        if (fileSystemObjects.size() > 0) {
+				return importResources(fileSystemObjects);
+			}
+	
+	        MessageDialog.openInformation(getContainer().getShell(),
+	                DataTransferMessages.DataTransfer_information,
+	                DataTransferMessages.FileImport_noneSelected);
+	
+	        return false;
         }
-
-        if (fileSystemObjects.size() > 0) {
-			return importResources(fileSystemObjects);
-		}
-
-        MessageDialog.openInformation(getContainer().getShell(),
-                DataTransferMessages.DataTransfer_information,
-                DataTransferMessages.FileImport_noneSelected);
-
         return false;
     }
 
@@ -1180,24 +1254,50 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
      */
     protected void updateWidgetEnablements() {
         super.updateWidgetEnablements();
-        enableButtonGroup(ensureSourceIsValid());
-
-    	if (createLinksInWorkspaceButton != null) {
-			IPath path = getContainerFullPath();
-	    	if (path != null && relativePathVariableGroup != null) {
-				IResource target = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
-				if (target != null && target.isVirtual())
-					createVirtualFoldersButton.setSelection(true);
-	    	}
-			relativePathVariableGroup.setEnabled(createLinksInWorkspaceButton.getSelection());
-			createVirtualFoldersButton.setEnabled(createLinksInWorkspaceButton.getSelection());
+        
+        this.referenceExistingProjectRadio.setEnabled(isCurrentSourceAnEclipseProject());
+        this.referenceAsNewProjectRadio.setEnabled(!isCurrentSourceAnEclipseProject());
+        this.copyAsNewProjectRadio.setEnabled(!isCurrentSourceAnEclipseProject());
+        if (isCurrentSourceAnEclipseProject() && (this.referenceAsNewProjectRadio.getSelection() || this.copyAsNewProjectRadio.getSelection())) {
+        	this.referenceAsNewProjectRadio.setSelection(false);
+        	this.copyAsNewProjectRadio.setSelection(false);
+        	this.referenceExistingProjectRadio.setSelection(true);
+        } else if (!isCurrentSourceAnEclipseProject() && this.referenceAsNewProjectRadio.getSelection()) {
+        	this.referenceAsNewProjectRadio.setSelection(true);
+        	this.referenceExistingProjectRadio.setSelection(false);
+        }
+        
+        if (this.selectionGroup != null) {
+	        enableButtonGroup(ensureSourceIsValid() && this.resourcesRadio.getSelection());
 	
-			if (!selectionGroup.isEveryItemChecked() ||
-				(createTopLevelFolderCheckbox.getSelection())) {
-	        	createVirtualFoldersButton.setSelection(true);
-			}
-    	}
+	       	this.overwriteExistingResourcesCheckbox.setEnabled(this.resourcesRadio.getSelection());
+	       	this.createTopLevelFolderCheckbox.setEnabled(this.resourcesRadio.getSelection());
+	       	
+	       	if (this.createLinksInWorkspaceButton != null) {
+	       		this.createLinksInWorkspaceButton.setEnabled(this.resourcesRadio.getSelection());
+				IPath path = getContainerFullPath();
+		    	if (path != null && relativePathVariableGroup != null) {
+					IResource target = ResourcesPlugin.getWorkspace().getRoot().findMember(path);
+					if (target != null && target.isVirtual())
+						createVirtualFoldersButton.setSelection(true);
+		    	}
+				relativePathVariableGroup.setEnabled(createLinksInWorkspaceButton.getSelection());
+				createVirtualFoldersButton.setEnabled(createLinksInWorkspaceButton.getSelection());
+		
+				if (!selectionGroup.isEveryItemChecked() ||
+					(createTopLevelFolderCheckbox.getSelection())) {
+		        	createVirtualFoldersButton.setSelection(true);
+				}
+	    	}
+        }
     }
+
+	/**
+	 * @return
+	 */
+	private boolean isCurrentSourceAnEclipseProject() {
+		return this.source != null && new File(this.source, IProjectDescription.DESCRIPTION_FILE_NAME).exists();
+	}
 
     /**
      *	Answer a boolean indicating whether self's source specification
@@ -1209,6 +1309,15 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
             setMessage(SOURCE_EMPTY_MESSAGE);
             enableButtonGroup(false);
             return false;
+        }
+        if (!sourceDirectory.exists() || !sourceDirectory.isDirectory()) {
+        	setMessage(DataTransferMessages.FileImport_invalidSource);
+        	enableButtonGroup(false);
+        	return false;
+        }
+        
+        if (!this.resourcesRadio.getSelection()) {
+        	return true;
         }
 
         if (sourceConflictsWithDestination(new Path(sourceDirectory.getPath()))) {
@@ -1267,5 +1376,113 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         // WizardResourceImportPage
         return false;
     }
+    
+    /*
+     * @see WizardDataTransferPage.determinePageCompletion.
+     */
+    protected boolean determinePageCompletion() {
+    	setErrorMessage(null);
+    	if (!super.determinePageCompletion()) {
+    		return false;
+    	}
+    	if (this.referenceExistingProjectRadio.getSelection()) {
+    		InputStream projectDescrptionStream = null;
+    		try {
+	    		projectDescrptionStream = new FileInputStream(new File(this.source, IProjectDescription.DESCRIPTION_FILE_NAME));
+	    		this.projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(projectDescrptionStream);
+	    		if (ResourcesPlugin.getWorkspace().getRoot().getProject(this.projectDescription.getName()).exists()) {
+	    			setErrorMessage(NLS.bind(IDEWorkbenchMessages.WizardImportPage_projectAlreadyExists, this.projectDescription.getName()));
+	    			return false;
+	    		}
+    			return true;
+    		} catch (Exception ex) {
+    			setErrorMessage(ex.getLocalizedMessage());
+    			return false;
+    		} finally {
+    			if (projectDescrptionStream != null) {
+    				try {
+    					projectDescrptionStream.close();
+    				} catch (IOException ioException) {
+    					// ignore
+    				}
+    			}
+    		}
+    		
+    	} else if (this.resourcesRadio.getSelection()) {
+	        //Check for valid projects before making the user do anything 
+	        if (noOpenProjects()) {
+	            setErrorMessage(IDEWorkbenchMessages.WizardImportPage_noOpenProjects);
+	            return false;
+	        }
+        }
+        return true;
+    }
+    
+    /**
+     * Returns whether or not the passed workspace has any 
+     * open projects
+     * @return boolean
+     */
+    private boolean noOpenProjects() {
+        IProject[] projects = IDEWorkbenchPlugin.getPluginWorkspace().getRoot()
+                .getProjects();
+        for (int i = 0; i < projects.length; i++) {
+            if (projects[i].isOpen()) {
+				return false;
+			}
+        }
+        return true;
+    }
 
+	/**
+	 * @return whether this will invoke another wizard
+	 */
+	public boolean useNestedWizard() {
+		return !resourcesRadio.getSelection();
+	}
+
+	/**
+	 * 
+	 * @return the initialized wizard to show on next steps
+	 */
+	public IWizard getNestedWizard() {
+		if (!useNestedWizard()) {
+			return null;
+		}
+		Button selectedButton = null;
+		if (this.referenceAsNewProjectRadio.getSelection()) { selectedButton = this.referenceAsNewProjectRadio; }
+		if (this.copyAsNewProjectRadio.getSelection()) { selectedButton = this.copyAsNewProjectRadio; }
+		if (this.referenceExistingProjectRadio.getSelection()) { selectedButton = this.referenceExistingProjectRadio; }
+		if (this.resourcesRadio.getSelection()) { selectedButton = this.resourcesRadio; }
+		
+		if (this.nestedWizard == null ||
+			!this.source.equals(this.lastSource) || this.lastSelectedAction != selectedButton) {
+			if (this.nestedWizard != null) {
+				this.nestedWizard.dispose();
+			}
+			this.lastSource = this.source;
+			this.lastSelectedAction = selectedButton;
+			if (lastSelectedAction.equals(this.referenceAsNewProjectRadio) || lastSelectedAction.equals(this.copyAsNewProjectRadio)) {
+				BasicNewProjectResourceWizard wizard = new BasicNewProjectResourceWizard();
+				wizard.init(PlatformUI.getWorkbench(), null);
+				if (lastSelectedAction.equals(this.referenceAsNewProjectRadio)) {
+					wizard.setDefaultLocation(this.lastSource, true);
+				} else {
+					wizard.setDefaultProjectName(this.lastSource.getName());
+				}
+				this.nestedWizard = wizard;
+			} else {
+				this.nestedWizard = new ExternalProjectImportWizard(this.lastSource.getPath());
+			}
+		}
+		this.nestedWizard.addPages();
+		return this.nestedWizard;
+	}
+    
+    public IWizardPage getNextPage() {
+    	if (useNestedWizard()) {
+    		return getNestedWizard().getPages()[0];
+    	}
+    	return super.getNextPage();
+    }
 }

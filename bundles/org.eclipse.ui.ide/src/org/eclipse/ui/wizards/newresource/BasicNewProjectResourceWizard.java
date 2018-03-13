@@ -13,6 +13,7 @@
 
 package org.eclipse.ui.wizards.newresource;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -111,6 +112,10 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 
 	private WizardNewProjectReferencePage referencePage;
 
+	private File defaultLocation;
+	private boolean lockLocation;
+	private String defaultProjectName;
+	
 	// cache of newly-created project
 	private IProject newProject;
 
@@ -169,6 +174,12 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 		}; 
 		mainPage.setTitle(ResourceMessages.NewProject_title);
 		mainPage.setDescription(ResourceMessages.NewProject_description);
+		if (this.defaultProjectName == null && this.defaultLocation != null) {
+			this.defaultProjectName = this.defaultLocation.getName();
+		}
+		this.mainPage.setInitialProjectName(this.defaultProjectName);
+		this.mainPage.setInitialLocation(this.defaultLocation);
+		this.mainPage.setLockLocation(this.lockLocation);
 		this.addPage(mainPage);
 
 		// only add page if there are already projects in the workspace
@@ -610,5 +621,25 @@ public class BasicNewProjectResourceWizard extends BasicNewResourceWizard
 					preferenceValue);
 		}
 		return result == IDialogConstants.YES_ID;
+	}
+
+	/**
+	 * Select the initial location for the project
+	 * @param source
+	 * @param lock whether we allow user to change it or not
+	 * @since 3.10
+	 */
+	public void setDefaultLocation(File source, boolean lock) {
+		this.defaultLocation = source;
+		this.lockLocation = lock;
+	}
+
+	/**
+	 * Sets the default project name for the wizard
+	 * @param name
+	 * @since 3.10
+	 */
+	public void setDefaultProjectName(String name) {
+		this.defaultProjectName = name;
 	}
 }

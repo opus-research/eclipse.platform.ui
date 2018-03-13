@@ -16,6 +16,7 @@
 
 package org.eclipse.ui.internal.ide.dialogs;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -491,4 +492,32 @@ public class ProjectContentsLocationArea {
 		}
 		return locationPathField.getText();
 	}
-}
+
+	/**
+	 * The initial location for the {@link ProjectContentsLocationArea}
+	 * @param location
+	 */
+	public void setInitialLocation(File location) {
+		this.locationPathField.setText(location.getAbsolutePath());
+	}
+	
+	/**
+	 * Initialize whether the location will be default (project in
+	 * workspace) or not.
+	 * @param useDefaultLocation
+	 */
+	public void setDefault(boolean useDefaultLocation) {
+		this.useDefaultsButton.setSelection(useDefaultLocation);
+	}
+	
+	/**
+	 * Sets whether included widgets are enabled
+	 * @param enabled
+	 * @since 3.10
+	 */
+	public void setEnabled(boolean enabled) {
+		this.useDefaultsButton.setEnabled(this.useDefaultsButton.isEnabled() && enabled);
+		this.locationPathField.setEnabled(this.locationPathField.isEnabled() && enabled);
+		this.browseButton.setEnabled(this.browseButton.isEnabled() && enabled);
+	}
+ }

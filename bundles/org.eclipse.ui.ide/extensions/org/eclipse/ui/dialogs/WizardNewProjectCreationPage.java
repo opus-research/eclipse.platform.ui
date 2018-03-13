@@ -14,6 +14,7 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
+import java.io.File;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
@@ -61,6 +62,8 @@ public class WizardNewProjectCreationPage extends WizardPage {
 
        // initial value stores
     private String initialProjectFieldValue;
+    private File initialLocation;
+    private boolean lockLocation;
 
     // widgets
     Text projectNameField;
@@ -127,7 +130,11 @@ public class WizardNewProjectCreationPage extends WizardPage {
 
         createProjectNameGroup(composite);
         locationArea = new ProjectContentsLocationArea(getErrorReporter(), composite);
-        if(initialProjectFieldValue != null) {
+        if (this.initialLocation != null) {
+        	this.locationArea.setInitialLocation(initialLocation);
+        	this.locationArea.setDefault(true);
+        	this.locationArea.setEnabled(!this.lockLocation);
+        } else if(initialProjectFieldValue != null) {
 			locationArea.updateProjectName(initialProjectFieldValue);
 		}
         
@@ -322,6 +329,27 @@ public class WizardNewProjectCreationPage extends WizardPage {
 				locationArea.updateProjectName(name.trim());
 			}
         }
+    }
+    
+    /**
+     * Sets the initial location that this page will use when
+     * created. The location is ignored if the createControl(Composite)
+     * method has already been called.
+     * 
+     * @param location initial location of project for this page
+     * @since 3.10
+     */
+    public void setInitialLocation(File location) {
+    	this.initialLocation = location;
+    }
+    
+    /**
+     * Sets whether user is allowed to change location
+     * @param lockLocation
+     * @since 3.10
+     */
+    public void setLockLocation(boolean lockLocation) {
+    	this.lockLocation = lockLocation;
     }
 
     /**
