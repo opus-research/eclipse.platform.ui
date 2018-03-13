@@ -1077,6 +1077,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 	public void addEditorReference(EditorReference editorReference) {
+		final MPart part = editorReference.getModel();
+		if (!part.getTags().contains(EPartService.REMOVE_ON_HIDE_TAG)) {
+			part.getTags().add(EPartService.REMOVE_ON_HIDE_TAG);
+		}
 		editorReferences.add(editorReference);
 	}
 
@@ -4601,25 +4605,32 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		}
 	}
 
-	public void firePartClosed(CompatibilityPart compatibilityPart) {
-		final IWorkbenchPart part = compatibilityPart.getPart();
-		final WorkbenchPartReference partReference = compatibilityPart.getReference();
-		MPart model = partReference.getModel();
+	/**
+	 * Do all required bookkeeping and event firing associated with
+	 * part closure.
+	 * @param partReference
+	 */
+	protected final void processPartClosed(final WorkbenchPartReference partReference) {
+		final IWorkbenchPart part = partReference.getPart(false);
 
-		SaveablesList modelManager = (SaveablesList) getWorkbenchWindow().getService(
-				ISaveablesLifecycleListener.class);
-		Object postCloseInfo = modelManager.preCloseParts(Collections.singletonList(part), false,
-				getWorkbenchWindow());
-		if (postCloseInfo != null) {
-			modelManager.postClose(postCloseInfo);
+		if (part != null) {
+			SaveablesList modelManager = (SaveablesList) getWorkbenchWindow().getService(
+					ISaveablesLifecycleListener.class);
+			Object postCloseInfo = modelManager.preCloseParts(Collections.singletonList(part),
+					false, getWorkbenchWindow());
+			if (postCloseInfo != null) {
+				modelManager.postClose(postCloseInfo);
+			}
 		}
 
-		for (final Object listener : partListenerList.getListeners()) {
-			SafeRunner.run(new SafeRunnable() {
-				public void run() throws Exception {
-					((IPartListener) listener).partClosed(part);
-				}
-			});
+		if (part != null) {
+			for (final Object listener : partListenerList.getListeners()) {
+				SafeRunner.run(new SafeRunnable() {
+					public void run() throws Exception {
+						((IPartListener) listener).partClosed(part);
+					}
+				});
+			}
 		}
 
 		for (final Object listener : partListener2List.getListeners()) {
@@ -4630,12 +4641,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			});
 		}
 
-		if (part instanceof IViewPart) {
+		if (partReference instanceof ViewReference) {
 			viewReferences.remove(partReference);
 		} else {
 			editorReferences.remove(partReference);
 		}
 
+		final MPart model = partReference.getModel();
 		for (int i = 0; i < activationList.size(); i++) {
 			if (model == activationList.get(i)) {
 				activationList.remove(i);
@@ -4946,6 +4958,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 					EditorReference reference = getEditorReference(part);
 					if (reference != null) {
 						reference.unsubscribe();
+
+						processPartClosed(reference);
 					}
 				}
 			}
