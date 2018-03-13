@@ -1164,32 +1164,15 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 			part = (MPart) ph.getRef();
 			part.setCurSharedRef(ph);
-
-			part = showPart(mode, part);
-
-			CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
-
-			if (compatibilityView != null) {
-				IWorkbenchPartReference ref = compatibilityView.getReference();
-
-				legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-				legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
-			}
-			return compatibilityView.getView();
 		}
 
 		part = showPart(mode, part);
 
-		CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
+		ViewReference ref = getViewReference(part);
+		legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
 
-		if (compatibilityView != null) {
-			IWorkbenchPartReference ref = compatibilityView.getReference();
-
-			legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
-		}
-		return compatibilityView.getView();
-
+		return (IViewPart) ref.getPart(true);
 	}
 	private MPart showPart(int mode, MPart part) {
 		switch (mode) {
@@ -2265,10 +2248,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @see org.eclipse.ui.IWorkbenchPage#getEditors()
 	 */
 	public IEditorPart[] getEditors() {
-		int length = editorReferences.size();
+		final IEditorReference[] editorReferences = getEditorReferences();
+		int length = editorReferences.length;
 		IEditorPart[] editors = new IEditorPart[length];
 		for (int i = 0; i < length; i++) {
-			editors[i] = editorReferences.get(i).getEditor(true);
+			editors[i] = editorReferences[i].getEditor(true);
 		}
 		return editors;
 	}

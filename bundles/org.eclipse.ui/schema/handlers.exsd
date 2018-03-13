@@ -2,9 +2,9 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="org.eclipse.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appInfo>
+      <appinfo>
          <meta.schema plugin="org.eclipse.ui" id="handlers" name="Handlers"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
 The handlers extension point is an elaboration of the experimental &lt;code&gt;handlerSubmission&lt;/code&gt; element defined in Eclipse 3.0.  A handler is the behaviour of a command at a particular point in time.  A command can have zero or more handlers associated with it.  At any one point in time, however, a command will either have no active handler or one active handler.  The active handler is the one which is currently responsible for carrying out the behaviour of the command.  This is very similar to the concept of an action handler and a retargettable action.
@@ -30,16 +30,10 @@ These conditions are used to avoid unnecessary plug-in loading.  These handler d
    <include schemaLocation="schema://org.eclipse.core.expressions/schema/expressionLanguage.exsd"/>
 
    <element name="extension">
-      <annotation>
-         <appInfo>
-            <meta.element />
-         </appInfo>
-      </annotation>
       <complexType>
-         <choice>
+         <sequence>
             <element ref="handler" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="e4handler" minOccurs="0" maxOccurs="unbounded"/>
-         </choice>
+         </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
@@ -67,7 +61,7 @@ These conditions are used to avoid unnecessary plug-in loading.  These handler d
    <element name="handler">
       <annotation>
          <appInfo>
-            <meta.element labelAttribute="commandId"/>
+           <meta.element labelAttribute="commandId"/>
          </appInfo>
          <documentation>
             &lt;p&gt;Associated a command with a handler implementation.&lt;/p&gt;
@@ -84,65 +78,19 @@ These conditions are used to avoid unnecessary plug-in loading.  These handler d
                <documentation>
                   &lt;p&gt;The id of the command to associate with this handler implementation.&lt;/p&gt;
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  &lt;p&gt;The handler class that implements &lt;code&gt;org.eclipse.core.commands.IHandler&lt;/code&gt; or extends &lt;code&gt;org.eclipse.core.commands.AbstractHandler&lt;/code&gt;.&lt;/p&gt;
+                  &lt;p&gt;The handler class that imlements &lt;code&gt;org.eclipse.core.commands.IHandler&lt;/code&gt; or extends &lt;code&gt;org.eclipse.core.commands.AbstractHandler&lt;/code&gt;.&lt;/p&gt;
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="helpContextId" type="string">
-            <annotation>
-               <documentation>
-                  &lt;p&gt;
-The identifier of the help context that relates to this specific handler.  While a command can provide a general description of a command&apos;s behaviour, it is sometimes appropriate for a handler to provide help more specific to their implementation.
-&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;Since: 3.2&lt;/em&gt;&lt;/p&gt;
-               </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="e4handler">
-      <annotation>
-         <documentation>
-            An e4-style handler
-&lt;p&gt;&lt;em&gt;Since: 3.105&lt;/em&gt;&lt;/p&gt;
-         </documentation>
-      </annotation>
-      <complexType>
-         <sequence>
-            <element ref="activeWhen" minOccurs="0" maxOccurs="1"/>
-            <element ref="class" minOccurs="0" maxOccurs="1"/>
-            <element ref="enabledWhen"/>
-         </sequence>
-         <attribute name="commandId" type="string" use="required">
-            <annotation>
-               <documentation>
-                  &lt;p&gt;The id of the command to associate with this handler implementation.&lt;/p&gt;
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="identifier" basedOn="org.eclipse.ui.commands/command/@id"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  &lt;p&gt;The handler class that is a POJO and uses the @Execute annotation for determine the method to be called.
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="java"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="helpContextId" type="string">
@@ -223,9 +171,9 @@ The identifier of the help context that relates to this specific handler.  While
                <documentation>
                   &lt;p&gt;The handler class that imlements &lt;code&gt;org.eclipse.core.commands.IHandler&lt;/code&gt; or extends &lt;code&gt;org.eclipse.core.commands.AbstractHandler&lt;/code&gt;.&lt;/p&gt;
                </documentation>
-               <appInfo>
+               <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
-               </appInfo>
+               </appinfo>
             </annotation>
          </attribute>
       </complexType>
@@ -256,18 +204,18 @@ The identifier of the help context that relates to this specific handler.  While
    </element>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="since"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          3.1
       </documentation>
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="examples"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
 Variables that are valid in activeWhen and enabledWhen expressions can be found in &lt;code&gt;org.eclipse.ui.ISources&lt;/code&gt;.  The types of the variables are determined by the &lt;code&gt;org.eclipse.ui.ISourceProvider&lt;/code&gt; that provides them.
@@ -321,9 +269,9 @@ To further avoid plug-in loading, it is possible to specify when the handler is 
    </annotation>
 
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="apiInfo"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          &lt;p&gt;
 All handlers implement &lt;code&gt;org.eclipse.core.commands.IHandler&lt;/code&gt;, and can use &lt;code&gt;org.eclipse.core.commands.AbstractHandler&lt;/code&gt; as a base class.  Within the workbench, it is possible to activate and deactivate handlers using the &lt;code&gt;org.eclipse.ui.handlers.IHandlerService&lt;/code&gt; interface.  This interface can be retrieved from supporting workbench objects, such as &lt;code&gt;IWorkbench&lt;/code&gt; itself, a workbench window, or a part site.  To retrieve the service, you would make a call like &lt;code&gt;IWorkbench.getService(IHandlerService.class)&lt;/code&gt;.
@@ -343,10 +291,11 @@ It is also possible to activate and deactive handlers using legacy code in the w
    </annotation>
 
 
+
    <annotation>
-      <appInfo>
+      <appinfo>
          <meta.section type="copyright"/>
-      </appInfo>
+      </appinfo>
       <documentation>
          Copyright (c) 2005, 2007 IBM Corporation and others.&lt;br&gt;
 All rights reserved. This program and the accompanying materials are made
