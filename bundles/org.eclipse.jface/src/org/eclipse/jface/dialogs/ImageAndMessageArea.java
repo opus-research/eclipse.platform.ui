@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Text;
  * @since 3.2
  * @deprecated As of 3.3, this class is no longer necessary.
  *
+ * This class is planned to be deleted, see Bug 475863.
  */
 @Deprecated
 public class ImageAndMessageArea extends Composite {

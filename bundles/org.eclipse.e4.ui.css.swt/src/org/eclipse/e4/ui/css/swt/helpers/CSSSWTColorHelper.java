@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -267,7 +267,7 @@ public class CSSSWTColorHelper {
 		if (grad.getRGBs().size() == grad.getPercents().size() + 1) {
 			int[] percents = new int[grad.getPercents().size()];
 			for (int i = 0; i < percents.length; i++) {
-				int value = ((Integer) grad.getPercents().get(i)).intValue();
+				int value = (grad.getPercents().get(i)).intValue();
 				if (value < 0 || value > 100) {
 					// TODO this should be an exception because bad source
 					// format

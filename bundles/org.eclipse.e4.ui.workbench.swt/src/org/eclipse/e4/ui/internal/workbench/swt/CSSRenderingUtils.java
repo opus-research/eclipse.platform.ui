@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 IBM Corporation and others.
+ * Copyright (c) 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <scela@redhat.com> - Bug 472707
+ *     Sopot Cela <scela@redhat.com> - Bug 472761
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -76,11 +76,13 @@ public class CSSRenderingUtils {
 
 		Image handleImage = createImage(toFrame, classId, HANDLE_IMAGE_PROP,
 				null);
-		if (handleImage == null) {
+
+		if ((handleImage == null) && (draggable)) {
 			// need to feed default image otherwise the toolbar DnD won't work
-			// see bug 472707
+			// see bug 472761
 			handleImage = JFaceResources.getImage(DRAG_HANDLE);
 		}
+
 		if (vertical && handleImage != null)
 			handleImage = rotateImage(toFrame.getDisplay(), handleImage, null);
 
