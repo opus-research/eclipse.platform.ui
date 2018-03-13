@@ -151,6 +151,22 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					}
 				}
 			}
+
+			if (element instanceof MPart) {
+				MPart part = (MPart) element;
+				if (UIEvents.UIElement.TOBERENDERED.equals(attName)) {
+					boolean tbr = (Boolean) event
+							.getProperty(UIEvents.EventTags.NEW_VALUE);
+					if (!tbr) {
+						List<MMenu> menus = part.getMenus();
+						for (MMenu menu : menus) {
+							if (menu instanceof MPopupMenu)
+								unlinkMenu(menu);
+						}
+					}
+				}
+			}
+
 			if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 				if (element instanceof MMenu) {
 					MMenu menuModel = (MMenu) element;
@@ -629,8 +645,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		Object obj = itemModel.getContributionItem();
 		if (obj instanceof IContextFunction) {
 			final IEclipseContext lclContext = getContext(itemModel);
-			ici = (IContributionItem) ((IContextFunction) obj)
-					.compute(lclContext, null);
+			ici = (IContributionItem) ((IContextFunction) obj).compute(
+					lclContext, null);
 			itemModel.setContributionItem(ici);
 		} else if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -984,5 +1000,20 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 			menuManager.remove(ici);
 			clearModelToContribution(menuModel, ici);
 		}
+	}
+
+	private void unlinkMenu(MMenu menu) {
+
+		List<MMenuElement> children = menu.getChildren();
+		for (MMenuElement child : children) {
+			if (child instanceof MMenu)
+				unlinkMenu((MMenu) child);
+			else {
+				IContributionItem contribution = getContribution(child);
+				clearModelToContribution(child, contribution);
+			}
+		}
+		MenuManager mm = getManager(menu);
+		clearModelToManager(menu, mm);
 	}
 }
