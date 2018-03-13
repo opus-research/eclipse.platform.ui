@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,8 +17,6 @@ import java.util.HashMap;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -47,7 +45,7 @@ public abstract class ToolTip {
 
 	private ToolTipOwnerControlListener listener;
 
-	private HashMap data;
+	private HashMap<String, Object> data;
 
 	// Ensure that only one tooltip is active in time
 	private static Shell CURRENT_TOOLTIP;
@@ -102,15 +100,6 @@ public abstract class ToolTip {
 	public ToolTip(Control control, int style, boolean manualActivation) {
 		this.control = control;
 		this.style = style;
-		this.control.addDisposeListener(new DisposeListener() {
-
-			public void widgetDisposed(DisposeEvent e) {
-				data = null;
-				deactivate();
-			}
-
-		});
-
 		this.listener = new ToolTipOwnerControlListener();
 		this.shellListener = new Listener() {
 			public void handleEvent(final Event event) {
@@ -147,7 +136,7 @@ public abstract class ToolTip {
 	 */
 	public void setData(String key, Object value) {
 		if (data == null) {
-			data = new HashMap();
+			data = new HashMap<String, Object>();
 		}
 		data.put(key, value);
 	}
@@ -452,6 +441,10 @@ public abstract class ToolTip {
 			tip.dispose();
 			CURRENT_TOOLTIP = null;
 			afterHideToolTip(event);
+		}
+		if (event != null && event.type == SWT.Dispose) {
+			deactivate();
+			data = null;
 		}
 	}
 
