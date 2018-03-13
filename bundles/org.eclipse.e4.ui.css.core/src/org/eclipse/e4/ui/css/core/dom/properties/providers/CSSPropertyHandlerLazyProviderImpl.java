@@ -131,15 +131,15 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	 * @return
 	 */
 	protected String getHandlerClassName(String property) {
-		StringBuilder handlerClassName = new StringBuilder("CSSProperty"); //$NON-NLS-1$
-		String[] s = StringUtils.split(property, "-"); //$NON-NLS-1$
+		String handlerClassName = "CSSProperty";
+		String[] s = StringUtils.split(property, "-");
 		for (int i = 0; i < s.length; i++) {
 			String p = s[i];
-			handlerClassName.append(Character.toUpperCase(p.charAt(0)));
-			handlerClassName.append(p.substring(1));
+			p = p.substring(0, 1).toUpperCase() + p.substring(1, p.length());
+			handlerClassName += p;
 		}
-		handlerClassName.append("Handler"); //$NON-NLS-1$
-		return handlerClassName.toString();
+		handlerClassName += "Handler";
+		return handlerClassName;
 	}
 
 	/*

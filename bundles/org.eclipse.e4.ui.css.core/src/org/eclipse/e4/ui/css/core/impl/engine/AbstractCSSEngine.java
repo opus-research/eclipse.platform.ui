@@ -222,8 +222,10 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		//final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
-		if (!parseImport) {
-			documentCSS.addStyleSheet(s);
+		if (documentCSS instanceof ExtendedDocumentCSS) {
+			if (!parseImport) {
+				documentCSS.addStyleSheet(s);
+			}
 		}
 		return s;
 	}
