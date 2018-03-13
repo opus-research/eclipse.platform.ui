@@ -370,8 +370,8 @@ class NewWizardNewPage implements ISelectionChangedListener {
                 }
             }
         });
-
-		treeViewer.setFilters(new ViewerFilter[] { filter, filteredTreeFilter });
+        
+        treeViewer.addFilter(filter);
         
         if (projectsOnly) {
 			treeViewer.addFilter(projectFilter);
@@ -436,8 +436,7 @@ class NewWizardNewPage implements ISelectionChangedListener {
                                     currentExpanded.length, delta.length);
                             filteredTree.getViewer().setExpandedElements(expanded);
                         } else {
-							filteredTree.getViewer().setFilters(
-									new ViewerFilter[] { filter, filteredTreeFilter });
+                        	filteredTree.getViewer().addFilter(filter);
                             if (projectsOnly) {
 								filteredTree.getViewer().addFilter(projectFilter);
 							}
