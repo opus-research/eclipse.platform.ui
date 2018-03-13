@@ -255,11 +255,6 @@ public class UIEvents {
 		 * Sent when application startup is complete
 		 */
 		public static final String APP_STARTUP_COMPLETE = TOPIC + TOPIC_SEP + "appStartupComplete"; //$NON-NLS-1$
-
-		/**
-		 * Sent when MPart changes busy state
-		 */
-		public static final String BUSY = "busy"; //$NON-NLS-1$
 	}
 
 	/**
@@ -309,17 +304,6 @@ public class UIEvents {
 			return false;
 
 		return eventBroker.send(topic, argMap);
-	}
-
-	/**
-	 * Publish the topic with the provided arguments to the global event bus. Both parameters are
-	 * wrapped in the event builder instance that was used to collect event data
-	 * 
-	 * @param eventBuilder
-	 * @return true if the event is published correctly, false otherwise
-	 */
-	public static boolean publishEvent(UIEventBuilder eventBuilder) {
-		return publishEvent(eventBuilder.getTopic(), eventBuilder.getParams());
 	}
 
 	@SuppressWarnings("javadoc")
@@ -967,7 +951,6 @@ public class UIEvents {
 		public static final String TOPIC_ICONURI = "org/eclipse/e4/ui/model/ui/UILabel/iconURI/*"; //$NON-NLS-1$
 		public static final String TOPIC_LABEL = "org/eclipse/e4/ui/model/ui/UILabel/label/*"; //$NON-NLS-1$
 		public static final String TOPIC_TOOLTIP = "org/eclipse/e4/ui/model/ui/UILabel/tooltip/*"; //$NON-NLS-1$
-		public static final String TOPIC_BUSY = "org/eclipse/e4/ui/model/ui/UILabel/busy"; //$NON-NLS-1$
 
 		// Attributes that can be tested in event handlers
 		public static final String ICONURI = "iconURI"; //$NON-NLS-1$
