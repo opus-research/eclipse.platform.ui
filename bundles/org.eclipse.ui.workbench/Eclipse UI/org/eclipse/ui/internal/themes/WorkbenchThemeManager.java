@@ -17,6 +17,7 @@ import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.internal.css.swt.definition.IThemeElementDefinitionOverridable;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -115,11 +116,17 @@ public class WorkbenchThemeManager extends EventManager implements
 	private EventHandler themeChangedHandler = new EventHandler() {
 		public void handleEvent(org.osgi.service.event.Event event) {
 			IStylingEngine engine = (IStylingEngine) context.get(IStylingEngine.SERVICE_NAME);
-			IThemeRegistry themeRegistry = (IThemeRegistry) context.get(IThemeRegistry.class
+			ThemeRegistry themeRegistry = (ThemeRegistry) context.get(IThemeRegistry.class
 					.getName());
 			FontRegistry fontRegistry = getCurrentTheme().getFontRegistry();
 			ColorRegistry colorRegistry = getCurrentTheme().getColorRegistry();
 
+			overrideAlreadyExistingDefinitions(engine, themeRegistry, fontRegistry, colorRegistry);
+			addNewDefinitions(engine, themeRegistry, fontRegistry, colorRegistry);
+		}
+
+		private void overrideAlreadyExistingDefinitions(IStylingEngine engine,
+				ThemeRegistry themeRegistry, FontRegistry fontRegistry, ColorRegistry colorRegistry) {
 			for (FontDefinition fontDefinition : themeRegistry.getFonts()) {
 				engine.style(fontDefinition);
 				if (fontDefinition.isOverridden()) {
@@ -132,6 +139,35 @@ public class WorkbenchThemeManager extends EventManager implements
 					colorRegistry.put(colorDefinition.getId(), colorDefinition.getValue());
 				}
 			}
+		}
+
+		private void addNewDefinitions(IStylingEngine engine, ThemeRegistry themeRegistry,
+				FontRegistry fontRegistry, ColorRegistry colorRegistry) {
+			ThemesExtension themesExtension = new ThemesExtension();
+			engine.style(themesExtension);
+
+			for (IThemeElementDefinitionOverridable<?> definition : themesExtension
+					.getDefinitions()) {				
+				engine.style(definition);
+				if (definition.isOverridden() && definition instanceof FontDefinition) {
+					addFontDefinition((FontDefinition) definition, themeRegistry, fontRegistry);
+				} else if (definition.isOverridden() && definition instanceof ColorDefinition) {
+					addColorDefinition((ColorDefinition) definition, themeRegistry, colorRegistry);
+				}
+			}
+
+		}
+
+		private void addFontDefinition(FontDefinition definition, ThemeRegistry themeRegistry,
+				FontRegistry fontRegistry) {
+			themeRegistry.add(definition);
+			fontRegistry.put(definition.getId(), definition.getValue());
+		}
+
+		private void addColorDefinition(ColorDefinition definition, ThemeRegistry themeRegistry,
+				ColorRegistry colorRegistry) {
+			themeRegistry.add(definition);
+			colorRegistry.put(definition.getId(), definition.getValue());
 		}
 	};
 
