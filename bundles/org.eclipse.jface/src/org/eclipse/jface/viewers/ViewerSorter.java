@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel - Lars.Vogel@gmail.com https://bugs.eclipse.org/402464
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -29,11 +30,13 @@ import java.text.Collator; // can't use ICU - Collator used in public API
  * to provide a totally different way of sorting elements.
  * </p>
  * <p>
- * It is recommended to use <code>ViewerComparator</code> instead.
+ * @deprecated use <code>ViewerComparator</code> instead.
  * </p>
  * @see IStructuredContentProvider
  * @see StructuredViewer
  */
+
+@Deprecated
 public class ViewerSorter extends ViewerComparator {
     /**
      * The collator used to sort strings.
@@ -46,7 +49,10 @@ public class ViewerSorter extends ViewerComparator {
     /**
      * Creates a new viewer sorter, which uses the default collator
      * to sort strings.
+     * 
+     * @deprecated use <code>ViewerComparator</code> instead.
      */
+    @Deprecated
     public ViewerSorter() {
         this(Collator.getInstance());
     }
@@ -56,7 +62,10 @@ public class ViewerSorter extends ViewerComparator {
      * to sort strings.
      *
      * @param collator the collator to use to sort strings
+	 *
+     * @deprecated use <code>ViewerComparator</code> instead.
      */
+    @Deprecated
     public ViewerSorter(Collator collator) {
     	super(collator);
         this.collator = collator;
@@ -69,7 +78,7 @@ public class ViewerSorter extends ViewerComparator {
      * @deprecated as of 3.3 Use {@link ViewerComparator#getComparator()}
      */
     @Deprecated
-	public Collator getCollator() {
+    public Collator getCollator() {
         return collator;
     }
 

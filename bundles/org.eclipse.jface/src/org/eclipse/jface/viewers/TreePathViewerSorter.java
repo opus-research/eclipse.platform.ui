@@ -19,7 +19,10 @@ import java.util.Comparator;
  * parent element of the elements being sorted.
  * 
  * @since 3.2
+ * 
+ * @deprecated
  */
+@Deprecated
 public class TreePathViewerSorter extends ViewerSorter {
 
 	/**
