@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -164,8 +164,7 @@ public abstract class Action extends AbstractAction implements IAction {
 	/**
 	 * Convenience method for removing any optional accelerator text from the
 	 * given string. The accelerator text appears at the end of the text, and is
-	 * separated from the main part by the last tab character <code>'\t'</code>
-	 * (or the last <code>'@'</code> if there is no tab).
+	 * separated from the main part by a single tab character <code>'\t'</code>.
 	 * 
 	 * @param text
 	 *            the text
@@ -637,8 +636,22 @@ public abstract class Action extends AbstractAction implements IAction {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IAction#setText(java.lang.String)
+	/**
+	 * Sets the text for this action.
+	 * <p>
+	 * Fires a property change event for the <code>TEXT</code> property if the
+	 * text actually changes as a consequence.
+	 * </p>
+	 * <p>
+	 * The accelerator is identified by the last index of a tab character. If
+	 * there are no tab characters, then it is identified by the last index of a
+	 * '@' character. If neither, then there is no accelerator text. Note that
+	 * if you want to insert a '@' character into the text (but no accelerator,
+	 * you can simply insert a '@' or a tab at the end of the text.
+	 * </p>
+	 * 
+	 * @param text
+	 *            the text, or <code>null</code> if none
 	 */
 	public void setText(String text) {
 		String oldText = this.text;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -372,11 +372,7 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	 * @see org.eclipse.ui.IWorkbenchPartReference#getId()
 	 */
 	public String getId() {
-		String id = part.getElementId();
-
-		// Only return the descriptor id
-		int colonIndex = id.indexOf(':');
-		return colonIndex == -1 ? id : id.substring(0, colonIndex);
+		return part.getElementId();
 	}
 
     /**

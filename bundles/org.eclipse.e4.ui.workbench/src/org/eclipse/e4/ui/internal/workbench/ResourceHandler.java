@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tristan Hume - <trishume@gmail.com> -
- *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
- *     		Implemented workbench auto-save to correctly restore state in case of crash.
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -17,7 +14,6 @@ package org.eclipse.e4.ui.internal.workbench;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +26,6 @@ import org.eclipse.core.internal.runtime.PlatformURLPluginConnection;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -41,7 +36,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuPackageImpl;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
-import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.modeling.IModelReconcilingService;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
@@ -75,7 +69,6 @@ public class ResourceHandler implements IModelResourceHandler {
 	private URI applicationDefinitionInstance;
 
 	@Inject
-	@Optional
 	@Named(E4Workbench.INSTANCE_LOCATION)
 	private Location instanceLocation;
 
@@ -96,8 +89,8 @@ public class ResourceHandler implements IModelResourceHandler {
 	 * @param deltaRestore
 	 */
 	@Inject
-	public ResourceHandler(@Named(IWorkbench.PERSIST_STATE) boolean saveAndRestore,
-			@Named(IWorkbench.CLEAR_PERSISTED_STATE) boolean clearPersistedState,
+	public ResourceHandler(@Named(E4Workbench.PERSIST_STATE) boolean saveAndRestore,
+			@Named(E4Workbench.CLEAR_PERSISTED_STATE) boolean clearPersistedState,
 			@Named(E4Workbench.DELTA_RESTORE) boolean deltaRestore) {
 		this.saveAndRestore = saveAndRestore;
 		this.clearPersistedState = clearPersistedState;
@@ -129,16 +122,24 @@ public class ResourceHandler implements IModelResourceHandler {
 	}
 
 	public Resource loadMostRecentModel() {
+		File baseLocation;
+		try {
+			baseLocation = new File(URIUtil.toURI(instanceLocation.getURL()));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+		baseLocation = new File(baseLocation, ".metadata"); //$NON-NLS-1$
+		baseLocation = new File(baseLocation, ".plugins"); //$NON-NLS-1$
+		baseLocation = new File(baseLocation, "org.eclipse.e4.workbench"); //$NON-NLS-1$
+
 		// This is temporary code to migrate existing delta files into full models
 		if (deltaRestore && saveAndRestore && !clearPersistedState) {
-			File baseLocation = getBaseLocation();
 			File deltaFile = new File(baseLocation, "deltas.xml"); //$NON-NLS-1$
-
 			if (deltaFile.exists()) {
 				MApplication appElement = null;
 				try {
 					// create new resource in case code below fails somewhere
-					File workbenchData = getWorkbenchSaveLocation();
+					File workbenchData = new File(baseLocation, "workbench.xmi"); //$NON-NLS-1$			
 					URI restoreLocationNew = URI.createFileURI(workbenchData.getAbsolutePath());
 					resource = resourceSetImpl.createResource(restoreLocationNew);
 
@@ -178,17 +179,14 @@ public class ResourceHandler implements IModelResourceHandler {
 			}
 		}
 
-		File workbenchData = null;
-		URI restoreLocation = null;
+		File workbenchData = new File(baseLocation, "workbench.xmi"); //$NON-NLS-1$			
 
-		if (saveAndRestore) {
-			workbenchData = getWorkbenchSaveLocation();
-			restoreLocation = URI.createFileURI(workbenchData.getAbsolutePath());
-		}
-
-		if (clearPersistedState && workbenchData != null && workbenchData.exists()) {
+		if (clearPersistedState && workbenchData.exists())
 			workbenchData.delete();
-		}
+
+		URI restoreLocation = null;
+		if (saveAndRestore)
+			restoreLocation = URI.createFileURI(workbenchData.getAbsolutePath());
 
 		// last stored time-stamp
 		long restoreLastModified = restoreLocation == null ? 0L : new File(
@@ -206,7 +204,10 @@ public class ResourceHandler implements IModelResourceHandler {
 		if (resource == null) {
 			Resource applicationResource = loadResource(applicationDefinitionInstance);
 			MApplication theApp = (MApplication) applicationResource.getContents().get(0);
-			resource = createResourceWithApp(theApp);
+			if (restoreLocation == null)
+				restoreLocation = URI.createFileURI(workbenchData.getAbsolutePath());
+			resource = resourceSetImpl.createResource(restoreLocation);
+			resource.getContents().add((EObject) theApp);
 		}
 
 		// Add model items described in the model extension point
@@ -226,50 +227,11 @@ public class ResourceHandler implements IModelResourceHandler {
 			resource.save(null);
 	}
 
-	/**
-	 * Creates a resource with an app Model, used for saving copies of the main app model.
-	 * 
-	 * @param theApp
-	 *            the application model to add to the resource
-	 * @return a resource with a proper save path with the model as contents
-	 */
-	public Resource createResourceWithApp(MApplication theApp) {
-		Resource res = createResource();
-		res.getContents().add((EObject) theApp);
-		return res;
-	}
-
-	private Resource createResource() {
-		if (saveAndRestore) {
-			URI saveLocation = URI.createFileURI(getWorkbenchSaveLocation().getAbsolutePath());
-			return resourceSetImpl.createResource(saveLocation);
-		}
-		return resourceSetImpl.createResource(URI.createURI("workbench.xmi")); //$NON-NLS-1$
-	}
-
-	private File getWorkbenchSaveLocation() {
-		File workbenchData = new File(getBaseLocation(), "workbench.xmi"); //$NON-NLS-1$
-		return workbenchData;
-	}
-
-	private File getBaseLocation() {
-		File baseLocation;
-		try {
-			baseLocation = new File(URIUtil.toURI(instanceLocation.getURL()));
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-		baseLocation = new File(baseLocation, ".metadata"); //$NON-NLS-1$
-		baseLocation = new File(baseLocation, ".plugins"); //$NON-NLS-1$
-		baseLocation = new File(baseLocation, "org.eclipse.e4.workbench"); //$NON-NLS-1$
-		return baseLocation;
-	}
-
 	// Ensures that even models with error are loaded!
 	private Resource loadResource(URI uri) {
 		Resource resource;
 		try {
-			resource = getResource(uri);
+			resource = resourceSetImpl.getResource(uri, true);
 		} catch (Exception e) {
 			// TODO We could use diagnostics for better analyzing the error
 			logger.error(e, "Unable to load resource " + uri.toString()); //$NON-NLS-1$
@@ -287,22 +249,6 @@ public class ResourceHandler implements IModelResourceHandler {
 				}
 			}
 		}
-		return resource;
-	}
-
-	private Resource getResource(URI uri) throws Exception {
-		Resource resource;
-		if (saveAndRestore) {
-			resource = resourceSetImpl.getResource(uri, true);
-		} else {
-			// Workaround for java.lang.IllegalStateException: No instance data can be specified
-			// thrown by org.eclipse.core.internal.runtime.DataArea.assertLocationInitialized
-			// The DataArea.assertLocationInitialized is called by ResourceSetImpl.getResource(URI,
-			// boolean)
-			resource = resourceSetImpl.createResource(uri);
-			resource.load(new URL(uri.toString()).openStream(), resourceSetImpl.getLoadOptions());
-		}
-
 		return resource;
 	}
 

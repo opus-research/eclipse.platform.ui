@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,16 +26,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  * A representation of the model object '<em><b>Part</b></em>'.
  * <!-- end-user-doc -->
  *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * @since 1.0
- * <!-- end-model-doc -->
- *
  * <p>
  * The following features are supported:
  * <ul>
@@ -54,15 +44,11 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * Returns the value of the '<em><b>Menus</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.menu.MMenu}.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Menus</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Menus</em>' containment reference list.
 	 * @model containment="true"
 	 * @generated
@@ -72,15 +58,11 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	/**
 	 * Returns the value of the '<em><b>Toolbar</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Toolbar</em>' containment reference isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Toolbar</em>' containment reference.
 	 * @see #setToolbar(MToolBar)
 	 * @model containment="true"
@@ -102,15 +84,11 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * Returns the value of the '<em><b>Closeable</b></em>' attribute.
 	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Closeable</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Closeable</em>' attribute.
 	 * @see #setCloseable(boolean)
 	 * @model default="false"
@@ -131,15 +109,11 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	/**
 	 * Returns the value of the '<em><b>Description</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Description</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
 	 * @model
@@ -160,14 +134,6 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
-	 * </p>
-	 * <!-- end-model-doc -->
 	 * @model kind="operation"
 	 * @generated
 	 */
