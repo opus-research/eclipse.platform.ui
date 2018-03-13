@@ -566,7 +566,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 		cs.getActiveContextIds();
 
-		configureShell(getShell(), windowContext);
+		String title = getWindowConfigurer().basicGetTitle();
+		if (title != null) {
+			getShell().setText(TextProcessor.process(title, TEXT_DELIMITERS));
+		}
 
 		initializeDefaultServices();
 
@@ -698,20 +701,10 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		preferenceStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations);
 
 		getShell().setData(this);
+		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 		trackShellActivation();
 	}
 
-	private void configureShell(Shell shell, IEclipseContext context) {
-		String title = getWindowConfigurer().basicGetTitle();
-		if (title != null) {
-			shell.setText(TextProcessor.process(title, TEXT_DELIMITERS));
-		}
-		workbench.getHelpSystem().setHelp(shell, IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
-
-		IContextService contextService = context.get(IContextService.class);
-		contextService.registerShell(shell, IContextService.TYPE_WINDOW);
-	}
-	
 	private boolean manageChanges = true;
 	private boolean canUpdateMenus = true;
 
@@ -1798,11 +1791,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
-					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
-					for (Control bottomCtrl : tpl.bottom.getChildren()) {
-						if (bottomCtrl != slCtrl)
-							disableControl(bottomCtrl, toEnable);
+					MUIElement statusLine = modelService.find("StatusLine", model); //$NON-NLS-1$
+					if (statusLine != null && statusLine.getWidget() instanceof Control) {
+						Control slCtrl = (Control) statusLine.getWidget();
+						for (Control bottomCtrl : tpl.bottom.getChildren()) {
+							if (bottomCtrl != slCtrl)
+								disableControl(bottomCtrl, toEnable);
+						}		
 					}
 				}
 
