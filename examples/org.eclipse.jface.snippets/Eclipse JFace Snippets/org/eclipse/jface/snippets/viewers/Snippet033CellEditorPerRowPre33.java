@@ -48,6 +48,8 @@ public class Snippet033CellEditorPerRowPre33 {
 		
 		private TableViewer viewer;
 		
+		private boolean enabled = true;
+
 		public void setViewer(TableViewer viewer) {
 			this.viewer = viewer;
 		}
