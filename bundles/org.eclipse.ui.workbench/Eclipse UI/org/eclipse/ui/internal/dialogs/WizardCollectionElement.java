@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ package org.eclipse.ui.internal.dialogs;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IPath;
@@ -37,7 +36,8 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  * elements. Instances also store a list of wizards.
  */
 public class WizardCollectionElement extends AdaptableList implements 
-		IPluginContribution, IWizardCategory {
+ IPluginContribution,
+		IWizardCategory, Cloneable {
     private String id;
 
     private String pluginId;
@@ -303,11 +303,11 @@ public class WizardCollectionElement extends AdaptableList implements
      * For debugging purposes.
      */
     public String toString() {
-        StringBuffer buf = new StringBuffer("WizardCollection, "); //$NON-NLS-1$
-        buf.append(children.size());
-        buf.append(" children, "); //$NON-NLS-1$
+		StringBuffer buf = new StringBuffer("WizardCollection: "); //$NON-NLS-1$
+		buf.append("{" + children.size()); //$NON-NLS-1$
+		buf.append(" children; "); //$NON-NLS-1$
         buf.append(wizards.size());
-        buf.append(" wizards"); //$NON-NLS-1$
+		buf.append(" wizards}"); //$NON-NLS-1$
         return buf.toString();
     }
 
@@ -412,5 +412,18 @@ public class WizardCollectionElement extends AdaptableList implements
 	 */
 	public IWizardCategory findCategory(IPath path) {
 		return findChildCollection(path);
+	}
+
+	@Override
+	public Object clone() {
+		WizardCollectionElement copy = new WizardCollectionElement(id, pluginId, name, parent);
+		copy.configElement = configElement;
+
+		for (Object child: wizards.getChildren()) {
+			if (child instanceof IAdaptable) {
+				copy.wizards.add((IAdaptable) child);
+			}
+		}
+		return copy;
 	}
 }
