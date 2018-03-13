@@ -2806,7 +2806,19 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	public IWorkbenchPage showPerspective(String perspectiveId, IWorkbenchWindow window)
 			throws WorkbenchException {
-		return showPerspective(perspectiveId, window, null);
+		if (window == null)
+			window = getActiveWorkbenchWindow();
+
+		IWorkbenchPage page = window == null ? null : window.getActivePage();
+		if (page == null)
+			return null;
+
+		// Delegate this method to the active page
+		IPerspectiveRegistry registry = getPerspectiveRegistry();
+		IPerspectiveDescriptor perspective = registry.findPerspectiveWithId(perspectiveId);
+		page.setPerspective(registry.findPerspectiveWithId(perspectiveId));
+		page.setPerspective(perspective);
+		return page;
 	}
 
 	private boolean activate(String perspectiveId, IWorkbenchPage page, IAdaptable input,
