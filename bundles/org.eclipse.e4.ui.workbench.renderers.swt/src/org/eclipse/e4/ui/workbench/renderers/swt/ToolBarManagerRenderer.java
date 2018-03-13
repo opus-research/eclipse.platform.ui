@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,6 +33,8 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
@@ -290,11 +292,34 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 * @param element
 	 */
 	private void processContribution(MToolBar toolbarModel) {
+		HashSet<String> existingToolbarIds = getExistingToolbarIds((MTrimmedWindow) modelService
+				.getTopLevelWindowFor(toolbarModel));
+
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(),
-				toolbarModel.getElementId(), toContribute);
+				toolbarModel.getElementId(), toContribute, existingToolbarIds);
 		generateContributions(toolbarModel, toContribute);
+	}
+
+	private HashSet<String> getExistingToolbarIds(MTrimmedWindow topWin) {
+		HashSet<String> result = new HashSet<String>();
+		for (MTrimBar bar : topWin.getTrimBars()) {
+			for (MTrimElement trimElem : bar.getChildren()) {
+				if (trimElem.getElementId() != null) {
+					result.add(trimElem.getElementId());
+				}
+				if (trimElem instanceof MToolBar) {
+					for (MToolBarElement toolElem : ((MToolBar) trimElem)
+							.getChildren()) {
+						if (toolElem.getElementId() != null) {
+							result.add(toolElem.getElementId());
+						}
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
