@@ -95,7 +95,6 @@ public interface EModelService {
 	 * <li>{@link org.eclipse.e4.ui.model.application.commands.MCommand MCommand}</li>
 	 * <li>
 	 * {@link org.eclipse.e4.ui.model.application.commands.MCommandParameter MCommandParameter}</li>
-	 * <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MCompositePart MCompositePart}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.MCoreExpression MCoreExpression}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem MDirectMenuItem}</li>
 	 * <li>{@link org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem MDirectToolItem}</li>

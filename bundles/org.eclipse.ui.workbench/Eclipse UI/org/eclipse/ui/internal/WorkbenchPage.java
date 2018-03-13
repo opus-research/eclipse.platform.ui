@@ -210,10 +210,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
-			WorkbenchWindow wwindow = (WorkbenchWindow) getWorkbenchWindow();
-			if (!wwindow.isClosing()) {
-				wwindow.getStatusLineManager().update(false);
-			}
+			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
 		}
 
 		public void partHidden(MPart part) {
@@ -559,7 +556,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		private IEditorPart topEditor;
 
-		private List<IActionSetDescriptor> oldActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList oldActionSets = new ArrayList();
 
 		/**
 		 * Updates the contributions given the new part as the active part.
@@ -624,7 +621,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newPart, true);
 			}
 
-			List<IActionSetDescriptor> newActionSets = null;
+			ArrayList newActionSets = null;
 			if (isNewPartAnEditor || (activePart == topEditor && newPart == null)) {
 				newActionSets = calculateActionSets(newPart, null);
 			} else {
@@ -686,7 +683,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activateContributions(newEditor, false);
 			}
 
-			List<IActionSetDescriptor> newActionSets = calculateActionSets(activePart, newEditor);
+			ArrayList newActionSets = calculateActionSets(activePart, newEditor);
 			if (!updateActionSets(newActionSets)) {
 				updateActionBars();
 			}
@@ -736,9 +733,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            active part
 		 * @return the new action sets
 		 */
-		private List<IActionSetDescriptor> calculateActionSets(IWorkbenchPart part,
-				IEditorPart editor) {
-			List<IActionSetDescriptor> newActionSets = new ArrayList<IActionSetDescriptor>();
+		private ArrayList calculateActionSets(IWorkbenchPart part, IEditorPart editor) {
+			ArrayList newActionSets = new ArrayList();
 			if (part != null) {
 				IActionSetDescriptor[] partActionSets = WorkbenchPlugin.getDefault()
 						.getActionSetRegistry().getActionSetsFor(part.getSite().getId());
@@ -764,7 +760,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		 *            the action sets to show
 		 * @return <code>true</code> if the action sets changed
 		 */
-		private boolean updateActionSets(List<IActionSetDescriptor> newActionSets) {
+		private boolean updateActionSets(ArrayList newActionSets) {
 			if (oldActionSets.equals(newActionSets)) {
 				return false;
 			}
@@ -1462,10 +1458,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (save) {
 			if (workbenchPart instanceof ISaveablePart) {
 				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-				if (saveablePart.isSaveOnCloseNeeded()) {
-					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
-						return false;
-					}
+				if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
+					return false;
 				}
 			}
 		}
@@ -2803,7 +2797,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler selectionHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 			if (!(changedElement instanceof MPerspectiveStack)) {
 				return;
@@ -3956,6 +3950,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
+		if (_perspectiveStack != null)
+			return _perspectiveStack;
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -4950,7 +4946,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private EventHandler firingHandler = new EventHandler() {
 		public void handleEvent(Event event) {
-			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+			MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 			Object value = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 			if (value instanceof CompatibilityPart && element instanceof MPart) {
 				Integer events = partEvents.remove(element);
@@ -5294,21 +5290,5 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	public void resetToolBarLayout() {
 		ICoolBarManager2 mgr = (ICoolBarManager2) legacyWindow.getCoolBarManager2();
 		mgr.resetItemOrder();
-	}
-
-	/**
-	 * Call {@link #firePartDeactivated(MPart)} if the passed part is the
-	 * currently active part according to the part service. This method should
-	 * only be called in the case of workbench shutdown, where E4 does not fire
-	 * deactivate listeners on the active part.
-	 * 
-	 * @param part
-	 */
-	public void firePartDeactivatedIfActive(MPart part) {
-		if (partService.getActivePart() == part) {
-			// At shutdown, e4 doesn't fire part deactivated on the active
-			// part.
-			firePartDeactivated(part);
-		}
 	}
 }
