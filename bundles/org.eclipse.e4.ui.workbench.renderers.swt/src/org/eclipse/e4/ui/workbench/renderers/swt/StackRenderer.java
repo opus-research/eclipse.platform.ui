@@ -110,6 +110,11 @@ public class StackRenderer extends LazyStackRenderer {
 	 */
 	private static final String INHIBIT_FOCUS = "InhibitFocus"; //$NON-NLS-1$
 
+	/**
+	 * Add this tag to render the part stack below the (active) part.
+	 */
+	private static final String STACK_BOTTOM = "StackBottom"; //$NON-NLS-1$
+
 	// Minimum characters in for stacks outside the shared area
 	private static int MIN_VIEW_CHARS = 1;
 
@@ -479,7 +484,9 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		// TBD: need to define attributes to handle this
-		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER);
+		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER
+				| (element.getTags().contains(STACK_BOTTOM) ? SWT.BOTTOM
+						: SWT.NONE));
 		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
