@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,8 @@ import java.util.StringTokenizer;
  * Helper for String.
  */
 public class StringUtils {
+	
+	public static final String EMPTY_STRING = "";
 
 	/**
 	 * Replace <b>oldString</b> occurrences with <b>newString</b> occurrences of
@@ -189,5 +191,13 @@ public class StringUtils {
 			}
 		}
 		return false;
+	}
+	
+	public static String nullIfEmpty(String str) {
+		return str.trim().length() == 0? null: str;
+	}
+	
+	public static String emptyIfNull(String str) {
+		return str == null? EMPTY_STRING: str;
 	}
 }

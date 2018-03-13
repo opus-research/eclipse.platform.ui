@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,13 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
+import static org.eclipse.e4.ui.css.core.utils.StringUtils.emptyIfNull;
+import static org.eclipse.e4.ui.css.core.utils.StringUtils.nullIfEmpty;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.e4.ui.css.swt.dom.ControlElement;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.widgets.ImageBasedFrame;
@@ -26,13 +30,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
 
 public class CSSRenderingUtils {
-
 	// NOTE: The CSS engine 'owns' the image it returns (it caches it)
 	// so we have to cache any rotated versions to match
 	private Map<Image, Image> rotatedImageMap = new HashMap<Image, Image>();
@@ -118,7 +122,6 @@ public class CSSRenderingUtils {
 		return rotatedImage;
 	}
 
-	@SuppressWarnings("restriction")
 	public CSSValue getCSSValue(Control styleControl, String className,
 			String attributeName) {
 		CSSEngine csseng = WidgetElement.getEngine(styleControl);
@@ -142,6 +145,52 @@ public class CSSRenderingUtils {
 			return null;
 
 		return styleDeclarations.getPropertyCSSValue(attributeName);
+	}
+
+	@SuppressWarnings("restriction")
+	public void addCSSClass(Widget widget, String className) {
+		CSSEngine engine = WidgetElement.getEngine(widget);
+		String cssClasses = emptyIfNull((String) widget
+				.getData(CSSSWTConstants.CSS_CLASS_NAME_KEY));
+
+		if (engine == null || cssClasses.contains(className)) {
+			return;
+		}
+
+		widget.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY,
+				String.format("%s %s", cssClasses, className).trim());
+
+		engine.reapply(); // used instead of applyStyle since the UI refreshing
+							// issue
+	}
+
+	@SuppressWarnings("restriction")
+	public void removeCSSClass(Widget widget, String className) {
+		CSSEngine engine = WidgetElement.getEngine(widget);
+		String cssClasses = emptyIfNull((String) widget
+				.getData(CSSSWTConstants.CSS_CLASS_NAME_KEY));
+
+		if (engine == null) {
+			return;
+		}
+
+		StringBuilder newCssClasses = new StringBuilder();
+		boolean removed = false;
+		for (String item : cssClasses.split("\\s")) {
+			if (!item.equals(className)) {
+				newCssClasses.append(newCssClasses.length() == 0 ? "" : " ")
+						.append(item);
+			} else {
+				removed = true;
+			}
+		}
+
+		if (removed) {
+			widget.setData(CSSSWTConstants.CSS_CLASS_NAME_KEY,
+					nullIfEmpty(newCssClasses.toString()));
+
+			engine.reapply();
+		}
 	}
 
 	/**
