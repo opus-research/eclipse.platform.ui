@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation 
+   Copyright 2002  The Apache Software Foundation
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -62,6 +62,11 @@ public abstract class AbstractElementSelector
         return (s.namespaceURI.equals(namespaceURI) &&
                 s.localName.equals(localName));
     }
+
+	@Override
+	public int hashCode() {
+		return this.namespaceURI.hashCode() ^ this.localName.hashCode();
+	}
 
     /**
      * <b>SAC</b>: Implements {@link
