@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 Angelo Zerr and others.
+ * Copyright (c) 2009, 2012 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,21 +33,24 @@ public class ScaleElement extends ControlElement {
 		super(scale, engine);
 	}
 
-	@Override
 	public void initialize() {
 		super.initialize();
+
+		if (!dynamicEnabled) return; 
 		
 		Scale scale = getScale();
 		scale.addSelectionListener(selectionListener);
 	}
 		
-	@Override
-	public void dispose() {			
+	public void dispose() {	
+		super.dispose();
+		
+		if (!dynamicEnabled) return; 
+		
 		Scale scale = getScale();
-		if (scale != null && !scale.isDisposed()) {
+		if (!scale.isDisposed()) {
 			scale.removeSelectionListener(selectionListener);
 		}
-		super.dispose();
 	}
 
 	public String getAttribute(String attr) {
