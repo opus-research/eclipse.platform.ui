@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +29,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -149,6 +154,7 @@ import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.part.IShowInSource;
 import org.eclipse.ui.part.ShowInContext;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.views.IStickyViewDescriptor;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.osgi.service.event.Event;
@@ -159,6 +165,8 @@ import org.osgi.service.event.EventHandler;
  */
 public class WorkbenchPage extends CompatibleWorkbenchPage implements
         IWorkbenchPage {
+
+	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
 
 	class E4PartListener implements org.eclipse.e4.ui.workbench.modeling.IPartListener {
 
@@ -186,7 +194,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				CompatibilityPart compatibilityPart = (CompatibilityPart) client;
 				IWorkbenchPartSite site = compatibilityPart.getPart().getSite();
 				// if it's an editor, we only want to disable the actions
-				compatibilityPart.deactivateActionBars(site instanceof ViewSite);
+				((PartSite) site).deactivateActionBars(site instanceof ViewSite);
 			}
 
 			((WorkbenchWindow) getWorkbenchWindow()).getStatusLineManager().update(false);
@@ -1055,7 +1063,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	private boolean contains(ViewReference reference) {
 		for (ViewReference viewReference : viewReferences) {
-			if (reference.getId().equals(viewReference.getId())) {
+			if (reference.getModel().getElementId().equals(viewReference.getModel().getElementId())) {
 				return true;
 			}
 		}
@@ -1597,6 +1605,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 			modelService.removePerspectiveModel(persp, window);
 			modelToPerspectiveMapping.remove(persp);
+
+			legacyWindow.firePerspectiveClosed(this, desc);
 		}
 	}
 
@@ -1877,7 +1887,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      * @see org.eclipse.ui.IWorkbenchPage
      */
     public IViewReference findViewReference(String viewId) {
-        return findViewReference(viewId, null);
+		for (IViewReference reference : getViewReferences()) {
+			ViewReference ref = (ViewReference) reference;
+			if (viewId.equals(ref.getModel().getElementId())) {
+				return reference;
+			}
+		}
+		return null;
     }
 
     /*
@@ -1886,19 +1902,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      * @see org.eclipse.ui.IWorkbenchPage
      */
     public IViewReference findViewReference(String viewId, String secondaryId) {
-		for (IViewReference reference : getViewReferences()) {
-			if (viewId.equals(reference.getId())) {
-				String refSecondaryId = reference.getSecondaryId();
-				if (refSecondaryId == null) {
-					if (secondaryId == null) {
-						return reference;
-					}
-				} else if (refSecondaryId.equals(secondaryId)) {
-					return reference;
-				}
-			}
-		}
-		return null;
+		String compoundId = viewId;
+		if (secondaryId != null && secondaryId.length() > 0)
+			compoundId += ":" + secondaryId; //$NON-NLS-1$
+		return findViewReference(compoundId);
     }
 
 	public void createViewReferenceForPart(final MPart part, String viewId) {
@@ -2634,7 +2641,78 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				sortedPerspectives.add(desc);
 			}
 		}
+		restoreWorkingSets();
     }
+
+	public void restoreWorkingSets() {
+		String workingSetName = getWindowModel().getPersistedState().get(
+				IWorkbenchConstants.TAG_WORKING_SET);
+		if (workingSetName != null) {
+			AbstractWorkingSetManager workingSetManager = (AbstractWorkingSetManager) getWorkbenchWindow()
+					.getWorkbench().getWorkingSetManager();
+			setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
+		}
+
+		String workingSetMemString = getWindowModel().getPersistedState().get(
+				IWorkbenchConstants.TAG_WORKING_SETS);
+		if (workingSetMemString != null) {
+			IMemento workingSetMem;
+			try {
+				workingSetMem = XMLMemento.createReadRoot(new StringReader(workingSetMemString));
+				IMemento[] workingSetChildren = workingSetMem
+						.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
+				List workingSetList = new ArrayList(workingSetChildren.length);
+				for (int i = 0; i < workingSetChildren.length; i++) {
+					IWorkingSet set = getWorkbenchWindow().getWorkbench().getWorkingSetManager()
+							.getWorkingSet(workingSetChildren[i].getID());
+					if (set != null) {
+						workingSetList.add(set);
+					}
+				}
+
+				workingSets = (IWorkingSet[]) workingSetList.toArray(new IWorkingSet[workingSetList
+						.size()]);
+			} catch (WorkbenchException e) {
+				StatusManager.getManager().handle(
+						new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR,
+								WorkbenchMessages.WorkbenchPage_problemRestoringTitle, e));
+			}
+		}
+
+		aggregateWorkingSetId = getWindowModel().getPersistedState().get(
+				ATT_AGGREGATE_WORKING_SET_ID);
+	}
+
+	@PreDestroy
+	public void saveWorkingSets() {
+		// Save working set if set
+		if (workingSet != null) {
+			getWindowModel().getPersistedState().put(IWorkbenchConstants.TAG_WORKING_SET,
+					workingSet.getName());
+		} else {
+			getWindowModel().getPersistedState().remove(IWorkbenchConstants.TAG_WORKING_SET);
+		}
+
+		XMLMemento workingSetMem = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SETS);
+		for (int i = 0; i < workingSets.length; i++) {
+			workingSetMem
+					.createChild(IWorkbenchConstants.TAG_WORKING_SET, workingSets[i].getName());
+		}
+		StringWriter writer = new StringWriter();
+		try {
+			workingSetMem.save(writer);
+			getWindowModel().getPersistedState().put(IWorkbenchConstants.TAG_WORKING_SETS,
+					writer.getBuffer().toString());
+		} catch (IOException e) {
+			// Simply don't store the settings
+			StatusManager.getManager().handle(
+					new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID, IStatus.ERROR,
+							WorkbenchMessages.SavingProblem, e));
+		}
+
+		getWindowModel().getPersistedState().put(ATT_AGGREGATE_WORKING_SET_ID,
+				aggregateWorkingSetId);
+	}
 
 	/**
 	 * Extends the perspectives within the given stack with action set
@@ -3047,6 +3125,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		partService.showPart(editor, PartState.VISIBLE);
 
 		CompatibilityEditor compatibilityEditor = (CompatibilityEditor) editor.getObject();
+		if (compatibilityEditor == null) {
+			return null;
+		}
 
 		if (activate) {
 			partService.activate(editor);
@@ -3604,6 +3685,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		modelPerspective.getContext().activate();
 
+		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
 	}
 
