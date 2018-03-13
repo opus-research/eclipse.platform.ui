@@ -49,34 +49,31 @@ import org.eclipse.swt.widgets.Widget;
  * tables). Supports custom sorting, filtering, and rendering.
  * <p>
  * Any number of viewer filters can be added to this viewer (using
- * <code>addFilter</code>). When the viewer receives an update, it asks each of
- * its filters if it is out of date, and refilters elements as required.
+ * <code>addFilter</code>). When the viewer receives an update, it asks each
+ * of its filters if it is out of date, and refilters elements as required.
  * </p>
  * 
  * @see ViewerFilter
  * @see ViewerComparator
  */
-public abstract class StructuredViewer extends ContentViewer implements
-		IPostSelectionProvider {
+public abstract class StructuredViewer extends ContentViewer implements IPostSelectionProvider {
 
 	/**
 	 * A map from the viewer's model elements to SWT widgets. (key type:
-	 * <code>Object</code>, value type: <code>Widget</code>, or
-	 * <code>Widget[]</code>). <code>null</code> means that the element map is
-	 * disabled.
+	 * <code>Object</code>, value type: <code>Widget</code>, or <code>Widget[]</code>).
+	 * <code>null</code> means that the element map is disabled.
 	 */
 	private CustomHashtable elementMap;
 
 	/**
 	 * The comparer to use for comparing elements, or <code>null</code> to use
-	 * the default <code>equals</code> and <code>hashCode</code> methods on the
-	 * element itself.
+	 * the default <code>equals</code> and <code>hashCode</code> methods on
+	 * the element itself.
 	 */
 	private IElementComparer comparer;
 
 	/**
-	 * This viewer's comparator used for sorting. <code>null</code> means there
-	 * is no comparator.
+	 * This viewer's comparator used for sorting. <code>null</code> means there is no comparator.
 	 */
 	private ViewerComparator sorter;
 
@@ -100,7 +97,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * @see #setSelection(ISelection, boolean)
 	 */
 	private boolean inChange;
-
+	
 	/**
 	 * Used while a selection change is in progress on this viewer to indicates
 	 * whether the selection should be restored.
@@ -134,49 +131,46 @@ public abstract class StructuredViewer extends ContentViewer implements
 	private ListenerList postSelectionChangedListeners = new ListenerList();
 
 	/**
-	 * The colorAndFontCollector is an object used by viewers that support the
-	 * IColorProvider, the IFontProvider and/or the IViewerLabelProvider for
-	 * color and font updates. Initialize it to have no color or font providing
+	 * The colorAndFontCollector is an object used by viewers that
+	 * support the IColorProvider, the IFontProvider and/or the 
+	 * IViewerLabelProvider for color and font updates.
+	 * Initialize it to have no color or font providing
 	 * initially.
-	 * 
 	 * @since 3.1
 	 */
 	private ColorAndFontCollector colorAndFontCollector = new ColorAndFontCollector();
-
-	/**
+	
+	
+	/** 
 	 * Calls when associate() and disassociate() are called
 	 */
 	private StructuredViewerInternals.AssociateListener associateListener;
-
+	
 	/**
 	 * Empty array of widgets.
 	 */
 	private static Widget[] NO_WIDGETS = new Widget[0];
 
 	/**
-	 * The ColorAndFontCollector is a helper class for viewers that have color
-	 * and font support ad optionally decorators.
-	 * 
+	 * The ColorAndFontCollector is a helper class for viewers
+	 * that have color and font support ad optionally decorators.
 	 * @see IColorDecorator
 	 * @see IFontDecorator
 	 * @see IColorProvider
 	 * @see IFontProvider
 	 * @see IDecoration
 	 */
-	protected class ColorAndFontCollectorWithProviders extends
-			ColorAndFontCollector {
+	protected class ColorAndFontCollectorWithProviders extends ColorAndFontCollector{
 
 		IColorProvider colorProvider;
 
 		IFontProvider fontProvider;
-
+		
 		/**
-		 * Create a new instance of the receiver using the supplied label
-		 * provider. If it is an IColorProvider or IFontProvider set these
-		 * values up.
-		 * 
-		 * @param provider
-		 *            IBaseLabelProvider
+		 * Create a new instance of the receiver using the supplied
+		 * label provider. If it is an IColorProvider or IFontProvider
+		 * set these values up.
+		 * @param provider IBaseLabelProvider
 		 * @see IColorProvider
 		 * @see IFontProvider
 		 */
@@ -191,125 +185,129 @@ public abstract class StructuredViewer extends ContentViewer implements
 		}
 
 		@Override
-		public void setFontsAndColors(Object element) {
-
-			if (fontProvider != null) {
-				if (font == null) {
+		public void setFontsAndColors(Object element){
+			
+			if(fontProvider != null){
+				if(font == null) {
 					font = fontProvider.getFont(element);
-				}
+				}	
 			}
-
-			if (colorProvider == null) {
+			
+			if(colorProvider == null) {
 				return;
-			}
-			// Set the colors if they are not set yet
-			if (background == null) {
+			}			
+			//Set the colors if they are not set yet
+			if(background == null) {
 				background = colorProvider.getBackground(element);
 			}
-
-			if (foreground == null) {
+			
+			if(foreground == null) {
 				foreground = colorProvider.getForeground(element);
-			}
+			}			
 		}
 
 		@Override
 		public void applyFontsAndColors(TableItem control) {
-
-			if (colorProvider == null) {
-				if (usedDecorators) {
-					// If there is no provider only apply set values
-					if (background != null) {
+			
+			if(colorProvider == null){
+				if(usedDecorators){
+					//If there is no provider only apply set values
+					if(background != null) {
 						control.setBackground(background);
 					}
-
-					if (foreground != null) {
+				
+					if(foreground != null) {
 						control.setForeground(foreground);
 					}
 				}
-			} else {
-				// Always set the value if there is a provider
+			}
+			else{
+				//Always set the value if there is a provider
 				control.setBackground(background);
 				control.setForeground(foreground);
 			}
-
-			if (fontProvider == null) {
-				if (usedDecorators && font != null) {
+			
+			if(fontProvider == null){
+				if(usedDecorators && font != null) {
 					control.setFont(font);
 				}
 			} else {
 				control.setFont(font);
 			}
-
+			
 			clear();
 		}
 
 		@Override
 		public void applyFontsAndColors(TreeItem control) {
-
-			if (colorProvider == null) {
-				if (usedDecorators) {
-					// If there is no provider only apply set values
-					if (background != null) {
+			
+			if(colorProvider == null){
+				if(usedDecorators){
+					//If there is no provider only apply set values
+					if(background != null) {
 						control.setBackground(background);
 					}
-
-					if (foreground != null) {
+				
+					if(foreground != null) {
 						control.setForeground(foreground);
 					}
 				}
-			} else {
-				// Always set the value if there is a provider
+			}
+			else{
+				//Always set the value if there is a provider
 				control.setBackground(background);
 				control.setForeground(foreground);
 			}
-
-			if (fontProvider == null) {
-				if (usedDecorators && font != null) {
+			
+			if(fontProvider == null){
+				if(usedDecorators && font != null) {
 					control.setFont(font);
 				}
 			} else {
 				control.setFont(font);
 			}
-
+			
 			clear();
 		}
 
 		@Override
 		public void applyFontsAndColors(TableTreeItem control) {
-
-			if (colorProvider == null) {
-				if (usedDecorators) {
-					// If there is no provider only apply set values
-					if (background != null) {
+			
+			if(colorProvider == null){
+				if(usedDecorators){
+					//If there is no provider only apply set values
+					if(background != null) {
 						control.setBackground(background);
 					}
-
-					if (foreground != null) {
+				
+					if(foreground != null) {
 						control.setForeground(foreground);
 					}
 				}
-			} else {
-				// Always set the value if there is a provider
+			}
+			else{
+				//Always set the value if there is a provider
 				control.setBackground(background);
 				control.setForeground(foreground);
 			}
-
-			if (fontProvider == null) {
-				if (usedDecorators && font != null) {
+			
+			if(fontProvider == null){
+				if(usedDecorators && font != null) {
 					control.setFont(font);
 				}
 			} else {
 				control.setFont(font);
 			}
-
+			
 			clear();
 		}
-
+		
+		
 	}
-
+	
 	/**
-	 * The ColorAndFontCollector collects fonts and colors without a a color or
-	 * font provider.
+	 * The ColorAndFontCollector collects fonts and colors without a
+	 * a color or font provider.
 	 *
 	 */
 	protected class ColorAndFontCollector {
@@ -323,12 +321,13 @@ public abstract class StructuredViewer extends ContentViewer implements
 		boolean usedDecorators = false;
 
 		/**
-		 * Create a new instance of the receiver with no color and font
-		 * provider.
+		 * Create a new instance of the receiver with
+		 * no color and font provider.	
 		 */
-		public ColorAndFontCollector() {
+		public ColorAndFontCollector(){
 			super();
 		}
+		
 
 		/**
 		 * Clear all of the results.
@@ -340,15 +339,14 @@ public abstract class StructuredViewer extends ContentViewer implements
 			usedDecorators = false;
 		}
 
+		
 		/**
-		 * Set the initial fonts and colors for the element from the content
-		 * providers.
-		 * 
-		 * @param element
-		 *            Object
+		 * Set the initial fonts and colors for the element from the
+		 * content providers.
+		 * @param element Object
 		 */
-		public void setFontsAndColors(Object element) {
-			// Do nothing if there are no providers
+		public void setFontsAndColors(Object element){
+			//Do nothing if there are no providers
 		}
 
 		/**
@@ -359,102 +357,98 @@ public abstract class StructuredViewer extends ContentViewer implements
 		}
 
 		/**
-		 * Apply the fonts and colors to the control if required.
-		 * 
+		 * Apply the fonts and colors to the control if
+		 * required.
 		 * @param control
 		 */
 		public void applyFontsAndColors(TableItem control) {
-
-			if (usedDecorators) {
-				// If there is no provider only apply set values
-				if (background != null) {
+			
+			if(usedDecorators){
+				//If there is no provider only apply set values
+				if(background != null) {
 					control.setBackground(background);
 				}
-
-				if (foreground != null) {
+			
+				if(foreground != null) {
 					control.setForeground(foreground);
 				}
-
-				if (font != null) {
+		
+				if(font != null) {
 					control.setFont(font);
 				}
 			}
 			clear();
 		}
-
+		
 		/**
-		 * Apply the fonts and colors to the control if required.
-		 * 
+		 * Apply the fonts and colors to the control if
+		 * required.
 		 * @param control
 		 */
 		public void applyFontsAndColors(TreeItem control) {
-			if (usedDecorators) {
-				// If there is no provider only apply set values
-				if (background != null) {
+			if(usedDecorators){
+				//If there is no provider only apply set values
+				if(background != null) {
 					control.setBackground(background);
 				}
-
-				if (foreground != null) {
+			
+				if(foreground != null) {
 					control.setForeground(foreground);
 				}
-
-				if (font != null) {
+		
+				if(font != null) {
 					control.setFont(font);
 				}
 			}
 			clear();
 		}
-
+		
 		/**
-		 * Apply the fonts and colors to the control if required.
-		 * 
+		 * Apply the fonts and colors to the control if
+		 * required.
 		 * @param control
 		 */
 		public void applyFontsAndColors(TableTreeItem control) {
-			if (usedDecorators) {
-				// If there is no provider only apply set values
-				if (background != null) {
+			if(usedDecorators){
+				//If there is no provider only apply set values
+				if(background != null) {
 					control.setBackground(background);
 				}
-
-				if (foreground != null) {
+			
+				if(foreground != null) {
 					control.setForeground(foreground);
 				}
-
-				if (font != null) {
+		
+				if(font != null) {
 					control.setFont(font);
 				}
 			}
 			clear();
 		}
-
+		
 		/**
 		 * Set the background color.
-		 * 
-		 * @param background
+		 * @param background 
 		 */
 		public void setBackground(Color background) {
 			this.background = background;
 		}
-
 		/**
 		 * Set the font.
-		 * 
-		 * @param font
+		 * @param font 
 		 */
 		public void setFont(Font font) {
 			this.font = font;
 		}
-
 		/**
 		 * Set the foreground color.
-		 * 
 		 * @param foreground
 		 */
 		public void setForeground(Color foreground) {
 			this.foreground = foreground;
 		}
-
+	
+		
 	}
 
 	/**
@@ -478,7 +472,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			doUpdateItem(widget, element, fullMap);
 		}
 	}
-
+	
 	/**
 	 * Creates a structured element viewer. The viewer has no input, no content
 	 * provider, a default label provider, no sorter, and no filters.
@@ -510,8 +504,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	@Override
-	public void addPostSelectionChangedListener(
-			ISelectionChangedListener listener) {
+	public void addPostSelectionChangedListener(ISelectionChangedListener listener) {
 		postSelectionChangedListeners.add(listener);
 	}
 
@@ -530,8 +523,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 *            cleanup after the drag and drop operation finishes
 	 * @see org.eclipse.swt.dnd.DND
 	 */
-	public void addDragSupport(int operations, Transfer[] transferTypes,
-			DragSourceListener listener) {
+	public void addDragSupport(int operations, Transfer[] transferTypes, DragSourceListener listener) {
 
 		Control myControl = getControl();
 		final DragSource dragSource = new DragSource(myControl, operations);
@@ -591,7 +583,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 		for (int i = 0, n = elements.length; i < n; ++i) {
 			Assert.isNotNull(elements[i]);
 		}
-
+		
 		if (InternalPolicy.DEBUG_LOG_EQUAL_VIEWER_ELEMENTS
 				&& elements.length > 1) {
 			CustomHashtable elementSet = newHashtable(elements.length * 2);
@@ -638,10 +630,11 @@ public abstract class StructuredViewer extends ContentViewer implements
 			associateListener.associate(element, item);
 	}
 
+	
 	/**
 	 * Disassociates the given SWT item from its corresponding element. Sets the
-	 * item's data to <code>null</code> and removes the element from the element
-	 * map (if enabled).
+	 * item's data to <code>null</code> and removes the element from the
+	 * element map (if enabled).
 	 * 
 	 * @param item
 	 *            the widget
@@ -651,7 +644,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			associateListener.disassociate(item);
 		Object element = item.getData();
 		Assert.isNotNull(element);
-		// Clear the map before we clear the data
+		//Clear the map before we clear the data
 		unmapElement(element, item);
 		item.setData(null);
 	}
@@ -684,26 +677,24 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Copies the attributes of the given element into the given SWT item. The
-	 * element map is updated according to the value of <code>fullMap</code>. If
-	 * <code>fullMap</code> is <code>true</code> then the current mapping from
-	 * element to widgets is removed and the new mapping is added. If full map
-	 * is <code>false</code> then only the new map gets installed. Installing
-	 * only the new map is necessary in cases where only the order of elements
-	 * changes but not the set of elements.
+	 * element map is updated according to the value of <code>fullMap</code>.
+	 * If <code>fullMap</code> is <code>true</code> then the current mapping
+	 * from element to widgets is removed and the new mapping is added. If
+	 * full map is <code>false</code> then only the new map gets installed.
+	 * Installing only the new map is necessary in cases where only the order of
+	 * elements changes but not the set of elements.
 	 * <p>
 	 * This method is internal to the framework; subclassers should not call
 	 * this method.
 	 * </p>
 	 * 
 	 * @param item
-	 * @param element
-	 *            element
+	 * @param element element
 	 * @param fullMap
 	 *            <code>true</code> if mappings are added and removed, and
 	 *            <code>false</code> if only the new map gets installed
 	 */
-	protected abstract void doUpdateItem(Widget item, Object element,
-			boolean fullMap);
+	protected abstract void doUpdateItem(Widget item, Object element, boolean fullMap);
 
 	/**
 	 * Compares two elements for equality. Uses the element comparer if one has
@@ -718,11 +709,9 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 */
 	protected boolean equals(Object elementA, Object elementB) {
 		if (comparer == null) {
-			return elementA == null ? elementB == null : elementA
-					.equals(elementB);
+			return elementA == null ? elementB == null : elementA.equals(elementB);
 		} else {
-			return elementA == null ? elementB == null : comparer.equals(
-					elementA, elementB);
+			return elementA == null ? elementB == null : comparer.equals(elementA, elementB);
 		}
 	}
 
@@ -740,8 +729,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			for (int i = 0; i < elements.length; i++) {
 				boolean add = true;
 				for (int j = 0; j < filters.size(); j++) {
-					add = ((ViewerFilter) filters.get(j)).select(this, root,
-							elements[i]);
+					add = ((ViewerFilter) filters.get(j)).select(this, root, elements[i]);
 					if (!add) {
 						break;
 					}
@@ -763,10 +751,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * <p>
 	 * The default implementation of this method tries first to find the widget
 	 * for the given element assuming that it is the viewer's input; this is
-	 * done by calling <code>doFindInputItem</code>. If it is not found there,
-	 * it is looked up in the internal element map provided that this feature
-	 * has been enabled. If the element map is disabled, the widget is found via
-	 * <code>doFindInputItem</code>.
+	 * done by calling <code>doFindInputItem</code>. If it is not found
+	 * there, it is looked up in the internal element map provided that this
+	 * feature has been enabled. If the element map is disabled, the widget is
+	 * found via <code>doFindInputItem</code>.
 	 * </p>
 	 * 
 	 * @param element
@@ -791,10 +779,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * <p>
 	 * The default implementation of this method tries first to find the widget
 	 * for the given element assuming that it is the viewer's input; this is
-	 * done by calling <code>doFindInputItem</code>. If it is not found there,
-	 * the widgets are looked up in the internal element map provided that this
-	 * feature has been enabled. If the element map is disabled, the widget is
-	 * found via <code>doFindItem</code>.
+	 * done by calling <code>doFindInputItem</code>. If it is not found
+	 * there, the widgets are looked up in the internal element map provided
+	 * that this feature has been enabled. If the element map is disabled, the
+	 * widget is found via <code>doFindItem</code>.
 	 * </p>
 	 * 
 	 * @param element
@@ -811,12 +799,12 @@ public abstract class StructuredViewer extends ContentViewer implements
 		// if we have an element map use it, otherwise search for the item.
 		if (usingElementMap()) {
 			Object widgetOrWidgets = elementMap.get(element);
-			if (widgetOrWidgets == null) {
+			if (widgetOrWidgets==null) {
 				return NO_WIDGETS;
 			} else if (widgetOrWidgets instanceof Widget) {
-				return new Widget[] { (Widget) widgetOrWidgets };
+				return new Widget[] {(Widget) widgetOrWidgets};
 			} else {
-				return (Widget[]) widgetOrWidgets;
+				return (Widget[])widgetOrWidgets;
 			}
 		}
 		result = doFindItem(element);
@@ -892,11 +880,13 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Returns the comparer to use for comparing elements, or <code>null</code>
-	 * if none has been set. If specified, the viewer uses this to compare and
-	 * hash elements rather than the elements' own equals and hashCode methods.
-	 * 
-	 * @return the comparer to use for comparing elements or <code>null</code>
+	 * Returns the comparer to use for comparing elements, or
+	 * <code>null</code> if none has been set.  If specified,
+	 * the viewer uses this to compare and hash elements rather
+	 * than the elements' own equals and hashCode methods.
+	 *           
+	 * @return the comparer to use for comparing elements or
+	 *            <code>null</code>
 	 */
 	public IElementComparer getComparer() {
 		return comparer;
@@ -917,8 +907,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			for (Iterator iter = filters.iterator(); iter.hasNext();) {
 				ViewerFilter f = (ViewerFilter) iter.next();
 				Object[] filteredResult = f.filter(this, parent, result);
-				if (associateListener != null
-						&& filteredResult.length != result.length) {
+				if (associateListener != null && filteredResult.length != result.length) {
 					notifyFilteredOut(result, filteredResult);
 				}
 				result = filteredResult;
@@ -928,16 +917,15 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Notifies an AssociateListener of the elements that have been filtered
-	 * out.
+	 * Notifies an AssociateListener of the elements that have been filtered out.
 	 * 
-	 * @param rawResult
-	 * @param filteredResult
+	 * @param rawResult 
+	 * @param filteredResult  
 	 */
 	private void notifyFilteredOut(Object[] rawResult, Object[] filteredResult) {
 		int rawIndex = 0;
 		int filteredIndex = 0;
-		for (; filteredIndex < filteredResult.length;) {
+		for (; filteredIndex < filteredResult.length; ) {
 			if (rawResult[rawIndex] != filteredResult[filteredIndex]) {
 				associateListener.filteredOut(rawResult[rawIndex++]);
 				continue;
@@ -949,7 +937,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 			associateListener.filteredOut(rawResult[rawIndex]);
 		}
 	}
-
+	
+	
 	/**
 	 * Returns this viewer's filters.
 	 * 
@@ -967,8 +956,9 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Returns the item at the given display-relative coordinates, or
-	 * <code>null</code> if there is no item at that location or the underlying
-	 * SWT-Control is not made up of {@link Item} (e.g {@link ListViewer})
+	 * <code>null</code> if there is no item at that location or 
+	 * the underlying SWT-Control is not made up of {@link Item} 
+	 * (e.g {@link ListViewer}) 
 	 * <p>
 	 * The default implementation of this method returns <code>null</code>.
 	 * </p>
@@ -979,19 +969,16 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 *            vertical coordinate
 	 * @return the item, or <code>null</code> if there is no item at the given
 	 *         coordinates
-	 * @deprecated This method is deprecated in 3.3 in favor of
-	 *             {@link ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)}
-	 *             . Viewers who are not subclasses of {@link ColumnViewer}
-	 *             should consider using a widget relative implementation like
-	 *             {@link ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)}
-	 *             .
-	 * 
+	 * @deprecated This method is deprecated in 3.3 in favor of {@link ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)}. 
+	 * Viewers who are not subclasses of {@link ColumnViewer} should consider using a
+	 * widget relative implementation like {@link ColumnViewer#getItemAt(org.eclipse.swt.graphics.Point)}.
+	 *  
 	 */
 	@Deprecated
 	protected Item getItem(int x, int y) {
 		return null;
 	}
-
+	
 	/**
 	 * Returns the children of the given parent without sorting and filtering
 	 * them. The resulting array must not be modified, as it may come directly
@@ -1020,8 +1007,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * Returns the root element.
 	 * <p>
 	 * The default implementation of this framework method forwards to
-	 * <code>getInput</code>. Override if the root element is different from the
-	 * viewer's input element.
+	 * <code>getInput</code>. Override if the root element is different from
+	 * the viewer's input element.
 	 * </p>
 	 * 
 	 * @return the root element, or <code>null</code> if none
@@ -1032,19 +1019,12 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * The <code>StructuredViewer</code> implementation of this method returns
-	 * the result as an <code>IStructuredSelection</code>. Sub-classes should
-	 * also return a <code>IStructuredSelection</code>.
-	 * 
+	 * the result as an <code>IStructuredSelection</code>.
 	 * <p>
 	 * Subclasses do not typically override this method, but implement
 	 * <code>getSelectionFromWidget(List)</code> instead.
 	 * <p>
-	 * 
-	 * Call <code>getStructuredSelection</code> instead to the
-	 * <code>IStructuredSelection</code> type directly.
-	 * 
 	 * @return ISelection
-	 *
 	 */
 	@Override
 	public ISelection getSelection() {
@@ -1054,22 +1034,6 @@ public abstract class StructuredViewer extends ContentViewer implements
 		}
 		List list = getSelectionFromWidget();
 		return new StructuredSelection(list, comparer);
-	}
-
-	/**
-	 * Returns the <code>IStructuredSelection</code> of this viewer.
-	 * 
-	 * @return IStructuredSelection
-	 * @since 3.11
-	 */
-	public IStructuredSelection getStructuredSelection() {
-		ISelection selection = getSelection();
-		if (selection instanceof IStructuredSelection) {
-			return (IStructuredSelection) selection;
-
-		}
-		throw new ClassCastException(
-				"StructuredViewer should return an instance of IStructuredSelection from its getSelection() method. "); //$NON-NLS-1$
 	}
 
 	/**
@@ -1101,34 +1065,34 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Returns this viewer's sorter, or <code>null</code> if it does not have
-	 * one. If this viewer has a comparator that was set via
-	 * <code>setComparator(ViewerComparator)</code> then this method will return
+	 * one.  If this viewer has a comparator that was set via 
+	 * <code>setComparator(ViewerComparator)</code> then this method will return 
 	 * <code>null</code> if the comparator is not an instance of ViewerSorter.
-	 * <p>
-	 * It is recommended to use <code>getComparator()</code> instead.
-	 * </p>
+     * <p>
+     * It is recommended to use <code>getComparator()</code> instead.
+     * </p>
 	 * 
-	 * @return a viewer sorter, or <code>null</code> if none or if the
-	 *         comparator is not an instance of ViewerSorter
+	 * @return a viewer sorter, or <code>null</code> if none or if the comparator is 
+	 * 				not an instance of ViewerSorter
 	 */
 	public ViewerSorter getSorter() {
 		if (sorter instanceof ViewerSorter)
-			return (ViewerSorter) sorter;
+			return (ViewerSorter)sorter;
 		return null;
 	}
 
 	/**
-	 * Return this viewer's comparator used to sort elements. This method should
-	 * be used instead of <code>getSorter()</code>.
+	 * Return this viewer's comparator used to sort elements.
+	 * This method should be used instead of <code>getSorter()</code>.
 	 * 
 	 * @return a viewer comparator, or <code>null</code> if none
-	 *
+     *
 	 * @since 3.2
 	 */
-	public ViewerComparator getComparator() {
+	public ViewerComparator getComparator(){
 		return sorter;
 	}
-
+	
 	/**
 	 * Handles a double-click select event from the widget.
 	 * <p>
@@ -1141,20 +1105,19 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 */
 	protected void handleDoubleSelect(SelectionEvent event) {
 		// This method is reimplemented in AbstractTreeViewer to fix bug 108102.
-
+		
 		// handle case where an earlier selection listener disposed the control.
 		Control control = getControl();
 		if (control != null && !control.isDisposed()) {
-			// If the double-clicked element can be obtained from the event, use
-			// it
-			// otherwise get it from the control. Some controls like List do
+			// If the double-clicked element can be obtained from the event, use it
+			// otherwise get it from the control.  Some controls like List do
 			// not have the notion of item.
-			// For details, see bug 90161 [Navigator] DefaultSelecting folders
-			// shouldn't always expand first one
+			// For details, see bug 90161 [Navigator] DefaultSelecting folders shouldn't always expand first one
 			ISelection selection;
 			if (event.item != null && event.item.getData() != null) {
 				selection = new StructuredSelection(event.item.getData());
-			} else {
+			}
+			else {
 				selection = getSelection();
 				updateSelection(selection);
 			}
@@ -1188,8 +1151,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * the selection has been removed from the viewer, the viewer is free to
 	 * either remove the element from the selection or to pick another element
 	 * as its new selection. The default implementation of this method calls
-	 * <code>updateSelection</code>. Subclasses may override it to implement a
-	 * different strategy for picking a new selection when the old selection
+	 * <code>updateSelection</code>. Subclasses may override it to implement
+	 * a different strategy for picking a new selection when the old selection
 	 * becomes invalid.
 	 * </p>
 	 * 
@@ -1198,22 +1161,19 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * @param newSelection
 	 *            the selection after the update, or <code>null</code> if none
 	 */
-	protected void handleInvalidSelection(ISelection invalidSelection,
-			ISelection newSelection) {
+	protected void handleInvalidSelection(ISelection invalidSelection, ISelection newSelection) {
 		updateSelection(newSelection);
-		SelectionChangedEvent event = new SelectionChangedEvent(this,
-				newSelection);
+		SelectionChangedEvent event = new SelectionChangedEvent(this, newSelection);
 		firePostSelectionChanged(event);
 	}
 
 	/**
 	 * The <code>StructuredViewer</code> implementation of this
-	 * <code>ContentViewer</code> method calls <code>update</code> if the event
-	 * specifies that the label of a given element has changed, otherwise it
-	 * calls super. Subclasses may reimplement or extend. </p>
-	 * 
-	 * @param event
-	 *            the event that generated this update
+	 * <code>ContentViewer</code> method calls <code>update</code> if the
+	 * event specifies that the label of a given element has changed, otherwise
+	 * it calls super. Subclasses may reimplement or extend.
+	 * </p>
+	 * @param event the event that generated this update
 	 */
 	@Override
 	protected void handleLabelProviderChanged(LabelProviderChangedEvent event) {
@@ -1250,12 +1210,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * this method.
 	 * </p>
 	 * 
-	 * @param e
-	 *            the SWT selection event
+	 * @param e the SWT selection event
 	 */
 	protected void handlePostSelect(SelectionEvent e) {
-		SelectionChangedEvent event = new SelectionChangedEvent(this,
-				getSelection());
+		SelectionChangedEvent event = new SelectionChangedEvent(this, getSelection());
 		firePostSelectionChanged(event);
 	}
 
@@ -1267,8 +1225,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// On Windows, selection events may happen during a refresh.
-				// Ignore these events if we are currently in
-				// preservingSelection().
+				// Ignore these events if we are currently in preservingSelection().
 				// See bug 184441.
 				if (!inChange) {
 					handleSelect(e);
@@ -1296,7 +1253,6 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Returns whether this viewer has any filters.
-	 * 
 	 * @return boolean
 	 */
 	protected boolean hasFilters() {
@@ -1316,7 +1272,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * as described in <code>refresh(boolean updateLabels)</code>.
 	 * <p>
 	 * The default implementation simply calls
-	 * <code>internalRefresh(element)</code>, ignoring <code>updateLabels</code>.
+	 * <code>internalRefresh(element)</code>, ignoring
+	 * <code>updateLabels</code>.
 	 * <p>
 	 * If this method is overridden to do the actual refresh, then
 	 * <code>internalRefresh(Object element)</code> should simply call
@@ -1403,11 +1360,9 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Returns a new hashtable using the given capacity and this viewer's
-	 * element comparer.
+	 * Returns a new hashtable using the given capacity and this viewer's element comparer.
 	 * 
-	 * @param capacity
-	 *            the initial capacity of the hashtable
+	 * @param capacity the initial capacity of the hashtable
 	 * @return a new hashtable
 	 * 
 	 * @since 3.0
@@ -1418,8 +1373,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Attempts to preserves the current selection across a run of the given
-	 * code. This method should not preserve the selection if {link
-	 * #getPreserveSelection()} returns false.
+	 * code. This method should not preserve the selection if
+	 * {link #getPreserveSelection()} returns false.
 	 * <p>
 	 * The default implementation of this method:
 	 * <ul>
@@ -1436,7 +1391,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * @param updateCode
 	 *            the code to run
 	 * 
-	 *            see #getPreserveSelection()
+	 * see #getPreserveSelection()
 	 */
 	protected void preservingSelection(Runnable updateCode) {
 		preservingSelection(updateCode, false);
@@ -1470,7 +1425,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 		if (!preserveSelection) {
 			return;
 		}
-
+		
 		ISelection oldSelection = null;
 		try {
 			// preserve selection
@@ -1503,17 +1458,17 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Refreshes this viewer with information freshly obtained from this
-	 * viewer's model. If <code>updateLabels</code> is <code>true</code> then
-	 * labels for otherwise unaffected elements are updated as well. Otherwise,
-	 * it assumes labels for existing elements are unchanged, and labels are
-	 * only obtained as needed (for example, for new elements).
+	 * viewer's model. If <code>updateLabels</code> is <code>true</code>
+	 * then labels for otherwise unaffected elements are updated as well.
+	 * Otherwise, it assumes labels for existing elements are unchanged, and
+	 * labels are only obtained as needed (for example, for new elements).
 	 * <p>
 	 * Calling <code>refresh(true)</code> has the same effect as
 	 * <code>refresh()</code>.
 	 * <p>
 	 * Note that the implementation may still obtain labels for existing
-	 * elements even if <code>updateLabels</code> is false. The intent is simply
-	 * to allow optimization where possible.
+	 * elements even if <code>updateLabels</code> is false. The intent is
+	 * simply to allow optimization where possible.
 	 * 
 	 * @param updateLabels
 	 *            <code>true</code> to update labels for existing elements,
@@ -1583,11 +1538,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * This method is internal to the framework; subclassers should not call
 	 * this method.
 	 * </p>
-	 * 
 	 * @param widget
-	 *            the widget
+     *            the widget
 	 * @param element
-	 *            the element
+     *            the element
 	 */
 	protected final void refreshItem(Widget widget, Object element) {
 		SafeRunnable.run(new UpdateItemSafeRunnable(widget, element, true));
@@ -1605,8 +1559,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	@Override
-	public void removePostSelectionChangedListener(
-			ISelectionChangedListener listener) {
+	public void removePostSelectionChangedListener(ISelectionChangedListener listener) {
 		postSelectionChangedListeners.remove(listener);
 	}
 
@@ -1653,7 +1606,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	void setAssociateListener(StructuredViewerInternals.AssociateListener l) {
 		associateListener = l;
 	}
-
+	
 	/**
 	 * Sets the filters, replacing any previous filters, and triggers
 	 * refiltering and resorting of the elements.
@@ -1670,7 +1623,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			refresh();
 		}
 	}
-
+	
 	/**
 	 * Discards this viewer's filters and triggers refiltering and resorting of
 	 * the elements.
@@ -1698,8 +1651,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Assert that the content provider is of one of the supported types.
-	 * 
+	 * Assert that the content provider is of one of the
+	 * supported types.
 	 * @param provider
 	 */
 	protected void assertContentProviderType(IContentProvider provider) {
@@ -1715,14 +1668,14 @@ public abstract class StructuredViewer extends ContentViewer implements
 							"(Has the widget been disposed?)"); //$NON-NLS-1$
 		}
 		try {
-			// fInChange= true;
+			//		fInChange= true;
 
 			unmapAllElements();
 
 			super.setInput(input);
 
 		} finally {
-			// fInChange= false;
+			//		fInChange= false;
 		}
 	}
 
@@ -1771,16 +1724,16 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 *            list of selected elements (element type: <code>Object</code>)
 	 *            or <code>null</code> if the selection is to be cleared
 	 * @param reveal
-	 *            <code>true</code> if the selection is to be made visible, and
-	 *            <code>false</code> otherwise
+	 *            <code>true</code> if the selection is to be made visible,
+	 *            and <code>false</code> otherwise
 	 */
 	protected abstract void setSelectionToWidget(List l, boolean reveal);
 
 	/**
 	 * Converts the selection to a <code>List</code> and calls
 	 * <code>setSelectionToWidget(List, boolean)</code>. The selection is
-	 * expected to be an <code>IStructuredSelection</code> of elements. If not,
-	 * the selection is cleared.
+	 * expected to be an <code>IStructuredSelection</code> of elements. If
+	 * not, the selection is cleared.
 	 * <p>
 	 * Subclasses do not typically override this method, but implement
 	 * <code>setSelectionToWidget(List, boolean)</code> instead.
@@ -1793,8 +1746,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 */
 	protected void setSelectionToWidget(ISelection selection, boolean reveal) {
 		if (selection instanceof IStructuredSelection) {
-			setSelectionToWidget(((IStructuredSelection) selection).toList(),
-					reveal);
+			setSelectionToWidget(((IStructuredSelection) selection).toList(), reveal);
 		} else {
 			setSelectionToWidget((List) null, reveal);
 		}
@@ -1802,10 +1754,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Sets this viewer's sorter and triggers refiltering and resorting of this
-	 * viewer's element. Passing <code>null</code> turns sorting off.
-	 * <p>
-	 * It is recommended to use <code>setComparator()</code> instead.
-	 * </p>
+	 * viewer's element. Passing <code>null</code> turns sorting off.  
+     * <p>
+     * It is recommended to use <code>setComparator()</code> instead.
+     * </p>
 	 * 
 	 * @param sorter
 	 *            a viewer sorter, or <code>null</code> if none
@@ -1818,29 +1770,27 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Sets this viewer's comparator to be used for sorting elements, and
-	 * triggers refiltering and resorting of this viewer's element.
-	 * <code>null</code> turns sorting off. To get the viewer's comparator, call
-	 * <code>getComparator()</code>.
-	 * <p>
-	 * IMPORTANT: This method was introduced in 3.2. If a reference to this
-	 * viewer object is passed to clients who call <code>getSorter()</code>,
-	 * null may be returned from from that method even though the viewer is
-	 * sorting its elements using the viewer's comparator.
-	 * </p>
+	 * Sets this viewer's comparator to be used for sorting elements, and triggers refiltering and 
+	 * resorting of this viewer's element.  <code>null</code> turns sorting off.
+	 * To get the viewer's comparator, call <code>getComparator()</code>.
+     * <p>
+     * IMPORTANT: This method was introduced in 3.2. If a reference to this viewer object 
+     * is passed to clients who call <code>getSorter()</code>, null may be returned from
+     * from that method even though the viewer is sorting its elements using the
+     * viewer's comparator.
+     * </p>
 	 * 
-	 * @param comparator
-	 *            a viewer comparator, or <code>null</code> if none
-	 *
-	 * @since 3.2
+	 * @param comparator a viewer comparator, or <code>null</code> if none
+     *
+     * @since 3.2
 	 */
-	public void setComparator(ViewerComparator comparator) {
-		if (this.sorter != comparator) {
+	public void setComparator(ViewerComparator comparator){
+		if (this.sorter != comparator){
 			this.sorter = comparator;
 			refresh();
 		}
 	}
-
+	
 	/**
 	 * Configures whether this structured viewer uses an internal hash table to
 	 * speeds up the mapping between elements and SWT items. This must be called
@@ -1861,9 +1811,9 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * Sets the comparer to use for comparing elements, or <code>null</code> to
-	 * use the default <code>equals</code> and <code>hashCode</code> methods on
-	 * the elements themselves.
+	 * Sets the comparer to use for comparing elements, or <code>null</code>
+	 * to use the default <code>equals</code> and <code>hashCode</code>
+	 * methods on the elements themselves.
 	 * 
 	 * @param comparer
 	 *            the comparer to use for comparing elements or
@@ -1877,19 +1827,20 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * NON-API - to be removed - see bug 200214 Enable or disable the preserve
-	 * selection behavior of this viewer. The default is that the viewer
-	 * attempts to preserve the selection across update operations. This is an
-	 * advanced option, to support clients that manage the selection without
-	 * relying on the viewer, or clients running into performance problems when
-	 * using viewers and {@link SWT#VIRTUAL}. Note that this method has been
-	 * introduced in 3.5 and that trying to disable the selection behavior may
-	 * not be possible for all subclasses of <code>StructuredViewer</code>, or
-	 * may cause program errors. This method is supported for
-	 * {@link TableViewer}, {@link TreeViewer}, {@link ListViewer},
-	 * {@link CheckboxTableViewer}, {@link CheckboxTreeViewer}, and
-	 * {@link ComboViewer}, but no promises are made for other subclasses of
-	 * StructuredViewer, or subclasses of the listed viewer classes.
+	 * NON-API - to be removed - see bug 200214
+	 * Enable or disable the preserve selection behavior of this viewer. The
+	 * default is that the viewer attempts to preserve the selection across
+	 * update operations. This is an advanced option, to support clients that
+	 * manage the selection without relying on the viewer, or clients running
+	 * into performance problems when using viewers and {@link SWT#VIRTUAL}.
+	 * Note that this method has been introduced in 3.5 and that trying to
+	 * disable the selection behavior may not be possible for all subclasses of
+	 * <code>StructuredViewer</code>, or may cause program errors. This method
+	 * is supported for {@link TableViewer}, {@link TreeViewer},
+	 * {@link ListViewer}, {@link CheckboxTableViewer},
+	 * {@link CheckboxTreeViewer}, and {@link ComboViewer}, but no promises are
+	 * made for other subclasses of StructuredViewer, or subclasses of the
+	 * listed viewer classes.
 	 * 
 	 * @param preserve
 	 *            <code>true</code> if selection should be preserved,
@@ -1900,9 +1851,10 @@ public abstract class StructuredViewer extends ContentViewer implements
 	}
 
 	/**
-	 * NON-API - to be removed - see bug 200214 Returns whether an attempt
-	 * should be made to preserve selection across update operations. To be used
-	 * by subclasses that override {@link #preservingSelection(Runnable)}.
+	 * NON-API - to be removed - see bug 200214
+	 * Returns whether an attempt should be made to preserve selection across
+	 * update operations. To be used by subclasses that override
+	 * {@link #preservingSelection(Runnable)}.
 	 * 
 	 * @return <code>true</code> if selection should be preserved,
 	 *         <code>false</code> otherwise
@@ -1913,7 +1865,6 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Hook for testing.
-	 * 
 	 * @param element
 	 * @return Widget
 	 */
@@ -1923,7 +1874,6 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	/**
 	 * Hook for testing.
-	 * 
 	 * @param element
 	 * @return Widget[]
 	 * @since 3.2
@@ -1931,7 +1881,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	public Widget[] testFindItems(Object element) {
 		return findItems(element);
 	}
-
+	
 	/**
 	 * Removes all elements from the map.
 	 * <p>
@@ -1974,8 +1924,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * 
 	 * @param element
 	 *            the element
-	 * @param item
-	 *            the item to unmap
+	 * @param item the item to unmap
 	 * @since 2.0
 	 */
 	protected void unmapElement(Object element, Widget item) {
@@ -1998,19 +1947,17 @@ public abstract class StructuredViewer extends ContentViewer implements
 				}
 				int length = widgets.length;
 				if (indexOfItem == 0) {
-					if (length == 1) {
+					if(length == 1) {
 						elementMap.remove(element);
 					} else {
 						Widget[] updatedWidgets = new Widget[length - 1];
-						System.arraycopy(widgets, 1, updatedWidgets, 0,
-								length - 1);
+						System.arraycopy(widgets, 1, updatedWidgets, 0, length -1 );
 						elementMap.put(element, updatedWidgets);
 					}
 				} else {
 					Widget[] updatedWidgets = new Widget[length - 1];
 					System.arraycopy(widgets, 0, updatedWidgets, 0, indexOfItem);
-					System.arraycopy(widgets, indexOfItem + 1, updatedWidgets,
-							indexOfItem, length - indexOfItem - 1);
+					System.arraycopy(widgets, indexOfItem + 1, updatedWidgets, indexOfItem, length - indexOfItem - 1);
 					elementMap.put(element, updatedWidgets);
 				}
 			}
@@ -2019,7 +1966,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	// flag to indicate that a full refresh took place. See bug 102440.
 	private boolean refreshOccurred;
-
+	
 	/**
 	 * Updates the given elements' presentation when one or more of their
 	 * properties change. Only the given elements are updated.
@@ -2044,8 +1991,8 @@ public abstract class StructuredViewer extends ContentViewer implements
 	 * <p>
 	 * If the viewer has a sorter which is affected by a change to one of the
 	 * properties, the elements' positions are updated to maintain the sort
-	 * order. Note that resorting may not happen if <code>properties</code> is
-	 * <code>null</code>.
+	 * order. Note that resorting may not happen if <code>properties</code>
+	 * is <code>null</code>.
 	 * </p>
 	 * <p>
 	 * If the viewer has a filter which is affected by a change to one of the
@@ -2123,35 +2070,32 @@ public abstract class StructuredViewer extends ContentViewer implements
 		for (int i = 0; i < items.length; i++) {
 			internalUpdate(items[i], element, properties);
 			if (mayExitEarly && refreshOccurred) {
-				// detected a change from refreshOccurred==false to
-				// refreshOccurred==true
+				// detected a change from refreshOccurred==false to refreshOccurred==true 
 				return;
 			}
-		}
+		}		
 	}
 
 	/**
-	 * Updates the given element's presentation when one or more of its
-	 * properties changes. Only the given element is updated.
-	 * <p>
-	 * EXPERIMENTAL. Not to be used except by JDT. This method was added to
-	 * support JDT's explorations into grouping by working sets, which requires
-	 * viewers to support multiple equal elements. See bug 76482 for more
-	 * details. This support will likely be removed in Eclipse 3.3 in favor of
-	 * proper support for multiple equal elements (which was implemented for
-	 * AbtractTreeViewer in 3.2).
-	 * </p>
-	 * 
-	 * @param widget
-	 *            the widget for the element
-	 * @param element
-	 *            the element
-	 * @param properties
-	 *            the properties that have changed, or <code>null</code> to
-	 *            indicate unknown
-	 */
-	protected void internalUpdate(Widget widget, Object element,
-			String[] properties) {
+     * Updates the given element's presentation when one or more of its
+     * properties changes. Only the given element is updated.
+     * <p>
+     * EXPERIMENTAL.  Not to be used except by JDT.
+     * This method was added to support JDT's explorations
+     * into grouping by working sets, which requires viewers to support multiple 
+     * equal elements.  See bug 76482 for more details.  This support will
+     * likely be removed in Eclipse 3.3 in favor of proper support for
+     * multiple equal elements (which was implemented for AbtractTreeViewer in 3.2). 
+     * </p>
+     * @param widget
+     *            the widget for the element
+     * @param element
+     *            the element
+     * @param properties
+     *            the properties that have changed, or <code>null</code> to
+     *            indicate unknown
+     */
+	protected void internalUpdate(Widget widget, Object element, String[] properties) {
 		boolean needsRefilter = false;
 		if (properties != null) {
 			for (int i = 0; i < properties.length; ++i) {
@@ -2179,8 +2123,7 @@ public abstract class StructuredViewer extends ContentViewer implements
 			needsUpdate = false;
 			IBaseLabelProvider labelProvider = getLabelProvider();
 			for (int i = 0; i < properties.length; ++i) {
-				needsUpdate = labelProvider.isLabelProperty(element,
-						properties[i]);
+				needsUpdate = labelProvider.isLabelProperty(element, properties[i]);
 				if (needsUpdate) {
 					break;
 				}
@@ -2245,146 +2188,123 @@ public abstract class StructuredViewer extends ContentViewer implements
 
 	@Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
-		if (labelProvider instanceof IColorProvider
-				|| labelProvider instanceof IFontProvider) {
-			colorAndFontCollector = new ColorAndFontCollectorWithProviders(
-					labelProvider);
+		if (labelProvider instanceof IColorProvider || labelProvider instanceof IFontProvider) {
+			colorAndFontCollector = new ColorAndFontCollectorWithProviders(labelProvider);
 		} else {
 			colorAndFontCollector = new ColorAndFontCollector();
 		}
 		super.setLabelProvider(labelProvider);
-
+		
 	}
-
+	
 	/**
 	 * Build a label up for the element using the supplied label provider.
-	 * 
-	 * @param updateLabel
-	 *            The ViewerLabel to collect the result in
-	 * @param element
-	 *            The element being decorated.
+	 * @param updateLabel The ViewerLabel to collect the result in
+	 * @param element The element being decorated.
 	 */
-	protected void buildLabel(ViewerLabel updateLabel, Object element) {
+	protected void buildLabel(ViewerLabel updateLabel, Object element){
 
 		if (getLabelProvider() instanceof IViewerLabelProvider) {
 			IViewerLabelProvider itemProvider = (IViewerLabelProvider) getLabelProvider();
 			itemProvider.updateLabel(updateLabel, element);
-
+            		
 			colorAndFontCollector.setUsedDecorators();
-
-			if (updateLabel.hasNewBackground()) {
-				colorAndFontCollector
-						.setBackground(updateLabel.getBackground());
+			
+			if(updateLabel.hasNewBackground()) {
+				colorAndFontCollector.setBackground(updateLabel.getBackground());
 			}
-
-			if (updateLabel.hasNewForeground()) {
-				colorAndFontCollector
-						.setForeground(updateLabel.getForeground());
+			
+			if(updateLabel.hasNewForeground()) {
+				colorAndFontCollector.setForeground(updateLabel.getForeground());
 			}
-
-			if (updateLabel.hasNewFont()) {
+			
+			if(updateLabel.hasNewFont()) {
 				colorAndFontCollector.setFont(updateLabel.getFont());
 			}
 			return;
 
-		}
-
-		if (getLabelProvider() instanceof ILabelProvider) {
+		} 
+		
+		if(getLabelProvider() instanceof ILabelProvider){
 			ILabelProvider labelProvider = (ILabelProvider) getLabelProvider();
 			updateLabel.setText(labelProvider.getText(element));
 			updateLabel.setImage(labelProvider.getImage(element));
 		}
-
+	
 	}
-
+	
 	/**
 	 * Build a label up for the element using the supplied label provider.
-	 * 
-	 * @param updateLabel
-	 *            The ViewerLabel to collect the result in
-	 * @param element
-	 *            The element being decorated.
-	 * @param labelProvider
-	 *            ILabelProvider the labelProvider for the receiver.
+	 * @param updateLabel The ViewerLabel to collect the result in
+	 * @param element The element being decorated.
+	 * @param labelProvider ILabelProvider the labelProvider for the receiver.
 	 */
-	void buildLabel(ViewerLabel updateLabel, Object element,
-			IViewerLabelProvider labelProvider) {
+	void buildLabel(ViewerLabel updateLabel, Object element,IViewerLabelProvider labelProvider){
 
-		labelProvider.updateLabel(updateLabel, element);
-
-		colorAndFontCollector.setUsedDecorators();
-
-		if (updateLabel.hasNewBackground()) {
-			colorAndFontCollector.setBackground(updateLabel.getBackground());
-		}
-
-		if (updateLabel.hasNewForeground()) {
-			colorAndFontCollector.setForeground(updateLabel.getForeground());
-		}
-
-		if (updateLabel.hasNewFont()) {
-			colorAndFontCollector.setFont(updateLabel.getFont());
-		}
-
+			labelProvider.updateLabel(updateLabel, element);
+            		
+			colorAndFontCollector.setUsedDecorators();
+			
+			if(updateLabel.hasNewBackground()) {
+				colorAndFontCollector.setBackground(updateLabel.getBackground());
+			}
+			
+			if(updateLabel.hasNewForeground()) {
+				colorAndFontCollector.setForeground(updateLabel.getForeground());
+			}
+			
+			if(updateLabel.hasNewFont()) {
+				colorAndFontCollector.setFont(updateLabel.getFont());
+			}
+	
 	}
-
+	
 	/**
 	 * Build a label up for the element using the supplied label provider.
-	 * 
-	 * @param updateLabel
-	 *            The ViewerLabel to collect the result in
-	 * @param elementPath
-	 *            The path of the element being decorated.
-	 * @param labelProvider
-	 *            ILabelProvider the labelProvider for the receiver.
+	 * @param updateLabel The ViewerLabel to collect the result in
+	 * @param elementPath The path of the element being decorated.
+	 * @param labelProvider ILabelProvider the labelProvider for the receiver.
 	 */
-	void buildLabel(ViewerLabel updateLabel, TreePath elementPath,
-			ITreePathLabelProvider labelProvider) {
+	void buildLabel(ViewerLabel updateLabel, TreePath elementPath,ITreePathLabelProvider labelProvider){
 
-		labelProvider.updateLabel(updateLabel, elementPath);
-
-		colorAndFontCollector.setUsedDecorators();
-
-		if (updateLabel.hasNewBackground()) {
-			colorAndFontCollector.setBackground(updateLabel.getBackground());
-		}
-
-		if (updateLabel.hasNewForeground()) {
-			colorAndFontCollector.setForeground(updateLabel.getForeground());
-		}
-
-		if (updateLabel.hasNewFont()) {
-			colorAndFontCollector.setFont(updateLabel.getFont());
-		}
-
+			labelProvider.updateLabel(updateLabel, elementPath);
+            		
+			colorAndFontCollector.setUsedDecorators();
+			
+			if(updateLabel.hasNewBackground()) {
+				colorAndFontCollector.setBackground(updateLabel.getBackground());
+			}
+			
+			if(updateLabel.hasNewForeground()) {
+				colorAndFontCollector.setForeground(updateLabel.getForeground());
+			}
+			
+			if(updateLabel.hasNewFont()) {
+				colorAndFontCollector.setFont(updateLabel.getFont());
+			}
+	
 	}
-
+	
 	/**
 	 * Build a label up for the element using the supplied label provider.
-	 * 
-	 * @param updateLabel
-	 *            The ViewerLabel to collect the result in
-	 * @param element
-	 *            The element being decorated.
-	 * @param labelProvider
-	 *            ILabelProvider the labelProvider for the receiver.
+	 * @param updateLabel The ViewerLabel to collect the result in
+	 * @param element The element being decorated.
+	 * @param labelProvider ILabelProvider the labelProvider for the receiver.
 	 */
-	void buildLabel(ViewerLabel updateLabel, Object element,
-			ILabelProvider labelProvider) {
-		updateLabel.setText(labelProvider.getText(element));
-		updateLabel.setImage(labelProvider.getImage(element));
+	void buildLabel(ViewerLabel updateLabel, Object element,ILabelProvider labelProvider){
+			updateLabel.setText(labelProvider.getText(element));
+			updateLabel.setImage(labelProvider.getImage(element));
 	}
 
 	/**
 	 * Get the ColorAndFontCollector for the receiver.
-	 * 
-	 * @return ColorAndFontCollector
+	 * @return ColorAndFontCollector 
 	 * @since 3.1
 	 */
 	protected ColorAndFontCollector getColorAndFontCollector() {
 		return colorAndFontCollector;
 	}
-
+	
 	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
