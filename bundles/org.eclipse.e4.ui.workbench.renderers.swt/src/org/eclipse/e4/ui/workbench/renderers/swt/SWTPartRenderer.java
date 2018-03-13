@@ -66,15 +66,10 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	public void setCSSInfo(MUIElement me, Object widget) {
 		// Set up the CSS Styling parameters; id & class
 		IEclipseContext ctxt = getContext(me);
-		if (ctxt == null) {
+		if (ctxt == null)
 			ctxt = getContext(me);
-		}
-		if (ctxt == null) {
-			return;
-		}
-
-		final IStylingEngine engine = (IStylingEngine) ctxt
-				.get(IStylingEngine.SERVICE_NAME);
+		final IStylingEngine engine = (IStylingEngine) getContext(me).get(
+				IStylingEngine.SERVICE_NAME);
 		if (engine == null)
 			return;
 
