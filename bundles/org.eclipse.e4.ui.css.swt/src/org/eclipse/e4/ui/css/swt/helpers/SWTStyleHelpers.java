@@ -30,9 +30,6 @@ public class SWTStyleHelpers {
 	 * @return
 	 */
 	public static String getSWTWidgetStyleAsString(Widget widget) {
-		if (widget.isDisposed()) {
-			return "";
-		}
 		return getSWTWidgetStyleAsString(widget.getStyle(), " ");
 	}
 

@@ -24,11 +24,12 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -81,7 +82,6 @@ public class SearchField {
 	private Text text;
 
 	private QuickAccessContents quickAccessContents;
-
 	private MWindow window;
 
 	private Map<String, QuickAccessProvider> providerMap = new HashMap<String, QuickAccessProvider>();
@@ -97,10 +97,6 @@ public class SearchField {
 
 	@Inject
 	private EPartService partService;
-	private Table table;
-
-	// private Object invokingCommandKeySequences;
-	// private Object invokingCommand;
 
 	@PostConstruct
 	void createWidget(final Composite parent, MApplication application, MWindow window) {
@@ -124,7 +120,10 @@ public class SearchField {
 			private void closeDropDown() {
 				if (shell == null || shell.isDisposed() || text.isDisposed() || !shell.isVisible())
 					return;
+
 				quickAccessContents.doClose();
+				text.setText(""); //$NON-NLS-1$
+				quickAccessContents.resetProviders();
 			}
 		});
 
@@ -141,22 +140,20 @@ public class SearchField {
 		restoreDialog();
 
 		quickAccessContents = new QuickAccessContents(providers) {
-			protected void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
+			void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
 			}
 
-			protected void doClose() {
-				text.setText(""); //$NON-NLS-1$
-				resetProviders();
+			void doClose() {
 				dialogHeight = shell.getSize().y;
 				dialogWidth = shell.getSize().x;
 				shell.setVisible(false);
 			}
 
-			protected QuickAccessElement getPerfectMatch(String filter) {
+			QuickAccessElement getPerfectMatch(String filter) {
 				return elementMap.get(filter);
 			}
 
-			protected void handleElementSelected(String string, Object selectedElement) {
+			void handleElementSelected(String string, Object selectedElement) {
 				if (selectedElement instanceof QuickAccessElement) {
 					QuickAccessElement element = (QuickAccessElement) selectedElement;
 					addPreviousPick(string, element);
@@ -174,9 +171,8 @@ public class SearchField {
 					if (text.isFocusControl()) {
 						MPart activePart = partService.getActivePart();
 						if (activePart != null) {
-							IPresentationEngine pe = activePart.getContext().get(
-									IPresentationEngine.class);
-							pe.focusGui(activePart);
+							ContextInjectionFactory.invoke(activePart.getObject(), Focus.class,
+									activePart.getContext(), null);
 						}
 					}
 				}
@@ -185,16 +181,16 @@ public class SearchField {
 		quickAccessContents.hookFilterText(text);
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		shell.addShellListener(new ShellAdapter() {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				quickAccessContents.doClose();
+				text.setText(""); //$NON-NLS-1$
 				e.doit = false;
 			}
 		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
-		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
+		final Table table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
@@ -233,7 +229,6 @@ public class SearchField {
 				boolean nowVisible = text.getText().length() > 0;
 				if (!wasVisible && nowVisible) {
 					layoutShell();
-					quickAccessContents.preOpen();
 				}
 				shell.setVisible(nowVisible);
 			}
@@ -254,7 +249,22 @@ public class SearchField {
 				}
 			}
 		});
-		quickAccessContents.createInfoLabel(shell);
+	}
+
+	public Table getTable() {
+		return quickAccessContents.getTable();
+	}
+
+	public Text getFilterText() {
+		return text;
+	}
+
+	public void close() {
+		shell.setVisible(false);
+	}
+
+	public void toggleShowAllMatches() {
+		quickAccessContents.toggleShowAllMatches();
 	}
 
 	private void hookUpSelectAll() {
@@ -380,11 +390,8 @@ public class SearchField {
 		this.previousFocusControl = previousFocusControl;
 		if (!shell.isVisible()) {
 			layoutShell();
-			quickAccessContents.preOpen();
 			shell.setVisible(true);
 			quickAccessContents.refresh(text.getText().toLowerCase());
-		} else {
-			quickAccessContents.setShowAllMatches(!quickAccessContents.getShowAllMatches());
 		}
 	}
 
@@ -407,6 +414,8 @@ public class SearchField {
 			if (!shell.isFocusControl() && !table.isFocusControl()
 					&& !text.isFocusControl()) {
 				quickAccessContents.doClose();
+				text.setText(""); //$NON-NLS-1$
+				quickAccessContents.resetProviders();
 			}
 		}
 	}
@@ -594,33 +603,4 @@ public class SearchField {
 		}
 	}
 
-	/**
-	 * Returns the quick access shell for testing. Should not be referenced
-	 * outside of the tests.
-	 * 
-	 * @return the current quick access shell or <code>null</code>
-	 */
-	public Shell getQuickAccessShell() {
-		return shell;
-	}
-
-	/**
-	 * Returns the quick access search text for testing. Should not be
-	 * referenced outside of the tests.
-	 * 
-	 * @return the search text in the workbench window or <code>null</code>
-	 */
-	public Text getQuickAccessSearchText() {
-		return text;
-	}
-
-	/**
-	 * Returns the table in the shell for testing. Should not be referenced
-	 * outside of the tests.
-	 * 
-	 * @return the table created in the shell or <code>null</code>
-	 */
-	public Table getQuickAccessTable(){
-		return table;
-	}
 }

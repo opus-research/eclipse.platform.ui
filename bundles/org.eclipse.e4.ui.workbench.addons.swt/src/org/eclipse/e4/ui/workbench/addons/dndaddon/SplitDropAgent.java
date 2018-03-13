@@ -277,11 +277,11 @@ public class SplitDropAgent extends DropAgent {
 
 		float pct = (float) (onEdge ? 0.34 : 0.50);
 
-		clearFeedback();
+		if (feedback != null)
+			feedback.dispose();
 
 		feedback = new SplitFeedbackOverlay(dropCTF.getShell(), feedbackBounds, side, pct,
 				getEnclosed(), getModified());
-		feedback.setVisible(true);
 	}
 
 	private void clearFeedback() {

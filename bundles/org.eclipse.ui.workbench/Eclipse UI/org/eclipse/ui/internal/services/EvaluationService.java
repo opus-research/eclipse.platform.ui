@@ -11,8 +11,6 @@
 
 package org.eclipse.ui.internal.services;
 
-import org.eclipse.e4.core.commands.ExpressionContext;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +29,7 @@ import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
@@ -86,7 +85,7 @@ public final class EvaluationService implements IEvaluationService {
 		legacyContext = new ExpressionContext(context);
 		ExpressionContext.defaultVariableConverter = new ContextFunction() {
 			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
+			public Object compute(IEclipseContext context) {
 				Object defaultVariable = context.getLocal(DEFAULT_VAR);
 				if (defaultVariable != null
 						&& defaultVariable != IEvaluationContext.UNDEFINED_VARIABLE) {

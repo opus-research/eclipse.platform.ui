@@ -138,7 +138,7 @@ public class MenusTest extends UITestCase {
 		
 	}
 
-	public void XXXtestMenuVisibilityWithCustomFactory() {
+	public void testMenuVisibilityWithCustomFactory() {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.singleton("menuTest1")); // enable the foo
 														// activity		
