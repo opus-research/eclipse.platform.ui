@@ -334,10 +334,7 @@ public class WorkbenchSiteProgressService implements
      * @see org.eclipse.ui.progress.IWorkbenchSiteProgressService#warnOfContentChange()
      */
     public void warnOfContentChange() {
-		MPart part = site.getModel();
-		if (!part.getTags().contains(CSSConstants.CSS_CONTENT_CHANGE_CLASS)) {
-			part.getTags().add(CSSConstants.CSS_CONTENT_CHANGE_CLASS);
-		}
+		// site.getPane().showHighlight();
     }
 
     /*
