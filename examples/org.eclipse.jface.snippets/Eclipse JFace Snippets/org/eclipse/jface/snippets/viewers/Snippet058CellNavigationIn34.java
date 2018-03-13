@@ -193,7 +193,7 @@ public class Snippet058CellNavigationIn34 {
 
 		});
 		
-		ComboBoxCellEditor editor = new ComboBoxCellEditor(((TableViewer) v).getTable(), new String[] {"M","F"});
+		ComboBoxCellEditor editor = new ComboBoxCellEditor(v.getTable(), new String[] {"M","F"});
 		editor.setActivationStyle(ComboBoxCellEditor.DROP_DOWN_ON_TRAVERSE_ACTIVATION | 
 				ComboBoxCellEditor.DROP_DOWN_ON_PROGRAMMATIC_ACTIVATION |
 				ComboBoxCellEditor.DROP_DOWN_ON_MOUSE_ACTIVATION |

@@ -116,8 +116,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /*
      * Extends this method to update check box states.
      */
-    @Override
-	protected void doUpdateItem(Item item, Object element) {
+    protected void doUpdateItem(Item item, Object element) {
     	super.doUpdateItem(item, element);
     	if(!item.isDisposed() && checkStateProvider != null) {
 			setChecked(element, checkStateProvider.isChecked(element));
@@ -268,8 +267,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on StructuredViewer.
      */
-    @Override
-	protected void handleDoubleSelect(SelectionEvent event) {
+    protected void handleDoubleSelect(SelectionEvent event) {
 
         if (lastClickedItem != null) {
             TreeItem item = lastClickedItem;
@@ -289,8 +287,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on StructuredViewer.
      */
-    @Override
-	protected void handleSelect(SelectionEvent event) {
+    protected void handleSelect(SelectionEvent event) {
 
         lastClickedItem = null;
         if (event.detail == SWT.CHECK) {
@@ -396,8 +393,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /* (non-Javadoc)
      * Method declared on Viewer.
      */
-    @Override
-	protected void preservingSelection(Runnable updateCode) {
+    protected void preservingSelection(Runnable updateCode) {
     	if (!getPreserveSelection()) {
     		return;
     	}
@@ -647,7 +643,6 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
 	}
 	
-	@Override
 	boolean optionallyPruneChildren(Item item, Object element) {
 		return false;
 	}

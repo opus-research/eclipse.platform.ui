@@ -74,8 +74,7 @@ public abstract class ControlContribution extends ContributionItem {
      * Subclasses must implement <code>createControl</code> rather than
      * overriding this method.
      */
-    @Override
-	public final void fill(Composite parent) {
+    public final void fill(Composite parent) {
         createControl(parent);
     }
 
@@ -83,8 +82,7 @@ public abstract class ControlContribution extends ContributionItem {
      * The control item implementation of this <code>IContributionItem</code>
      * method throws an exception since controls cannot be added to menus.
      */
-    @Override
-	public final void fill(Menu parent, int index) {
+    public final void fill(Menu parent, int index) {
         Assert.isTrue(false, "Can't add a control to a menu");//$NON-NLS-1$
     }
 
@@ -96,8 +94,7 @@ public abstract class ControlContribution extends ContributionItem {
      * Subclasses must implement <code>createControl</code> rather than
      * overriding this method.
      */
-    @Override
-	public final void fill(ToolBar parent, int index) {
+    public final void fill(ToolBar parent, int index) {
         Control control = createControl(parent);
 		if (control == null) {
 			Policy.logException(new IllegalStateException(

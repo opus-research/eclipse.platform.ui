@@ -656,10 +656,6 @@ public class TrimStack {
 		}
 	}
 
-	public MUIElement getMinimizedElement() {
-		return minimizedElement;
-	}
-
 	private MUIElement findElement() {
 		MUIElement result;
 		List<MPerspectiveStack> ps = modelService.findElements(window, null,

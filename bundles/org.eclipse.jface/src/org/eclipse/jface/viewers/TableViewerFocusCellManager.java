@@ -65,7 +65,6 @@ public class TableViewerFocusCellManager extends SWTFocusCellManager {
 		super(viewer, focusDrawingDelegate, navigationStrategy);
 	}
 
-	@Override
 	ViewerCell getInitialFocusCell() {
 		Table table = (Table) getViewer().getControl();
 
@@ -91,7 +90,6 @@ public class TableViewerFocusCellManager extends SWTFocusCellManager {
 		return row.getBounds(colIndex).x >= clientArea.x;
 	}
 
-	@Override
 	public ViewerCell getFocusCell() {
 		ViewerCell cell = super.getFocusCell();
 		Table t = (Table) getViewer().getControl();

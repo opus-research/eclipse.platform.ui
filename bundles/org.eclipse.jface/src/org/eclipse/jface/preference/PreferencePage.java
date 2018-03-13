@@ -263,7 +263,6 @@ public abstract class PreferencePage extends DialogPage implements
 			data.widthHint = Math.max(widthHint, minButtonSize.x);
 			defaultsButton.setLayoutData(data);
 			defaultsButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					performDefaults();
 				}
@@ -278,7 +277,6 @@ public abstract class PreferencePage extends DialogPage implements
 			data.widthHint = Math.max(widthHint, minButtonSize.x);
 			applyButton.setLayoutData(data);
 			applyButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					performApply();
 				}
@@ -508,8 +506,7 @@ public abstract class PreferencePage extends DialogPage implements
      * the preference page container title. Subclasses may extend.
      * @see IDialogPage#setTitle(String)
      */
-    @Override
-	public void setTitle(String title) {
+    public void setTitle(String title) {
         super.setTitle(title);
         if (getContainer() != null) {
 			getContainer().updateTitle();
@@ -542,8 +539,7 @@ public abstract class PreferencePage extends DialogPage implements
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return getTitle();
     }
 
@@ -613,8 +609,7 @@ public abstract class PreferencePage extends DialogPage implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
      */
-    @Override
-	public void performHelp() {
+    public void performHelp() {
         getControl().notifyListeners(SWT.Help, new Event());
     }
 
@@ -641,7 +636,6 @@ public abstract class PreferencePage extends DialogPage implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.DialogPage#setErrorMessage(java.lang.String)
 	 */
-	@Override
 	public void setErrorMessage(String newMessage) {
 		super.setErrorMessage(newMessage);
 		if (getContainer() != null) {
@@ -652,7 +646,6 @@ public abstract class PreferencePage extends DialogPage implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.dialogs.DialogPage#setMessage(java.lang.String, int)
 	 */
-	@Override
 	public void setMessage(String newMessage, int newType) {
 		super.setMessage(newMessage, newType);
 		if (getContainer() != null) {
