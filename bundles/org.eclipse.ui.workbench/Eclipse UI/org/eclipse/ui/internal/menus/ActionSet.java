@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -314,13 +314,17 @@ public class ActionSet {
 			tpath += IWorkbenchActionConstants.MB_ADDITIONS;
 		}
 
-		MToolBarElement action = MenuHelper
+		MToolBarElement action = null;
+		if (!IWorkbenchRegistryConstants.EXTENSION_EDITOR_ACTIONS.equals(element
+				.getDeclaringExtension().getExtensionPointUniqueIdentifier())) {
+			action = MenuHelper
 				.createLegacyToolBarActionAdditions(application, element);
-		if (action == null) {
-			return;
+			if (action == null) {
+				return;
+			}
+			action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
+			action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
 		}
-		action.getTransientData().put("Name", MenuHelper.getLabel(element)); //$NON-NLS-1$
-		action.getTransientData().put("ActionSet", id); //$NON-NLS-1$
 
 		MToolBarContribution toolBarContribution = MenuFactoryImpl.eINSTANCE
 				.createToolBarContribution();
@@ -368,8 +372,9 @@ public class ActionSet {
 
 		toolBarContribution.setPositionInParent(positionInParent);
 		toolBarContribution.setVisibleWhen(createVisibleWhen());
-
-		toolBarContribution.getChildren().add(action);
+		if (action != null) {
+			toolBarContribution.getChildren().add(action);
+		}
 		contributions.add(toolBarContribution);
 	}
 
