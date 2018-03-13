@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -37,6 +38,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.internal.WorkbenchPage;
 
 public class SelectionService implements ISelectionChangedListener, ISelectionService {
+	private static final String CONTAINS_SELECTION_PROP = SelectionService.class.getName()
+			+ ".containsSelection"; //$NON-NLS-1$
 
 	@Inject
 	private IEclipseContext context;
@@ -73,6 +76,9 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 				IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 				notifyListeners(part.getElementId(), workbenchPart, (ISelection) selection);
 			}
+
+			// workaround for Bug415721
+			restoreFocus(part, (ISelection) selection);
 		}
 	};
 
@@ -334,6 +340,17 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		ESelectionService selectionService = (ESelectionService) part.getContext().get(
 				ESelectionService.class.getName());
 		selectionService.setSelection(e.getSelection());
+	}
+
+	private void restoreFocus(MPart part, ISelection selection) {
+		Boolean containsSelection = (Boolean) part.getTransientData().get(CONTAINS_SELECTION_PROP);
+		boolean emptySelection = selection == StructuredSelection.EMPTY;
+		
+		if (containsSelection != null && !containsSelection && !emptySelection) {
+			part.getContext().get(IPresentationEngine.class).focusGui(part);
+		}
+		
+		part.getTransientData().put(CONTAINS_SELECTION_PROP, emptySelection);
 	}
 
 }
