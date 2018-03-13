@@ -289,7 +289,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	/**
 	 * @param element
 	 */
-	public void processContribution(MToolBar toolbarModel) {
+	private void processContribution(MToolBar toolbarModel) {
 		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(),
