@@ -33,6 +33,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -101,6 +102,7 @@ public class TrimStack {
 
 	private boolean isShowing = false;
 	private MUIElement minimizedElement;
+	private Composite clientAreaComposite;
 	private Composite hostPane;
 
 	@Inject
@@ -235,6 +237,14 @@ public class TrimStack {
 				return;
 			}
 
+			if (changedElement instanceof MCompositePart) {
+				MPart innerPart = getLeafPart(changedElement);
+				if (innerPart != null) {
+					fixToolItemSelection();
+					return;
+				}
+			}
+
 			if (changedElement == getLeafPart(minimizedElement)) {
 				fixToolItemSelection();
 				return;
@@ -254,7 +264,7 @@ public class TrimStack {
 				item.setSelection(false);
 			}
 		} else {
-			if (isEditorStack()) {
+			if (isEditorStack() || minimizedElement instanceof MPlaceholder) {
 				trimStackTB.getItem(1).setSelection(true);
 			} else if (isPerspectiveStack()) {
 				MPerspectiveStack pStack = (MPerspectiveStack) minimizedElement;
@@ -277,7 +287,11 @@ public class TrimStack {
 	}
 
 	private boolean isEditorStack() {
-		return minimizedElement instanceof MPlaceholder;
+		if (!(minimizedElement instanceof MPlaceholder))
+			return false;
+
+		MPlaceholder ph = (MPlaceholder) minimizedElement;
+		return ph.getRef() instanceof MArea;
 	}
 
 	private boolean isPerspectiveStack() {
@@ -494,8 +508,18 @@ public class TrimStack {
 			public void widgetDisposed(DisposeEvent e) {
 				trimStackTB = null;
 				trimStackMenu = null;
+
+				if (isShowing && hostPane != null && !hostPane.isDisposed())
+					showStack(false);
 			}
 		});
+
+		// Get the shell's client area composite
+		Shell theShell = trimStackTB.getShell();
+		if (theShell.getLayout() instanceof TrimmedPartLayout) {
+			TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
+			clientAreaComposite = tpl.clientArea;
+		}
 
 		trimStackTB.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
@@ -743,6 +767,16 @@ public class TrimStack {
 			ti.setToolTipText(Messages.TrimStack_SharedAreaTooltip);
 			ti.setImage(getLayoutImage());
 			ti.addSelectionListener(toolItemSelectionListener);
+		} else if (minimizedElement instanceof MPlaceholder) {
+			MPlaceholder ph = (MPlaceholder) minimizedElement;
+			if (ph.getRef() instanceof MPart) {
+				MPart part = (MPart) ph.getRef();
+				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
+				ti.setData(part);
+				ti.setImage(getImage(part));
+				ti.setToolTipText(getLabelText(part));
+				ti.addSelectionListener(toolItemSelectionListener);
+			}
 		} else if (minimizedElement instanceof MGenericStack<?>) {
 			// Handle *both* PartStacks and PerspectiveStacks here...
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
@@ -797,16 +831,14 @@ public class TrimStack {
 	 *            whether the stack should be visible
 	 */
 	public void showStack(boolean show) {
-		Control ctf = (Control) minimizedElement.getWidget();
-		Composite clientArea = getShellClientComposite();
-		if (clientArea == null)
+		Control ctrl = (Control) minimizedElement.getWidget();
+		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
 			return;
 
 		if (show && !isShowing) {
 			hostPane = getHostPane();
-			ctf.setParent(hostPane);
-
-			clientArea.addControlListener(caResizeListener);
+			ctrl.setParent(hostPane);
+			clientAreaComposite.addControlListener(caResizeListener);
 
 			// Set the initial location
 			setPaneLocation(hostPane);
@@ -814,6 +846,7 @@ public class TrimStack {
 			hostPane.layout(true);
 			hostPane.moveAbove(null);
 			hostPane.setVisible(true);
+			isShowing = true;
 
 			// Activate the part that is being brought up...
 			if (minimizedElement instanceof MPartStack) {
@@ -827,8 +860,7 @@ public class TrimStack {
 						partService.activate((MPart) ph.getRef());
 					}
 				}
-			} else if (minimizedElement instanceof MPlaceholder
-					&& ((MPlaceholder) minimizedElement).getRef() instanceof MArea) {
+			} else if (isEditorStack()) {
 				MArea area = (MArea) ((MPlaceholder) minimizedElement).getRef();
 
 				// See if we can find an element to activate...
@@ -858,15 +890,20 @@ public class TrimStack {
 				if (partToActivate != null) {
 					partService.activate(partToActivate);
 				}
+			} else if (minimizedElement instanceof MPlaceholder) {
+				MPlaceholder ph = (MPlaceholder) minimizedElement;
+				if (ph.getRef() instanceof MPart) {
+					MPart part = (MPart) ph.getRef();
+					partService.activate(part);
+				}
 			}
 
-			isShowing = true;
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
 			// Check to ensure that the client area is non-null since the
 			// trimstack may be currently hosted in the limbo shell
-			if (clientArea != null) {
-				clientArea.removeControlListener(caResizeListener);
+			if (clientAreaComposite != null) {
+				clientAreaComposite.removeControlListener(caResizeListener);
 			}
 
 			if (hostPane != null && hostPane.isVisible()) {
@@ -878,24 +915,11 @@ public class TrimStack {
 		}
 	}
 
-	Composite getShellClientComposite() {
-		if (trimStackTB == null || trimStackTB.isDisposed()) {
-			return null;
-		}
-		Shell theShell = trimStackTB.getShell();
-		if (!(theShell.getLayout() instanceof TrimmedPartLayout))
-			return null;
-
-		TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
-		return tpl.clientArea;
-	}
-
 	private void setPaneLocation(Composite someShell) {
-		Composite clientComp = getShellClientComposite();
-		if (clientComp == null || clientComp.isDisposed())
+		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
 			return;
 
-		Rectangle caRect = getShellClientComposite().getBounds();
+		Rectangle caRect = clientAreaComposite.getBounds();
 
 		// NOTE: always starts in the persisted (or default) size
 		Point paneSize = getHostPane().getSize();
