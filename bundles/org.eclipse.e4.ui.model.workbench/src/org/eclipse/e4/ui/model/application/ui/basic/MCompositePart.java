@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.model.application.ui.MGenericTile;
  * of managing their internal structure.
  * </p>
  * @since 1.1
- * @noimplement This interface is not intended to be implemented by clients.
  * 
  * <!-- end-model-doc -->
  *
