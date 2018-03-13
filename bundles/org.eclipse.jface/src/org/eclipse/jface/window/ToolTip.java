@@ -47,7 +47,7 @@ public abstract class ToolTip {
 
 	private ToolTipOwnerControlListener listener;
 
-	private HashMap<String, Object> data;
+	private HashMap data;
 
 	// Ensure that only one tooltip is active in time
 	private static Shell CURRENT_TOOLTIP;
@@ -147,7 +147,7 @@ public abstract class ToolTip {
 	 */
 	public void setData(String key, Object value) {
 		if (data == null) {
-			data = new HashMap<String, Object>();
+			data = new HashMap();
 		}
 		data.put(key, value);
 	}
