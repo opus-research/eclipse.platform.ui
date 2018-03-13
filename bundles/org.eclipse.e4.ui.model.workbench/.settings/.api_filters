@@ -1,17 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<component id="org.eclipse.e4.ui.model.workbench" version="2">
+<?xml version="1.0" encoding="UTF-8"?><component id="org.eclipse.e4.ui.model.workbench" version="2">
     <resource path="META-INF/MANIFEST.MF">
         <filter comment="Bug 411257 - .api_description files in Kepler release do not contain @noreference" id="923795461">
             <message_arguments>
                 <message_argument value="1.0.0"/>
                 <message_argument value="1.0.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/eclipse/e4/ui/model/application/MApplication.java" type="org.eclipse.e4.ui.model.application.MApplication">
-        <filter comment="Added for Bug 421462" id="403853384">
-            <message_arguments>
-                <message_argument value="org.eclipse.e4.ui.model.application.MApplication"/>
             </message_arguments>
         </filter>
     </resource>
