@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,9 +25,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.Policy;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -118,7 +116,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	@Inject
 	private IPresentationEngine engine;
 
-	private EventHandler topWindowHandler;
 	private EventHandler shellUpdater;
 	private EventHandler visibilityHandler;
 	private EventHandler sizeHandler;
@@ -137,7 +134,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 
 		if (activePart != null) {
-			activePart.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
+			activePart.getTags().remove("active"); //$NON-NLS-1$
 
 			MUIElement parent = activePart.getParent();
 			if (parent == null && activePart.getCurSharedRef() != null) {
@@ -155,7 +152,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		activePart = p;
 
 		if (activePart != null) {
-			activePart.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+			activePart.getTags().add("active"); //$NON-NLS-1$
 			MUIElement parent = activePart.getParent();
 			if (parent == null && activePart.getCurSharedRef() != null) {
 				MPlaceholder ph = activePart.getCurSharedRef();
@@ -171,9 +168,9 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	private void styleStack(MPartStack stack, boolean active) {
 		if (!active)
-			stack.getTags().remove(CSSConstants.CSS_ACTIVE_CLASS);
+			stack.getTags().remove("active"); //$NON-NLS-1$
 		else
-			stack.getTags().add(CSSConstants.CSS_ACTIVE_CLASS);
+			stack.getTags().add("active"); //$NON-NLS-1$
 
 		if (stack.getWidget() != null)
 			setCSSInfo(stack, stack.getWidget());
@@ -210,32 +207,6 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	@PostConstruct
 	public void init() {
-		topWindowHandler = new EventHandler() {
-
-			public void handleEvent(Event event) {
-				// Ensure that this event is for a MApplication
-				if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MApplication))
-					return;
-				MWindow win = (MWindow) event
-						.getProperty(UIEvents.EventTags.NEW_VALUE);
-				if ((win == null) || !win.getTags().contains("topLevel")) //$NON-NLS-1$
-					return;
-				win.setToBeRendered(true);
-				if (!(win.getRenderer() == WBWRenderer.this))
-					return;
-				Shell shell = (Shell) win.getWidget();
-				if (shell.getMinimized()) {
-					shell.setMinimized(false);
-				}
-				shell.setActive();
-				shell.moveAbove(null);
-
-			}
-		};
-
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT,
-				topWindowHandler);
-
 		shellUpdater = new EventHandler() {
 			public void handleEvent(Event event) {
 				// Ensure that this event is for a MMenuItem
@@ -388,7 +359,6 @@ public class WBWRenderer extends SWTPartRenderer {
 
 	@PreDestroy
 	public void contextDisposed() {
-		eventBroker.unsubscribe(topWindowHandler);
 		eventBroker.unsubscribe(shellUpdater);
 		eventBroker.unsubscribe(visibilityHandler);
 		eventBroker.unsubscribe(sizeHandler);
@@ -490,7 +460,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return wbwShell;
 			}
 		});
-		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+		localContext.set(ISaveHandler.class, new ISaveHandler() {
 			public Save promptToSave(MPart dirtyPart) {
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
@@ -518,9 +488,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				}
 				return response;
 			}
-		};
-		saveHandler.logger = logger;
-		localContext.set(ISaveHandler.class, saveHandler);
+		});
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());

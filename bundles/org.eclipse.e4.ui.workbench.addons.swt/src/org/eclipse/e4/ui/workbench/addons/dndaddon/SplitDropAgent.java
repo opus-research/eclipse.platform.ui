@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -277,11 +277,11 @@ public class SplitDropAgent extends DropAgent {
 
 		float pct = (float) (onEdge ? 0.34 : 0.50);
 
-		clearFeedback();
+		if (feedback != null)
+			feedback.dispose();
 
 		feedback = new SplitFeedbackOverlay(dropCTF.getShell(), feedbackBounds, side, pct,
 				getEnclosed(), getModified());
-		feedback.setVisible(true);
 	}
 
 	private void clearFeedback() {
