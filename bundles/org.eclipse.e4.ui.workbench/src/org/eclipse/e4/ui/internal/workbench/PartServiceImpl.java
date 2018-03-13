@@ -1228,7 +1228,23 @@ public class PartServiceImpl implements EPartService {
 
 	public boolean saveAll(boolean confirm) {
 		Collection<MPart> dirtyParts = getDirtyParts();
-		if (dirtyParts.isEmpty()) {
+		return saveParts(dirtyParts, confirm);
+	}
+
+	/**
+	 * Saves the contents of all dirty parts and returns whether the operation completed.
+	 * 
+	 * @param dirtyParts
+	 *            a collection of dirty parts
+	 * @param confirm
+	 *            <code>true</code> if the user should be prompted prior to saving the changes, and
+	 *            <code>false</code> to save changes without asking
+	 * @return <code>true</code> if the operation completed successfully, <code>false</code> if the
+	 *         user canceled the operation or if an error occurred while saving the changes
+	 */
+	public boolean saveParts(Collection<MPart> dirtyParts, boolean confirm) {
+		// TODO: this method should become part of EPartService in Luna
+		if (dirtyParts == null || dirtyParts.isEmpty()) {
 			return true;
 		}
 		if (saveHandler != null) {
