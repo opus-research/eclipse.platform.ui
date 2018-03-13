@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -130,33 +130,13 @@ public class ZipLeveledStructureProvider implements
 	}
 
 	/*
-	 * Strip the leading directories from the path
-	 */
-	private String stripPath(String path) {
-		String pathOrig = new String(path);
-		for (int i = 0; i < stripLevel; i++) {
-			int firstSep = path.indexOf('/');
-			// If the first character was a separator we must strip to the next
-			// separator as well
-			if (firstSep == 0) {
-				path = path.substring(1);
-				firstSep = path.indexOf('/');
-			}
-			// No separator was present so we're in a higher directory right
-			// now
-			if (firstSep == -1) {
-				return pathOrig;
-			}
-			path = path.substring(firstSep);
-		}
-		return path;
-	}
-
-	/*
 	 * (non-Javadoc) Method declared on IImportStructureProvider
 	 */
 	public String getFullPath(Object element) {
-		return stripPath(((ZipEntry) element).getName());
+		IPath path = new Path(((ZipEntry) element).getName());
+		if (path.segmentCount() >= stripLevel)
+			path = path.removeFirstSegments(stripLevel);
+		return path.toString();
 	}
 
 	/*
@@ -167,7 +147,7 @@ public class ZipLeveledStructureProvider implements
 			return ((ZipEntry) element).getName();
 		}
 
-		return stripPath(new Path(((ZipEntry) element).getName()).lastSegment());
+		return new Path(((ZipEntry) element).getName()).lastSegment().toString();
 	}
 
 	/**
