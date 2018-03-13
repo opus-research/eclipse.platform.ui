@@ -21,8 +21,7 @@ import java.util.List;
  * <p>
  * Provisional for 4.3.
  * </p>
- * @noreference This interface is not intended to be referenced by clients
- * @since 1.0
+ * @noreference
  * <!-- end-model-doc -->
  *
  * <p>
@@ -34,6 +33,7 @@ import java.util.List;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MTrimContributions {
 

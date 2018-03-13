@@ -23,7 +23,6 @@ package org.eclipse.e4.ui.model.application.commands;
  * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
  * There is a GenModel/documentation node under each type and attribute.
  * </p>
- * @since 1.0
  * <!-- end-model-doc -->
  *
  * <p>
@@ -35,6 +34,7 @@ package org.eclipse.e4.ui.model.application.commands;
  *
  * @model interface="true" abstract="true"
  * @generated
+ * @since 1.0
  */
 public interface MKeySequence {
 	/**
