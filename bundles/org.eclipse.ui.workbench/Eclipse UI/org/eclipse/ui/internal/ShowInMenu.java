@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -226,16 +227,6 @@ public class ShowInMenu extends ContributionItem implements
 					CommandContributionItemParameter ccip = new CommandContributionItemParameter(
 							workbenchWindow, commandId, commandId,
 							CommandContributionItem.STYLE_PUSH);
-					String label = menuElement.getLabel();
-					if (label.length() > 0) {
-						ccip.label = label;
-						String mnemonics = menuElement.getMnemonics();
-						if (mnemonics != null && mnemonics.length() == 1) {
-							ccip.mnemonic = mnemonics;
-						} else {
-							ccip.mnemonic = label.substring(0, 1);
-						}
-					}
 					String iconURI = menuElement.getIconURI();
 					try {
 						ccip.icon = ImageDescriptor.createFromURL(new URL(iconURI));
@@ -277,15 +268,7 @@ public class ShowInMenu extends ContributionItem implements
 		ArrayList targetIds = new ArrayList();
 		WorkbenchPage page = (WorkbenchPage) getWindow().getActivePage();
 		if (page != null) {
-			String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
-			ArrayList<?> pagePartIds = page.getShowInPartIds();
-			for (Object pagePartId : pagePartIds) {
-				// Don't add own view, except when explicitly requested with
-				// IShowInTargetList below
-				if (!pagePartId.equals(srcId)) {
-					targetIds.add(pagePartId);
-				}
-			}
+			targetIds.addAll(page.getShowInPartIds());
 		}
 		IShowInTargetList targetList = getShowInTargetList(sourcePart);
 		if (targetList != null) {
@@ -313,10 +296,13 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	private IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
-
+		
 		if (window == null)
 			return null;
-
+		Shell shell = window.getShell();
+		if (shell == null || shell != shell.getDisplay().getActiveShell())
+			return null;
+		
 		IWorkbenchPage page = window.getActivePage();
 		if (page != null) {
 			return page.getActivePart();
@@ -384,14 +370,17 @@ public class ShowInMenu extends ContributionItem implements
 	 * Returns the view descriptors to show in the dialog.
 	 */
 	private IViewDescriptor[] getViewDescriptors(IWorkbenchPart sourcePart) {
+		String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
 		ArrayList ids = getShowInPartIds(sourcePart);
 		ArrayList descs = new ArrayList();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
 		for (Iterator i = ids.iterator(); i.hasNext();) {
 			String id = (String) i.next();
-			IViewDescriptor desc = reg.find(id);
-			if (desc != null) {
-				descs.add(desc);
+			if (!id.equals(srcId)) {
+				IViewDescriptor desc = reg.find(id);
+				if (desc != null) {
+					descs.add(desc);
+				}
 			}
 		}
 		return (IViewDescriptor[]) descs.toArray(new IViewDescriptor[descs
