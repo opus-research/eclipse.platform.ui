@@ -32,7 +32,6 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.ide.IDEInternalPreferences;
-import org.eclipse.ui.internal.ide.IDEPreferenceInitializer;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -148,6 +147,10 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		return item;
 	}
 
+	/**
+	 * @param event
+	 * @return
+	 */
 	private IResource getEditorInputResource(ExecutionEvent event) {
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
 		if (!(activePart instanceof IEditorPart)) {
@@ -211,11 +214,19 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 	/**
 	 * The default command for launching the system explorer on this platform.
 	 * 
-	 * @return The default command which launches the system explorer on this system, or an empty
-	 *         string if no default exists
+	 * @return The default command which launches the system explorer on this
+	 *         system, or an empty string if no default exists.
 	 */
 	public static String getDefaultCommand() {
-		// See https://bugs.eclipse.org/419940 why it is implemented in IDEPreferenceInitializer 
-		return IDEPreferenceInitializer.getShowInSystemExplorerCommand();
+		if (Util.isGtk()) {
+			return "dbus-send --print-reply --dest=org.freedesktop.FileManager1 /org/freedesktop/FileManager1 org.freedesktop.FileManager1.ShowItems array:string:\"${selected_resource_uri}\" string:\"\""; //$NON-NLS-1$
+		} else if (Util.isWindows()) {
+			return "explorer /E,/select=${selected_resource_loc}"; //$NON-NLS-1$
+		} else if (Util.isMac()) {
+			return "open -R \"${selected_resource_loc}\""; //$NON-NLS-1$
+		}
+
+		// if all else fails, return empty default
+		return ""; //$NON-NLS-1$
 	}
 }

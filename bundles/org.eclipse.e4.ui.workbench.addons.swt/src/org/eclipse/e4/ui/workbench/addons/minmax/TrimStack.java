@@ -33,7 +33,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -234,14 +233,6 @@ public class TrimStack {
 			if (changedElement instanceof MPerspectiveStack) {
 				showStack(false);
 				return;
-			}
-
-			if (changedElement instanceof MCompositePart) {
-				MPart innerPart = getLeafPart(changedElement);
-				if (innerPart != null) {
-					fixToolItemSelection();
-					return;
-				}
 			}
 
 			if (changedElement == getLeafPart(minimizedElement)) {

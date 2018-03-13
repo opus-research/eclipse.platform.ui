@@ -1164,15 +1164,32 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 			part = (MPart) ph.getRef();
 			part.setCurSharedRef(ph);
+
+			part = showPart(mode, part);
+
+			CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
+
+			if (compatibilityView != null) {
+				IWorkbenchPartReference ref = compatibilityView.getReference();
+
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+				legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+			}
+			return compatibilityView.getView();
 		}
 
 		part = showPart(mode, part);
 
-		ViewReference ref = getViewReference(part);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
-		legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		CompatibilityView compatibilityView = (CompatibilityView) part.getObject();
 
-		return (IViewPart) ref.getPart(true);
+		if (compatibilityView != null) {
+			IWorkbenchPartReference ref = compatibilityView.getReference();
+
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), ref, CHANGE_VIEW_SHOW);
+			legacyWindow.firePerspectiveChanged(this, getPerspective(), CHANGE_VIEW_SHOW);
+		}
+		return compatibilityView.getView();
+
 	}
 	private MPart showPart(int mode, MPart part) {
 		switch (mode) {
