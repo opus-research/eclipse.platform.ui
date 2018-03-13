@@ -402,9 +402,14 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
             return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
         }
         
-        if (image == null) {        
-            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-        }
+		if (image == null) {
+			if (legacyPart != null) {
+				image = legacyPart.getTitleImage();
+			}
+			if (image == null) {
+				image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
+			}
+		}
         return image;
     }
     
