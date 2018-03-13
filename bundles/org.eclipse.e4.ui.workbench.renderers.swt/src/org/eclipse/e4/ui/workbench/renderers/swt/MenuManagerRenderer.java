@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -52,7 +53,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.ExpressionContext;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -629,8 +629,8 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		Object obj = itemModel.getContributionItem();
 		if (obj instanceof IContextFunction) {
 			final IEclipseContext lclContext = getContext(itemModel);
-			ici = (IContributionItem) ((IContextFunction) obj)
-					.compute(lclContext, null);
+			ici = (IContributionItem) ((IContextFunction) obj).compute(
+					lclContext, null);
 			itemModel.setContributionItem(ici);
 		} else if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
