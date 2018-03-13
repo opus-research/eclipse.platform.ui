@@ -34,35 +34,34 @@ public class ListViewerComparatorTest extends ViewerComparatorTest {
 	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
 	 */
 	protected StructuredViewer createViewer(Composite parent) {
-        ListViewer<Object,Object> viewer = new ListViewer<Object,Object>(parent);
+        ListViewer viewer = new ListViewer(parent);
         viewer.setContentProvider(new TeamModelContentProvider());
         viewer.setLabelProvider(new TeamModelLabelProvider());
-        comparatorTestViewer = viewer;
         return viewer;
 	}
-
+	
 	public void testViewerSorter(){
-		comparatorTestViewer.setSorter(new ViewerSorter());
+		fViewer.setSorter(new ViewerSorter());
 		assertSortedResult(TEAM1_SORTED);
 	}
-
+	
 	public void testViewerSorterInsertElement(){
-		comparatorTestViewer.setSorter(new ViewerSorter());
+		fViewer.setSorter(new ViewerSorter());
 		team1.addMember("Duong");
 		assertSortedResult(TEAM1_SORTED_WITH_INSERT);
 	}
-
+	
 	public void testViewerComparator(){
-		comparatorTestViewer.setComparator(new ViewerComparator<Object,Object>());
+		fViewer.setComparator(new ViewerComparator());
 		assertSortedResult(TEAM1_SORTED);
 	}
-
+	
 	public void testViewerComparatorInsertElement(){
-		comparatorTestViewer.setComparator(new ViewerComparator<Object,Object>());
+		fViewer.setComparator(new ViewerComparator());
 		team1.addMember("Duong");
 		assertSortedResult(TEAM1_SORTED_WITH_INSERT);
 	}
-
+	
 	private void assertSortedResult(String[] expected){
 		String[] items = getListViewer().getList().getItems();
 		for (int i = 0; i < items.length; i++){
@@ -70,15 +69,15 @@ public class ListViewerComparatorTest extends ViewerComparatorTest {
 			assertEquals("Item not expected.  actual=" + item + " expected=", expected[i], item);
 		}
 	}
-
+	
 	protected void setInput() {
-		comparatorTestViewer.setInput(team1);
+		fViewer.setInput(team1);
 	}
-
-	protected ListViewer<Object,Object> getListViewer(){
-		return (ListViewer<Object,Object>)comparatorTestViewer;
+	
+	protected ListViewer getListViewer(){
+		return (ListViewer)fViewer;
 	}
-
+	
 	/**
 	 * @param args
 	 */

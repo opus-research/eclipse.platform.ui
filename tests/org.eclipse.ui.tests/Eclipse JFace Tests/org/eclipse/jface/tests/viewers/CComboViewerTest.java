@@ -24,9 +24,9 @@ public class CComboViewerTest extends StructuredViewerTest {
         super(name);
     }
 
-    protected StructuredViewer<TestElement,TestElement> createViewer(Composite parent) {
+    protected StructuredViewer createViewer(Composite parent) {
     	CCombo cCombo = new CCombo(parent, SWT.READ_ONLY | SWT.BORDER);
-        ComboViewer<TestElement,TestElement> viewer = new ComboViewer<TestElement,TestElement>(cCombo);
+        ComboViewer viewer = new ComboViewer(cCombo);
         viewer.setContentProvider(new TestModelContentProvider());
         return viewer;
     }
@@ -47,7 +47,7 @@ public class CComboViewerTest extends StructuredViewerTest {
     }
 
     /**
-     * TODO: Determine if this test is applicable to ComboViewer
+     * TODO: Determine if this test is applicable to ComboViewer 
      */
     public void testInsertChild() {
 

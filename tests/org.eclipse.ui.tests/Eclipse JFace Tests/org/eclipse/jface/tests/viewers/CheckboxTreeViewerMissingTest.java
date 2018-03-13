@@ -30,13 +30,13 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
 
     public static class CheckboxMissingTableTestLabelProvider extends
             CheckboxTreeViewerTest.CheckboxTableTestLabelProvider implements
-            ITableLabelProvider<TestElement> {
+            ITableLabelProvider {
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see org.eclipse.jface.tests.viewers.StructuredViewerTest.TestLabelProvider#getImage(java.lang.Object)
          */
-        public Image getImage(TestElement element) {
+        public Image getImage(Object element) {
             return getMissingImage();
         }
 
@@ -50,13 +50,13 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
      *  (non-Javadoc)
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#getTestLabelProvider()
      */
-    public IBaseLabelProvider<TestElement> getTestLabelProvider() {
+    public IBaseLabelProvider getTestLabelProvider() {
         return new CheckboxMissingTableTestLabelProvider();
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#tearDown()
      */
     public void tearDown() {
