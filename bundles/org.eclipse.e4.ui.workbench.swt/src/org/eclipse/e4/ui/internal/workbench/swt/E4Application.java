@@ -104,7 +104,6 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
-	private static final String PERSPECTIVE_ARG_NAME = "perspective";
 
 	private String[] args;
 
@@ -240,7 +239,7 @@ public class E4Application implements IApplication {
 			}
 		}
 
-		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
+		String forcedPerspectiveId = getArgValue("perspective",
 				applicationContext, false);
 		if (forcedPerspectiveId != null) {
 			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,

@@ -40,7 +40,7 @@ public class TableViewerComparatorTest extends ViewerComparatorTest {
 	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
 	 */
 	protected StructuredViewer createViewer(Composite parent) {
-		TableViewer<Object,Object> viewer = new TableViewer<Object,Object>(parent);
+		TableViewer viewer = new TableViewer(parent);
 		viewer.setContentProvider(new TeamModelContentProvider());
 		viewer.setLabelProvider(new TeamModelLabelProvider());
 		viewer.getTable().setLinesVisible(true);
@@ -62,32 +62,32 @@ public class TableViewerComparatorTest extends ViewerComparatorTest {
 			tc.setText(headers[i]);
 			columns[i] = tc;
 		}
-		comparatorTestViewer = viewer;
+
 		return viewer;
 	}
-
+	
 	public void testViewerSorter(){
-		comparatorTestViewer.setSorter(new ViewerSorter());
+		fViewer.setSorter(new ViewerSorter());
 		assertSortedResult(TEAM1_SORTED);
 	}
-
+	
 	public void testViewerSorterInsertElement(){
-		comparatorTestViewer.setSorter(new ViewerSorter());
+		fViewer.setSorter(new ViewerSorter());
 		team1.addMember("Duong");
 		assertSortedResult(TEAM1_SORTED_WITH_INSERT);
 	}
-
+	
 	public void testViewerComparator(){
-		comparatorTestViewer.setComparator(new ViewerComparator<Object,Object>());
+		fViewer.setComparator(new ViewerComparator());
 		assertSortedResult(TEAM1_SORTED);
 	}
-
+	
 	public void testViewerComparatorInsertElement(){
-		comparatorTestViewer.setComparator(new ViewerComparator<Object,Object>());
+		fViewer.setComparator(new ViewerComparator());
 		team1.addMember("Duong");
 		assertSortedResult(TEAM1_SORTED_WITH_INSERT);
 	}
-
+	
 	private void assertSortedResult(String[] expected){
 		TableItem[] items = getTableViewer().getTable().getItems();
 		for (int i = 0; i < items.length; i++){
@@ -95,15 +95,15 @@ public class TableViewerComparatorTest extends ViewerComparatorTest {
 			assertEquals("Item not expected.  actual=" + item.getText() + " expected=", expected[i], item.getText());
 		}
 	}
-
+	
 	protected void setInput() {
-		comparatorTestViewer.setInput(team1);
+		fViewer.setInput(team1);
 	}
-
-	protected TableViewer<Object,Object> getTableViewer(){
-		return (TableViewer<Object,Object>)comparatorTestViewer;
+	
+	protected TableViewer getTableViewer(){
+		return (TableViewer)fViewer;
 	}
-
+	
 	/**
 	 * @param args
 	 */
