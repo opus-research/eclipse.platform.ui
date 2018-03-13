@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,6 +87,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
 	 * The <code>selectionGroup</code> field should have been created with a
 	 * private modifier. Subclasses should not access this field directly.
+	 * 
+	 * @noreference This field is not intended to be referenced by clients.
 	 */
     protected ResourceTreeAndListGroup selectionGroup;
 
@@ -134,6 +136,20 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
 
     }
 
+    /**
+     * Sets the root of the tree and list selection group to be the given object.
+     * Has no effect if the tree and list group has not been created yet.
+     * 
+     * @param newRoot the new root
+     * @see FileSystemElement
+     * @since 3.10
+     */
+    protected void setFileSelectionRoot(Object newRoot) {
+    	if(selectionGroup != null) {
+    		selectionGroup.setRoot(newRoot);
+    	}
+    }
+    
     /**
      * The <code>WizardResourceImportPage</code> implementation of this 
      * <code>WizardDataTransferPage</code> method returns <code>true</code>. 
@@ -319,10 +335,8 @@ public abstract class WizardResourceImportPage extends WizardDataTransferPage {
     /**
      * Returns this page's list of currently-specified resources to be 
      * imported filtered by the IElementFilter.
-     *
      */
-    protected void getSelectedResources(IElementFilter filter,
-            IProgressMonitor monitor) throws InterruptedException {
+    protected void getSelectedResources(IElementFilter filter, IProgressMonitor monitor) throws InterruptedException {
         this.selectionGroup.getAllCheckedListItems(filter, monitor);
     }
 
