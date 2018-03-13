@@ -40,11 +40,8 @@ public class TabbedPropertySheetTitleProvider extends LabelProvider {
 		IWorkbenchPart part = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage().findView(ProjectExplorer.VIEW_ID);
 
-		INavigatorContentService contentService = null;
-		if (part != null) {
-			contentService = (INavigatorContentService) part
+		INavigatorContentService contentService = (INavigatorContentService) part
 				.getAdapter(INavigatorContentService.class);
-		}
 
 		if (contentService != null) {
 			labelProvider = contentService.createCommonLabelProvider();
