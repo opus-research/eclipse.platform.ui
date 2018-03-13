@@ -75,6 +75,7 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
 import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRendererFilter;
 import org.eclipse.e4.ui.workbench.renderers.swt.TrimBarLayout;
+import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.CoolBarManager;
@@ -107,6 +108,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
@@ -1690,6 +1692,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		perspectiveListeners.removePerspectiveListener(l);
 	}
 
+	private void disableControl(Control ctrl, List<Control> toEnable) {
+		if (ctrl != null && !ctrl.isDisposed() && ctrl.isEnabled()) {
+			ctrl.setEnabled(false);
+			toEnable.add(ctrl);
+		}
+	}
+
 	/*
 	 * (non-Javadoc) Method declared on IRunnableContext.
 	 */
@@ -1703,7 +1712,40 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			runnable.run(new NullProgressMonitor());
 		} else {
 			boolean wasCancelEnabled = manager.isCancelEnabled();
+			boolean enableMainMenu = false;
+			List<Control> toEnable = new ArrayList<Control>();
 			try {
+				Menu mainMenu = (Menu) model.getMainMenu().getWidget();
+				if (mainMenu != null && !mainMenu.isDisposed() && mainMenu.isEnabled()) {
+					mainMenu.setEnabled(false);
+					enableMainMenu = true;
+				}				
+				
+				// disable child shells
+				Shell theShell = getShell();
+				for (Shell childShell : theShell.getShells()) {
+					disableControl(childShell, toEnable);
+				}
+				
+				//Disable the presentation (except the bottom trim)
+				TrimmedPartLayout tpl = (TrimmedPartLayout) getShell().getLayout();
+				disableControl(tpl.clientArea, toEnable);
+				disableControl(tpl.top, toEnable);
+				disableControl(tpl.left, toEnable);
+				disableControl(tpl.right, toEnable);
+				
+				// Disable everything in the bottom trim except the status line
+				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
+					MUIElement statusLine = modelService.find("StatusLine", model); //$NON-NLS-1$
+					if (statusLine != null && statusLine.getWidget() instanceof Control) {
+						Control slCtrl = (Control) statusLine.getWidget();
+						for (Control bottomCtrl : tpl.bottom.getChildren()) {
+							if (bottomCtrl != slCtrl)
+								disableControl(bottomCtrl, toEnable);
+						}		
+					}
+				}
+
 				manager.setCancelEnabled(cancelable);
 
 				final InvocationTargetException[] ite = new InvocationTargetException[1];
@@ -1731,6 +1773,18 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				}
 			} finally {
 				manager.setCancelEnabled(wasCancelEnabled);
+
+				// re-enable the main menu if necessary
+				if (enableMainMenu) {
+					Menu mainMenu = (Menu) model.getMainMenu().getWidget();
+					mainMenu.setEnabled(true);
+				}
+				
+				// Re-enable any disabled controls
+				for (Control ctrl : toEnable) {
+					if (!ctrl.isDisposed())
+						ctrl.setEnabled(true);
+				}
 			}
 		}
 	}
