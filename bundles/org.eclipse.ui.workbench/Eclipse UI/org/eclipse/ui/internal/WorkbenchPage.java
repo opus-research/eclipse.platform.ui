@@ -3125,9 +3125,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		partService.showPart(editor, PartState.VISIBLE);
 
 		CompatibilityEditor compatibilityEditor = (CompatibilityEditor) editor.getObject();
-		if (compatibilityEditor == null) {
-			return null;
-		}
 
 		if (activate) {
 			partService.activate(editor);
