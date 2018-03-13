@@ -43,7 +43,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -158,9 +157,6 @@ public class ModelServiceImpl implements EModelService {
 		}
 		if (MCommandParameter.class.equals(elementType)) {
 			return (T) MCommandsFactory.INSTANCE.createCommandParameter();
-		}
-		if (MCompositePart.class.equals(elementType)) {
-			return (T) MBasicFactory.INSTANCE.createCompositePart();
 		}
 		if (MCoreExpression.class.equals(elementType)) {
 			return (T) MUiFactory.INSTANCE.createCoreExpression();
@@ -755,10 +751,6 @@ public class ModelServiceImpl implements EModelService {
 		} else {
 			MPartSashContainer newSash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			newSash.setHorizontal(horizontal);
-			
-			// Maintain the existing weight in the new sash
-			newSash.setContainerData(relTo.getContainerData());
-			
 			combine(toInsert, relTo, newSash, insertBefore, ratio);
 		}
 
