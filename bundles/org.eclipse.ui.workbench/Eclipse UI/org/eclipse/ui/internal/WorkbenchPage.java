@@ -3062,10 +3062,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		EditorDescriptor descriptor = (EditorDescriptor) getWorkbenchWindow().getWorkbench()
 				.getEditorRegistry().findEditor(editorId);
-		if (descriptor == null) {
-			throw new PartInitException(NLS.bind(
-					WorkbenchMessages.EditorManager_unknownEditorIDMessage, editorId));
-		}
 
 		setEditorAreaVisible(true);
 
@@ -3083,8 +3079,15 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				activate(editor);
 			}
 
+			if (descriptor == null) {
+				descriptor = ((EditorReference) editorReferences[0]).getDescriptor();
+			}
 			recordEditor(input, descriptor);
+
 			return editor;
+		} else if (descriptor == null) {
+			throw new PartInitException(NLS.bind(
+					WorkbenchMessages.EditorManager_unknownEditorIDMessage, editorId));
 		} else if (descriptor.isInternal()) {
 			// look for an editor to reuse
 			EditorReference reusableEditorRef = (EditorReference) ((TabBehaviour) Tweaklets
