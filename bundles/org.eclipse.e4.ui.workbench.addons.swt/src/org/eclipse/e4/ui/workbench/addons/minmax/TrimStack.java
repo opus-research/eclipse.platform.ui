@@ -81,6 +81,12 @@ public class TrimStack {
 
 	private static final String RESTORE_ICON_URI = "platform:/plugin/org.eclipse.e4.ui.workbench.addons.swt/icons/full/etool16/fastview_restore.gif"; //$NON-NLS-1$
 
+	/**
+	 * If the minimized shared editor area is empty, the editor area tool item will have a non null
+	 * data entry with this key (toolItem.getData(EMPTY_EDITOR_AREA) != null)
+	 */
+	private static final String EMPTY_EDITOR_AREA = "KEY_EMPTY_EDITOR_AREA"; //$NON-NLS-1$
+
 	static final String STATE_XSIZE = "XSize"; //$NON-NLS-1$
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
@@ -516,8 +522,7 @@ public class TrimStack {
 				} else if (data instanceof MPerspective) {
 					// A perspective in a perspective stack (for now we just support restore)
 					createEmtpyEditorAreaMenu();
-				} else if (isEditorStack()) {
-					// An empty editor area
+				} else if (isEditorStack() && selectedToolItem.getData(EMPTY_EDITOR_AREA) != null) {
 					createEmtpyEditorAreaMenu();
 				}
 			}
@@ -732,9 +737,16 @@ public class TrimStack {
 		}
 
 		if (isEditorStack() && trimStackTB.getItemCount() == 1) {
+			MPart data = getLeafPart(minimizedElement);
 			ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
 			ti.setToolTipText(Messages.TrimStack_SharedAreaTooltip);
 			ti.setImage(getLayoutImage());
+			if (data != null) {
+				ti.setData(data);
+			} else {
+				// empty editor area, add keyed data so we can recognize it
+				ti.setData(EMPTY_EDITOR_AREA, EMPTY_EDITOR_AREA);
+			}
 			ti.addSelectionListener(toolItemSelectionListener);
 		} else if (minimizedElement instanceof MGenericStack<?>) {
 			// Handle *both* PartStacks and PerspectiveStacks here...
