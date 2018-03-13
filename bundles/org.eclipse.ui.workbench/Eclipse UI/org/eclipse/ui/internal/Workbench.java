@@ -1618,6 +1618,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "Workbench"); //$NON-NLS-1$
 		}
 
+		// forceOpenPerspective();
+
 		return true;
 	}
 

@@ -121,7 +121,6 @@ import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPageService;
 import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
@@ -567,11 +566,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 		cs.getActiveContextIds();
 
-		String title = getWindowConfigurer().basicGetTitle();
-		if (title != null) {
-			getShell().setText(TextProcessor.process(title, TEXT_DELIMITERS));
-		}
-		workbench.getHelpSystem().setHelp(getShell(), IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
+		configureShell(getShell(), windowContext);
 
 		initializeDefaultServices();
 
@@ -595,7 +590,22 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		fillActionBars(FILL_ALL_ACTION_BARS);
 		firePageOpened();
 
-		boolean newWindow = setupPerspectiveStack();
+		List<MPerspectiveStack> ps = modelService.findElements(model, null,
+				MPerspectiveStack.class, null);
+		MPerspective curPersp = null;
+		boolean newWindow = true;
+		if (ps.size() > 0) {
+			MPerspectiveStack stack = ps.get(0);
+			if (stack.getSelectedElement() != null) {
+				curPersp = stack.getSelectedElement();
+				IPerspectiveDescriptor thePersp = getWorkbench().getPerspectiveRegistry()
+						.findPerspectiveWithId(curPersp.getElementId());
+				if (thePersp != null) {
+					perspective = thePersp;
+					newWindow = false;
+				}
+			}
+		}
 
 		populateTopTrimContributions();
 		populateBottomTrimContributions();
@@ -691,54 +701,17 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		trackShellActivation();
 	}
 
-	private boolean setupPerspectiveStack() {
-		List<MPerspectiveStack> ps = modelService.findElements(model, null,
-				MPerspectiveStack.class, null);
-		IPerspectiveRegistry perspRegistry = getWorkbench().getPerspectiveRegistry();
-		boolean newWindow = true;
-
-		if (ps.size() > 0) {
-			MPerspectiveStack stack = ps.get(0);
-			if (stack.getSelectedElement() != null) {
-				MPerspective curPersp = stack.getSelectedElement();
-				IPerspectiveDescriptor thePersp = perspRegistry
-						.findPerspectiveWithId(curPersp.getElementId());
-				if (thePersp != null) {
-					perspective = thePersp;
-					newWindow = false;
-				}
-			} else {
-				// No perspectives...do we have an override ?
-				IPerspectiveDescriptor perspOverride = getPerspectiveOverride();
-				if (perspOverride != null) {
-					perspective = perspOverride;
-				}
-			}
+	private void configureShell(Shell shell, IEclipseContext context) {
+		String title = getWindowConfigurer().basicGetTitle();
+		if (title != null) {
+			shell.setText(TextProcessor.process(title, TEXT_DELIMITERS));
 		}
+		workbench.getHelpSystem().setHelp(shell, IWorkbenchHelpContextIds.WORKBENCH_WINDOW);
 
-		if (perspective == null) {
-			perspective = perspRegistry
-					.findPerspectiveWithId(perspRegistry.getDefaultPerspective());
-		}
-
-		return newWindow;
+		IContextService contextService = context.get(IContextService.class);
+		contextService.registerShell(shell, IContextService.TYPE_WINDOW);
 	}
-
-	private IPerspectiveDescriptor getPerspectiveOverride() {
-		String perspId = null;
-		String[] commandLineArgs = Platform.getCommandLineArgs();
-		for (int i = 0; i < commandLineArgs.length - 1; i++) {
-			if (commandLineArgs[i].equalsIgnoreCase("-perspective")) { //$NON-NLS-1$
-				perspId = commandLineArgs[i + 1];
-				break;
-			}
-		}
-		if (perspId == null) {
-			return null;
-		}
-		return getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspId);
-	}
-
+	
 	private boolean manageChanges = true;
 	private boolean canUpdateMenus = true;
 
