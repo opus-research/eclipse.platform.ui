@@ -383,7 +383,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			manager.setOverrides(overrides);
 			linkModelToManager((MToolBar) element, manager);
 		}
-		ToolBar bar = manager.createControl(parent, orientation);
+		ToolBar bar = manager.createControl(parent);
 		bar.setData(manager);
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
 		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);

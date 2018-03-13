@@ -51,7 +51,7 @@ public class ToolBarManager extends ContributionManager implements
 
 	/**
 	 * The menu manager to the context menu associated with the toolbar.
-	 *
+	 * 
 	 * @since 3.0
 	 */
 	private MenuManager contextMenuManager = null;
@@ -59,7 +59,7 @@ public class ToolBarManager extends ContributionManager implements
 	/**
 	 * Creates a new tool bar manager with the default SWT button style. Use the
 	 * {@link #createControl(Composite)} method to create the tool bar control.
-	 *
+	 * 
 	 */
 	public ToolBarManager() {
 		//Do nothing if there are no parameters
@@ -68,7 +68,7 @@ public class ToolBarManager extends ContributionManager implements
 	/**
 	 * Creates a tool bar manager with the given SWT button style. Use the
 	 * <code>createControl</code> method to create the tool bar control.
-	 *
+	 * 
 	 * @param style
 	 *            the tool bar item style
 	 * @see org.eclipse.swt.widgets.ToolBar for valid style bits
@@ -86,7 +86,7 @@ public class ToolBarManager extends ContributionManager implements
 	 * JFace.
 	 * @see #ToolBarManager()
 	 * @see #ToolBarManager(int)
-	 *
+	 * 
 	 * @param toolbar
 	 *            the tool bar control
 	 */
@@ -96,62 +96,31 @@ public class ToolBarManager extends ContributionManager implements
 	}
 
 	/**
-	 * Creates and returns this manager's tool bar control. Does not create
-	 * a new control if one with the same parent already exists and its orientation
-	 * is the same as in the initial style. Before creating a new control,
-	 * the previous one (if any) is disposed.
-	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
-	 *
+	 * Creates and returns this manager's tool bar control. Does not create a
+	 * new control if one already exists. Also create an {@link AccessibleListener}
+	 * for the {@link ToolBar}.
+	 * 
 	 * @param parent
 	 *            the parent control
 	 * @return the tool bar control
 	 */
 	public ToolBar createControl(Composite parent) {
-		int currenOrientation = (itemStyle & SWT.VERTICAL) != 0 ? SWT.VERTICAL : SWT.HORIZONTAL;
-		return createControl(parent, currenOrientation);
-	}
-
-	/**
-	 * Creates and returns this manager's tool bar control. Does not create
-	 * a new control if one with the same parent and orientation already exists.
-	 * Before creating a new control, the previous one (if any) is disposed.
-	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
-	 *
-	 * @param parent
-	 *            the parent control
-	 * @param orientation
-	 *            orientation of the tool bar: {@code SWT.HORIZONTAL} or {@code SWT.VERTICAL}
-	 * @return the tool bar control
-	 */
-	public ToolBar createControl(Composite parent, int orientation) {
-		if (toolBarExist() && parent != null &&
-				(parent != toolBar.getParent() || (orientation & toolBar.getStyle()) == 0)) {
-			dispose();
-		}
-
 		if (!toolBarExist() && parent != null) {
-			int style = itemStyle;
-			if ((style & orientation) == 0) {
-				style &= ~SWT.HORIZONTAL & ~SWT.VERTICAL;
-				style |= orientation;
-			}
-			toolBar = new ToolBar(parent, style);
+			toolBar = new ToolBar(parent, itemStyle);
 			toolBar.setMenu(getContextMenuControl());
 			update(true);
-
+			
 			toolBar.getAccessible().addAccessibleListener(getAccessibleListener());
 		}
 
 		return toolBar;
 	}
 
-
-
 	/**
 	 * Get the accessible listener for the tool bar.
-	 *
+	 * 
 	 * @return AccessibleListener
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private AccessibleListener getAccessibleListener() {
@@ -199,7 +168,7 @@ public class ToolBarManager extends ContributionManager implements
 
 	/**
 	 * Returns the tool bar control for this manager.
-	 *
+	 * 
 	 * @return the tool bar control, or <code>null</code> if none (before
 	 *         creating or after disposal)
 	 */
@@ -212,7 +181,7 @@ public class ToolBarManager extends ContributionManager implements
 	 * <p>
 	 * The default implementation of this framework method re-lays out the
 	 * parent when the number of items are different and the new count != 0
-	 *
+	 * 
 	 * @param layoutBar
 	 *            the tool bar control
 	 * @param oldCount
@@ -225,14 +194,14 @@ public class ToolBarManager extends ContributionManager implements
 			Point beforePack = layoutBar.getSize();
 			layoutBar.pack(true);
 			Point afterPack = layoutBar.getSize();
-
+			
 			// If the TB didn't change size then we're done
 			if (beforePack.equals(afterPack))
 				return;
-
+			
 			// OK, we need to re-layout the TB
 			layoutBar.getParent().layout();
-
+			
 			// Now, if we're in a CoolBar then change the CoolItem size as well
 			if (layoutBar.getParent() instanceof CoolBar) {
 				CoolBar cb = (CoolBar) layoutBar.getParent();
@@ -251,7 +220,7 @@ public class ToolBarManager extends ContributionManager implements
 
 	/**
 	 * Returns whether the tool bar control is created and not disposed.
-	 *
+	 * 
 	 * @return <code>true</code> if the control is created and not disposed,
 	 *         <code>false</code> otherwise
 	 */
@@ -316,7 +285,7 @@ public class ToolBarManager extends ContributionManager implements
 					// there may be null items in a toolbar
 					if (mi[i] == null)
 						continue;
-
+					
 					Object data = mi[i].getData();
 					if (data == null
 							|| !clean.contains(data)
@@ -413,11 +382,11 @@ public class ToolBarManager extends ContributionManager implements
                 }
 
 				int newCount = toolBar.getItemCount();
-
+				
 				// If we're forcing a change then ensure that we re-layout everything
 				if (force)
 					oldCount = newCount+1;
-
+				
 				relayout(toolBar, oldCount, newCount);
 			}
 
@@ -433,7 +402,7 @@ public class ToolBarManager extends ContributionManager implements
 	/**
 	 * Returns the control of the Menu Manager. If the menu manager does not
 	 * have a control then one is created.
-	 *
+	 * 
 	 * @return menu widget associated with manager
 	 */
 	private Menu getContextMenuControl() {
@@ -449,7 +418,7 @@ public class ToolBarManager extends ContributionManager implements
 
 	/**
 	 * Returns the context menu manager for this tool bar manager.
-	 *
+	 * 
 	 * @return the context menu manager, or <code>null</code> if none
 	 * @since 3.0
 	 */
@@ -461,7 +430,7 @@ public class ToolBarManager extends ContributionManager implements
 	 * Sets the context menu manager for this tool bar manager to the given menu
 	 * manager. If the tool bar control exists, it also adds the menu control to
 	 * the tool bar.
-	 *
+	 * 
 	 * @param contextMenuManager
 	 *            the context menu manager, or <code>null</code> if none
 	 * @since 3.0
@@ -475,14 +444,14 @@ public class ToolBarManager extends ContributionManager implements
 
 	private boolean isChildVisible(IContributionItem item) {
 		Boolean v;
-
+		
 		IContributionManagerOverrides overrides = getOverrides();
 		if(overrides == null) {
 			v = null;
 		} else {
-			v = getOverrides().getVisible(item);
+			v = getOverrides().getVisible(item); 
 		}
-
+		
 		if (v != null) {
 			return v.booleanValue();
 		}
