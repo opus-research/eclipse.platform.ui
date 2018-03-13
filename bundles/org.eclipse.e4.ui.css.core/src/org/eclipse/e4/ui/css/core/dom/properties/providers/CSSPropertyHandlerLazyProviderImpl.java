@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2012 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
- *     Red Hat Inc. (mistria) - Fixes suggested by FindBugs
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.dom.properties.providers;
 
@@ -132,15 +131,15 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	 * @return
 	 */
 	protected String getHandlerClassName(String property) {
-		StringBuilder handlerClassName = new StringBuilder("CSSProperty"); //$NON-NLS-1$
-		String[] s = StringUtils.split(property, "-"); //$NON-NLS-1$
+		String handlerClassName = "CSSProperty";
+		String[] s = StringUtils.split(property, "-");
 		for (int i = 0; i < s.length; i++) {
 			String p = s[i];
-			handlerClassName.append(p.substring(0, 1).toUpperCase());
-			handlerClassName.append(p.substring(1));
+			p = p.substring(0, 1).toUpperCase() + p.substring(1, p.length());
+			handlerClassName += p;
 		}
-		handlerClassName.append("Handler"); //$NON-NLS-1$
-		return handlerClassName.toString();
+		handlerClassName += "Handler";
+		return handlerClassName;
 	}
 
 	/*
