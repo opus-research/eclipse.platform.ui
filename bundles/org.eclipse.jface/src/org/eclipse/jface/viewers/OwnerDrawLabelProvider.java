@@ -79,6 +79,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 *             in this class will set up the necessary owner draw callbacks
 	 *             automatically. Calls to this method can be removed.
 	 */
+	@Deprecated
 	public static void setUpOwnerDraw(final ColumnViewer viewer) {
 		getOrCreateOwnerDrawListener(viewer).enabledGlobally++;
 	}
@@ -106,6 +107,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 
 	}
 
+	@Override
 	public void dispose(ColumnViewer viewer, ViewerColumn column) {
 		if (!viewer.getControl().isDisposed()) {
 			setOwnerDrawEnabled(viewer, column, false);
@@ -122,6 +124,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 	 * implementation or, alternatively,
 	 * {@link #initialize(ColumnViewer, ViewerColumn, boolean)}.
 	 */
+	@Override
 	protected void initialize(ColumnViewer viewer, ViewerColumn column) {
 		this.initialize(viewer, column, true);
 	}
@@ -151,6 +154,7 @@ public abstract class OwnerDrawLabelProvider extends CellLabelProvider {
 		setOwnerDrawEnabled(viewer, column, enableOwnerDraw);
 	}
 
+	@Override
 	public void update(ViewerCell cell) {
 		// Force a redraw
 		Rectangle cellBounds = cell.getBounds();
