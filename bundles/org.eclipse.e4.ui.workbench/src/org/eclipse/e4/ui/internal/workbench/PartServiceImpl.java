@@ -28,7 +28,6 @@ import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -156,15 +155,7 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	void setPart(@Optional @Named(IServiceConstants.ACTIVE_PART) MPart p) {
 		if (activePart != p) {
-			MPart lastActivePart = activePart;
-			activePart = p;
-
-			// no need to do anything if we have no listeners
-			if (constructed && !listeners.isEmpty()) {
-				if (lastActivePart != null && lastActivePart != activePart) {
-					firePartDeactivated(lastActivePart);
-				}
-			}
+			activate(p, true, true);
 		}
 	}
 
@@ -521,6 +512,11 @@ public class PartServiceImpl implements EPartService {
 				modelService.bringToTop(perspective);
 				perspective.getContext().activate();
 			} else {
+				// Ensure that the topmost editor doesn't change
+				if ((modelService.getElementLocation(newActivePart) & EModelService.IN_SHARED_AREA) != 0) {
+					if (newActivePart.getParent().getSelectedElement() != newActivePart)
+						newActivePart = (MPart) newActivePart.getParent().getSelectedElement();
+				}
 				activate(newActivePart, true, false);
 			}
 		}
@@ -549,6 +545,14 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void activate(MPart part, boolean requiresFocus, boolean activateBranch) {
+		if (part == null) {
+			if (constructed && activePart != null) {
+				firePartDeactivated(activePart);
+			}
+			activePart = part;
+			return;
+		}
+
 		// only activate parts that is under our control
 		if (!isInContainer(part)) {
 			return;
@@ -567,6 +571,14 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
+
+		MPart lastActivePart = activePart;
+		activePart = part;
+
+		if (constructed && lastActivePart != null && lastActivePart != activePart) {
+			firePartDeactivated(lastActivePart);
+		}
+
 		try {
 			// record any sibling into the activation history if necessary, this will allow it to be
 			// reselected again in the future as it will be an activation candidate in the future,
@@ -580,18 +592,11 @@ public class PartServiceImpl implements EPartService {
 
 			partActivationHistory.activate(part, activateBranch);
 
-			Object object = part.getObject();
-			if (object != null && requiresFocus) {
-				try {
-					ContextInjectionFactory.invoke(object, Focus.class, part.getContext(), null);
-				} catch (InjectionException e) {
-					log("Failed to grant focus to part", "Failed to grant focus to part ({0})", //$NON-NLS-1$ //$NON-NLS-2$
-							part.getElementId(), e);
-				} catch (RuntimeException e) {
-					log("Failed to grant focus to part via DI", //$NON-NLS-1$
-							"Failed to grant focus via DI to part ({0})", part.getElementId(), e); //$NON-NLS-1$
-				}
+			if (requiresFocus) {
+				IPresentationEngine pe = part.getContext().get(IPresentationEngine.class);
+				pe.focusGui(part);
 			}
+
 			firePartActivated(part);
 			UIEvents.publishEvent(UIEvents.UILifeCycle.ACTIVATE, part);
 		} finally {
@@ -1023,6 +1028,7 @@ public class PartServiceImpl implements EPartService {
 		case VISIBLE:
 			MPart activePart = getActivePart();
 			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
+				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
 				bringToTop(addedPart);

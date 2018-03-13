@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,15 +133,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
      * Stores the current Image for this part reference. Lazily created. Null if not allocated.
      */
     private Image image = null;
-
-    /**
-     * Stores reference to the image kept in the legacyPart. Used for quick check
-     * if the image changed.
-     */
-    private Image legacyPartImage = null;
-
+    
     private ImageDescriptor defaultImageDescriptor;
-
+    
     /**
      * Stores the current image descriptor for the part. 
      */
@@ -407,24 +401,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
         if (isDisposed()) {
             return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
         }
-
-        Image newLegacyPartImage = null;
-        if (legacyPart != null) {
-            newLegacyPartImage = legacyPart.getTitleImage();
-        }
-        // refresh the local image if the image in the legacyPart changed
-        if (newLegacyPartImage != null && newLegacyPartImage != legacyPartImage) {
-            legacyPartImage = newLegacyPartImage;
-            // the setImageDescriptor(ImageDescriptor) method sets the image field to null,
-            // so a new value will be assigned to the image in the conditional statement below
-            setImageDescriptor(computeImageDescriptor());
-        }
-        if (image == null) {
+        
+        if (image == null) {        
             image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
         }
         return image;
     }
-
+    
     public ImageDescriptor getTitleImageDescriptor() {
         if (isDisposed()) {
             return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
