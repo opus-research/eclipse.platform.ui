@@ -162,8 +162,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    protected void adjustForNumColumns(int numColumns) {
 
         GridData data = new GridData();
         if (valueControl.getLayoutData() != null) {
@@ -177,8 +176,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void applyFont() {
+    protected void applyFont() {
         if (chosenFont != null && previewer != null) {
 			previewer.setFont(chosenFont);
 		}
@@ -187,8 +185,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         getLabelControl(parent);
 
         valueControl = getValueControl(parent);
@@ -218,8 +215,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoad() {
+    protected void doLoad() {
         if (changeFontButton == null) {
 			return;
 		}
@@ -230,8 +226,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoadDefault() {
+    protected void doLoadDefault() {
         if (changeFontButton == null) {
 			return;
 		}
@@ -242,8 +237,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doStore() {
+    protected void doStore() {
         if (chosenFont != null) {
 			PreferenceConverter.setValue(getPreferenceStore(),
                     getPreferenceName(), chosenFont);
@@ -263,8 +257,7 @@ public class FontFieldEditor extends FieldEditor {
 				changeFontButton.setText(changeButtonText);
 			}
             changeFontButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     FontDialog fontDialog = new FontDialog(changeFontButton
                             .getShell());
                     if (chosenFont != null) {
@@ -302,8 +295,7 @@ public class FontFieldEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	public int getNumberOfControls() {
+    public int getNumberOfControls() {
         if (previewer == null) {
 			return 3;
 		}
@@ -419,8 +411,7 @@ public class FontFieldEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         getChangeControl(parent).setEnabled(enabled);
         getValueControl(parent).setEnabled(enabled);

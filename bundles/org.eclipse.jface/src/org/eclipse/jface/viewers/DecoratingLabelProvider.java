@@ -54,8 +54,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      *
      * @param listener a label provider listener
      */
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    public void addListener(ILabelProviderListener listener) {
         super.addListener(listener);
         provider.addListener(listener);
         if (decorator != null) {
@@ -68,8 +67,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      * The <code>DecoratingLabelProvider</code> implementation of this <code>IBaseLabelProvider</code> method
      * disposes both the nested label provider and the label decorator.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         provider.dispose();
         if (decorator != null) {
             decorator.dispose();
@@ -83,8 +81,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      * decorated with the decoration provided by the label decorator's
      * <code>decorateImage</code> method.
      */
-    @Override
-	public Image getImage(Object element) {
+    public Image getImage(Object element) {
         Image image = provider.getImage(element);
         if (decorator != null) {
         	if (decorator instanceof LabelDecorator) {
@@ -128,8 +125,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      * decorated with the decoration provided by the label decorator's
      * <code>decorateText</code> method.
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         String text = provider.getText(element);
         if (decorator != null) {
         	if (decorator instanceof LabelDecorator) {
@@ -154,8 +150,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      * on the nested label provider returns <code>true</code> or if the corresponding method on the 
      * decorator returns <code>true</code>.
      */
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    public boolean isLabelProperty(Object element, String property) {
         if (provider.isLabelProperty(element, property)) {
 			return true;
 		}
@@ -171,8 +166,7 @@ public class DecoratingLabelProvider extends LabelProvider implements
      *
      * @param listener a label provider listener
      */
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    public void removeListener(ILabelProviderListener listener) {
         super.removeListener(listener);
         provider.removeListener(listener);
         if (decorator != null) {

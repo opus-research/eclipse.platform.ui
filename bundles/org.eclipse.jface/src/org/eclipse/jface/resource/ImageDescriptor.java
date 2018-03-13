@@ -161,8 +161,7 @@ public abstract class ImageDescriptor extends DeviceResourceDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#createResource(org.eclipse.swt.graphics.Device)
      */
-    @Override
-	public Object createResource(Device device) throws DeviceResourceException {
+    public Object createResource(Device device) throws DeviceResourceException {
         Image result = createImage(false, device);
         if (result == null) {
             throw new DeviceResourceException(this);
@@ -173,8 +172,7 @@ public abstract class ImageDescriptor extends DeviceResourceDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#destroyResource(Object)
      */
-    @Override
-	public void destroyResource(Object previouslyCreatedObject) {
+    public void destroyResource(Object previouslyCreatedObject) {
         ((Image)previouslyCreatedObject).dispose();
     }
     

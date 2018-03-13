@@ -63,8 +63,7 @@ public class BooleanPropertyAction extends Action {
      *  (non-Javadoc)
      * @see org.eclipse.jface.action.IAction#run()
      */
-    @Override
-	public void run() {
+    public void run() {
         preferenceStore.setValue(property, isChecked());
     }
 }

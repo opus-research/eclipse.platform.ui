@@ -172,7 +172,6 @@ abstract class SWTFocusCellManager {
 		viewer.getControl().addListener(SWT.FocusIn, listener);
 		viewer.getControl().getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
-					@Override
 					public void getName(AccessibleEvent event) {
 						ViewerCell cell = getFocusCell();
 						if (cell == null)

@@ -38,8 +38,7 @@ public class GroupMarker extends AbstractGroupMarker {
      * The <code>GroupMarker</code> implementation of this method
      * returns <code>false</code> since group markers are always invisible.
      */
-    @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         return false;
     }
 }

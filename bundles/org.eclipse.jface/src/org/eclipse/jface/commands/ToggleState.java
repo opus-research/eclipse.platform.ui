@@ -39,7 +39,6 @@ public class ToggleState extends PersistentState {
 		setValue(Boolean.FALSE);
 	}
 
-	@Override
 	public final void load(final IPreferenceStore store,
 			final String preferenceKey) {
 		final boolean currentValue = ((Boolean) getValue()).booleanValue(); 
@@ -50,7 +49,6 @@ public class ToggleState extends PersistentState {
 		}
 	}
 
-	@Override
 	public final void save(final IPreferenceStore store,
 			final String preferenceKey) {
 		if (shouldPersist()) {
@@ -61,7 +59,6 @@ public class ToggleState extends PersistentState {
 		}
 	}
 
-	@Override
 	public void setValue(final Object value) {
 		if (!(value instanceof Boolean)) {
 			throw new IllegalArgumentException(

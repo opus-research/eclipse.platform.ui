@@ -144,8 +144,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
     /* (non-Javadoc)
      * Method declared on IDialogPage.
      */
-    @Override
-	public Image getImage() {
+    public Image getImage() {
         Image result = super.getImage();
 
         if (result == null && wizard != null) {
@@ -197,8 +196,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * once the container is created even though this page's control may not 
      * yet be created.
      */
-    @Override
-	public Shell getShell() {
+    public Shell getShell() {
 
         IWizardContainer container = getContainer();
         if (container == null) {
@@ -241,8 +239,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * method extends the <code>DialogPage</code> implementation to update
      * the wizard container title bar. Subclasses may extend.
      */
-    @Override
-	public void setDescription(String description) {
+    public void setDescription(String description) {
         super.setDescription(description);
         if (isCurrentPage()) {
 			getContainer().updateTitleBar();
@@ -254,8 +251,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this is the current page.
      */
-    @Override
-	public void setErrorMessage(String newMessage) {
+    public void setErrorMessage(String newMessage) {
         super.setErrorMessage(newMessage);
         if (isCurrentPage()) {
             getContainer().updateMessage();
@@ -267,8 +263,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this page is the current page.
      */
-    @Override
-	public void setImageDescriptor(ImageDescriptor image) {
+    public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);
         if (isCurrentPage()) {
 			getContainer().updateTitleBar();
@@ -280,8 +275,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this is the current page.
      */
-    @Override
-	public void setMessage(String newMessage, int newType) {
+    public void setMessage(String newMessage, int newType) {
         super.setMessage(newMessage, newType);
         if (isCurrentPage()) {
 			getContainer().updateMessage();
@@ -318,8 +312,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * method extends the <code>DialogPage</code> implementation to update
      * the wizard container title bar. Subclasses may extend.
      */
-    @Override
-	public void setTitle(String title) {
+    public void setTitle(String title) {
         super.setTitle(title);
         if (isCurrentPage()) {
             getContainer().updateTitleBar();
@@ -337,8 +330,7 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * Returns a printable representation of this wizard page suitable
      * only for debug purposes.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return name;
     }
 }

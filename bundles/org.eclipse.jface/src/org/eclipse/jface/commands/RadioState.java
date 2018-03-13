@@ -221,7 +221,6 @@ public class RadioState extends ToggleState {
 	/**
 	 * Unregisters this state from the manager, which detaches the listeners.
 	 */
-	@Override
 	public void dispose() {
 		setRadioGroupIdentifier(null);
 	}
@@ -252,7 +251,6 @@ public class RadioState extends ToggleState {
 	 * @param value
 	 *            The new value; should be a <code>Boolean</code>.
 	 */
-	@Override
 	public void setValue(final Object value) {
 		if (!(value instanceof Boolean)) {
 			throw new IllegalArgumentException(

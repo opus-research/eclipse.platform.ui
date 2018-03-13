@@ -24,8 +24,7 @@ public class PreferenceLabelProvider extends LabelProvider {
      * @param element must be an instance of <code>IPreferenceNode</code>.
      * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         return ((IPreferenceNode) element).getLabelText();
     }
 
@@ -33,8 +32,7 @@ public class PreferenceLabelProvider extends LabelProvider {
      * @param element must be an instance of <code>IPreferenceNode</code>.
      * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
      */
-    @Override
-	public Image getImage(Object element) {
+    public Image getImage(Object element) {
         return ((IPreferenceNode) element).getLabelImage();
     }
 }

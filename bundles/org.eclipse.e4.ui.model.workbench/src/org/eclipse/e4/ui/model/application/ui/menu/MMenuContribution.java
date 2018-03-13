@@ -19,10 +19,9 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Provisional for 4.3. This represents a potential extension to some menu already
- * defined in the UI.
+ * Provisional for 4.3.
  * </p>
- * @noreference This interface is not intended to be referenced by clients.
+ * @noreference This interface is not intended to be referenced by clients
  * @since 1.0
  * <!-- end-model-doc -->
  *
@@ -45,7 +44,10 @@ public interface MMenuContribution extends MElementContainer<MMenuElement> {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * Indicates the position in the parent menu where this contribution should be placed.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Position In Parent</em>' attribute.
@@ -71,7 +73,10 @@ public interface MMenuContribution extends MElementContainer<MMenuElement> {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * The element id of the Menu to be contributed to.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Parent Id</em>' attribute.

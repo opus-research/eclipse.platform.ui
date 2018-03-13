@@ -65,8 +65,7 @@ public class LazySortedCollection {
     
     // This object is inserted as the value into any node scheduled for lazy removal
     private Object lazyRemovalFlag = new Object() {
-        @Override
-		public String toString() {
+        public String toString() {
             return "Lazy removal flag";  //$NON-NLS-1$
         }
     };
