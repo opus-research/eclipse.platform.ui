@@ -117,8 +117,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    protected void adjustForNumColumns(int numColumns) {
         Control control = getLabelControl();
         ((GridData) control.getLayoutData()).horizontalSpan = numColumns;
         ((GridData) list.getLayoutData()).horizontalSpan = numColumns - 1;
@@ -175,8 +174,7 @@ public abstract class ListEditor extends FieldEditor {
      */
     public void createSelectionListener() {
         selectionListener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent event) {
+            public void widgetSelected(SelectionEvent event) {
                 Widget widget = event.widget;
                 if (widget == addButton) {
                     addPressed();
@@ -196,8 +194,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
         GridData gd = new GridData();
         gd.horizontalSpan = numColumns;
@@ -219,8 +216,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoad() {
+    protected void doLoad() {
         if (list != null) {
             String s = getPreferenceStore().getString(getPreferenceName());
             String[] array = parseString(s);
@@ -233,8 +229,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doLoadDefault() {
+    protected void doLoadDefault() {
         if (list != null) {
             list.removeAll();
             String s = getPreferenceStore().getDefaultString(
@@ -249,8 +244,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	protected void doStore() {
+    protected void doStore() {
         String s = createList(list.getItems());
         if (s != null) {
 			getPreferenceStore().setValue(getPreferenceName(), s);
@@ -332,8 +326,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	public int getNumberOfControls() {
+    public int getNumberOfControls() {
         return 2;
     }
 
@@ -419,8 +412,7 @@ public abstract class ListEditor extends FieldEditor {
     /* (non-Javadoc)
      * Method declared on FieldEditor.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         if (list != null) {
             list.setFocus();
         }
@@ -457,8 +449,7 @@ public abstract class ListEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         getListControl(parent).setEnabled(enabled);
         addButton.setEnabled(enabled);

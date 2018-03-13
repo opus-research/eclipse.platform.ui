@@ -19,10 +19,9 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * Provisional for 4.3. This is a container aggregating the toolbar contributions to be
- * applied to existing toolbars.
+ * Provisional for 4.3.
  * </p>
- * @noreference This interface is not intended to be referenced by clients.
+ * @noreference This interface is not intended to be referenced by clients
  * @since 1.0
  * <!-- end-model-doc -->
  *

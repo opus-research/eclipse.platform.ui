@@ -19,7 +19,10 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * <p>
- * A type specific collection of PartDescriptors.
+ * <strong>Developers</strong>:
+ * Add more detailed documentation by editing this comment in 
+ * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+ * There is a GenModel/documentation node under each type and attribute.
  * </p>
  * @since 1.0
  * <!-- end-model-doc -->
@@ -42,7 +45,10 @@ public interface MPartDescriptorContainer {
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * A collection of PartDescriptors.
+	 * <strong>Developers</strong>:
+	 * Add more detailed documentation by editing this comment in 
+	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
+	 * There is a GenModel/documentation node under each type and attribute.
 	 * </p>
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Descriptors</em>' containment reference list.

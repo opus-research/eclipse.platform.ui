@@ -90,7 +90,6 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 *            The key to format.
 	 * @return The key formatted as a string; should not be <code>null</code>.
 	 */
-	@Override
 	public final String format(final int key) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
 		final String name = lookup.formalNameLookup(key);
@@ -111,7 +110,6 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 * 
 	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyDelimiter()
 	 */
-	@Override
 	protected String getKeyDelimiter() {
 		// We must do the look up every time, as our locale might change.
 		if (Util.isMac()) {
@@ -128,7 +126,6 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 * 
 	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
 	 */
-	@Override
 	protected String getKeyStrokeDelimiter() {
 		// We must do the look up every time, as our locale might change.
 		if (Util.isWindows()) {
@@ -146,7 +143,6 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 	 * 
 	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#sortModifierKeys(int)
 	 */
-	@Override
 	protected int[] sortModifierKeys(final int modifierKeys) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
 		final int[] sortedKeys = new int[4];

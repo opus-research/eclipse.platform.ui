@@ -54,8 +54,7 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
      * Method declared on StringButtonFieldEditor.
      * Opens the directory chooser dialog and returns the selected directory.
      */
-    @Override
-	protected String changePressed() {
+    protected String changePressed() {
         File f = new File(getTextControl().getText());
         if (!f.exists()) {
 			f = null;
@@ -72,8 +71,7 @@ public class DirectoryFieldEditor extends StringButtonFieldEditor {
      * Method declared on StringFieldEditor.
      * Checks whether the text input field contains a valid directory.
      */
-    @Override
-	protected boolean doCheckState() {
+    protected boolean doCheckState() {
         String fileName = getTextControl().getText();
         fileName = fileName.trim();
         if (fileName.length() == 0 && isEmptyStringAllowed()) {

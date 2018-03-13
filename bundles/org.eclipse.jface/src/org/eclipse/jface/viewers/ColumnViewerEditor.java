@@ -212,7 +212,6 @@ public abstract class ColumnViewerEditor {
 				if (cellEditor.dependsOnExternalFocusListener()) {
 					if (focusListener == null) {
 						focusListener = new FocusAdapter() {
-							@Override
 							public void focusLost(FocusEvent e) {
 								applyEditorValue();
 							}
@@ -222,7 +221,6 @@ public abstract class ColumnViewerEditor {
 				}
 
 				mouseListener = new MouseAdapter() {
-					@Override
 					public void mouseDown(MouseEvent e) {
 						// time wrap?
 						// check for expiration of doubleClickTime
