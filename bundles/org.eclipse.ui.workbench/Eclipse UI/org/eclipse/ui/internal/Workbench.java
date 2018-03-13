@@ -1615,12 +1615,7 @@ public final class Workbench extends EventManager implements IWorkbench {
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "Workbench"); //$NON-NLS-1$
 		}
 
-		eventBroker.subscribe(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE, new EventHandler() {
-			public void handleEvent(org.osgi.service.event.Event event) {
-				forceOpenPerspective();
-				eventBroker.unsubscribe(this);
-			}
-		});
+		// forceOpenPerspective();
 
 		return true;
 	}
