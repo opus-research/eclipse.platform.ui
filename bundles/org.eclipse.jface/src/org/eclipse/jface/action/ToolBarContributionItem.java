@@ -357,7 +357,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         ToolBar toolBar = (ToolBar) control;
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
-        ArrayList<ToolItem> hidden = new ArrayList<ToolItem>();
+        ArrayList hidden = new ArrayList();
         for (int i = 0; i < items.length; ++i) {
             Rectangle itemBounds = items[i].getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
@@ -371,8 +371,8 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             chevronMenuManager.dispose();
         }
         chevronMenuManager = new MenuManager();
-        for (Iterator<ToolItem> i = hidden.iterator(); i.hasNext();) {
-            ToolItem toolItem = i.next();
+        for (Iterator i = hidden.iterator(); i.hasNext();) {
+            ToolItem toolItem = (ToolItem) i.next();
             IContributionItem data = (IContributionItem) toolItem.getData();
             if (data instanceof ActionContributionItem) {
                 ActionContributionItem contribution = new ActionContributionItem(
