@@ -127,12 +127,7 @@ public class CompatibilityView extends CompatibilityPart {
 		MMenu menu = getViewMenu();
 		if (menu == null) {
 			menu = MenuFactoryImpl.eINSTANCE.createMenu();
-
-			// Only use the substring before the ':'
-			String partId = part.getElementId();
-			int colonIndex = partId.indexOf(':');
-			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
-			menu.setElementId(descId);
+			menu.setElementId(part.getElementId());
 
 			menu.getTags().add(StackRenderer.TAG_VIEW_MENU);
 			menu.getTags().add(ContributionsAnalyzer.MC_MENU);
@@ -149,13 +144,7 @@ public class CompatibilityView extends CompatibilityPart {
 		MToolBar toolbar = part.getToolbar();
 		if (toolbar == null) {
 			toolbar = MenuFactoryImpl.eINSTANCE.createToolBar();
-
-			// Only use the substring before the ':'
-			String partId = part.getElementId();
-			int colonIndex = partId.indexOf(':');
-			String descId = colonIndex == -1 ? partId : partId.substring(0, colonIndex);
-			toolbar.setElementId(descId);
-
+			toolbar.setElementId(part.getElementId());
 			part.setToolbar(toolbar);
 		}
 		apr = rendererFactory.getRenderer(toolbar, parent);
