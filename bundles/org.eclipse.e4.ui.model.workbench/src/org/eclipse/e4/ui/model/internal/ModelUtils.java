@@ -28,9 +28,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.ETypeParameter;
 
 public class ModelUtils {
-	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
-	public static final String CONTAINING_PARENT = "ModelUtils.containingParent";
-	
 	public static EClassifier getTypeArgument(EClass eClass,
 			EGenericType eGenericType) {
 		ETypeParameter eTypeParameter = eGenericType.getETypeParameter();
@@ -176,25 +173,22 @@ public class ModelUtils {
 		}
 	}
 
-	static MApplicationElement getParent(MApplicationElement element) {
-		if ( (element instanceof MUIElement) && ((MUIElement)element).getCurSharedRef() != null) {
-			return ((MUIElement)element).getCurSharedRef().getParent();
-		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
-			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
-		} else if (element instanceof EObject) {
-			return (MApplicationElement) ((EObject) element).eContainer();
-		}
-		return null;
-	}
-	
 	public static IEclipseContext getContainingContext(MApplicationElement element) {
-		MApplicationElement curParent = getParent(element);
+		MApplicationElement curParent = null;
+		if ( element instanceof MUIElement && ((MUIElement)element).getCurSharedRef() != null)
+			curParent = ((MUIElement)element).getCurSharedRef().getParent();
+		else
+			curParent = (MApplicationElement) ((EObject) element).eContainer();
 
 		while (curParent != null) {
 			if (curParent instanceof MContext) {
 				return ((MContext) curParent).getContext();
 			}
-			curParent = getParent(curParent);
+
+			if ( (curParent instanceof MUIElement) && ((MUIElement)curParent).getCurSharedRef() != null)
+				curParent = ((MUIElement)curParent).getCurSharedRef().getParent();
+			else
+				curParent = (MApplicationElement) ((EObject) curParent).eContainer();
 		}
 
 		return null;
