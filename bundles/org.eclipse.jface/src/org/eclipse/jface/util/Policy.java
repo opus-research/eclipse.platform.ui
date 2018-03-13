@@ -189,7 +189,7 @@ public class Policy {
 			 *                the arguments cannot be cast to Strings.
 			 */
 			public int compare(String s1, String s2) {
-				return s1.compareTo(s2);
+				return s1.compareToIgnoreCase(s2);
 			}
 		};
 	}
