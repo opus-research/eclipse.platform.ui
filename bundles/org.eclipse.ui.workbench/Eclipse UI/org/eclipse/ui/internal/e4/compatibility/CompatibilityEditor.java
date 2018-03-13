@@ -137,6 +137,11 @@ public class CompatibilityEditor extends CompatibilityPart {
 	}
 
 	@Override
+	void updateImages(MPart part) {
+		updateTabImages(part);
+	}
+
+	@Override
 	void disposeSite(PartSite site) {
 		EditorActionBars bars = (EditorActionBars) site.getActionBars();
 		EditorReference.disposeEditorActionBars(bars);

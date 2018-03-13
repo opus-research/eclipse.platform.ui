@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -194,20 +194,12 @@ public class BasicPartList extends AbstractTableInformationControl {
 	protected boolean deleteSelectedElements() {
 		Object selectedElement = getSelectedElement();
 		if (selectedElement != null) {
-			if (partService.savePart((MPart) selectedElement, false))
-				partService.hidePart((MPart) selectedElement);
+			partService.hidePart((MPart) selectedElement);
 
 			if (getInput().isEmpty()) {
 				getShell().dispose();
 				return true;
 			}
-
-			// Remove part from viewer model
-			@SuppressWarnings("unchecked")
-			List<Object> viewerInput = (List<Object>) getTableViewer()
-					.getInput();
-			viewerInput.remove(selectedElement);
-
 		}
 		return false;
 
