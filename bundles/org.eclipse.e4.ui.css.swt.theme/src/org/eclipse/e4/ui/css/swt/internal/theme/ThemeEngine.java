@@ -585,7 +585,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 	
 	public void resetModifiedStylesheets(ITheme selection) {
-		modifiedStylesheets.remove(selection.getId());
+		List<String> ss = modifiedStylesheets.remove(selection.getId());
 	}
 
 	public void addCSSEngine(CSSEngine cssEngine) {
