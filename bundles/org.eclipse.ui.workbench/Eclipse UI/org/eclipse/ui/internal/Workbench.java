@@ -1185,9 +1185,6 @@ public final class Workbench extends EventManager implements IWorkbench {
 					res.save(null);
 				} catch (IOException e) {
 					// Just auto-save, we don't really care
-				} finally {
-					res.unload();
-					res.getResourceSet().getResources().remove(res);
 				}
 				return Status.OK_STATUS;
 			}
