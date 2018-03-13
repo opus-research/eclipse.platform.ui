@@ -46,7 +46,6 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Tree;
 
 /**
@@ -198,9 +197,6 @@ public class ResourceTreeAndListGroup extends EventManager {
             treeViewer.setSelection(new StructuredSelection(primary));
         }
         treeViewer.getControl().setFocus();
-        
-        treeViewer.getControl().setEnabled(false);
-        listViewer.getControl().setEnabled(false);
     }
 
     /**
@@ -290,7 +286,6 @@ public class ResourceTreeAndListGroup extends EventManager {
      */
     private void createListViewer(Composite parent, boolean useHeightHint) {
         listViewer = CheckboxTableViewer.newCheckList(parent, SWT.BORDER);
-        listViewer.getControl().setEnabled(false);
         GridData data = new GridData(GridData.FILL_BOTH);
         if (useHeightHint) {
 			data.heightHint = PREFERRED_HEIGHT;
@@ -712,22 +707,6 @@ public class ResourceTreeAndListGroup extends EventManager {
         return elements.length;
     }
 
-    /**
-     * Get the table the list viewer uses.
-     * @return org.eclipse.swt.widgets.Table
-     * @since 3.10
-     */
-    public Table getListTable() {
-        return this.listViewer.getTable();
-    }
-    
-    /**
-     * @return the Tree the Tree Viewer uses
-     * @since 3.10 
-     */
-    public Tree getTree() {
-    	return this.treeViewer.getTree();
-    }
 
     /**
      *	Logically gray-check all ancestors of treeItem by ensuring that they
@@ -1150,14 +1129,5 @@ public class ResourceTreeAndListGroup extends EventManager {
         }
         	
     }
-
-	/**
-	 * @param enabled whether to enable the widgets or not
-	 * @since 3.10
-	 */
-	public void setEnabled(boolean enabled) {
-		this.listViewer.getControl().setEnabled(enabled);
-		this.treeViewer.getControl().setEnabled(enabled);
-	}
 
 }

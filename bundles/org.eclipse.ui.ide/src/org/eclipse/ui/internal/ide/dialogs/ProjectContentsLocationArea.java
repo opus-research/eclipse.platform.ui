@@ -16,7 +16,6 @@
 
 package org.eclipse.ui.internal.ide.dialogs;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -491,22 +490,5 @@ public class ProjectContentsLocationArea {
 			return Platform.getLocation().toOSString();
 		}
 		return locationPathField.getText();
-	}
-
-	/**
-	 * The initial location for the {@link ProjectContentsLocationArea}
-	 * @param location
-	 */
-	public void setInitialLocation(File location) {
-		this.locationPathField.setText(location.getAbsolutePath());
-	}
-	
-	/**
-	 * Initialize whether the location will be default (project in
-	 * workspace) or not.
-	 * @param useDefaultLocation
-	 */
-	public void setDefault(boolean useDefaultLocation) {
-		this.useDefaultsButton.setSelection(useDefaultLocation);
 	}
 }
