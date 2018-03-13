@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly 
+ *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -30,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.bindings.EBindingService;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MParameter;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -40,8 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
@@ -186,10 +186,10 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
  */
 public class CustomizePerspectiveDialog extends TrayDialog {
 
-	private static final String TOOLBAR_ICON = "$nl$/icons/full/obj16/toolbar.gif"; //$NON-NLS-1$
-	private static final String SUBMENU_ICON = "$nl$/icons/full/obj16/submenu.gif"; //$NON-NLS-1$
-	private static final String MENU_ICON = "$nl$/icons/full/obj16/menu.gif"; //$NON-NLS-1$
-	private static final String WARNING_ICON = "$nl$/icons/full/obj16/warn_tsk.gif"; //$NON-NLS-1$
+	private static final String TOOLBAR_ICON = "$nl$/icons/full/obj16/toolbar.png"; //$NON-NLS-1$
+	private static final String SUBMENU_ICON = "$nl$/icons/full/obj16/submenu.png"; //$NON-NLS-1$
+	private static final String MENU_ICON = "$nl$/icons/full/obj16/menu.png"; //$NON-NLS-1$
+	private static final String WARNING_ICON = "$nl$/icons/full/obj16/warn_tsk.png"; //$NON-NLS-1$
 
 	private static final String SHORTCUT_CONTRIBUTION_ITEM_ID_OPEN_PERSPECTIVE = "openPerspective"; //$NON-NLS-1$
 	private static final String SHORTCUT_CONTRIBUTION_ITEM_ID_SHOW_VIEW = "showView"; //$NON-NLS-1$
@@ -3074,7 +3074,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 					dynamicEntry.setCheckState(getMenuItemIsVisible(dynamicEntry));
 					parent.addChild(dynamicEntry);
 				}
-			} else if (menuItem instanceof MOpaqueMenuItem) {
+			} else if (OpaqueElementUtil.isOpaqueMenuItem(menuItem)) {
 				IContributionItem contributionItem = menuMngrRenderer.getContribution(menuItem);
 				if (contributionItem instanceof ActionContributionItem) {
 					final IAction action = ((ActionContributionItem) contributionItem).getAction();
@@ -3175,7 +3175,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				continue;
 			}
 
-			if (element instanceof MOpaqueToolItem) {
+			if (OpaqueElementUtil.isOpaqueToolItem(element)) {
 				if (contributionItem instanceof ActionContributionItem) {
 					final IAction action = ((ActionContributionItem) contributionItem).getAction();
 					DisplayItem toolbarEntry = new DisplayItem(action.getText(), contributionItem);
@@ -3271,13 +3271,13 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				text = text + " (" + sequence.format() + ')'; //$NON-NLS-1$
 			}
 			return text;
-		} else if (item instanceof MOpaqueMenuItem) {
-			Object opaque = ((MOpaqueMenuItem) item).getOpaqueItem();
+		} else if (OpaqueElementUtil.isOpaqueMenuItem(item)) {
+			Object opaque = OpaqueElementUtil.getOpaqueItem(item);
 			if (opaque instanceof ActionContributionItem) {
 				return ((ActionContributionItem) opaque).getAction().getText();
 			}
-		} else if (item instanceof MOpaqueToolItem) {
-			Object opaque = ((MOpaqueToolItem) item).getOpaqueItem();
+		} else if (OpaqueElementUtil.isOpaqueToolItem(item)) {
+			Object opaque = OpaqueElementUtil.getOpaqueItem(item);
 			if (opaque instanceof ActionContributionItem) {
 				return ((ActionContributionItem) opaque).getAction().getToolTipText();
 			}

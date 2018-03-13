@@ -15,25 +15,20 @@ package org.eclipse.ui.internal;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
@@ -50,7 +45,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.part.ViewPart;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -58,11 +52,6 @@ import org.osgi.service.event.EventHandler;
  * 
  */
 public abstract class WorkbenchPartReference implements IWorkbenchPartReference, ISizeProvider {
-
-    /**
-	 * 
-	 */
-	private static final String E4_WRAPPER_KEY = "e4Wrapper"; //$NON-NLS-1$
 
 	/**
      * Internal property ID: Indicates that the underlying part was created
@@ -133,29 +122,8 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     private int state = STATE_LAZY;
    
 	protected IWorkbenchPart legacyPart;
-
-
     private boolean pinned = false;
     
-
-    /**
-     * Stores the current Image for this part reference. Lazily created. Null if not allocated.
-     */
-    private Image image = null;
-
-    /**
-     * Stores reference to the image kept in the legacyPart. Used for quick check
-     * if the image changed.
-     */
-    private Image legacyPartImage = null;
-
-    private ImageDescriptor defaultImageDescriptor;
-
-    /**
-     * Stores the current image descriptor for the part. 
-     */
-    private ImageDescriptor imageDescriptor;
-
     /**
      * API listener list
      */
@@ -170,8 +138,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     private ListenerList partChangeListeners = new ListenerList();
     
     protected Map propertyCache = new HashMap();
-    
-
     
     private IPropertyListener propertyChangeListener = new IPropertyListener() {
         /* (non-Javadoc)
@@ -188,36 +154,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		}
     };
 
-	class E4PartWrapper extends ViewPart {
-		MPart wrappedPart;
-
-		E4PartWrapper(MPart part) {
-			wrappedPart = part;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt
-		 * .widgets.Composite)
-		 */
-		@Override
-		public void createPartControl(Composite parent) {
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-		 */
-		@Override
-		public void setFocus() {
-			if (part.getObject() != null && part.getContext() != null)
-				ContextInjectionFactory.invoke(part.getObject(), Focus.class, part.getContext());
-		}
-
-	}
 	private IWorkbenchPage page;
 
 	private MPart part;
@@ -230,6 +166,11 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     	this.windowContext = windowContext;
 		this.page = page;
 		this.part = part;
+
+		// cache the reference in the MPart's transientData
+		if (part != null) {
+			part.getTransientData().put(IWorkbenchPartReference.class.getName(), this);
+		}
 	}
 
 	private EventHandler createContextEventHandler() {
@@ -278,39 +219,9 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		return part;
 	}
 
-    protected void setImageDescriptor(ImageDescriptor descriptor) {
-        if (Util.equals(imageDescriptor, descriptor)) {
-            return;
-        }
 
-        Image oldImage = image;
-        ImageDescriptor oldDescriptor = imageDescriptor;
-        image = null;
-        imageDescriptor = descriptor;
-        
-        // Don't queue events triggered by image changes. We'll dispose the image
-        // immediately after firing the event, so we need to fire it right away.
-        immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-        // If we had allocated the old image, deallocate it now (AFTER we fire the property change 
-        // -- listeners may need to clean up references to the old image)
-        if (oldImage != null) {
-            JFaceResources.getResources().destroy(oldDescriptor);
-        }
-    }
-    
     protected void partPropertyChanged(Object source, int propId) {
-
-        // We handle these properties directly (some of them may be transformed
-        // before firing events to workbench listeners)
-		// if (propId == IWorkbenchPartConstants.PROP_CONTENT_DESCRIPTION
-		// || propId == IWorkbenchPartConstants.PROP_PART_NAME
-		// || propId == IWorkbenchPartConstants.PROP_TITLE) {
-		//
-		// refreshFromPart();
-		// } else {
-            // Any other properties are just reported to listeners verbatim
-            firePropertyChange(propId);
-		// }
+		firePropertyChange(propId);
         
         // Let the model manager know as well
         if (propId == IWorkbenchPartConstants.PROP_DIRTY) {
@@ -324,22 +235,6 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     
     protected void partPropertyChanged(PropertyChangeEvent event) {
     	firePartPropertyChange(event);
-    }
-
-    
-    protected ImageDescriptor computeImageDescriptor() {
-		if (legacyPart != null) {
-			return ImageDescriptor
-					.createFromImage(legacyPart.getTitleImage(), Display.getCurrent());
-        }
-        return defaultImageDescriptor;
-    }
-
-	public void init(ImageDescriptor desc) {
-        Assert.isNotNull(desc);
-        
-        this.defaultImageDescriptor = desc;
-        this.imageDescriptor = computeImageDescriptor();
     }
 
     /**
@@ -407,7 +302,10 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 	 * @see org.eclipse.ui.IWorkbenchPartReference#getTitleToolTip()
 	 */
 	public String getTitleToolTip() {
-		String toolTip = part.getLocalizedTooltip();
+		String toolTip = (String) part.getTransientData().get(
+				IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
+		if (toolTip == null || toolTip.length() == 0)
+			toolTip = part.getLocalizedTooltip();
 		return Util.safeString(toolTip);
 	}
 
@@ -442,35 +340,20 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 		return Util.safeString(legacyPart.getTitle());
     }
 
-    public final Image getTitleImage() {
-        if (isDisposed()) {
-            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
-        }
+	public final Image getTitleImage() {
+		if (isDisposed()) {
+			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+		}
 
-        Image newLegacyPartImage = null;
-        if (legacyPart != null) {
-            newLegacyPartImage = legacyPart.getTitleImage();
-        }
-        // refresh the local image if the image in the legacyPart changed
-        if (newLegacyPartImage != null && newLegacyPartImage != legacyPartImage) {
-            legacyPartImage = newLegacyPartImage;
-            // the setImageDescriptor(ImageDescriptor) method sets the image field to null,
-            // so a new value will be assigned to the image in the conditional statement below
-            setImageDescriptor(computeImageDescriptor());
-        }
-        if (image == null) {
-            image = JFaceResources.getResources().createImageWithDefault(imageDescriptor);
-        }
-        return image;
-    }
+		WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
+		if (part != null && wbw.getModel().getRenderer() instanceof SWTPartRenderer) {
+			SWTPartRenderer r = (SWTPartRenderer) wbw.getModel().getRenderer();
+			return r.getImage(part);
+		}
 
-    public ImageDescriptor getTitleImageDescriptor() {
-        if (isDisposed()) {
-            return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW);
-        }
-        
-        return imageDescriptor;
-    }
+		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
+	}
     
     /* package */ void fireVisibilityChange() {
         fireInternalPropertyChange(INTERNAL_PROPERTY_VISIBLE);
@@ -535,17 +418,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
 					legacyPart = compatibilityPart.getPart();
 				}
 			} else if (part.getObject() != null) {
-				if (part.getTransientData().get(E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					legacyPart = (IWorkbenchPart) part.getTransientData().get(E4_WRAPPER_KEY);
-				} else {
-					legacyPart = new E4PartWrapper(part);
-					part.getTransientData().put(E4_WRAPPER_KEY, legacyPart);
+        		if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
+        		  return (IWorkbenchPart) part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY);
 				}
-				
-			}
+        	}
 		}
-		return legacyPart;
 
+		return legacyPart;
     }
     
 	public abstract IWorkbenchPart createPart() throws PartInitException;
@@ -588,9 +467,13 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
         }
         
         pinned = newPinned;
-        
-        setImageDescriptor(computeImageDescriptor());
-        
+
+		immediateFirePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
+        if (pinned)
+        	part.getTags().add(IPresentationEngine.ADORNMENT_PIN);
+        else
+        	part.getTags().remove(IPresentationEngine.ADORNMENT_PIN);
+
         fireInternalPropertyChange(INTERNAL_PROPERTY_PINNED);
     }
     
@@ -676,6 +559,10 @@ public abstract class WorkbenchPartReference implements IWorkbenchPartReference,
     
 	public IWorkbenchPage getPage() {
 		return page;
+	}
+
+	public void setPage(IWorkbenchPage newPage) {
+		page = newPage;
 	}
 
 	/*
