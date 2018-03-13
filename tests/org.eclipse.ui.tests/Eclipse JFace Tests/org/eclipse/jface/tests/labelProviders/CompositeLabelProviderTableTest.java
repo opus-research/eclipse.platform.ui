@@ -11,7 +11,6 @@
 
 package org.eclipse.jface.tests.labelProviders;
 
-import org.eclipse.jface.tests.viewers.TestElement;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.IViewerLabelProvider;
@@ -30,53 +29,53 @@ import org.eclipse.swt.widgets.TableItem;
  * {@link IColorProvider}, {@link org.eclipse.jface.viewers.IColorProvider},
  * {@link IFontProvider}
  * @since 3.3
- *
+ * 
  */
 public class CompositeLabelProviderTableTest extends CompositeLabelProviderTest {
 
-	class MyLabelProvider extends LabelProvider<TestElement> implements IColorProvider<TestElement>,
-			IViewerLabelProvider<TestElement>, IFontProvider<TestElement> {
+	class MyLabelProvider extends LabelProvider implements IColorProvider,
+			IViewerLabelProvider, IFontProvider {
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
 		 */
-		public Color getForeground(TestElement element) {
+		public Color getForeground(Object element) {
 			return foreground;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
 		 */
-		public Color getBackground(TestElement element) {
+		public Color getBackground(Object element) {
 			return background;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
 		 *      java.lang.Object)
 		 */
-		public void updateLabel(ViewerLabel label, TestElement element) {
+		public void updateLabel(ViewerLabel label, Object element) {
 			label.setText(getText(element));
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
 		 */
-		public Font getFont(TestElement element) {
+		public Font getFont(Object element) {
 			return font;
 		}
 	}
 
 	/**
 	 * Create a new instance of the recevier.
-	 *
+	 * 
 	 * @param name
 	 */
 	public CompositeLabelProviderTableTest(String name) {
@@ -85,13 +84,13 @@ public class CompositeLabelProviderTableTest extends CompositeLabelProviderTest 
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
 	 */
-	protected StructuredViewer<TestElement,TestElement> createViewer(Composite parent) {
-
+	protected StructuredViewer createViewer(Composite parent) {
+		
 		initializeColors(parent);
-		final TableViewer<TestElement,TestElement>  v = new TableViewer<TestElement,TestElement> (parent);
+		final TableViewer v = new TableViewer(parent);
 		v.setContentProvider(new LabelTableContentProvider());
 		v.setLabelProvider(new MyLabelProvider());
 		v.getTable().setLinesVisible(true);

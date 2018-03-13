@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,12 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -37,27 +35,27 @@ import org.eclipse.swt.widgets.TableItem;
  * A simple TableViewer to demonstrating how viewers could be refresh and
  * scrolling avoided in 3.2. In 3.3 implementors should consider using the
  * {@link StructuredViewer#refresh(boolean, boolean)} instead.
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet022TableViewerRefreshNoScroll {
-	private class MyContentProvider implements IStructuredContentProvider<MyModel,List<MyModel>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		public MyModel[] getElements(List<MyModel> inputElement) {
-			inputElement.add(new MyModel(inputElement.size()));
-			MyModel[] myModels = new MyModel[inputElement.size()];
-			return inputElement.toArray(myModels);
+		public Object[] getElements(Object inputElement) {
+			ArrayList list = (ArrayList) inputElement;
+			list.add(new MyModel(list.size()));
+			return list.toArray();
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
 		public void dispose() {
@@ -66,11 +64,11 @@ public class Snippet022TableViewerRefreshNoScroll {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		public void inputChanged(Viewer<? extends List<MyModel>> viewer, List<MyModel> oldInput, List<MyModel> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
@@ -90,13 +88,13 @@ public class Snippet022TableViewerRefreshNoScroll {
 
 	public Snippet022TableViewerRefreshNoScroll(Shell shell) {
 		shell.setLayout(new GridLayout(2, false));
-		final TableViewer<MyModel,List<MyModel>> v = new TableViewer<MyModel,List<MyModel>>(shell, SWT.BORDER
+		final TableViewer v = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
 
-		v.setLabelProvider(new LabelProvider<MyModel>());
+		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(new MyContentProvider());
 		v.setInput(createModel(100));
 		v.getTable().setLinesVisible(true);
@@ -152,8 +150,8 @@ public class Snippet022TableViewerRefreshNoScroll {
 		});
 	}
 
-	private ArrayList<MyModel> createModel(int size) {
-		ArrayList<MyModel> elements = new ArrayList<MyModel>();
+	private ArrayList createModel(int size) {
+		ArrayList elements = new ArrayList();
 
 		for (int i = 0; i < size; i++) {
 			elements.add(new MyModel(i));

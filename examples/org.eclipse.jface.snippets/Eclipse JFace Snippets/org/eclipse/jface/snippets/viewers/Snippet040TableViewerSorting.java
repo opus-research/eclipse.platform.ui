@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 Tom Schindl and others.
+ * Copyright (c) 2006, 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,9 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -34,23 +30,22 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example usage of ViewerComparator in tables to allow sorting
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet040TableViewerSorting {
 
-	private class MyContentProvider implements IStructuredContentProvider<Person,List<Person>> {
+	private class MyContentProvider implements IStructuredContentProvider {
 
-		public Person[] getElements(List<Person> inputElement) {
-			Person[] persons = new Person[inputElement.size()];
-			return inputElement.toArray(persons);
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
 		}
 
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer<? extends List<Person>> viewer, List<Person> oldInput, List<Person> newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
 	}
@@ -71,7 +66,7 @@ public class Snippet040TableViewerSorting {
 	protected abstract class AbstractEditingSupport extends EditingSupport {
 		private TextCellEditor editor;
 
-		public AbstractEditingSupport(TableViewer<Person,List<Person>> viewer) {
+		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
@@ -93,17 +88,17 @@ public class Snippet040TableViewerSorting {
 	}
 
 	public Snippet040TableViewerSorting(Shell shell) {
-		TableViewer<Person,List<Person>> v = new TableViewer<Person,List<Person>>(shell, SWT.BORDER | SWT.FULL_SELECTION);
+		TableViewer v = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		v.setContentProvider(new MyContentProvider());
 
-		TableViewerColumn<Person,List<Person>> column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		TableViewerColumn column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Givenname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.givenname;
+			public String getText(Object element) {
+				return ((Person) element).givenname;
 			}
 		});
 
@@ -118,7 +113,7 @@ public class Snippet040TableViewerSorting {
 			}
 
 		});
-
+		
 		ColumnViewerSorter cSorter = new ColumnViewerSorter(v,column) {
 
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
@@ -126,17 +121,17 @@ public class Snippet040TableViewerSorting {
 				Person p2 = (Person) e2;
 				return p1.givenname.compareToIgnoreCase(p2.givenname);
 			}
-
+			
 		};
 
-		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("Surname");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.surname;
+			public String getText(Object element) {
+				return ((Person) element).surname;
 			}
 
 		});
@@ -152,7 +147,7 @@ public class Snippet040TableViewerSorting {
 			}
 
 		});
-
+		
 		new ColumnViewerSorter(v,column) {
 
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
@@ -160,17 +155,17 @@ public class Snippet040TableViewerSorting {
 				Person p2 = (Person) e2;
 				return p1.surname.compareToIgnoreCase(p2.surname);
 			}
-
+			
 		};
 
-		column = new TableViewerColumn<Person,List<Person>>(v, SWT.NONE);
+		column = new TableViewerColumn(v, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText("E-Mail");
 		column.getColumn().setMoveable(true);
-		column.setLabelProvider(new ColumnLabelProvider<Person,List<Person>>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
-			public String getText(Person element) {
-				return element.email;
+			public String getText(Object element) {
+				return ((Person) element).email;
 			}
 
 		});
@@ -186,7 +181,7 @@ public class Snippet040TableViewerSorting {
 			}
 
 		});
-
+		
 		new ColumnViewerSorter(v,column) {
 
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
@@ -194,42 +189,42 @@ public class Snippet040TableViewerSorting {
 				Person p2 = (Person) e2;
 				return p1.email.compareToIgnoreCase(p2.email);
 			}
-
+			
 		};
 
-		List<Person> model = createModel();
+		Person[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 		cSorter.setSorter(cSorter, ColumnViewerSorter.ASC);
 	}
 
-	private List<Person> createModel() {
-		List<Person> elements = new ArrayList<Person>(4);
-		elements.add(new Person("Tom", "Schindl",
-				"tom.schindl@bestsolution.at"));
-		elements.add(new Person("Boris", "Bokowski",
-				"Boris_Bokowski@ca.ibm.com"));
-		elements.add(new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com"));
-		elements.add(new Person("Wayne", "Beaton", "wayne@eclipse.org"));
+	private Person[] createModel() {
+		Person[] elements = new Person[4];
+		elements[0] = new Person("Tom", "Schindl",
+				"tom.schindl@bestsolution.at");
+		elements[1] = new Person("Boris", "Bokowski",
+				"Boris_Bokowski@ca.ibm.com");
+		elements[2] = new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com");
+		elements[3] = new Person("Wayne", "Beaton", "wayne@eclipse.org");
 
 		return elements;
 	}
 
 	private static abstract class ColumnViewerSorter extends ViewerComparator {
 		public static final int ASC = 1;
-
+		
 		public static final int NONE = 0;
-
+		
 		public static final int DESC = -1;
-
+		
 		private int direction = 0;
-
-		private TableViewerColumn<Person,List<Person>> column;
-
-		private ColumnViewer<Person,List<Person>> viewer;
-
-		public ColumnViewerSorter(ColumnViewer<Person,List<Person>> viewer, TableViewerColumn<Person,List<Person>> column) {
+		
+		private TableViewerColumn column;
+		
+		private ColumnViewer viewer;
+		
+		public ColumnViewerSorter(ColumnViewer viewer, TableViewerColumn column) {
 			this.column = column;
 			this.viewer = viewer;
 			this.column.getColumn().addSelectionListener(new SelectionAdapter() {
@@ -238,7 +233,7 @@ public class Snippet040TableViewerSorting {
 					if( ColumnViewerSorter.this.viewer.getComparator() != null ) {
 						if( ColumnViewerSorter.this.viewer.getComparator() == ColumnViewerSorter.this ) {
 							int tdirection = ColumnViewerSorter.this.direction;
-
+							
 							if( tdirection == ASC ) {
 								setSorter(ColumnViewerSorter.this, DESC);
 							} else if( tdirection == DESC ) {
@@ -253,7 +248,7 @@ public class Snippet040TableViewerSorting {
 				}
 			});
 		}
-
+		
 		public void setSorter(ColumnViewerSorter sorter, int direction) {
 			if( direction == NONE ) {
 				column.getColumn().getParent().setSortColumn(null);
@@ -262,29 +257,29 @@ public class Snippet040TableViewerSorting {
 			} else {
 				column.getColumn().getParent().setSortColumn(column.getColumn());
 				sorter.direction = direction;
-
+				
 				if( direction == ASC ) {
 					column.getColumn().getParent().setSortDirection(SWT.DOWN);
 				} else {
 					column.getColumn().getParent().setSortDirection(SWT.UP);
 				}
-
+				
 				if( viewer.getComparator() == sorter ) {
 					viewer.refresh();
 				} else {
 					viewer.setComparator(sorter);
 				}
-
+				
 			}
 		}
 
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			return direction * doCompare(viewer, e1, e2);
 		}
-
+		
 		protected abstract int doCompare(Viewer viewer, Object e1, Object e2);
 	}
-
+	
 	/**
 	 * @param args
 	 */

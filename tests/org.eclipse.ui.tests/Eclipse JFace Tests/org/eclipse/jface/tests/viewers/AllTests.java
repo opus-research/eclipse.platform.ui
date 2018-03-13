@@ -66,6 +66,5 @@ public class AllTests extends TestSuite {
 		addTestSuite(Bug287765Test.class);
 		addTestSuite(StyledStringBuilderTest.class);
 		addTestSuite(TreeManagerTest.class);
-		addTestSuite(ArrayContentProviderTest.class);
 	}
 }

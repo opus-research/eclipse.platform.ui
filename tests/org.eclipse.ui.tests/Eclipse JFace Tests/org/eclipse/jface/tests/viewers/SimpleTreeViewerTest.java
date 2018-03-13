@@ -11,6 +11,9 @@
 
 package org.eclipse.jface.tests.viewers;
 
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -19,20 +22,21 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.TreeNode;
+import org.eclipse.jface.viewers.TreeNodeContentProvider;
 import org.eclipse.jface.viewers.TreePathViewerSorter;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class SimpleTreeViewerTest extends ViewerTestCase {
 
-	private TreeViewer<TestElement,TestElement> treeViewer;
+	private TreeViewer treeViewer;
 
 	/**
 	 * @param name
@@ -41,8 +45,8 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 		super(name);
 	}
 
-	protected StructuredViewer<TestElement,TestElement> createViewer(Composite parent) {
-		treeViewer = new TreeViewer<TestElement,TestElement>(parent);
+	protected StructuredViewer createViewer(Composite parent) {
+		treeViewer = new TreeViewer(parent);
 		treeViewer.setContentProvider(new TestModelContentProvider());
 		return treeViewer;
 	}
@@ -51,15 +55,15 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 		treeViewer.setInput(null);
 		treeViewer.setSorter(new TreePathViewerSorter());
 	}
-
+	
 	public void testNullLabel() {
-		treeViewer.setLabelProvider(new ITableLabelProvider<TestElement>(){
+		treeViewer.setLabelProvider(new ITableLabelProvider(){
 
-			public Image getColumnImage(TestElement element, int columnIndex) {
+			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
 
-			public String getColumnText(TestElement element, int columnIndex) {
+			public String getColumnText(Object element, int columnIndex) {
 				return null;
 			}
 
@@ -69,7 +73,7 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 			public void dispose() {
 			}
 
-			public boolean isLabelProperty(TestElement element, String property) {
+			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
@@ -91,10 +95,10 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 	public void testBug184441() {
 		MyViewerSorter sorter = new MyViewerSorter();
 		treeViewer.setSorter(sorter);
-		ITreeContentProvider<TestElement,TestElement> contentProvider = (ITreeContentProvider<TestElement,TestElement>) treeViewer
+		ITreeContentProvider contentProvider = (ITreeContentProvider) treeViewer
 				.getContentProvider();
-		TestElement firstRoot = contentProvider.getElements(treeViewer.getInput())[0];
-		TestElement childOfFirstRoot = contentProvider.getChildren(firstRoot)[0];
+		Object firstRoot = contentProvider.getElements(treeViewer.getInput())[0];
+		Object childOfFirstRoot = contentProvider.getChildren(firstRoot)[0];
 		treeViewer.setSelection(new StructuredSelection(childOfFirstRoot), true);
 		final ISelectionChangedListener listener = new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -108,20 +112,46 @@ public class SimpleTreeViewerTest extends ViewerTestCase {
 	}
 
 	public void testBug184712() {
-		class TableAndTreeLabelProvider extends LabelProvider<TestElement> implements ITableLabelProvider<TestElement> {
-			public Image getColumnImage(TestElement element, int columnIndex) {
+		class TableAndTreeLabelProvider extends LabelProvider implements ITableLabelProvider {
+			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
 
-			public String getColumnText(TestElement element, int columnIndex) {
+			public String getColumnText(Object element, int columnIndex) {
 				return "wrong";
 			}
 
-			public String getText(TestElement element) {
+			public String getText(Object element) {
 				return "right";
 			}
 		}
 		treeViewer.setLabelProvider(new TableAndTreeLabelProvider());
 		assertEquals("right", treeViewer.getTree().getItem(0).getText());
 	}
+
+	public void test327004() {
+		treeViewer.setInput(null);
+		treeViewer.setContentProvider(new TreeNodeContentProvider());
+
+		final TreeNode[] children= new TreeNode[5];
+		children[0]= new TreeNode("0");
+		children[1]= new TreeNode("1");
+		children[2]= new TreeNode("1");
+		children[3]= new TreeNode("1");
+		children[4]= new TreeNode("1");
+		treeViewer.setInput(children);
+
+		ViewerFilter filter= new ViewerFilter() {
+			public boolean select(Viewer viewer, Object parentElement, Object element) {
+				if (element == children[0] || element == children[1] || element == children[2] || element == children[4])
+					return false;
+				return true;
+			}
+		};
+		treeViewer.setFilters(new ViewerFilter[] { filter });
+		int i= treeViewer.getTree().getItemCount();
+
+		assertEquals(4, i); // 4 because the filter doesn't work due to equal nodes
+	}
+
 }

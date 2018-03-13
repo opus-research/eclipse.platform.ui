@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Michael Krkoska - initial API and implementation (bug 188333)
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -85,7 +84,7 @@ public class Snippet049StyledCellLabelProvider {
 		label.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
 		label.setText("Viewer with a StyledCellLabelProvider:"); //$NON-NLS-1$
 
-		final TableViewer<File,Object> tableViewer= new TableViewer<File,Object>(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		final TableViewer tableViewer= new TableViewer(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		// Multi-font support only works in JFace 3.5 and above (specifically, 3.5 M4 and above).
 		// With JFace 3.4, the font information (bold in this example) will be ignored.
@@ -114,7 +113,7 @@ public class Snippet049StyledCellLabelProvider {
        	return styleData;
     }
 
-	private static class ExampleLabelProvider extends StyledCellLabelProvider<File,Object> {
+	private static class ExampleLabelProvider extends StyledCellLabelProvider {
 
 		private static int IMAGE_SIZE= 16;
 		private static final Image IMAGE1= new Image(DISPLAY, DISPLAY.getSystemImage(SWT.ICON_WARNING).getImageData().scaledTo(IMAGE_SIZE, IMAGE_SIZE));
@@ -130,11 +129,11 @@ public class Snippet049StyledCellLabelProvider {
 			};
 		}
 
-		public void update(ViewerCell<File> cell) {
-			File element= cell.getElement();
+		public void update(ViewerCell cell) {
+			Object element= cell.getElement();
 
 			if (element instanceof File) {
-				File file= element;
+				File file= (File) element;
 
 				// Multi-font support only works in JFace 3.5 and above (specifically, 3.5 M4 and above).
 				// With JFace 3.4, the font information (bold in this example) will be ignored.
@@ -158,14 +157,14 @@ public class Snippet049StyledCellLabelProvider {
 			super.update(cell);
 		}
 
-		protected void measure(Event event, File element) {
+		protected void measure(Event event, Object element) {
 			super.measure(event, element);
 		}
 	}
 
-	private static class FileSystemContentProvider implements IStructuredContentProvider<File,Object> {
+	private static class FileSystemContentProvider implements IStructuredContentProvider {
 
-		public File[] getElements(Object element) {
+		public Object[] getElements(Object element) {
 			File[] roots = File.listRoots();
 			for (int i = 0; i < roots.length; i++) {
 				File[] list = roots[i].listFiles();
@@ -179,7 +178,7 @@ public class Snippet049StyledCellLabelProvider {
 		public void dispose() {
 		}
 
-		public void inputChanged(Viewer<? extends Object> viewer, Object oldInput, Object newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 	}
 }
