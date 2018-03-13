@@ -50,6 +50,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IFileTypeProcessor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
@@ -58,6 +59,7 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
+import org.eclipse.ui.internal.registry.FileTypeProcessor;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -490,26 +492,26 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 							WorkbenchMessages.ContentTypes_addDialog_message,
 							WorkbenchMessages.ContentTypes_addDialog_label);
 					if (dialog.open() == Window.OK) {
-						String name = dialog.getName();
-						String extension = dialog.getExtension();
-						try {
-							if (name.equals("*")) { //$NON-NLS-1$
-								selectedContentType.addFileSpec(extension,
-										IContentType.FILE_EXTENSION_SPEC);
-							} else {
-								selectedContentType
-										.addFileSpec(
-												name
-														+ (extension.length() > 0 ? ('.' + extension)
-																: ""), //$NON-NLS-1$
-												IContentType.FILE_NAME_SPEC);
+						IFileTypeProcessor processor = new FileTypeProcessor();
+						String pattern = dialog.getPattern();
+						if (processor.isValidFileType(pattern)) {
+							String name = processor.getName(pattern);
+							String extension = processor.getExtension(pattern);
+							try {
+								if (name.equals("*")) { //$NON-NLS-1$
+									selectedContentType.addFileSpec(extension,
+											IContentType.FILE_EXTENSION_SPEC);
+								} else {
+									selectedContentType.addFileSpec(name
+											+ (extension.length() > 0 ? ('.' + extension) : ""), //$NON-NLS-1$
+											IContentType.FILE_NAME_SPEC);
+								}
+							} catch (CoreException ex) {
+								StatusUtil.handleStatus(ex.getStatus(), StatusManager.SHOW, shell);
+								WorkbenchPlugin.log(ex);
+							} finally {
+								fileAssociationViewer.refresh(false);
 							}
-						} catch (CoreException ex) {
-							StatusUtil.handleStatus(ex.getStatus(),
-									StatusManager.SHOW, shell);
-							WorkbenchPlugin.log(ex);
-						} finally {
-							fileAssociationViewer.refresh(false);
 						}
 					}
 				}
@@ -539,36 +541,36 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 						dialog.setInitialValue(spec.name);
 					}
 					if (dialog.open() == Window.OK) {
-						String name = dialog.getName();
-						String extension = dialog.getExtension();
-						try {
-							// remove the original spec
-							if (spec.name != null) {
-								selectedContentType.removeFileSpec(spec.name,
-										IContentType.FILE_NAME_SPEC);
-							} else if (spec.ext != null) {
-								selectedContentType.removeFileSpec(spec.ext,
-										IContentType.FILE_EXTENSION_SPEC);
-							}
+						IFileTypeProcessor processor = new FileTypeProcessor();
+						String pattern = dialog.getPattern();
+						if (processor.isValidFileType(pattern)) {
+							String name = processor.getName(pattern);
+							String extension = processor.getExtension(pattern);
+							try {
+								// remove the original spec
+								if (spec.name != null) {
+									selectedContentType.removeFileSpec(spec.name,
+											IContentType.FILE_NAME_SPEC);
+								} else if (spec.ext != null) {
+									selectedContentType.removeFileSpec(spec.ext,
+											IContentType.FILE_EXTENSION_SPEC);
+								}
 
-							// add the new one
-							if (name.equals("*")) { //$NON-NLS-1$
-								selectedContentType.addFileSpec(extension,
-										IContentType.FILE_EXTENSION_SPEC);
-							} else {
-								selectedContentType
-										.addFileSpec(
-												name
-														+ (extension.length() > 0 ? ('.' + extension)
-																: ""), //$NON-NLS-1$
-												IContentType.FILE_NAME_SPEC);
+								// add the new one
+								if (name.equals("*")) { //$NON-NLS-1$
+									selectedContentType.addFileSpec(extension,
+											IContentType.FILE_EXTENSION_SPEC);
+								} else {
+									selectedContentType.addFileSpec(name
+											+ (extension.length() > 0 ? ('.' + extension) : ""), //$NON-NLS-1$
+											IContentType.FILE_NAME_SPEC);
+								}
+							} catch (CoreException ex) {
+								StatusUtil.handleStatus(ex.getStatus(), StatusManager.SHOW, shell);
+								WorkbenchPlugin.log(ex);
+							} finally {
+								fileAssociationViewer.refresh(false);
 							}
-						} catch (CoreException ex) {
-							StatusUtil.handleStatus(ex.getStatus(),
-									StatusManager.SHOW, shell);
-							WorkbenchPlugin.log(ex);
-						} finally {
-							fileAssociationViewer.refresh(false);
 						}
 					}
 				}
