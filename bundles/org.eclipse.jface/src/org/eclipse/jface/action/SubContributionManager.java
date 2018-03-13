@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public abstract class SubContributionManager implements IContributionManager {
      * Maps each item in the manager to a wrapper.  The wrapper is used to 
      * control the visibility of each item.
      */
-    private Map<IContributionItem, SubContributionItem> mapItemToWrapper = new HashMap<IContributionItem, SubContributionItem>();
+    private Map mapItemToWrapper = new HashMap();
 
     /**
      * The visibility of the manager,
@@ -92,12 +92,12 @@ public abstract class SubContributionManager implements IContributionManager {
      * @since 3.0
      */
     public void disposeManager() {
-        Iterator<SubContributionItem> it = mapItemToWrapper.values().iterator();
+        Iterator it = mapItemToWrapper.values().iterator();
         // Dispose items in addition to removing them.
         // See bugs 64024 and 73715 for details.
 	    // Do not use getItems() here as subclasses can override that in bad ways.
         while (it.hasNext()) {
-            IContributionItem item = it.next();
+            IContributionItem item = (IContributionItem) it.next();
             item.dispose();
         }
         removeAll();
@@ -234,15 +234,14 @@ public abstract class SubContributionManager implements IContributionManager {
      * @return fetch all enumeration of wrappers for the item
      * @deprecated Use getItems(String value) instead.
      */
-    @Deprecated
-	public Enumeration<SubContributionItem> items() {
-        final Iterator<SubContributionItem> i = mapItemToWrapper.values().iterator();
-        return new Enumeration<SubContributionItem>() {
+    public Enumeration items() {
+        final Iterator i = mapItemToWrapper.values().iterator();
+        return new Enumeration() {
             public boolean hasMoreElements() {
                 return i.hasNext();
             }
 
-            public SubContributionItem nextElement() {
+            public Object nextElement() {
                 return i.next();
             }
         };
@@ -289,7 +288,7 @@ public abstract class SubContributionManager implements IContributionManager {
      * Method declared on IContributionManager.
      */
     public IContributionItem remove(IContributionItem item) {
-        SubContributionItem wrap = mapItemToWrapper
+        SubContributionItem wrap = (SubContributionItem) mapItemToWrapper
                 .get(item);
         if (wrap == null) {
 			return null;
@@ -324,9 +323,9 @@ public abstract class SubContributionManager implements IContributionManager {
     public void setVisible(boolean visible) {
         this.visible = visible;
         if (mapItemToWrapper.size() > 0) {
-            Iterator<SubContributionItem> it = mapItemToWrapper.values().iterator();
+            Iterator it = mapItemToWrapper.values().iterator();
             while (it.hasNext()) {
-                IContributionItem item = it.next();
+                IContributionItem item = (IContributionItem) it.next();
                 item.setVisible(visible);
             }
             parentMgr.markDirty();

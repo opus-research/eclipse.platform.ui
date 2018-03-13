@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -337,7 +337,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * 
 	 * @since 3.0
 	 */
-	@Override
 	protected void cancelPressed() {
 		// NOTE: this was previously done from a listener installed on the
 		// cancel button. On GTK, the listener installed by
@@ -355,7 +354,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * The <code>ProgressMonitorDialog</code> implementation of this method
 	 * only closes the dialog if there are no currently running runnables.
 	 */
-	@Override
 	public boolean close() {
 		if (getNestingDepth() <= 0) {
 			clearCursors();
@@ -390,7 +388,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/*
 	 * (non-Javadoc) Method declared in Window.
 	 */
-	@Override
 	protected void configureShell(final Shell shell) {
 		super.configureShell(shell);
 		shell.setText(JFaceResources.getString("ProgressMonitorDialog.title")); //$NON-NLS-1$
@@ -416,7 +413,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/*
 	 * (non-Javadoc) Method declared on Dialog.
 	 */
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		// cancel button
 		createCancelButton(parent);
@@ -442,7 +438,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	/*
 	 * (non-Javadoc) Method declared on Dialog.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		setMessage(DEFAULT_TASKNAME, false);
 		createMessageArea(parent);
@@ -471,7 +466,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * 
 	 * @see org.eclipse.jface.window.Window#getInitialSize()
 	 */
-	@Override
 	protected Point getInitialSize() {
 		Point calculatedSize = super.getInitialSize();
 		if (calculatedSize.x < 450) {
@@ -635,7 +629,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * 
 	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
 	 */
-	@Override
 	protected Image getImage() {
 		return getInfoImage();
 	}
@@ -675,7 +668,6 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	 * 
 	 * @see org.eclipse.jface.window.Window#open()
 	 */
-	@Override
 	public int open() {
 		// Check to be sure it is not already done. If it is just return OK.
 		if (!getOpenOnRun()) {
