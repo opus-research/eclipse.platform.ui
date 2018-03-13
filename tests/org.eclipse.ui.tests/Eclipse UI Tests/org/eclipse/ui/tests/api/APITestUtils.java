@@ -27,7 +27,6 @@ import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.SaveableHelper;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchPartReference;
 
@@ -80,7 +79,6 @@ public class APITestUtils {
 	}
 	
 	public static void saveableHelperSetAutomatedResponse(final int response) {
-		SaveableHelper.testSetAutomatedResponse(response);
 		Workbench workbench = (Workbench) PlatformUI.getWorkbench();
 		MApplication application = workbench.getApplication();
 		
