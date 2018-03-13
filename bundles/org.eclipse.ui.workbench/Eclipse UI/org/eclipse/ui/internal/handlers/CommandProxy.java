@@ -24,8 +24,6 @@ import org.eclipse.core.commands.NotHandledException;
  * 
  */
 public class CommandProxy {
-	private static boolean disabled = true;
-
 	private static Method firePreExecute = null;
 
 	private static Method getFirePreExecute() {
@@ -46,8 +44,6 @@ public class CommandProxy {
 	}
 
 	public static void firePreExecute(Command command, ExecutionEvent event) {
-		if (disabled)
-			return;
 		try {
 			getFirePreExecute().invoke(command, event);
 		} catch (IllegalArgumentException e) {
@@ -86,8 +82,6 @@ public class CommandProxy {
 	 * @param e
 	 */
 	public static void fireNotHandled(Command command, NotHandledException e) {
-		if (disabled)
-			return;
 		try {
 			getFireNotHandled().invoke(command, e);
 		} catch (IllegalArgumentException e1) {
@@ -126,8 +120,6 @@ public class CommandProxy {
 	 * @param exception
 	 */
 	public static void fireNotEnabled(Command command, NotEnabledException exception) {
-		if (disabled)
-			return;
 		try {
 			getFireNotEnabled().invoke(command, exception);
 		} catch (IllegalArgumentException e) {
@@ -166,8 +158,6 @@ public class CommandProxy {
 	 * @param exception
 	 */
 	public static void firePostExecuteFailure(Command command, ExecutionException exception) {
-		if (disabled)
-			return;
 		try {
 			getFirePostExecuteFailure().invoke(command, exception);
 		} catch (IllegalArgumentException e) {
@@ -206,8 +196,6 @@ public class CommandProxy {
 	 * @param returnValue
 	 */
 	public static void firePostExecuteSuccess(Command command, Object returnValue) {
-		if (disabled)
-			return;
 		try {
 			getFirePostExecuteSuccess().invoke(command, returnValue);
 		} catch (IllegalArgumentException e) {
