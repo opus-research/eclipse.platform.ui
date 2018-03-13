@@ -33,8 +33,8 @@ public final class Util {
 	 * An unmodifiable, empty, sorted set. This value is guaranteed to never
 	 * change and never be <code>null</code>.
 	 */
-	public static final SortedSet EMPTY_SORTED_SET = Collections
-			.unmodifiableSortedSet(new TreeSet());
+	public static final SortedSet<?> EMPTY_SORTED_SET = Collections
+			.unmodifiableSortedSet(new TreeSet<Object>());
 
 	/**
 	 * A common zero-length string. It avoids needing write <code>NON-NLS</code>
@@ -51,7 +51,7 @@ public final class Util {
 	 *            The class which the object should be; must not be
 	 *            <code>null</code>.
 	 */
-	public static final void assertInstance(final Object object, final Class c) {
+	public static final void assertInstance(final Object object, final Class<?> c) {
 		assertInstance(object, c, false);
 	}
 
@@ -69,7 +69,7 @@ public final class Util {
 	 *            Whether the object is allowed to be <code>null</code>.
 	 */
 	private static final void assertInstance(final Object object,
-			final Class c, final boolean allowNull) {
+			final Class<?> c, final boolean allowNull) {
 		if (object == null && allowNull) {
 			return;
 		}
@@ -89,9 +89,9 @@ public final class Util {
 	 *            The left value to compare
 	 * @param right
 	 *            The right value to compare
-	 * @return <code>-1</code> if the left is <code>false</code> and the
-	 *         right is <code>true</code>. <code>1</code> if the opposite
-	 *         is true. If they are equal, then it returns <code>0</code>.
+	 * @return <code>-1</code> if the left is <code>false</code> and the right
+	 *         is <code>true</code>. <code>1</code> if the opposite is true. If
+	 *         they are equal, then it returns <code>0</code>.
 	 */
 	public static final int compare(final boolean left, final boolean right) {
 		return left == false ? (right == true ? -1 : 0) : 1;
@@ -117,11 +117,11 @@ public final class Util {
 	 *            The left object to compare; may be <code>null</code>.
 	 * @param right
 	 *            The right object to compare; may be <code>null</code>.
-	 * @return The result of the comparison. <code>null</code> is considered
-	 *         to be the least possible value.
+	 * @return The result of the comparison. <code>null</code> is considered to
+	 *         be the least possible value.
 	 */
-	public static final int compare(final Comparable left,
-			final Comparable right) {
+	public static final <T extends Comparable<? super T>> int compare(
+			final T left, final T right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -141,12 +141,12 @@ public final class Util {
 	 *            The left array to be compared; may be <code>null</code>.
 	 * @param right
 	 *            The right array to be compared; may be <code>null</code>.
-	 * @return The result of the comparison. <code>null</code> is considered
-	 *         to be the least possible value. A shorter array is considered
-	 *         less than a longer array.
+	 * @return The result of the comparison. <code>null</code> is considered to
+	 *         be the least possible value. A shorter array is considered less
+	 *         than a longer array.
 	 */
-	public static final int compare(final Comparable[] left,
-			final Comparable[] right) {
+	public static final <T extends Comparable<? super T>> int compare(
+			final T[] left, final T[] right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -178,16 +178,17 @@ public final class Util {
 	 * contain comparable objects.
 	 * 
 	 * @param left
-	 *            The left list to compare; may be <code>null</code>. This
-	 *            list must only contain instances of <code>Comparable</code>.
+	 *            The left list to compare; may be <code>null</code>. This list
+	 *            must only contain instances of <code>Comparable</code>.
 	 * @param right
-	 *            The right list to compare; may be <code>null</code>. This
-	 *            list must only contain instances of <code>Comparable</code>.
-	 * @return The result of the comparison. <code>null</code> is considered
-	 *         to be the least possible value. A shorter list is considered less
+	 *            The right list to compare; may be <code>null</code>. This list
+	 *            must only contain instances of <code>Comparable</code>.
+	 * @return The result of the comparison. <code>null</code> is considered to
+	 *         be the least possible value. A shorter list is considered less
 	 *         than a longer list.
 	 */
-	public static final int compare(final List left, final List right) {
+	public static final <T extends Comparable<? super T>> int compare(
+			final List<T> left, final List<T> right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -203,8 +204,7 @@ public final class Util {
 			}
 
 			for (int i = 0; i < l; i++) {
-				int compareTo = compare((Comparable) left.get(i),
-						(Comparable) right.get(i));
+				int compareTo = compare(left.get(i), right.get(i));
 
 				if (compareTo != 0) {
 					return compareTo;
@@ -272,14 +272,13 @@ public final class Util {
 	 * <code>null</code>.
 	 * 
 	 * @param leftArray
-	 *            The left array to compare; may be <code>null</code>, and
-	 *            may be empty and may contain <code>null</code> elements.
+	 *            The left array to compare; may be <code>null</code>, and may
+	 *            be empty and may contain <code>null</code> elements.
 	 * @param rightArray
-	 *            The right array to compare; may be <code>null</code>, and
-	 *            may be empty and may contain <code>null</code> elements.
-	 * @return <code>true</code> if the arrays are equal length and the
-	 *         elements at the same position are equal; <code>false</code>
-	 *         otherwise.
+	 *            The right array to compare; may be <code>null</code>, and may
+	 *            be empty and may contain <code>null</code> elements.
+	 * @return <code>true</code> if the arrays are equal length and the elements
+	 *         at the same position are equal; <code>false</code> otherwise.
 	 */
 	public static final boolean equals(final Object[] leftArray,
 			final Object[] rightArray) {
@@ -437,8 +436,8 @@ public final class Util {
 	 * @param defaultString
 	 *            The value to return if the resource cannot be found; may be
 	 *            <code>null</code>.
-	 * @return The value of the translated resource at <code>key</code>. If
-	 *         the key cannot be found, then it is simply the
+	 * @return The value of the translated resource at <code>key</code>. If the
+	 *         key cannot be found, then it is simply the
 	 *         <code>defaultString</code>.
 	 */
 	public static final String translateString(
@@ -459,20 +458,24 @@ public final class Util {
 		return defaultString;
 	}
 
-    /**
-     * Foundation replacement for <code>String#replaceAll(String,
-     * String)</code>, but <strong>without support for regular
-     * expressions</strong>.
-     * 
-     * @param src the original string
-     * @param find the string to find
-     * @param replacement the replacement string
-     * @return the new string, with all occurrences of <code>find</code>
-     *         replaced by <code>replacement</code> (not using regular
-     *         expressions)
-     * @since 3.4
-     */
-	public static final String replaceAll(String src, String find, String replacement) {
+	/**
+	 * Foundation replacement for <code>String#replaceAll(String,
+	 * String)</code>, but <strong>without support for regular
+	 * expressions</strong>.
+	 * 
+	 * @param src
+	 *            the original string
+	 * @param find
+	 *            the string to find
+	 * @param replacement
+	 *            the replacement string
+	 * @return the new string, with all occurrences of <code>find</code>
+	 *         replaced by <code>replacement</code> (not using regular
+	 *         expressions)
+	 * @since 3.4
+	 */
+	public static final String replaceAll(String src, String find,
+			String replacement) {
 		final int len = src.length();
 		final int findLen = find.length();
 
@@ -486,7 +489,7 @@ public final class Util {
 		while (idx != -1 && idx < len) {
 			buf.append(src.substring(beginIndex, idx));
 			buf.append(replacement);
-			
+
 			beginIndex = idx + findLen;
 			if (beginIndex < len) {
 				idx = src.indexOf(find, beginIndex);
@@ -494,66 +497,75 @@ public final class Util {
 				idx = -1;
 			}
 		}
-		if (beginIndex<len) {
-			buf.append(src.substring(beginIndex, (idx==-1?len:idx)));
+		if (beginIndex < len) {
+			buf.append(src.substring(beginIndex, (idx == -1 ? len : idx)));
 		}
 		return buf.toString();
 	}
-	
+
 	//
 	// Methods for working with the windowing system
 	//
-	
+
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_WIN32 = "win32";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_MOTIF = "motif";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_GTK = "gtk";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_PHOTON = "photon";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_CARBON = "carbon";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_COCOA = "cocoa";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_WPF = "wpf";//$NON-NLS-1$
 
 	/**
 	 * Windowing system constant.
+	 * 
 	 * @since 3.5
 	 */
 	public static final String WS_UNKNOWN = "unknown";//$NON-NLS-1$
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for windows platforms
 	 * @since 3.5
 	 */
@@ -561,9 +573,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_WIN32.equals(ws) || WS_WPF.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for mac platforms
 	 * @since 3.5
 	 */
@@ -571,9 +584,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_CARBON.equals(ws) || WS_COCOA.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for linux platform
 	 * @since 3.5
 	 */
@@ -581,9 +595,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_GTK.equals(ws) || WS_MOTIF.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for gtk platforms
 	 * @since 3.5
 	 */
@@ -591,9 +606,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_GTK.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for motif platforms
 	 * @since 3.5
 	 */
@@ -601,9 +617,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_MOTIF.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for photon platforms
 	 * @since 3.5
 	 */
@@ -611,9 +628,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_PHOTON.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for carbon platforms
 	 * @since 3.5
 	 */
@@ -621,9 +639,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_CARBON.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for the cocoa platform.
 	 * @since 3.5
 	 */
@@ -631,9 +650,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_COCOA.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for WPF
 	 * @since 3.5
 	 */
@@ -641,9 +661,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_WPF.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return <code>true</code> for win32
 	 * @since 3.5
 	 */
@@ -651,9 +672,10 @@ public final class Util {
 		final String ws = SWT.getPlatform();
 		return WS_WIN32.equals(ws);
 	}
-	
+
 	/**
-	 * Common WS query helper method. 
+	 * Common WS query helper method.
+	 * 
 	 * @return the SWT windowing platform string.
 	 * @see SWT#getPlatform()
 	 * @since 3.5
