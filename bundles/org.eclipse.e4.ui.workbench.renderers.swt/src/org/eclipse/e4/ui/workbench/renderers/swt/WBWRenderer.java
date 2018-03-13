@@ -621,7 +621,16 @@ public class WBWRenderer extends SWTPartRenderer {
 					} else if (parentME == null) {
 						parentME = (MUIElement) ((EObject) w).eContainer();
 						if (parentME instanceof MContext) {
-							w.getContext().activate();
+							MPart ap = (MPart) w.getContext().get(
+									IServiceConstants.ACTIVE_PART);
+							if (ap != null) {
+								System.out.println("ap: " + ap.getLabel()); //$NON-NLS-1$
+								EPartService ps = w.getContext().get(
+										EPartService.class);
+								ps.activate(ap, true);
+							} else {
+								w.getContext().activate();
+							}
 						}
 					}
 				}

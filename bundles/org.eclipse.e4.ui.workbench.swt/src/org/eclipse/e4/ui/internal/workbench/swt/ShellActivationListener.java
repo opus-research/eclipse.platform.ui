@@ -70,7 +70,7 @@ public class ShellActivationListener implements Listener {
 
 		switch (event.type) {
 		case SWT.Activate:
-			activate(shell);
+			// activate(shell);
 			break;
 		case SWT.Deactivate:
 			deactivate(shell);
@@ -90,7 +90,7 @@ public class ShellActivationListener implements Listener {
 			SafeRunner.run(new ISafeRunnable() {
 				public void run() throws Exception {
 					// reconstruct the active chain for this mwindow
-					local.activateBranch();
+					// local.activateBranch();
 				}
 
 				public void handleException(Throwable exception) {
@@ -117,7 +117,7 @@ public class ShellActivationListener implements Listener {
 		SafeRunner.run(new ISafeRunnable() {
 			public void run() throws Exception {
 				// activate this shell
-				shellContext.activate();
+				// SshellContext.activate();
 			}
 
 			public void handleException(Throwable exception) {
@@ -145,7 +145,8 @@ public class ShellActivationListener implements Listener {
 		SafeRunner.run(new ISafeRunnable() {
 			public void run() throws Exception {
 				if (prevChild == null) {
-					IEclipseContext activeChild = parentContext.getActiveChild();
+					IEclipseContext activeChild = parentContext
+							.getActiveChild();
 					if (activeChild != null) {
 						activeChild.deactivate();
 					}
