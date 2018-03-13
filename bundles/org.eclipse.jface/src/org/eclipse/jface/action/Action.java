@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Menu;
  * the action's semantics.
  * </p>
  */
-public abstract class Action extends AbstractAction {
+public abstract class Action extends AbstractAction implements IAction {
 
 	private static final IMenuCreator VAL_DROP_DOWN_MENU = new IMenuCreator() {
 		public void dispose() {
