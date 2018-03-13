@@ -4,7 +4,7 @@
 
    <extension
          id="CocoaUIProcessor"
-         name="%extension.name"
+         name="Cocoa UI Processor"
          point="org.eclipse.e4.workbench.model">
       <processor
             beforefragment="false"

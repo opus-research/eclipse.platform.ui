@@ -23,7 +23,7 @@ import java.util.List;
  * @model
  * @generated
  */
-public enum SideValue implements org.eclipse.emf.common.util.Enumerator {
+public enum SideValue implements InternalSideValue {
 	/**
 	 * The '<em><b>Top</b></em>' literal object.
 	 * <!-- begin-user-doc -->
@@ -266,3 +266,13 @@ public enum SideValue implements org.eclipse.emf.common.util.Enumerator {
 	}
 	
 } //SideValue
+
+/**
+ * A private implementation interface used to hide the inheritance from Enumerator.
+ * <!-- begin-user-doc -->
+ * <!-- end-user-doc -->
+ * @generated
+ */
+interface InternalSideValue extends org.eclipse.emf.common.util.Enumerator {
+	// Empty 
+}
