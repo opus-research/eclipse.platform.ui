@@ -12,7 +12,6 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -265,11 +264,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	 * @see org.eclipse.jface.action.IContributionManager#find(java.lang.String)
 	 */
 	public IContributionItem find(String id) {
-		final MToolBar model = findToolbar(id);
-		if (model == null) {
+		MUIElement el = modelService.find(id, window);
+		if (!(el instanceof MToolBar))
 			return null;
-		}
 
+		final MToolBar model = (MToolBar) el;
 		if (model.getTransientData().get(OBJECT) != null) {
 			return (IContributionItem) model.getTransientData().get(OBJECT);
 		}
@@ -292,17 +291,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				return (IContributionItem) model.getTransientData().get(OBJECT);
 			}
 			return new GroupMarker(model.getElementId());
-		}
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	private MToolBar findToolbar(String id) {
-		for (Object elem: modelService.findElements(window, id, MTrimElement.class,
-				Collections.EMPTY_LIST)) {
-			if (elem instanceof MToolBar) {
-				return (MToolBar) elem;
-			}
 		}
 		return null;
 	}
