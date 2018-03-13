@@ -1118,29 +1118,32 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	}
 
 	public Object convert(CSSValue value, Object toType, Object context)
-			throws Exception {
-		Object newValue = null;
+			throws Exception {		
 		String key = CSSResourcesHelpers.getCSSValueKey(value);
-		IResourcesRegistry resourcesRegistry = getResourcesRegistry();
-		if (resourcesRegistry != null) {
-			if (key != null)
-				newValue = resourcesRegistry.getResource(toType, key);
-		}
+		Object newValue = getResource(toType, key);
+		
 		if (newValue == null) {
 			ICSSValueConverter converter = getCSSValueConverter(toType);
 			if (converter != null) {
 				newValue = converter.convert(value, this, context);
-				if (newValue != null) {
-					// cache it
-					if (resourcesRegistry != null) {
-						if (key != null)
-							resourcesRegistry.registerResource(toType, key,
-									newValue);
-					}
-				}
+				// cache it	
+				registerResource(toType, key, newValue);
 			}
 		}
 		return newValue;
+	}
+	
+	private Object getResource(Object toType, Object key) {
+		if (key != null && getResourcesRegistry() != null) {
+			return getResourcesRegistry().getResource(toType, key);
+		}
+		return null;
+	}
+	
+	private void registerResource(Object toType, Object key, Object resource) {
+		if (key != null && resource != null && getResourcesRegistry() != null) {
+			getResourcesRegistry().registerResource(toType, key, resource);
+		}
 	}
 
 	public String convert(Object value, Object toType, Object context)
