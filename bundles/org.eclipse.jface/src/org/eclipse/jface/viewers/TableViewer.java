@@ -56,15 +56,13 @@ import org.eclipse.swt.widgets.Widget;
  * Users setting up an editable table with more than 1 column <b>have</b> to pass the
  * SWT.FULL_SELECTION style bit
  * </p>
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  * 
  * @see SWT#VIRTUAL
  * @see #doFindItem(Object)
  * @see #internalRefresh(Object, boolean)
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
+public class TableViewer extends AbstractTableViewer {
 	/**
 	 * This viewer's table control.
 	 */
@@ -73,7 +71,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	/**
 	 * The cached row which is reused all over
 	 */
-	private TableViewerRow<E> cachedRow;
+	private TableViewerRow cachedRow;
 
 	/**
 	 * Creates a table viewer on a newly-created table control under the given
@@ -164,9 +162,9 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 
 	@Override
-	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
+	protected ViewerRow getViewerRowFromItem(Widget item) {
 		if (cachedRow == null) {
-			cachedRow = new TableViewerRow<E>((TableItem) item);
+			cachedRow = new TableViewerRow((TableItem) item);
 		} else {
 			cachedRow.setItem((TableItem) item);
 		}
@@ -183,7 +181,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	 * @since 3.3
 	 */
 	@Override
-	protected ViewerRow<E> internalCreateNewRowPart(int style, int rowIndex) {
+	protected ViewerRow internalCreateNewRowPart(int style, int rowIndex) {
 		TableItem item;
 
 		if (rowIndex >= 0) {
@@ -405,7 +403,7 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	 * @see org.eclipse.jface.viewers.AbstractTableViewer#remove(java.lang.Object[])
 	 */
 	@Override
-	public void remove(E[] elements) {
+	public void remove(Object[] elements) {
 		assertElementsNotNull(elements);
 		if (checkBusy())
 			return;
@@ -450,8 +448,8 @@ public class TableViewer<E,I> extends AbstractTableViewer<E,I>  {
 	}
 	
 	@Override
-	protected Widget doFindItem(E element) {
-		IContentProvider<I> contentProvider = getContentProvider();
+	protected Widget doFindItem(Object element) {
+		IContentProvider contentProvider = getContentProvider();
 		if (contentProvider instanceof IIndexableLazyContentProvider) {
 			IIndexableLazyContentProvider indexable = (IIndexableLazyContentProvider) contentProvider;
 			int idx = indexable.findElement(element);
