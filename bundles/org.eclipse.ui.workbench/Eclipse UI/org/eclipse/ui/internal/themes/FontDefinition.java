@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,152 +10,213 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
+import java.util.ResourceBundle;
+import org.eclipse.e4.ui.internal.css.swt.definition.IFontDefinitionOverridable;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * The FontDefiniton is the representation of the fontDefinition
- * from the plugin.xml of a type.
+ * The FontDefiniton is the representation of the fontDefinition from the
+ * plugin.xml of a type.
  */
 public class FontDefinition implements IHierarchalThemeElementDefinition,
-        ICategorizedThemeElementDefinition, IEditable {
+		ICategorizedThemeElementDefinition, IEditable, IFontDefinitionOverridable {
 
-    private String label;
+	private final static ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(Theme.class
+			.getName());
 
-    private String id;
+	private String label;
 
-    private String defaultsTo;
+	private String id;
 
-    private String categoryId;
+	private String defaultsTo;
 
-    private String description;
+	private String categoryId;
 
-    private String value;
+	private String description;
 
-    private boolean isEditable;
+	private String value;
 
-    private FontData[] parsedValue;
+	private boolean isEditable;
 
-    /**
-     * Create a new instance of the receiver.
-     * 
-     * @param fontName The name display
-     * ed in the preference page.
-     * @param uniqueId The id used to refer to this definition.
-     * @param defaultsId The id of the font this defaults to.
-     * @param fontDescription The description of the font in the preference page.
-     */
-    public FontDefinition(String fontName, String uniqueId, String defaultsId,
-            String value, String categoryId, boolean isEditable,
-            String fontDescription) {
-        this.label = fontName;
-        this.id = uniqueId;
-        this.defaultsTo = defaultsId;
-        this.value = value;
-        this.categoryId = categoryId;
-        this.description = fontDescription;
-        this.isEditable = isEditable;
-    }
+	private boolean overriden;
 
-    /**
-     * Create a new instance of the receiver.
-     * 
-     * @param originalFont the original definition.  This will be used to populate 
-     * all fields except defaultsTo and value.  defaultsTo will always be 
-     * <code>null</code>.
-     * @param datas the FontData[] value
-     */
-    public FontDefinition(FontDefinition originalFont, FontData[] datas) {
-        this.label = originalFont.getName();
-        this.id = originalFont.getId();
-        this.categoryId = originalFont.getCategoryId();
-        this.description = originalFont.getDescription();
-        this.isEditable = originalFont.isEditable();
-        this.parsedValue = datas;
-    }
+	private FontData[] parsedValue;
 
-    /**
-     * Returns the defaultsTo. This is the id of the text font
-     * that this font defualts to.
-     * @return String or <pre>null</pre>.
-     */
-    public String getDefaultsTo() {
-        return defaultsTo;
-    }
+	/**
+	 * Create a new instance of the receiver.
+	 * 
+	 * @param fontName
+	 *            The name display ed in the preference page.
+	 * @param uniqueId
+	 *            The id used to refer to this definition.
+	 * @param defaultsId
+	 *            The id of the font this defaults to.
+	 * @param fontDescription
+	 *            The description of the font in the preference page.
+	 */
+	public FontDefinition(String fontName, String uniqueId, String defaultsId, String value,
+			String categoryId, boolean isEditable, String fontDescription) {
+		this.label = fontName;
+		this.id = uniqueId;
+		this.defaultsTo = defaultsId;
+		this.value = value;
+		this.categoryId = categoryId;
+		this.description = fontDescription;
+		this.isEditable = isEditable;
+	}
 
-    /**
-     * Returns the description.
-     * @return String or <pre>null</pre>.
-     */
-    public String getDescription() {
-        return description;
-    }
+	/**
+	 * Create a new instance of the receiver.
+	 * 
+	 * @param originalFont
+	 *            the original definition. This will be used to populate all
+	 *            fields except defaultsTo and value. defaultsTo will always be
+	 *            <code>null</code>.
+	 * @param datas
+	 *            the FontData[] value
+	 */
+	public FontDefinition(FontDefinition originalFont, FontData[] datas) {
+		this.label = originalFont.getName();
+		this.id = originalFont.getId();
+		this.categoryId = originalFont.getCategoryId();
+		this.description = originalFont.getDescription();
+		this.isEditable = originalFont.isEditable();
+		this.parsedValue = datas;
+	}
 
-    /**
-     * Returns the label.
-     * @return String
-     */
-    public String getName() {
-        return label;
-    }
+	/**
+	 * Returns the defaultsTo. This is the id of the text font that this font
+	 * defualts to.
+	 * 
+	 * @return String or
+	 * 
+	 *         <pre>
+	 * null
+	 * </pre>
+	 * 
+	 *         .
+	 */
+	public String getDefaultsTo() {
+		return defaultsTo;
+	}
 
-    /**
-     * Returns the id.
-     * @return String
-     */
-    public String getId() {
-        return id;
-    }
+	/**
+	 * Returns the description.
+	 * 
+	 * @return String or
+	 * 
+	 *         <pre>
+	 * null
+	 * </pre>
+	 * 
+	 *         .
+	 */
+	public String getDescription() {
+		return description;
+	}
 
-    /**
-     * Returns the categoryId.
-     * @return String
-     */
-    public String getCategoryId() {
-        return categoryId;
-    }
+	/**
+	 * Returns the label.
+	 * 
+	 * @return String
+	 */
+	public String getName() {
+		return label;
+	}
 
-    /**
-     * Returns the value.
-     * 
-     * @return FontData []
-     */
-    public FontData[] getValue() {
-        if (value == null) {
+	/**
+	 * Returns the id.
+	 * 
+	 * @return String
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Returns the categoryId.
+	 * 
+	 * @return String
+	 */
+	public String getCategoryId() {
+		return categoryId;
+	}
+
+	/**
+	 * Returns the value.
+	 * 
+	 * @return FontData []
+	 */
+	public FontData[] getValue() {
+		if (value == null) {
 			return null;
 		}
-        if (parsedValue == null) {
-            parsedValue = JFaceResources.getFontRegistry().filterData(
-                    StringConverter.asFontDataArray(value),
-                    PlatformUI.getWorkbench().getDisplay());
-        }
+		if (parsedValue == null) {
+			parsedValue = JFaceResources.getFontRegistry().filterData(
+					StringConverter.asFontDataArray(value), PlatformUI.getWorkbench().getDisplay());
+		}
 
-        return parsedValue;
-    }
+		return parsedValue;
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IEditable#isEditable()
-     */
-    public boolean isEditable() {
-        return isEditable;
-    }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals(Object obj) {
-        if (obj instanceof FontDefinition) {
-            return getId().equals(((FontDefinition)obj).getId());
-        }
-        return false;
-    }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        return id.hashCode();
-    }    
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.themes.IEditable#isEditable()
+	 */
+	public boolean isEditable() {
+		return isEditable;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		if (obj instanceof FontDefinition) {
+			return getId().equals(((FontDefinition) obj).getId());
+		}
+		return false;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.css.swt.definition.IDefinitionOverridable#setData(java
+	 * .lang.Object)
+	 */
+	public void setValue(FontData[] data) {
+		if (data != null && data.length > 0) {
+			value = data[0].getName();
+			parsedValue = data;
+			if (!isOverriden()) {
+				description += ' ' + RESOURCE_BUNDLE.getString("Overriden.by.css.label"); //$NON-NLS-1$
+				overriden = true;
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.css.swt.definition.IDefinitionOverridable#isOverriden()
+	 */
+	public boolean isOverriden() {
+		return overriden;
+	}
 }
