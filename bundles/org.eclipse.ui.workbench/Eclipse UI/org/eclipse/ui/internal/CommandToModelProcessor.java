@@ -17,15 +17,17 @@ import java.util.Map;
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
+import org.eclipse.core.commands.IParameter;
+import org.eclipse.core.commands.ParameterType;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MCategory;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
+import org.eclipse.e4.ui.model.application.commands.MCommandParameter;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.ui.internal.commands.CommandPersistence;
 
@@ -85,9 +87,29 @@ public class CommandToModelProcessor {
 				continue;
 			}
 			try {
-				final MCategory categoryModel = categories.get(cmd.getCategory().getId());
+				MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
+				command.setElementId(cmd.getId());
+				command.setCategory(categories.get(cmd.getCategory().getId()));
+				command.setCommandName(cmd.getName());
+				command.setDescription(cmd.getDescription());
 
-				MCommand command = CommandProcessingAddon.createCommand(cmd, categoryModel);
+				// deal with parameters
+				// command.getParameters().addAll(parameters);
+				IParameter[] cmdParms = cmd.getParameters();
+				if (cmdParms != null) {
+					for (IParameter cmdParm : cmdParms) {
+						MCommandParameter parmModel = CommandsFactoryImpl.eINSTANCE
+								.createCommandParameter();
+						parmModel.setElementId(cmdParm.getId());
+						parmModel.setName(cmdParm.getName());
+						parmModel.setOptional(cmdParm.isOptional());
+						ParameterType parmType = cmd.getParameterType(cmdParm.getId());
+						if (parmType != null) {
+							parmModel.setTypeId(parmType.getId());
+						}
+						command.getParameters().add(parmModel);
+					}
+				}
 
 				application.getCommands().add(command);
 				commands.put(command.getElementId(), command);
@@ -97,8 +119,6 @@ public class CommandToModelProcessor {
 			}
 		}
 	}
-
-
 
 	/**
 	 * @param commandManager
