@@ -18,15 +18,6 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  * A representation of the model object '<em><b>Item</b></em>'.
  * <!-- end-user-doc -->
  *
- * <!-- begin-model-doc -->
- * <p>
- * <strong>Developers</strong>:
- * Add more detailed documentation by editing this comment in 
- * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
- * There is a GenModel/documentation node under each type and attribute.
- * </p>
- * <!-- end-model-doc -->
- *
  * <p>
  * The following features are supported:
  * <ul>
@@ -44,15 +35,11 @@ public interface MItem extends MUIElement, MUILabel {
 	 * Returns the value of the '<em><b>Enabled</b></em>' attribute.
 	 * The default value is <code>"true"</code>.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Enabled</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Enabled</em>' attribute.
 	 * @see #setEnabled(boolean)
 	 * @model default="true"
@@ -73,15 +60,11 @@ public interface MItem extends MUIElement, MUILabel {
 	/**
 	 * Returns the value of the '<em><b>Selected</b></em>' attribute.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Selected</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Selected</em>' attribute.
 	 * @see #setSelected(boolean)
 	 * @model
@@ -103,15 +86,11 @@ public interface MItem extends MUIElement, MUILabel {
 	 * Returns the value of the '<em><b>Type</b></em>' attribute.
 	 * The literals are from the enumeration {@link org.eclipse.e4.ui.model.application.ui.menu.ItemType}.
 	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
 	 * <p>
-	 * <strong>Developers</strong>:
-	 * Add more detailed documentation by editing this comment in 
-	 * org.eclipse.ui.model.workbench/model/UIElements.ecore. 
-	 * There is a GenModel/documentation node under each type and attribute.
+	 * If the meaning of the '<em>Type</em>' attribute isn't clear,
+	 * there really should be more of a description here...
 	 * </p>
-	 * <!-- end-model-doc -->
+	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Type</em>' attribute.
 	 * @see org.eclipse.e4.ui.model.application.ui.menu.ItemType
 	 * @see #setType(ItemType)

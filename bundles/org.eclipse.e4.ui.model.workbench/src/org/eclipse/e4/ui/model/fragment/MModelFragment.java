@@ -35,6 +35,10 @@ public interface MModelFragment {
 	 * Returns the value of the '<em><b>Elements</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.MApplicationElement}.
 	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Elements</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Elements</em>' containment reference list.
 	 * @model containment="true"
