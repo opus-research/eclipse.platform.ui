@@ -62,7 +62,6 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.2
  * @deprecated As of 3.3, clients should use {@link ControlDecoration} instead.
  */
-@Deprecated
 public class DecoratedField {
 
 	/**

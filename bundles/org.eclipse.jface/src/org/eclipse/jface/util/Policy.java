@@ -228,7 +228,6 @@ public class Policy {
 	 * @since 3.2
 	 * @deprecated this is no longer in use as of 3.3
 	 */
-	@Deprecated
 	public static void setAnimatorFactory(AnimatorFactory factory) {
 		animatorFactory = factory;
 	}
@@ -241,7 +240,6 @@ public class Policy {
 	 * @since 3.2
 	 * @deprecated this is no longer in use as of 3.3
 	 */
-	@Deprecated
 	public static AnimatorFactory getAnimatorFactory() {
 		if (animatorFactory == null)
 			animatorFactory = new AnimatorFactory();

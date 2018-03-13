@@ -210,8 +210,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return the menu control
      * @deprecated use <code>createMenuBar(Decorations)</code> instead.
      */
-    @Deprecated
-	public Menu createMenuBar(Shell parent) {
+    public Menu createMenuBar(Shell parent) {
         return createMenuBar((Decorations) parent);
     }
 
@@ -552,8 +551,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @deprecated this method is no longer a part of the 
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
-    @Deprecated
-	public boolean isSubstituteFor(IContributionItem item) {
+    public boolean isSubstituteFor(IContributionItem item) {
         return this.equals(item);
     }
 

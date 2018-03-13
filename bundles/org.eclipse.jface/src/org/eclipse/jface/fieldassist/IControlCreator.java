@@ -24,7 +24,6 @@ import org.eclipse.swt.widgets.Control;
  *             of {@link DecoratedField}.
  * 
  */
-@Deprecated
 public interface IControlCreator {
 	/**
 	 * Create a control with the specified parent and style bits.

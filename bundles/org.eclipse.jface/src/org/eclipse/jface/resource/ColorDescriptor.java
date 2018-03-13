@@ -38,8 +38,7 @@ public abstract class ColorDescriptor extends DeviceResourceDescriptor {
      * original Color's constructor.
      * @return a newly created ColorDescriptor that describes the given Color.
      */
-    @Deprecated
-	public static ColorDescriptor createFrom(Color toCreate, Device originalDevice) {
+    public static ColorDescriptor createFrom(Color toCreate, Device originalDevice) {
         return new RGBColorDescriptor(toCreate);
     }
     

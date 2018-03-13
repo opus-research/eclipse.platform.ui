@@ -39,8 +39,7 @@ public abstract class FontDescriptor extends DeviceResourceDescriptor {
      * the font's constructor when it was first created.
      * @return a newly created FontDescriptor.
      */
-    @Deprecated
-	public static FontDescriptor createFrom(Font font, Device originalDevice) {
+    public static FontDescriptor createFrom(Font font, Device originalDevice) {
         return new ArrayFontDescriptor(font);
     }
     
