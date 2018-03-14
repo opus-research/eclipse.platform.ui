@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,14 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956 - Fix perspective customization on 4.x
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -22,11 +23,15 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer;
 import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -46,6 +51,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.internal.menus.ActionSet;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -73,7 +79,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 	private static final String TOOLBAR_SEPARATOR = "toolbarSeparator"; //$NON-NLS-1$
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
-	private static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
+	public static final String OBJECT = "coolbar.object"; //$NON-NLS-1$
 	private static final String PREV_CHILD_VISIBLE = "prevChildVisible"; //$NON-NLS-1$
 	private MTrimBar topTrim;
 	private List<MTrimElement> workbenchTrimElements;
@@ -104,8 +110,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			topTrim.setElementId(MAIN_TOOLBAR_ID);
 		}
 		topTrim.setToBeRendered(false);
-		MToolBar mToolBar = modelService.createModelElement(MToolBar.class);
-		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(mToolBar, null);
+
+		renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(
+				MenuFactoryImpl.eINSTANCE.createToolBar(), null);
 	}
 
 	@Override
@@ -128,7 +135,8 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 
 		if (item instanceof IToolBarContributionItem) {
-			IToolBarManager mgr = ((IToolBarContributionItem) item).getToolBarManager();
+			IToolBarContributionItem tbc = (IToolBarContributionItem) item;
+			IToolBarManager mgr = tbc.getToolBarManager();
 			if (!(mgr instanceof ToolBarManager)) {
 				return;
 			}
@@ -141,12 +149,16 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBar toolBar = (MToolBar) modelService.find(item.getId(), window);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
-				toolBar = modelService.createModelElement(MToolBar.class);
+				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 			} else {
 				toolBar.getChildren().clear();
 			}
 			toolBar.setElementId(item.getId());
 			toolBar.getTransientData().put(OBJECT, item);
+			String toolbarLabel = getToolbarLabel(application, item.getId());
+			if (toolbarLabel != null) {
+				toolBar.getTransientData().put("Name", toolbarLabel); //$NON-NLS-1$
+			}
 			renderer.linkModelToManager(toolBar, manager);
 			toolBar.setToBeRendered(true);
 			if (!tbFound) {
@@ -171,7 +183,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 					return;
 				}
 			}
-			MToolBarSeparator separator = modelService.createModelElement(MToolBarSeparator.class);
+			MToolBarSeparator separator = MenuFactoryImpl.eINSTANCE.createToolBarSeparator();
 			separator.setToBeRendered(false);
 			separator.setElementId(item.getId());
 
@@ -179,7 +191,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBar toolBar = toolbars.isEmpty() ? null : toolbars.get(0);
 			boolean tbFound = toolBar != null;
 			if (!tbFound) {
-				toolBar = modelService.createModelElement(MToolBar.class);
+				toolBar = MenuFactoryImpl.eINSTANCE.createToolBar();
 			} else {
 				toolBar.getChildren().clear();
 			}
@@ -198,6 +210,49 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			workbenchTrimElements.add(toolBar);
 		}
 
+	}
+
+	public static String getToolbarLabel(MApplication application, MUIElement elt) {
+		String name = getTransientName(elt);
+		if (name != null) {
+			return name;
+		}
+		String elementId = elt.getElementId();
+		return getToolbarLabel(application, elementId);
+	}
+
+	// See MenuAdditionCacheEntry
+	private static String getToolbarLabel(MApplication application, String elementId) {
+		String name;
+		if (IWorkbenchActionConstants.TOOLBAR_FILE.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_FileToolbar;
+		}
+		if (IWorkbenchActionConstants.TOOLBAR_NAVIGATE.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_NavigateToolbar;
+		}
+		if (IWorkbenchActionConstants.TOOLBAR_HELP.equalsIgnoreCase(elementId)) {
+			return WorkbenchMessages.WorkbenchWindow_HelpToolbar;
+		}
+		List<MTrimContribution> trimContributions = application.getTrimContributions();
+		for (MTrimContribution mtb : trimContributions) {
+			for (MTrimElement e : mtb.getChildren()) {
+				if (e.getElementId().equals(elementId)) {
+					name = getTransientName(e);
+					if (name != null) {
+						return name;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	static String getTransientName(MUIElement elt) {
+		Object name = elt.getTransientData().get("Name"); //$NON-NLS-1$
+		if (name instanceof String) {
+			return (String) name;
+		}
+		return null;
 	}
 
 	@Override
@@ -500,14 +555,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 		// and now add it to the model, start the rendering
 		if (!trimBarsAdded) {
-			boolean hidden = !topTrim.isVisible();
-			if (hidden) {
-				topTrim.setVisible(true);
-			}
 			topTrim.setToBeRendered(true);
-			if (hidden) {
-				topTrim.setVisible(false);
-			}
 			trimBarsAdded = true;
 		}
 	}
@@ -537,7 +585,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 	private void fill(MToolBar container, IContributionManager manager) {
 		ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(container, null);
 
-		for (IContributionItem item : manager.getItems()) {
+		IContributionItem[] items = manager.getItems();
+		for (int index = 0; index < items.length; index++) {
+			IContributionItem item = items[index];
 			if (item == null) {
 				continue;
 			}
@@ -558,12 +608,22 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			} else if (item instanceof IContributionManager) {
 				fill(container, (IContributionManager) item);
 			} else if (item instanceof CommandContributionItem) {
-				CommandContributionItem cci = (CommandContributionItem) item;
-				MToolItem toolItem = MenuHelper.createToolItem(application, cci);
-				manager.remove(item);
-				if (toolItem != null) {
-					container.getChildren().add(toolItem);
+				MHandledToolItem toolItem = MenuHelper.createToolItem(application, (CommandContributionItem) item);
+				if (toolItem == null) {
+					continue;
 				}
+				toolItem.setRenderer(renderer);
+				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
+						window.getContext());
+				if (manager instanceof ContributionManager) {
+					ContributionManager cm = (ContributionManager) manager;
+					cm.insert(index, ci);
+					cm.remove(item);
+				}
+				ci.setModel(toolItem);
+				ci.setVisible(toolItem.isVisible());
+				renderer.linkModelToContribution(toolItem, ci);
+				container.getChildren().add(toolItem);
 			} else {
 				MToolItem toolItem = OpaqueElementUtil.createOpaqueToolItem();
 				toolItem.setElementId(item.getId());
@@ -606,5 +666,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			return v.booleanValue();
 		}
 		return null;
+	}
+
+	public MTrimBar getTopTrim() {
+		return topTrim;
 	}
 }

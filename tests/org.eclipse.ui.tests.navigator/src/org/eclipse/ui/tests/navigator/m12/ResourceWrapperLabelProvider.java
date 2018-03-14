@@ -21,7 +21,6 @@ import org.eclipse.ui.ide.IDE.SharedImages;
 
 public class ResourceWrapperLabelProvider implements ILabelProvider {
 
-	@Override
 	public Image getImage(Object element) {
 		ISharedImages sharedImages = PlatformUI.getWorkbench()
 				.getSharedImages();
@@ -35,27 +34,22 @@ public class ResourceWrapperLabelProvider implements ILabelProvider {
 		return null;
 	}
 
-	@Override
 	public String getText(Object element) {
 		ResourceWrapper res = (ResourceWrapper) element;
 		return "[" + res.getModelId() + "] " + res.getResource().getName();
 	}
 
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 
 	}
 
-	@Override
 	public void dispose() {
 	}
 
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 
 	}
