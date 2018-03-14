@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445484, 457132, 458261
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -56,7 +56,8 @@ public class EarlyStartupRunnable extends SafeRunnable {
     @Override
 	public void handleException(Throwable exception) {
 		IStatus status = new Status(IStatus.ERROR, extension.getNamespaceIdentifier(), 0,
-                "Unable to execute early startup code for an extension", //$NON-NLS-1$
+				"Unable to execute early startup code for the org.eclipse.ui.IStartup extension contributed by the '" //$NON-NLS-1$
+						+ extension.getNamespaceIdentifier() + "' plug-in.", //$NON-NLS-1$
                 exception);
 		WorkbenchPlugin.log(status);
     }
