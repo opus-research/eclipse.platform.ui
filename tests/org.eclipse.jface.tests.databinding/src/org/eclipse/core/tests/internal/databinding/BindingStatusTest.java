@@ -24,6 +24,9 @@ import org.eclipse.core.runtime.Status;
 public class BindingStatusTest extends TestCase {
 	private BindingStatus bindingStatus;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();

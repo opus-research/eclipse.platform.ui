@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 434611, 472654
- *     Manumitting Technologies Inc - Bug 380609
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 434611
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -19,7 +18,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
@@ -158,7 +156,7 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MApplication && (searchFlags == ANYWHERE)) {
 			MApplication app = (MApplication) searchRoot;
 
-			List<MApplicationElement> children = new ArrayList<>();
+			List<MApplicationElement> children = new ArrayList<MApplicationElement>();
 			if (clazz != null) {
 				if (clazz.equals(MHandler.class)) {
 					children.addAll(app.getHandlers());
@@ -310,7 +308,7 @@ public class ModelServiceImpl implements EModelService {
 	@Override
 	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
 			int searchFlags, Selector matcher) {
-		List<T> elements = new ArrayList<>();
+		List<T> elements = new ArrayList<T>();
 		findElementsRecursive(searchRoot, clazz, matcher, elements, searchFlags);
 		return elements;
 	}
@@ -318,7 +316,7 @@ public class ModelServiceImpl implements EModelService {
 	private <T> List<T> findPerspectiveElements(MUIElement searchRoot, String id,
 			Class<T> clazz,
 			List<String> tagsToMatch) {
-		List<T> elements = new ArrayList<>();
+		List<T> elements = new ArrayList<T>();
 		ElementMatcher matcher = new ElementMatcher(id, clazz, tagsToMatch);
 		findElementsRecursive(searchRoot, clazz, matcher, elements, PRESENTATION);
 		return elements;
@@ -503,7 +501,7 @@ public class ModelServiceImpl implements EModelService {
 	@Override
 	public MPlaceholder findPlaceholderFor(MWindow window, MUIElement element) {
 		List<MPlaceholder> phList = findPerspectiveElements(window, null, MPlaceholder.class, null);
-		List<MPlaceholder> elementRefs = new ArrayList<>();
+		List<MPlaceholder> elementRefs = new ArrayList<MPlaceholder>();
 		for (MPlaceholder ph : phList) {
 			if (ph.getRef() == element) {
 				elementRefs.add(ph);
@@ -531,23 +529,23 @@ public class ModelServiceImpl implements EModelService {
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent) {
 		move(element, newParent, -1, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent,
 			boolean leavePlaceholder) {
 		move(element, newParent, -1, leavePlaceholder);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index) {
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index) {
 		move(element, newParent, index, false);
 	}
 
 	@Override
-	public <T extends MUIElement> void move(T element, MElementContainer<? super T> newParent, int index,
+	public void move(MUIElement element, MElementContainer<MUIElement> newParent, int index,
 			boolean leavePlaceholder) {
 		// Cache where we were
 		MElementContainer<MUIElement> curParent = element.getParent();
@@ -594,11 +592,7 @@ public class ModelServiceImpl implements EModelService {
 	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			int where, float ratio) {
 		assert (toInsert != null && relTo != null);
-		if (ratio >= 1) {
-			warn("EModelService#insert() expects the ratio to be between (0,100)"); //$NON-NLS-1$
-			ratio = ratio / 100; // reduce it
-		}
-		assert(ratio > 0 && ratio < 1);
+		assert (ratio > 0 && ratio < 100);
 
 		// determine insertion order
 		boolean insertBefore = where == ABOVE || where == LEFT_OF;
@@ -778,7 +772,7 @@ public class ModelServiceImpl implements EModelService {
 
 		// Remove any minimized stacks for this perspective
 		List<MTrimBar> bars = findElements(window, null, MTrimBar.class, null);
-		List<MToolControl> toRemove = new ArrayList<>();
+		List<MToolControl> toRemove = new ArrayList<MToolControl>();
 		for (MTrimBar bar : bars) {
 			for (MUIElement barKid : bar.getChildren()) {
 				if (!(barKid instanceof MToolControl)) {
@@ -922,7 +916,7 @@ public class ModelServiceImpl implements EModelService {
 				OUTSIDE_PERSPECTIVE | IN_SHARED_AREA);
 
 		// Iterate across the perspective(s) removing any 'local' placeholders
-		List<MPerspective> persps = new ArrayList<>();
+		List<MPerspective> persps = new ArrayList<MPerspective>();
 		if (perspective != null) {
 			persps.add(perspective);
 		} else {
@@ -1014,12 +1008,5 @@ public class ModelServiceImpl implements EModelService {
 		}
 
 		return hostWindow.getSharedElements().contains(curElement);
-	}
-
-	private void warn(String message) {
-		Logger logger = appContext.get(Logger.class);
-		if (logger != null) {
-			logger.warn(message);
-		}
 	}
 }

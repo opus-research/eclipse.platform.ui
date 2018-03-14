@@ -214,6 +214,12 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Overrides method in CopyFilesAndFoldersOperation
+	 *
+	 * Note this method is for internal use only. It is not API.
+	 *
+	 */
 	@Override
 	public String validateDestination(IContainer destination,
 			IResource[] sourceResources) {
@@ -246,6 +252,11 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 		return super.validateDestination(destination, sourceResources);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.actions.CopyFilesAndFoldersOperation#isMove()
+	 */
 	@Override
 	protected boolean isMove() {
 		return true;
