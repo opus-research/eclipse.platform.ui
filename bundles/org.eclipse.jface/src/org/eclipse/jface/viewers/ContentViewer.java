@@ -76,8 +76,7 @@ public abstract class ContentViewer extends Viewer {
     private final ILabelProviderListener labelProviderListener = new ILabelProviderListener() {
     	private boolean logWhenDisposed = true; // initially true, set to false
         
-        @Override
-		public void labelProviderChanged(LabelProviderChangedEvent event) {
+        public void labelProviderChanged(LabelProviderChangedEvent event) {
         	Control control = getControl();
         	if (control == null || control.isDisposed()) {
     			if (logWhenDisposed) {
@@ -212,8 +211,7 @@ public abstract class ContentViewer extends Viewer {
      */
     protected void hookControl(Control control) {
         control.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
+            public void widgetDisposed(DisposeEvent event) {
                 handleDispose(event);
             }
         });
