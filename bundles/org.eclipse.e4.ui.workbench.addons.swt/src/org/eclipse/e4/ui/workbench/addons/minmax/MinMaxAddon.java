@@ -44,7 +44,6 @@ import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
-import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Rectangle;
@@ -94,14 +93,12 @@ public class MinMaxAddon {
 		private MUIElement getElementToChange(CTabFolderEvent event) {
 			CTabFolder ctf = (CTabFolder) event.widget;
 			MUIElement element = (MUIElement) ctf.getData(AbstractPartRenderer.OWNING_ME);
-			if (element instanceof MArea) {
+			if (element instanceof MArea)
 				return element.getCurSharedRef();
-			}
 
 			MUIElement parentElement = element.getParent();
-			while (parentElement != null && !(parentElement instanceof MArea)) {
+			while (parentElement != null && !(parentElement instanceof MArea))
 				parentElement = parentElement.getParent();
-			}
 
 			return parentElement != null ? parentElement.getCurSharedRef() : element;
 		}
@@ -122,7 +119,11 @@ public class MinMaxAddon {
 		}
 	};
 
-	private MouseListener CTFDblClickListener = new MouseAdapter() {
+	private MouseListener CTFDblClickListener = new MouseListener() {
+		@Override
+		public void mouseUp(MouseEvent e) {
+		}
+
 		@Override
 		public void mouseDown(MouseEvent e) {
 			// HACK! If this is an empty stack treat it as though it was the editor area
@@ -153,9 +154,8 @@ public class MinMaxAddon {
 			}
 
 			MUIElement parentElement = element.getParent();
-			while (parentElement != null && !(parentElement instanceof MArea)) {
+			while (parentElement != null && !(parentElement instanceof MArea))
 				parentElement = parentElement.getParent();
-			}
 
 			return parentElement != null ? parentElement.getCurSharedRef() : element;
 		}
@@ -165,14 +165,12 @@ public class MinMaxAddon {
 			// only maximize if the primary mouse button was used
 			if (e.button == 1) {
 				CTabFolder ctf = (CTabFolder) e.widget;
-				if (!ctf.getMaximizeVisible()) {
+				if (!ctf.getMaximizeVisible())
 					return;
-				}
 
 				// Only fire if we're in the 'tab' area
-				if (e.y > ctf.getTabHeight()) {
+				if (e.y > ctf.getTabHeight())
 					return;
-				}
 
 				MUIElement elementToChange = getElementToChange(e);
 				if (!elementToChange.getTags().contains(MAXIMIZED)) {
@@ -202,25 +200,21 @@ public class MinMaxAddon {
 	@Optional
 	private void subscribeTopicWidget(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
 		final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
-		if (!(changedElement instanceof MPartStack) && !(changedElement instanceof MArea)) {
+		if (!(changedElement instanceof MPartStack) && !(changedElement instanceof MArea))
 			return;
-		}
 
 		final CTabFolder ctf = getCTFFor(changedElement);
-		if (ctf == null) {
+		if (ctf == null)
 			return;
-		}
 
 		MUIElement stateElement = changedElement;
 		if (changedElement instanceof MPartStack) {
 			MPartStack stack = (MPartStack) changedElement;
 			MArea area = getAreaFor(stack);
-			if (area != null && !(area.getWidget() instanceof CTabFolder)) {
+			if (area != null && !(area.getWidget() instanceof CTabFolder))
 				stateElement = area.getCurSharedRef();
-			}
-		} else if (changedElement instanceof MArea) {
+		} else if (changedElement instanceof MArea)
 			stateElement = changedElement.getCurSharedRef();
-		}
 
 		adjustCTFButtons(stateElement);
 
@@ -243,9 +237,8 @@ public class MinMaxAddon {
 			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 		final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
 		if (!(changedElement instanceof MPerspectiveStack)
-				|| modelService.getTopLevelWindowFor(changedElement) == null) {
+				|| modelService.getTopLevelWindowFor(changedElement) == null)
 			return;
-		}
 
 		if (UIEvents.isREMOVE(event)) {
 			for (Object removedElement : UIEvents.asIterable(event, UIEvents.EventTags.OLD_VALUE)) {
@@ -283,9 +276,8 @@ public class MinMaxAddon {
 	private void subscribeTopicSelectedElement(
 			@UIEventTopic(UIEvents.ElementContainer.TOPIC_SELECTEDELEMENT) Event event) {
 		final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
-		if (!(changedElement instanceof MPerspectiveStack)) {
+		if (!(changedElement instanceof MPerspectiveStack))
 			return;
-		}
 
 		MPerspectiveStack ps = (MPerspectiveStack) changedElement;
 		MWindow window = modelService.getTopLevelWindowFor(ps);
@@ -350,15 +342,13 @@ public class MinMaxAddon {
 	@Optional
 	private void subscribeTopicTagsChanged(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TAGS) Event event) {
-		if (ignoreTagChanges) {
+		if (ignoreTagChanges)
 			return;
-		}
 
 		Object changedObj = event.getProperty(EventTags.ELEMENT);
 
-		if (!(changedObj instanceof MUIElement)) {
+		if (!(changedObj instanceof MUIElement))
 			return;
-		}
 
 		final MUIElement changedElement = (MUIElement) changedObj;
 
@@ -394,9 +384,8 @@ public class MinMaxAddon {
 		Object changedObject = event.getProperty(EventTags.ELEMENT);
 
 		// Only care about MPerspective id changes
-		if (!(changedObject instanceof MPerspective)) {
+		if (!(changedObject instanceof MPerspective))
 			return;
-		}
 
 		MPerspective perspective = (MPerspective) changedObject;
 
@@ -409,17 +398,15 @@ public class MinMaxAddon {
 
 		// Search the trim for the window containing the perspective
 		MWindow perspWin = modelService.getTopLevelWindowFor(perspective);
-		if (perspWin == null) {
+		if (perspWin == null)
 			return;
-		}
 
 		List<MToolControl> trimStacks = modelService.findElements(perspWin, null,
 				MToolControl.class, null);
 		for (MToolControl trimStack : trimStacks) {
 			// Only care about MToolControls that are TrimStacks
-			if (TrimStack.CONTRIBUTION_URI.equals(trimStack.getContributionURI())) {
+			if (TrimStack.CONTRIBUTION_URI.equals(trimStack.getContributionURI()))
 				trimStack.setElementId(trimStack.getElementId().replace(oldID, newID));
-			}
 		}
 	}
 
@@ -464,9 +451,7 @@ public class MinMaxAddon {
 		MWindow stackWin = modelService.getTopLevelWindowFor(stack);// getContainingWindow(stack);
 		MUIElement tcElement = modelService.find(stack.getElementId() + perspIdStr, stackWin);
 		if (tcElement == null)
-		 {
 			return ""; //$NON-NLS-1$
-		}
 
 		MTrimBar bar = (MTrimBar) ((MUIElement) tcElement.getParent());
 		int sideVal = bar.getSide().getValue();
@@ -515,9 +500,8 @@ public class MinMaxAddon {
 	private MArea getAreaFor(MPartStack stack) {
 		MUIElement parent = stack.getParent();
 		while (parent != null) {
-			if (parent instanceof MArea) {
+			if (parent instanceof MArea)
 				return (MArea) parent;
-			}
 			parent = parent.getParent();
 		}
 		return null;
@@ -555,14 +539,12 @@ public class MinMaxAddon {
 	 *            The element to test
 	 */
 	private void adjustCTFButtons(MUIElement element) {
-		if (!(element instanceof MPartStack) && !(element instanceof MPlaceholder)) {
+		if (!(element instanceof MPartStack) && !(element instanceof MPlaceholder))
 			return;
-		}
 
 		CTabFolder ctf = getCTFFor(element);
-		if (ctf == null) {
+		if (ctf == null)
 			return;
-		}
 
 		if (element instanceof MPlaceholder) {
 			setCTFButtons(ctf, element, false);
@@ -576,19 +558,17 @@ public class MinMaxAddon {
 
 	private CTabFolder getCTFFor(MUIElement element) {
 		if (element instanceof MArea) {
-			if (element.getWidget() instanceof CTabFolder) {
+			if (element.getWidget() instanceof CTabFolder)
 				return (CTabFolder) element.getWidget();
-			}
 			List<MPartStack> stacks = modelService.findElements(element, null, MPartStack.class,
 					null);
 			for (MPartStack stack : stacks) {
-				if (stack.getWidget() instanceof CTabFolder) {
+				if (stack.getWidget() instanceof CTabFolder)
 					return (CTabFolder) stack.getWidget();
-				}
 			}
-		} else if (element.getWidget() instanceof CTabFolder) {
+		} else if (element.getWidget() instanceof CTabFolder)
 			return (CTabFolder) element.getWidget();
-		} else if (element instanceof MPlaceholder) {
+		else if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
 			if (ph.getRef() instanceof MArea) {
 				return getCTFFor(ph.getRef());
@@ -598,18 +578,16 @@ public class MinMaxAddon {
 	}
 
 	boolean isEmptyPerspectiveStack(MUIElement element) {
-		if (!(element instanceof MPerspectiveStack)) {
+		if (!(element instanceof MPerspectiveStack))
 			return false;
-		}
 		MPerspectiveStack ps = (MPerspectiveStack) element;
 		return ps.getChildren().size() == 0;
 	}
 
 	void minimize(MUIElement element) {
 		// Can't minimize a non-rendered element
-		if (!element.isToBeRendered()) {
+		if (!element.isToBeRendered())
 			return;
-		}
 
 		if (isEmptyPerspectiveStack(element)) {
 			element.setVisible(false);
@@ -651,9 +629,8 @@ public class MinMaxAddon {
 			// Are any stacks still minimized ?
 			boolean unMax = true;
 			for (MUIElement toRestore : elementsLeftToRestore) {
-				if (!toRestore.isVisible()) {
+				if (!toRestore.isVisible())
 					unMax = false;
-				}
 			}
 			if (unMax) {
 				maxElement.getTags().remove(IPresentationEngine.MAXIMIZED);
@@ -662,9 +639,8 @@ public class MinMaxAddon {
 	}
 
 	void maximize(final MUIElement element) {
-		if (!element.isToBeRendered()) {
+		if (!element.isToBeRendered())
 			return;
-		}
 
 		List<MUIElement> elementsToMinimize = getElementsToMinimize(element);
 		Shell hostShell = (Shell) modelService.getTopLevelWindowFor(element).getWidget();
@@ -700,9 +676,8 @@ public class MinMaxAddon {
 			List<MPartStack> globalStacks = modelService.findElements(win, null, MPartStack.class,
 					null, EModelService.OUTSIDE_PERSPECTIVE);
 			for (MPartStack gStack : globalStacks) {
-				if (gStack == element || !gStack.isToBeRendered()) {
+				if (gStack == element || !gStack.isToBeRendered())
 					continue;
-				}
 
 				if (gStack.getWidget() != null && !gStack.getTags().contains(MINIMIZED)) {
 					elementsToMinimize.add(gStack);
@@ -723,9 +698,7 @@ public class MinMaxAddon {
 			}
 			if (perspStack != null) {
 				if (perspStack.getElementId() == null || perspStack.getElementId().length() == 0)
-				 {
 					perspStack.setElementId("PerspectiveStack"); //$NON-NLS-1$
-				}
 
 				elementsToMinimize.add(perspStack);
 			}
@@ -733,14 +706,12 @@ public class MinMaxAddon {
 			List<MPartStack> stacks = modelService.findElements(persp == null ? win : persp, null,
 					MPartStack.class, null, EModelService.PRESENTATION);
 			for (MPartStack theStack : stacks) {
-				if (theStack == element || !theStack.isToBeRendered()) {
+				if (theStack == element || !theStack.isToBeRendered())
 					continue;
-				}
 
 				// Exclude stacks in DW's
-				if (getWindowFor(theStack) != win) {
+				if (getWindowFor(theStack) != win)
 					continue;
-				}
 
 				loc = modelService.getElementLocation(theStack);
 				if (loc != EModelService.IN_SHARED_AREA && theStack.getWidget() != null
@@ -755,9 +726,8 @@ public class MinMaxAddon {
 			List<MPlaceholder> standaloneViews = modelService.findElements(persp == null ? win
 					: persp, null, MPlaceholder.class, standaloneTag, EModelService.PRESENTATION);
 			for (MPlaceholder part : standaloneViews) {
-				if (!part.isToBeRendered()) {
+				if (!part.isToBeRendered())
 					continue;
-				}
 				elementsToMinimize.add(part);
 			}
 
@@ -789,17 +759,14 @@ public class MinMaxAddon {
 		if (curMax.size() > 0) {
 			for (MUIElement maxElement : curMax) {
 				// Only unmax elements in this window
-				if (getWindowFor(maxElement) != win) {
+				if (getWindowFor(maxElement) != win)
 					continue;
-				}
 
 				MPerspective maxPersp = modelService.getPerspectiveFor(maxElement);
-				if (maxPersp != elePersp) {
+				if (maxPersp != elePersp)
 					continue;
-				}
-				if (maxElement == element) {
+				if (maxElement == element)
 					continue;
-				}
 				ignoreTagChanges = true;
 				try {
 					maxElement.getTags().remove(MAXIMIZED);
@@ -825,9 +792,8 @@ public class MinMaxAddon {
 
 		// We rely here on the fact that a DW's 'getParent' will return
 		// null since it's not in the 'children' hierarchy
-		while (parent != null && !(parent instanceof MWindow)) {
+		while (parent != null && !(parent instanceof MWindow))
 			parent = parent.getParent();
-		}
 
 		// A detached window will end up with getParent() == null
 		return (MWindow) parent;
@@ -876,9 +842,8 @@ public class MinMaxAddon {
 				// unzoooming an element outside the perspectives
 				if (outsidePerspectives) {
 					int stackLoc = modelService.getElementLocation(theStack);
-					if ((stackLoc & EModelService.OUTSIDE_PERSPECTIVE) == 0) {
+					if ((stackLoc & EModelService.OUTSIDE_PERSPECTIVE) == 0)
 						continue;
-					}
 				}
 
 				// Make sure we're only working on *our* window
@@ -939,11 +904,10 @@ public class MinMaxAddon {
 			// Check if we have a cached location
 			MTrimBar bar = getBarForElement(element, window);
 			int index = getCachedIndex(element);
-			if (index == -1 || index >= bar.getChildren().size()) {
+			if (index == -1 || index >= bar.getChildren().size())
 				bar.getChildren().add(trimStack);
-			} else {
+			else
 				bar.getChildren().add(index, trimStack);
-			}
 
 			bar.setVisible(true);
 
@@ -974,9 +938,8 @@ public class MinMaxAddon {
 	private String getCachedInfo(MUIElement element) {
 		String cacheId = GLOBAL_CACHE_ID;
 		MPerspective persp = modelService.getPerspectiveFor(element);
-		if (persp != null) {
+		if (persp != null)
 			cacheId = persp.getElementId();
-		}
 		String cacheInfo = minMaxAddon.getPersistedState().get(cacheId);
 
 		return cacheInfo;
@@ -984,9 +947,8 @@ public class MinMaxAddon {
 
 	private int getCachedIndex(MUIElement element) {
 		String cache = getCachedInfo(element);
-		if (cache == null) {
+		if (cache == null)
 			return -1;
-		}
 
 		String[] stacks = cache.split("#"); //$NON-NLS-1$
 		for (String stackInfo : stacks) {
@@ -1000,9 +962,8 @@ public class MinMaxAddon {
 
 	private SideValue getCachedBar(MUIElement element) {
 		String cache = getCachedInfo(element);
-		if (cache == null) {
+		if (cache == null)
 			return null;
-		}
 
 		String[] stacks = cache.split("#"); //$NON-NLS-1$
 		for (String stackInfo : stacks) {
