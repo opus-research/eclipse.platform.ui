@@ -427,9 +427,12 @@ public class PreferenceStore extends EventManager implements
 	 */
 	public String[] preferenceNames() {
 		ArrayList<String> list = new ArrayList<String>();
-		Enumeration<String> it = (Enumeration<String>) properties.propertyNames();
+		Enumeration<?> it = properties.propertyNames();
 		while (it.hasMoreElements()) {
-			list.add(it.nextElement());
+			Object element = it.nextElement();
+			if (element instanceof String) {
+				list.add((String) element);
+			}
 		}
 		return list.toArray(new String[list.size()]);
 	}
