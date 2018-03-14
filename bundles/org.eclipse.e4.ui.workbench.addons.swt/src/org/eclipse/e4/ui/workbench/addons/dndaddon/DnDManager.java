@@ -75,8 +75,9 @@ class DnDManager {
 	DragDetectListener dragDetector = new DragDetectListener() {
 		@Override
 		public void dragDetected(DragDetectEvent e) {
-			if (dragging || e.widget.isDisposed())
+			if (dragging || e.widget.isDisposed()) {
 				return;
+			}
 
 			info.update(e);
 			dragAgent = getDragAgent(info);
@@ -146,8 +147,9 @@ class DnDManager {
 
 				// Only add listeners for stacks in *this* window
 				MWindow elementWin = getModelService().getTopLevelWindowFor(element);
-				if (elementWin != dragWindow)
+				if (elementWin != dragWindow) {
 					return;
+				}
 
 				// Listen for drags starting in CTabFolders
 				if (element.getWidget() instanceof CTabFolder
@@ -180,8 +182,9 @@ class DnDManager {
 	protected void dispose() {
 		clearOverlay();
 
-		if (overlayFrame != null && !overlayFrame.isDisposed())
+		if (overlayFrame != null && !overlayFrame.isDisposed()) {
 			overlayFrame.dispose();
+		}
 		overlayFrame = null;
 	}
 
@@ -284,8 +287,9 @@ class DnDManager {
 	}
 
 	public void setRectangle(Rectangle newRect) {
-		if (tracker == null)
+		if (tracker == null) {
 			return;
+		}
 
 		Rectangle[] rectArray = { newRect };
 		tracker.setRectangles(rectArray);
@@ -293,8 +297,9 @@ class DnDManager {
 
 	public void hostElement(MUIElement element, int xOffset, int yOffset) {
 		if (element == null) {
-			if (dragHost != null && !dragHost.isDisposed())
+			if (dragHost != null && !dragHost.isDisposed()) {
 				dragHost.dispose();
+			}
 			dragHost = null;
 			return;
 		}
@@ -309,10 +314,11 @@ class DnDManager {
 		dragHost.setRegion(shellRgn);
 
 		dragCtrl = (Control) element.getWidget();
-		if (dragCtrl != null)
+		if (dragCtrl != null) {
 			dragHost.setSize(dragCtrl.getSize());
-		else
+		} else {
 			dragHost.setSize(400, 400);
+		}
 
 		if (feedbackStyle == HOSTED) {
 			// Special code to wrap the element in a CTF if it's coming from one
@@ -350,8 +356,9 @@ class DnDManager {
 	}
 
 	public void setDragHostVisibility(boolean visible) {
-		if (dragHost == null || dragHost.isDisposed())
+		if (dragHost == null || dragHost.isDisposed()) {
 			return;
+		}
 
 		if (visible) {
 			if (dragHost.getChildren().length > 0
@@ -381,8 +388,9 @@ class DnDManager {
 		images.clear();
 		imageRects.clear();
 
-		if (overlayFrame != null)
+		if (overlayFrame != null) {
 			overlayFrame.setVisible(false);
+		}
 	}
 
 	private void updateOverlay() {
@@ -417,8 +425,9 @@ class DnDManager {
 		overlayFrame.setBounds(bounds);
 
 		Region curRegion = overlayFrame.getRegion();
-		if (curRegion != null && !curRegion.isDisposed())
+		if (curRegion != null && !curRegion.isDisposed()) {
 			curRegion.dispose();
+		}
 
 		Region rgn = new Region();
 
@@ -460,19 +469,22 @@ class DnDManager {
 			if (fr.width > 6) {
 				Rectangle outerBounds = new Rectangle(fr.x - 3, fr.y - 3, fr.width + 6,
 						fr.height + 6);
-				if (bounds == null)
+				if (bounds == null) {
 					bounds = outerBounds;
+				}
 				bounds.add(outerBounds);
 			} else {
-				if (bounds == null)
+				if (bounds == null) {
 					bounds = fr;
+				}
 				bounds.add(fr);
 			}
 		}
 
 		for (Rectangle ir : imageRects) {
-			if (bounds == null)
+			if (bounds == null) {
 				bounds = ir;
+			}
 			bounds.add(ir);
 		}
 
@@ -481,13 +493,15 @@ class DnDManager {
 
 	public void frameRect(Rectangle bounds) {
 		clearOverlay();
-		if (bounds != null)
+		if (bounds != null) {
 			addFrame(bounds);
+		}
 	}
 
 	public void addDragAgent(DragAgent newAgent) {
-		if (!dragAgents.contains(newAgent))
+		if (!dragAgents.contains(newAgent)) {
 			dragAgents.add(newAgent);
+		}
 	}
 
 	public void removeDragAgent(DragAgent agentToRemove) {
@@ -495,8 +509,9 @@ class DnDManager {
 	}
 
 	public void addDropAgent(DropAgent newAgent) {
-		if (!dropAgents.contains(newAgent))
+		if (!dropAgents.contains(newAgent)) {
 			dropAgents.add(newAgent);
+		}
 	}
 
 	public void removeDropAgent(DropAgent agentToRemove) {
@@ -505,16 +520,18 @@ class DnDManager {
 
 	private DragAgent getDragAgent(DnDInfo info) {
 		for (DragAgent agent : dragAgents) {
-			if (agent.canDrag(info))
+			if (agent.canDrag(info)) {
 				return agent;
+			}
 		}
 		return null;
 	}
 
 	public DropAgent getDropAgent(MUIElement dragElement, DnDInfo info) {
 		for (DropAgent agent : dropAgents) {
-			if (agent.canDrop(dragElement, info))
+			if (agent.canDrop(dragElement, info)) {
 				return agent;
+			}
 		}
 		return null;
 	}
@@ -530,8 +547,9 @@ class DnDManager {
 	 * @param newBounds
 	 */
 	public void setHostBounds(Rectangle newBounds) {
-		if (dragHost == null || dragHost.isDisposed())
+		if (dragHost == null || dragHost.isDisposed()) {
 			return;
+		}
 
 		info.setDragHostBounds(newBounds);
 		update();

@@ -44,11 +44,13 @@ public class IBFDragAgent extends DragAgent {
 	 */
 	@Override
 	public MUIElement getElementToDrag(DnDInfo info) {
-		if (!(info.curCtrl instanceof ImageBasedFrame))
+		if (!(info.curCtrl instanceof ImageBasedFrame)) {
 			return null;
+		}
 
-		if (!(info.curElement instanceof MTrimElement))
+		if (!(info.curElement instanceof MTrimElement)) {
 			return null;
+		}
 
 		ImageBasedFrame frame = (ImageBasedFrame) info.curCtrl;
 		Rectangle handleRect = frame.getHandleRect();
@@ -81,8 +83,9 @@ public class IBFDragAgent extends DragAgent {
 			}
 		}
 
-		if (dropAgent == null)
+		if (dropAgent == null) {
 			attachToCursor(info);
+		}
 	}
 
 	private void attachToCursor(DnDInfo info) {
@@ -90,8 +93,9 @@ public class IBFDragAgent extends DragAgent {
 		dragElement.setVisible(false);
 		dragElement.getTags().add("LockVisibility");
 
-		if (ds == null)
+		if (ds == null) {
 			ds = new Shell(dndManager.getDragShell(), SWT.NO_TRIM);
+		}
 
 		frame.setParent(ds);
 		frame.setLocation(0, 0);
@@ -117,11 +121,13 @@ public class IBFDragAgent extends DragAgent {
 			ds.dispose();
 			ds = null;
 		}
-		if (dropAgent == null)
+		if (dropAgent == null) {
 			attachToCursor(info);
+		}
 
-		if (ds != null)
+		if (ds != null) {
 			ds.setLocation(info.cursorPos.x - 5, info.cursorPos.y - 5);
+		}
 	}
 
 	/*
@@ -138,8 +144,9 @@ public class IBFDragAgent extends DragAgent {
 		super.dragFinished(performDrop, info);
 
 		// NOTE: the dragElement should no longer be a child of the shell
-		if (ds != null && !ds.isDisposed())
+		if (ds != null && !ds.isDisposed()) {
 			ds.dispose();
+		}
 		ds = null;
 	}
 }
