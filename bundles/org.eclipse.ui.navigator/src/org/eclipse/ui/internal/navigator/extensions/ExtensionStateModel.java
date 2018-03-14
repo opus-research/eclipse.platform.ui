@@ -102,7 +102,7 @@ public class ExtensionStateModel extends EventManager implements
 	@Override
 	public void setIntProperty(String aPropertyName, int aPropertyValue) {
 		Integer oldValue = (Integer) values.get(aPropertyName);
-		Integer newValue = Integer.valueOf(aPropertyValue);
+		Integer newValue = new Integer(aPropertyValue);
 		if (hasPropertyChanged(oldValue, newValue)) {
 			values.put(aPropertyName, newValue);
 			firePropertyChangeEvent(new PropertyChangeEvent(this,
@@ -143,8 +143,8 @@ public class ExtensionStateModel extends EventManager implements
 
 	protected void firePropertyChangeEvent(PropertyChangeEvent anEvent) {
 		Object[] listeners = getListeners();
-		for (Object listener : listeners) {
-			((IPropertyChangeListener) listener).propertyChange(anEvent);
+		for (int i = 0; i < listeners.length; ++i) {
+			((IPropertyChangeListener) listeners[i]).propertyChange(anEvent);
 		}
 	}
 

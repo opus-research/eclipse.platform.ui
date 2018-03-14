@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2017 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,17 +10,22 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.layout;
 
-import org.junit.runner.JUnitCore;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ GeometryTest.class, AbstractColumnLayoutTest.class, GridDataFactoryTest.class,
-		GridLayoutFactoryTest.class, TreeColumnLayoutTest.class })
-public class AllTests {
+public class AllTests extends TestSuite {
 
 	public static void main(String[] args) {
-		JUnitCore.main(AllTests.class.getName());
+		junit.textui.TestRunner.run(suite());
 	}
 
+	public static Test suite() {
+		return new AllTests();
+	}
+
+	public AllTests() {
+		addTestSuite(GeometryTest.class);
+		addTestSuite(AbstractColumnLayoutTest.class);
+		addTestSuite(TreeColumnLayoutTest.class);
+	}
 }

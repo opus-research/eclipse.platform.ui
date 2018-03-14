@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,14 +9,13 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Christian Georgi (SAP)            - Bug 432480
- *     Patrik Suzzi <psuzzi@gmail.com>   - Bug 490700, 502050
- *     Vasili Gulevich                   - Bug 501404
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,7 +23,6 @@ import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -32,7 +30,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -40,7 +37,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -149,41 +145,27 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Helper class used to process delayed events.
 	 */
-	private final DelayedEventsProcessor delayedEventsProcessor;
-
-	private static boolean jfaceComparatorIsSet = false;
-
-	/**
-	 * Base wait time between workspace lock attempts
-	 */
-	private final int workspaceWaitDelay;
-
-	private final Listener closeListener = new Listener() {
-		@Override
-		public void handleEvent(Event event) {
-			boolean doExit = IDEWorkbenchWindowAdvisor.promptOnExit(null);
-			event.doit = doExit;
-			if (!doExit)
-				event.type = SWT.None;
-		}
-	};
+	private DelayedEventsProcessor delayedEventsProcessor;
 
 	/**
 	 * Creates a new workbench advisor instance.
 	 */
 	public IDEWorkbenchAdvisor() {
-		this(1000, null);
-	}
-
-	IDEWorkbenchAdvisor(int workspaceWaitDelay, DelayedEventsProcessor processor) {
 		super();
-		this.workspaceWaitDelay = workspaceWaitDelay;
 		if (workbenchAdvisor != null) {
 			throw new IllegalStateException();
 		}
 		workbenchAdvisor = this;
 
-		this.delayedEventsProcessor = processor;
+		Listener closeListener = new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				boolean doExit = IDEWorkbenchWindowAdvisor.promptOnExit(null);
+				event.doit = doExit;
+				if (!doExit)
+					event.type = SWT.None;
+			}
+		};
 		Display.getDefault().addListener(SWT.Close, closeListener);
 	}
 
@@ -192,7 +174,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * @param processor helper class used to process delayed events
 	 */
 	public IDEWorkbenchAdvisor(DelayedEventsProcessor processor) {
-		this(1000, processor);
+		this();
+		this.delayedEventsProcessor = processor;
 	}
 
 	@Override
@@ -221,20 +204,15 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		// show Help button in JFace dialogs
 		TrayDialog.setDialogHelpAvailable(true);
 
-		// Set the default value of the preference controlling the workspace
-		// name displayed in the window title.
-		setWorkspaceNameDefault();
-
-		if (!jfaceComparatorIsSet) {
-			// Policy.setComparator can only be called once in Jface lifetime
-			Policy.setComparator(Collator.getInstance());
-			jfaceComparatorIsSet = true;
-		}
-
+		Policy.setComparator(Collator.getInstance());
 	}
 
 	@Override
 	public void preStartup() {
+
+		// Suspend background jobs while we startup
+		Job.getJobManager().suspend();
+
 		// Register the build actions
 		IProgressService service = PlatformUI.getWorkbench()
 				.getProgressService();
@@ -258,9 +236,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			initializeSettingsChangeListener();
 			Display.getCurrent().addListener(SWT.Settings,
 					settingsChangeListener);
-		} finally {
-			// Resume the job manager to allow background jobs to run.
-			// The job manager was suspended by the IDEApplication.start method.
+		} finally {// Resume background jobs after we startup
 			Job.getJobManager().resume();
 		}
 	}
@@ -298,10 +274,13 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 				currentHighContrast = !currentHighContrast;
 
 				// make sure they really want to do this
-				if (new MessageDialog(null, IDEWorkbenchMessages.SystemSettingsChange_title, null,
-						IDEWorkbenchMessages.SystemSettingsChange_message, MessageDialog.QUESTION, 1,
-						IDEWorkbenchMessages.SystemSettingsChange_yes, IDEWorkbenchMessages.SystemSettingsChange_no)
-								.open() == Window.OK) {
+				if (new MessageDialog(null,
+						IDEWorkbenchMessages.SystemSettingsChange_title, null,
+						IDEWorkbenchMessages.SystemSettingsChange_message,
+						MessageDialog.QUESTION, new String[] {
+								IDEWorkbenchMessages.SystemSettingsChange_yes,
+								IDEWorkbenchMessages.SystemSettingsChange_no },
+						1).open() == Window.OK) {
 					PlatformUI.getWorkbench().restart();
 				}
 			}
@@ -311,7 +290,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void postShutdown() {
-		Display.getDefault().removeListener(SWT.Close, closeListener);
 		if (activityHelper != null) {
 			activityHelper.shutdown();
 			activityHelper = null;
@@ -324,57 +302,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			workspaceUndoMonitor.shutdown();
 			workspaceUndoMonitor = null;
 		}
-
-		IWorkspace workspace = IDEWorkbenchPlugin.getPluginWorkspace();
-
-		final Runnable disconnectFromWorkspace = new Runnable() {
-
-			int attempts;
-
-			@Override
-			public void run() {
-				if (isWorkspaceLocked(workspace)) {
-					if (attempts < 3) {
-						attempts++;
-						IDEWorkbenchPlugin.log(null, createErrorStatus("Workspace is locked, waiting...")); //$NON-NLS-1$
-						Display.getCurrent().timerExec(workspaceWaitDelay * attempts, this);
-					} else {
-						IDEWorkbenchPlugin.log(null, createErrorStatus("Workspace is locked and can't be saved.")); //$NON-NLS-1$
-					}
-					return;
-				}
-				disconnectFromWorkspace();
-			}
-
-			IStatus createErrorStatus(String exceptionMessage) {
-				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 1,
-						IDEWorkbenchMessages.ProblemsSavingWorkspace, new IllegalStateException(exceptionMessage));
-			}
-		};
-
-		// postShutdown may be called while workspace is locked, for example -
-		// during file save operation, see
-		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=501404.
-		// Disconnect is postponed until workspace is unlocked to prevent
-		// deadlock between background thread launched by
-		// disconnectFromWorkspace() and current thread
-		// WARNING: this condition makes code that relies on synchronous
-		// disconnect very hard to discover and test
-		if (workspace != null) {
-			if (isWorkspaceLocked(workspace)) {
-				Display.getCurrent().asyncExec(disconnectFromWorkspace);
-			} else {
-				disconnectFromWorkspace.run();
-			}
+		if (IDEWorkbenchPlugin.getPluginWorkspace() != null) {
+			disconnectFromWorkspace();
 		}
-		// This completes workbench lifecycle.
-		// Another advisor can now be created for a new workbench instance.
-		workbenchAdvisor = null;
-	}
-
-	private boolean isWorkspaceLocked(IWorkspace workspace) {
-		ISchedulingRule currentRule = Job.getJobManager().currentRule();
-		return currentRule != null && currentRule.isConflicting(workspace.getRoot());
 	}
 
 	@Override
@@ -411,8 +341,8 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 
 		// Do not refresh if it was already done by core on startup.
-		for (String commandLineArg : commandLineArgs) {
-			if (commandLineArg.equalsIgnoreCase("-refresh")) { //$NON-NLS-1$
+		for (int i = 0; i < commandLineArgs.length; i++) {
+			if (commandLineArgs[i].equalsIgnoreCase("-refresh")) { //$NON-NLS-1$
 				return;
 			}
 		}
@@ -498,9 +428,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Disconnect from the core workspace.
-	 *
-	 * Locks workspace in a background thread, should not be called while
-	 * holding any workspace locks.
 	 */
 	private void disconnectFromWorkspace() {
 		// save the workspace
@@ -582,12 +509,13 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	private Map<String, AboutInfo> computeBundleGroupMap() {
 		// use tree map to get predicable order
-		Map<String, AboutInfo> ids = new TreeMap<>();
+		Map<String, AboutInfo> ids = new TreeMap<String, AboutInfo>();
 
 		IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		for (IBundleGroupProvider provider : providers) {
-			IBundleGroup[] groups = provider.getBundleGroups();
-			for (IBundleGroup group : groups) {
+		for (int i = 0; i < providers.length; ++i) {
+			IBundleGroup[] groups = providers[i].getBundleGroups();
+			for (int j = 0; j < groups.length; ++j) {
+				IBundleGroup group = groups[j];
 				AboutInfo info = new AboutInfo(group);
 
 				String version = info.getVersionId();
@@ -635,33 +563,12 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// remove the previously known from the current set
 		if (previousFeaturesArray != null) {
-			for (String previousFeature : previousFeaturesArray) {
-				bundleGroups.remove(previousFeature);
+			for (int i = 0; i < previousFeaturesArray.length; ++i) {
+				bundleGroups.remove(previousFeaturesArray[i]);
 			}
 		}
 
 		return bundleGroups;
-	}
-
-	/**
-	 * Sets the default value of the preference controlling the workspace name
-	 * displayed in the window title to the name of the workspace directory.
-	 * This preference cannot be set in the preference initializer because the
-	 * workspace directory may not be known when the preference initializer is
-	 * called.
-	 */
-	private static void setWorkspaceNameDefault() {
-		IPreferenceStore preferences = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		String workspaceNameDefault = preferences.getDefaultString(IDEInternalPreferences.WORKSPACE_NAME);
-		if (workspaceNameDefault != null && !workspaceNameDefault.isEmpty())
-			return; // Default is set in a plugin customization file - don't change it.
-		IPath workspaceDir = Platform.getLocation();
-		if (workspaceDir == null)
-			return;
-		String workspaceName = workspaceDir.lastSegment();
-		if (workspaceName == null)
-			return;
-		preferences.setDefault(IDEInternalPreferences.WORKSPACE_NAME, workspaceName);
 	}
 
 	/**
@@ -848,9 +755,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_WARNING,
 				PATH_EVIEW + "problems_view_warning.png", true); //$NON-NLS-1$
-		declareWorkbenchImage(ideBundle,
-				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_INFO,
-				PATH_EVIEW + "problems_view_info.png", true); //$NON-NLS-1$
 
 		// synchronization indicator objects
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_WBET_STAT,
@@ -896,33 +800,22 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	}
 
 	/**
-	 * Returns the location specified in command line when -showlocation is
-	 * defined. Otherwise returns null
-	 *
-	 * @return
-	 */
-	public String getCommandLineLocation() {
-		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
-		return context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
-	}
-
-	/**
 	 * Returns the location to show in the window title, depending on a
-	 * {@link IDEInternalPreferences#SHOW_LOCATION} user preference. Note that
+	 * {@link IDEInternalPreferences#SHOW_LOCATION user preference}. Note that
 	 * this may be overridden by the '-showlocation' command line argument.
 	 *
 	 * @return the location string, or <code>null</code> if the location is not
 	 *         being shown
 	 */
 	public String getWorkspaceLocation() {
-		String location = getCommandLineLocation();
 		// read command line, which has priority
+		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
+		String location = context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
 		if (location != null) {
 			return location;
 		}
-		// read the preferences
+		// read the preference
 		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(IDEInternalPreferences.SHOW_LOCATION)) {
-			// show the full location
 			return Platform.getLocation().toOSString();
 		}
 		return null;
@@ -937,8 +830,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			// support old welcome perspectives if intro plugin is not present
 			if (!hasIntro()) {
 				Map<String, AboutInfo> m = getNewlyAddedBundleGroups();
-				ArrayList<AboutInfo> list = new ArrayList<>(m.size());
-				for (AboutInfo info : m.values()) {
+				ArrayList<AboutInfo> list = new ArrayList<AboutInfo>(m.size());
+				for (Iterator<AboutInfo> i = m.values().iterator(); i.hasNext();) {
+					AboutInfo info = i.next();
 					if (info != null && info.getWelcomePerspectiveId() != null
 							&& info.getWelcomePageURL() != null) {
 						list.add(info);

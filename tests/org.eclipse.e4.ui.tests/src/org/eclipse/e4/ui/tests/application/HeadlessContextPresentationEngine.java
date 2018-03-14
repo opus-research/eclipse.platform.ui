@@ -74,10 +74,9 @@ public class HeadlessContextPresentationEngine implements IPresentationEngine {
 	private static void populateModelInterfaces(MContext contextModel,
 			IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			if (Policy.DEBUG_CONTEXTS) {
-				Activator.trace(Policy.DEBUG_CONTEXTS_FLAG, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-						+ contextModel.getClass().getName(), null);
-			}
+			Activator.trace(Policy.DEBUG_CONTEXTS,
+					"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+							+ contextModel.getClass().getName(), null);
 			context.set(intf.getName(), contextModel);
 
 			populateModelInterfaces(contextModel, context, intf.getInterfaces());

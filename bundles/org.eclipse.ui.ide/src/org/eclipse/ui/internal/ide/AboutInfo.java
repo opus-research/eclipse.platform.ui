@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -92,10 +91,13 @@ public final class AboutInfo {
 			return null;
 		}
 
-		for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
-			for (IBundleGroup group : provider.getBundleGroups()) {
-				if (id.equals(group.getIdentifier()) && versionId.equals(group.getVersion())) {
-					return group;
+        IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
+        for (int p = 0; p < providers.length; ++p) {
+            IBundleGroup[] groups = providers[p].getBundleGroups();
+            for (int g = 0; g < groups.length; ++g) {
+				if (id.equals(groups[g].getIdentifier())
+                        && versionId.equals(groups[g].getVersion())) {
+					return groups[g];
 				}
 			}
         }
@@ -181,7 +183,7 @@ public final class AboutInfo {
 				}
 			}
 
-            return checksum.getValue();
+            return new Long(checksum.getValue());
         } catch (IOException e) {
             return null;
         } finally {

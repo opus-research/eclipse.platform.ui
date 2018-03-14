@@ -44,7 +44,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  *
  * <pre>
  * final IObservableValue max = WritableValue.withValueType(Integer.TYPE);
- * max.setValue(Integer.valueOf(0));
+ * max.setValue(new Integer(0));
  * IObservableSet primes = new ComputedSet() {
  * 	protected Set calculate() {
  * 		int maxVal = ((Integer) max.getValue()).intValue();
@@ -56,7 +56,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * 				if (i % knownPrime.intValue() == 0)
  * 					continue outer;
  * 			}
- * 			result.add(Integer.valueOf(i));
+ * 			result.add(new Integer(i));
  * 		}
  * 		return result;
  * 	}
@@ -64,7 +64,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  *
  * System.out.println(primes); // =&gt; &quot;[]&quot;
  *
- * max.setValue(Integer.valueOf(20));
+ * max.setValue(new Integer(20));
  * System.out.println(primes); // =&gt; &quot;[2, 3, 5, 7, 11, 13, 17, 19]&quot;
  * </pre>
  *
@@ -201,16 +201,16 @@ privateInterface, privateInterface, null);
 			// even if we were already stale before recomputing. This is in case
 			// clients assume that a set change is indicative of non-staleness.
 			stale = false;
-			for (IObservable newDependency : newDependencies) {
-				if (newDependency.isStale()) {
+			for (int i = 0; i < newDependencies.length; i++) {
+				if (newDependencies[i].isStale()) {
 					makeStale();
 					break;
 				}
 			}
 
 			if (!stale) {
-				for (IObservable newDependency : newDependencies) {
-					newDependency.addStaleListener(privateInterface);
+				for (int i = 0; i < newDependencies.length; i++) {
+					newDependencies[i].addStaleListener(privateInterface);
 				}
 			}
 
@@ -271,7 +271,9 @@ privateInterface, privateInterface, null);
 
 	private void stopListening() {
 		if (dependencies != null) {
-			for (IObservable observable : dependencies) {
+			for (int i = 0; i < dependencies.length; i++) {
+				IObservable observable = dependencies[i];
+
 				observable.removeChangeListener(privateInterface);
 				observable.removeStaleListener(privateInterface);
 			}

@@ -16,7 +16,6 @@ package org.eclipse.core.databinding;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.IObservable;
@@ -37,7 +36,7 @@ public class ObservablesManager {
 
 	private Set managedObservables = new IdentitySet();
 	private Set excludedObservables = new IdentitySet();
-	private Map<DataBindingContext, Pair> contexts = new HashMap<>();
+	private Map contexts = new HashMap();
 
 	/**
 	 * Create a new observables manager.
@@ -102,8 +101,8 @@ public class ObservablesManager {
 	 */
 	public void runAndCollect(Runnable runnable) {
 		IObservable[] collected = ObservableTracker.runAndCollect(runnable);
-		for (IObservable observable : collected)
-			addObservable(observable);
+		for (int i = 0; i < collected.length; i++)
+			addObservable(collected[i]);
 	}
 
 	/**
@@ -112,9 +111,9 @@ public class ObservablesManager {
 	public void dispose() {
 		Set observables = new IdentitySet();
 		observables.addAll(managedObservables);
-		for (Entry<DataBindingContext, Pair> entry : contexts.entrySet()) {
-			DataBindingContext context = entry.getKey();
-			Pair trackModelsOrTargets = entry.getValue();
+		for (Iterator it = contexts.keySet().iterator(); it.hasNext();) {
+			DataBindingContext context = (DataBindingContext) it.next();
+			Pair trackModelsOrTargets = (Pair) contexts.get(context);
 			boolean disposeTargets = ((Boolean) trackModelsOrTargets.a)
 					.booleanValue();
 			boolean disposeModels = ((Boolean) trackModelsOrTargets.b)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 BestSolution.at and others.
+ * Copyright (c) 2008, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,7 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
  *     Christian Georgi (SAP) - Bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 393171, 508450
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -18,7 +18,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.e4.core.commands.ExpressionContext;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
@@ -28,7 +27,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.ServiceRegistration;
@@ -61,7 +59,15 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>rendererFactoryUri</code>
 	 */
 	public static final String RENDERER_FACTORY_URI = "rendererFactoryUri"; //$NON-NLS-1$
-
+	/**
+	 * The argument for setting the delta store location <br>
+	 * <br>
+	 * Value is: <code>deltaRestore</code>
+	 *
+	 * @deprecated
+	 */
+	@Deprecated
+	public static final String DELTA_RESTORE = "deltaRestore"; //$NON-NLS-1$
 	/**
 	 * The argument for setting RTL mode <br>
 	 * <br>
@@ -129,8 +135,6 @@ public class E4Workbench implements IWorkbench {
 
 		osgiRegistration = Activator.getDefault().getContext()
 				.registerService(IWorkbench.class.getName(), this, properties);
-
-		ContextInjectionFactory.make(PartOnTopManager.class, appContext);
 	}
 
 	@Override
@@ -158,25 +162,24 @@ public class E4Workbench implements IWorkbench {
 	 *
 	 */
 	public void instantiateRenderer() {
-		renderer = appContext.get(IPresentationEngine.class);
+		renderer = (IPresentationEngine) appContext.get(IPresentationEngine.class.getName());
 		if (renderer == null) {
 			String presentationURI = (String) appContext.get(IWorkbench.PRESENTATION_URI_ARG);
 			if (presentationURI != null) {
-				IContributionFactory factory = appContext.get(IContributionFactory.class);
+				IContributionFactory factory = (IContributionFactory) appContext
+						.get(IContributionFactory.class.getName());
 				renderer = (IPresentationEngine) factory.create(presentationURI, appContext);
-				appContext.set(IPresentationEngine.class, renderer);
+				appContext.set(IPresentationEngine.class.getName(), renderer);
 			}
 			if (renderer == null) {
-				Logger logger = appContext.get(Logger.class);
+				Logger logger = (Logger) appContext.get(Logger.class.getName());
 				logger.error("Failed to create the presentation engine for URI: " + presentationURI); //$NON-NLS-1$
 			}
 		}
 	}
 
 	private void init(MApplication appElement) {
-		if (Policy.DEBUG_WORKBENCH) {
-			Activator.trace(Policy.DEBUG_WORKBENCH_FLAG, "init() workbench", null); //$NON-NLS-1$
-		}
+		Activator.trace(Policy.DEBUG_WORKBENCH, "init() workbench", null); //$NON-NLS-1$
 
 		IEclipseContext context = appElement.getContext();
 		if (context != null) {
@@ -186,9 +189,6 @@ public class E4Workbench implements IWorkbench {
 
 	@Override
 	public boolean close() {
-		// Fire an E4 lifecycle notification
-		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, appModel);
-
 		if (renderer != null) {
 			renderer.stop();
 		}
@@ -246,10 +246,9 @@ public class E4Workbench implements IWorkbench {
 		} else {
 			context = parentContext.createChild("PartContext(" + contextModel + ')'); //$NON-NLS-1$
 		}
-		if (Policy.DEBUG_CONTEXTS) {
-			Activator.trace(Policy.DEBUG_CONTEXTS_FLAG, "initializeContext(" //$NON-NLS-1$
-					+ parentContext.toString() + ", " + contextModel + ")", null); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+
+		Activator.trace(Policy.DEBUG_CONTEXTS, "initializeContext(" //$NON-NLS-1$
+				+ parentContext.toString() + ", " + contextModel + ")", null); //$NON-NLS-1$ //$NON-NLS-2$
 		// fill in the interfaces, so MContributedPart.class.getName() will
 		// return the model element, for example.
 		ContributionsAnalyzer.populateModelInterfaces(contextModel, context, contextModel

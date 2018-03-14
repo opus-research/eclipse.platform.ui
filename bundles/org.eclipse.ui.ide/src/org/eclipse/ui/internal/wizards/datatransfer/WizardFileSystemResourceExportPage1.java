@@ -61,16 +61,12 @@ public class WizardFileSystemResourceExportPage1 extends
 
     protected Button createSelectionOnlyButton;
 
-	protected Button resolveLinkedResourcesCheckbox;
-
     // dialog store id constants
     private static final String STORE_DESTINATION_NAMES_ID = "WizardFileSystemResourceExportPage1.STORE_DESTINATION_NAMES_ID"; //$NON-NLS-1$
 
     private static final String STORE_OVERWRITE_EXISTING_FILES_ID = "WizardFileSystemResourceExportPage1.STORE_OVERWRITE_EXISTING_FILES_ID"; //$NON-NLS-1$
 
     private static final String STORE_CREATE_STRUCTURE_ID = "WizardFileSystemResourceExportPage1.STORE_CREATE_STRUCTURE_ID"; //$NON-NLS-1$
-
-	private final static String STORE_RESOLVE_LINKED_RESOURCES_ID = "WizardFileSystemResourceExportPage1.STORE_RESOLVE_LINKED_RESOURCES_ID"; //$NON-NLS-1$
 
     //messages
     private static final String SELECT_DESTINATION_MESSAGE = DataTransferMessages.FileExport_selectDestinationMessage;
@@ -170,8 +166,6 @@ public class WizardFileSystemResourceExportPage1 extends
         createOverwriteExisting(optionsGroup, font);
 
         createDirectoryStructureOptions(optionsGroup, font);
-
-		createResolveLinkedResources(optionsGroup, font);
     }
 
     /**
@@ -209,21 +203,6 @@ public class WizardFileSystemResourceExportPage1 extends
         overwriteExistingFilesCheckbox.setText(DataTransferMessages.ExportFile_overwriteExisting);
         overwriteExistingFilesCheckbox.setFont(font);
     }
-
-    /**
-	 * Create the button for checking if we should export linked files.
-	 *
-	 * @param parent
-	 * @param font
-	 */
-	protected void createResolveLinkedResources(Composite parent, Font font) {
-		// resolve links... checkbox
-		resolveLinkedResourcesCheckbox = new Button(parent, SWT.CHECK | SWT.LEFT);
-		resolveLinkedResourcesCheckbox.setText(DataTransferMessages.ExportFile_resolveLinkedResources);
-		resolveLinkedResourcesCheckbox.setFont(font);
-		resolveLinkedResourcesCheckbox.setSelection(getShowLinkedResources());
-		resolveLinkedResourcesCheckbox.addListener(SWT.Selection, this);
-	}
 
     /**
      * Attempts to ensure that the specified directory exists on the local file system.
@@ -274,7 +253,6 @@ public class WizardFileSystemResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setOverwriteFiles(overwriteExistingFilesCheckbox.getSelection());
-		op.setResolveLinks(resolveLinkedResourcesCheckbox.getSelection());
 
         try {
             getContainer().run(true, true, op);
@@ -364,13 +342,6 @@ public class WizardFileSystemResourceExportPage1 extends
     }
 
     /**
-	 * Updates the content providers to show/hide linked resurces
-	 */
-	protected void handleResolveLinkedResourcesCheckboxSelected() {
-		updateContentProviders(resolveLinkedResourcesCheckbox.getSelection());
-	}
-
-    /**
      * Handle all events and enablements for widgets in this page
      * @param e Event
      */
@@ -380,8 +351,6 @@ public class WizardFileSystemResourceExportPage1 extends
 
         if (source == destinationBrowseButton) {
 			handleDestinationBrowseButtonPressed();
-		} else if (source == resolveLinkedResourcesCheckbox) {
-			handleResolveLinkedResourcesCheckboxSelected();
 		}
 
         updatePageCompletion();
@@ -412,7 +381,6 @@ public class WizardFileSystemResourceExportPage1 extends
             settings.put(STORE_CREATE_STRUCTURE_ID,
                     createDirectoryStructureButton.getSelection());
 
-			settings.put(STORE_RESOLVE_LINKED_RESOURCES_ID, resolveLinkedResourcesCheckbox.getSelection());
         }
     }
 
@@ -432,8 +400,8 @@ public class WizardFileSystemResourceExportPage1 extends
 
             // destination
             setDestinationValue(directoryNames[0]);
-            for (String directoryName : directoryNames) {
-				addDestinationItem(directoryName);
+            for (int i = 0; i < directoryNames.length; i++) {
+				addDestinationItem(directoryNames[i]);
 			}
 
             // options
@@ -444,10 +412,6 @@ public class WizardFileSystemResourceExportPage1 extends
                     .getBoolean(STORE_CREATE_STRUCTURE_ID);
             createDirectoryStructureButton.setSelection(createDirectories);
             createSelectionOnlyButton.setSelection(!createDirectories);
-			boolean showLinked = settings.getBoolean(STORE_RESOLVE_LINKED_RESOURCES_ID);
-			if (resolveLinkedResourcesCheckbox.getSelection() != showLinked) {
-				resolveLinkedResourcesCheckbox.setSelection(showLinked);
-			}
         }
     }
 

@@ -49,7 +49,8 @@ public class NavigatorImages {
 	}
 
 	/**
-	 * Create and returns a image descriptor and adds the image to the registry.
+	 * Create and returns a image descriptor and adds the image to the
+	 * registery.
 	 *
 	 * @param prefix
 	 *            Icon dir structure.

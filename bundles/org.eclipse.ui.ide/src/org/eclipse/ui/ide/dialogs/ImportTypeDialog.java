@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.ide.dialogs;
 
@@ -190,8 +189,9 @@ public class ImportTypeDialog extends TrayDialog {
 	// the format of the context is operationMask,value:operationMask,value:operationMask,value
 	private String readContextPreference(String key) {
 		String value = IDEWorkbenchPlugin.getDefault().getPreferenceStore().getString(key);
-		for (String keyPair : value.split(":")) { //$NON-NLS-1$
-			String [] element = keyPair.split(","); //$NON-NLS-1$
+		String [] keyPairs = value.split(":"); //$NON-NLS-1$
+		for (int i = 0; i < keyPairs.length; i++) {
+			String [] element = keyPairs[i].split(","); //$NON-NLS-1$
 			if (element.length == 2) {
 				if (element[0].equals(Integer.toString(operationMask)))
 					return element[1];
@@ -303,7 +303,7 @@ public class ImportTypeDialog extends TrayDialog {
 			copyButton.setText(hasFlag(IMPORT_FILES_ONLY) ? IDEWorkbenchMessages.ImportTypeDialog_copyFiles: IDEWorkbenchMessages.ImportTypeDialog_copyFilesAndDirectories);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			copyButton.setLayoutData(gridData);
-			copyButton.setData(IMPORT_COPY);
+			copyButton.setData(new Integer(IMPORT_COPY));
 			copyButton.addSelectionListener(listener);
 			copyButton.setFont(parent.getFont());
 		}
@@ -313,7 +313,7 @@ public class ImportTypeDialog extends TrayDialog {
 			moveButton.setText(hasFlag(IMPORT_FILES_ONLY) ? IDEWorkbenchMessages.ImportTypeDialog_moveFiles:IDEWorkbenchMessages.ImportTypeDialog_moveFilesAndDirectories);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			moveButton.setLayoutData(gridData);
-			moveButton.setData(IMPORT_MOVE);
+			moveButton.setData(new Integer(IMPORT_MOVE));
 			moveButton.addSelectionListener(listener);
 			moveButton.setFont(parent.getFont());
 		}
@@ -323,7 +323,7 @@ public class ImportTypeDialog extends TrayDialog {
 			linkButton.setText(hasFlag(IMPORT_FILES_ONLY) ? IDEWorkbenchMessages.ImportTypeDialog_linkFiles:IDEWorkbenchMessages.ImportTypeDialog_createLinks);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			linkButton.setLayoutData(gridData);
-			linkButton.setData(IMPORT_LINK);
+			linkButton.setData(new Integer(IMPORT_LINK));
 			linkButton.addSelectionListener(listener);
 			linkButton.setFont(parent.getFont());
 		}
@@ -333,7 +333,7 @@ public class ImportTypeDialog extends TrayDialog {
 			shadowCopyButton.setText(IDEWorkbenchMessages.ImportTypeDialog_recreateFilesAndDirectories);
 			gridData = new GridData(GridData.FILL_HORIZONTAL);
 			shadowCopyButton.setLayoutData(gridData);
-			shadowCopyButton.setData(IMPORT_VIRTUAL_FOLDERS_AND_LINKS);
+			shadowCopyButton.setData(new Integer(IMPORT_VIRTUAL_FOLDERS_AND_LINKS));
 			shadowCopyButton.addSelectionListener(listener);
 			shadowCopyButton.setFont(parent.getFont());
 		}
@@ -451,8 +451,8 @@ public class ImportTypeDialog extends TrayDialog {
 	 * @return true if a set of paths are files only or a mix of files and folders, false otherwise
 	 */
 	private static boolean areOnlyFiles(IResource[] resources) {
-		for (IResource resource : resources) {
-			if (resource.getType() != IResource.FILE)
+		for (int i = 0; i < resources.length; i++) {
+			if (resources[i].getType() != IResource.FILE)
 				return false;
 		}
 		return true;
@@ -464,8 +464,8 @@ public class ImportTypeDialog extends TrayDialog {
 	 * @return true if a set of paths are files only or a mix of files and folders, false otherwise
 	 */
 	private static boolean areOnlyFiles(String[] names) {
-		for (String name : names) {
-			File file = new File(name);
+		for (int i = 0; i < names.length; i++) {
+			File file = new File(names[i]);
 			if (file.exists() && !file.isFile())
 				return false;
 		}

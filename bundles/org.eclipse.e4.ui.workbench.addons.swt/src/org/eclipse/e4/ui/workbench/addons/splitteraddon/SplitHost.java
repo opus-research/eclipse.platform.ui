@@ -69,9 +69,8 @@ public class SplitHost {
 	void tbrHandler(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
 		MUIElement changedElement = (MUIElement) eventData.getProperty(UIEvents.EventTags.ELEMENT);
 
-		if (!isOneOfMyParts(changedElement)) {
+		if (!isOneOfMyParts(changedElement))
 			return;
-		}
 
 		boolean isDirty = false;
 		List<MPart> kids = getSubParts();
@@ -96,14 +95,12 @@ public class SplitHost {
 	void callingAllParts(Class<? extends Annotation> clz) {
 		List<MPart> parts = ms.findElements(myPart, null, MPart.class, null);
 		for (MPart part : parts) {
-			if (part == myPart) {
+			if (part == myPart)
 				continue;
-			}
 
 			Control ctrl = (Control) part.getWidget();
-			if (part.getObject() != null && ctrl != null && !ctrl.isDisposed()) {
+			if (part.getObject() != null && ctrl != null && !ctrl.isDisposed())
 				ContextInjectionFactory.invoke(part.getObject(), clz, part.getContext(), null);
-			}
 		}
 	}
 
@@ -120,14 +117,12 @@ public class SplitHost {
 	@Focus
 	void setFocus() {
 		MPart ap = findInnerActive(myPart);
-		if (ap == null) {
+		if (ap == null)
 			return;
-		}
 
 		Control ctrl = (Control) ap.getWidget();
-		if (ap.getObject() != null && ctrl != null && !ctrl.isDisposed()) {
+		if (ap.getObject() != null && ctrl != null && !ctrl.isDisposed())
 			ContextInjectionFactory.invoke(ap.getObject(), Focus.class, ap.getContext(), null);
-		}
 	}
 
 	// @PostConstruct

@@ -51,8 +51,6 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
 
     private boolean useCompression = true;
 
-	private boolean resolveLinks = false;
-
     private boolean useTarFormat = false;
 
     private boolean createLeadupStructure = true;
@@ -129,8 +127,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
 
         int count = 0;
         if (checkResource.isAccessible()) {
-			for (IResource child : ((IContainer) checkResource).members()) {
-				count += countChildrenOf(child);
+            IResource[] children = ((IContainer) checkResource).members();
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -186,7 +185,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void exportResource(IResource exportResource, int leadupDepth)
             throws InterruptedException {
-		if (!exportResource.isAccessible() || (!resolveLinks && exportResource.isLinked())) {
+        if (!exportResource.isAccessible()) {
 			return;
 		}
 
@@ -223,8 +222,8 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
                 }
             }
 
-            for (IResource child : children) {
-				exportResource(child, leadupDepth + 1);
+            for (int i = 0; i < children.length; i++) {
+				exportResource(children[i], leadupDepth + 1);
 			}
 
         }
@@ -269,9 +268,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void initialize() throws IOException {
     	if(useTarFormat) {
-    		exporter = new TarFileExporter(destinationFilename, useCompression, resolveLinks);
+    		exporter = new TarFileExporter(destinationFilename, useCompression);
     	} else {
-        	exporter = new ZipFileExporter(destinationFilename, useCompression, resolveLinks);
+        	exporter = new ZipFileExporter(destinationFilename, useCompression);
     	}
     }
 
@@ -372,15 +371,4 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     public void setUseTarFormat(boolean value) {
     	useTarFormat = value;
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setIncludeLinkedResources(boolean value) {
-		resolveLinks = value;
-	}
 }

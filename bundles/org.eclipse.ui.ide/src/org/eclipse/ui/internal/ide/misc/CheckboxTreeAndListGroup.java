@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
@@ -67,15 +66,10 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
     private ILabelProvider listLabelProvider;
 
-    private ViewerComparator treeComparator;
-
-    private ViewerComparator listComparator;
-
     // widgets
     private CheckboxTreeViewer treeViewer;
 
     private CheckboxTableViewer listViewer;
-
 
     /**
      *  Create an instance of this class.  Use this constructor if you wish to specify
@@ -97,43 +91,12 @@ public class CheckboxTreeAndListGroup extends EventManager implements
             IStructuredContentProvider listContentProvider,
             ILabelProvider listLabelProvider, int style, int width, int height) {
 
-    	this(parent, rootObject, treeContentProvider, treeLabelProvider, null,
-    			listContentProvider, listLabelProvider, null, style, width, height);
-    }
-
-    /**
-     *  Create an instance of this class.  Use this constructor if you wish to specify
-     *	the width and/or height of the combined widget (to only hardcode one of the
-     *	sizing dimensions, specify the other dimension's value as -1)
-     * @param parent
-     * @param rootObject
-     * @param treeContentProvider
-     * @param treeLabelProvider
-     * @param treeComparator
-     * @param listContentProvider
-     * @param listLabelProvider
-     * @param listComparator
-     * @param style
-     * @param width
-     * @param height
-     */
-    public CheckboxTreeAndListGroup(Composite parent, Object rootObject,
-    		ITreeContentProvider treeContentProvider,
-    		ILabelProvider treeLabelProvider,
-    		ViewerComparator treeComparator,
-    		IStructuredContentProvider listContentProvider,
-    		ILabelProvider listLabelProvider,
-    		ViewerComparator listComparator,
-    		int style, int width, int height) {
-
-    	root = rootObject;
-    	this.treeContentProvider = treeContentProvider;
-    	this.listContentProvider = listContentProvider;
-    	this.treeLabelProvider = treeLabelProvider;
-    	this.listLabelProvider = listLabelProvider;
-    	this.treeComparator = treeComparator;
-    	this.listComparator = listComparator;
-    	createContents(parent, width, height, style);
+        root = rootObject;
+        this.treeContentProvider = treeContentProvider;
+        this.listContentProvider = listContentProvider;
+        this.treeLabelProvider = treeLabelProvider;
+        this.listLabelProvider = listLabelProvider;
+        createContents(parent, width, height, style);
     }
 
     /**
@@ -219,7 +182,8 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      *	time and check each one in the tree viewer as appropriate
      */
     protected void checkNewTreeElements(Object[] elements) {
-		for (Object currentElement : elements) {
+        for (int i = 0; i < elements.length; ++i) {
+            Object currentElement = elements[i];
             boolean checked = checkedStateStore.containsKey(currentElement);
             treeViewer.setChecked(currentElement, checked);
             treeViewer.setGrayed(currentElement, checked
@@ -289,7 +253,6 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         listViewer.getTable().setFont(parent.getFont());
         listViewer.setContentProvider(listContentProvider);
         listViewer.setLabelProvider(listLabelProvider);
-        listViewer.setComparator(listComparator);
         listViewer.addCheckStateListener(this);
     }
 
@@ -307,7 +270,6 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         treeViewer = new CheckboxTreeViewer(tree);
         treeViewer.setContentProvider(treeContentProvider);
         treeViewer.setLabelProvider(treeLabelProvider);
-        treeViewer.setComparator(treeComparator);
         treeViewer.addTreeListener(this);
         treeViewer.addCheckStateListener(this);
         treeViewer.addSelectionChangedListener(this);
@@ -335,8 +297,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         // if any children of treeElement are still gray-checked then treeElement
         // must remain gray-checked as well
-		for (Object child : treeContentProvider.getChildren(treeElement)) {
-			if (checkedStateStore.containsKey(child)) {
+        Object[] children = treeContentProvider.getChildren(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+            if (checkedStateStore.containsKey(children[i])) {
 				return true;
 			}
         }
@@ -366,8 +329,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         // always go through all children first since their white-checked
         // statuses will be needed to determine the white-checked status for
         // this tree element
-		for (Object child : treeContentProvider.getElements(treeElement)) {
-			determineWhiteCheckedDescendents(child);
+        Object[] children = treeContentProvider.getElements(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+			determineWhiteCheckedDescendents(children[i]);
 		}
 
         // now determine the white-checked status for this tree element
@@ -534,12 +498,13 @@ public class CheckboxTreeAndListGroup extends EventManager implements
      */
     protected void notifyCheckStateChangeListeners(
             final CheckStateChangedEvent event) {
-		for (Object listener : getListeners()) {
-			final ICheckStateListener checkStateListener = (ICheckStateListener) listener;
+        Object[] array = getListeners();
+        for (int i = 0; i < array.length; i++) {
+            final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
-					checkStateListener.checkStateChanged(event);
+                    l.checkStateChanged(event);
                 }
             });
         }
@@ -655,9 +620,10 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         }
 
         if (state) {
+            Object[] listItems = listContentProvider.getElements(treeElement);
             List listItemsChecked = new ArrayList();
-			for (Object listItem : listContentProvider.getElements(treeElement)) {
-				listItemsChecked.add(listItem);
+            for (int i = 0; i < listItems.length; ++i) {
+				listItemsChecked.add(listItems[i]);
 			}
 
             checkedStateStore.put(treeElement, listItemsChecked);
@@ -670,8 +636,9 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         treeViewer.setGrayed(treeElement, false);
 
         // now logically check/uncheck all children as well
-		for (Object child : treeContentProvider.getChildren(treeElement)) {
-			setTreeChecked(child, state);
+        Object[] children = treeContentProvider.getChildren(treeElement);
+        for (int i = 0; i < children.length; ++i) {
+            setTreeChecked(children[i], state);
         }
     }
 
@@ -806,11 +773,13 @@ public class CheckboxTreeAndListGroup extends EventManager implements
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
                 () -> {
+				    Iterator keyIterator = items.keySet().iterator();
+
 				    //Update the store before the hierarchy to prevent updating parents before all of the children are done
-					for (Entry<?, List> entry : ((Map<Object, List>) items).entrySet()) {
-						Object key1 = entry.getKey();
+				    while (keyIterator.hasNext()) {
+				        Object key1 = keyIterator.next();
 				        //Replace the items in the checked state store with those from the supplied items
-						List selections = entry.getValue();
+				        List selections = (List) items.get(key1);
 				        if (selections.size() == 0) {
 							//If it is empty remove it from the list
 				            checkedStateStore.remove(key1);
@@ -826,13 +795,16 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 				    }
 
 				    //Now update hierarchies
-					for (Entry<Object, List> entry : ((Map<Object, List>) items).entrySet()) {
-						Object key2 = entry.getKey();
+				    keyIterator = items.keySet().iterator();
+
+				    while (keyIterator.hasNext()) {
+				        Object key2 = keyIterator.next();
 				        updateHierarchy(key2);
 				        if (currentTreeSelection != null
 				                && currentTreeSelection.equals(key2)) {
 				            listViewer.setAllChecked(false);
-							listViewer.setCheckedElements(entry.getValue().toArray());
+				            listViewer.setCheckedElements(((List) items
+				                    .get(key2)).toArray());
 				        }
 				    }
 				});
