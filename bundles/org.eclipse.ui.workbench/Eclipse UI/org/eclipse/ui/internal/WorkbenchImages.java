@@ -9,13 +9,16 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426365
+ *     Sergey Grant <sergey.grant@me.com> (Google Inc.) - Bug 477391
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
@@ -103,9 +106,9 @@ public/*final*/class WorkbenchImages {
      */
     private final static void declareImage(String key, String path,
             boolean shared) {
-        URL url = BundleUtility.find(PlatformUI.PLUGIN_ID, path);
-        ImageDescriptor desc = ImageDescriptor.createFromURL(url);
-        declareImage(key, desc, shared);
+        declareImage(key, ImageDescriptor.createFromSupplier(()-> ImageDescriptor.createFromURL(
+                FileLocator.find(Platform.getBundle(PlatformUI.PLUGIN_ID), new Path(path), null))
+                        .getImageData()), shared);
     }
 
     private static void drawViewMenu(GC gc, GC maskgc) {

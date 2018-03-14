@@ -7,10 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Sergey Grant <sergey.grant@me.com> (Google Inc.) - Bug 477391
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
 import java.net.URL;
+import java.util.function.Supplier;
 
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Device;
@@ -128,19 +130,31 @@ public abstract class ImageDescriptor extends DeviceResourceDescriptor {
     }
 
     /**
-     * Creates and returns a new image descriptor for the given image. This
-     * method takes the Device that created the Image as an argument, allowing
-     * the original Image to be reused if the descriptor is asked for another
-     * Image on the same device. Note that disposing the original Image will
-     * cause the descriptor to become invalid.
-     *
-     * @deprecated use {@link ImageDescriptor#createFromImage(Image)}
-     * @since 3.1
-     *
-     * @param img image to create
-     * @param theDevice the device that was used to create the Image
-     * @return a newly created image descriptor
-     */
+	 * @param supplier
+	 * @return an ImageDescriptor from an ImageData supplier queried on
+	 *         {@link #getImageData()}.
+	 * @since 3.12
+	 */
+	public static ImageDescriptor createFromSupplier(Supplier<ImageData> supplier) {
+		return new SuppliedImageDescriptor(supplier);
+	}
+
+	/**
+	 * Creates and returns a new image descriptor for the given image. This
+	 * method takes the Device that created the Image as an argument, allowing
+	 * the original Image to be reused if the descriptor is asked for another
+	 * Image on the same device. Note that disposing the original Image will
+	 * cause the descriptor to become invalid.
+	 *
+	 * @deprecated use {@link ImageDescriptor#createFromImage(Image)}
+	 * @since 3.1
+	 *
+	 * @param img
+	 *            image to create
+	 * @param theDevice
+	 *            the device that was used to create the Image
+	 * @return a newly created image descriptor
+	 */
     @Deprecated
 	public static ImageDescriptor createFromImage(Image img, Device theDevice) {
         return new ImageDataImageDescriptor(img);
