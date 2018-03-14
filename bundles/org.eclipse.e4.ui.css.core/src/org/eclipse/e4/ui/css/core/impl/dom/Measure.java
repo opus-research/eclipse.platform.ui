@@ -11,14 +11,10 @@
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
-import org.eclipse.e4.ui.css.core.utils.SharedStringBuilder;
 import org.w3c.css.sac.LexicalUnit;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.css.CSSValue;
 
 public class Measure extends CSSValueImpl {
-
-	private static final SharedStringBuilder SSB = new SharedStringBuilder();
 
 	LexicalUnit value;
 
@@ -36,9 +32,8 @@ public class Measure extends CSSValueImpl {
 		//If it's actually a SAC_INTEGER return the integer value, callers tend to expect and cast
 		//There is no getIntegerFloat(short)
 		//TODO Not sure the purpose of arg valyeType, its not referenced in this method
-		if(value.getLexicalUnitType() == LexicalUnit.SAC_INTEGER) {
+		if(value.getLexicalUnitType() == LexicalUnit.SAC_INTEGER)
 			return value.getIntegerValue();
-		}
 		//TODO not sure what to do if it's not one of the lexical unit types that are specified in LexicalUnit#getFloatValue()
 		//ie. SAC_DEGREE, SAC_GRADIAN, SAC_RADIAN, SAC_MILLISECOND, SAC_SECOND, SAC_HERTZ or SAC_KILOHERTZ
 		return value.getFloatValue();
@@ -61,9 +56,8 @@ public class Measure extends CSSValueImpl {
 		short lexicalUnit = value.getLexicalUnitType();
 		if((lexicalUnit == LexicalUnit.SAC_IDENT)
 				|| (lexicalUnit == LexicalUnit.SAC_STRING_VALUE)
-				|| (lexicalUnit == LexicalUnit.SAC_URI)) {
+				|| (lexicalUnit == LexicalUnit.SAC_URI))
 			return value.getStringValue();
-		}
 		// TODO There are more cases to catch of getLexicalUnitType()
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
@@ -116,7 +110,6 @@ public class Measure extends CSSValueImpl {
 		// TODO: All LexicalUnit.SAC_OPERATOR_* except for COMMA left undone for
 		// now as it's not even clear whether they should be treated as measures
 		// see bug #278139
-		StringBuilder sb = null;
 		switch (value.getLexicalUnitType()) {
 		case LexicalUnit.SAC_INTEGER:
 			return String.valueOf(value.getIntegerValue());
@@ -131,11 +124,9 @@ public class Measure extends CSSValueImpl {
 		case LexicalUnit.SAC_POINT:
 		case LexicalUnit.SAC_INCH:
 		case LexicalUnit.SAC_DEGREE:
-			sb = SSB.get();
-			return sb.append(value.getFloatValue()).append(value.getDimensionUnitText()).toString();
+			return String.valueOf(value.getFloatValue()) + value.getDimensionUnitText();
 		case LexicalUnit.SAC_URI:
-			sb = SSB.get();
-			return sb.append("url(").append(value.getStringValue()).append(")").toString();
+			return "url(" + value.getStringValue() + ")";
 		case LexicalUnit.SAC_OPERATOR_COMMA:
 			return ",";
 		case LexicalUnit.SAC_INHERIT:
