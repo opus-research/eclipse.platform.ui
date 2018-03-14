@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Francis Upton - <francisu@ieee.org> - 
+ *     Francis Upton - <francisu@ieee.org> -
  *     		Fix for Bug 217777 [Workbench] Workbench event loop does not terminate if Display is closed
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *******************************************************************************/
@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -155,6 +156,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveableFilter;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.ISourceProvider;
@@ -290,13 +292,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 		private final int maximumProgressCount;
 
 		// stack of names of bundles currently starting
-		private final List starting;
+		private final List<String> starting;
 
 		StartupProgressBundleListener(IProgressMonitor progressMonitor, int maximumProgressCount) {
 			super();
 			this.progressMonitor = progressMonitor;
 			this.maximumProgressCount = maximumProgressCount;
-			this.starting = new ArrayList();
+			this.starting = new ArrayList<String>();
 		}
 
 		@Override
@@ -489,10 +491,10 @@ public final class Workbench extends EventManager implements IWorkbench,
 		application = app;
 		e4Context = appContext;
 		Workbench.instance = this;
-		eventBroker = (IEventBroker) e4Context.get(IEventBroker.class.getName());
+		eventBroker = e4Context.get(IEventBroker.class);
 
 		appContext.set(getClass().getName(), this);
-		appContext.set(IWorkbench.class.getName(), this);
+		appContext.set(IWorkbench.class, this);
 		appContext.set(IEventLoopAdvisor.class, new IEventLoopAdvisor() {
 			@Override
 			public void eventLoopIdle(Display display) {
@@ -599,8 +601,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 				if (obj instanceof E4Application) {
 					E4Application e4app = (E4Application) obj;
-					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
-							display);
+					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(), display);
 
 					// create the workbench instance
 					Workbench workbench = new Workbench(display, advisor, e4Workbench
@@ -812,8 +813,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 						// for this to be relevant
 					}
 				};
-				registration[0] = context.registerService(StartupMonitor.class.getName(),
-						startupMonitor, properties);
+				registration[0] = context.registerService(StartupMonitor.class.getName(), startupMonitor, properties);
 
 				splash.init(splashShell);
 			}
@@ -1334,15 +1334,25 @@ public final class Workbench extends EventManager implements IWorkbench,
 	}
 
 	private boolean saveAllEditors(boolean confirm, boolean closing) {
-		for (IWorkbenchWindow window : getWorkbenchWindows()) {
-			IWorkbenchPage page = window.getActivePage();
+		IWorkbenchWindow[] windows = getWorkbenchWindows();
+		if (windows.length == 0) {
+			return true;
+		}
+
+		Set<ISaveablePart> dirtyParts = new HashSet<ISaveablePart>();
+		for (IWorkbenchWindow window : windows) {
+			WorkbenchPage page = (WorkbenchPage) window.getActivePage();
 			if (page != null) {
-				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing, false)) {
-					return false;
-				}
+				Collections.addAll(dirtyParts, page.getDirtyParts());
 			}
 		}
-		return true;
+
+		IWorkbenchWindow activeWindow = getActiveWorkbenchWindow();
+		if (activeWindow == null) {
+			activeWindow = windows[0];
+		}
+		return WorkbenchPage.saveAll(new ArrayList<ISaveablePart>(dirtyParts),
+				confirm, closing, true, activeWindow, activeWindow);
 	}
 
 	@Override
@@ -1417,6 +1427,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 			return null;
 		}
 
+		// search for existing IWorkbenchWindow
+		IWorkbenchWindow iWorkbenchWindow = activeWindow.getContext().get(IWorkbenchWindow.class);
+		if (iWorkbenchWindow != null) {
+			return iWorkbenchWindow;
+		}
+		// otherwise create new IWorkbenchWindow instance
 		return createWorkbenchWindow(getDefaultPageInput(), getPerspectiveRegistry()
 				.findPerspectiveWithId(getPerspectiveRegistry().getDefaultPerspective()),
 				activeWindow, false);
@@ -1424,13 +1440,12 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	IWorkbenchWindow createWorkbenchWindow(IAdaptable input, IPerspectiveDescriptor descriptor,
 			MWindow window, boolean newWindow) {
+
 		IEclipseContext windowContext = window.getContext();
 		if (windowContext == null) {
-			windowContext = E4Workbench.initializeContext(
-					e4Context, window);
+			windowContext = E4Workbench.initializeContext(e4Context, window);
 		}
-		WorkbenchWindow result = (WorkbenchWindow) windowContext.get(IWorkbenchWindow.class
-				.getName());
+		WorkbenchWindow result = (WorkbenchWindow) windowContext.get(IWorkbenchWindow.class);
 		if (result == null) {
 			if (windowBeingCreated != null)
 				return windowBeingCreated;
@@ -1445,7 +1460,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 					application.setSelectedElement(window);
 				}
 				ContextInjectionFactory.inject(result, windowContext);
-				windowContext.set(IWorkbenchWindow.class.getName(), result);
+				windowContext.set(IWorkbenchWindow.class, result);
 			} finally {
 				windowBeingCreated = null;
 			}
@@ -1855,8 +1870,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 							MWindow window = (MWindow) removed;
 							IEclipseContext windowContext = window.getContext();
 							if (windowContext != null) {
-								IWorkbenchWindow wwindow = (IWorkbenchWindow) windowContext
-										.get(IWorkbenchWindow.class.getName());
+								IWorkbenchWindow wwindow = windowContext.get(IWorkbenchWindow.class);
 								if (wwindow != null) {
 									fireWindowClosed(wwindow);
 								}
@@ -1874,8 +1888,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 							.getProperty(UIEvents.EventTags.TYPE))) {
 						MWindow window = (MWindow) event.getProperty(UIEvents.EventTags.NEW_VALUE);
 						if (window != null) {
-							IWorkbenchWindow wwindow = (IWorkbenchWindow) window.getContext().get(
-									IWorkbenchWindow.class.getName());
+							IWorkbenchWindow wwindow = window.getContext().get(IWorkbenchWindow.class);
 							if (wwindow != null) {
 								e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_NAME, wwindow);
 								e4Context.set(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME,
@@ -1974,14 +1987,14 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 */
 	private WorkbenchPage getWorkbenchPage(MPart part) {
 		IEclipseContext context = getWindowContext(part);
-		WorkbenchPage page = (WorkbenchPage) context.get(IWorkbenchPage.class.getName());
+		WorkbenchPage page = (WorkbenchPage) context.get(IWorkbenchPage.class);
 		if (page == null) {
-			MWindow window = (MWindow) context.get(MWindow.class.getName());
+			MWindow window = context.get(MWindow.class);
 			Workbench workbench = (Workbench) PlatformUI.getWorkbench();
 			workbench.openWorkbenchWindow(getDefaultPageInput(), getPerspectiveRegistry()
 					.findPerspectiveWithId(getDefaultPerspectiveId()),
 					window, false);
-			page = (WorkbenchPage) context.get(IWorkbenchPage.class.getName());
+			page = (WorkbenchPage) context.get(IWorkbenchPage.class);
 		}
 		return page;
 	}
@@ -2003,8 +2016,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// If this editor was cloned from an existing editor (as
 				// part of a split...) then re-create a valid EditorReference
 				// from the existing editor's ref.
-				MPart clonedFrom = (MPart) part.getTransientData().get(
-						EModelService.CLONED_FROM_KEY);
+				MPart clonedFrom = (MPart) part.getTransientData().get(EModelService.CLONED_FROM_KEY);
 				if (clonedFrom != null && clonedFrom.getContext() != null) {
 					EditorReference originalRef = page.getEditorReference(clonedFrom);
 					if (originalRef != null) {
@@ -2024,7 +2036,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 					ref = createEditorReference(part, page);
 				}
 			}
-			context.set(EditorReference.class.getName(), ref);
+			context.set(EditorReference.class, ref);
 		} else {
 			// Create View References for 'e4' parts as well
 			WorkbenchPage page = getWorkbenchPage(part);
@@ -2032,7 +2044,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 			if (ref == null) {
 				ref = createViewReference(part, page);
 			}
-			context.set(ViewReference.class.getName(), ref);
+			context.set(ViewReference.class, ref);
 		}
 	}
 
@@ -2130,7 +2142,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	private CommandService initializeCommandService(IEclipseContext appContext) {
 		CommandService service = new CommandService(commandManager, appContext);
-		appContext.set(ICommandService.class.getName(), service);
+		appContext.set(ICommandService.class, service);
 		appContext.set(IUpdateService.class, service);
 		service.readRegistry();
 
@@ -2376,7 +2388,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 			@Override
 			public void runWithException() {
 				handlerService[0] = new LegacyHandlerService(e4Context);
-				e4Context.set(IHandlerService.class.getName(), handlerService[0]);
+				e4Context.set(IHandlerService.class, handlerService[0]);
 				handlerService[0].readRegistry();
 			}
 		});
@@ -3158,7 +3170,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	@Override
 	public IProgressService getProgressService() {
-		return (IProgressService) e4Context.get(IProgressService.class.getName());
+		return e4Context.get(IProgressService.class);
 	}
 
 	private WorkbenchActivitySupport workbenchActivitySupport;
@@ -3199,7 +3211,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	@Override
 	public IWorkbenchActivitySupport getActivitySupport() {
-		return (IWorkbenchActivitySupport) e4Context.get(IWorkbenchActivitySupport.class.getName());
+		return e4Context.get(IWorkbenchActivitySupport.class);
 	}
 
 	@Override
@@ -3408,7 +3420,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 
 	@Override
 	public IExtensionTracker getExtensionTracker() {
-		return (IExtensionTracker) e4Context.get(IExtensionTracker.class.getName());
+		return e4Context.get(IExtensionTracker.class);
 	}
 
 	/**
