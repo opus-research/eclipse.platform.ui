@@ -33,7 +33,7 @@ public class CssThemeSwitchAction extends Action {
 
 		this.window = window;
 		this.themeId = themeId;
-		themeEngine = (IThemeEngine) window.getService(IThemeEngine.class);
+		themeEngine = window.getService(IThemeEngine.class);
 	}
 
 	@Override
