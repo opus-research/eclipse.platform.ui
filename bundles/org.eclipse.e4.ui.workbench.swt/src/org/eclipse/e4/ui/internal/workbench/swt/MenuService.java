@@ -26,7 +26,6 @@ public class MenuService implements EMenuService {
 	@Inject
 	private MPart myPart;
 
-	@Override
 	public boolean registerContextMenu(Object parent, String menuId) {
 		if (!(parent instanceof Control)) {
 			return false;

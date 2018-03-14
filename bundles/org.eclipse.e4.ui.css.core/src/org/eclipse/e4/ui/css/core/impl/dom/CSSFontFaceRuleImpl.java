@@ -28,7 +28,6 @@ public class CSSFontFaceRuleImpl extends CSSRuleImpl implements CSSFontFaceRule 
 	/**
 	 * @see org.w3c.dom.css.CSSRule.getType()
 	 */
-	@Override
 	public short getType() {
 		return CSSRule.FONT_FACE_RULE;
 	}
@@ -38,7 +37,6 @@ public class CSSFontFaceRuleImpl extends CSSRuleImpl implements CSSFontFaceRule 
 	/**
 	 * @see org.w3c.dom.css.CSSFontFaceRule.getStyle()
 	 */
-	@Override
 	public CSSStyleDeclaration getStyle() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
