@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -121,6 +120,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 				WorkbenchMessages.WorkingSetSelectionDialog_newButton_label,
 				false);
 		newButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				createWorkingSet();
 			}
@@ -134,6 +134,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 					false);
 			detailsButton.setEnabled(false);
 			detailsButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					editSelectedWorkingSet();
 				}
@@ -146,6 +147,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 					false);
 			removeButton.setEnabled(false);
 			removeButton.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					removeSelectedWorkingSets();
 				}
@@ -175,6 +177,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 				WorkbenchMessages.SelectionDialog_selectLabel,
 				false);
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				selectAllSets();
 			}
@@ -186,6 +189,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 				WorkbenchMessages.SelectionDialog_deselectLabel,
 				false);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				deselectAllSets();
 			}
@@ -290,25 +294,17 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.IWorkingSetSelectionDialog#getSelection()
-	 */
+	@Override
 	public IWorkingSet[] getSelection() {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.dialogs.IWorkingSetSelectionDialog#setSelection(org.eclipse.ui.IWorkingSet[])
-	 */
+	@Override
 	public void setSelection(IWorkingSet[] selection) {
 		result = selection;
 	}
 
-	/**
-	 * Overrides method in Dialog
-	 * 
-	 * @see org.eclipse.jface.dialogs.Dialog#open()
-	 */
+	@Override
 	public int open() {
 		addedWorkingSets = new ArrayList();
 		removedWorkingSets = new ArrayList();

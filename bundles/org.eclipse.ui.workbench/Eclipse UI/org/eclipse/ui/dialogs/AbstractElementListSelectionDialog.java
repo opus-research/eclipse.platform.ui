@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -275,7 +275,8 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
      * Creates the message text widget and sets layout data.
      * @param composite the parent composite of the message area.
      */
-    protected Label createMessageArea(Composite composite) {
+    @Override
+	protected Label createMessageArea(Composite composite) {
         Label label = super.createMessageArea(composite);
 
         GridData data = new GridData();
@@ -333,10 +334,8 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return status.isOK();
     }
 
-    /*
-     * @see Dialog#cancelPressed
-     */
-    protected void cancelPressed() {
+    @Override
+	protected void cancelPressed() {
         setResult(null);
         super.cancelPressed();
     }
@@ -365,11 +364,13 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         list.setFilter((fFilter == null ? "" : fFilter)); //$NON-NLS-1$		
 
         list.addSelectionListener(new SelectionListener() {
-            public void widgetDefaultSelected(SelectionEvent e) {
+            @Override
+			public void widgetDefaultSelected(SelectionEvent e) {
                 handleDefaultSelected();
             }
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 handleWidgetSelected();
             }
         });
@@ -411,20 +412,23 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         text.setText((fFilter == null ? "" : fFilter)); //$NON-NLS-1$
 
         Listener listener = new Listener() {
-            public void handleEvent(Event e) {
+            @Override
+			public void handleEvent(Event e) {
                 fFilteredList.setFilter(fFilterText.getText());
             }
         };
         text.addListener(SWT.Modify, listener);
 
         text.addKeyListener(new KeyListener() {
-            public void keyPressed(KeyEvent e) {
+            @Override
+			public void keyPressed(KeyEvent e) {
                 if (e.keyCode == SWT.ARROW_DOWN) {
 					fFilteredList.setFocus();
 				}
             }
 
-            public void keyReleased(KeyEvent e) {
+            @Override
+			public void keyReleased(KeyEvent e) {
             }
         });
 
@@ -433,11 +437,8 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return text;
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#open()
-     */
-    public int open() {
+    @Override
+	public int open() {
         super.open();
         return getReturnCode();
     }
@@ -446,14 +447,12 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         super.create();
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#create()
-     */
-    public void create() {
+    @Override
+	public void create() {
 
         BusyIndicator.showWhile(null, new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 access$superCreate();
 
                 Assert.isNotNull(fFilteredList);

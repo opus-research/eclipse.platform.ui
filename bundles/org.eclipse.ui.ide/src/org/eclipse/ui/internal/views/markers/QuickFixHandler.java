@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,6 +66,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 	 * 
 	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		final ExtendedMarkersView view = getView(event);
@@ -77,6 +78,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 		final IMarker firstSelectedMarker = selectedMarkers[0];
 
 		IRunnableWithProgress resolutionsRunnable = new IRunnableWithProgress() {
+			@Override
 			public void run(IProgressMonitor monitor) {
 				monitor
 						.beginTask(
@@ -168,7 +170,8 @@ public class QuickFixHandler extends MarkerViewHandler {
 	}
 
 	/**
-	 * Checks whether the given extent contains all all but the first element from the given array.
+	 * Checks whether the given extent contains all all but the first element from the given members
+	 * array.
 	 * 
 	 * @param extent the array which should contain the elements
 	 * @param members the elements to check

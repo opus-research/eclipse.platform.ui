@@ -625,7 +625,7 @@
  
 	   <editor
             class="org.eclipse.ui.tests.api.MockEditorPart"
-            icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/font.gif"
+            icon="platform:/plugin/org.eclipse.ui/icons/full/obj16/font.png"
             default="true"
             name="Plugin Icon Test 1"
             id="org.eclipse.ui.tests.IconTestEditor1"
@@ -3646,6 +3646,11 @@
             defaultHandler="org.eclipse.ui.tests.menus.HelloEHandler"
             id="org.eclipse.ui.tests.menus.enabledWorld"
             name="Hello">
+         <commandParameter
+               id="Greeting"
+               name="Greeting"
+               optional="true">
+         </commandParameter>
       </command>
       <command
             categoryId="org.eclipse.ui.category.window"
@@ -4183,6 +4188,11 @@
          </command>
       </menuContribution>
       <menuContribution
+            allPopups="false"
+            class="org.eclipse.ui.tests.menus.DeclaredProgrammaticFactoryForToolbarVisibilityTest"
+            locationURI="toolbar:org.eclipse.ui.tests.toolbarContributionFromFactoryVisibilityTest">
+      </menuContribution>
+      <menuContribution
             locationURI="popup:org.eclipse.ui.tests.Bug264804?after=additions">
          <command
                commandId="org.eclipse.ui.file.close"
@@ -4372,4 +4382,9 @@
          </menu>
       </menuContribution>
    </extension>
+   
+   <extension point="org.eclipse.e4.ui.css.swt.theme">
+   		<theme basestylesheeturi="css/mock.css" id="org.eclipse.e4.ui.css.theme.mock" label="mock"/>
+   </extension>
+   
 </plugin>

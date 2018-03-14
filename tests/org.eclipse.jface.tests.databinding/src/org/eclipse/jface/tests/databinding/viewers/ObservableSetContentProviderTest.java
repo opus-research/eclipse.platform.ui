@@ -21,7 +21,7 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.WritableSet;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.tests.databinding.AbstractSWTTestCase;
 import org.eclipse.jface.viewers.TableViewer;
@@ -39,6 +39,7 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 	private ObservableSetContentProvider contentProvider;
 	private IObservableSet input;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
@@ -51,6 +52,7 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 		viewer.setInput(input);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		shell.dispose();
 		viewer = null;
@@ -60,13 +62,13 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 
 	public void testKnownElements_Realm() throws Exception {
 		assertSame("realm for the known elements should be the SWT realm",
-				SWTObservables.getRealm(Display.getDefault()), contentProvider
+				DisplayRealm.getRealm(Display.getDefault()), contentProvider
 						.getKnownElements().getRealm());
 	}
 
 	public void testRealizedElements_Realm() {
 		assertSame("realm for the realized elements should be the SWT realm",
-				SWTObservables.getRealm(Display.getDefault()), contentProvider
+				DisplayRealm.getRealm(Display.getDefault()), contentProvider
 						.getRealizedElements().getRealm());
 	}
 
@@ -122,6 +124,7 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 			this.id = id;
 		}
 
+		@Override
 		public boolean equals(Object obj) {
 			if (obj == this)
 				return true;
@@ -133,6 +136,7 @@ public class ObservableSetContentProviderTest extends AbstractSWTTestCase {
 			return this.id == that.id;
 		}
 
+		@Override
 		public int hashCode() {
 			return id;
 		}

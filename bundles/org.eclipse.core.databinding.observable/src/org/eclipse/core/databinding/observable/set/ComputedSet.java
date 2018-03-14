@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237703)
  *     Matthew Hall - bug 274081
+ *     Abel Hegedus - bug 414297
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.set;
 
@@ -146,17 +147,20 @@ public abstract class ComputedSet extends AbstractObservableSet {
 	 */
 	private class PrivateInterface implements Runnable, IChangeListener,
 			IStaleListener {
+		@Override
 		public void run() {
 			cachedSet = calculate();
 			if (cachedSet == null)
 				cachedSet = Collections.EMPTY_SET;
 		}
 
+		@Override
 		public void handleStale(StaleEvent event) {
 			if (!dirty)
 				makeStale();
 		}
 
+		@Override
 		public void handleChange(ChangeEvent event) {
 			makeDirty();
 		}
@@ -175,6 +179,7 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		return doGetSet();
 	}
 
+	@Override
 	protected Set getWrappedSet() {
 		return doGetSet();
 	}
@@ -227,12 +232,15 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		if (!dirty) {
 			dirty = true;
 
+			// copy the old set
+			// bug 414297: moved before makeStale(), as cachedSet may be
+			// overwritten
+			// in makeStale() if a listener calls isStale()
+			final Set oldSet = new HashSet(cachedSet);
 			makeStale();
 
 			stopListening();
 
-			// copy the old set
-			final Set oldSet = new HashSet(cachedSet);
 			// Fire the "dirty" event. This implementation recomputes the new
 			// set lazily.
 			fireSetChange(new SetDiff() {
@@ -244,10 +252,12 @@ public abstract class ComputedSet extends AbstractObservableSet {
 					return delegate;
 				}
 
+				@Override
 				public Set getAdditions() {
 					return getDelegate().getAdditions();
 				}
 
+				@Override
 				public Set getRemovals() {
 					return getDelegate().getRemovals();
 				}
@@ -274,16 +284,19 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		}
 	}
 
+	@Override
 	public boolean isStale() {
 		// recalculate set if dirty, to ensure staleness is correct.
 		getSet();
 		return stale;
 	}
 
+	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
+	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
 		super.addChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
@@ -291,6 +304,7 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		computeSetForListeners();
 	}
 
+	@Override
 	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		super.addSetChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
@@ -308,6 +322,7 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		// been executed. It is their job to figure out what to do with those
 		// notifications.
 		getRealm().exec(new Runnable() {
+			@Override
 			public void run() {
 				if (dependencies == null) {
 					// We are not currently listening.
@@ -320,6 +335,7 @@ public abstract class ComputedSet extends AbstractObservableSet {
 		});
 	}
 
+	@Override
 	public synchronized void dispose() {
 		stopListening();
 		super.dispose();

@@ -92,20 +92,16 @@ public class FileExtensionDialog extends TitleAreaDialog {
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(title);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell, helpContextId);
     }
 
    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-     */
-    protected Control createDialogArea(Composite parent) {
+    @Override
+	protected Control createDialogArea(Composite parent) {
 		Composite parentComposite = (Composite) super.createDialogArea(parent);
 
 		Composite contents = new Composite(parentComposite, SWT.NONE);
@@ -122,6 +118,7 @@ public class FileExtensionDialog extends TitleAreaDialog {
 			filenameField.setText(initialValue);
 		}
 		filenameField.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent event) {
 				if (event.widget == filenameField) {
 					filename = filenameField.getText().trim();
@@ -141,10 +138,8 @@ public class FileExtensionDialog extends TitleAreaDialog {
 	}
 
    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
-     */
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         okButton = createButton(parent, IDialogConstants.OK_ID,
                 IDialogConstants.OK_LABEL, true);
         okButton.setEnabled(false);
@@ -244,21 +239,16 @@ public class FileExtensionDialog extends TitleAreaDialog {
     	this.initialValue = initialValue;
     }
    
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
-     */
-    protected IDialogSettings getDialogBoundsSettings() {
+    @Override
+	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = WorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
         if (section == null) section = settings.addNewSection(DIALOG_SETTINGS_SECTION);
         return section;
     }
     
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
-    protected boolean isResizable() {
+    @Override
+	protected boolean isResizable() {
     	return true;
     }
 }

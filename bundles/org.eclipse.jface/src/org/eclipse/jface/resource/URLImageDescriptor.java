@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,9 +49,7 @@ class URLImageDescriptor extends ImageDescriptor {
 		this.url = url;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
+	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof URLImageDescriptor)) {
 			return false;
@@ -59,10 +57,7 @@ class URLImageDescriptor extends ImageDescriptor {
 		return ((URLImageDescriptor) o).url.toExternalForm().equals(this.url.toExternalForm());
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on ImageDesciptor. Returns null if the
-	 * image data cannot be read.
-	 */
+	@Override
 	public ImageData getImageData() {
 		ImageData result = null;
 		InputStream in = getStream();
@@ -101,21 +96,17 @@ class URLImageDescriptor extends ImageDescriptor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
+	@Override
 	public int hashCode() {
 		return url.toExternalForm().hashCode();
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
 	/**
 	 * The <code>URLImageDescriptor</code> implementation of this
 	 * <code>Object</code> method returns a string representation of this
 	 * object which is suitable only for debugging.
 	 */
+	@Override
 	public String toString() {
 		return "URLImageDescriptor(" + url + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -145,12 +136,7 @@ class URLImageDescriptor extends ImageDescriptor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.resource.ImageDescriptor#createImage(boolean,
-	 *      org.eclipse.swt.graphics.Device)
-	 */
+	@Override
 	public Image createImage(boolean returnMissingImageOnError, Device device) {
 
 		// Try to see if we can optimize using SWTs file based image support.

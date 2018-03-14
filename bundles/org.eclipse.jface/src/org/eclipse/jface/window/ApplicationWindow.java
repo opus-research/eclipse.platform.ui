@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -122,7 +122,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
 
         static final int BAR_SIZE = 23;
 
-        protected Point computeSize(Composite composite, int wHint, int hHint,
+        @Override
+		protected Point computeSize(Composite composite, int wHint, int hHint,
                 boolean flushCache) {
             if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 				return new Point(wHint, hHint);
@@ -166,7 +167,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
             return result;
         }
 
-        protected void layout(Composite composite, boolean flushCache) {
+        @Override
+		protected void layout(Composite composite, boolean flushCache) {
             Rectangle clientArea = composite.getClientArea();
 
             Control[] ws = composite.getChildren();
@@ -289,17 +291,13 @@ public class ApplicationWindow extends Window implements IRunnableContext {
         }	
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
-    protected boolean canHandleShellCloseEvent() {
+    @Override
+	protected boolean canHandleShellCloseEvent() {
         return super.canHandleShellCloseEvent() && !operationInProgress;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
-    public boolean close() {
+    @Override
+	public boolean close() {
         if (operationInProgress) {
 			return false;
 		}
@@ -337,7 +335,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
     /**
      * Extends the super implementation by creating the trim widgets using <code>createTrimWidgets</code>. 
      */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
 
         super.configureShell(shell);
 
@@ -352,7 +351,9 @@ public class ApplicationWindow extends Window implements IRunnableContext {
      */
     protected void createTrimWidgets(Shell shell) {
         if (menuBarManager != null) {
+        	boolean resizeHasOccurredBackup = this.resizeHasOccurred;
         	shell.setMenuBar(menuBarManager.createMenuBar((Decorations) shell));
+        	this.resizeHasOccurred = resizeHasOccurredBackup;
             menuBarManager.updateAll(true);
         }
 
@@ -366,10 +367,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
         createStatusLine(shell);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.window.Window#getLayout()
-     */
-    protected Layout getLayout() {
+    @Override
+	protected Layout getLayout() {
         return new ApplicationWindowLayout();
     }
 
@@ -686,7 +685,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
      * responsibility to call <code>Display.readAndDispatch()</code>
      * to ensure UI responsiveness.
      */
-    public void run(final boolean fork, boolean cancelable,
+    @Override
+	public void run(final boolean fork, boolean cancelable,
             final IRunnableWithProgress runnable)
             throws InvocationTargetException, InterruptedException {
         try {
@@ -754,7 +754,8 @@ public class ApplicationWindow extends Window implements IRunnableContext {
                 mgr.setCancelEnabled(cancelable);
                 final Exception[] holder = new Exception[1];
                 BusyIndicator.showWhile(display, new Runnable() {
-                    public void run() {
+                    @Override
+					public void run() {
                         try {
                             ModalContext.run(runnable, fork, mgr
                                     .getProgressMonitor(), display);

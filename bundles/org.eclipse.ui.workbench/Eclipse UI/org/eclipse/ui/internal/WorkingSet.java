@@ -88,6 +88,7 @@ public class WorkingSet extends AbstractWorkingSet {
 	 * @return true=the object equals the receiver, the name is the same. false
 	 *         otherwise
 	 */
+	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -105,25 +106,18 @@ public class WorkingSet extends AbstractWorkingSet {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean isEditable() {
 		WorkingSetDescriptor descriptor = getDescriptor(null);
 		return descriptor != null && descriptor.isEditable();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSet
-	 */
+	@Override
 	public String getId() {
 		return editPageId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSet#getImageDescriptor()
-	 */
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		WorkingSetDescriptor descriptor = getDescriptor(DEFAULT_ID);
 		if (descriptor == null) {
@@ -137,6 +131,7 @@ public class WorkingSet extends AbstractWorkingSet {
 	 * 
 	 * @return the hash code.
 	 */
+	@Override
 	public int hashCode() {
 		int hashCode = getName().hashCode();
 
@@ -149,6 +144,7 @@ public class WorkingSet extends AbstractWorkingSet {
 	/**
 	 * Recreates the working set elements from the persistence memento.
 	 */
+	@Override
 	void restoreWorkingSet() {
 		IMemento[] itemMementos = workingSetMemento
 				.getChildren(IWorkbenchConstants.TAG_ITEM);
@@ -174,6 +170,7 @@ public class WorkingSet extends AbstractWorkingSet {
 					.run(new SafeRunnable(
 							"Unable to restore working set item - exception while invoking factory: " + factoryID) { //$NON-NLS-1$
 
+						@Override
 						public void run() throws Exception {
 							IAdaptable item = factory
 									.createElement(itemMemento);
@@ -198,6 +195,7 @@ public class WorkingSet extends AbstractWorkingSet {
 	 * 
 	 * @see org.eclipse.ui.IPersistableElement#saveState(IMemento)
 	 */
+	@Override
 	public void saveState(IMemento memento) {
 		if (workingSetMemento != null) {
 			// just re-save the previous memento if the working set has
@@ -223,6 +221,7 @@ public class WorkingSet extends AbstractWorkingSet {
 							.run(new SafeRunnable(
 									"Problems occurred while saving persistable item state") { //$NON-NLS-1$
 
+								@Override
 								public void run() throws Exception {
 									persistable.saveState(itemMemento);
 								}
@@ -232,35 +231,30 @@ public class WorkingSet extends AbstractWorkingSet {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSet
-	 */
+	@Override
 	public void setElements(IAdaptable[] newElements) {
 		internalSetElements(newElements);
 		fireWorkingSetChanged(
 				IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSet
-	 */
+	@Override
 	public void setId(String pageId) {
 		editPageId = pageId;
 	}
 
+	@Override
 	public boolean isVisible() {
 		return true;
 	}
 
+	@Override
 	public boolean isSelfUpdating() {
 		WorkingSetDescriptor descriptor = getDescriptor(null);
 		return descriptor != null && descriptor.getUpdaterClassName() != null;
 	}
 
+	@Override
 	public boolean isAggregateWorkingSet() {
 		return false;
 	}
@@ -287,11 +281,7 @@ public class WorkingSet extends AbstractWorkingSet {
 		return registry.getWorkingSetDescriptor(id);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
-	 */
+	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		IWorkingSetManager manager = getManager();
 		if (manager instanceof WorkingSetManager) {
