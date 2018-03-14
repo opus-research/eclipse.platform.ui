@@ -704,11 +704,13 @@ public class MinMaxAddon {
 			}
 
 			// Find the editor 'area'
-			MPlaceholder eaPlaceholder = (MPlaceholder) modelService.find(ID_EDITOR_AREA,
-					persp == null ? win : persp);
-			if (element != eaPlaceholder && eaPlaceholder != null
-					&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
-				elementsToMinimize.add(eaPlaceholder);
+			if (persp != null) {
+				MPlaceholder eaPlaceholder = (MPlaceholder) modelService
+						.find(ID_EDITOR_AREA, persp);
+				if (element != eaPlaceholder && eaPlaceholder != null
+						&& eaPlaceholder.getWidget() != null && eaPlaceholder.isVisible()) {
+					elementsToMinimize.add(eaPlaceholder);
+				}
 			}
 		}
 
@@ -965,9 +967,8 @@ public class MinMaxAddon {
 	private String getMinimizedElementSuffix(MUIElement element) {
 		String id = ID_SUFFIX;
 		MPerspective persp = modelService.getPerspectiveFor(element);
-		MWindow window = getWindowFor(element);
 		if (persp != null) {
-			id = '(' + window.getElementId() + '.' + persp.getElementId() + ')';
+			id = '(' + persp.getElementId() + ')';
 		}
 		return id;
 	}
