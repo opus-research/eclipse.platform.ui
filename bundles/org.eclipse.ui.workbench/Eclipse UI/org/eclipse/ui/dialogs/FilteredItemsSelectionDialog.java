@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *  Robert Roth <robert.roth.off@gmail.com> - Bug 436703
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -751,8 +752,8 @@ public abstract class FilteredItemsSelectionDialog extends
 
 				}
 
-				if (e.keyCode == SWT.ARROW_UP && (e.stateMask & SWT.SHIFT) != 0
-						&& (e.stateMask & SWT.CTRL) != 0) {
+				if (e.keyCode == SWT.ARROW_UP && (e.stateMask & SWT.SHIFT) == 0
+						&& (e.stateMask & SWT.CTRL) == 0) {
 					StructuredSelection selection = (StructuredSelection) list
 							.getSelection();
 
@@ -772,8 +773,8 @@ public abstract class FilteredItemsSelectionDialog extends
 				}
 
 				if (e.keyCode == SWT.ARROW_DOWN
-						&& (e.stateMask & SWT.SHIFT) != 0
-						&& (e.stateMask & SWT.CTRL) != 0) {
+						&& (e.stateMask & SWT.SHIFT) == 0
+						&& (e.stateMask & SWT.CTRL) == 0) {
 
 					if (list
 							.getElementAt(list.getTable().getSelectionIndex() + 1) instanceof ItemsListSeparator)
