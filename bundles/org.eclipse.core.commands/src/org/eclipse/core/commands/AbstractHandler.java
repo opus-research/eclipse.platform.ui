@@ -14,6 +14,11 @@ import org.eclipse.core.commands.common.EventManager;
 
 /**
  * <p>
+ * 
+ * 
+ * 
+ * test
+ * 
  * This class is a partial implementation of <code>IHandler</code>. This
  * abstract implementation provides support for handler listeners. You should
  * subclass from this method unless you want to implement your own listener
