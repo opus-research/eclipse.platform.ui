@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -47,11 +46,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
-	public static final String EVENT_IMPORT_END = "org/eclipse/ui/internal/wizards/preferences/import/end"; //$NON-NLS-1$
-
     private WizardPreferencesImportPage1 mainPage;
-
-	private IEventBroker eventBroker;
 
     /**
      * Creates a wizard for importing resources into the workspace from
@@ -76,7 +71,6 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-		eventBroker = workbench.getService(IEventBroker.class);
         setWindowTitle(PreferencesMessages.PreferencesImportWizard_import);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_PREF_WIZ));
@@ -85,14 +79,6 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
     @Override
 	public boolean performFinish() {
-		boolean success = mainPage.finish();
-		sendEvent(EVENT_IMPORT_END);
-		return success;
+        return mainPage.finish();
     }
-
-	private void sendEvent(String topic) {
-		if (eventBroker != null) {
-			eventBroker.send(topic, null);
-		}
-	}
 }
