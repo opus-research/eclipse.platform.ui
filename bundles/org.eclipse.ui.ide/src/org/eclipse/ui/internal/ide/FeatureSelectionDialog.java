@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.SelectionDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -31,14 +33,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.SelectionDialog;
 
 import com.ibm.icu.text.Collator;
 
 /**
  * Dialog to allow the user to select a feature from a list.
  */
-public class FeatureSelectionDialog extends SelectionDialog {
+public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
     /**
      * List width in characters.
      */
@@ -92,17 +93,14 @@ public class FeatureSelectionDialog extends SelectionDialog {
         setMessage(shellMessage);
 
         // Sort ascending
-        Arrays.sort(features, new Comparator() {
+		Arrays.sort(features, new Comparator<AboutInfo>() {
             Collator coll = Collator.getInstance(Locale.getDefault());
 
-            @Override
-			public int compare(Object a, Object b) {
-                AboutInfo i1, i2;
+			@Override
+			public int compare(AboutInfo o1, AboutInfo o2) {
                 String name1, name2;
-                i1 = (AboutInfo) a;
-                name1 = i1.getFeatureLabel();
-                i2 = (AboutInfo) b;
-                name2 = i2.getFeatureLabel();
+				name1 = o1.getFeatureLabel();
+				name2 = o2.getFeatureLabel();
                 if (name1 == null) {
 					name1 = ""; //$NON-NLS-1$
 				}
@@ -110,19 +108,19 @@ public class FeatureSelectionDialog extends SelectionDialog {
 					name2 = ""; //$NON-NLS-1$
 				}
                 return coll.compare(name1, name2);
-            }
+			}
         });
 
         // Find primary feature
         for (int i = 0; i < features.length; i++) {
             if (features[i].getFeatureId().equals(primaryFeatureId)) {
-                setInitialSelections(new Object[] { features[i] });
+				setInitialSelection(features[i]);
                 return;
             }
         }
 
-        // set a safe default		
-        setInitialSelections(new Object[0]);
+		// set a safe default
+		setInitialSelection(new AboutInfo[0]);
     }
 
     @Override
@@ -160,15 +158,14 @@ public class FeatureSelectionDialog extends SelectionDialog {
 		listViewer.setInput(features);
 
         // Set the initial selection
-        listViewer.setSelection(new StructuredSelection(
-                getInitialElementSelections()), true);
+		listViewer.setSelection(new StructuredSelection(getInitialSelection()), true);
 
         // Add a selection change listener
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
 			public void selectionChanged(SelectionChangedEvent event) {
                 // Update OK button enablement
-                getOkButton().setEnabled(!event.getSelection().isEmpty());
+				getButton(IDialogConstants.OK_ID).setEnabled(!event.getSelection().isEmpty());
             }
         });
 
@@ -182,11 +179,24 @@ public class FeatureSelectionDialog extends SelectionDialog {
         return composite;
     }
 
-    @Override
+	@Override
+	protected Control createButtonBar(Composite parent) {
+		Control buttonSection = super.createButtonBar(parent);
+		// disable ok button if the selection is empty
+		getButton(IDialogConstants.OK_ID).setEnabled(listViewer.getSelection().isEmpty());
+
+		return buttonSection;
+	}
+
+	@Override
 	protected void okPressed() {
-        IStructuredSelection selection = (IStructuredSelection) listViewer
-                .getSelection();
-        setResult(selection.toList());
+		IStructuredSelection selection = listViewer.getStructuredSelection();
+		setResult(selection);
         super.okPressed();
     }
+
+	@SuppressWarnings("unchecked")
+	private void setResult(IStructuredSelection selection) {
+		setResult(selection.toList());
+	}
 }

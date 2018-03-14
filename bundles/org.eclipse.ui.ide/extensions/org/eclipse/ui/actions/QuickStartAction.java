@@ -13,18 +13,15 @@ package org.eclipse.ui.actions;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.eclipse.swt.widgets.Shell;
-
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
-
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -147,19 +144,20 @@ public class QuickStartAction extends Action implements
                 product == null ? null : product.getId(), IDEWorkbenchMessages.WelcomePageSelectionDialog_title,
                 IDEWorkbenchMessages.WelcomePageSelectionDialog_message,
                 IIDEHelpContextIds.WELCOME_PAGE_SELECTION_DIALOG);
-        if (d.open() != Window.OK || d.getResult().length != 1) {
+		if (d.open() != Window.OK || d.getResult().size() != 1) {
 			return null;
 		}
-        return (AboutInfo) d.getResult()[0];
+		return d.getResult().iterator().next();
     }
 
     /**
-     * Opens the welcome page for the given feature.
-     * 
-     * @param featureId the about info for the feature
-     * @return <code>true</code> if successful, <code>false</code> otherwise
-     * @throws WorkbenchException
-     */
+	 * Opens the welcome page for the given feature.
+	 *
+	 * @param featureId
+	 *            the about info for the feature
+	 * @return <code>true</code> if successful, <code>false</code> otherwise
+	 * @throws WorkbenchException
+	 */
     public boolean openWelcomePage(String featureId) throws WorkbenchException {
         AboutInfo feature = findFeature(featureId);
         if (feature == null || feature.getWelcomePageURL() == null) {

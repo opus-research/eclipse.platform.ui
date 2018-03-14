@@ -93,13 +93,12 @@ public class TipsAndTricksAction extends PartEventAction implements
                 IDEWorkbenchMessages.TipsAndTricksPageSelectionDialog_message,
                 IIDEHelpContextIds.TIPS_AND_TRICKS_PAGE_SELECTION_DIALOG);
         d.create();
-        d.getOkButton().setEnabled(false);
-        
-        if (d.open() != Window.OK || d.getResult().length != 1) {
+
+		if (d.open() != Window.OK || d.getResult().size() != 1) {
 			return;
 		}
 
-        AboutInfo feature = (AboutInfo) d.getResult()[0];
+		AboutInfo feature = d.getResult().iterator().next();
 
         /**
          * Open the tips and trick help topic
