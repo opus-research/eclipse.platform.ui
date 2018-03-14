@@ -51,8 +51,6 @@ public class WorkbenchRendererFactory implements IRendererFactory {
 
 	private IEclipseContext context;
 
-	// private RenderedToolBarRenderer renderedToolbarRenderer;
-
 	@Override
 	public AbstractPartRenderer getRenderer(MUIElement uiElement, Object parent) {
 		if (uiElement instanceof MArea) {
