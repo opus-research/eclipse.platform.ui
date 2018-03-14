@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -122,18 +122,9 @@ public class ResourcePatternFilter extends ViewerFilter {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on ViewerFilter.
-     */
     @Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
-        IResource resource = null;
-        if (element instanceof IResource) {
-            resource = (IResource) element;
-        } else if (element instanceof IAdaptable) {
-            IAdaptable adaptable = (IAdaptable) element;
-            resource = adaptable.getAdapter(IResource.class);
-        }
+		IResource resource = Adapters.adapt(element, IResource.class);
         if (resource != null) {
             String name = resource.getName();
             StringMatcher[] testMatchers = getMatchers();

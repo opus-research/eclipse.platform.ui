@@ -102,9 +102,6 @@ public class WizardFileSystemResourceExportPage1 extends
         destinationNameField.add(value);
     }
 
-    /** (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
     @Override
 	public void createControl(Composite parent) {
         super.createControl(parent);
@@ -459,10 +456,6 @@ public class WizardFileSystemResourceExportPage1 extends
         return true;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.dialogs.WizardDataTransferPage#validateSourceGroup()
-     */
     @Override
 	protected boolean validateSourceGroup() {
     	// there must be some resources selected for Export

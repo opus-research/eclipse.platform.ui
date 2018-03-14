@@ -108,7 +108,7 @@ public class ModelUtils {
 				      String elementId = posInfo.getPositionReference();
 
 				      for( int i = 0; i < list.size(); i++ ) {
-		            if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
+		            if( elementId.equals((list.get(i)).getElementId()) ) {
 		              tmpIndex = i;
 		              break;
 		            }
@@ -208,7 +208,10 @@ public class ModelUtils {
 		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
 		} else if (element instanceof EObject) {
-			return (MApplicationElement) ((EObject) element).eContainer();
+			EObject eContainer = ((EObject) element).eContainer();
+			if (eContainer instanceof MApplicationElement) {
+				return (MApplicationElement) eContainer;
+			}
 		}
 		return null;
 	}
