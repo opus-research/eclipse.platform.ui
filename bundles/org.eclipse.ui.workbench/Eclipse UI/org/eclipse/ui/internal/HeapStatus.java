@@ -142,6 +142,7 @@ public class HeapStatus extends Composite {
 
         Listener listener = new Listener() {
 
+
             @Override
 			public void handleEvent(Event event) {
                 switch (event.type) {
@@ -223,6 +224,20 @@ public class HeapStatus extends Composite {
 		button.redraw();
 		button.update();
 	}
+
+	@Override
+	public void setForeground(Color color) {
+		// use existing default color
+		if (color == null) {
+			usedMemCol = getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+		} else {
+			usedMemCol = color;
+		}
+
+		button.redraw();
+		button.update();
+	}
+
 	/**
 	 * Returns the maximum memory limit, or Long.MAX_VALUE if the max is not known.
 	 */
