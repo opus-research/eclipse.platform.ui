@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -27,8 +28,8 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.SelectionListenerAction;
-import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 import org.eclipse.ui.part.ResourceTransfer;
+import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 
 /**
  * Standard action for copying the currently selected resources to the clipboard.
@@ -98,8 +99,8 @@ import org.eclipse.ui.part.ResourceTransfer;
      * clipboard.
      */
     public void run() {
-        List<IResource> selectedResources = getSelectedResources();
-        IResource[] resources =selectedResources
+        List selectedResources = getSelectedResources();
+        IResource[] resources = (IResource[]) selectedResources
                 .toArray(new IResource[selectedResources.size()]);
 
         // Get the file names and a string representation
@@ -185,7 +186,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-        List<IResource> selectedResources = getSelectedResources();
+        List selectedResources = getSelectedResources();
         if (selectedResources.size() == 0) {
 			return false;
 		}
@@ -203,13 +204,16 @@ import org.eclipse.ui.part.ResourceTransfer;
 		}
 
         // must have a common parent	
-        IContainer firstParent = selectedResources.get(0).getParent();
+        IContainer firstParent = ((IResource) selectedResources.get(0))
+                .getParent();
         if (firstParent == null) {
 			return false;
 		}
 
-        for (IResource currentResource : selectedResources) {
-        	if (!currentResource.getParent().equals(firstParent)) {
+        Iterator resourcesEnum = selectedResources.iterator();
+        while (resourcesEnum.hasNext()) {
+            IResource currentResource = (IResource) resourcesEnum.next();
+            if (!currentResource.getParent().equals(firstParent)) {
 				return false;
 			}
             // resource location must exist

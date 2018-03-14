@@ -48,6 +48,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.emf.ecore.EObject;
@@ -75,6 +76,13 @@ import org.osgi.service.event.EventHandler;
  * Create a contribute part.
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
+
+	private static final Selector ALL_SELECTOR = new Selector() {
+
+		public boolean select(MApplicationElement element) {
+			return true;
+		}
+	};
 
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
@@ -244,7 +252,31 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Optional
 	void dirtyChanged(
 			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
-		updateEnablement();
+		getUpdater().updateContributionItems(ALL_SELECTOR);
+	}
+
+	@Inject
+	@Optional
+	void updateRequest(
+			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
+		final Object v = eventData.getProperty(IEventBroker.DATA);
+		Selector s;
+		if (v instanceof Selector) {
+			s = (Selector) v;
+		} else {
+			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
+				s = ALL_SELECTOR;
+			} else {
+				s = new Selector() {
+
+					public boolean select(MApplicationElement element) {
+						return v.equals(element.getElementId());
+					}
+				};
+			}
+		}
+
+		getUpdater().updateContributionItems(s);
 	}
 
 	@PostConstruct
@@ -274,7 +306,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				for (String var : updateVariables) {
 					context.get(var);
 				}
-				updateEnablement();
+				getUpdater().updateContributionItems(ALL_SELECTOR);
 				return true;
 			}
 		};
@@ -394,7 +426,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 						public void run() {
 							manager.update(false);
-							updateEnablement();
+							getUpdater().updateContributionItems(ALL_SELECTOR);
 						}
 					});
 					// disposeToolbarIfNecessary(toolbarModel);
@@ -901,9 +933,5 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	ToolItemUpdater getUpdater() {
 		return enablementUpdater;
-	}
-
-	public void updateEnablement() {
-		enablementUpdater.updateContributionItems();
 	}
 }
