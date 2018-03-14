@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 436908
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -15,8 +14,6 @@ package org.eclipse.ui.internal.e4.compatibility;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -24,7 +21,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
@@ -40,8 +36,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IPersistable;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPart;
@@ -49,7 +43,6 @@ import org.eclipse.ui.IWorkbenchPart2;
 import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.internal.ErrorEditorPart;
 import org.eclipse.ui.internal.ErrorViewPart;
 import org.eclipse.ui.internal.PartSite;
@@ -60,8 +53,6 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.util.Util;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public abstract class CompatibilityPart implements ISelectionChangedListener {
 
@@ -138,22 +129,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 
 	CompatibilityPart(MPart part) {
 		this.part = part;
-	}
-
-	@PersistState
-	void persistState() {
-		if (wrapped instanceof IPersistable) {
-			try {
-				Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-						.newDocument();
-				Element root = document.createElement("dummy-memento"); //$NON-NLS-1$
-				document.appendChild(root);
-				IMemento memento = new XMLMemento(document, root);
-				((IPersistable) wrapped).saveState(memento);
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public abstract WorkbenchPartReference getReference();
