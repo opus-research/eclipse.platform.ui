@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
@@ -183,9 +183,9 @@ public class Snippet001NestedSelectionWithCombo {
 			Combo city = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
 
 			ListViewer peopleListViewer = new ListViewer(peopleList);
-			IObservableMap attributeMap = BeanProperties.value(Person.class, "name").observeDetail(
+			IObservableMap attributeMap = BeansObservables.observeMap(
 					Observables.staticObservableSet(realm, new HashSet(
-							viewModel.getPeople())));
+							viewModel.getPeople())), Person.class, "name");
 			peopleListViewer.setLabelProvider(new ObservableMapLabelProvider(
 					attributeMap));
 			peopleListViewer.setContentProvider(new ArrayContentProvider());
@@ -194,14 +194,9 @@ public class Snippet001NestedSelectionWithCombo {
 			DataBindingContext dbc = new DataBindingContext(realm);
 			IObservableValue selectedPerson = ViewersObservables
 					.observeSingleSelection(peopleListViewer);
-			Class selectedPersonValueType = null;
-			if (selectedPerson.getValueType() instanceof Class<?>) {
-				selectedPersonValueType = (Class) selectedPerson.getValueType();
-			}
-			dbc.bindValue(
-					WidgetProperties.text(SWT.Modify).observe(name),
-					BeanProperties.value(selectedPersonValueType, "name", String.class)
-					.observeDetail(selectedPerson));
+			dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(name),
+					BeansObservables.observeDetailValue(selectedPerson,
+							"name", String.class));
 
 			ComboViewer cityViewer = new ComboViewer(city);
 			cityViewer.setContentProvider(new ArrayContentProvider());
@@ -209,8 +204,8 @@ public class Snippet001NestedSelectionWithCombo {
 
 			IObservableValue citySelection = ViewersObservables
 					.observeSingleSelection(cityViewer);
-			dbc.bindValue(citySelection, BeanProperties.value(selectedPersonValueType, "city", String.class)
-					.observeDetail(selectedPerson));
+			dbc.bindValue(citySelection, BeansObservables.observeDetailValue(
+					selectedPerson, "city", String.class));
 
 			GridLayoutFactory.swtDefaults().applyTo(shell);
 			// Open and return the Shell
