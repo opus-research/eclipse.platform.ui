@@ -15,7 +15,6 @@
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
  * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
- * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -150,9 +149,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String Workbench_addTask;
 	public static String Workbench_addTaskToolTip;
 
-
-	// --- Perspective Menu ---
-	public static String Workbench_perspective;
 
 	// --- Navigate Menu ---
 	public static String Workbench_navigate;
@@ -959,7 +955,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_versionTitle_olderWorkspace;
 	public static String IDEApplication_versionMessage_newerWorkspace;
 	public static String IDEApplication_versionMessage_olderWorkspace;
-	public static String IDEApplication_version_doNotWarnAgain;
 	public static String GlobalBuildAction_BuildRunningTitle;
 	public static String GlobalBuildAction_BuildRunningMessage;
 	public static String CleanDialog_buildCleanAuto;

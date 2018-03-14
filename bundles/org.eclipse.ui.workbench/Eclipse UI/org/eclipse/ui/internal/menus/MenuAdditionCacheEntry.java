@@ -53,8 +53,6 @@ import org.eclipse.ui.internal.services.ServiceLocator;
 import org.eclipse.ui.menus.CommandContributionItem;
 
 public class MenuAdditionCacheEntry {
-	private static final String AFTER_ADDITIONS = "after=additions"; //$NON-NLS-1$
-
 	final static String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
 
 	final static String TRIM_COMMAND1 = "org.eclipse.ui.trim.command1"; //$NON-NLS-1$
@@ -113,7 +111,6 @@ public class MenuAdditionCacheEntry {
 	public void mergeIntoModel(ArrayList<MMenuContribution> menuContributions,
 			ArrayList<MToolBarContribution> toolBarContributions,
 			ArrayList<MTrimContribution> trimContributions) {
-		boolean hasAdditions = false;
 		if ("menu:help?after=additions".equals(location.toString())) { //$NON-NLS-1$
 			IConfigurationElement[] menus = configElement
 					.getChildren(IWorkbenchRegistryConstants.TAG_MENU);
@@ -132,12 +129,11 @@ public class MenuAdditionCacheEntry {
 				processTrimChildren(trimContributions, toolBarContributions, configElement);
 			} else {
 				String query = location.getQuery();
-				hasAdditions = AFTER_ADDITIONS.equals(query);
 				if (query == null || query.length() == 0) {
-					query = AFTER_ADDITIONS;
+					query = "after=additions"; //$NON-NLS-1$
 				}
 				processToolbarChildren(toolBarContributions, configElement, location.getPath(),
-						query, hasAdditions);
+						query);
 			}
 			return;
 		}
@@ -146,15 +142,14 @@ public class MenuAdditionCacheEntry {
 		if (idContrib != null && idContrib.length() > 0) {
 			menuContribution.setElementId(idContrib);
 		}
-		String query = location.getQuery();
 		if ("org.eclipse.ui.popup.any".equals(location.getPath())) { //$NON-NLS-1$
 			menuContribution.setParentId("popup"); //$NON-NLS-1$
 		} else {
 			menuContribution.setParentId(location.getPath());
-			hasAdditions = AFTER_ADDITIONS.equals(query);
 		}
+		String query = location.getQuery();
 		if (query == null || query.length() == 0) {
-			query = AFTER_ADDITIONS;
+			query = "after=additions"; //$NON-NLS-1$
 		}
 		menuContribution.setPositionInParent(query);
 		menuContribution.getTags().add("scheme:" + location.getScheme()); //$NON-NLS-1$
@@ -165,11 +160,7 @@ public class MenuAdditionCacheEntry {
 		menuContribution.getTags().add(filter);
 		menuContribution.setVisibleWhen(MenuHelper.getVisibleWhen(configElement));
 		addMenuChildren(menuContribution, configElement, filter);
-		if (hasAdditions) {
-			menuContributions.add(0, menuContribution);
-		} else {
-			menuContributions.add(menuContribution);
-		}
+		menuContributions.add(menuContribution);
 		processMenuChildren(menuContributions, configElement, filter);
 	}
 
@@ -190,7 +181,7 @@ public class MenuAdditionCacheEntry {
 				menuContribution.setElementId(idContrib);
 			}
 			menuContribution.setParentId(idContrib);
-			menuContribution.setPositionInParent(AFTER_ADDITIONS);
+			menuContribution.setPositionInParent("after=additions"); //$NON-NLS-1$
 			menuContribution.getTags().add("scheme:" + location.getScheme()); //$NON-NLS-1$
 			menuContribution.getTags().add(filter);
 			menuContribution.setVisibleWhen(MenuHelper.getVisibleWhen(menu));
@@ -358,7 +349,7 @@ public class MenuAdditionCacheEntry {
 		} else {
 			contribution.setParentId(location.getPath());
 			if (query == null || query.length() == 0) {
-				query = AFTER_ADDITIONS;
+				query = "after=additions"; //$NON-NLS-1$
 			}
 			contribution.setPositionInParent(query);
 		}
@@ -376,8 +367,6 @@ public class MenuAdditionCacheEntry {
 		if (idContrib != null && idContrib.length() > 0) {
 			trimContribution.setElementId(idContrib);
 		}
-		String query = location.getQuery();
-		boolean hasAdditions = AFTER_ADDITIONS.equals(query);
 		processTrimLocation(trimContribution);
 		trimContribution.getTags().add("scheme:" + location.getScheme()); //$NON-NLS-1$
 		for (IConfigurationElement toolbar : toolbars) {
@@ -385,18 +374,14 @@ public class MenuAdditionCacheEntry {
 			item.setElementId(MenuHelper.getId(toolbar));
 			item.getTransientData().put("Name", MenuHelper.getLabel(toolbar)); //$NON-NLS-1$
 			processToolbarChildren(toolBarContributions, toolbar, item.getElementId(),
-					AFTER_ADDITIONS, false);
+					"after=additions"); //$NON-NLS-1$
 			trimContribution.getChildren().add(item);
 		}
-		if (hasAdditions) {
-			trimContributions.add(0, trimContribution);
-		} else {
-			trimContributions.add(trimContribution);
-		}
+		trimContributions.add(trimContribution);
 	}
 
 	private void processToolbarChildren(ArrayList<MToolBarContribution> contributions,
-			IConfigurationElement toolbar, String parentId, String position, boolean hasAdditions) {
+			IConfigurationElement toolbar, String parentId, String position) {
 		MToolBarContribution toolBarContribution = MenuFactoryImpl.eINSTANCE
 				.createToolBarContribution();
 		String idContrib = MenuHelper.getId(toolbar);
@@ -424,11 +409,7 @@ public class MenuAdditionCacheEntry {
 			}
 		}
 
-		if (hasAdditions) {
-			contributions.add(0, toolBarContribution);
-		} else {
-			contributions.add(toolBarContribution);
-		}
+		contributions.add(toolBarContribution);
 	}
 
 	private MToolBarElement createToolControlAddition(IConfigurationElement element) {

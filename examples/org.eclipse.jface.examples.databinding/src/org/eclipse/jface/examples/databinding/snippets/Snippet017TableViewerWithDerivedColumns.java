@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2009 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Coconut Palm Software, Inc. - Initial API and implementation
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -18,12 +17,12 @@ import java.beans.PropertyChangeSupport;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -53,7 +52,6 @@ public class Snippet017TableViewerWithDerivedColumns {
 		// application, you can do this once, wrapping your binding
 		// method call.
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
-			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
 				Shell shell = new View(viewModel).createShell();
@@ -141,7 +139,6 @@ public class Snippet017TableViewerWithDerivedColumns {
 			firePropertyChange("father", this.father, this.father = father);
 		}
 
-		@Override
 		public String toString() {
 			return name;
 		}
@@ -244,7 +241,6 @@ public class Snippet017TableViewerWithDerivedColumns {
 			// Since we're using a JFace Viewer, we do first wrap our Table...
 			TableViewer peopleViewer = new TableViewer(duckFamily);
 			peopleViewer.addFilter(new ViewerFilter() {
-				@Override
 				public boolean select(Viewer viewer, Object parentElement,
 						Object element) {
 					return element != UNKNOWN;
@@ -259,25 +255,25 @@ public class Snippet017TableViewerWithDerivedColumns {
 			// Bind viewer selection to detail fields
 			IObservableValue selection = ViewersObservables
 					.observeSingleSelection(peopleViewer);
-			bindingContext.bindValue(WidgetProperties.text().observe(nameText),
-					BeanProperties.value((Class) selection.getValueType(), "name", String.class).observeDetail(
-							selection));
+			bindingContext.bindValue(SWTObservables.observeText(nameText,
+					SWT.Modify), BeansObservables.observeDetailValue(selection,
+					"name", String.class));
 
 			ComboViewer mothercomboViewer = new ComboViewer(motherCombo);
 			ViewerSupport.bind(mothercomboViewer, viewModel.getPeople(),
 					BeanProperties.value("name"));
 			bindingContext.bindValue(ViewersObservables
-					.observeSingleSelection(mothercomboViewer), BeanProperties
-					.value((Class) selection.getValueType(), "mother", Person.class)
-					.observeDetail(selection));
+					.observeSingleSelection(mothercomboViewer),
+					BeansObservables.observeDetailValue(selection, "mother",
+							Person.class));
 
 			ComboViewer fatherComboViewer = new ComboViewer(fatherCombo);
 			ViewerSupport.bind(fatherComboViewer, viewModel.getPeople(),
 					BeanProperties.value("name"));
 			bindingContext.bindValue(ViewersObservables
 					.observeSingleSelection(fatherComboViewer),
-					BeanProperties.value((Class) selection.getValueType(), "father", Person.class)
-					.observeDetail(selection));
+					BeansObservables.observeDetailValue(selection, "father",
+							Person.class));
 		}
 	}
 

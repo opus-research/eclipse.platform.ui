@@ -26,18 +26,37 @@ public class TestNewPropertySheetHandler extends NewPropertySheetHandler {
 
 	public static final String ID = NewPropertySheetHandler.ID + "Test";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#execute(org.eclipse
+	 * .core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		return super.execute(event);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#getShowInContext
+	 * (org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public PropertyShowInContext getShowInContext(ExecutionEvent event)
 			throws ExecutionException {
 		return super.getShowInContext(event);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#findPropertySheet
+	 * (org.eclipse.core.commands.ExecutionEvent,
+	 * org.eclipse.ui.views.properties.PropertyShowInContext)
+	 */
 	protected PropertySheet findPropertySheet(ExecutionEvent event,
 			PropertyShowInContext context) throws PartInitException,
 			ExecutionException {

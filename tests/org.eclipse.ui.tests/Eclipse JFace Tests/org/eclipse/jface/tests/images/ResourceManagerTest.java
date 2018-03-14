@@ -53,20 +53,26 @@ public class ResourceManagerTest extends TestCase {
             this.toWrap = toWrap;
         }
         
-        @Override
-		public Object createResource(Device device) throws DeviceResourceException {
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.resource.DeviceResourceDescriptor#createResource(org.eclipse.swt.graphics.Device)
+         */
+        public Object createResource(Device device) throws DeviceResourceException {
             Object result = toWrap.createResource(device);
             refCount++;
             return result;
         }
-        @Override
-		public void destroyResource(Object previouslyCreatedObject) {
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.resource.DeviceResourceDescriptor#destroyResource(java.lang.Object)
+         */
+        public void destroyResource(Object previouslyCreatedObject) {
             refCount--;
             toWrap.destroyResource(previouslyCreatedObject);
         }
         
-        @Override
-		public boolean equals(Object arg0) {
+        /* (non-Javadoc)
+         * @see java.lang.Object#equals(java.lang.Object)
+         */
+        public boolean equals(Object arg0) {
             if (arg0 instanceof TestDescriptor) {
                 TestDescriptor td = (TestDescriptor)arg0;
                 
@@ -76,14 +82,18 @@ public class ResourceManagerTest extends TestCase {
             return false;
         }
         
-        @Override
-		public int hashCode() {
+        /* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
+        public int hashCode() {
             return toWrap.hashCode();
         }
     }
     
-    @Override
-	protected void setUp() throws Exception {
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#setUp()
+     */
+    protected void setUp() throws Exception {
         super.setUp();
         TestDescriptor.refCount = 0;
         Display display = Display.getCurrent();
@@ -128,8 +138,10 @@ public class ResourceManagerTest extends TestCase {
         numDupes = 11;
     }
     
-    @Override
-	protected void tearDown() throws Exception {
+    /* (non-Javadoc)
+     * @see junit.framework.TestCase#tearDown()
+     */
+    protected void tearDown() throws Exception {
         super.tearDown();
         globalResourceManager.dispose();
         Assert.assertEquals("Detected leaks", 0, TestDescriptor.refCount);

@@ -60,7 +60,6 @@ public final class BindingInteractionsTest extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected void doSetUp() {
 		contextManager = new ContextManager();
 		bindingManager = new BindingManager(contextManager,
@@ -70,7 +69,6 @@ public final class BindingInteractionsTest extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected void doTearDown() {
 		contextManager = null;
 		bindingManager = null;

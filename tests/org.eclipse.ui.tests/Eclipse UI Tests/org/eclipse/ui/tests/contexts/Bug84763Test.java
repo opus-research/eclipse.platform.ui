@@ -81,12 +81,10 @@ public final class Bug84763Test extends UITestCase {
 	 * Creates a new context manager and a binding manager for use in the test
 	 * cases.
 	 */
-	@Override
 	protected void doSetUp() {
 		contextManager = new ContextManager();
 		contextManagerListener = new IContextManagerListener() {
 
-			@Override
 			public void contextManagerChanged(
 					ContextManagerEvent contextManagerEvent) {
 				previousContextIds = contextManagerEvent
@@ -105,7 +103,6 @@ public final class Bug84763Test extends UITestCase {
 	/**
 	 * Releases the context manager and binding manager for garbage collection.
 	 */
-	@Override
 	protected void doTearDown() {
 		contextManager = null;
 		contextManagerListener = null;

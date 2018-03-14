@@ -28,7 +28,7 @@ public class Adventure extends ModelObject {
 	private String description;
 
 	private String location;
-
+	
 	private int maxNumberOfPeople;
 
 	public String getName() {
@@ -40,20 +40,19 @@ public class Adventure extends ModelObject {
 		name = string;
 		firePropertyChange("name", oldValue, name);
 	}
-
+	
 	public int getMaxNumberOfPeople(){
 		return maxNumberOfPeople;
 	}
-
+	
 	public void setMaxNumberOfPeople(int anInt) {
 		int oldValue = maxNumberOfPeople;
 		maxNumberOfPeople = anInt;
 		firePropertyChange("maxNumberOfPeople", oldValue, maxNumberOfPeople);
 	}
-
+	
 	public IValidator getMaxNumberOfPeopleDomainValidator() {
 		return new IValidator() {
-			@Override
 			public IStatus validate(Object value) {
 				int intValue = ((Integer)value).intValue();
 				if (intValue < 1 || intValue > 20) {

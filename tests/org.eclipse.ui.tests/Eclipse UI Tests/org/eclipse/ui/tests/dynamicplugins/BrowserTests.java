@@ -44,23 +44,31 @@ public class BrowserTests extends DynamicTestCase {
         }
     }
     
-    @Override
-	protected String getExtensionId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+     */
+    protected String getExtensionId() {
         return "newBrowser1.testDynamicBrowserAddition";
     }
 
-    @Override
-	protected String getExtensionPoint() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+     */
+    protected String getExtensionPoint() {
         return IWorkbenchRegistryConstants.PL_BROWSER_SUPPORT;
     }
 
-    @Override
-	protected String getInstallLocation() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+     */
+    protected String getInstallLocation() {
         return "data/org.eclipse.newBrowser1";
     }
     
-    @Override
-	protected String getMarkerClass() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+     */
+    protected String getMarkerClass() {
         return "org.eclipse.ui.dynamic.DynamicBrowserSupport";
     }
 

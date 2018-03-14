@@ -53,9 +53,9 @@ public final class HelpContextIdTest extends UITestCase {
 	 *             defined.
 	 */
 	public final void testHelpContextId() throws NotDefinedException {
-		final ICommandService commandService = fWorkbench
+		final ICommandService commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
-		final IHandlerService handlerService = fWorkbench
+		final IHandlerService handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		String helpContextId = null;
 
@@ -67,7 +67,6 @@ public final class HelpContextIdTest extends UITestCase {
 
 		// Retract the handler help context id by creating a handler conflict.
 		handlerService.activateHandler(COMMAND_ID, new AbstractHandler() {
-			@Override
 			public final Object execute(final ExecutionEvent event) {
 				return null;
 			}

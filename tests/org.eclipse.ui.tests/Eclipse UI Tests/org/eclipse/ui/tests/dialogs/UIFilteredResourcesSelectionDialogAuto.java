@@ -63,7 +63,6 @@ public class UIFilteredResourcesSelectionDialogAuto extends
 		dialog.getShell().setLocation(window.getShell().getSize().x + 1, 0);
 		dialog.getShell().setSize(testDialogSize);
 		dialog.getShell().addShellListener(new ShellAdapter() {
-			@Override
 			public void shellClosed(ShellEvent e) {
 				e.doit = false;
 			}

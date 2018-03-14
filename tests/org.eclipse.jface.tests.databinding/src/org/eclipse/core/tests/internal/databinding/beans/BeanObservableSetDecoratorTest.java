@@ -31,7 +31,6 @@ public class BeanObservableSetDecoratorTest extends TestCase {
 	private BeanObservableSetDecorator decorator;
 	private Bean bean;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

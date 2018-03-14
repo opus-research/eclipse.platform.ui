@@ -42,8 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MInputPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -591,11 +589,25 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
+	 * .MPart)
+	 */
 	@Override
 	public void activate(MPart part) {
 		activate(part, true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
+	 * .MPart,boolean)
+	 */
 	@Override
 	public void activate(MPart part, boolean requiresFocus) {
 		activate(part, requiresFocus, true);
@@ -723,6 +735,11 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getActivePart()
+	 */
 	@Override
 	public MPart getActivePart() {
 		return activePart;
@@ -975,22 +992,16 @@ public class PartServiceImpl implements EPartService {
 		}
 
 		MElementContainer<?> lastContainer = getLastContainer(searchRoot, children);
-		if (lastContainer instanceof MPartStack) {
-			return lastContainer;
+		if (lastContainer == null) {
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
+			searchRoot.getChildren().add(stack);
+			return stack;
+		} else if (!(lastContainer instanceof MPartStack)) {
+			MPartStack stack = modelService.createModelElement(MPartStack.class);
+			((List) lastContainer.getChildren()).add(stack);
+			return stack;
 		}
-
-		// No stacks found make one and add it
-		MPartStack stack = modelService.createModelElement(MPartStack.class);
-		stack.setElementId("CreatedByGetLastContainer"); //$NON-NLS-1$
-		if (children.get(0) instanceof MPartSashContainer) {
-			MPartSashContainer psc = (MPartSashContainer) children.get(0);
-			psc.getChildren().add(stack);
-		} else {
-			// We need a sash so 'insert' the new stack
-			modelService.insert(stack, (MPartSashContainerElement) children.get(0),
-					EModelService.RIGHT_OF, 0.5f);
-		}
-		return stack;
+		return lastContainer;
 	}
 
 	private MElementContainer<?> getLastContainer(MElementContainer<?> container, List<?> children) {
@@ -1108,8 +1119,7 @@ public class PartServiceImpl implements EPartService {
 			return addedPart;
 		case VISIBLE:
 			MPart activePart = getActivePart();
-			if (activePart == null
-					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
+			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
 				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
@@ -1271,6 +1281,11 @@ public class PartServiceImpl implements EPartService {
 		return context != null && context.getParent().getActiveChild() == context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getDirtyParts()
+	 */
 	@Override
 	public Collection<MPart> getDirtyParts() {
 		List<MPart> dirtyParts = new ArrayList<MPart>();
@@ -1282,6 +1297,13 @@ public class PartServiceImpl implements EPartService {
 		return dirtyParts;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#save(org.eclipse.e4.ui.model.application.
+	 * MSaveablePart, boolean)
+	 */
 	@Override
 	public boolean savePart(MPart part, boolean confirm) {
 		if (!part.isDirty()) {
