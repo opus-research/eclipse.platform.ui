@@ -34,10 +34,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	// W3C CSSStyleDeclaration API methods
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getCSSText()
-	 */
+	@Override
 	public String getCssText() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < properties.size(); i++) {
@@ -52,70 +49,51 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		return sb.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getLength()
-	 */
+
+	@Override
 	public int getLength() {
 		return properties.size();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getParentRule()
-	 */
+	@Override
 	public CSSRule getParentRule() {
 		return parentRule;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyCSSValue(String)
-	 */
+	@Override
 	public CSSValue getPropertyCSSValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
-			? null
-			: property.getValue();
+				? null
+						: property.getValue();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyPriority(String)
-	 */
+	@Override
 	public String getPropertyPriority(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property != null && property.isImportant())
-			? CSSPropertyImpl.IMPORTANT_IDENTIFIER
-			: "";
+				? CSSPropertyImpl.IMPORTANT_IDENTIFIER
+						: "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#getPropertyValue(String)
-	 */
+	@Override
 	public String getPropertyValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
-			? ""
-			: property.getValue().toString();
+				? ""
+						: property.getValue().toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#item(int)
-	 */
+	@Override
 	public String item(int index) {
 		return properties.get(index).getName();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#removeProperty(String)
-	 */
+	@Override
 	public String removeProperty(String propertyName) throws DOMException {
-		if(readOnly)
+		if(readOnly) {
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
+		}
 		for (int i = 0; i < properties.size(); i++) {
 			CSSProperty property = properties.get(i);
 			if(CSSPropertyImpl.sameName(property, propertyName)) {
@@ -126,25 +104,21 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 		return "";
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration#setCssText(String)
-	 */
+	@Override
 	public void setCssText(String cssText) throws DOMException {
-		if(readOnly)
+		if(readOnly) {
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
+		}
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if cssText is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSStyleDeclaration.setProperty(String, String, String)
-	 */
+	@Override
 	public void setProperty(String propertyName, String value, String priority) throws DOMException {
-		if(readOnly)
+		if(readOnly) {
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
+		}
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if value is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -172,8 +146,9 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private CSSProperty findCSSProperty(String propertyName) {
 		for (CSSProperty property : properties) {
-			if(CSSPropertyImpl.sameName(property, propertyName))
+			if(CSSPropertyImpl.sameName(property, propertyName)) {
 				return property;
+			}
 		}
 		return null;
 	}

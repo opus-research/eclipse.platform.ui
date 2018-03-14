@@ -64,7 +64,7 @@ public interface ICategory extends Comparable {
      *         not empty, it is guaranteed to only contain instances of <code>ICategoryActivityBinding</code>.
      * @see ICategoryActivityBinding
      */
-    Set getCategoryActivityBindings();
+	Set<ICategoryActivityBinding> getCategoryActivityBindings();
 
     /**
      * Returns the identifier of this instance.

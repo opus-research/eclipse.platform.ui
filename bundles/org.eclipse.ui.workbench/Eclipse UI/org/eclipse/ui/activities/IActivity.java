@@ -12,7 +12,6 @@
 package org.eclipse.ui.activities;
 
 import java.util.Set;
-
 import org.eclipse.core.expressions.Expression;
 
 /**
@@ -72,7 +71,7 @@ public interface IActivity extends Comparable {
      * 		   <code>IActivityRequirementBinding</code>.
      * @see IActivityRequirementBinding
      */
-    Set getActivityRequirementBindings();
+	Set<IActivityRequirementBinding> getActivityRequirementBindings();
 
     /**
      * Returns the set of activity pattern bindings for this instance.

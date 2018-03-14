@@ -29,36 +29,24 @@ public class CSSImportRuleImpl extends CSSRuleImpl implements CSSImportRule {
 		this.mediaList = mediaListImpl;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSRule#getType()
-	 */
+	@Override
 	public short getType() {
 		return CSSRule.IMPORT_RULE;
 	}
 
 	// W3C CSSImportRule API methods
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSImportRule#getHref()
-	 */
+	@Override
 	public String getHref() {
 		return uri;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSImportRule#getMedia()
-	 */
+	@Override
 	public MediaList getMedia() {
 		return mediaList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.w3c.dom.css.CSSImportRule#getStyleSheet()
-	 */
+	@Override
 	public CSSStyleSheet getStyleSheet() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
