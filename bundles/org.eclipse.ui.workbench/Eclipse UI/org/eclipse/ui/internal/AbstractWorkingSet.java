@@ -12,7 +12,6 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -36,7 +35,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	private String name;
 
-	protected ArrayList elements;
+	protected ArrayList<IAdaptable> elements;
 
 	private IWorkingSetManager manager;
 
@@ -122,7 +121,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	}
 
 	/**
-	 * Disconnet this working set from its manager, if any.
+	 * Disconnect this working set from its manager, if any.
 	 */
 	public void disconnect() {
 		this.manager= null;
@@ -138,14 +137,14 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	/**
 	 * Create a copy of the elements to store in the receiver.
 	 * 
-	 * @param elements the elements to store a copy of in the 
+	 * @param newElements the elements to store a copy of in the 
 	 * 	receiver.
 	 */
 	protected void internalSetElements(IAdaptable[] newElements) {
 	    Assert.isNotNull(newElements,
 	            "Working set elements array must not be null"); //$NON-NLS-1$
 	
-	    elements = new ArrayList(newElements.length);
+		elements = new ArrayList<IAdaptable>(newElements.length);
 	    for (int i = 0; i < newElements.length; i++) {
 	        elements.add(newElements[i]);
 	    }
@@ -153,8 +152,8 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	@Override
 	public IAdaptable[] getElements() {
-	    ArrayList list = getElementsArray();
-	    return (IAdaptable[]) list.toArray(new IAdaptable[list.size()]);
+		ArrayList<IAdaptable> list = getElementsArray();
+		return list.toArray(new IAdaptable[list.size()]);
 	}
 
 	/**
@@ -163,7 +162,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	 * 
 	 * @return the elements array list
 	 */
-	protected ArrayList getElementsArray() {
+	protected ArrayList<IAdaptable> getElementsArray() {
 	    if (elements == null) {
 	        restoreWorkingSet();
 	        workingSetMemento = null;
@@ -201,28 +200,16 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 		return getElementsArray().isEmpty();
 	}
 	
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.ui.IWorkingSet#getImage()
-     */
     @Override
 	public final ImageDescriptor getImage() {
         return getImageDescriptor();
     }
 
 
-	/* 
-	 * (non-Javadoc)
-	 * @return Returns the unigueId.
-	 */
     /*package*/String getUniqueId() {
 		return uniqueId;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @param unigueId The unigueId to set.
-	 */
 	/*package*/void setUniqueId(String uniqueId) {
 		this.uniqueId = uniqueId;
 	}
