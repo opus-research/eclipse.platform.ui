@@ -101,7 +101,6 @@ public class ContextContextService implements EContextService {
 	private void setEventCaching(boolean cache) {
 		if (cache) {
 			deferUpdates = true;
-			contextManager.deferUpdates(true);
 			return;
 		}
 
@@ -128,7 +127,6 @@ public class ContextContextService implements EContextService {
 			}
 		}
 		eclipseContext.set(LOCAL_CONTEXTS, locals.clone());
-		contextManager.deferUpdates(false);
 	}
 	
 	@Override
