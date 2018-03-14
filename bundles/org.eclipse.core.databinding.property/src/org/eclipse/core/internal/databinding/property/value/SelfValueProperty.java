@@ -11,15 +11,18 @@
 
 package org.eclipse.core.internal.databinding.property.value;
 
+import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.value.SimpleValueProperty;
 
 /**
+ * @param <T>
+ *            type of the value of the property
  * @since 3.3
  *
  */
-public final class SelfValueProperty extends SimpleValueProperty {
+public final class SelfValueProperty<T> extends SimpleValueProperty<T, T> {
 	private final Object valueType;
 
 	/**
@@ -35,24 +38,24 @@ public final class SelfValueProperty extends SimpleValueProperty {
 	}
 
 	@Override
-	protected Object doGetValue(Object source) {
+	protected T doGetValue(T source) {
 		return source;
 	}
 
 	@Override
-	protected void doSetValue(Object source, Object value) {
+	protected void doSetValue(T source, T value) {
 	}
 
 	@Override
-	public INativePropertyListener adaptListener(
-			ISimplePropertyListener listener) {
+	public INativePropertyListener<T> adaptListener(
+			ISimplePropertyListener<ValueDiff<T>> listener) {
 		return null;
 	}
 
-	protected void doAddListener(Object source, INativePropertyListener listener) {
+	protected void doAddListener(T source, INativePropertyListener<T> listener) {
 	}
 
-	protected void doRemoveListener(Object source,
-			INativePropertyListener listener) {
+	protected void doRemoveListener(T source,
+			INativePropertyListener<T> listener) {
 	}
 }
