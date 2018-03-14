@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,8 @@
  * Contributors:
  *      IBM Corporation - initial API and implementation 
  * 		Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font
- *   	should be activated and used by other components.
+ *   	  should be activated and used by other components.
+ *      Mickael Istria (Red Hat Inc.) - 427887 Up/Down to order working sets
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -51,7 +52,6 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.util.Util;
-import org.eclipse.ui.model.WorkbenchViewerComparator;
 
 /**
  * A working set selection dialog displays a list of working
@@ -220,7 +220,6 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 
         listViewer.setLabelProvider(labelProvider);
         listViewer.setContentProvider(contentProvider);
-        listViewer.setComparator(new WorkbenchViewerComparator());
         
         listViewer.addFilter(new WorkingSetFilter(getSupportedWorkingSetIds()));
         
@@ -484,5 +483,63 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
 		buttonNoSet.setSelection(false);
 		buttonSelectedSets.setSelection(true);
 		updateButtonAvailability();
+	}
+
+	@Override
+	protected void updateButtonAvailability() {
+		super.updateButtonAvailability();
+		if (this.upButton != null && !this.upButton.isDisposed()) {
+			if (!this.listViewer.getSelection().isEmpty()) {
+				IStructuredSelection selection = (IStructuredSelection) this.listViewer
+						.getSelection();
+				if (selection.size() == 1) {
+					int selectionIndex = this.listViewer.getTable().getSelectionIndex();
+					this.upButton.setEnabled(selectionIndex > 0);
+					this.downButton.setEnabled(selectionIndex < this.listViewer.getTable()
+							.getItemCount() - 1);
+				}
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.dialogs.AbstractWorkingSetDialog#upSelectedWorkingSet
+	 * ()
+	 */
+	@Override
+	protected void upSelectedWorkingSet() {
+		moveSelectedWorkingSet(-1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.dialogs.AbstractWorkingSetDialog#
+	 * downSelectedWorkingSet()
+	 */
+	@Override
+	protected void downSelectedWorkingSet() {
+		moveSelectedWorkingSet(+1);
+	}
+
+	private void moveSelectedWorkingSet(int diffLocation) {
+		if (this.listViewer.getSelection().isEmpty()) {
+			return;
+		}
+		IStructuredSelection selection = (IStructuredSelection) listViewer.getSelection();
+		if (selection.size() > 1) {
+			return;
+		}
+		IWorkingSet currentWorkingSet = (IWorkingSet) selection.getFirstElement();
+		int idx = this.listViewer.getTable().getSelectionIndex();
+		int otherIdx = idx + diffLocation;
+		IWorkingSet otherWorkingSet = (IWorkingSet) this.listViewer.getTable().getItem(otherIdx)
+				.getData();
+		IWorkingSetManager manager = WorkbenchPlugin.getDefault().getWorkingSetManager();
+		manager.swapIndex(currentWorkingSet, otherWorkingSet);
+		availableWorkingSetsChanged();
 	}
 }
