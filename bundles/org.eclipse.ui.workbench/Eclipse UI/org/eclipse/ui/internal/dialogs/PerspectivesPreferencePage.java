@@ -91,11 +91,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 	private Button openNewWindowButton;
 
 	private int openPerspMode;
-
-	// widgets for open view mode
-	private int openViewMode;
-
-	private Button openEmbedButton;
     
 	// labels
 	private final String OPM_TITLE = WorkbenchMessages.OpenPerspectiveMode_optionsTitle; 
@@ -367,7 +362,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 				.getPreferenceStore();
 		setPreferenceStore(store);
 
-		openViewMode = store.getInt(IPreferenceConstants.OPEN_VIEW_MODE);
 		openPerspMode = store.getInt(IPreferenceConstants.OPEN_PERSP_MODE);
 	}
 
@@ -379,14 +373,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		//Project perspective preferences
 		IPreferenceStore store = WorkbenchPlugin.getDefault()
 				.getPreferenceStore();
-
-		openViewMode = store.getDefaultInt(IPreferenceConstants.OPEN_VIEW_MODE);
-		// Open view as float no longer supported
-		if (openViewMode == IPreferenceConstants.OVM_FLOAT) {
-			openViewMode = IPreferenceConstants.OVM_FAST;
-		}
-		openEmbedButton
-				.setSelection(openViewMode == IPreferenceConstants.OVM_EMBED);
 
 		openPerspMode = store
 				.getDefaultInt(IPreferenceConstants.OPEN_PERSP_MODE);
@@ -496,9 +482,6 @@ public class PerspectivesPreferencePage extends PreferencePage implements
 		}
 
 		IPreferenceStore store = getPreferenceStore();
-
-		// store the open view mode setting
-		store.setValue(IPreferenceConstants.OPEN_VIEW_MODE, openViewMode);
 
 		// store the open perspective mode setting
 		store.setValue(IPreferenceConstants.OPEN_PERSP_MODE, openPerspMode);
