@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Obeo - Bug 410426
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -144,7 +145,16 @@ public class ToolBarContributionRecord {
 		if (toolbarContribution.getVisibleWhen() != null) {
 			return true;
 		}
-		for (MToolBarElement child : toolbarContribution.getChildren()) {
+
+		List<MToolBarElement> childrenToInspect;
+		if (toolbarContribution.getTransientData().get(FACTORY) != null) {
+			// See mergeIntoModel
+			childrenToInspect = toolbarModel.getChildren();
+		} else {
+			childrenToInspect = toolbarContribution.getChildren();
+		}
+
+		for (MToolBarElement child : childrenToInspect) {
 			if (child.getVisibleWhen() != null
 					|| child.getPersistedState().get(
 							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
