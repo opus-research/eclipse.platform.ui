@@ -132,13 +132,13 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 				PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS,
 				Messages.MonitoringPreferencePage_long_event_error_threshold_label, topGroup,
 				3, HOUR_IN_MS);
-		createIntegerEditor(
-				PreferenceConstants.MAX_STACK_SAMPLES,
-				Messages.MonitoringPreferencePage_max_stack_samples_label, topGroup, 0, 100);
 		deadlockThreshold = createIntegerEditor(
 				PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS,
 				Messages.MonitoringPreferencePage_deadlock_threshold_label, topGroup,
 				1000, 24 * HOUR_IN_MS);
+		createIntegerEditor(
+				PreferenceConstants.MAX_STACK_SAMPLES,
+				Messages.MonitoringPreferencePage_max_stack_samples_label, topGroup, 0, 100);
 
 		topGroup.setLayout(layout);
 
