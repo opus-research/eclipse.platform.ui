@@ -283,6 +283,13 @@ public class MinMaxAddon {
 	}
 
 	private EventHandler perspectiveChangeListener = new EventHandler() {
+		private MWindow getWindow(MToolControl tc) {
+			MUIElement curParent = tc.getParent();
+			while (curParent != null && !(curParent instanceof MWindow))
+				curParent = curParent.getParent();
+			return (MWindow) curParent;
+		}
+
 		public void handleEvent(Event event) {
 			final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
 			if (!(changedElement instanceof MPerspectiveStack))
@@ -293,6 +300,9 @@ public class MinMaxAddon {
 			List<MToolControl> tcList = modelService.findElements(window, null, MToolControl.class,
 					null);
 
+			// Remember which windows need a layout
+			final List<Shell> shellsToLayout = new ArrayList<Shell>();
+
 			final MPerspective curPersp = ps.getSelectedElement();
 			if (curPersp != null) {
 				// Show any minimized stack from the current perspective
@@ -300,6 +310,14 @@ public class MinMaxAddon {
 				for (MToolControl tc : tcList) {
 					if (tc.getObject() instanceof TrimStack && tc.getElementId().contains(perspId)) {
 						tc.setVisible(true);
+
+						// Remember to layout the associated shell
+						MWindow tcWin = getWindow(tc);
+						if (tcWin != null && (tcWin.getWidget() instanceof Shell)) {
+							Shell tcShell = (Shell) tc.getWidget();
+							if (!shellsToLayout.contains(tcShell))
+								shellsToLayout.add(tcShell);
+						}
 					}
 				}
 
@@ -322,11 +340,13 @@ public class MinMaxAddon {
 				}
 			}
 
-			final Shell winShell = (Shell) window.getWidget();
+			Shell winShell = (Shell) window.getWidget();
 			winShell.getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					if (!winShell.isDisposed()) {
-						winShell.layout(true, true);
+					for (Shell s : shellsToLayout) {
+						if (!s.isDisposed()) {
+							s.layout(true, true);
+						}
 					}
 				}
 			});
