@@ -74,9 +74,9 @@ public class ToolItemRenderer extends SWTPartRenderer {
 	private static final String TIR_STATIC_CONTEXT = "HCI-staticContext"; //$NON-NLS-1$
 
 	@Inject
-	private Logger logger;
+	Logger logger;
 	@Inject
-	private IEventBroker eventBroker;
+	IEventBroker eventBroker;
 
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
