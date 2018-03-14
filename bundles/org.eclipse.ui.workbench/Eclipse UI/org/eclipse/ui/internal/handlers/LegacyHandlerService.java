@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -147,12 +148,20 @@ public class LegacyHandlerService implements IHandlerService {
 
 	public static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
 			String id, final String cmdId, IHandler handler, Expression activeWhen) {
+		return registerLegacyHandler(context, id, cmdId, handler, activeWhen, null);
+	}
+
+	private static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
+			String id, final String cmdId, IHandler handler, Expression activeWhen, String helpContextId) {
 
 		ECommandService cs = (ECommandService) context.get(ECommandService.class.getName());
 		Command command = cs.getCommand(cmdId);
 		boolean handled = command.isHandled();
 		boolean enabled = command.isEnabled();
 		E4HandlerProxy handlerProxy = new E4HandlerProxy(command, handler);
+		if (helpContextId != null) {
+			setHelpContextId(handlerProxy, helpContextId, context);
+		}
 		HandlerActivation activation = new HandlerActivation(context, cmdId, handler, handlerProxy,
 				activeWhen);
 		addHandlerActivation(activation);
@@ -698,7 +707,8 @@ public class LegacyHandlerService implements IHandlerService {
 					commandId,
 					new org.eclipse.ui.internal.handlers.HandlerProxy(commandId, configElement,
 							IWorkbenchRegistryConstants.ATT_CLASS, enabledWhen, eclipseContext
-									.get(IEvaluationService.class)), activeWhen);
+									.get(IEvaluationService.class)), activeWhen,
+					configElement.getAttribute(IWorkbenchRegistryConstants.ATT_HELP_CONTEXT_ID));
 		}
 	}
 
@@ -734,7 +744,13 @@ public class LegacyHandlerService implements IHandlerService {
 	 * core.commands.IHandler, java.lang.String)
 	 */
 	public void setHelpContextId(IHandler handler, String helpContextId) {
-		// TODO Auto-generated method stub
+		setHelpContextId(handler, helpContextId, eclipseContext);
+	}
 
+	private static void setHelpContextId(IHandler handler, String helpContextId,
+			IEclipseContext eclipseContext) {
+		ICommandService commandService = (ICommandService) eclipseContext.get(ICommandService.class
+				.getName());
+		commandService.setHelpContextId(handler, helpContextId);
 	}
 }
