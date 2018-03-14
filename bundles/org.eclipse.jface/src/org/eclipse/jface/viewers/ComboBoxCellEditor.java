@@ -129,6 +129,9 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		populateComboBoxItems();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on CellEditor.
+	 */
 	@Override
 	protected Control createControl(Composite parent) {
 
@@ -189,6 +192,9 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		return new Integer(selection);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on CellEditor.
+	 */
 	@Override
 	protected void doSetFocus() {
 		comboBox.setFocus();
@@ -278,6 +284,11 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		deactivate();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#focusLost()
+	 */
 	@Override
 	protected void focusLost() {
 		if (isActivated()) {
@@ -285,6 +296,11 @@ public class ComboBoxCellEditor extends AbstractComboBoxCellEditor {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#keyReleaseOccured(org.eclipse.swt.events.KeyEvent)
+	 */
 	@Override
 	protected void keyReleaseOccured(KeyEvent keyEvent) {
 		if (keyEvent.character == '\u001b') { // Escape character

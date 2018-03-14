@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
- *     Brian de Alwis - Fix size computation to account for trim
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -120,12 +120,10 @@ public class SearchField {
 		text = createText(comp);
 
 		parent.getShell().addControlListener(new ControlListener() {
-			@Override
 			public void controlResized(ControlEvent e) {
 				closeDropDown();
 			}
 
-			@Override
 			public void controlMoved(ControlEvent e) {
 				closeDropDown();
 			}
@@ -151,11 +149,9 @@ public class SearchField {
 		restoreDialog();
 
 		quickAccessContents = new QuickAccessContents(providers) {
-			@Override
 			protected void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
 			}
 
-			@Override
 			protected void doClose() {
 				text.setText(""); //$NON-NLS-1$
 				resetProviders();
@@ -165,12 +161,10 @@ public class SearchField {
 				removeAccessibleListener();
 			}
 
-			@Override
 			protected QuickAccessElement getPerfectMatch(String filter) {
 				return elementMap.get(filter);
 			}
 
-			@Override
 			protected void handleElementSelected(String string, Object selectedElement) {
 				if (selectedElement instanceof QuickAccessElement) {
 					QuickAccessElement element = (QuickAccessElement) selectedElement;
@@ -211,18 +205,15 @@ public class SearchField {
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
-			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
 				table.getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						checkFocusLost(table, text);
 					}
 				});
 			}
 
-			@Override
 			public void focusGained(FocusEvent e) {
 				IHandlerService hs = SearchField.this.window.getContext()
 						.get(IHandlerService.class);
@@ -235,12 +226,10 @@ public class SearchField {
 			
 		});
 		table.addFocusListener(new FocusAdapter() {
-			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
 				table.getDisplay().asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						checkFocusLost(table, text);
 					}
@@ -248,7 +237,6 @@ public class SearchField {
 			}
 		});
 		text.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				boolean wasVisible = shell.getVisible();
 				boolean nowVisible = text.getText().length() > 0;
@@ -294,12 +282,12 @@ public class SearchField {
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
-		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
-		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		FontMetrics fm = gc.getFontMetrics();
+		int width = text.computeSize(fm.getAverageCharWidth() * text.getMessage().length(),
+				SWT.DEFAULT).x + 15 /* some extra space */;
 		gc.dispose();
 
-		// computeTrim() may result in r.x < 0
-		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
+		GridDataFactory.fillDefaults().hint(width, SWT.DEFAULT).applyTo(text);
 		return text;
 	}
 
@@ -324,28 +312,24 @@ public class SearchField {
 		IHandlerService whService = windowContext.get(IHandlerService.class);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 				new AbstractHandler() {
-					@Override
 					public Object execute(ExecutionEvent event) {
 						text.selectAll();
 						return null;
 					}
 				}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, new AbstractHandler() {
-			@Override
 			public Object execute(ExecutionEvent event) {
 				text.cut();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, new AbstractHandler() {
-			@Override
 			public Object execute(ExecutionEvent event) {
 				text.copy();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, new AbstractHandler() {
-			@Override
 			public Object execute(ExecutionEvent event) {
 				text.paste();
 				return null;
@@ -471,7 +455,6 @@ public class SearchField {
 	private void addAccessibleListener() {
 		if (accessibleListener == null) {
 			accessibleListener = new AccessibleAdapter() {
-				@Override
 				public void getName(AccessibleEvent e) {
 					e.result = selectedString;
 				}

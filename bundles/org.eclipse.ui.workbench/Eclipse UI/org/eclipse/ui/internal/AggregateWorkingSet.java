@@ -127,12 +127,10 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 	}
 
-	@Override
 	public String getId() {
 		return null;
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_WORKING_SETS);
@@ -141,11 +139,9 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * A no-op for aggregates - their contents should be derived.
 	 */
-	@Override
 	public void setElements(IAdaptable[] elements) {
 	}
 
-	@Override
 	public void setId(String id) {
 
 	}
@@ -153,7 +149,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Aggregates are not editable.
 	 */
-	@Override
 	public boolean isEditable() {
 		return false;
 	}
@@ -161,12 +156,10 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/**
 	 * Aggregates should not generally be visible in the UI.
 	 */
-	@Override
 	public boolean isVisible() {
 		return false;
 	}
 
-	@Override
 	public void saveState(IMemento memento) {
 		if (workingSetMemento != null) {
 			// just re-save the previous memento if the working set has
@@ -188,13 +181,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 	}
 
-	@Override
 	public void connect(IWorkingSetManager manager) {
 		manager.addPropertyChangeListener(this);
 		super.connect(manager);
 	}
 
-	@Override
 	public void disconnect() {
 		IWorkingSetManager connectedManager = getManager();
 		if (connectedManager != null)
@@ -207,7 +198,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	 * 
 	 * @return the component working sets
 	 */
-	@Override
 	public IWorkingSet[] getComponents() {
 		IWorkingSet[] localComponents = getComponentsInternal();
 		IWorkingSet[] copiedArray = new IWorkingSet[localComponents.length];
@@ -223,7 +213,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return components;
 	}
 
-	@Override
 	public void propertyChange(PropertyChangeEvent event) {
 		String property = event.getProperty();
 		if (property.equals(IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
@@ -251,7 +240,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		}
 	}
 
-	@Override
 	void restoreWorkingSet() {
 		IWorkingSetManager manager = getManager();
 		if (manager == null) {
@@ -274,7 +262,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		constructElements(false);
 	}
 
-	@Override
 	public boolean equals(Object object) {
 		if (this == object) {
 			return true;
@@ -288,13 +275,11 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return false;
 	}
 
-	@Override
 	public int hashCode() {
 		int hashCode = getName().hashCode() & getComponentsInternal().hashCode();
 		return hashCode;
 	}
 	
-	@Override
 	public boolean isSelfUpdating() {
 		IWorkingSet[] localComponents = getComponentsInternal();
 		if (localComponents == null || localComponents.length == 0) {
@@ -308,7 +293,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return true;
 	}
 	
-	@Override
 	public boolean isAggregateWorkingSet() {
 		return true;
 	}
@@ -316,7 +300,6 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
 	 */
-	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];
 	}

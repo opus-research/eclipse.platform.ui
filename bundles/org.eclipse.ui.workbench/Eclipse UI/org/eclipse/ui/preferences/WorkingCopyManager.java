@@ -37,7 +37,6 @@ public class WorkingCopyManager implements IWorkingCopyManager{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.preferences.IWorkingCopyManager#getWorkingCopy(org.eclipse.core.runtime.preferences.IEclipsePreferences)
 	 */
-	@Override
 	public IEclipsePreferences getWorkingCopy(IEclipsePreferences original) {
 		if (original instanceof WorkingCopyPreferences) {
 			throw new IllegalArgumentException("Trying to get a working copy of a working copy"); //$NON-NLS-1$
@@ -55,7 +54,6 @@ public class WorkingCopyManager implements IWorkingCopyManager{
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.preferences.IWorkingCopyManager#applyChanges()
 	 */
-	@Override
 	public void applyChanges() throws BackingStoreException {
 		Collection values = workingCopies.values();
 		WorkingCopyPreferences[] valuesArray = (WorkingCopyPreferences[]) values.toArray(new WorkingCopyPreferences[values.size()]);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ package org.eclipse.e4.ui.progress.internal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
@@ -32,7 +31,7 @@ public class JobInfo extends JobTreeElement {
     private IStatus blockedStatus;
 
     private volatile boolean canceled = false;
-    private List<SubTaskInfo> children = Collections.synchronizedList(new ArrayList<SubTaskInfo>());
+    private List children = Collections.synchronizedList(new ArrayList());
 
     private Job job;
 
@@ -342,7 +341,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getParent()
      */
-	public GroupInfo getParent() {
+	public Object getParent() {
         return parent;
     }
 
