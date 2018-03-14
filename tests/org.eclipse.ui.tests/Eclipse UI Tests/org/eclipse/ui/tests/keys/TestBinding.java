@@ -32,7 +32,7 @@ final class TestBinding extends Binding {
 
 		/**
 		 * Constructs a new instance of <code>TestTriggerSequence</code>.
-		 *
+		 * 
 		 * @param myTriggers
 		 *            The triggers to use in constructing this sequence; must
 		 *            not be <code>null</code>.
@@ -46,6 +46,11 @@ final class TestBinding extends Binding {
 			return toString();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.bindings.TriggerSequence#getPrefixes()
+		 */
 		@Override
 		public TriggerSequence[] getPrefixes() {
 			return new TriggerSequence[0];
@@ -65,7 +70,7 @@ final class TestBinding extends Binding {
 
 	/**
 	 * Constructs a new instance of <code>TestBinding</code>
-	 *
+	 * 
 	 * @param commandId
 	 *            The command id
 	 * @param schemeId
@@ -89,6 +94,11 @@ final class TestBinding extends Binding {
 				schemeId, contextId, locale, platform, null, type);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.Binding#getTriggerSequence()
+	 */
 	@Override
 	public final TriggerSequence getTriggerSequence() {
 		return TRIGGER_SEQUENCE;

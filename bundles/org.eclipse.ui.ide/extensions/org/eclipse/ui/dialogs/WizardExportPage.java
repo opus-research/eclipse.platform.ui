@@ -938,6 +938,9 @@ public abstract class WizardExportPage extends WizardDataTransferPage {
                 .getSelection());
     }
 
+    /* (non-Javadoc)
+     * Method declared on WizardDataTransferPage.
+     */
     @Override
 	protected final boolean validateSourceGroup() {
         if (exportCurrentSelection) {

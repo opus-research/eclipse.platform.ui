@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Brad Reynolds and others.
+ * Copyright (c) 2006, 2009 Brad Reynolds and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Brad Reynolds - initial API and implementation
  *     IBM Corporation - see bug 137934
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -18,12 +17,12 @@ import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -45,7 +44,7 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * An example showing how to create a {@link ILabelProvider label provider} that
  * to provide colors.
- *
+ * 
  * @since 3.2
  */
 public class Snippet007ColorLabelProvider {
@@ -60,7 +59,7 @@ public class Snippet007ColorLabelProvider {
 		persons.add(new Person("David Gilmour", Person.MALE));
 
 		final Display display = new Display();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				Shell shell = new Shell(display);
@@ -89,11 +88,9 @@ public class Snippet007ColorLabelProvider {
 
 				// this does not have to correspond to the columns in the table,
 				// we just list all attributes that affect the table content.
-				IObservableMap[] attributes = new IObservableMap[2];
-				attributes[0] = BeanProperties.value(Person.class, "name").observeDetail(
-						contentProvider.getKnownElements());
-				attributes[1] = BeanProperties.value(Person.class, "gender").observeDetail(
-						contentProvider.getKnownElements());
+				IObservableMap[] attributes = BeansObservables.observeMaps(
+						contentProvider.getKnownElements(), Person.class,
+						new String[] { "name", "gender" });
 
 				class ColorLabelProvider extends ObservableMapLabelProvider
 						implements ITableColorProvider {
@@ -192,7 +189,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the name. Method declared public to satisfy Java bean
 		 * conventions
-		 *
+		 * 
 		 * @return the name
 		 */
 		public String getName() {
@@ -213,7 +210,7 @@ public class Snippet007ColorLabelProvider {
 		/**
 		 * Returns the gender. Method declared public to satisfy Java bean
 		 * conventions
-		 *
+		 * 
 		 * @return the gender
 		 */
 		public int getGender() {

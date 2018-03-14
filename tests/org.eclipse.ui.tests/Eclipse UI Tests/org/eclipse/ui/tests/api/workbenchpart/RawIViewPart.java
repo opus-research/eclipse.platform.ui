@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api.workbenchpart;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +22,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPartConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -30,109 +30,151 @@ import org.eclipse.ui.PlatformUI;
  */
 public class RawIViewPart extends EventManager implements IViewPart {
 
-	private IViewSite site;
+    private IViewSite site;
 
-	private String title = "SomeTitle";
+    private String title = "SomeTitle";
 
-	/**
-     *
+    /**
+     * 
      */
-	public RawIViewPart() {
-		super();
-	}
+    public RawIViewPart() {
+        super();
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IViewPart#getViewSite()
+     */
+    @Override
 	public IViewSite getViewSite() {
-		return site;
-	}
+        return site;
+    }
 
-	public void setTitle(String newTitle) {
-		title = newTitle;
-		firePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
-	}
+    public void setTitle(String newTitle) {
+        title = newTitle;
+        firePropertyChange(IWorkbenchPartConstants.PROP_TITLE);
+    }
 
-	@Override
-	public void init(IViewSite site) {
-		this.site = site;
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite)
+     */
+    @Override
+	public void init(IViewSite site) throws PartInitException {
+        this.site = site;
+    }
 
-	@Override
-	public void init(IViewSite site, IMemento memento) {
-		this.site = site;
-	}
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IViewPart#init(org.eclipse.ui.IViewSite, org.eclipse.ui.IMemento)
+     */
+    @Override
+	public void init(IViewSite site, IMemento memento) throws PartInitException {
+        this.site = site;
+    }
 
-	/**
-	 * Fires a property changed event.
-	 *
-	 * @param propertyId
-	 *            the id of the property that changed
-	 */
-	protected void firePropertyChange(final int propertyId) {
-		Object[] array = getListeners();
-		for (Object element : array) {
-			final IPropertyListener l = (IPropertyListener) element;
-			SafeRunner.run(new SafeRunnable() {
-				@Override
+    /**
+     * Fires a property changed event.
+     *
+     * @param propertyId the id of the property that changed
+     */
+    protected void firePropertyChange(final int propertyId) {
+        Object[] array = getListeners();
+        for (int nX = 0; nX < array.length; nX++) {
+            final IPropertyListener l = (IPropertyListener) array[nX];
+            Platform.run(new SafeRunnable() {
+                @Override
 				public void run() {
-					l.propertyChanged(RawIViewPart.this, propertyId);
-				}
-			});
-		}
-	}
+                    l.propertyChanged(RawIViewPart.this, propertyId);
+                }
+            });
+        }
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IViewPart#saveState(org.eclipse.ui.IMemento)
+     */
+    @Override
 	public void saveState(IMemento memento) {
 
-	}
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#addPropertyListener(org.eclipse.ui.IPropertyListener)
+     */
+    @Override
 	public void addPropertyListener(IPropertyListener listener) {
-		addListenerObject(listener);
-	}
+        addListenerObject(listener);
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
+    @Override
 	public void createPartControl(Composite parent) {
 
-	}
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#dispose()
+     */
+    @Override
 	public void dispose() {
 
-	}
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#getSite()
+     */
+    @Override
 	public IWorkbenchPartSite getSite() {
-		return site;
-	}
+        return site;
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#getTitle()
+     */
+    @Override
 	public String getTitle() {
-		return title;
-	}
+        return title;
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#getTitleImage()
+     */
+    @Override
 	public Image getTitleImage() {
-		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_DEF_VIEW);
-	}
+        return PlatformUI.getWorkbench().getSharedImages().getImage(
+                ISharedImages.IMG_DEF_VIEW);
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#getTitleToolTip()
+     */
+    @Override
 	public String getTitleToolTip() {
-		return "blah";
-	}
+        return "blah";
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
+     */
+    @Override
 	public void removePropertyListener(IPropertyListener l) {
-		removeListenerObject(l);
-	}
+        removeListenerObject(l);
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
+    @Override
 	public void setFocus() {
 
-	}
+    }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    @Override
 	public Object getAdapter(Class adapter) {
-		return null;
-	}
+        return null;
+    }
 
 }

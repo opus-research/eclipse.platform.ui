@@ -16,7 +16,7 @@ import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.property.value.IValueProperty;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.util.JFaceProperties;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -36,7 +36,7 @@ public class Snippet031JFaceObservable {
 		Display display = new Display();
 		final ViewModel viewModel = new ViewModel();
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				final Shell shell = new View(viewModel).createShell();
@@ -55,7 +55,7 @@ public class Snippet031JFaceObservable {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	//
+	// 
 	// In this example, we extend the EventManager class
 	// to manage our listeners and we fire a property change
 	// event when the object state changes.

@@ -29,9 +29,9 @@ import org.eclipse.swt.widgets.TableItem;
 /**
  * ColorAndFontProviderTest is a test of a color and font provider that is an
  * IViewerLabelProvider.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class ColorAndFontViewerLabelProviderTest extends CompositeLabelProviderTest {
 
@@ -45,21 +45,42 @@ public class ColorAndFontViewerLabelProviderTest extends CompositeLabelProviderT
 			super();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		@Override
 		public Font getFont(Object element) {
 			return font;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+		 */
 		@Override
 		public Color getBackground(Object element) {
 			return background;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+		 */
 		@Override
 		public Color getForeground(Object element) {
 			return foreground;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public void updateLabel(ViewerLabel label, Object element) {
 			// Do nothing
@@ -70,13 +91,18 @@ public class ColorAndFontViewerLabelProviderTest extends CompositeLabelProviderT
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param name
 	 */
 	public ColorAndFontViewerLabelProviderTest(String name) {
 		super(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		initializeColors(parent);
@@ -103,7 +129,7 @@ public class ColorAndFontViewerLabelProviderTest extends CompositeLabelProviderT
 		assertTrue("Font was not set", item.getFont(0).equals(font));
 
 		Font oldFont = font;
-
+		
 		clearColors();
 		fViewer.refresh(item.getData());
 

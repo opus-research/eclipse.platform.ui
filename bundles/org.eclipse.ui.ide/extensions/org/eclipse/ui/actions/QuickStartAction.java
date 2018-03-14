@@ -258,6 +258,10 @@ public class QuickStartAction extends Action implements
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {

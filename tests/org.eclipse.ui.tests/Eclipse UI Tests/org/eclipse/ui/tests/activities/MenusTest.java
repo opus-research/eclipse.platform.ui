@@ -25,7 +25,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class MenusTest extends UITestCase {
 
@@ -36,7 +36,7 @@ public class MenusTest extends UITestCase {
 
 	/**
 	 * @since 3.3
-	 *
+	 * 
 	 */
 	private final class TestFactory extends AbstractContributionFactory {
 		private CommandContributionItem fooItemWithNoVisibilityClause;
@@ -87,6 +87,11 @@ public class MenusTest extends UITestCase {
 		super(testName);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -97,6 +102,11 @@ public class MenusTest extends UITestCase {
 		assertNotNull(service);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
@@ -120,21 +130,21 @@ public class MenusTest extends UITestCase {
 		MenuManager manager = new MenuManager();
 		service.populateContributionManager(manager, "menu:tests");
 		assertTrue(manager.getSize() > 0);
-
+		
 		assertTrue(factory.getFooItemWithNoVisibilityClause().isVisible());
 		assertTrue(factory.getBarItemWithNoVisibilityClause().isVisible());
-
+		
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.EMPTY_SET);
 		assertTrue(factory.getFooItemWithNoVisibilityClause().isVisible());
 		assertTrue(factory.getBarItemWithNoVisibilityClause().isVisible());
-
+		
 	}
 
 	public void XXXtestMenuVisibilityWithCustomFactory() {
 		window.getWorkbench().getActivitySupport().setEnabledActivityIds(
 				Collections.singleton("menuTest1")); // enable the foo
-														// activity
+														// activity		
 		factory = new TestFactory("menu:tests",
 				"org.eclipse.ui.tests");
 		service.addContributionFactory(factory);

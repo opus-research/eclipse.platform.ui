@@ -38,6 +38,9 @@ public class QuickAccessDialogTest extends UITestCase {
 		super(testName);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		WorkbenchWindow workbenchWindow = (WorkbenchWindow) getWorkbench()
@@ -51,6 +54,9 @@ public class QuickAccessDialogTest extends UITestCase {
 		assertNotNull("Search Field must exist", searchField);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		Text text = searchField.getQuickAccessSearchText();
@@ -187,7 +193,7 @@ public class QuickAccessDialogTest extends UITestCase {
 		assertTrue("Turning on show all should display more items", newCount > oldCount);
 		assertEquals("Turning on show all should not change the top item", oldFirstItemText, table.getItem(0).getText(1));
 
-		// Run the handler to turn off show all
+		// Run the handler to turn off show all 
 		handlerService
 		.executeCommand("org.eclipse.ui.window.quickAccess", null); //$NON-NLS-1$
 		processEventsUntil(new Condition() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -18,32 +18,36 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.tests.navigator.AbstractNavigatorTest;
 
 /**
- *
+ * 
  */
 public class LocaleTest extends AbstractNavigatorTest {
 
-
+	
 	public LocaleTest(String testName) {
 		super(testName);
-
+		
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
 	}
-
-
+	
+	
 	public void testLocales() {
 		Locale[] locales = Locale.getAvailableLocales();
 		Locale oldLocale = Locale.getDefault();
-
+		
 		switchLocale(new Locale("sv"));
-		for (Locale locale : locales) {
+		for (int i = 0; i < locales.length; i++) {
+			Locale locale = locales[i];
 			switchLocale(locale);
 		}
-
+		
 		Locale.setDefault(oldLocale);
 	}
 
@@ -56,8 +60,8 @@ public class LocaleTest extends AbstractNavigatorTest {
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench()
 				.getPerspectiveRegistry().getPerspectives();
-		for (IPerspectiveDescriptor perspective : perspectives) {
-			page.setPerspective(perspective);
+		for (int j = 0; j < perspectives.length; j++) {
+			page.setPerspective(perspectives[j]);
 		}
 		page.closeAllPerspectives(false, false);
 	}

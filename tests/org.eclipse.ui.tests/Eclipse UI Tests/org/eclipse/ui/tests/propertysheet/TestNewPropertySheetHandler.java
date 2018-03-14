@@ -20,23 +20,45 @@ import org.eclipse.ui.views.properties.PropertyShowInContext;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class TestNewPropertySheetHandler extends NewPropertySheetHandler {
 
 	public static final String ID = NewPropertySheetHandler.ID + "Test";
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#execute(org.eclipse
+	 * .core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		return super.execute(event);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#getShowInContext
+	 * (org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public PropertyShowInContext getShowInContext(ExecutionEvent event)
 			throws ExecutionException {
 		return super.getShowInContext(event);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.NewPropertySheetHandler#findPropertySheet
+	 * (org.eclipse.core.commands.ExecutionEvent,
+	 * org.eclipse.ui.views.properties.PropertyShowInContext)
+	 */
 	@Override
 	protected PropertySheet findPropertySheet(ExecutionEvent event,
 			PropertyShowInContext context) throws PartInitException,

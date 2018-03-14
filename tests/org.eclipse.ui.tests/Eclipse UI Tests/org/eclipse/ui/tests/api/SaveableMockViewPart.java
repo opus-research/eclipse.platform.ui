@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -30,12 +29,12 @@ import org.eclipse.ui.internal.DefaultSaveable;
 /**
  * Mock view part that implements ISaveablePart.
  * Used for testing hideView and other view lifecycle on saveable views.
- *
+ * 
  * @since 3.0.1
  */
 public class SaveableMockViewPart extends MockViewPart implements
 		ISaveablePart, ISaveablesSource {
-
+	
 	public static String ID = "org.eclipse.ui.tests.api.SaveableMockViewPart";
 
 	private boolean isDirty = false;
@@ -68,7 +67,7 @@ public class SaveableMockViewPart extends MockViewPart implements
         		setAdapt(adaptToggle.getSelection());
         	}
         });
-
+        
         final Button saveNeededToggle = new Button(parent, SWT.CHECK);
         saveNeededToggle.setText("Save on close");
         saveNeededToggle.addSelectionListener(new SelectionAdapter() {
@@ -78,7 +77,7 @@ public class SaveableMockViewPart extends MockViewPart implements
             }
         });
         saveNeededToggle.setSelection(saveNeeded);
-
+        
         final Button saveAsToggle = new Button(parent, SWT.CHECK);
         saveAsToggle.setText("Save as allowed");
         saveAsToggle.addSelectionListener(new SelectionAdapter() {
@@ -89,36 +88,51 @@ public class SaveableMockViewPart extends MockViewPart implements
         });
         saveAsToggle.setSelection(saveAsAllowed);
     }
-
+    
 	/**
 	 * @param selection
 	 */
 	protected void setAdapt(boolean selection) {
 		this.adapt = selection;
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
@@ -129,21 +143,27 @@ public class SaveableMockViewPart extends MockViewPart implements
 		this.isDirty = isDirty;
         firePropertyChange(PROP_DIRTY);
 	}
-
+    
     public void setSaveAsAllowed(boolean isSaveAsAllowed) {
         this.saveAsAllowed = isSaveAsAllowed;
     }
-
+    
     public void setSaveNeeded(boolean isSaveOnCloseNeeded) {
         this.saveNeeded = isSaveOnCloseNeeded;
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablesSource#getActiveSaveables()
+	 */
 	@Override
 	public Saveable[] getActiveSaveables() {
 		// TODO Auto-generated method stub
 		return getSaveables();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablesSource#getSaveables()
+	 */
 	@Override
 	public Saveable[] getSaveables() {
 		Saveable[] result = new Saveable[1];
@@ -153,9 +173,9 @@ public class SaveableMockViewPart extends MockViewPart implements
 				final IFile[] someFile = {null};
 				try {
 					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
-
+						
 						@Override
-						public boolean visit(IResource resource) {
+						public boolean visit(IResource resource) throws CoreException {
 							if (someFile[0] != null) {
 								return false;
 							}

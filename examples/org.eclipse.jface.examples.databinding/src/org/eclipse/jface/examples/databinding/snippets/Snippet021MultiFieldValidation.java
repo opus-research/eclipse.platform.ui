@@ -25,7 +25,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.MultiValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class Snippet021MultiFieldValidation extends WizardPage {
 
@@ -81,7 +81,7 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 
 	/**
 	 * Create contents of the wizard
-	 *
+	 * 
 	 * @param parent
 	 */
 	@Override
@@ -342,7 +342,7 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 	public static void main(String[] args) {
 		Display display = new Display();
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				IWizard wizard = new MultiFieldValidationWizard();

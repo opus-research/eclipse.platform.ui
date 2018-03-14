@@ -48,9 +48,9 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * Most of the setup has been taken from
  * org.eclipse.jface.snippets.viewers.Snippet010OwnerDraw.java
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 
@@ -58,6 +58,11 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 	private class TestCellLabelProvider extends CellLabelProvider implements
 			IStyledLabelProvider, IFontProvider {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+		 */
 		@Override
 		public void update(ViewerCell cell) {
 			Object element = cell.getElement();
@@ -70,6 +75,11 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 					SWT.COLOR_RED));
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getImage(java.lang.Object)
+		 */
 		@Override
 		public Image getImage(Object element) {
 			// create a resource manager that holds onto images
@@ -79,12 +89,22 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 					SWT.ICON_WARNING);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
+		 */
 		@Override
 		public StyledString getStyledText(Object element) {
 			return new StyledString(element.toString(),
 					StyledString.COUNTER_STYLER);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		@Override
 		public Font getFont(Object element) {
 			return JFaceResources.getFont(JFaceResources.BANNER_FONT);
@@ -122,12 +142,22 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		public void removeListener(ILabelProviderListener listener) {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateBackground(Object element) {
 			return fViewer.getControl().getDisplay().getSystemColor(
 					SWT.COLOR_RED);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateForeground(Object element) {
 			return fViewer.getControl().getDisplay().getSystemColor(
@@ -152,15 +182,31 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 		TableViewer viewer = new TableViewer(parent, SWT.FULL_SELECTION);
 
 		viewer.setContentProvider(new IStructuredContentProvider() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+			 */
 			@Override
 			public void dispose() {
 			};
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return entries;
 			};
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			@Override
 			public void inputChanged(org.eclipse.jface.viewers.Viewer viewer,
 					Object oldInput, Object newInput) {
@@ -377,7 +423,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 
 		/**
 		 * Create a new instance of the receiver.
-		 *
+		 * 
 		 * @param countryName
 		 * @param worldCupYear
 		 */
@@ -432,7 +478,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 
 		/**
 		 * Draw the flag in bounds.
-		 *
+		 * 
 		 * @param event
 		 */
 		protected void drawFlag(Event event) {
@@ -446,7 +492,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 
 		/**
 		 * Draw the cup year
-		 *
+		 * 
 		 * @param event
 		 */
 		private void drawCupYear(Event event) {
@@ -456,7 +502,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 
 		/**
 		 * Draw the name of the receiver.
-		 *
+		 * 
 		 * @param event
 		 */
 		protected void drawName(Event event) {
@@ -481,7 +527,7 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			layout.setStyle(italic, name.length(), buffer.length() - 1);
 
 			layout.draw(event.gc, event.x, event.y);
-
+			
 			layout.dispose();
 
 		}
@@ -527,6 +573,11 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("Deutschland", "Germany", "1990");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 
@@ -562,6 +613,11 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("\u00D6sterreich", "Austria", "TBD");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 
@@ -595,6 +651,11 @@ public class DecoratingStyledCellLabelProviderTest extends ViewerTestCase {
 			super("Blighty", "England", "1966");
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.tests.viewers.OwnerDrawExample.CountryEntry#drawFlag(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		protected void drawFlag(Event event) {
 

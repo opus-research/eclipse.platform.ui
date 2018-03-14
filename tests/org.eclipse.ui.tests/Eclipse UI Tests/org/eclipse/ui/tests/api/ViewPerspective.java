@@ -16,11 +16,14 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 /**
  * Supplies an arrangement of views to test various forms of view activation.
- *
+ * 
  * @since 3.0
  */
 public class ViewPerspective implements IPerspectiveFactory {
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
+     */
     @Override
 	public void createInitialLayout(IPageLayout layout) {
         String editorArea = layout.getEditorArea();

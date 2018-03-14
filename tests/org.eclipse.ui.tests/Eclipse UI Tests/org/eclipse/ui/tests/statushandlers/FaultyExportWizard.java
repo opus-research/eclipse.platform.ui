@@ -30,7 +30,7 @@ public class FaultyExportWizard extends Wizard implements IExportWizard {
 
 	/**
 	 * Intentional constructor that hides default one
-	 *
+	 * 
 	 * @param name
 	 *            does nothing
 	 */
@@ -38,11 +38,22 @@ public class FaultyExportWizard extends Wizard implements IExportWizard {
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
+	 */
 	@Override
 	public boolean performFinish() {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+	 *      org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		setWindowTitle("window title");
@@ -57,13 +68,18 @@ public class FaultyExportWizard extends Wizard implements IExportWizard {
 	public class MyWizardPage extends WizardPage {
 		/**
 		 * Creates some wizard page
-		 *
+		 * 
 		 * @param pageName
 		 */
 		protected MyWizardPage(String pageName) {
 			super(pageName);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+		 */
 		@Override
 		public void createControl(Composite parent) {
 			Composite page = new Composite(parent, SWT.NONE);

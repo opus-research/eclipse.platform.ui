@@ -24,70 +24,105 @@ import org.eclipse.ui.part.EditorPart;
 
 /**
  * @since 3.1
- *
+ * 
  */
 public class SessionEditorPart extends EditorPart {
 
 	public static int instantiatedEditors = 0;
-
+	
 	private Composite fMainPanel;
 
 	/**
-	 *
+	 * 
 	 */
 	public SessionEditorPart() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
+	 *      org.eclipse.ui.IEditorInput)
+	 */
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		if (!(input instanceof IFileEditorInput)) {
+		if (!(input instanceof IFileEditorInput))
 			throw new PartInitException(
 					"Invalid Input: Must be IFileEditorInput");
-		}
 		setSite(site);
 		setInput(input);
 		++SessionEditorPart.instantiatedEditors;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
+	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void createPartControl(Composite parent) {
 	       fMainPanel = new Composite(parent, SWT.NONE);
 	       fMainPanel.setLayout(new RowLayout(SWT.VERTICAL));
-
+	       
 	       Label l = new Label(fMainPanel, SWT.NONE);
 	       l.setText("Editor Title:");
-
+	       
 	       l = new Label(fMainPanel, SWT.BORDER);
 	       l.setText(getEditorInput().getName());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	@Override
 	public void setFocus() {
 		fMainPanel.setFocus();

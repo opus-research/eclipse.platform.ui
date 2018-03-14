@@ -13,10 +13,10 @@
 package org.eclipse.jface.examples.databinding.snippets;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.PojoProperties;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -33,7 +33,7 @@ public class Snippet034ComboViewerAndEnum {
 		Display display = new Display();
 		final Person model = new Person("Pat", Gender.Unknown);
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				final Shell shell = new View(model).createShell();
@@ -56,7 +56,7 @@ public class Snippet034ComboViewerAndEnum {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	//
+	// 
 	// In this example, we only push changes from the GUI to the model, so we
 	// don't worry about implementing JavaBeans bound properties. If we need
 	// our GUI to automatically reflect changes in the Person object, the
@@ -123,17 +123,15 @@ public class Snippet034ComboViewerAndEnum {
 
 			IObservableValue widgetObservable = WidgetProperties.text(SWT.Modify).observe(
 					name);
-			bindingContext.bindValue(widgetObservable,
-					PojoProperties.value(viewModel.getClass(), "name")
-								.observe(viewModel));
+			bindingContext.bindValue(widgetObservable, PojoObservables
+					.observeValue(viewModel, "name"));
 
 			// The second key to binding a combo to an Enum is to use a
 			// selection observable from the ComboViewer:
 			widgetObservable = ViewersObservables
 					.observeSingleSelection(gender);
-			bindingContext.bindValue(widgetObservable,
-					PojoProperties.value(viewModel.getClass(), "gender")
-								.observe(viewModel));
+			bindingContext.bindValue(widgetObservable, PojoObservables
+					.observeValue(viewModel, "gender"));
 
 			// Open and return the Shell
 			shell.pack();

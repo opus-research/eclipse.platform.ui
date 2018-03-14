@@ -25,7 +25,6 @@ public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		
@@ -35,7 +34,6 @@ public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
 	 */
-	@Override
 	protected Number doGetOutOfRangeNumber() {
 		return new Long((long) Integer.MAX_VALUE + 1);
 	}
@@ -43,7 +41,6 @@ public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToIntegerConverter(numberFormat, fromType, false);
 	}
@@ -51,7 +48,6 @@ public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return new NumberToIntegerConverter(numberFormat, fromType, true);
 	}
@@ -59,7 +55,6 @@ public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType(boolean)
 	 */
-	@Override
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? Integer.TYPE : Integer.class;
 	}

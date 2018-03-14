@@ -59,17 +59,13 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		adapter.setFilterStyle(filterStyle);
 		adapter.setPropagateKeys(propagateKeys);
 		adapter.setProposalAcceptanceStyle(acceptance);
-
+		
 		createExtraControls(parent);
 
 		return content;
 	}
-
-	/**
-	 * @param parent
-	 *            the SWT composite
-	 */
-	protected void createExtraControls(Composite parent) {
+	
+	protected void createExtraControls(@SuppressWarnings("unused") Composite parent) {
 		// default is to do nothing
 	}
 
@@ -81,7 +77,7 @@ public abstract class AbstractFieldAssistWindow extends Window {
 	/**
 	 * Create and return the content proposal adapter that will be used by this
 	 * field assist window.
-	 *
+	 * 
 	 * @param control
 	 *            the SWT control to provide field assist for
 	 */
@@ -138,7 +134,7 @@ public abstract class AbstractFieldAssistWindow extends Window {
 		}
 		return proposalProvider;
 	}
-
+	
 	protected ContentProposalAdapter getContentProposalAdapter() {
 		return adapter;
 	}
