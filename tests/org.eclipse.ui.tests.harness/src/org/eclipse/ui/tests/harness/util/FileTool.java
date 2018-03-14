@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 
 package org.eclipse.ui.tests.harness.util;
@@ -53,11 +52,11 @@ public class FileTool {
 
 	private static void unzip(ZipFile zipFile, File rootDstDir, File dstDir, int depth) throws IOException {
 
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		Enumeration entries = zipFile.entries();
 
 		try {
 			while(entries.hasMoreElements()){
-				ZipEntry entry = entries.nextElement();
+				ZipEntry entry = (ZipEntry)entries.nextElement();
 				if(entry.isDirectory()){
 					continue;
 				}
