@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,17 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <scholzsimon@vogella.com> - Bug 446616
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
 
+import com.ibm.icu.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Locale;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.SelectionDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -32,14 +30,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.SelectionDialog;
 import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * Dialog to allow the user to select a feature from a list.
  */
-public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
+public class FeatureSelectionDialog extends SelectionDialog {
     /**
      * List width in characters.
      */
@@ -93,14 +90,17 @@ public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
         setMessage(shellMessage);
 
         // Sort ascending
-		Arrays.sort(features, new Comparator<AboutInfo>() {
+        Arrays.sort(features, new Comparator() {
             Collator coll = Collator.getInstance(Locale.getDefault());
 
-			@Override
-			public int compare(AboutInfo o1, AboutInfo o2) {
+            @Override
+			public int compare(Object a, Object b) {
+                AboutInfo i1, i2;
                 String name1, name2;
-				name1 = o1.getFeatureLabel();
-				name2 = o2.getFeatureLabel();
+                i1 = (AboutInfo) a;
+                name1 = i1.getFeatureLabel();
+                i2 = (AboutInfo) b;
+                name2 = i2.getFeatureLabel();
                 if (name1 == null) {
 					name1 = ""; //$NON-NLS-1$
 				}
@@ -108,19 +108,19 @@ public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
 					name2 = ""; //$NON-NLS-1$
 				}
                 return coll.compare(name1, name2);
-			}
+            }
         });
 
         // Find primary feature
         for (int i = 0; i < features.length; i++) {
             if (features[i].getFeatureId().equals(primaryFeatureId)) {
-				setInitialSelection(features[i]);
+                setInitialSelections(new Object[] { features[i] });
                 return;
             }
         }
 
-		// set a safe default
-		setInitialSelection(new AboutInfo[0]);
+        // set a safe default		
+        setInitialSelections(new Object[0]);
     }
 
     @Override
@@ -161,14 +161,15 @@ public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
         // it is ignored but must be non-null
 
         // Set the initial selection
-		listViewer.setSelection(new StructuredSelection(getInitialSelection()), true);
+        listViewer.setSelection(new StructuredSelection(
+                getInitialElementSelections()), true);
 
         // Add a selection change listener
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
 			public void selectionChanged(SelectionChangedEvent event) {
                 // Update OK button enablement
-				getButton(IDialogConstants.OK_ID).setEnabled(!event.getSelection().isEmpty());
+                getOkButton().setEnabled(!event.getSelection().isEmpty());
             }
         });
 
@@ -186,7 +187,7 @@ public class FeatureSelectionDialog extends SelectionDialog<AboutInfo> {
 	protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer
                 .getSelection();
-		setResult(selection.toList());
+        setResult(selection.toList());
         super.okPressed();
     }
 }
