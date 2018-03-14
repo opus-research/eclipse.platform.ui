@@ -93,6 +93,12 @@ public class FileDescription extends AbstractResourceDescription {
 		this.fileContentDescription = fileContentDescription;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#recordStateFromHistory(org.eclipse.core.resources.IResource,
+	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void recordStateFromHistory(IResource resource,
 			IProgressMonitor monitor) throws CoreException {
@@ -106,16 +112,31 @@ public class FileDescription extends AbstractResourceDescription {
 		if (states.length > 0) {
 			final IFileState state = getMatchingFileState(states);
 			this.fileContentDescription = new IFileContentDescription() {
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#exists()
+				 */
 				@Override
 				public boolean exists() {
 					return state.exists();
 				}
 
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getContents()
+				 */
 				@Override
 				public InputStream getContents() throws CoreException {
 					return state.getContents();
 				}
 
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getCharset()
+				 */
 				@Override
 				public String getCharset() throws CoreException {
 					return state.getCharset();
@@ -124,6 +145,11 @@ public class FileDescription extends AbstractResourceDescription {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#createResourceHandle()
+	 */
 	@Override
 	public IResource createResourceHandle() {
 		IWorkspaceRoot workspaceRoot = parent.getWorkspace().getRoot();
@@ -131,6 +157,12 @@ public class FileDescription extends AbstractResourceDescription {
 		return workspaceRoot.getFile(fullPath);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#createExistentResourceFromHandle(org.eclipse.core.resources.IResource,
+	 *      org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void createExistentResourceFromHandle(IResource resource,
 			IProgressMonitor monitor) throws CoreException {
@@ -180,6 +212,11 @@ public class FileDescription extends AbstractResourceDescription {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#isValid()
+	 */
 	@Override
 	public boolean isValid() {
 		if (location != null) {
@@ -189,6 +226,11 @@ public class FileDescription extends AbstractResourceDescription {
 				&& fileContentDescription.exists();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#getName()
+	 */
 	@Override
 	public String getName() {
 		return name;
@@ -209,6 +251,11 @@ public class FileDescription extends AbstractResourceDescription {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.ide.undo.ResourceDescription#restoreResourceAttributes(org.eclipse.core.resources.IResource)
+	 */
 	@Override
 	protected void restoreResourceAttributes(IResource resource)
 			throws CoreException {
