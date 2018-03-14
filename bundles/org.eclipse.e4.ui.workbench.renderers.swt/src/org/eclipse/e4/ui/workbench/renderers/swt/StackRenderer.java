@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,10 +39,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -51,6 +51,8 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
+import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
@@ -524,12 +526,14 @@ public class StackRenderer extends LazyStackRenderer {
 
 	protected void updateTab(CTabItem cti, MPart part, String attName,
 			Object newValue) {
-		if (UIEvents.UILabel.LABEL.equals(attName)) {
+		if (UIEvents.UILabel.LABEL.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
 			String newName = (String) newValue;
 			cti.setText(getLabel(part, newName));
 		} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 			cti.setImage(getImage(part));
-		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
+		} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
+				|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
 			String newTTip = (String) newValue;
 			cti.setToolTipText(getToolTip(newTTip));
 		} else if (UIEvents.Dirtyable.DIRTY.equals(attName)) {
@@ -805,7 +809,11 @@ public class StackRenderer extends LazyStackRenderer {
 		cti.setData(OWNING_ME, element);
 		cti.setText(getLabel(part, part.getLocalizedLabel()));
 		cti.setImage(getImage(part));
-		cti.setToolTipText(getToolTip(part.getLocalizedTooltip()));
+
+		String toolTip = getToolTip(part);
+		if (toolTip == null)
+			toolTip = part.getLocalizedTooltip();
+		cti.setToolTipText(getToolTip(toolTip));
 		if (element.getWidget() != null) {
 			// The part might have a widget but may not yet have been placed
 			// under this stack, check this
@@ -1217,6 +1225,11 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		ignoreTabSelChanges = true;
+		// Ensure that the newly selected control is correctly sized
+		if (cti.getControl() instanceof Composite) {
+			Composite ctiComp = (Composite) cti.getControl();
+			ctiComp.layout(true, true);
+		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
 
@@ -1348,6 +1361,7 @@ public class StackRenderer extends LazyStackRenderer {
 							EPartService.class);
 					if (partService.savePart(part, true))
 						partService.hidePart(part);
+
 				}
 			});
 			closeableElements++;
@@ -1450,6 +1464,42 @@ public class StackRenderer extends LazyStackRenderer {
 
 		EPartService partService = getContextForParent(part).get(
 				EPartService.class);
+		// try using the ISaveHandler first... This gives better control of
+		// dialogs...
+		ISaveHandler saveHandler = getContextForParent(part).get(
+				ISaveHandler.class);
+		if (saveHandler != null) {
+			final List<MPart> toPrompt = new ArrayList<MPart>(others);
+			toPrompt.retainAll(partService.getDirtyParts());
+
+			final Save[] response;
+			if (toPrompt.size() > 1) {
+				response = saveHandler.promptToSave(toPrompt);
+			} else if (toPrompt.size() == 1) {
+				response = new Save[] { saveHandler.promptToSave(toPrompt
+						.get(0)) };
+			} else {
+				response = new Save[] {};
+			}
+			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
+			for (int i = 0; i < response.length; i++) {
+				final Save save = response[i];
+				final MPart mPart = toPrompt.get(i);
+				if (save == Save.CANCEL) {
+					return;
+				} else if (save == Save.YES) {
+					toSave.add(mPart);
+				}
+			}
+			saveHandler.saveParts(toSave, false);
+
+			for (MPart other : others) {
+				partService.hidePart(other);
+			}
+			return;
+		}
+
+		// No ISaveHandler, fall back to just using the part service...
 		for (MPart otherPart : others) {
 			if (partService.savePart(otherPart, true))
 				partService.hidePart(otherPart);
@@ -1485,17 +1535,15 @@ public class StackRenderer extends LazyStackRenderer {
 
 		for (MMenuElement menuElement : viewMenu.getChildren()) {
 			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
-				if (menuElement instanceof MDirectMenuItem
-						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
-					IContributionItem item = (IContributionItem) menuElement
-							.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
+				if (menuElement instanceof MOpaqueMenuItem) {
+					IContributionItem item = (IContributionItem) ((MOpaqueMenuItem) menuElement)
+							.getOpaqueItem();
 					if (item != null && item.isVisible()) {
 						return true;
 					}
-				} else if (menuElement instanceof MMenuSeparator
-						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
-					IContributionItem item = (IContributionItem) menuElement
-							.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
+				} else if (menuElement instanceof MOpaqueMenuSeparator) {
+					IContributionItem item = (IContributionItem) ((MOpaqueMenuSeparator) menuElement)
+							.getOpaqueItem();
 					if (item != null && item.isVisible()) {
 						return true;
 					}

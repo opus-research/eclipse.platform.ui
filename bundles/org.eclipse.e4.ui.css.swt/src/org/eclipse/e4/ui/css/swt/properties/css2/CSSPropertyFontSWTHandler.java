@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,24 +49,38 @@ implements ICSSPropertyHandler2 {
 	private static void setFont(Widget widget, Font font) {
 
 		if (widget instanceof CTabItem) {
-			((CTabItem) widget).setFont(font);
+			CTabItem item = (CTabItem) widget;
+			if (item.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(item);
+				item.setFont(font);
+			}
+		} else if (widget instanceof CTabFolder) {
+			CTabFolder folder = (CTabFolder) widget;
+			try {
+				folder.setRedraw(false);
+				if (folder.getFont() != font) {
+					CSSSWTFontHelper.storeDefaultFont(folder);
+					folder.setFont(font);
+				}
+				updateChildrenFonts(folder, font);
+			} finally {
+				folder.setRedraw(true);
+			}
 		} else if (widget instanceof Control) {
 			Control control = (Control) widget;
-			try {
-				control.setRedraw(false);
+			if (control.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(control);
 				control.setFont(font);
-				if (control instanceof CTabFolder) {
-					updateChildrenFonts((CTabFolder) widget, font);
-				}
-			} finally {
-				control.setRedraw(true);
 			}
 		}
 	}
 
 	private static void updateChildrenFonts(CTabFolder folder, Font font) {
 		for (CTabItem item : folder.getItems()) {
-			item.setFont(font);
+			if (item.getFont() != font) {
+				CSSSWTFontHelper.storeDefaultFont(item);
+				item.setFont(font);
+			}
 		}
 	}
 
@@ -180,28 +194,33 @@ implements ICSSPropertyHandler2 {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontAdjust(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontFamily(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontFamily(widget);
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontSize(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontSize(widget);
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontStretch(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontStyle(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
@@ -209,17 +228,20 @@ implements ICSSPropertyHandler2 {
 
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontVariant(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontWeight(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontWeight(widget);
 	}
 
+	@Override
 	public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine)
 			throws Exception {
 		final Widget widget = SWTElementHelpers.getWidget(element);
@@ -377,6 +399,7 @@ implements ICSSPropertyHandler2 {
 			properties.setStretch(null);
 		}
 
+		@Override
 		public void handleEvent(Event e) {
 			if (e.widget instanceof CTabFolder) {
 				Item[] items;
