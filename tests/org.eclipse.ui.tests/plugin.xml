@@ -4377,4 +4377,12 @@
          </menu>
       </menuContribution>
    </extension>
+      <extension
+         point="org.eclipse.e4.ui.css.swt.theme">
+      <theme
+            basestylesheeturi="css/e4_classic_winxp.css"
+            id="org.eclipse.ui.tests.theme.e4_classic"
+            label="UI Tests Classic">
+      </theme>
+   </extension>
 </plugin>

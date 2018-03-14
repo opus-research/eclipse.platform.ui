@@ -12,6 +12,7 @@ package org.eclipse.ui.tests.themes;
 
 import java.util.Arrays;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
@@ -50,6 +51,11 @@ public abstract class ThemeTest extends UITestCase {
 
     protected IThemeManager fManager;
 
+    protected IThemeEngine fThemeEngine;
+
+	private org.eclipse.e4.ui.css.swt.theme.ITheme activeTheme;
+
+    
     /**
      * @param testName
      */
@@ -67,8 +73,19 @@ public abstract class ThemeTest extends UITestCase {
         super.doSetUp();
         fManager = fWorkbench.getThemeManager();
         fManager.setCurrentTheme(IThemeManager.DEFAULT_THEME);
+        fThemeEngine = (IThemeEngine) fWorkbench.getService(IThemeEngine.class);
+        activeTheme = fThemeEngine.getActiveTheme();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+     */
+    @Override
+    protected void doTearDown() throws Exception {
+    	fThemeEngine.setTheme(activeTheme, false);
+    	super.doTearDown();
+    }
+    
     /**
      * @return
      */
