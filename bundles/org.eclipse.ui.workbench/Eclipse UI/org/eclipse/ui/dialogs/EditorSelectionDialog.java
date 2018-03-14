@@ -13,29 +13,21 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.util.Util;
-import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -48,7 +40,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -56,8 +49,6 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.EditorRegistry;
-import org.eclipse.ui.progress.IProgressService;
-import org.eclipse.ui.statushandlers.StatusManager;
 
 
 /**
@@ -69,57 +60,15 @@ import org.eclipse.ui.statushandlers.StatusManager;
  */
 
 public class EditorSelectionDialog extends Dialog {
+	private EditorDescriptor selectedEditor;
 
-	private static class TreeArrayContentProvider implements ITreeContentProvider {
+	private EditorDescriptor hiddenSelectedEditor;
 
-		private static final Object[] EMPTY = new Object[0];
-
-		@Override
-		public void dispose() {
-			//
-		}
-
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			//
-		}
-
-		@Override
-		public Object[] getElements(Object inputElement) {
-			if (inputElement == null || !inputElement.getClass().isArray()) {
-				return EMPTY;
-			}
-			// see bug 9262 why we can't return the same array
-			Object[] orig = (Object[]) inputElement;
-			Object[] arr = new Object[orig.length];
-			System.arraycopy(orig, 0, arr, 0, arr.length);
-			return arr;
-		}
-
-		@Override
-		public Object[] getChildren(Object parentElement) {
-			return EMPTY;
-		}
-
-		@Override
-		public Object getParent(Object element) {
-			return null;
-		}
-
-		@Override
-		public boolean hasChildren(Object element) {
-			return false;
-		}
-
-	}
-
-	private IEditorDescriptor selectedEditor;
-
-	private IEditorDescriptor hiddenSelectedEditor;
+	private int hiddenTableTopIndex;
 
 	private Button externalButton;
 
-	private FilteredTree editorTable;
+	private Table editorTable;
 
 	private Button browseExternalEditorsButton;
 
@@ -135,8 +84,6 @@ public class EditorSelectionDialog extends Dialog {
 	 */
 	protected static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
 
-	private static final String STORE_ID_DESCR = "EditorSelectionDialog.STORE_ID_DESCR";//$NON-NLS-1$
-
 	private String message = WorkbenchMessages.EditorSelection_chooseAnEditor;
 
 	// collection of IEditorDescriptor
@@ -150,7 +97,7 @@ public class EditorSelectionDialog extends Dialog {
 
 	private ResourceManager resourceManager;
 
-	private TreeViewer editorTableViewer;
+	private TableViewer editorTableViewer;
 
 	private static final String[] Executable_Filters;
 
@@ -249,12 +196,10 @@ public class EditorSelectionDialog extends Dialog {
 		externalButton.setLayoutData(data);
 		externalButton.setFont(font);
 
-		editorTable = new FilteredTree(contents, SWT.SINGLE | SWT.BORDER, new PatternFilter(), true);
-		editorTableViewer = editorTable.getViewer();
-		Tree tree = editorTableViewer.getTree();
-		tree.addListener(SWT.Selection, listener);
-		tree.addListener(SWT.DefaultSelection, listener);
-		tree.addListener(SWT.MouseDoubleClick, listener);
+		editorTable = new Table(contents, SWT.SINGLE | SWT.BORDER);
+		editorTable.addListener(SWT.Selection, listener);
+		editorTable.addListener(SWT.DefaultSelection, listener);
+		editorTable.addListener(SWT.MouseDoubleClick, listener);
 		data = new GridData();
 		data.widthHint = convertHorizontalDLUsToPixels(TABLE_WIDTH);
 		data.horizontalAlignment = GridData.FILL;
@@ -264,8 +209,9 @@ public class EditorSelectionDialog extends Dialog {
 		data.horizontalSpan = 2;
 		editorTable.setLayoutData(data);
 		editorTable.setFont(font);
-		data.heightHint = tree.getItemHeight() * 12;
-		editorTableViewer.setContentProvider(new TreeArrayContentProvider());
+		data.heightHint = editorTable.getItemHeight() * 12;
+		editorTableViewer = new TableViewer(editorTable);
+		editorTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		editorTableViewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -293,45 +239,38 @@ public class EditorSelectionDialog extends Dialog {
 
 		restoreWidgetValues(); // Place buttons to the appropriate state
 
-		// Run async to restore selection on *visible* dialog - otherwise three won't scroll
-		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+		fillEditorTable();
 
-			@Override
-			public void run() {
-				if (editorTable.isDisposed()) {
-					return;
-				}
-				fillEditorTable();
-				updateEnableState();
-			}
-		});
+		updateEnableState();
+
 		return contents;
 	}
 
 	protected void fillEditorTable() {
-		IEditorDescriptor newSelection = selectedEditor;
+		EditorDescriptor newSelection = null;
+		int newTopIndex = 0;
 
 		boolean showInternal = internalButton.getSelection();
-		Object[] input = (Object[]) editorTableViewer.getInput();
-		if (input != null) {
-			// we are switching between external/internal editors
-			boolean isShowingInternal = Arrays.equals(input, getInternalEditors());
-			if (showInternal != isShowingInternal) {
-				newSelection = hiddenSelectedEditor;
-				if (!editorTableViewer.getSelection().isEmpty()) {
-					hiddenSelectedEditor = (EditorDescriptor) editorTableViewer.getStructuredSelection()
-							.getFirstElement();
-				}
+		boolean isShowingInternal = editorTableViewer.getInput() == getInternalEditors();
+		if (showInternal != isShowingInternal) {
+			newSelection = hiddenSelectedEditor;
+			newTopIndex = hiddenTableTopIndex;
+			if (editorTable.getSelectionIndex() != -1) {
+				hiddenSelectedEditor = (EditorDescriptor) editorTable.getSelection()[0].getData();
+				hiddenTableTopIndex = editorTable.getTopIndex();
 			}
 		}
 
 		editorTableViewer.setInput(showInternal ? getInternalEditors() : getExternalEditors());
 
 		if (newSelection != null) {
+			editorTable.setTopIndex(newTopIndex);
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
 		} else {
 			// set focus to first element, but don't select it:
-			editorTableViewer.getTree().showItem(editorTableViewer.getTree().getItem(0));
+			editorTable.setTopIndex(0);
+			editorTable.setSelection(0);
+			editorTable.deselectAll();
 		}
 		editorTable.setFocus();
 	}
@@ -356,34 +295,26 @@ public class EditorSelectionDialog extends Dialog {
 	 */
 	protected IEditorDescriptor[] getExternalEditors() {
 		if (externalEditors == null) {
-			IProgressService ps = PlatformUI.getWorkbench().getService(IProgressService.class);
-			// Since this can take a while, show the busy cursor.
-			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) {
-					// Get the external editors available
-					EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
-					externalEditors = reg.getSortedEditorsFromOS();
-					externalEditors = filterEditors(externalEditors);
+			// Since this can take a while, show the busy
+			// cursor. If the dialog is not yet visible,
+			// then use the parent shell.
+			Control shell = getShell();
+			if (!shell.isVisible()) {
+				Control topShell = shell.getParent();
+				if (topShell != null) {
+					shell = topShell;
 				}
-			};
-			try {
-				// See bug 47556 - Program.getPrograms() requires a Display.getCurrent() != null
-				ps.runInUI(PlatformUI.getWorkbench().getActiveWorkbenchWindow(), runnable, null);
-			} catch (InvocationTargetException e) {
-				Throwable cause = e.getCause();
-				IStatus status;
-				if (cause instanceof CoreException) {
-					status = ((CoreException) cause).getStatus();
-				} else {
-					status = new Status(IStatus.ERROR, PlatformUI.PLUGIN_ID,
-							"Error while retrieving native editors", cause); //$NON-NLS-1$
-				}
-				StatusManager.getManager().handle(status);
-			} catch (InterruptedException e) {
-				// Canceled by the user
 			}
-
+			Cursor busy = new Cursor(shell.getDisplay(), SWT.CURSOR_WAIT);
+			shell.setCursor(busy);
+			// Get the external editors available
+			EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault()
+					.getEditorRegistry();
+			externalEditors = reg.getSortedEditorsFromOS();
+			externalEditors = filterEditors(externalEditors);
+			// Clean up
+			shell.setCursor(null);
+			busy.dispose();
 		}
 		return externalEditors;
 	}
@@ -405,7 +336,7 @@ public class EditorSelectionDialog extends Dialog {
 			return editors;
 		}
 
-		List<IEditorDescriptor> filteredList = new ArrayList<IEditorDescriptor>();
+		ArrayList filteredList = new ArrayList();
 		for (int i = 0; i < editors.length; i++) {
 			boolean add = true;
 			for (int j = 0; j < editorsToFilter.length; j++) {
@@ -418,7 +349,8 @@ public class EditorSelectionDialog extends Dialog {
 			}
 		}
 
-		return filteredList.toArray(new IEditorDescriptor[filteredList.size()]);
+		return (IEditorDescriptor[]) filteredList
+				.toArray(new IEditorDescriptor[filteredList.size()]);
 	}
 
 	/**
@@ -450,6 +382,19 @@ public class EditorSelectionDialog extends Dialog {
 		String result = dialog.open();
 		if (result != null) {
 			EditorDescriptor editor = EditorDescriptor.createForProgram(result);
+			// pretend we had obtained it from the list of os registered editors
+			TableItem ti = new TableItem(editorTable, SWT.NULL);
+			ti.setData(editor);
+			ti.setText(editor.getLabel());
+			Image image = (Image) resourceManager.get(editor.getImageDescriptor());
+			ti.setImage(image);
+
+			// need to pass an array to setSelection -- 1FSKYVO: SWT:ALL -
+			// inconsistent setSelection api on Table
+			editorTable.setSelection(new TableItem[] { ti });
+			editorTable.showSelection();
+			editorTable.setFocus();
+			selectedEditor = editor;
 
 			/*
 			 * add to our collection of cached external editors in case the user
@@ -460,10 +405,6 @@ public class EditorSelectionDialog extends Dialog {
 					externalEditors.length);
 			newEditors[newEditors.length - 1] = editor;
 			externalEditors = newEditors;
-			editorTableViewer.setInput(externalEditors);
-			editorTableViewer.setSelection(new StructuredSelection(editor), true);
-			editorTable.setFocus();
-			selectedEditor = editor;
 		}
 	}
 
@@ -483,21 +424,6 @@ public class EditorSelectionDialog extends Dialog {
 		boolean wasExternal = settings.getBoolean(STORE_ID_INTERNAL_EXTERNAL);
 		internalButton.setSelection(!wasExternal);
 		externalButton.setSelection(wasExternal);
-		String id = settings.get(STORE_ID_DESCR);
-		if (id != null) {
-			IEditorDescriptor[] editors;
-			if (wasExternal) {
-				editors = getExternalEditors();
-			} else {
-				editors = getInternalEditors();
-			}
-			for (IEditorDescriptor desc : editors) {
-				if (id.equals(desc.getId())) {
-					selectedEditor = desc;
-				}
-			}
-		}
-
 	}
 
 	/**
@@ -509,7 +435,6 @@ public class EditorSelectionDialog extends Dialog {
 		// record whether use was viewing internal or external editors
 		settings
 				.put(STORE_ID_INTERNAL_EXTERNAL, !internalButton.getSelection());
-		settings.put(STORE_ID_DESCR, selectedEditor.getId());
 	}
 
 	/**
@@ -561,7 +486,7 @@ public class EditorSelectionDialog extends Dialog {
 			return;
 		}
 		// If there is no selection, do not enable OK button
-		if (editorTableViewer.getSelection().isEmpty()) {
+		if (editorTable.getSelectionCount() == 0) {
 			okButton.setEnabled(false);
 			return;
 		}
@@ -581,9 +506,10 @@ public class EditorSelectionDialog extends Dialog {
 				fillEditorTable();
 			} else if (event.widget == browseExternalEditorsButton) {
 				promptForExternalEditor();
-			} else if (event.widget == editorTableViewer.getTree()) {
-				if (!editorTableViewer.getSelection().isEmpty()) {
-					selectedEditor = (EditorDescriptor) editorTableViewer.getStructuredSelection().getFirstElement();
+			} else if (event.widget == editorTable) {
+				if (editorTable.getSelectionIndex() != -1) {
+					selectedEditor = (EditorDescriptor) editorTable
+							.getSelection()[0].getData();
 				} else {
 					selectedEditor = null;
 					okButton.setEnabled(false);
