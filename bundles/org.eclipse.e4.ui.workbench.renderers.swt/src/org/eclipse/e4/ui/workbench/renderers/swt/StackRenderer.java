@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -584,8 +583,6 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(element instanceof MPartStack) || !(parent instanceof Composite))
 			return null;
 
-		MPartStack pStack = (MPartStack) element;
-
 		Composite parentComposite = (Composite) parent;
 
 		// Ensure that all rendered PartStacks have an Id
@@ -595,9 +592,8 @@ public class StackRenderer extends LazyStackRenderer {
 			element.setElementId(generatedId);
 		}
 
-		int styleOverride = getStyleOverride(pStack);
-		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
-		final CTabFolder ctf = new CTabFolder(parentComposite, style);
+		// TBD: need to define attributes to handle this
+		final CTabFolder ctf = new CTabFolder(parentComposite, SWT.BORDER);
 		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
@@ -1641,20 +1637,4 @@ public class StackRenderer extends LazyStackRenderer {
 			return newValue == null && tagName.equals(oldValue);
 		}
 	}
-
-	/**
-	 * @param pStack
-	 * @return Returns the style override bits or -1 if there is no override
-	 */
-	private int getStyleOverride(MPartStack pStack) {
-		String overrideStr = pStack.getPersistedState().get(
-				IPresentationEngine.STYLE_OVERRIDE_KEY);
-		if (overrideStr == null || overrideStr.length() == 0)
-			return -1;
-
-		int val = -1;
-		val = Integer.parseInt(overrideStr);
-		return val;
-	}
-
 }
