@@ -68,7 +68,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	 *            the property source
 	 * @return a List with the current contents of the source's list property
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.6
+	 * @since 1.7
 	 */
 	protected List<E> doGetList(S source) {
 		IObservableList<E> observable = observe(source);
@@ -96,7 +96,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	 *            the property source
 	 * @param list
 	 *            the new list
-	 * @since 1.6
+	 * @since 1.7
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doSetList(S source, List<E> list) {
