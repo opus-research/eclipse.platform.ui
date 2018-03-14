@@ -28,12 +28,8 @@ class ActionSetFilter extends ViewerFilter {
 	}
 
 	@Override
-	public boolean select(Viewer viewer, Object parentElement,
-			Object element) {
-		if (!(element instanceof DisplayItem)) {
-			return false;
-		}
-		if (actionSet == null) {
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
+		if (!(element instanceof DisplayItem) || actionSet == null) {
 			return false;
 		}
 		return CustomizePerspectiveDialog.includeInSetStructure((DisplayItem) element, actionSet);
