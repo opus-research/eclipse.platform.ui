@@ -81,6 +81,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.testing.TestableObject;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.Element;
@@ -1213,55 +1216,71 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		final IThemeEngine themeEngine = createThemeEngine(display, appContext);
 
 		if (cssTheme != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
+			Bundle bundle = WorkbenchSWTActivator.getDefault().getBundle();
+			BundleContext context = bundle.getBundleContext();
+			ServiceReference ref = context
+					.getServiceReference(IThemeManager.class.getName());
+			IThemeManager mgr = (IThemeManager) context.getService(ref);
+			final IThemeEngine engine = mgr.getEngineForDisplay(display);
+
+			// Store the app context
+			IContributionFactory contribution = (IContributionFactory) appContext
+					.get(IContributionFactory.class.getName());
+			IEclipseContext cssContext = EclipseContextFactory.create();
+			cssContext.set(IContributionFactory.class.getName(), contribution);
+			display.setData("org.eclipse.e4.ui.css.context", cssContext); //$NON-NLS-1$
+
 			// Create the OSGi resource locator
 			if (cssResourcesURI != null) {
 				// TODO: Should this be set through an extension as well?
-				themeEngine.registerResourceLocator(new OSGiResourceLocator(
+				engine.registerResourceLocator(new OSGiResourceLocator(
 						cssResourcesURI));
 			}
 
-			themeEngine.restore(cssTheme);
+			engine.restore(cssTheme);
+			// TODO Should we create an empty default theme?
+
+			appContext.set(IThemeEngine.class.getName(), engine);
 
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					themeEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					themeEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
-					themeEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
-					return themeEngine.getStyle(widget);
+					return engine.getStyle(widget);
 				}
 
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					themeEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
+
 			});
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
-			final CSSSWTEngineImpl cssEngine = new CSSSWTEngineImpl(display,
-					true);
-			WidgetElement.setEngine(display, cssEngine);
+			final CSSSWTEngineImpl engine = new CSSSWTEngineImpl(display, true);
+			WidgetElement.setEngine(display, engine);
 			if (cssResourcesURI != null) {
-				cssEngine.getResourcesLocatorManager().registerResourceLocator(
+				engine.getResourcesLocatorManager().registerResourceLocator(
 						new OSGiResourceLocator(cssResourcesURI.toString()));
 			}
 			// FIXME: is this needed?
@@ -1269,32 +1288,32 @@ public class PartRenderingEngine implements IPresentationEngine {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				public void setClassname(Object widget, String classname) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
-					cssEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void setId(Object widget, String id) {
 					WidgetElement.setID((Widget) widget, id);
-					cssEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public void style(Object widget) {
-					cssEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 				public CSSStyleDeclaration getStyle(Object widget) {
-					Element e = cssEngine.getCSSElementContext(widget)
+					Element e = engine.getCSSElementContext(widget)
 							.getElement();
 					if (e == null) {
 						return null;
 					}
-					return cssEngine.getViewCSS().getComputedStyle(e, null);
+					return engine.getViewCSS().getComputedStyle(e, null);
 				}
 
 				public void setClassnameAndId(Object widget, String classname,
 						String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
-					cssEngine.applyStyles(widget, true);
+					engine.applyStyles(widget, true);
 				}
 
 			});
@@ -1304,7 +1323,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			try {
 				url = FileLocator.resolve(new URL(cssURI));
 				stream = url.openStream();
-				cssEngine.parseStyleSheet(stream);
+				engine.parseStyleSheet(stream);
 			} catch (MalformedURLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -1327,7 +1346,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				try {
 					s.setRedraw(false);
 					s.reskin(SWT.ALL);
-					cssEngine.applyStyles(s, true);
+					engine.applyStyles(s, true);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1345,21 +1364,5 @@ public class PartRenderingEngine implements IPresentationEngine {
 		if (broker != null) {
 			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 		}
-	}
-
-	private static IThemeEngine createThemeEngine(Display display,
-			IEclipseContext appContext) {
-		// Store the app context
-		IContributionFactory contribution = (IContributionFactory) appContext
-				.get(IContributionFactory.class.getName());
-		IEclipseContext cssContext = EclipseContextFactory.create();
-		cssContext.set(IContributionFactory.class.getName(), contribution);
-		display.setData("org.eclipse.e4.ui.css.context", cssContext); //$NON-NLS-1$
-
-		IThemeManager mgr = appContext.get(IThemeManager.class);
-		IThemeEngine themeEngine = mgr.getEngineForDisplay(display);
-
-		appContext.set(IThemeEngine.class.getName(), themeEngine);
-		return themeEngine;
 	}
 }
