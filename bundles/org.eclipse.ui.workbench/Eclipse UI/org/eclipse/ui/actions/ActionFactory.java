@@ -92,7 +92,6 @@ public abstract class ActionFactory {
 		 * 
 		 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
 		 */
-		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
@@ -131,8 +130,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -155,8 +153,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -177,8 +174,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -197,8 +193,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -220,8 +215,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -245,8 +239,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -268,8 +261,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -294,8 +286,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -316,8 +307,7 @@ public abstract class ActionFactory {
     	 * 
     	 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
     	 */
-    	@Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+    	public IWorkbenchAction create(IWorkbenchWindow window) {
     		if (window == null) {
     			throw new IllegalArgumentException();
     		}
@@ -352,8 +342,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -383,8 +372,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -412,8 +400,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -441,8 +428,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -474,8 +460,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -501,8 +486,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -532,8 +516,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -560,8 +543,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -583,8 +565,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -605,8 +586,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -628,8 +608,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -658,7 +637,6 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
@@ -682,8 +660,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -710,8 +687,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -735,8 +711,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -758,8 +733,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -792,8 +766,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -813,8 +786,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -841,8 +813,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -875,8 +846,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -907,8 +877,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -935,8 +904,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -962,8 +930,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -991,8 +958,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1013,8 +979,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1041,8 +1006,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1074,8 +1038,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1106,8 +1069,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1133,8 +1095,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1163,8 +1124,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1186,8 +1146,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1212,8 +1171,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1242,8 +1200,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1265,8 +1222,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1288,8 +1244,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -1314,8 +1269,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1337,8 +1291,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1362,8 +1315,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1387,8 +1339,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1412,8 +1363,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -1439,8 +1389,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1462,8 +1411,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1483,8 +1431,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1508,8 +1455,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1536,7 +1482,6 @@ public abstract class ActionFactory {
 		 * 
 		 * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
 		 */
-		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			WorkbenchCommandAction action = new WorkbenchCommandAction("org.eclipse.ui.window.quickAccess", window); //$NON-NLS-1$
 			action.setId(getId());
@@ -1557,8 +1502,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1580,8 +1524,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1604,8 +1547,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1633,8 +1575,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1656,8 +1597,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1679,8 +1619,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1702,8 +1641,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1725,8 +1663,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
 			}
@@ -1755,8 +1692,7 @@ public abstract class ActionFactory {
         /* (non-Javadoc)
          * @see org.eclipse.ui.actions.ActionFactory#create(org.eclipse.ui.IWorkbenchWindow)
          */
-        @Override
-		public IWorkbenchAction create(IWorkbenchWindow window) {
+        public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -1781,7 +1717,6 @@ public abstract class ActionFactory {
 	public static final ActionFactory TOGGLE_COOLBAR = new ActionFactory(
 			"toggleCoolbar") { //$NON-NLS-1$
 
-		@Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();

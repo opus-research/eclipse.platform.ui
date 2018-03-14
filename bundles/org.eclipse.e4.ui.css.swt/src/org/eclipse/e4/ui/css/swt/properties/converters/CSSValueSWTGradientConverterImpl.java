@@ -40,7 +40,6 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		super(Gradient.class);
 	}
 
-	@Override
 	public Object convert(CSSValue value, CSSEngine engine, Object context) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Display display = (context instanceof Display) ? (Display) context : null;
@@ -58,7 +57,6 @@ public class CSSValueSWTGradientConverterImpl extends AbstractCSSValueConverter 
 		return null;
 	}
 
-	@Override
 	public String convert(Object value, CSSEngine engine, Object context,
 			ICSSValueConverterConfig config) throws Exception {
 		return null;

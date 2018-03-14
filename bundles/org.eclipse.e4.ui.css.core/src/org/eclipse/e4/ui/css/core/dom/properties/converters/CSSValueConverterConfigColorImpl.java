@@ -40,7 +40,6 @@ public class CSSValueConverterConfigColorImpl implements
 	 *
 	 * @see org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterColorConfig#getFormat()
 	 */
-	@Override
 	public int getFormat() {
 		return format;
 	}

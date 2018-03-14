@@ -118,7 +118,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 			} else {
 
 				Platform.run(new ISafeRunnable() {
-					@Override
 					public void run() {
 						try {
 							decorator = (ILightweightLabelDecorator) WorkbenchPlugin
@@ -134,7 +133,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 					/*
 					 * (non-Javadoc) Method declared on ISafeRunnable.
 					 */
-					@Override
 					public void handleException(Throwable e) {
 						// Do nothing as Core will handle the logging
 					}
@@ -179,7 +177,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#internalGetLabelProvider()
 	 */
-	@Override
 	protected IBaseLabelProvider internalGetLabelProvider()
 			throws CoreException {
 		return internalGetDecorator();
@@ -190,7 +187,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#isFull()
 	 */
-	@Override
 	public boolean isFull() {
 		return false;
 	}
@@ -293,7 +289,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#refreshDecorator()
 	 */
-	@Override
 	protected void refreshDecorator() {
 		// Only do something if disabled so as to prevent
 		// gratutitous activation
@@ -309,7 +304,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.IObjectContributor#isApplicableTo(java.lang.Object)
 	 */
-	@Override
 	public boolean isApplicableTo(Object object) {
 		return isEnabledFor(object);
 	}
@@ -319,7 +313,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.IObjectContributor#canAdapt()
 	 */
-	@Override
 	public boolean canAdapt() {
 		return isAdaptable();
 	}
@@ -342,7 +335,6 @@ class LightweightDecoratorDefinition extends DecoratorDefinition implements
 	 * 
 	 * @see org.eclipse.ui.internal.decorators.DecoratorDefinition#initializeEnablement()
 	 */
-	@Override
 	protected void initializeEnablement() {
 		super.initializeEnablement();
 		ActionExpression expression = getEnablement();

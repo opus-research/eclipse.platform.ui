@@ -43,7 +43,6 @@ public class IntroRegistry implements IIntroRegistry {
 	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroCount()
 	 */
-	@Override
 	public int getIntroCount() {
 		return getIntros().length;
 	}
@@ -53,7 +52,6 @@ public class IntroRegistry implements IIntroRegistry {
 	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntros()
 	 */
-	@Override
 	public IIntroDescriptor[] getIntros() {
 		IExtensionPoint point = Platform.getExtensionRegistry()
 				.getExtensionPoint(PlatformUI.PLUGIN_ID,
@@ -94,7 +92,6 @@ public class IntroRegistry implements IIntroRegistry {
 	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntroForProduct(java.lang.String)
 	 */
-	@Override
 	public IIntroDescriptor getIntroForProduct(String targetProductId) {
 		IExtensionPoint point = Platform.getExtensionRegistry()
 				.getExtensionPoint(PlatformUI.PLUGIN_ID,
@@ -164,7 +161,6 @@ public class IntroRegistry implements IIntroRegistry {
 	 * 
 	 * @see org.eclipse.ui.internal.intro.IIntroRegistry#getIntro(java.lang.String)
 	 */
-	@Override
 	public IIntroDescriptor getIntro(String id) {
 		IIntroDescriptor[] intros = getIntros();
 		for (int i = 0; i < intros.length; i++) {

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080
  *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 
@@ -39,7 +39,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
-import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -240,7 +239,7 @@ public class ModelAssembler {
 				key = id;
 			}
 
-			MApplicationElement el = ModelUtils.findElementById(application, id);
+			MApplicationElement el = findElementById(application, id);
 			if (el == null) {
 				logger.warn("Could not find element with id '" + id + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -268,7 +267,7 @@ public class ModelAssembler {
 		// now that we have all components loaded, resolve imports
 		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
 		for (MApplicationElement importedElement : imports) {
-			MApplicationElement realElement = ModelUtils.findElementById(application,
+			MApplicationElement realElement = findElementById(application,
 					importedElement.getElementId());
 			if (realElement == null) {
 				logger.warn("Could not resolve an import element for '" + realElement + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -303,7 +302,6 @@ public class ModelAssembler {
 
 					commands.add(new Runnable() {
 
-						@Override
 						public void run() {
 							if (internalFeature.isMany()) {
 								System.err.println("Replacing"); //$NON-NLS-1$
@@ -408,7 +406,6 @@ public class ModelAssembler {
 		// to explicitly resort anyways
 		List<String> sortedByOutdegree = new ArrayList<String>(requires.keySet());
 		Comparator<String> outdegreeSorter = new Comparator<String>() {
-			@Override
 			public int compare(String o1, String o2) {
 				assert requires.containsKey(o1) && requires.containsKey(o2);
 				return requires.get(o1).size() - requires.get(o2).size();
@@ -499,4 +496,22 @@ public class ModelAssembler {
 		}
 	}
 
+	// FIXME Should we not reuse ModelUtils???
+	private static MApplicationElement findElementById(MApplicationElement element, String id) {
+		if (id == null || id.length() == 0)
+			return null;
+		// is it me?
+		if (id.equals(element.getElementId()))
+			return element;
+		// Recurse if this is a container
+		EList<EObject> elements = ((EObject) element).eContents();
+		for (EObject childElement : elements) {
+			if (!(childElement instanceof MApplicationElement))
+				continue;
+			MApplicationElement result = findElementById((MApplicationElement) childElement, id);
+			if (result != null)
+				return result;
+		}
+		return null;
+	}
 }

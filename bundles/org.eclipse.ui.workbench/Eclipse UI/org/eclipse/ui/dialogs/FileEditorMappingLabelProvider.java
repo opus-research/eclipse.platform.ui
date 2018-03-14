@@ -59,8 +59,7 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         for (Iterator e = imagesToDispose.iterator(); e.hasNext();) {
             ((Image) e.next()).dispose();
@@ -74,16 +73,14 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
      * image is remembered internally and will be deallocated by
      * <code>dispose</code>.
      */
-    @Override
-	public Image getColumnImage(Object element, int row) {
+    public Image getColumnImage(Object element, int row) {
         return getImage(element);
     }
 
     /* (non-Javadoc)
      * Method declared on ITableLabelProvider.
      */
-    @Override
-	public String getColumnText(Object element, int row) {
+    public String getColumnText(Object element, int row) {
         return getText(element);
     }
 
@@ -92,8 +89,7 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
      * <code>ILabelProvider</code> method creates and returns an new image. The image
      * is remembered internally and will be deallocated by <code>dispose</code>.
      */
-    @Override
-	public Image getImage(Object element) {
+    public Image getImage(Object element) {
         if (element instanceof IFileEditorMapping) {
             Image image = ((IFileEditorMapping) element).getImageDescriptor()
                     .createImage();
@@ -106,8 +102,7 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider.
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         if (element instanceof IFileEditorMapping) {
 			return TextProcessor.process(((IFileEditorMapping) element)
 					.getLabel(), "*."); //$NON-NLS-1$

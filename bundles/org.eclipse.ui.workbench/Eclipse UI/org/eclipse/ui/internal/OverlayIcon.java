@@ -44,8 +44,7 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.CompositeImageDescriptor#drawCompositeImage(int, int)
      */
-    @Override
-	protected void drawCompositeImage(int width, int height) {
+    protected void drawCompositeImage(int width, int height) {
         ImageData bg;
         if (fBase == null || (bg = fBase.getImageData()) == null) {
 			bg = DEFAULT_IMAGE_DATA;
@@ -74,8 +73,7 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.CompositeImageDescriptor#getSize()
      */
-    @Override
-	protected Point getSize() {
+    protected Point getSize() {
         return fSize;
     }
 
@@ -83,16 +81,14 @@ public class OverlayIcon extends CompositeImageDescriptor {
      *  (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return Util.hashCode(fBase) * 17 + Util.hashCode(fOverlay);
     }
 
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (!(obj instanceof OverlayIcon)) {
 			return false;
 		}
