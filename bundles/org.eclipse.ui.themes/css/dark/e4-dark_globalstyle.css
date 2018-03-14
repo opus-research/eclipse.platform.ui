@@ -390,10 +390,8 @@ LayoutComposite > Table {
 }
 
 HeapStatus {
-	background-color: #41464a;
- 	color: black;
+	background-color:#41464a;
 }
-
 Twistie {
     color: #E8E4DF;
 }
