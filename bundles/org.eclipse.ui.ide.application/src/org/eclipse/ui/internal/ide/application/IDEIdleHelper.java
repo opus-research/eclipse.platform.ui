@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.ide.application;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -175,9 +176,9 @@ class IDEIdleHelper {
 	 * Creates the job that performs garbage collection
 	 */
 	private void createGarbageCollectionJob() {
-		gcJob = new Job(IDEWorkbenchMessages.IDEIdleHelper_backgroundGC) {
+		gcJob = Job.create(IDEWorkbenchMessages.IDEIdleHelper_backgroundGC, new IJobFunction() {
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+			public IStatus run(IProgressMonitor monitor) {
 				final Display display = configurer.getWorkbench().getDisplay();
 				if (display != null && !display.isDisposed()) {
 					final long start = System.currentTimeMillis();
@@ -203,7 +204,7 @@ class IDEIdleHelper {
 				}
 				return Status.OK_STATUS;
 			}
-		};
+		});
 		gcJob.setSystem(true);
 	}
 
