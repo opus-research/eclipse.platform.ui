@@ -29,6 +29,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 
 public class ImageBasedFrame extends Canvas {
+	public static int ImageDisposed = SWT.None - 1;
+
 	private Control framedControl;
 
 	private boolean draggable = true;
@@ -141,7 +143,8 @@ public class ImageBasedFrame extends Canvas {
 	}
 
 	protected void drawFrame(PaintEvent e) {
-		if (handle.isDisposed()) {
+		if (handle.isDisposed() || (imageCache != null && imageCache.isDisposed())) {
+			sendImageDisposedEvent(e);
 			return;
 		}
 		
@@ -338,5 +341,20 @@ public class ImageBasedFrame extends Canvas {
 			framedControl.setLocation(w1 + handleWidth, h1);
 		}
 		setSize(computeSize(-1, -1));
+	}
+
+	private void sendImageDisposedEvent(PaintEvent event) {
+		Event imageDisposedEvent = new Event();
+		imageDisposedEvent.display = event.display;
+		imageDisposedEvent.widget = event.widget;
+		imageDisposedEvent.gc = event.gc;
+		imageDisposedEvent.height = event.height;
+		imageDisposedEvent.width = event.width;
+		imageDisposedEvent.x = event.x;
+		imageDisposedEvent.y = event.y;
+		imageDisposedEvent.data = event.data;
+		imageDisposedEvent.count = event.count;
+		imageDisposedEvent.time = event.time;
+		notifyListeners(ImageDisposed, imageDisposedEvent);
 	}
 }
