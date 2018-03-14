@@ -271,7 +271,12 @@ public class EditorActionBars extends SubActionBars2 {
 		// add the editor group if the app did not add it already,
 		// otherwise the references to it below will fail
 		if (coolBarManager.find(IWorkbenchActionConstants.GROUP_EDITOR) == null) {
-			coolBarManager.add(new GroupMarker(IWorkbenchActionConstants.GROUP_EDITOR));
+			if (coolBarManager.find(IWorkbenchActionConstants.MB_ADDITIONS) != null) {
+				coolBarManager.insertAfter(IWorkbenchActionConstants.MB_ADDITIONS, new GroupMarker(
+						IWorkbenchActionConstants.GROUP_EDITOR));
+			} else {
+				coolBarManager.add(new GroupMarker(IWorkbenchActionConstants.GROUP_EDITOR));
+			}
 		}
 		if (toolBarContributionItem == null) {
 			IContributionItem foundItem = coolBarManager.find(type);
