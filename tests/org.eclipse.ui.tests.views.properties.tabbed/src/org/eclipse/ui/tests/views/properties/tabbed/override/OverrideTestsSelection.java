@@ -42,7 +42,11 @@ public class OverrideTestsSelection implements ISelection {
 		return element;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelection#isEmpty()
+	 */
 	public boolean isEmpty() {
 		/*
 		 * Since we want to display UI when there is no selection (empty
@@ -51,7 +55,11 @@ public class OverrideTestsSelection implements ISelection {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		if (getElement() == null) {
 			return super.toString();

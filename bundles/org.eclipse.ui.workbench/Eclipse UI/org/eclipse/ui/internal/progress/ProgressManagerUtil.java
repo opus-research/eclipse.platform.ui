@@ -150,7 +150,7 @@ public class ProgressManagerUtil {
 	 *
 	 * @param window
 	 */
-	static void openProgressView(IWorkbenchWindow window) {
+	static void openProgressView(WorkbenchWindow window) {
 		IWorkbenchPage page = window.getActivePage();
 		if (page == null) {
 			return;
@@ -490,6 +490,11 @@ public class ProgressManagerUtil {
 	static IShellProvider getShellProvider() {
 		return new IShellProvider() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.window.IShellProvider#getShell()
+			 */
 			@Override
 			public Shell getShell() {
 				return getDefaultParent();

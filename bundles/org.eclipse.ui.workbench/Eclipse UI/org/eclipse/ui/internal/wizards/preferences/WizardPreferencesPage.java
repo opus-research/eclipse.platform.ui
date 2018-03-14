@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -148,7 +148,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		setButtonLayoutData(button);
 
-		button.setData(Integer.valueOf(id));
+		button.setData(new Integer(id));
 		button.setText(label);
 
 		if (defaultButton) {
@@ -171,6 +171,9 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.add(value);
 	}
 
+	/**
+	 * (non-Javadoc) Method declared on IDialogPage.
+	 */
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
@@ -366,7 +369,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		selectAllButton = new Button(buttonComposite, SWT.PUSH);
 		selectAllButton.setText(PreferencesMessages.SelectionDialog_selectLabel);
-		selectAllButton.setData(Integer.valueOf(IDialogConstants.SELECT_ALL_ID));
+		selectAllButton.setData(new Integer(IDialogConstants.SELECT_ALL_ID));
 		setButtonLayoutData(selectAllButton);
 
 		SelectionListener listener = new SelectionAdapter() {
@@ -381,7 +384,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		deselectAllButton = new Button(buttonComposite, SWT.PUSH);
 		deselectAllButton.setText(PreferencesMessages.SelectionDialog_deselectLabel);
-		deselectAllButton.setData(Integer.valueOf(IDialogConstants.DESELECT_ALL_ID));
+		deselectAllButton.setData(new Integer(IDialogConstants.DESELECT_ALL_ID));
 		setButtonLayoutData(deselectAllButton);
 
 		listener = new SelectionAdapter() {

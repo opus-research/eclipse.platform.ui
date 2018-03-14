@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,12 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bugs 116920, 147515
  *     Matthew Hall - bug 274081
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 488145
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
-
-import java.util.function.Supplier;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -42,9 +38,9 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * <pre>
  * final IObservableList addends = WritableValue.withValueType(Integer.TYPE);
- * addends.add(Integer.valueOf(0));
- * addends.add(Integer.valueOf(1));
- * addends.add(Integer.valueOf(2));
+ * addends.add(new Integer(0));
+ * addends.add(new Integer(1));
+ * addends.add(new Integer(2));
  *
  * IObservableValue sum = new ComputedValue() {
  * 	protected Object calculate() {
@@ -59,56 +55,25 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * System.out.println(sum.getValue()); // =&gt; 3
  *
- * addends.add(Integer.valueOf(10));
+ * addends.add(new Integer(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
  *
- * @param <T>
- *            the type of value being observed
- *
  * @since 1.0
  */
-public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
+public abstract class ComputedValue extends AbstractObservableValue {
 
 	private boolean dirty = true;
 
 	private boolean stale = false;
 
-	private T cachedValue = null;
+	private Object cachedValue = null;
 
 	/**
 	 * Array of observables this computed value depends on. This field has a
 	 * value of <code>null</code> if we are not currently listening.
 	 */
 	private IObservable[] dependencies = null;
-
-	/**
-	 * Factory method to create {@link ComputedValue} objects in an easy manner.
-	 * <br/>
-	 * <br/>
-	 * Example observing the size of an {@link IObservableList}:
-	 *
-	 * <pre>
-	 * IObservableValue&lt;Integer&gt; listSizeObservable = ComputedValue.create(() -> observableList.size());
-	 * </pre>
-	 *
-	 * @param supplier
-	 *            {@link Supplier}, whose {@link Supplier#get()} method is a
-	 *            TrackedGetter. See
-	 *            {@link ObservableTracker#getterCalled(IObservable)} for
-	 *            details.
-	 * @return {@link ComputedValue} whose value is computed using the given
-	 *         {@link Supplier}.
-	 * @since 1.6
-	 */
-	public static <T> IObservableValue<T> create(Supplier<T> supplier) {
-		return new ComputedValue<T>() {
-			@Override
-			protected T calculate() {
-				return supplier.get();
-			}
-		};
-	}
 
 	/**
 	 *
@@ -189,7 +154,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	private Object valueType;
 
 	@Override
-	protected final T doGetValue() {
+	protected final Object doGetValue() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
@@ -225,7 +190,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 *
 	 * @return the object's value
 	 */
-	protected abstract T calculate();
+	protected abstract Object calculate();
 
 	protected final void makeDirty() {
 		if (!dirty) {
@@ -234,18 +199,18 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 			stopListening();
 
 			// copy the old value
-			final T oldValue = cachedValue;
+			final Object oldValue = cachedValue;
 			// Fire the "dirty" event. This implementation recomputes the new
 			// value lazily.
-			fireValueChange(new ValueDiff<T>() {
+			fireValueChange(new ValueDiff() {
 
 				@Override
-				public T getOldValue() {
+				public Object getOldValue() {
 					return oldValue;
 				}
 
 				@Override
-				public T getNewValue() {
+				public Object getNewValue() {
 					return getValue();
 				}
 			});
@@ -325,7 +290,7 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 
 	@Override
 	public synchronized void addValueChangeListener(
-			IValueChangeListener<? super T> listener) {
+			IValueChangeListener listener) {
 		super.addValueChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

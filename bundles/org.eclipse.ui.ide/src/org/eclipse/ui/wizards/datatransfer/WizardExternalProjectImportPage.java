@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.WizardPage;
@@ -39,6 +40,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -65,8 +67,14 @@ import org.eclipse.ui.internal.wizards.datatransfer.DataTransferMessages;
  */
 public class WizardExternalProjectImportPage extends WizardPage {
 
-    private FileFilter projectFilter = pathName -> pathName.getName().equals(
-	        IProjectDescription.DESCRIPTION_FILE_NAME);
+    private FileFilter projectFilter = new FileFilter() {
+        //Only accept those files that are .project
+        @Override
+		public boolean accept(File pathName) {
+            return pathName.getName().equals(
+                    IProjectDescription.DESCRIPTION_FILE_NAME);
+        }
+    };
 
     //Keep track of the directory that we browsed to last time
     //the wizard was invoked.
@@ -81,7 +89,12 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     private IProjectDescription description;
 
-    private Listener locationModifyListener = e -> setPageComplete(validatePage());
+    private Listener locationModifyListener = new Listener() {
+        @Override
+		public void handleEvent(Event e) {
+            setPageComplete(validatePage());
+        }
+    };
 
     // constants
     private static final int SIZING_TEXT_FIELD_WIDTH = 250;
@@ -98,6 +111,9 @@ public class WizardExternalProjectImportPage extends WizardPage {
 
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
 
@@ -436,9 +452,14 @@ public class WizardExternalProjectImportPage extends WizardPage {
             @Override
 			protected void execute(IProgressMonitor monitor)
                     throws CoreException {
-				SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-				project.create(description, subMonitor.split(50));
-				project.open(IResource.BACKGROUND_REFRESH, subMonitor.split(50));
+                monitor.beginTask("", 2000); //$NON-NLS-1$
+                project.create(description, new SubProgressMonitor(monitor,
+                        1000));
+                if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+                project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 1000));
+
             }
         };
 

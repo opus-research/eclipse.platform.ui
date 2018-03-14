@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -19,7 +18,6 @@ import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -68,11 +66,11 @@ public class MarkersPropertyPage extends PropertyPage {
 	protected Control createContents(Composite parent) {
 		// initialize resources/properties
 
-		IMarker element = Adapters.adapt(getElement(), IMarker.class);
+		Object element = getElement().getAdapter(IMarker.class);
 		IResource resource = null;
 
 		if (element != null) {
-			marker = element;
+			marker = (IMarker) element;
 			resource = marker.getResource();
 		} else if (resource == null) {
 			resource = ResourcesPlugin.getWorkspace().getRoot();
@@ -319,7 +317,7 @@ public class MarkersPropertyPage extends PropertyPage {
 				priority = IMarker.PRIORITY_LOW;
 			}
 
-			attrs.put(IMarker.PRIORITY, priority);
+			attrs.put(IMarker.PRIORITY, new Integer(priority));
 		}
 
 		if (completedCheckbox != null) {

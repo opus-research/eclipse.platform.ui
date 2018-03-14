@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150, 444410, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 441150, 444410
  *     Simon Scholz <Lars.Vogel@vogella.com> - Bug 429729
  *     Mike Leneweit <mike-le@web.de> - Bug 444410
  *******************************************************************************/
@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -97,7 +96,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	private static String ShellMaximizedTag = "shellMaximized"; //$NON-NLS-1$
 
 	private class WindowSizeUpdateJob implements Runnable {
-		public List<MWindow> windowsToUpdate = new ArrayList<>();
+		public List<MWindow> windowsToUpdate = new ArrayList<MWindow>();
 
 		@Override
 		public void run() {
@@ -246,15 +245,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		if (UIEvents.UIElement.VISIBLE.equals(attName)) {
 			boolean isVisible = (Boolean) event.getProperty(UIEvents.EventTags.NEW_VALUE);
-
-			Rectangle oldBounds = theShell.getBounds();
 			theShell.setVisible(isVisible);
-			// Workaround for bug 490944: Making a shell visible can change its
-			// size. This is a no-op if the bug isn't present.
-			Rectangle newBounds = theShell.getBounds();
-			if (!Objects.equals(oldBounds, newBounds)) {
-				theShell.setBounds(oldBounds);
-			}
 		}
 	}
 
@@ -417,7 +408,7 @@ public class WBWRenderer extends SWTPartRenderer {
 
 			@Override
 			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				List<MPart> parts = new ArrayList<>(dirtyParts);
+				List<MPart> parts = new ArrayList<MPart>(dirtyParts);
 				Shell shell = (Shell) context
 						.get(IServiceConstants.ACTIVE_SHELL);
 				Save[] response = new Save[dirtyParts.size()];
@@ -639,7 +630,7 @@ public class WBWRenderer extends SWTPartRenderer {
 		if (wbwModel instanceof MTrimmedWindow) {
 			Shell shell = (Shell) wbwModel.getWidget();
 			MTrimmedWindow tWindow = (MTrimmedWindow) wbwModel;
-			List<MTrimBar> trimBars = new ArrayList<>(
+			List<MTrimBar> trimBars = new ArrayList<MTrimBar>(
 					tWindow.getTrimBars());
 			for (MTrimBar trimBar : trimBars) {
 				renderer.createGui(trimBar, shell, wbwModel.getContext());
@@ -699,16 +690,8 @@ public class WBWRenderer extends SWTPartRenderer {
 
 		shell.layout(true);
 		forceLayout(shell);
-		Rectangle oldBounds = shell.getBounds();
 		if (shellME.isVisible()) {
 			shell.open();
-
-			// Workaround for bug 490944: Making a shell visible can change its
-			// size. This is a no-op if the bug isn't present.
-			Rectangle newBounds = shell.getBounds();
-			if (!Objects.equals(oldBounds, newBounds)) {
-				shell.setBounds(oldBounds);
-			}
 		} else {
 			shell.setVisible(false);
 		}
@@ -766,7 +749,8 @@ public class WBWRenderer extends SWTPartRenderer {
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			label.setText(SWTRenderersMessages.choosePartsToSave);
 
-			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.BORDER);
+			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
+					| SWT.BORDER);
 			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 			data.heightHint = 250;
 			data.widthHint = 300;
@@ -808,7 +792,7 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	protected static class ThemeDefinitionChangedHandler {
-		protected Set<Resource> unusedResources = new HashSet<>();
+		protected Set<Resource> unusedResources = new HashSet<Resource>();
 
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(IEventBroker.DATA);
@@ -817,7 +801,7 @@ public class WBWRenderer extends SWTPartRenderer {
 				return;
 			}
 
-			Set<CSSEngine> engines = new HashSet<>();
+			Set<CSSEngine> engines = new HashSet<CSSEngine>();
 
 			// In theory we can have multiple engines since API allows it.
 			// It doesn't hurt to be prepared for such case

@@ -745,33 +745,33 @@ public class GoalieStatsImpl extends EObjectImpl implements GoalieStats {
 				if (resolve) return getTeam();
 				return basicGetTeam();
 			case HockeyleaguePackage.GOALIE_STATS__GAMES_PLAYED_IN:
-				return Integer.valueOf(getGamesPlayedIn());
+				return new Integer(getGamesPlayedIn());
 			case HockeyleaguePackage.GOALIE_STATS__MINUTES_PLAYED_IN:
-				return Integer.valueOf(getMinutesPlayedIn());
+				return new Integer(getMinutesPlayedIn());
 			case HockeyleaguePackage.GOALIE_STATS__GOALS_AGAINST_AVERAGE:
 				return new Float(getGoalsAgainstAverage());
 			case HockeyleaguePackage.GOALIE_STATS__WINS:
-				return Integer.valueOf(getWins());
+				return new Integer(getWins());
 			case HockeyleaguePackage.GOALIE_STATS__LOSSES:
-				return Integer.valueOf(getLosses());
+				return new Integer(getLosses());
 			case HockeyleaguePackage.GOALIE_STATS__TIES:
-				return Integer.valueOf(getTies());
+				return new Integer(getTies());
 			case HockeyleaguePackage.GOALIE_STATS__EMPTY_NET_GOALS:
-				return Integer.valueOf(getEmptyNetGoals());
+				return new Integer(getEmptyNetGoals());
 			case HockeyleaguePackage.GOALIE_STATS__SHUTOUTS:
-				return Integer.valueOf(getShutouts());
+				return new Integer(getShutouts());
 			case HockeyleaguePackage.GOALIE_STATS__GOALS_AGAINST:
-				return Integer.valueOf(getGoalsAgainst());
+				return new Integer(getGoalsAgainst());
 			case HockeyleaguePackage.GOALIE_STATS__SAVES:
-				return Integer.valueOf(getSaves());
+				return new Integer(getSaves());
 			case HockeyleaguePackage.GOALIE_STATS__PENALTY_MINUTES:
-				return Integer.valueOf(getPenaltyMinutes());
+				return new Integer(getPenaltyMinutes());
 			case HockeyleaguePackage.GOALIE_STATS__GOALS:
-				return Integer.valueOf(getGoals());
+				return new Integer(getGoals());
 			case HockeyleaguePackage.GOALIE_STATS__ASSISTS:
-				return Integer.valueOf(getAssists());
+				return new Integer(getAssists());
 			case HockeyleaguePackage.GOALIE_STATS__POINTS:
-				return Integer.valueOf(getPoints());
+				return new Integer(getPoints());
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <sopotcela@gmail.com> - Bug 431868, 472761
+ *     Sopot Cela <sopotcela@gmail.com> - Bug 431868
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431868
- *     Mickael Istria (Red Hat Inc.) - Bug 477670 make toolbar popup menu extensible
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.List;
 import javax.inject.Inject;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -29,9 +27,6 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -78,7 +73,7 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		Composite parentComp = (Composite) parent;
 		MToolControl toolControl = (MToolControl) element;
 
-		if ((Object)(toolControl.getParent()) instanceof MToolBar) {
+		if (((Object) toolControl.getParent()) instanceof MToolBar) {
 			IRendererFactory factory = context.get(IRendererFactory.class);
 			AbstractPartRenderer renderer = factory.getRenderer(
 					toolControl.getParent(), parent);
@@ -130,7 +125,8 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			sep.setWidth(newCtrl.getSize().x);
 		}
 
-		bindWidget(toolControl, newCtrl);
+		setCSSInfo(toolControl, newCtrl);
+
 		boolean vertical = false;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
@@ -139,9 +135,7 @@ public class ToolControlRenderer extends SWTPartRenderer {
 					|| bar.getSide() == SideValue.RIGHT;
 		}
 		CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
-		MUIElement modelElement = (MUIElement) newCtrl.getData(AbstractPartRenderer.OWNING_ME);
-		boolean draggable = ((modelElement != null) && (modelElement.getTags().contains(IPresentationEngine.DRAGGABLE)));
-		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, draggable);
+		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, true);
 
 		boolean hideable = isHideable(toolControl);
 		boolean showRestoreMenu = isRestoreMenuShowable(toolControl);
@@ -220,7 +214,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			MenuItem hideItem = new MenuItem(toolControlMenu, SWT.NONE);
 			hideItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
 			hideItem.addListener(SWT.Selection, new Listener() {
-				@Override
 				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					toolControl.getTags().add(
 							IPresentationEngine.HIDDEN_EXPLICITLY);
@@ -234,28 +227,10 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		restoreHiddenItems
 				.setText(Messages.ToolBarManagerRenderer_MenuRestoreText);
 		restoreHiddenItems.addListener(SWT.Selection, new Listener() {
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				removeHiddenTags(toolControl);
 			}
 		});
-
-		// Support for this menu might be re-implemented to use
-		// MenuManagerRenderer
-		for (MMenuContribution menuModel : application.getMenuContributions()) {
-			String positionInParent = menuModel.getPositionInParent();
-			if (positionInParent.startsWith("popup:toolbar")) { //$NON-NLS-1$
-				for (MMenuElement itemModel : menuModel.getChildren()) {
-					if (itemModel instanceof MItem) {
-						final IEclipseContext lclContext = getContext(itemModel);
-						HandledContributionItem itemRenderer = ContextInjectionFactory
-								.make(HandledContributionItem.class, lclContext);
-						itemRenderer.setModel((MItem) itemModel);
-						itemRenderer.fill(toolControlMenu, 0);
-					}
-				}
-			}
-		}
 		renderedCtrl.setMenu(toolControlMenu);
 
 	}

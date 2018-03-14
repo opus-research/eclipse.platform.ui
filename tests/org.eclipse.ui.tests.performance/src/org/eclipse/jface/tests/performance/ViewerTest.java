@@ -71,7 +71,11 @@ public abstract class ViewerTest extends BasicPerformanceTest {
 
 	public ILabelProvider getLabelProvider() {
 		return new LabelProvider() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+			 */
 			public String getText(Object element) {
 				return ((TestElement) element).getText();
 			}
@@ -79,7 +83,9 @@ public abstract class ViewerTest extends BasicPerformanceTest {
 		};
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if(browserShell!= null){

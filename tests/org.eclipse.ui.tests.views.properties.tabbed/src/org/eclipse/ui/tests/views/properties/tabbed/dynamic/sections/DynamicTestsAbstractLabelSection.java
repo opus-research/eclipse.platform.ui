@@ -28,7 +28,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public abstract class DynamicTestsAbstractLabelSection extends
 		AbstractPropertySection {
 
-	@Override
 	public void createControls(Composite parent,
 			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 		super.createControls(parent, aTabbedPropertySheetPage);
@@ -60,7 +59,6 @@ public abstract class DynamicTestsAbstractLabelSection extends
 
 	public abstract String getLabel();
 
-	@Override
 	public boolean shouldUseExtraSpace() {
 		return true;
 	}
