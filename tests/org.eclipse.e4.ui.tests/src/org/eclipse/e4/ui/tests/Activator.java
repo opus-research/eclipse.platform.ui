@@ -12,6 +12,7 @@ package org.eclipse.e4.ui.tests;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.packageadmin.PackageAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -63,7 +64,17 @@ public class Activator extends Plugin {
 		return plugin;
 	}
 
-
+	public EventAdmin getEventAdmin() {
+		if (eventAdminTracker == null) {
+			BundleContext bundleContext = plugin.getBundle().getBundleContext();
+			if (bundleContext == null)
+				return null;
+			eventAdminTracker = new ServiceTracker(bundleContext,
+					EventAdmin.class.getName(), null);
+			eventAdminTracker.open();
+		}
+		return (EventAdmin) eventAdminTracker.getService();
+	}
 
 	public PackageAdmin getPackageAdmin() {
 		if (packageAdminTracker == null) {
