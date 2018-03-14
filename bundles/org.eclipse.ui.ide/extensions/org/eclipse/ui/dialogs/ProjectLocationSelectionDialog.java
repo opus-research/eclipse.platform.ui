@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,13 @@
  *     		[Workbench] Project copy doesn't validate location and uses invalid location as default
  *     Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
  *		    Bug 224997 [Workbench] Impossible to copy project
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -230,26 +233,25 @@ public class ProjectLocationSelectionDialog extends SelectionStatusDialog {
 			return projectName;
 		}
 
-		int counter = 1;
+		String newName = computeNewName(projectName);
 		while (true) {
-			String nameSegment;
-			if (counter > 1) {
-				nameSegment = NLS.bind(
-						IDEWorkbenchMessages.CopyProjectAction_copyNameTwoArgs,
-						new Integer(counter), projectName);
-			} else {
-				nameSegment = NLS.bind(
-						IDEWorkbenchMessages.CopyProjectAction_copyNameOneArg,
-						projectName);
+			if (!workspace.getRoot().getProject(newName).exists()) {
+				return newName;
 			}
-
-			if (!workspace.getRoot().getProject(nameSegment).exists()) {
-				return nameSegment;
-			}
-
-			counter++;
+			newName = computeNewName(newName);
 		}
+	}
 
+	private static String computeNewName(String str) {
+		String fileNameNoExtension = str;
+		Pattern p = Pattern.compile("[0-9]+$"); //$NON-NLS-1$
+		Matcher m = p.matcher(fileNameNoExtension);
+		if (m.find()) {
+			// String ends with a number: increment it by 1
+			int newNumber = Integer.parseInt(m.group()) + 1;
+			return m.replaceFirst(Integer.toString(newNumber));
+		}
+		return fileNameNoExtension + "2"; //$NON-NLS-1$
 	}
 
 	/**

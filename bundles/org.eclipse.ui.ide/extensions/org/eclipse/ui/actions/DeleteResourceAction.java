@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Benjamin Muskalla <b.muskalla@gmx.net> - Bug 172574
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -284,19 +285,20 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	 *         phantom resources
 	 */
 	private boolean canDelete(List<? extends IResource> resources) {
+		if (resources.isEmpty()) {
+			return false;
+		}
+
 		// allow only projects or only non-projects to be selected;
 		// note that the selection may contain multiple types of resource
 		if (!(containsOnlyProjects(resources) || containsOnlyNonProjects(resources))) {
 			return false;
 		}
 
-		if (resources.isEmpty()) {
-			return false;
-		}
-		// Return true if everything in the selection exists.
-		for (int i = 0; i < resources.size(); i++) {
-			IResource resource = resources.get(i);
-			if (resource.isPhantom()) {
+		// Return false if at least one element is not existing or workspace
+		// root
+		for (IResource resource : resources) {
+			if (resource.isPhantom() || resource.getType() == IResource.ROOT) {
 				return false;
 			}
 		}
@@ -397,14 +399,9 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		} else {
 			title = IDEWorkbenchMessages.DeleteResourceAction_titleN;
 			if (containsLinkedResource(resources)) {
-				msg = NLS
-						.bind(
-								IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN,
-						Integer.valueOf(resources.size()));
+				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN, resources.size());
 			} else {
-				msg = NLS.bind(
-						IDEWorkbenchMessages.DeleteResourceAction_confirmN,
-						new Integer(resources.size()));
+				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmN, resources.size());
 			}
 		}
 		return MessageDialog.openQuestion(shellProvider.getShell(), title, msg);
@@ -444,6 +441,9 @@ public class DeleteResourceAction extends SelectionListenerAction {
 	@Override
 	public void run() {
 		final List<? extends IResource> resources = getSelectedResources();
+		if (resources.isEmpty()) {
+			return;
+		}
 
 		if (!fTestingMode) {
 			if (LTKLauncher.openDeleteWizard(getStructuredSelection())) {

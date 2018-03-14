@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -108,7 +108,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IPath containerPath = container.getFullPath();
 
         for (int i = 0; i < elements.length; i++) {
-			IResource resource = Adapters.getAdapter(elements[i], IResource.class, true);
+			IResource resource = Adapters.adapt(elements[i], IResource.class);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
@@ -389,12 +389,12 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		    		continue;
 		    	}
 		    	item = (IAdaptable)items[i];
-				IContainer container = Adapters.getAdapter(item, IContainer.class, true);
+				IContainer container = Adapters.adapt(item, IContainer.class);
 
 		        if (container != null) {
 		            setSubtreeChecked(container, true, true);
 		        }
-				IResource resource = Adapters.getAdapter(item, IResource.class, true);
+				IResource resource = Adapters.adapt(item, IResource.class);
 		        if (resource != null && resource.isAccessible() == false) {
 		            IProject project = resource.getProject();
 		            if (tree.getChecked(project) == false) {

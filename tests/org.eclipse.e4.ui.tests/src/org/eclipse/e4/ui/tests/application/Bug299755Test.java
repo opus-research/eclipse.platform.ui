@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,17 +11,20 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.junit.Test;
 
-public class Bug299755Test extends TestCase {
+public class Bug299755Test {
 
 	static class InjectionObject {
 
@@ -60,10 +63,11 @@ public class Bug299755Test extends TestCase {
 		}
 	}
 
+	@Test
 	public void testBug299755() throws Exception {
 		// create a top-level context
 		IEclipseContext windowContext = EclipseContextFactory.create();
-		windowContext.set(Object.class.getName(), new Object());
+		windowContext.set(Object.class, new Object());
 		// put the event broker inside
 		windowContext.set(InjectionObject.class.getName(),
 				new ContextFunction() {

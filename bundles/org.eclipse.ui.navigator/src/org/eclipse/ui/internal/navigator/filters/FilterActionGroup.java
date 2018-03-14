@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,7 +96,7 @@ public class FilterActionGroup extends ActionGroup {
 				.getBooleanConfigProperty(INavigatorViewerDescriptor.PROP_HIDE_AVAILABLE_CUSTOMIZATIONS_DIALOG);
 		if (!hideAvailableCustomizationsDialog) {
 			selectFiltersAction = new SelectFiltersAction(commonViewer, this);
-			ImageDescriptor selectFiltersIcon = NavigatorPlugin.getImageDescriptor("icons/full/elcl16/filter_ps.gif"); //$NON-NLS-1$
+			ImageDescriptor selectFiltersIcon = NavigatorPlugin.getImageDescriptor("icons/full/elcl16/filter_ps.png"); //$NON-NLS-1$
 			selectFiltersAction.setImageDescriptor(selectFiltersIcon);
 			selectFiltersAction.setHoverImageDescriptor(selectFiltersIcon);
 		}

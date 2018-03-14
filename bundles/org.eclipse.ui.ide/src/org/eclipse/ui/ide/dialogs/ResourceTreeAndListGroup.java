@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
@@ -934,6 +935,8 @@ public class ResourceTreeAndListGroup extends EventManager {
     public void setListProviders(IStructuredContentProvider contentProvider, ILabelProvider labelProvider) {
         listViewer.setContentProvider(contentProvider);
         listViewer.setLabelProvider(labelProvider);
+        listContentProvider = contentProvider;
+        listLabelProvider = labelProvider;
     }
 
     /**
@@ -989,8 +992,27 @@ public class ResourceTreeAndListGroup extends EventManager {
      *	@param labelProvider ILabelProvider
      */
     public void setTreeProviders(ITreeContentProvider contentProvider, ILabelProvider labelProvider) {
+        List<?> items;
+        if (root == null) {
+            items = Collections.emptyList();
+        } else {
+            // remember checked elements
+            items = getAllWhiteCheckedItems();
+            // reset all caches
+            for (Object object : items) {
+                setTreeChecked(object, false);
+            }
+        }
+
         treeViewer.setContentProvider(contentProvider);
         treeViewer.setLabelProvider(labelProvider);
+        treeContentProvider = contentProvider;
+        treeLabelProvider = labelProvider;
+
+        // select (if any) previously checked elements again in the new model
+        for (Object object : items) {
+            setTreeChecked(object, true);
+        }
     }
 
     /**
@@ -1075,10 +1097,9 @@ public class ResourceTreeAndListGroup extends EventManager {
         checkedStateStore = new HashMap();
 
         //Update the store before the hierarchy to prevent updating parents before all of the children are done
-        Iterator keyIterator = items.keySet().iterator();
-        while (keyIterator.hasNext()) {
-            Object key = keyIterator.next();
-            List selections = (List) items.get(key);
+		for (Entry<Object, List> entry : ((Map<Object, List>) items).entrySet()) {
+			Object key = entry.getKey();
+			List selections = entry.getValue();
             //Replace the items in the checked state store with those from the supplied items
             checkedStateStore.put(key, selections);
             selectedNodes.add(key);
