@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
@@ -3147,7 +3148,8 @@ public class PartRenderingEngineTests {
 		assertTrue(window.getWindows().contains(detachedWindow));
 	}
 
-	private void testBug348069_DetachedPerspectiveWindow_01(
+	@Ignore
+	public void testBug348069_DetachedPerspectiveWindow_01(
 			boolean createPlaceholder) {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -3215,7 +3217,8 @@ public class PartRenderingEngineTests {
 		testBug348069_DetachedPerspectiveWindow_01(false);
 	}
 
-	private void testBug348069_DetachedPerspectiveWindow_02(
+	@Ignore
+	public void testBug348069_DetachedPerspectiveWindow_02(
 			boolean createPlaceholder) {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();

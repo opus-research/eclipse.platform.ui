@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -118,5 +119,12 @@ public class SWTPartRendererTest {
 				.get("setClassnameAndId");
 
 		assertNull(setClassnameAndIdParams);
+	}
+
+	@After
+	public void tearDown() {
+		if (context != null) {
+			context.dispose();
+		}
 	}
 }
