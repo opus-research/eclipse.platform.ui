@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - bug 201661
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 483425, 483429, 483435
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 483425, 483429
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -29,7 +29,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,13 +41,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.SimpleWorkingSetSelectionDialog;
 
 /**
@@ -104,7 +100,6 @@ public class WorkingSetConfigurationBlock {
 	private Combo workingSetCombo;
 	private Button selectButton;
 	private Button enableButton;
-	private Button newButton;
 
 	private IWorkingSet[] selectedWorkingSets;
 	private List<String> selectionHistory;
@@ -115,9 +110,7 @@ public class WorkingSetConfigurationBlock {
 
 	private final String comboLabel;
 
-	private final String enableButtonLabel;
-
-	private final String newButtonLabel;
+	private final String addButtonLabel;
 
 	/**
 	 * Create a new instance of this working set block using default labels.
@@ -129,60 +122,30 @@ public class WorkingSetConfigurationBlock {
 	 * @since 3.108
 	 */
 	public WorkingSetConfigurationBlock(IDialogSettings settings, String... workingSetIds) {
-		this(settings, null, null, null, null, workingSetIds);
+		this(workingSetIds, settings, null, null, null);
 	}
 
 	/**
 	 * Create a new instance of this working set block using default labels.
-	 * <br/>
-	 * <br/>
-	 * Note: Consider using the vararg version of this contructor.
 	 *
 	 * @param workingSetIds
 	 *            working set ids from which the user can choose
 	 * @param settings
 	 *            to store/load the selection history
 	 */
-	public WorkingSetConfigurationBlock(String[] workingSetIds, IDialogSettings settings) {
-		this(settings, workingSetIds);
+	public WorkingSetConfigurationBlock(String[] workingSetIds,
+			IDialogSettings settings) {
+		this(workingSetIds, settings, null, null, null);
 	}
-
-	/**
-	 * Create a new instance of this working set block using custom labels.
-	 * <br/>
-	 * <br/>
-	 * Note: Consider using the vararg version of this contructor.
-	 *
-	 * @param workingSetIds
-	 *            working set ids from which the user can choose
-	 * @param settings
-	 *            to store/load the selection history
-	 * @param enableButtonLabel
-	 *            the label to use for the checkable enablement button. May be
-	 *            <code>null</code> to use the default value.
-	 * @param comboLabel
-	 *            the label to use for the recent working set combo. May be
-	 *            <code>null</code> to use the default value.
-	 * @param selectLabel
-	 *            the label to use for the select button. May be
-	 *            <code>null</code> to use the default value.
-	 */
-	public WorkingSetConfigurationBlock(String[] workingSetIds, IDialogSettings settings, String enableButtonLabel, String comboLabel, String selectLabel) {
-		this(settings, enableButtonLabel, null, comboLabel, selectLabel, workingSetIds);
-	}
-
 
 	/**
 	 * Create a new instance of this working set block using custom labels.
 	 *
 	 * @param settings
 	 *            to store/load the selection history
-	 * @param enableButtonLabel
+	 * @param addButtonLabel
 	 *            the label to use for the checkable enablement button. May be
 	 *            <code>null</code> to use the default value.
-	 * @param newButtonLabel
-	 *            the label to use for the new button. May be <code>null</code>
-	 *            to use the default value.
 	 * @param comboLabel
 	 *            the label to use for the recent working set combo. May be
 	 *            <code>null</code> to use the default value.
@@ -193,8 +156,29 @@ public class WorkingSetConfigurationBlock {
 	 *            working set ids from which the user can choose
 	 * @since 3.108
 	 */
-	public WorkingSetConfigurationBlock(IDialogSettings settings, String enableButtonLabel, String newButtonLabel,
-			String comboLabel, String selectLabel, String... workingSetIds) {
+	public WorkingSetConfigurationBlock(IDialogSettings settings, String addButtonLabel, String comboLabel, String selectLabel, String... workingSetIds) {
+		this(workingSetIds, settings, addButtonLabel, comboLabel, selectLabel);
+	}
+
+	/**
+	 * Create a new instance of this working set block using custom labels.
+	 *
+	 * @param workingSetIds
+	 *            working set ids from which the user can choose
+	 * @param settings
+	 *            to store/load the selection history
+	 * @param addButtonLabel
+	 *            the label to use for the checkable enablement button. May be
+	 *            <code>null</code> to use the default value.
+	 * @param comboLabel
+	 *            the label to use for the recent working set combo. May be
+	 *            <code>null</code> to use the default value.
+	 * @param selectLabel
+	 *            the label to use for the select button. May be
+	 *            <code>null</code> to use the default value.
+	 */
+	public WorkingSetConfigurationBlock(String[] workingSetIds,
+			IDialogSettings settings, String addButtonLabel, String comboLabel, String selectLabel) {
 		Assert.isNotNull(workingSetIds);
 		Assert.isNotNull(settings);
 
@@ -204,15 +188,14 @@ public class WorkingSetConfigurationBlock {
 		dialogSettings = settings;
 		selectionHistory = loadSelectionHistory(settings, workingSetIds);
 
-		this.enableButtonLabel = enableButtonLabel == null ? WorkbenchMessages.WorkingSetGroup_EnableWorkingSet_button
-				: enableButtonLabel;
-		this.newButtonLabel = newButtonLabel == null
-				? WorkbenchMessages.WorkingSetConfigurationBlock_NewWorkingSet_button : newButtonLabel;
+		this.addButtonLabel = addButtonLabel == null ? WorkbenchMessages.WorkingSetGroup_EnableWorkingSet_button
+				: addButtonLabel;
 		this.comboLabel = comboLabel == null ? WorkbenchMessages.WorkingSetConfigurationBlock_WorkingSetText_name
 				: comboLabel;
 		this.selectLabel = selectLabel == null ? WorkbenchMessages.WorkingSetConfigurationBlock_SelectWorkingSet_button
 				: selectLabel;
 	}
+
 
 	/**
 	 * Set the current selection in the workbench.
@@ -317,27 +300,19 @@ public class WorkingSetConfigurationBlock {
 	 * @param parent the parent to add the block to
 	 */
 	public void createContent(final Composite parent) {
+		int numColumn = 3;
+
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-		composite.setLayout(new GridLayout(3, false));
+		composite.setLayout(new GridLayout(numColumn, false));
 
 		enableButton = new Button(composite, SWT.CHECK);
 		enableButton
-				.setText(enableButtonLabel);
+				.setText(addButtonLabel);
 		GridData enableData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		enableData.horizontalSpan = 2;
+		enableData.horizontalSpan = numColumn;
 		enableButton.setLayoutData(enableData);
 		enableButton.setSelection(selectedWorkingSets.length > 0);
-
-		newButton = new Button(composite, SWT.PUSH);
-		newButton.setText(this.newButtonLabel);
-		setButtonLayoutData(newButton);
-		newButton.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				createNewWorkingSet(newButton.getShell());
-			}
-		});
 
 		workingSetLabel = new Label(composite, SWT.NONE);
 		workingSetLabel
@@ -345,6 +320,7 @@ public class WorkingSetConfigurationBlock {
 
 		workingSetCombo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER);
 		GridData textData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textData.horizontalSpan = numColumn - 2;
 		textData.horizontalIndent = 0;
 		workingSetCombo.setLayoutData(textData);
 
@@ -396,29 +372,6 @@ public class WorkingSetConfigurationBlock {
 			workingSetCombo.select(historyIndex(selectionHistory.get(0)));
 			updateSelectedWorkingSets();
 		} else {
-			updateWorkingSetSelection();
-		}
-	}
-
-	private void createNewWorkingSet(Shell shell) {
-		IWorkingSetManager manager = WorkbenchPlugin.getDefault().getWorkingSetManager();
-		IWorkingSetNewWizard wizard = manager.createWorkingSetNewWizard(workingSetTypeIds);
-		// the wizard can never be null since we have at least a resource
-		// working set creation page
-		WizardDialog dialog = new WizardDialog(shell, wizard);
-		dialog.create();
-
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(dialog.getShell(),
-				IWorkbenchHelpContextIds.WORKING_SET_NEW_WIZARD);
-		if (dialog.open() == Window.OK) {
-			IWorkingSet workingSet = wizard.getSelection();
-			if (workingSet != null) {
-				manager.addWorkingSet(workingSet);
-				selectedWorkingSets = new IWorkingSet[] { workingSet };
-				PlatformUI.getWorkbench().getWorkingSetManager().addRecentWorkingSet(workingSet);
-			}
-			enableButton.setSelection(true);
-			updateEnableState(true);
 			updateWorkingSetSelection();
 		}
 	}
