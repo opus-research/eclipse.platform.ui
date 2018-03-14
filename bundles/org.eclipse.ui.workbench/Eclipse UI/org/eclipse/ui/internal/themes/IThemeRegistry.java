@@ -42,6 +42,9 @@ public interface IThemeRegistry {
             this.definitions = definitions;
         }
 
+        /* (non-Javadoc)
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
         @Override
 		public int compare(Object arg0, Object arg1) {
             String def0 = arg0 == null ? null
@@ -90,6 +93,9 @@ public interface IThemeRegistry {
      */
     public static final Comparator ID_COMPARATOR = new Comparator() {
 
+        /* (non-Javadoc)
+         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+         */
         @Override
 		public int compare(Object arg0, Object arg1) {
             String str0 = getCompareString(arg0);

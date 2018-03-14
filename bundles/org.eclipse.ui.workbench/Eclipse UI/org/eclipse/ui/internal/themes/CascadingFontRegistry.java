@@ -54,6 +54,9 @@ public class CascadingFontRegistry extends FontRegistry {
         parent.addListener(listener);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontRegistry#get(java.lang.String)
+     */
     @Override
 	public Font get(String symbolicName) {
         if (super.hasValueFor(symbolicName)) {
@@ -62,6 +65,9 @@ public class CascadingFontRegistry extends FontRegistry {
         return parent.get(symbolicName);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontRegistry#getKeySet()
+     */
     @Override
 	public Set getKeySet() {
         Set keyUnion = new HashSet(super.getKeySet());
@@ -77,6 +83,9 @@ public class CascadingFontRegistry extends FontRegistry {
         return parent.getFontData(symbolicName);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ColorRegistry#hasValueFor(java.lang.String)
+     */
     @Override
 	public boolean hasValueFor(String colorKey) {
         return super.hasValueFor(colorKey) || parent.hasValueFor(colorKey);

@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
- *     Alexander Baranov <achilles-86@mail.ru> - Bug 458460
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -862,8 +860,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
-				// Bug 458460: Operate on a copy in case child nulls out parent
-				for (MUIElement child : new ArrayList<MUIElement>(children)) {
+				for (MUIElement child : children) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
