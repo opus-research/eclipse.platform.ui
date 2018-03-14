@@ -76,9 +76,11 @@ public class FilterHandler {
 	 */
 	public boolean shouldLogEvent(StackSample[] stackSamples, int numSamples,
 			long displayThreadId) {
-		for (int i = 0; i < numSamples; i++) {
-			if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
-				return false;
+		if (filters.length > 0) {
+			for (int i = 0; i < numSamples; i++) {
+				if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
+					return false;
+				}
 			}
 		}
 		return true;

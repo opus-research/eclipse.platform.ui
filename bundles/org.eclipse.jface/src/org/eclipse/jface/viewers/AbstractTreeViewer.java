@@ -1442,9 +1442,7 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 
 	/*
 	 * Overridden in AbstractTreeViewer to fix bug 108102 (code copied from
-	 * StructuredViewer to avoid introducing new API) (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.viewers.StructuredViewer#handleDoubleSelect(org.eclipse.swt.events.SelectionEvent)
+	 * StructuredViewer to avoid introducing new API)
 	 */
 	@Override
 	protected void handleDoubleSelect(SelectionEvent event) {
@@ -2947,12 +2945,12 @@ public abstract class AbstractTreeViewer extends ColumnViewer {
 	 * The <code>AbstractTreeViewer</code> implementation of this method returns
 	 * the result as an <code>ITreeSelection</code>.
 	 * <p>
+	 * Call {@link #getStructuredSelection()} instead to get an instance of
+	 * <code>ITreeSelection</code> directly.
+	 * </p>
 	 * Subclasses do not typically override this method, but implement
 	 * <code>getSelectionFromWidget(List)</code> instead. If they override this
 	 * method, they should return an <code>ITreeSelection</code> as well.
-	 * </p>
-	 * Call {@link #getStructuredSelection()} instead to get an instance of
-	 * <code>ITreeSelection</code> directly.
 	 *
 	 * @since 3.2
 	 */

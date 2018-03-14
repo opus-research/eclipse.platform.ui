@@ -4,10 +4,10 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150, 442285
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -164,7 +165,6 @@ public class StackRenderer extends LazyStackRenderer {
 	 * container. The tab folder may need to layout itself again if a part's
 	 * toolbar has been changed.
 	 */
-	private EventHandler childrenHandler;
 	private EventHandler tabStateHandler;
 
 	// Manages CSS styling based on active part changes
@@ -233,11 +233,6 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 	}
 
-	// private ToolBar menuTB;
-	// private boolean menuButtonShowing = false;
-
-	// private Control partTB;
-
 	/**
 	 * Handles changes in tags
 	 * 
@@ -269,6 +264,36 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 		}
 	}
+
+	@Inject
+	@Optional
+	private void subscribeTopicChildrenChanged(
+			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+
+		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
+		// only interested in changes to toolbars
+		if (!(changedObj instanceof MToolBar)) {
+			return;
+		}
+
+		MUIElement container = modelService
+				.getContainer((MUIElement) changedObj);
+		// check if this is a part's toolbar
+		if (container instanceof MPart) {
+			MElementContainer<?> parent = ((MPart) container).getParent();
+			// only relayout if this part is the selected element and we
+			// actually rendered this element
+			if (parent instanceof MPartStack
+					&& parent.getSelectedElement() == container
+					&& parent.getRenderer() == StackRenderer.this) {
+				Object widget = parent.getWidget();
+				if (widget instanceof CTabFolder) {
+					adjustTopRight((CTabFolder) widget);
+				}
+			}
+		}
+	}
+
 
 	@Override
 	protected boolean requiresFocus(MPart element) {
@@ -435,37 +460,6 @@ public class StackRenderer extends LazyStackRenderer {
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
 				viewMenuUpdater);
 
-		childrenHandler = new EventHandler() {
-			@Override
-			public void handleEvent(Event event) {
-				Object changedObj = event
-						.getProperty(UIEvents.EventTags.ELEMENT);
-				// only interested in changes to toolbars
-				if (!(changedObj instanceof MToolBar)) {
-					return;
-				}
-
-				MUIElement container = modelService
-						.getContainer((MUIElement) changedObj);
-				// check if this is a part's toolbar
-				if (container instanceof MPart) {
-					MElementContainer<?> parent = ((MPart) container)
-							.getParent();
-					// only relayout if this part is the selected element and we
-					// actually rendered this element
-					if (parent instanceof MPartStack
-							&& parent.getSelectedElement() == container
-							&& parent.getRenderer() == StackRenderer.this) {
-						Object widget = parent.getWidget();
-						if (widget instanceof CTabFolder) {
-							adjustTopRight((CTabFolder) widget);
-						}
-					}
-				}
-			}
-		};
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
-				childrenHandler);
 
 		stylingHandler = new EventHandler() {
 			@Override
@@ -556,7 +550,6 @@ public class StackRenderer extends LazyStackRenderer {
 		eventBroker.unsubscribe(itemUpdater);
 		eventBroker.unsubscribe(dirtyUpdater);
 		eventBroker.unsubscribe(viewMenuUpdater);
-		eventBroker.unsubscribe(childrenHandler);
 		eventBroker.unsubscribe(stylingHandler);
 		eventBroker.unsubscribe(tabStateHandler);
 	}
@@ -1627,8 +1620,13 @@ public class StackRenderer extends LazyStackRenderer {
 				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 			}
 
+			String prevCssCls = WidgetElement.getCSSClass(cti);
 			setCSSInfo(part, cti);
-			reapplyStyles(cti.getParent());
+
+			if (prevCssCls == null
+					|| !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
+				reapplyStyles(cti.getParent());
+			}
 		}
 
 		public boolean validateElement(Object element) {

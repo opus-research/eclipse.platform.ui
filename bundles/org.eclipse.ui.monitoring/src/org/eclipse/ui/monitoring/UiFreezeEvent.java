@@ -14,31 +14,42 @@ package org.eclipse.ui.monitoring;
 /**
  * Responsible for holding the stack traces for a UI event.
  *
+ * @noextend This class is not intended to be subclassed by clients.
  * @since 1.0
  */
 public class UiFreezeEvent {
 	private final long startTimestamp;
 	private final long totalDuration;
 	private final StackSample[] stackTraceSamples;
-	private final boolean isRunning;
+	private final boolean isStillRunning;
 
-	public UiFreezeEvent(long startTime, long totalTime, StackSample[] samples,
+	/**
+	 * Creates a UiFreezeEvent.
+	 *
+	 * @param startTime initial dispatch time for the event in milliseconds since January 1,
+	 *     1970 UTC
+	 * @param duration duration of the event in milliseconds
+	 * @param samples array of {@link StackSample}s containing thread information
+	 * @param stillRunning whether or not the event was still running when this UiFreezeEvent
+	 *     was created. If {@code true}, this UiFreezeEvent may indicate a deadlock.
+	 */
+	public UiFreezeEvent(long startTime, long duration, StackSample[] samples,
 			boolean stillRunning) {
 		this.startTimestamp = startTime;
 		this.stackTraceSamples = samples;
-		this.totalDuration = totalTime;
-		this.isRunning = stillRunning;
+		this.totalDuration = duration;
+		this.isStillRunning = stillRunning;
 	}
 
 	/**
-	 * Returns the time when the UI thread froze.
+	 * Returns the time when the UI thread froze, in milliseconds since January 1, 1970 UTC.
 	 */
 	public long getStartTimestamp() {
 		return startTimestamp;
 	}
 
 	/**
-	 * Returns the total amount of time the UI thread remained frozen.
+	 * Returns the total amount of time in milliseconds that the UI thread remained frozen.
 	 */
 	public long getTotalDuration() {
 		return totalDuration;
@@ -52,27 +63,28 @@ public class UiFreezeEvent {
 	}
 
 	/**
-	 * Returns {@code true} if this event is still running.
+	 * Returns {@code true} if this event was still running at the time the event was logged,
+	 * which can happen for deadlocks.
 	 */
 	public boolean isStillRunning() {
-		return isRunning;
+		return isStillRunning;
 	}
 
 	/** For debugging only. */
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		buf.append("Freeze started at ");
+		buf.append("Freeze started at "); //$NON-NLS-1$
 		buf.append(startTimestamp);
-		if (isRunning) {
-			buf.append(" still ongoing after ");
+		if (isStillRunning) {
+			buf.append(" still ongoing after "); //$NON-NLS-1$
 		} else {
-			buf.append(" lasted ");
+			buf.append(" lasted "); //$NON-NLS-1$
 		}
 		buf.append(totalDuration);
-		buf.append("ms");
+		buf.append("ms"); //$NON-NLS-1$
 		if (stackTraceSamples.length != 0) {
-			buf.append("\nStack trace samples:");
+			buf.append("\nStack trace samples:"); //$NON-NLS-1$
 			for (StackSample stackTraceSample : stackTraceSamples) {
 				buf.append('\n');
 				buf.append(stackTraceSample.toString());
