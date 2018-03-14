@@ -52,8 +52,7 @@ public class EarlyStartupRunnable extends SafeRunnable {
         this.extension = extension;
     }
 
-    @Override
-	public void run() throws Exception {
+    public void run() throws Exception {
         IConfigurationElement[] configElements = extension
                 .getConfigurationElements();
 
@@ -75,8 +74,7 @@ public class EarlyStartupRunnable extends SafeRunnable {
 		}
     }
 
-    @Override
-	public void handleException(Throwable exception) {
+    public void handleException(Throwable exception) {
         IStatus status = new Status(IStatus.ERROR, extension.getNamespace(), 0,
                 "Unable to execute early startup code for an extension", //$NON-NLS-1$
                 exception);

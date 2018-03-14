@@ -12,7 +12,6 @@
 package org.eclipse.e4.ui.css.swt.engine;
 
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.e4.ui.css.core.impl.engine.RegistryCSSElementProvider;
 import org.eclipse.e4.ui.css.core.impl.engine.RegistryCSSPropertyHandlerProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -41,7 +40,6 @@ public class CSSSWTEngineImpl extends AbstractCSSSWTEngineImpl {
 
 	private void init() {
 		disposeListener = new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				handleWidgetDisposed(e.widget);
 			}
@@ -62,13 +60,6 @@ public class CSSSWTEngineImpl extends AbstractCSSSWTEngineImpl {
 				RegistryFactory.getRegistry()));
 	}
 
-	@Override
-	protected void initializeCSSElementProvider() {
-		setElementProvider(new RegistryCSSElementProvider(
-				RegistryFactory.getRegistry()));
-	}
-
-	@Override
 	public void reapply() {
 		Shell[] shells = display.getShells();
 		for (Shell s : shells) {

@@ -38,7 +38,6 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 	@Inject
 	IPresentationEngine renderingEngine;
 
-	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
 		MPlaceholder ph = (MPlaceholder) element;
 		final MUIElement ref = ph.getRef();

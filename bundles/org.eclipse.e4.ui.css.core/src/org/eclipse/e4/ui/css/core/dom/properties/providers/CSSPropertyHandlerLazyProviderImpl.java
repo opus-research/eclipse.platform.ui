@@ -41,7 +41,6 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	 * Return the list of PropertiesHandler corresponding to the property name
 	 * given as argument
 	 */
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 
@@ -150,7 +149,6 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 	 *      org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
      *      org.w3c.dom.css.CSSStyleDeclaration)
 	 */
-	@Override
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
@@ -195,13 +193,11 @@ public class CSSPropertyHandlerLazyProviderImpl extends
 		return stylableElement.getDefaultStyleDeclaration(pseudoE);
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		return getCSSPropertyHandlers(property);
 	}
 
-	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		Map<String, List<ICSSPropertyHandler>> propertyHandlers = getPropertyToHandlersMap();
 		// FIXME: could walk the package names, look for the classes matching
