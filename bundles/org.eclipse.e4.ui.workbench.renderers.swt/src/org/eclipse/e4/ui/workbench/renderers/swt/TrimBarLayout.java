@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Walther (Indel AG) - Bug 399458: Fix layout overlap in line-wrapped trim bar
  *     Christian Walther (Indel AG) - Bug 389012: Fix division by zero in TrimBarLayout
+ *     Marc-Andre Laperle (Ericsson) - Bug 466233: Toolbar items are wrongly rendered into a "drop-down"
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -31,8 +33,8 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class TrimBarLayout extends Layout {
 	class TrimLine {
-		Map<Control, Point> sizeMap = new HashMap<Control, Point>();
-		List<Control> ctrls = new ArrayList<Control>();
+		Map<Control, Point> sizeMap = new HashMap<>();
+		List<Control> ctrls = new ArrayList<>();
 		int spacerCount = 0;
 		int extraSpace = 0;
 		int major = 0;
@@ -66,7 +68,7 @@ public class TrimBarLayout extends Layout {
 		}
 	}
 
-	private List<TrimLine> lines = new ArrayList<TrimLine>();
+	private List<TrimLine> lines = new ArrayList<>();
 
 	public static String SPACER = "stretch"; //$NON-NLS-1$
 	public static String GLUE = "glue"; //$NON-NLS-1$
@@ -86,8 +88,10 @@ public class TrimBarLayout extends Layout {
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
-		// Clear the current cache
-		lines.clear();
+		if (flushCache) {
+			// Clear the current cache
+			lines.clear();
+		}
 
 		// First, hide any empty toolbars
 		MTrimBar bar = (MTrimBar) composite
@@ -195,6 +199,10 @@ public class TrimBarLayout extends Layout {
 
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
+		if (flushCache) {
+			// Clear the current cache
+			lines.clear();
+		}
 		Rectangle bounds = composite.getBounds();
 
 		// offset the rectangle to allow for the margins
