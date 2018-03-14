@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -232,7 +232,7 @@ class TasksFilter extends ViewerFilter implements Cloneable {
         if (workingSetElement.equals(element)) {
 			return true;
 		}
-		IResource workingSetResource = Adapters.adapt(workingSetElement, IResource.class);
+		IResource workingSetResource = Adapters.getAdapter(workingSetElement, IResource.class, true);
         if (workingSetResource != null) {
             IPath resourcePath = workingSetResource.getFullPath();
             if (resourcePath.isPrefixOf(elementPath)) {

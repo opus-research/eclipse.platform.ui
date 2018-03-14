@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,9 +54,8 @@ public interface INavigatorViewerDescriptor {
 	String PROP_HIDE_LINK_WITH_EDITOR_ACTION = "org.eclipse.ui.navigator.hideLinkWithEditorAction"; //$NON-NLS-1$
 
 	/**
-	 * {@value} (string): The help context id to be used for the "Filters and
-	 * Customization" view dialog, if not specified help will not be available.
-	 *
+	 * {@value} (string): The help context id to be used for the customize view dialog, if not specified
+	 * help will not be available.
 	 * @since 3.5
 	 */
 	String PROP_CUSTOMIZE_VIEW_DIALOG_HELP_CONTEXT = "org.eclipse.ui.navigator.customizeViewDialogHelpContext"; //$NON-NLS-1$

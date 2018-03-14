@@ -131,14 +131,14 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 
 	static ResourceMapping getResourceMapping(Object o) {
 		// First, ask the object directly for a resource mapping
-		ResourceMapping mapping = Adapters.adapt(o, ResourceMapping.class);
+		ResourceMapping mapping = Adapters.getAdapter(o, ResourceMapping.class, true);
 		if (mapping != null) {
 			return mapping;
 		}
 		// If this fails, ask for a resource and convert to a resource mapping
-		IResource resource = Adapters.adapt(o, IResource.class);
+		IResource resource = Adapters.getAdapter(o, IResource.class, true);
 		if (resource != null) {
-			mapping = Adapters.adapt(resource, ResourceMapping.class);
+			mapping = Adapters.getAdapter(resource, ResourceMapping.class, true);
 			if (mapping != null) {
 				return mapping;
 			}
@@ -147,7 +147,8 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 	}
 
 	static ResourceMapping getContributedResourceMapping(IAdaptable element) {
-		IContributorResourceAdapter resourceAdapter = Adapters.adapt(element, IContributorResourceAdapter.class);
+		IContributorResourceAdapter resourceAdapter = Adapters.getAdapter(element, IContributorResourceAdapter.class,
+				true);
 		if (resourceAdapter != null) {
 			if (resourceAdapter instanceof IContributorResourceAdapter2) {
 				// First, use the mapping contributor adapter to get the mapping
@@ -161,7 +162,7 @@ public class WorkingSetAdapterFactory implements IAdapterFactory {
 			// the mapping for that resource
 			IResource resource = resourceAdapter.getAdaptedResource(element);
 			if (resource != null) {
-				ResourceMapping mapping = Adapters.adapt(resource, ResourceMapping.class);
+				ResourceMapping mapping = Adapters.getAdapter(resource, ResourceMapping.class, true);
 				if (mapping != null) {
 					return mapping;
 				}

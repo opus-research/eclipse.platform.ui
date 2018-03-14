@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -418,10 +416,10 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			// has the side effect of recomputing saveablesProviderMap:
 			getSaveablesProviders();
 		}
-		for (Entry<NavigatorContentDescriptor, SaveablesProvider> entry : saveablesProviderMap.entrySet()) {
-			NavigatorContentDescriptor descriptor = entry.getKey();
+        for(Iterator<NavigatorContentDescriptor> sItr = saveablesProviderMap.keySet().iterator(); sItr.hasNext();) {
+        	NavigatorContentDescriptor descriptor = sItr.next();
                 if(descriptor.isTriggerPoint(element) || descriptor.isPossibleChild(element)) {
-				SaveablesProvider provider = entry.getValue();
+                	SaveablesProvider provider = saveablesProviderMap.get(descriptor);
                 	Saveable  saveable = provider.getSaveable(element);
                         if(saveable != null) {
                                 return saveable;
@@ -452,7 +450,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			List<SaveablesProvider> result = new ArrayList<SaveablesProvider>();
 			for (int i = 0; i < descriptors.length; i++) {
 				NavigatorContentDescriptor descriptor = (NavigatorContentDescriptor) descriptors[i];
-				String pluginId = descriptor
+				String pluginId = ((NavigatorContentDescriptor) descriptor)
 						.getContribution().getPluginId();
 				if (Platform.getBundle(pluginId).getState() != Bundle.ACTIVE) {
 					List<NavigatorContentDescriptor> inactiveDescriptors = inactivePluginsWithSaveablesProviders
@@ -490,7 +488,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		ITreeContentProvider contentProvider = extension
 				.getContentProvider();
 
-		return Adapters.adapt(contentProvider, SaveablesProvider.class);
+        return (SaveablesProvider)AdaptabilityUtility.getAdapter(contentProvider, SaveablesProvider.class);
 	}
 
 	private void recomputeSaveablesAndNotify(boolean recomputeProviders,

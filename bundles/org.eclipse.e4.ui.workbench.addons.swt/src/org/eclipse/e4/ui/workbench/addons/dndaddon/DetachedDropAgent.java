@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,10 +57,8 @@ public class DetachedDropAgent extends DropAgent {
 		if (dragElement.getCurSharedRef() != null)
 			dragElement = dragElement.getCurSharedRef();
 
-		Rectangle rectangle = getRectangle(dragElement, info);
-
-		modelService.detach((MPartSashContainerElement) dragElement, rectangle.x, rectangle.y, rectangle.width,
-				rectangle.height);
+		modelService.detach((MPartSashContainerElement) dragElement, curRect.x, curRect.y,
+				curRect.width, curRect.height);
 
 		// Fully re-activate the part since its location has changed
 		reactivatePart(dragElement);

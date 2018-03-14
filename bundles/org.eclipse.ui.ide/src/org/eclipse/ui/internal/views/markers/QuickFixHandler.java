@@ -105,7 +105,8 @@ public class QuickFixHandler extends MarkerViewHandler {
 			monitor.done();
 		};
 
-		IWorkbenchSiteProgressService service = Adapters.adapt(view.getSite(), IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = Adapters.getAdapter(view.getSite(), IWorkbenchSiteProgressService.class,
+				true);
 
 		IRunnableContext context = new ProgressMonitorDialog(view.getSite().getShell());
 

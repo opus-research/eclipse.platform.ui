@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom.html;
 
-import java.util.function.Supplier;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
@@ -43,11 +42,10 @@ public class SWTHTMLElement extends WidgetElement {
 	}
 
 	@Override
-	protected Supplier<String> internalGetAttribute(String attr) {
-		if ("type".equals(attr)) {
-			return () -> attributeType != null ? attributeType : "";
-		}
-		return super.internalGetAttribute(attr);
+	public String getAttribute(String attr) {
+		if ("type".equals(attr))
+			return attributeType;
+		return super.getAttribute(attr);
 	}
 
 	@Override

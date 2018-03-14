@@ -64,12 +64,12 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 	public void testGetValue() throws Exception {
 		int value = 100;
 		scale.setSelection(value);
-		assertEquals(Integer.valueOf(value), observable.getValue());
+		assertEquals(new Integer(value), observable.getValue());
 	}
 
 	public void testSetValue() throws Exception {
 		int value = 100;
-		observable.setValue(Integer.valueOf(value));
+		observable.setValue(new Integer(value));
 		assertEquals(value, scale.getSelection());
 	}
 
@@ -124,7 +124,7 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 		}
 
 		private Integer createIntegerValue(IObservableValue observable) {
-			return Integer.valueOf(((Integer) observable.getValue()).intValue() + 1);
+			return new Integer(((Integer) observable.getValue()).intValue() + 1);
 		}
 	}
 }

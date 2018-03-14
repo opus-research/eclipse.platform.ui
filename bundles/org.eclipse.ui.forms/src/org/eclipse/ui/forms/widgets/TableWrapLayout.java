@@ -555,7 +555,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 			if (col.intValue() == affectedColumn)
 				return;
 		}
-		growingColumns.add(Integer.valueOf(affectedColumn));
+		growingColumns.add(new Integer(affectedColumn));
 	}
 
 	private void updateGrowingRows(Vector<Integer> growingRows, TableWrapData spec,
@@ -566,7 +566,7 @@ public final class TableWrapLayout extends Layout implements ILayoutExtension {
 			if (irow.intValue() == affectedRow)
 				return;
 		}
-		growingRows.add(Integer.valueOf(affectedRow));
+		growingRows.add(new Integer(affectedRow));
 	}
 
 	private TableWrapData[] createEmptyRow() {
