@@ -63,6 +63,10 @@ public class WorkbenchNavigatorMessages extends NLS {
 	
 	public static String ProjectExplorerPart_workspace;
 	public static String ProjectExplorerPart_workingSetModel;
+
+	public static String ShowProjectHere;
+	public static String OpenProjectHere;
+	public static String ShowAsFolder;
 	
 	
 	static {
