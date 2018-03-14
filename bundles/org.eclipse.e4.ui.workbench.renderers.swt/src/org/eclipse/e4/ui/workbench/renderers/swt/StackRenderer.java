@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 400771
@@ -765,7 +765,7 @@ public class StackRenderer extends LazyStackRenderer {
 			}
 
 			ToolBar newViewTB = null;
-			if (needsTB) {
+			if (needsTB && part != null && part.getObject() != null) {
 				part.getToolbar().setVisible(true);
 				newViewTB = (ToolBar) renderer.createGui(part.getToolbar(),
 						ctf.getTopRight(), part.getContext());
@@ -1331,14 +1331,14 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	private boolean isClosable(MPart part) {
-		// if it's a shared part check its current ref
+		// if it's a shared part check if the NO_CLOSE tag is set
 		if (part.getCurSharedRef() != null) {
 			if (part.getCurSharedRef().getTags()
-					.contains(IPresentationEngine.NO_CLOSE)) {
+					.contains(IPresentationEngine.NO_CLOSE)
+					|| part.getTags().contains(IPresentationEngine.NO_CLOSE)) {
 				return false;
 			}
-			// tag not present, return status from the shared element
-			return part.isCloseable();
+			return part.getCurSharedRef().isCloseable();
 		}
 
 		return part.isCloseable();
