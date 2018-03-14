@@ -46,9 +46,8 @@ public class MockEditorActionBarContributor extends EditorActionBarContributor {
         actions = new MockAction[ACTION_COUNT];
         for (int nX = 0; nX < ACTION_COUNT; nX++) {
             actions[nX] = new MockAction(Integer.toString(nX));
-            if (nX % 2 > 0) {
-				actions[nX].setEnabled(false);
-			}
+            if (nX % 2 > 0)
+                actions[nX].setEnabled(false);
         }
         super.init(bars);
     }
@@ -58,8 +57,8 @@ public class MockEditorActionBarContributor extends EditorActionBarContributor {
      */
     @Override
 	public void contributeToToolBar(IToolBarManager toolBarManager) {
-        for (MockAction action : actions) {
-            toolBarManager.add(action);
+        for (int i = 0; i < actions.length; ++i) {
+            toolBarManager.add(actions[i]);
         }
     }
 

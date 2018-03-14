@@ -7,40 +7,45 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343, 442747
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
-import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.ITableFontProvider;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 
 /**
- * Demonstrates how to use keyboard-editing support in a TableViewer
+ * Demonstrates how to use keyboard-editing support in a TableViewer with no column
  *
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  *
  */
-public class Snippet044TableViewerKeyboardEditing {
+public class Snippet044NoColumnTableViewerKeyboardEditing {
 
-	private class MyModel {
+	public static boolean flag = true;
+
+	public class MyModel {
 		public int counter;
 
 		public MyModel(int counter) {
@@ -53,62 +58,63 @@ public class Snippet044TableViewerKeyboardEditing {
 		}
 	}
 
-	private class MyColumnLabelProvider extends ColumnLabelProvider {
+	public class MyLabelProvider extends LabelProvider implements
+			ITableLabelProvider, ITableFontProvider, ITableColorProvider {
+		FontRegistry registry = new FontRegistry();
 
-		private int columnIndex;
-		private Table table;
-
-		public MyColumnLabelProvider(Table table, int columnIndex) {
-			this.table = table;
-			this.columnIndex = columnIndex;
+		@Override
+		public Image getColumnImage(Object element, int columnIndex) {
+			return null;
 		}
 
 		@Override
-		public String getText(Object element) {
-			return "Column " + table.getColumnOrder()[columnIndex] + " => " + element.toString();
-		}
-	}
-
-	private class MyEditingSupport extends EditingSupport {
-
-		private String property;
-
-		public MyEditingSupport(ColumnViewer viewer, String property) {
-			super(viewer);
-			this.property = property;
+		public String getColumnText(Object element, int columnIndex) {
+			return "Column " + columnIndex + " => " + element.toString();
 		}
 
 		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return new TextCellEditor((Composite) getViewer().getControl());
+		public Font getFont(Object element, int columnIndex) {
+			return null;
 		}
 
 		@Override
-		protected boolean canEdit(Object element) {
-			return true;
+		public Color getBackground(Object element, int columnIndex) {
+			return null;
 		}
 
 		@Override
-		protected Object getValue(Object element) {
-			return "Column " + property + " => " + element.toString();
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-
+		public Color getForeground(Object element, int columnIndex) {
+			return null;
 		}
 
 	}
 
-	public Snippet044TableViewerKeyboardEditing(Shell shell) {
+	public Snippet044NoColumnTableViewerKeyboardEditing(Shell shell) {
 		final TableViewer v = new TableViewer(shell, SWT.BORDER|SWT.FULL_SELECTION);
+		v.setLabelProvider(new MyLabelProvider());
 		v.setContentProvider(ArrayContentProvider.getInstance());
 
-		TableViewerColumn viewerColumn = new TableViewerColumn(v, SWT.NONE);
-		viewerColumn.getColumn().setWidth(200);
+		v.setCellEditors(new CellEditor[] { new TextCellEditor(v.getTable()) });
+		v.setCellModifier(new ICellModifier() {
 
-		viewerColumn.setLabelProvider(new MyColumnLabelProvider(v.getTable(), 0));
-		viewerColumn.setEditingSupport(new MyEditingSupport(v, "1"));
+			@Override
+			public boolean canModify(Object element, String property) {
+				return true;
+			}
+
+			@Override
+			public Object getValue(Object element, String property) {
+				return "Column " + property + " => " + element.toString();
+			}
+
+			@Override
+			public void modify(Object element, String property, Object value) {
+
+			}
+
+		});
+
+		v.setColumnProperties(new String[] {"1"});
 
 		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(v,new FocusBorderCellHighlighter(v));
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(v) {
@@ -151,7 +157,7 @@ public class Snippet044TableViewerKeyboardEditing {
 
 		Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
-		new Snippet044TableViewerKeyboardEditing(shell);
+		new Snippet044NoColumnTableViewerKeyboardEditing(shell);
 		shell.open();
 
 		while (!shell.isDisposed()) {

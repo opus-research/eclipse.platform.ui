@@ -34,17 +34,15 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 		@Override
 		public String getText(Object element) {
-			if (fExtended) {
+			if (fExtended)
 				return providedString((String) element);
-			}
 			return element.toString();
 		}
 
 		@Override
 		public String getColumnText(Object element, int index) {
-			if (fExtended) {
+			if (fExtended)
 				return providedString((TestElement) element);
-			}
 			return element.toString();
 		}
 
@@ -88,7 +86,7 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 		return viewer;
 	}
-
+	
 	ViewerColumn getViewerColumn(ColumnViewer viewer, int index) {
 		Method method;
 		try {
@@ -106,10 +104,10 @@ public class TableViewerTest extends StructuredItemViewerTest {
 		assertNotNull(getViewerColumn((TableViewer) fViewer, 1));
 		assertNull(getViewerColumn((TableViewer) fViewer, 2));
     }
-
+	
 	/**
 	 * Get the content provider for the viewer.
-	 *
+	 * 
 	 * @return IContentProvider
 	 */
 	protected TestModelContentProvider getContentProvider() {
@@ -118,7 +116,7 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 	/**
 	 * Create the table viewer for the test
-	 *
+	 * 
 	 * @param parent
 	 * @return
 	 */
@@ -193,6 +191,6 @@ public class TableViewerTest extends StructuredItemViewerTest {
 
 	}
 
-
+	
 
 }
