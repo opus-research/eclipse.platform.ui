@@ -185,6 +185,9 @@ public class WorkspaceUndoUtil {
 		ResourceDescription[] returnedResourceDescriptions = new ResourceDescription[resourcesToDelete.length];
 		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_DeleteResourcesProgress);
 		for (int i = 0; i < resourcesToDelete.length; ++i) {
+			if (subMonitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
 			IResource resource = resourcesToDelete[i];
 			try {
 				returnedResourceDescriptions[i] = delete(resource, subMonitor.split(1), uiInfo,
@@ -474,6 +477,10 @@ public class WorkspaceUndoUtil {
 						resourcesAtDestination.add(generatedParent);
 					}
 				}
+
+				if (subMonitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
 			}
 		}
 		return overwrittenResources
@@ -634,6 +641,10 @@ public class WorkspaceUndoUtil {
 						resourcesAtDestination.add(generatedParent);
 					}
 				}
+
+				if (subMonitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
 			}
 		}
 		return overwrittenResources
@@ -679,6 +690,9 @@ public class WorkspaceUndoUtil {
 		IResource[] resourcesToReturn = new IResource[resourcesToRecreate.length];
 		subMonitor.setTaskName(UndoMessages.AbstractResourcesOperation_CreateResourcesProgress);
 		for (int i = 0; i < resourcesToRecreate.length; ++i) {
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
 			try {
 				resourcesToReturn[i] = resourcesToRecreate[i].createResource(subMonitor.split(1));
 			} catch (CoreException e) {

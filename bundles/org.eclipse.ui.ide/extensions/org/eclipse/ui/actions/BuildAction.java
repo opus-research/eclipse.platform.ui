@@ -28,6 +28,7 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -286,6 +287,9 @@ public class BuildAction extends WorkspaceAction {
 							progress.split(1));
 				} catch (CoreException e) {
 					status = e.getStatus();
+				}
+				if (progress.isCanceled()) {
+					throw new OperationCanceledException();
 				}
 				return status == null ? Status.OK_STATUS : status;
 			}
