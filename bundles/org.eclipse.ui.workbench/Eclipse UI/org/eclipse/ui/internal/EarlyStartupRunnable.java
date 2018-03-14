@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sergey Prigogin (Google) - bug 443898 
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.SafeRunnable;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IStartup;
 import org.osgi.framework.Bundle;
 
@@ -32,9 +31,8 @@ import org.osgi.framework.Bundle;
  * @since 3.0
  */
 public class EarlyStartupRunnable extends SafeRunnable {
-	private static final int MAX_EARLY_STARTUP_RUN_DURATION_MILLIS = 100;
 
-	private static final String EXTENSION_CLASS = "org.eclipse.core.runtime.IExtension"; //$NON-NLS-1$
+    private static final String EXTENSION_CLASS = "org.eclipse.core.runtime.IExtension"; //$NON-NLS-1$
 
 //    private static final String PLUGIN_DESC_CLASS = "org.eclipse.core.runtime.IPluginDescriptor"; //$NON-NLS-1$
 
@@ -86,17 +84,9 @@ public class EarlyStartupRunnable extends SafeRunnable {
     }
 
     private void runEarlyStartup(Object executableExtension) {
-		if (executableExtension instanceof IStartup) {
-			long startTime = System.currentTimeMillis();
+        if (executableExtension != null
+                && executableExtension instanceof IStartup) {
 			((IStartup) executableExtension).earlyStartup();
-			long duration = System.currentTimeMillis() - startTime;
-			if (duration > MAX_EARLY_STARTUP_RUN_DURATION_MILLIS) {
-				String message = NLS.bind(
-						WorkbenchMessages.EarlyStartupRunnable_ExtensionTookTooLong,
-						new Object[] { executableExtension.getClass().getName() + ".earlyStartup", //$NON-NLS-1$
-								duration, MAX_EARLY_STARTUP_RUN_DURATION_MILLIS });
-				WorkbenchPlugin.log(new Status(IStatus.WARNING, message, null));
-			}
 		} else {
             IStatus status = new Status(IStatus.ERROR,
                     extension.getNamespace(), 0,

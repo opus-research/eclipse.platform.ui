@@ -1162,10 +1162,7 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetGroup_WorkingSets_group;
 	public static String WorkingSetGroup_WorkingSetSelection_message;
 	public static String WorkingSetGroup_EnableWorkingSet_button;
-
-	// Early startup
-	public static String EarlyStartupRunnable_ExtensionTookTooLong;
-
+	
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
