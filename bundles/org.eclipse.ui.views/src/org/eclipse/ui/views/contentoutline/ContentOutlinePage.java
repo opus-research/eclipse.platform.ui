@@ -12,9 +12,6 @@ package org.eclipse.ui.views.contentoutline;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.ui.dialogs.filteredtree.FilteredTree;
-import org.eclipse.e4.ui.dialogs.filteredtree.PatternFilter;
-import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -24,8 +21,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.internal.views.ViewsPlugin;
-import org.eclipse.ui.internal.views.contentoutline.actions.ToggleTreeFilterAction;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.Page;
 
@@ -39,9 +34,9 @@ import org.eclipse.ui.part.Page;
  * This class should be subclassed.
  * </p>
  * <p>
- * Internally, each content outline page consists of a filtered tree viewer;
- * selections made in the tree viewer are reported as selection change events by
- * the page (which is a selection provider). The tree viewer is not created
+ * Internally, each content outline page consists of a standard tree viewer;
+ * selections made in the tree viewer are reported as selection change events
+ * by the page (which is a selection provider). The tree viewer is not created
  * until <code>createPage</code> is called; consequently, subclasses must extend
  * <code>createControl</code> to configure the tree viewer with a proper content
  * provider, label provider, and input element.
@@ -54,17 +49,11 @@ import org.eclipse.ui.part.Page;
  * <code>IContentOutlinePage</code> directly rather than subclassing this class.
  * </p>
  */
-@SuppressWarnings("restriction")
 public abstract class ContentOutlinePage extends Page implements
         IContentOutlinePage, ISelectionChangedListener {
-
-    private static final String TOGGLE_FILTER_TREE_ACTION_IS_CHECKED = "toggleFilterTreeActionIsChecked"; //$NON-NLS-1$
-
     private ListenerList selectionChangedListeners = new ListenerList();
 
-    private FilteredTree filteredTreeViewer;
-
-    private ToggleTreeFilterAction toggleTreeFilterAction;
+    private TreeViewer treeViewer;
 
     /**
      * Create a new content outline page.
@@ -74,34 +63,33 @@ public abstract class ContentOutlinePage extends Page implements
     }
 
     @Override
-    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
 
     /**
      * The <code>ContentOutlinePage</code> implementation of this
-     * must extend this method configure the filtered tree viewer with a proper content
+     * <code>IContentOutlinePage</code> method creates a tree viewer. Subclasses
+     * must extend this method configure the tree viewer with a proper content
      * provider, label provider, and input element.
      * @param parent
      */
     @Override
-    public void createControl(Composite parent) {
-        filteredTreeViewer = new FilteredTree(parent, getTreeStyle(), new PatternFilter(true));
-        filteredTreeViewer.setShowFilterControls(
-                ViewsPlugin.getDefault().getDialogSettings().getBoolean(TOGGLE_FILTER_TREE_ACTION_IS_CHECKED));
-        filteredTreeViewer.getViewer().addSelectionChangedListener(this);
+	public void createControl(Composite parent) {
+        treeViewer = new TreeViewer(parent, getTreeStyle());
+        treeViewer.addSelectionChangedListener(this);
     }
 
-    /**
-     * A hint for the styles to use while constructing the TreeViewer.
-     * <p>Subclasses may override.</p>
-     *
-     * @return the tree styles to use. By default, SWT.MULTI | SWT.H_SCROLL |
-     *         SWT.V_SCROLL
-     * @since 3.6
-     */
-    protected int getTreeStyle() {
-        return SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
+	/**
+	 * A hint for the styles to use while constructing the TreeViewer.
+	 * <p>Subclasses may override.</p>
+	 *
+	 * @return the tree styles to use. By default, SWT.MULTI | SWT.H_SCROLL |
+	 *         SWT.V_SCROLL
+	 * @since 3.6
+	 */
+	protected int getTreeStyle() {
+		return SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL;
 	}
 
     /**
@@ -120,7 +108,7 @@ public abstract class ContentOutlinePage extends Page implements
             final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             SafeRunner.run(new SafeRunnable() {
                 @Override
-                public void run() {
+				public void run() {
                     l.selectionChanged(event);
                 }
             });
@@ -128,19 +116,19 @@ public abstract class ContentOutlinePage extends Page implements
     }
 
     @Override
-    public Control getControl() {
-        if (filteredTreeViewer == null || filteredTreeViewer.isDisposed()) {
-            return null;
-        }
-        return filteredTreeViewer;
+	public Control getControl() {
+        if (treeViewer == null) {
+			return null;
+		}
+        return treeViewer.getControl();
     }
 
     @Override
-    public ISelection getSelection() {
-        if (filteredTreeViewer == null || filteredTreeViewer.isDisposed()) {
-            return StructuredSelection.EMPTY;
-        }
-        return filteredTreeViewer.getViewer().getSelection();
+	public ISelection getSelection() {
+        if (treeViewer == null) {
+			return StructuredSelection.EMPTY;
+		}
+        return treeViewer.getSelection();
     }
 
     /**
@@ -150,29 +138,23 @@ public abstract class ContentOutlinePage extends Page implements
      *   <code>createControl</code> has not been called yet
      */
     protected TreeViewer getTreeViewer() {
-        return filteredTreeViewer.getViewer();
+        return treeViewer;
     }
 
     @Override
-    public void init(IPageSite pageSite) {
+	public void init(IPageSite pageSite) {
         super.init(pageSite);
-        toggleTreeFilterAction = new ToggleTreeFilterAction(filteredTreeViewer);
-        toggleTreeFilterAction.setChecked(
-                ViewsPlugin.getDefault().getDialogSettings().getBoolean(TOGGLE_FILTER_TREE_ACTION_IS_CHECKED));
-        IContributionManager toolBarManager = pageSite.getActionBars().getToolBarManager();
-        toolBarManager.add(toggleTreeFilterAction);
-        toolBarManager.update(true);
         pageSite.setSelectionProvider(this);
     }
 
     @Override
-    public void removeSelectionChangedListener(
+	public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
 
     @Override
-    public void selectionChanged(SelectionChangedEvent event) {
+	public void selectionChanged(SelectionChangedEvent event) {
         fireSelectionChanged(event.getSelection());
     }
 
@@ -180,21 +162,14 @@ public abstract class ContentOutlinePage extends Page implements
      * Sets focus to a part in the page.
      */
     @Override
-    public void setFocus() {
-          filteredTreeViewer.getViewer().getControl().setFocus();
+	public void setFocus() {
+        treeViewer.getControl().setFocus();
     }
 
     @Override
-    public void setSelection(ISelection selection) {
-        if (filteredTreeViewer != null || filteredTreeViewer.isDisposed()) {
-            filteredTreeViewer.getViewer().setSelection(selection);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        ViewsPlugin.getDefault().getDialogSettings().put(TOGGLE_FILTER_TREE_ACTION_IS_CHECKED,
-            toggleTreeFilterAction.isChecked());
-        super.dispose();
+	public void setSelection(ISelection selection) {
+        if (treeViewer != null) {
+			treeViewer.setSelection(selection);
+		}
     }
 }
