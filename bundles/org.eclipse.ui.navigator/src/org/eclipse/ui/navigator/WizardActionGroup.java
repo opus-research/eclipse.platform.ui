@@ -99,7 +99,7 @@ public final class WizardActionGroup extends ActionGroup {
 	private CommonWizardDescriptor[] descriptors;
 
 	/* a map of (id, IAction)-pairs. */
-	private Map actions;
+	private Map<String, IAction> actions;
 
 	/*
 	 * the window is passed to created WizardShortcutActions for the shell and
@@ -175,6 +175,7 @@ public final class WizardActionGroup extends ActionGroup {
 
 	}
 
+	@Override
 	public void setContext(ActionContext aContext) {
 		Assert.isTrue(!disposed);
 
@@ -201,16 +202,17 @@ public final class WizardActionGroup extends ActionGroup {
 	 * 
 	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
+	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		Assert.isTrue(!disposed);
  
 		if (descriptors != null) { 
-			Map groups = findGroups(); 
+			Map<String, SortedSet> groups = findGroups(); 
 			SortedSet sortedWizards = null;
 			String menuGroupId = null;
-			for (Iterator menuGroupItr = groups.keySet().iterator(); menuGroupItr.hasNext();) {
-				menuGroupId = (String) menuGroupItr.next();
-				sortedWizards = (SortedSet) groups.get(menuGroupId); 
+			for (Iterator<String> menuGroupItr = groups.keySet().iterator(); menuGroupItr.hasNext();) {
+				menuGroupId = menuGroupItr.next();
+				sortedWizards = groups.get(menuGroupId); 
 				menu.add(new Separator(menuGroupId));
 				for (Iterator wizardItr = sortedWizards.iterator(); wizardItr.hasNext();) {
 					menu.add((IAction) wizardItr.next());				
@@ -222,17 +224,17 @@ public final class WizardActionGroup extends ActionGroup {
 	/**
 	 * @return A Map of menuGroupIds to SortedSets of IActions. 
 	 */
-	private synchronized Map/*<String, SortedSet<IAction>>*/  findGroups() {  
+	private synchronized Map/*<String, SortedSet<IAction>>*/<String, SortedSet>  findGroups() {  
 		IAction action = null;
-		Map groups = new TreeMap();
-		SortedSet sortedWizards = null;
+		Map<String, SortedSet> groups = new TreeMap<String, SortedSet>();
+		SortedSet<IAction> sortedWizards = null;
 		String menuGroupId = null;
 		for (int i = 0; i < descriptors.length; i++) {
 			menuGroupId = descriptors[i].getMenuGroupId() != null ? 
 							descriptors[i].getMenuGroupId() : CommonWizardDescriptor.DEFAULT_MENU_GROUP_ID;
-			sortedWizards = (SortedSet) groups.get(menuGroupId);
+			sortedWizards = groups.get(menuGroupId);
 			if(sortedWizards == null) {
-				groups.put(descriptors[i].getMenuGroupId(), sortedWizards = new TreeSet(ActionComparator.INSTANCE));
+				groups.put(descriptors[i].getMenuGroupId(), sortedWizards = new TreeSet<IAction>(ActionComparator.INSTANCE));
 			}  
 			if ((action = getAction(descriptors[i].getWizardId())) != null) {
 				sortedWizards.add(action); 
@@ -242,6 +244,7 @@ public final class WizardActionGroup extends ActionGroup {
 	}
 
 
+	@Override
 	public void dispose() {
 		super.dispose();
 		actions = null;
@@ -262,7 +265,7 @@ public final class WizardActionGroup extends ActionGroup {
 
 		// Keep a cache, rather than creating a new action each time,
 		// so that image caching in ActionContributionItem works.
-		IAction action = (IAction) getActions().get(id);
+		IAction action = getActions().get(id);
 		if (action == null) {
 			IWizardDescriptor descriptor = wizardRegistry.findWizard(id);
 			if (descriptor != null) {
@@ -277,9 +280,9 @@ public final class WizardActionGroup extends ActionGroup {
 	/**
 	 * @return a map of (id, IAction)-pairs.
 	 */
-	protected Map getActions() {
+	protected Map<String, IAction> getActions() {
 		if (actions == null) {
-			actions = new HashMap();
+			actions = new HashMap<String, IAction>();
 		}
 		return actions;
 	}
@@ -313,6 +316,7 @@ public final class WizardActionGroup extends ActionGroup {
 		/* (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
+		@Override
 		public int compare(Object arg0, Object arg1) {
 			return ((IAction)arg0).getText().compareTo(((IAction)arg1).getText());
 		}

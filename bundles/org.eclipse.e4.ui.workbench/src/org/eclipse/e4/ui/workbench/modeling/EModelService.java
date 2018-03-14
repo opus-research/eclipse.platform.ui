@@ -14,8 +14,6 @@ package org.eclipse.e4.ui.workbench.modeling;
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -78,7 +76,7 @@ public interface EModelService {
 	public static final int IN_MAIN_MENU = 0x20;
 
 	/**
-	 * Returned Location if the element is in a menu or a tool bar of an MPart
+	 * Returned Location if the element is in an MPart
 	 * 
 	 * @since 1.1
 	 */
@@ -131,9 +129,9 @@ public interface EModelService {
 	/**
 	 * This is a convenience method that constructs a new Selector based on {@link ElementMatcher}
 	 * and forwards the call on to the base API
-	 * {@link EModelService#findElements(MApplicationElement, int, Selector)}.
+	 * {@link EModelService#findElements(MApplicationElement, Class, int, Selector)}.
 	 * 
-	 * @see EModelService#findElements(MApplicationElement, int, Selector)
+	 * @see EModelService#findElements(MApplicationElement, Class, int, Selector)
 	 */
 	public <T> List<T> findElements(MUIElement searchRoot, String id, Class<T> clazz,
 			List<String> tagsToMatch, int searchFlags);
@@ -162,6 +160,9 @@ public interface EModelService {
 	 * @param searchRoot
 	 *            The element at which to start the search. This element must be non-null and is
 	 *            included in the search.
+	 * @param clazz
+	 *            The type of element to be searched for. If non-null this also defines the return
+	 *            type of the List.
 	 * @param searchFlags
 	 *            A bitwise combination of the following constants:
 	 *            <ul>
@@ -188,8 +189,8 @@ public interface EModelService {
 	 * 
 	 * @since 1.1
 	 */
-	public <T> List<T> findElements(MApplicationElement searchRoot, int searchFlags,
-			Selector matcher);
+	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
+			int searchFlags, Selector matcher);
 
 	/**
 	 * Returns the first element, recursively searching under the specified search root (inclusive)
@@ -265,18 +266,6 @@ public interface EModelService {
 	 * @return The root element of the snippet or <code>null</code> if none is found
 	 */
 	public MUIElement findSnippet(MSnippetContainer snippetContainer, String id);
-
-	/**
-	 * Finds a handler by ID in a particular container
-	 * 
-	 * @param handlerContainer
-	 *            The container to look in
-	 * @param id
-	 *            The ID of the handler
-	 * @return The handler or <code>null</code> if none is found
-	 * @since 1.1
-	 */
-	public MHandler findHandler(MHandlerContainer handlerContainer, String id);
 
 	/**
 	 * Return the count of the children whose 'toBeRendered' flag is true
