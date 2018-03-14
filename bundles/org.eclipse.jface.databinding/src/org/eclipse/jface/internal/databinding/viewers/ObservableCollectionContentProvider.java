@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.IViewerUpdater;
 import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.AbstractTableViewer;
@@ -89,15 +89,16 @@ public abstract class ObservableCollectionContentProvider implements
 		this.explicitViewerUpdater = explicitViewerUpdater;
 
 		display = Display.getDefault();
-		viewerObservable = new WritableValue(SWTObservables.getRealm(display));
+		viewerObservable = new WritableValue(DisplayRealm.getRealm(display));
 		viewerUpdater = null;
 
 		elementSetFactory = new IObservableFactory() {
+			@Override
 			public IObservable createObservable(Object target) {
 				IElementComparer comparer = null;
 				if (target instanceof StructuredViewer)
 					comparer = ((StructuredViewer) target).getComparer();
-				return ObservableViewerElementSet.withComparer(SWTObservables
+				return ObservableViewerElementSet.withComparer(DisplayRealm
 						.getRealm(display), null, comparer);
 			}
 		};
@@ -109,6 +110,7 @@ public abstract class ObservableCollectionContentProvider implements
 		observableCollection = null;
 	}
 
+	@Override
 	public Object[] getElements(Object inputElement) {
 		if (observableCollection == null)
 			return new Object[0];
@@ -127,6 +129,7 @@ public abstract class ObservableCollectionContentProvider implements
 		if (realizedElements == null)
 			return;
 		display.asyncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (realizedElements != null) {
 					realizedElements.addAll(knownElements);
@@ -135,6 +138,7 @@ public abstract class ObservableCollectionContentProvider implements
 		});
 	}
 
+	@Override
 	public void dispose() {
 		if (observableCollection != null)
 			removeCollectionChangeListener(observableCollection);
@@ -151,6 +155,7 @@ public abstract class ObservableCollectionContentProvider implements
 		display = null;
 	}
 
+	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		setViewer(viewer);
 		setInput(newInput);

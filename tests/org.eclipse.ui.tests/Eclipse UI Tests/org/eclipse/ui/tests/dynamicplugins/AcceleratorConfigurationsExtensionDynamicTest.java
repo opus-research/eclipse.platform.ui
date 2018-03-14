@@ -18,7 +18,7 @@ import org.eclipse.ui.keys.IBindingService;
 /**
  * Tests whether the "org.eclipse.ui.acceleratorConfigurations" extension point
  * can be added and removed dynamically.
- * 
+ *
  * @since 3.1.1
  */
 public final class AcceleratorConfigurationsExtensionDynamicTest extends
@@ -27,7 +27,7 @@ public final class AcceleratorConfigurationsExtensionDynamicTest extends
 	/**
 	 * Constructs a new instance of
 	 * <code>AcceleratorConfigurationsExtensionDynamicTest</code>.
-	 * 
+	 *
 	 * @param testName
 	 *            The name of the test; may be <code>null</code>.
 	 */
@@ -37,18 +37,20 @@ public final class AcceleratorConfigurationsExtensionDynamicTest extends
 
 	/**
 	 * Returns the full-qualified identifier of the extension to be tested.
-	 * 
+	 *
 	 * @return The extension identifier; never <code>null</code>.
 	 */
+	@Override
 	protected final String getExtensionId() {
 		return "acceleratorConfigurationsExtensionDynamicTest.testDynamicAcceleratorConfigurationAddition";
 	}
 
 	/**
 	 * Returns the unqualified identifier of the extension point to be tested.
-	 * 
+	 *
 	 * @return The extension point identifier; never <code>null</code>.
 	 */
+	@Override
 	protected final String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_ACCELERATOR_CONFIGURATIONS;
 	}
@@ -56,9 +58,10 @@ public final class AcceleratorConfigurationsExtensionDynamicTest extends
 	/**
 	 * Returns the relative location of the folder on disk containing the
 	 * plugin.xml file.
-	 * 
+	 *
 	 * @return The relative install location; never <code>null</code>.
 	 */
+	@Override
 	protected final String getInstallLocation() {
 		return "data/org.eclipse.acceleratorConfigurationsExtensionDynamicTest";
 	}

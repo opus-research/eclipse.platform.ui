@@ -22,6 +22,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.internal.databinding.swt.SWTObservableValueDecorator;
@@ -45,18 +46,20 @@ public class SWTDelayedObservableValueDecoratorTest extends
 	private ISWTObservableValue target;
 	private ISWTObservableValue delayed;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		display = Display.getCurrent();
 		shell = new Shell(display);
 		target = new SWTObservableValueDecorator(new WritableValue(
-				SWTObservables.getRealm(display)), shell);
+				DisplayRealm.getRealm(display)), shell);
 		oldValue = new Object();
 		newValue = new Object();
 		target.setValue(oldValue);
 		delayed = SWTObservables.observeDelayedValue(1, target);
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		delayed.dispose();
 		target.dispose();
@@ -69,6 +72,7 @@ public class SWTDelayedObservableValueDecoratorTest extends
 
 	public void testFocusOut_FiresPendingValueChange() {
 		assertFiresPendingValueChange(new Runnable() {
+			@Override
 			public void run() {
 				// simulate focus-out event
 				shell.notifyListeners(SWT.FocusOut, new Event());
@@ -104,32 +108,38 @@ public class SWTDelayedObservableValueDecoratorTest extends
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		Shell shell;
 
+		@Override
 		public void setUp() {
 			super.setUp();
 			shell = new Shell();
 		}
 
+		@Override
 		public void tearDown() {
 			shell.dispose();
 			shell = null;
 			super.tearDown();
 		}
 
+		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return SWTObservables.observeDelayedValue(0,
 					new SWTObservableValueDecorator(new WritableValue(realm,
 							null, Object.class), shell));
 		}
 
+		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Object.class;
 		}
 
+		@Override
 		public void change(IObservable observable) {
 			IObservableValue observableValue = (IObservableValue) observable;
 			observableValue.setValue(createValue(observableValue));
 		}
 
+		@Override
 		public Object createValue(IObservableValue observable) {
 			return new Object();
 		}

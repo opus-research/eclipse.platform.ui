@@ -44,10 +44,11 @@ public class TestElement implements Cloneable {
             int position) {
         fModel = model;
         fContainer = container;
-        if (container != null)
-            fId = container.getID() + "-" + position;
-        else
-            fId = Integer.toString(position);
+        if (container != null) {
+			fId = container.getID() + "-" + position;
+		} else {
+			fId = Integer.toString(position);
+		}
         fSomeName = "name-" + position;
 
         if (level < model.getNumLevels()) {
@@ -71,8 +72,9 @@ public class TestElement implements Cloneable {
     }
 
     public void addChildren(TestElement[] elements, TestModelChange change) {
-        for (int i = 0; i < elements.length; i++)
-            fChildren.add(elements[i]);
+        for (TestElement element : elements) {
+			fChildren.add(element);
+		}
         fModel.fireModelChanged(change);
     }
 
@@ -106,7 +108,8 @@ public class TestElement implements Cloneable {
         return Integer.parseInt(id);
     }
 
-    public Object clone() {
+    @Override
+	public Object clone() {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
@@ -149,9 +152,11 @@ public class TestElement implements Cloneable {
                 TestModelChange.STRUCTURE_CHANGE, this));
     }
 
-    public boolean equals(Object arg) {
-        if (!(arg instanceof TestElement))
-            return false;
+    @Override
+	public boolean equals(Object arg) {
+        if (!(arg instanceof TestElement)) {
+			return false;
+		}
         TestElement element = (TestElement) arg;
         return element.fId.equals(fId);
     }
@@ -163,7 +168,7 @@ public class TestElement implements Cloneable {
     public int getChildCount() {
         return fChildren.size();
     }
-    
+
     /**
      * Get the children of the receiver.
      * @return TestElement[]
@@ -171,7 +176,7 @@ public class TestElement implements Cloneable {
     public TestElement[] getChildren(){
     	TestElement[] result = new TestElement[fChildren.size()];
     	fChildren.toArray(result);
-    	return result;    	
+    	return result;
     }
 
     public TestElement getContainer() {
@@ -179,8 +184,9 @@ public class TestElement implements Cloneable {
     }
 
     public TestElement getFirstChild() {
-        if (fChildren.size() > 0)
-            return (TestElement) fChildren.elementAt(0);
+        if (fChildren.size() > 0) {
+			return (TestElement) fChildren.elementAt(0);
+		}
         return null;
     }
 
@@ -194,8 +200,9 @@ public class TestElement implements Cloneable {
 
     public TestElement getLastChild() {
         int size = fChildren.size();
-        if (size > 0)
-            return (TestElement) fChildren.elementAt(size - 1);
+        if (size > 0) {
+			return (TestElement) fChildren.elementAt(size - 1);
+		}
         return null;
     }
 
@@ -203,7 +210,8 @@ public class TestElement implements Cloneable {
         return fModel;
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return fId.hashCode();
     }
 
@@ -218,14 +226,17 @@ public class TestElement implements Cloneable {
     }
 
     public boolean testDeleted() {
-        if (fIsDeleted)
-            return true;
-        if (fContainer != null)
-            return fContainer.testDeleted();
+        if (fIsDeleted) {
+			return true;
+		}
+        if (fContainer != null) {
+			return fContainer.testDeleted();
+		}
         return false;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return getID() + " " + getLabel();
     }
 }

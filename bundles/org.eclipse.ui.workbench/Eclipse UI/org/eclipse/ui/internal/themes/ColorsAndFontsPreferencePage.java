@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -183,9 +185,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
                     if (categoryId.equals(categories[i].getParentId())) {
                         Set bindings = themeRegistry
                                 .getPresentationsBindingsFor(categories[i]);
-                        if (bindings == null
-                                || bindings.contains(workbench
-                                        .getPresentationId())) {
+						if (bindings == null) {
 							list.add(categories[i]);
 						}
                     }
@@ -339,8 +339,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
                 if (categories[i].getParentId() == null) {
                     Set bindings = themeRegistry
                             .getPresentationsBindingsFor(categories[i]);
-                    if (bindings == null
-                            || bindings.contains(workbench.getPresentationId())) {
+					if (bindings == null) {
 						list.add(categories[i]);
 					}
                 }
@@ -769,7 +768,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 		private boolean isAnyThemeChanged() {
 			return currentTheme != workbench.getThemeManager().getCurrentTheme()
-					|| currentCSSTheme != themeEngine.getActiveTheme();
+					|| currentCSSTheme != getActiveTheme();
 		}
 	};
 
@@ -852,6 +851,19 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 			return true;
         return false;
     }
+
+	/**
+	 * Get the active theme.
+	 * 
+	 * @return the active theme if there is one; <code>null</code> if there
+	 *         isn't or {@link #themeEngine} is <code>null</code>.
+	 */
+	private org.eclipse.e4.ui.css.swt.theme.ITheme getActiveTheme() {
+		if (themeEngine != null) {
+			return themeEngine.getActiveTheme();
+		}
+		return null;
+	}
 
     /**
      * Create a button for the preference page.
@@ -1379,7 +1391,7 @@ getPreferenceStore(),
 
         currentTheme = manager.getCurrentTheme();
 
-		currentCSSTheme = themeEngine.getActiveTheme();
+		currentCSSTheme = getActiveTheme();
 
         colorRegistry = new CascadingColorRegistry(currentTheme.getColorRegistry());
         fontRegistry = new CascadingFontRegistry(currentTheme.getFontRegistry());
@@ -2145,10 +2157,10 @@ getPreferenceStore(),
 			clientArea = new Rectangle(clientArea.x, clientArea.y, clientArea.width, maxHeight);
 		
 		String messageTop = RESOURCE_BUNDLE.getString("fontColorSample"); //$NON-NLS-1$
+		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
 		String messageBottom = MessageFormat
-				.format(
-						"RGB({0}, {1}, {2})", new Object[] { new Integer(rgb.red), new Integer(rgb.green), new Integer(rgb.blue) }); //$NON-NLS-1$
+				.format(fontColorString, new Object[] { new Integer(rgb.red), new Integer(rgb.green), new Integer(rgb.blue) });
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
