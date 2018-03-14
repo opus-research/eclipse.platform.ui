@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208332, 274450
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -67,7 +66,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected void fireSetChange(SetDiff<E> diff) {
+	protected void fireSetChange(SetDiff<? extends E> diff) {
 		// fire general change event first
 		super.fireChange();
 
