@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 12116 [Contributions] widgets: MenuManager.setImageDescriptor() method needed
+ *     Steven Spungin <steven@spungin.tv> - Bug 437747
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -21,6 +22,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -521,6 +524,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         });
         // Don't do an update(true) here, in case menu is never opened.
         // Always do it lazily in handleAboutToShow().
+
+		// This ensures we fill the menu
+		menu.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				setDirty(true);
+			}
+		});
     }
 
     /* (non-Javadoc)
