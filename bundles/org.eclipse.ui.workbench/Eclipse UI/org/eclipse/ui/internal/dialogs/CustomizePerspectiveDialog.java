@@ -3238,20 +3238,21 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 				String text;
 				ToolBarManager manager = toolbarMngrRenderer.getManager(toolBar);
 				if (manager != null && hasVisibleItems(toolBar)) {
-					IContributionItem contributionItem = (IContributionItem) toolBar
+					IContributionItem contributionItem = (IContributionItem) trimElement
 							.getTransientData().get("coolbar.object"); //$NON-NLS-1$
-					Object name = toolBar.getTransientData().get("Name"); //$NON-NLS-1$
+					Object name = trimElement.getTransientData().get("Name"); //$NON-NLS-1$
 					if (name != null) {// && ((String) name).length() != 0
 						text = (String) name;
 					} else {
-						text = getToolbarLabel(toolBar.getElementId());
+						text = getToolbarLabel(trimElement.getElementId());
 					}
 					DisplayItem toolBarEntry = new DisplayItem(text, contributionItem);
 					toolBarEntry.setImageDescriptor(toolbarImageDescriptor);
-					toolBarEntry.setActionSet(idToActionSet.get(getActionSetID(toolBar)));
+					toolBarEntry.setActionSet(idToActionSet
+							.get(getActionSetID(trimElement)));
 					root.addChild(toolBarEntry);
 					toolBarEntry.setCheckState(getToolbarItemIsVisible(toolBarEntry));
-					createToolbarEntries(toolBar, toolBarEntry);
+					createToolbarEntries((MToolBar) trimElement, toolBarEntry);
 				}
 			}
 		}
