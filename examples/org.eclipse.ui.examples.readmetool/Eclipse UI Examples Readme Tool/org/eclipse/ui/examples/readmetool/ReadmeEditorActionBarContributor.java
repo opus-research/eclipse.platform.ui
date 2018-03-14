@@ -31,8 +31,8 @@ import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 /**
  * This class demonstrates action contribution for the readme editor.
  * A number of menu, toolbar, and status line contributions are defined
- * in the workbench window.  These actions are shared among all
- * readme editors, and are only visible when a readme editor is
+ * in the workbench window.  These actions are shared among all 
+ * readme editors, and are only visible when a readme editor is 
  * active.  Otherwise, they are invisible.
  */
 public class ReadmeEditorActionBarContributor extends
@@ -66,8 +66,7 @@ public class ReadmeEditorActionBarContributor extends
             this.shell = shell;
         }
 
-        @Override
-		public void run() {
+        public void run() {
             String editorName = MessageUtil.getString("Empty_Editor_Name"); //$NON-NLS-1$
             if (activeEditor != null)
                 editorName = activeEditor.getTitle();
@@ -126,8 +125,10 @@ public class ReadmeEditorActionBarContributor extends
         dirtyStateContribution = new DirtyStateContribution();
     }
 
-    @Override
-	public void contributeToMenu(IMenuManager menuManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToMenu(IMenuManager menuManager) {
         // Run super.
         super.contributeToMenu(menuManager);
 
@@ -144,17 +145,21 @@ public class ReadmeEditorActionBarContributor extends
         readmeMenu.add(action3);
     }
 
-    @Override
-	public void contributeToStatusLine(IStatusLineManager statusLineManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToStatusLine(IStatusLineManager statusLineManager) {
         // Run super.
         super.contributeToStatusLine(statusLineManager);
-        // Test status line.
+        // Test status line.	
         statusLineManager.setMessage(MessageUtil.getString("Editor_is_active")); //$NON-NLS-1$
         statusLineManager.add(dirtyStateContribution);
     }
 
-    @Override
-	public void contributeToToolBar(IToolBarManager toolBarManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToToolBar(IToolBarManager toolBarManager) {
         // Run super.
         super.contributeToToolBar(toolBarManager);
 
@@ -165,15 +170,19 @@ public class ReadmeEditorActionBarContributor extends
         toolBarManager.add(action3);
     }
 
-    @Override
-	public void dispose() {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void dispose() {
         // Remove retarget actions as page listeners
         getPage().removePartListener(action2);
         getPage().removePartListener(action3);
     }
 
-    @Override
-	public void init(IActionBars bars, IWorkbenchPage page) {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void init(IActionBars bars, IWorkbenchPage page) {
         super.init(bars, page);
         bars.setGlobalActionHandler(IReadmeConstants.RETARGET2, handler2);
         bars.setGlobalActionHandler(IReadmeConstants.LABELRETARGET3, handler3);
@@ -192,8 +201,10 @@ public class ReadmeEditorActionBarContributor extends
         }
     }
 
-    @Override
-	public void setActiveEditor(IEditorPart editor) {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void setActiveEditor(IEditorPart editor) {
         // Run super.
         super.setActiveEditor(editor);
 
