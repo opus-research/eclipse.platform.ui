@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
@@ -100,8 +99,9 @@ import org.eclipse.ui.part.ResourceTransfer;
      */
     @Override
 	public void run() {
-		List<? extends IResource> selectedResources = getSelectedResources();
-		IResource[] resources = selectedResources.toArray(new IResource[selectedResources.size()]);
+        List<IResource> selectedResources = getSelectedResources();
+        IResource[] resources =selectedResources
+                .toArray(new IResource[selectedResources.size()]);
 
         // Get the file names and a string representation
         final int length = resources.length;
@@ -187,7 +187,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
         if (selectedResources.size() == 0) {
 			return false;
 		}
