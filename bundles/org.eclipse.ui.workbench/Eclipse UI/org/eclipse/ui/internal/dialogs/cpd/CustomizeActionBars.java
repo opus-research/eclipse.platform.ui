@@ -27,15 +27,22 @@ import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
 import org.eclipse.ui.services.IServiceLocator;
 
 /**
- * Fake IActionBarConfigurer used to build the menus and toolbar contributions
- * of the workbench for the CustomizePerspectiveDialog. We cannot use the actual
- * workbench action bars, since doing so would make the action set items
- * visible.that gets passed to the application's ActionBarAdvisor.
+ * The proxy IActionBarConfigurer that gets passed to the application's
+ * ActionBarAdvisor. This is used to construct a representation of the
+ * window's hardwired menus and toolbars in order to display their structure
+ * properly in the preview panes.
  *
+ * @since 3.5
  */
 public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 {
 
 	IWorkbenchWindowConfigurer configurer;
+
+	/**
+	 * Fake action bars to use to build the menus and toolbar contributions
+	 * for the workbench. We cannot use the actual workbench action bars,
+	 * since doing so would make the action set items visible.
+	 */
 	MenuManager menuManager = new MenuManager();
 	CoolBarManager coolBarManager = new CoolBarManager();
 	private StatusLineManager statusLineManager = new StatusLineManager();
