@@ -9,9 +9,11 @@
  *     IBM Corporation - initial API and implementation
  *     Lars.Vogel@vogella.com - Bug 454712
  *     dirk.fauth@googlemail.com - Bug 446095
+ *     neufeld.eugen@googlemail.com - Bug 455747
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1048,11 +1050,17 @@ public class TrimStack {
 					}
 				}
 
-				// If we haven't found one then use the first
+				// If we haven't found one then use the first active and visible
 				if (partToActivate == null) {
 					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					if (parts.size() > 0)
-						partToActivate = parts.get(0);
+					List<MPart> relevantParts = new ArrayList<MPart>();
+					for (MPart part : parts) {
+						if (partService.isPartOrPlaceholderInPerspective(part.getElementId(),
+								modelService.getActivePerspective(window)))
+							relevantParts.add(part);
+					}
+					if (relevantParts.size() > 0)
+						partToActivate = relevantParts.get(0);
 				}
 
 				if (partToActivate != null) {
