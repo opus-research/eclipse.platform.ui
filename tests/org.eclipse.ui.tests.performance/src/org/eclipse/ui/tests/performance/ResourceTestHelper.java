@@ -66,7 +66,6 @@ public class ResourceTestHelper {
 	public static void write(String dest, final String content) throws IOException, CoreException {
 		InputStream stream= new InputStream() {
 			private Reader fReader= new StringReader(content);
-			@Override
 			public int read() throws IOException {
 				return fReader.read();
 			}
@@ -115,7 +114,7 @@ public class ResourceTestHelper {
 				continue;
 			if (i < buffer.length() - 1 && Character.isJavaIdentifierPart(buffer.charAt(i + identifier.length())))
 				continue;
-			positions.add(Integer.valueOf(i));
+			positions.add(new Integer(i));
 		}
 		return positions;
 	}

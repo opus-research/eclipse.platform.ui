@@ -10,7 +10,6 @@
  *     Teddy Walker <teddy.walker@googlemail.com>
  *     		- Fix for Bug 151204 [Progress] Blocked status of jobs are not applied/reported
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
- *     Philipp Bumann <bumannp@gmail.com> - Bug 477602
  *******************************************************************************/
 package org.eclipse.e4.ui.progress.internal;
 
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -405,7 +403,8 @@ public class ProgressManager extends ProgressProvider {
 				Iterator<IJobBusyListener> startListeners = busyListenersForJob(event.getJob())
 						.iterator();
 				while (startListeners.hasNext()) {
-					IJobBusyListener next = startListeners.next();
+					IJobBusyListener next = (IJobBusyListener) startListeners
+							.next();
 					next.incrementBusy(event.getJob());
 				}
 			}
@@ -726,10 +725,12 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
 		synchronized (jobs) {
+			Iterator<Job> iterator = jobs.keySet().iterator();
 			Collection<JobInfo> result = new ArrayList<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					result.add(entry.getValue());
+			while (iterator.hasNext()) {
+				Job next = iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					result.add(jobs.get(next));
 				}
 			}
 			JobInfo[] infos = new JobInfo[result.size()];
@@ -746,10 +747,12 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
 		synchronized (jobs) {
+			Iterator<Job> iterator = jobs.keySet().iterator();
 			Collection<JobTreeElement> result = new HashSet<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					JobInfo jobInfo = entry.getValue();
+			while (iterator.hasNext()) {
+				Job next = iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					JobInfo jobInfo = jobs.get(next);
 					GroupInfo group = jobInfo.getGroupInfo();
 					if (group == null) {
 						result.add(jobInfo);
@@ -771,7 +774,11 @@ public class ProgressManager extends ProgressProvider {
 	 */
 	public boolean hasJobInfos() {
 		synchronized (jobs) {
-			return !jobs.isEmpty();
+			Iterator<Job> iterator = jobs.keySet().iterator();
+			while (iterator.hasNext()) {
+				return true;
+			}
+			return false;
 		}
 	}
 

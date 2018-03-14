@@ -537,7 +537,8 @@ public class PreferenceStore extends EventManager implements
 		if (oldValue != value) {
 			setValue(properties, name, value);
 			dirty = true;
-			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(value));
+			firePropertyChangeEvent(name, new Integer(oldValue), new Integer(
+					value));
 		}
 	}
 

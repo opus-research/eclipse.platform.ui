@@ -96,7 +96,7 @@ public class DuckType implements InvocationHandler {
          return Boolean.valueOf(equals(args[0]));
       }
       if (method.getName().equals("hashCode") && args == null) {
-         return Integer.valueOf(hashCode());
+         return new Integer(hashCode());
       }
       if (method.getName().equals("duckType_GetWrappedValue") && args == null) {
          return object;

@@ -11,6 +11,7 @@
 package org.eclipse.e4.ui.css.swt.properties.custom;
 
 import java.lang.reflect.Constructor;
+import org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.helpers.URI;
 import org.eclipse.e4.ui.css.swt.properties.AbstractCSSPropertySWTHandler;
@@ -25,6 +26,7 @@ import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertyTabRendererSWTHandler extends AbstractCSSPropertySWTHandler {
 
+	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyTabRendererSWTHandler();
 	private boolean backwardsCompatURIsLogged = false;
 
 	@Override

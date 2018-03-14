@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -117,6 +117,10 @@ public class ViewsPreferencePage extends PreferencePage implements
 			GridLayout layout = new GridLayout(1, false);
 			layout.horizontalSpacing = 10;
 			comp.setLayout(layout);
+			Label separator = new Label(comp, SWT.SEPARATOR | SWT.HORIZONTAL);
+			GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			layoutData.verticalIndent = 20;
+			separator.setLayoutData(layoutData);
 			createThemeIndependentComposits(comp);
 			return comp;
 		}
@@ -188,7 +192,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 			selectColorsAndFontsTheme(colorsAndFontsThemeId);
 		}
 
-		Dialog.applyDialogFont(comp);
 		return comp;
 	}
 

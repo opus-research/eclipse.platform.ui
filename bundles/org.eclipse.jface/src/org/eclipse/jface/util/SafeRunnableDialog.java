@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.util;
 
@@ -20,8 +19,10 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -42,7 +43,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	private TableViewer statusListViewer;
 
-	private Collection<IStatus> statuses = new ArrayList<>();
+	private Collection<IStatus> statuses = new ArrayList<IStatus>();
 
 	/**
 	 * Create a new instance of the receiver on a status.
@@ -70,8 +71,9 @@ class SafeRunnableDialog extends ErrorDialog {
 					.getException().toString() : status.getException()
 					.getMessage();
 		}
-		this.message = JFaceResources.format("SafeRunnableDialog_reason", //$NON-NLS-1$
-				status.getMessage(), reason);
+		this.message = JFaceResources.format(
+				"SafeRunnableDialog_reason", new Object[] { //$NON-NLS-1$
+				status.getMessage(), reason });
 	}
 
 	/**
@@ -163,7 +165,12 @@ class SafeRunnableDialog extends ErrorDialog {
 		statusListViewer.setContentProvider(getStatusContentProvider());
 		statusListViewer.setLabelProvider(getStatusListLabelProvider());
 		statusListViewer
-				.addSelectionChangedListener(event -> handleSelectionChange());
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						handleSelectionChange();
+					}
+				});
 		applyDialogFont(parent);
 		statusListViewer.setInput(this);
 	}

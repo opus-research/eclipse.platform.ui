@@ -126,14 +126,14 @@ public final class Parameterization {
 	 *             If the parameter needed to be initialized, but couldn't be.
 	 */
 	public final String getValueName() throws ParameterValuesException {
-		final Map<String, String> parameterValues = parameter.getValues().getParameterValues();
-		Iterator<Entry<String, String>> parameterValueItr = parameterValues.entrySet().iterator();
+		final Map<?, ?> parameterValues = parameter.getValues().getParameterValues();
+		final Iterator<?> parameterValueItr = parameterValues.entrySet().iterator();
 		String returnValue = null;
 		while (parameterValueItr.hasNext()) {
-			Entry<String, String> entry = parameterValueItr.next();
-			final String currentValue = entry.getValue();
+			final Entry<?, ?> entry = (Entry<?, ?>) parameterValueItr.next();
+			final String currentValue = (String) entry.getValue();
 			if (Util.equals(value, currentValue)) {
-				returnValue = entry.getKey();
+				returnValue = (String) entry.getKey();
 				break;
 			}
 		}

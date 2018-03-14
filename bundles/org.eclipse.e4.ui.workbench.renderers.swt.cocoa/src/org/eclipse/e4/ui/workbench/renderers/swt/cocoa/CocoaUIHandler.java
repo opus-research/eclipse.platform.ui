@@ -196,7 +196,6 @@ public class CocoaUIHandler {
 
 		final Display display = Display.getDefault();
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				allocateDelegate(display);
 
@@ -237,7 +236,6 @@ public class CocoaUIHandler {
 			invokeMethod(OS.class, "object_setInstanceVariable", //$NON-NLS-1$
 					new Object[] { idValue, SWT_OBJECT, wrapPointer(delegateJniRef) });
 			display.disposeExec(new Runnable() {
-				@Override
 				public void run() {
 					// TODO Auto-generated method stub
 					if (delegateJniRef != 0) {
@@ -501,7 +499,6 @@ public class CocoaUIHandler {
 			MenuItem item = findMenuItemById(topLevelMenu, menuItemId);
 			if (item != null) {
 				item.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						if (runCommand(commandId) || runAction(commandId)) {
 							e.doit = false;
@@ -769,7 +766,7 @@ public class CocoaUIHandler {
 			method = clazz.getMethod("object_getInstanceVariable", new Class[] { //$NON-NLS-1$
 					int.class, byte[].class, int[].class });
 			int[] resultPtr = new int[1];
-			method.invoke(null, new Object[] { Integer.valueOf((int) delegateId), name, resultPtr });
+			method.invoke(null, new Object[] { new Integer((int) delegateId), name, resultPtr });
 			return new long[] { resultPtr[0] };
 		}
 	}
@@ -817,7 +814,7 @@ public class CocoaUIHandler {
 		if (PTR_CLASS == long.class)
 			return new Long(value);
 		else
-			return Integer.valueOf((int) value);
+			return new Integer((int) value);
 	}
 
 	private ParameterizedCommand generateParameterizedCommand(final MHandledItem item) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -46,6 +45,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.SubActionBars;
 import org.eclipse.ui.internal.WorkbenchPage;
 import org.eclipse.ui.internal.WorkbenchPlugin;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * Abstract superclass of all multi-page workbench views.
@@ -429,14 +429,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			// for backward compability with IPage
 			rec.page.setActionBars(rec.subActionBars);
 
-			count = Integer.valueOf(0);
+			count = new Integer(0);
 		} else {
 			site = (IPageSite) mapPageToSite.get(rec.page);
 			rec.subActionBars = (SubActionBars) site.getActionBars();
 			count = ((Integer) mapPageToNumRecs.get(rec.page));
 		}
 
-		mapPageToNumRecs.put(rec.page, Integer.valueOf(count.intValue() + 1));
+		mapPageToNumRecs.put(rec.page, new Integer(count.intValue() + 1));
 	}
 
 	/**
@@ -569,7 +569,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	public <T> T getAdapter(Class<T> key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
-		T adapter = Adapters.adapt(page, key);
+		T adapter = Util.getAdapter(page, key);
 		if (adapter != null) {
 			return adapter;
 		}
@@ -872,7 +872,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 				((PageSite) site).dispose();
 			}
 		} else {
-			mapPageToNumRecs.put(rec.page, Integer.valueOf(newCount));
+			mapPageToNumRecs.put(rec.page, new Integer(newCount));
 		}
 	}
 

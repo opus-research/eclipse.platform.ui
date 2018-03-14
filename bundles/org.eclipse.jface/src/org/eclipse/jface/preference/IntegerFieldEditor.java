@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     <sgandon@nds.com> - Fix for bug 109389 - IntegerFieldEditor
  *     does not fire property change all the time
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -28,8 +27,8 @@ public class IntegerFieldEditor extends StringFieldEditor {
     private static final int DEFAULT_TEXT_LIMIT = 10;
 
     /**
-    * Creates a new integer field editor
-    */
+     * Creates a new integer field editor
+     */
     protected IntegerFieldEditor() {
     }
 
@@ -71,8 +70,9 @@ public class IntegerFieldEditor extends StringFieldEditor {
     public void setValidRange(int min, int max) {
         minValidValue = min;
         maxValidValue = max;
-		setErrorMessage(JFaceResources.format("IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
-				Integer.valueOf(min), Integer.valueOf(max)));
+        setErrorMessage(JFaceResources.format(
+        		"IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
+        		new Object[] { new Integer(min), new Integer(max) }));
     }
 
     @Override
@@ -127,7 +127,7 @@ public class IntegerFieldEditor extends StringFieldEditor {
 	protected void doStore() {
         Text text = getTextControl();
         if (text != null) {
-			Integer i = Integer.valueOf(text.getText());
+            Integer i = new Integer(text.getText());
             getPreferenceStore().setValue(getPreferenceName(), i.intValue());
         }
     }
@@ -140,6 +140,6 @@ public class IntegerFieldEditor extends StringFieldEditor {
      *   contain a parsable integer
      */
     public int getIntValue() throws NumberFormatException {
-		return Integer.valueOf(getStringValue()).intValue();
+        return new Integer(getStringValue()).intValue();
     }
 }

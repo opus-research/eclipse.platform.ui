@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,8 +16,8 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -62,17 +62,20 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
      *
      * @return a list of <code>IResource</code>
      */
-	List<IResource> getResources(IStructuredSelection selection) {
-		List<IResource> v = new ArrayList<>();
-		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
+    List getResources(IStructuredSelection selection) {
+        List v = new ArrayList();
+        for (Iterator i = selection.iterator(); i.hasNext();) {
             Object o = i.next();
-
-			IResource resource = Adapters.adapt(o, IResource.class);
-			if (resource != null) {
-				v.add(resource);
+            if (o instanceof IResource) {
+                v.add(o);
             } else if (o instanceof IMarker) {
-				resource = ((IMarker) o).getResource();
-				v.add(resource);
+                IResource resource = ((IMarker) o).getResource();
+                v.add(resource);
+            } else if (o instanceof IAdaptable) {
+                IResource resource = ((IAdaptable) o).getAdapter(IResource.class);
+                if (resource != null) {
+                    v.add(resource);
+                }
             }
         }
         return v;
@@ -84,7 +87,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
      */
     @Override
 	public void run() {
-		List<IResource> v = getResources(getStructuredSelection());
+        List v = getResources(getStructuredSelection());
         if (v.isEmpty()) {
 			return;
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -137,7 +136,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	 * A collection of objects listening to changes to this manager. This
 	 * collection is <code>null</code> if there are no listeners.
 	 */
-	private transient ListenerList<IHandlerListener> listenerList = null;
+	private transient ListenerList listenerList = null;
 
 	/**
 	 * The image style to use when selecting the images to display for this
@@ -227,7 +226,7 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 	@Override
 	public final void addHandlerListener(final IHandlerListener handlerListener) {
 		if (listenerList == null) {
-			listenerList = new ListenerList<>(ListenerList.IDENTITY);
+			listenerList = new ListenerList(ListenerList.IDENTITY);
 		}
 
 		listenerList.add(handlerListener);
@@ -235,6 +234,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void addState(String id, State state) {
+		// TODO Auto-generated method stub
+
 	}
 
 
@@ -420,11 +421,13 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public State getState(String stateId) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String[] getStateIds() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -662,6 +665,8 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 
 	@Override
 	public void removeState(String stateId) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private final void selectionChanged(final ISelection selection) {
@@ -708,8 +713,6 @@ public final class ActionDelegateHandlerProxy implements ISelectionListener,
 				final String className = element
 						.getAttribute(delegateAttributeName);
 				buffer.append(className);
-				final String namespaceId = element.getNamespaceIdentifier();
-				buffer.append(" in ").append(namespaceId); //$NON-NLS-1$
 			} catch (InvalidRegistryObjectException e) {
 				buffer.append(actionId);
 			}
