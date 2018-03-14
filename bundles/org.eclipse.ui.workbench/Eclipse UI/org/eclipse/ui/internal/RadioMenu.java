@@ -124,6 +124,9 @@ public class RadioMenu implements IChangeListener {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.controls.IView#changed()
+     */
     @Override
 	public void update(boolean changed) {
         refreshSelection();

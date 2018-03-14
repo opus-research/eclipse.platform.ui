@@ -30,7 +30,11 @@ public class MarkerSortUtilTest extends UITestCase {
 		super("MarkerSortUtilTest");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		// TODO Auto-generated method stub
 		super.doSetUp();
@@ -51,7 +55,6 @@ public class MarkerSortUtilTest extends UITestCase {
 		MockMarkerEntry[] fArray1=generateArray(arraySize);
 		MockMarkerEntry[] fArray2=fArray1.clone();
 		Comparator comparator=new Comparator() {
-			@Override
 			public int compare(Object o1, Object o2) {
 				return ((MockMarkerEntry)o1).name.compareTo(((MockMarkerEntry)o2).name);
 			}

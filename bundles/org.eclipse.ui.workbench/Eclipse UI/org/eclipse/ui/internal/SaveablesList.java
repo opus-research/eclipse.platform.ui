@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -351,11 +350,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	public Object preCloseParts(List partsToClose, boolean save, IShellProvider shellProvider,
 			final IWorkbenchWindow window) {
-		return preCloseParts(partsToClose, false, save, shellProvider, window);
-	}
-
-	public Object preCloseParts(List partsToClose, boolean addNonPartSources, boolean save,
-			IShellProvider shellProvider, final IWorkbenchWindow window) {
 		// reference count (how many occurrences of a model will go away?)
 		PostCloseInfo postCloseInfo = new PostCloseInfo();
 		for (Iterator it = partsToClose.iterator(); it.hasNext();) {
@@ -391,16 +385,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
 				postCloseInfo.modelsDecrementing);
-		if (addNonPartSources) {
-			for (ISaveablesSource nonPartSource : getNonPartSources()) {
-				Saveable[] saveables = nonPartSource.getSaveables();
-				for (Saveable saveable : saveables) {
-					if (saveable.isDirty()) {
-						postCloseInfo.modelsClosing.add(saveable);
-					}
-				}
-			}
-		}
 		if (save) {
 			boolean canceled = promptForSavingIfNecessary(shellProvider, window,
 					postCloseInfo.modelsClosing, postCloseInfo.modelsDecrementing, true);
@@ -591,7 +575,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						stillOpenElsewhere ? WorkbenchMessages.EditorManager_saveResourcesOptionallyMessage
 								: WorkbenchMessages.EditorManager_saveResourcesMessage,
 						canCancel, stillOpenElsewhere);
-				dlg.setInitialElementSelections(modelsToSave);
+				dlg.setInitialSelections(modelsToSave.toArray());
 				dlg.setTitle(WorkbenchMessages.EditorManager_saveResourcesTitle);
 
 				// this "if" statement aids in testing.
@@ -623,28 +607,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 *            use a workbench window for this.
 	 * @return <code>true</code> if the operation was canceled
 	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext) {
-		return saveModels(finalModels, shellProvider, runnableContext, true);
-	}
-
-	/**
-	 * Save the given models.
-	 *
-	 * @param finalModels
-	 *            the list of models to be saved
-	 * @param shellProvider
-	 *            the provider used to obtain a shell in prompting is required.
-	 *            Clients can use a workbench window for this.
-	 * @param runnableContext
-	 *            a runnable context that will be used to provide a progress
-	 *            monitor while the save is taking place. Clients can use a
-	 *            workbench window for this.
-	 * @param blockUntilSaved
-	 * @return <code>true</code> if the operation was canceled
-	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext, final boolean blockUntilSaved) {
+	public boolean saveModels(final List finalModels, final IShellProvider shellProvider, IRunnableContext runnableContext) {
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
@@ -659,8 +622,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						monitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1),
-							shellProvider, blockUntilSaved);
+					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), shellProvider, true);
 					if (monitorWrap.isCanceled())
 						break;
 				}

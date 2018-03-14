@@ -29,7 +29,11 @@ import org.eclipse.ui.internal.ConfigurationInfo;
  */
 public class CopyBuildIdToClipboardHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final String buildId = ConfigurationInfo.getBuildId();
 		if (buildId == null || buildId.length() == 0)

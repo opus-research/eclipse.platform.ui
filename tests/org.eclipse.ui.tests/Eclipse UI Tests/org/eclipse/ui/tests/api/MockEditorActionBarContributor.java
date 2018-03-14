@@ -40,8 +40,7 @@ public class MockEditorActionBarContributor extends EditorActionBarContributor {
     /**
      * @see IEditorActionBarContributor#init(IActionBars)
      */
-    @Override
-	public void init(IActionBars bars) {
+    public void init(IActionBars bars) {
         callHistory.add("init");
         actions = new MockAction[ACTION_COUNT];
         for (int nX = 0; nX < ACTION_COUNT; nX++) {
@@ -55,8 +54,7 @@ public class MockEditorActionBarContributor extends EditorActionBarContributor {
     /**
      * @see EditorActionBarContributor#contributeToToolBar(IToolBarManager)
      */
-    @Override
-	public void contributeToToolBar(IToolBarManager toolBarManager) {
+    public void contributeToToolBar(IToolBarManager toolBarManager) {
         for (int i = 0; i < actions.length; ++i) {
             toolBarManager.add(actions[i]);
         }
@@ -65,8 +63,7 @@ public class MockEditorActionBarContributor extends EditorActionBarContributor {
     /**
      * @see IEditorActionBarContributor#setActiveEditor(IEditorPart)
      */
-    @Override
-	public void setActiveEditor(IEditorPart targetEditor) {
+    public void setActiveEditor(IEditorPart targetEditor) {
         callHistory.add("setActiveEditor");
         target = targetEditor;
     }

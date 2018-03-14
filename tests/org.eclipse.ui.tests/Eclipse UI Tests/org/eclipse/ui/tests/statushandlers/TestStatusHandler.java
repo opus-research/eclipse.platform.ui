@@ -29,7 +29,12 @@ public class TestStatusHandler extends AbstractStatusHandler {
 
 	private static AbstractStatusHandler workbenchHandler;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
+	 *      int)
+	 */
 	public void handle(StatusAdapter statusAdapter, int style) {
 		lastHandledStatusAdapter = statusAdapter;
 		lastHandledStyle = style;

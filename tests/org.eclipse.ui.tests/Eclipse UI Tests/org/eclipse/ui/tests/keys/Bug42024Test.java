@@ -47,8 +47,7 @@ public class Bug42024Test extends UITestCase {
     /*
      * @see TestCase#setUp()
      */
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
 
         // Create a window with a KeySequenceText
@@ -62,8 +61,7 @@ public class Bug42024Test extends UITestCase {
         shell.open();
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         super.doTearDown();
 
         // Close and destroy the window

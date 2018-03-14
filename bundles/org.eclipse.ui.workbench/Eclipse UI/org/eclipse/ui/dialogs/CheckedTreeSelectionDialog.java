@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
  *      Lubomir Marinov <lubomir.marinov@gmail.com> - Fix for bug 182122 -[Dialogs] 
  *          CheckedTreeSelectionDialog#createSelectionButtons(Composite) fails to 
  *          align the selection buttons to the right
- *      Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -141,7 +140,7 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
      *            the initial selection.
      */
     public void setInitialSelection(Object selection) {
-		setInitialSelections(selection);
+        setInitialSelections(new Object[] { selection });
     }
 
     /**
@@ -267,6 +266,10 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         updateStatus(fCurrStatus);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#open()
+     */
     @Override
 	public int open() {
         fIsEmpty = evaluateIfTreeEmpty(fInput);
@@ -295,6 +298,10 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         setResult(Arrays.asList(fViewer.getCheckedElements()));
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#create()
+     */
     @Override
 	public void create() {
         BusyIndicator.showWhile(null, new Runnable() {
@@ -311,6 +318,10 @@ public class CheckedTreeSelectionDialog extends SelectionStatusDialog {
         });
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);

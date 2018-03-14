@@ -27,7 +27,13 @@ public class TestPropertySheetPage extends PropertySheetPage implements
 	private ISelection fSelection;
 	private IWorkbenchPart fPart;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang.Object,
+	 * java.lang.Class)
+	 */
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		// singleton cleanup
 		fSelection = null;
@@ -35,12 +41,22 @@ public class TestPropertySheetPage extends PropertySheetPage implements
 		return this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
+	 */
 	public Class[] getAdapterList() {
 		return new Class[] { IPropertySheetPage.class };
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.views.properties.PropertySheetPage#selectionChanged(org
+	 * .eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		super.selectionChanged(part, selection);
 		fPart = part;

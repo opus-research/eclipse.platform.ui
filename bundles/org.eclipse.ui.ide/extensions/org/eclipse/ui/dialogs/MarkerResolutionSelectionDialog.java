@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be activated and used by other components.
- *   Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 
 package org.eclipse.ui.dialogs;
@@ -83,18 +82,22 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         resolutions = markerResolutions;
         setTitle(IDEWorkbenchMessages.MarkerResolutionSelectionDialog_title);
         setMessage(IDEWorkbenchMessages.MarkerResolutionSelectionDialog_messageLabel);
-		setInitialSelections(markerResolutions[0]);
+        setInitialSelections(new Object[] { markerResolutions[0] });
     }
 
-    @Override
-	protected void configureShell(Shell newShell) {
+    /* (non-Javadoc)
+     * Method declared on Window.
+     */
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
                 IIDEHelpContextIds.MARKER_RESOLUTION_SELECTION_DIALOG);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
 
         // Create label
@@ -109,8 +112,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         listViewer.getList().setFont(parent.getFont());
         // Set the label provider		
         listViewer.setLabelProvider(new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 // Return the resolution's label.
                 return element == null ? "" : ((IMarkerResolution) element).getLabel(); //$NON-NLS-1$
             }
@@ -128,8 +130,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
 
         // Add a selection change listener
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 // Update OK button enablement
                 getOkButton().setEnabled(!event.getSelection().isEmpty());
             }
@@ -137,16 +138,17 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
 
         // Add double-click listener
         listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 okPressed();
             }
         });
         return composite;
     }
 
-    @Override
-	protected void okPressed() {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer
                 .getSelection();
         setResult(selection.toList());
