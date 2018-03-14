@@ -152,11 +152,11 @@ public class ErrorDialog extends IconAndMessageDialog {
 	}
 
 	/*
-	 * (non-Javadoc) Method declared on Dialog. Handles the pressing of the Ok
-	 * or Details button in this dialog. If the Ok button was pressed then close
-	 * this dialog. If the Details button was pressed then toggle the displaying
-	 * of the error details area. Note that the Details button will only be
-	 * visible if the error being displayed specifies child details.
+	 * Handles the pressing of the Ok or Details button in this dialog. If the
+	 * Ok button was pressed then close this dialog. If the Details button was
+	 * pressed then toggle the displaying of the error details area. Note that
+	 * the Details button will only be visible if the error being displayed
+	 * specifies child details.
 	 */
 	@Override
 	protected void buttonPressed(int id) {
@@ -335,9 +335,6 @@ public class ErrorDialog extends IconAndMessageDialog {
 		return list;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Window.
-	 */
 	/**
 	 * Extends <code>Window.open()</code>. Opens an error dialog to display
 	 * the error. If you specified a mask to filter the displaying of these
