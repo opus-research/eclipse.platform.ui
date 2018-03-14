@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
+ *     Kaloyan Raev <kaloyan.r@zend.com> - Bug 142228
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -36,6 +37,8 @@ public class IDEPreferenceInitializer extends AbstractPreferenceInitializer {
 
 		node.put(IDE.Preferences.PROJECT_OPEN_NEW_PERSPECTIVE,
 				IWorkbenchPreferenceConstants.OPEN_PERSPECTIVE_REPLACE);
+
+		node.putBoolean(IDE.Preferences.OPEN_UNKNOWN_TEXT_FILE_IN_TEXT_EDITOR, true);
 
 		// Set the workspace selection dialog to open by default
 		node.putBoolean(IDE.Preferences.SHOW_WORKSPACE_SELECTION_DIALOG, true);
