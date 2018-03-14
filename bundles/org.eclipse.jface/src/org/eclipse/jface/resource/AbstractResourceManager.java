@@ -70,7 +70,7 @@ abstract class AbstractResourceManager extends ResourceManager {
 
         // Lazily allocate the map
         if (map == null) {
-            map = new HashMap<>();
+            map = new HashMap<DeviceResourceDescriptor, RefCount>();
         }
 
         // Get the current reference count

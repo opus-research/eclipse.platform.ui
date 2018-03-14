@@ -18,13 +18,12 @@ import org.eclipse.swt.graphics.Font;
  *
  * If an IFontDecorator decorates a font in an object that also has
  * an IFontProvider the IFontDecorator will take precedence.
- * @param <E> Type of an element of the model
  * @see IFontProvider
  *
  * @since 3.1
  */
-public interface IFontDecorator<E> {
-	
+public interface IFontDecorator {
+
 	/**
 	 * Return the font for element or <code>null</code> if there
 	 * is not one.
@@ -32,6 +31,6 @@ public interface IFontDecorator<E> {
 	 * @param element
 	 * @return Font or <code>null</code>
 	 */
-	public Font decorateFont(E element);
+	public Font decorateFont(Object element);
 
 }

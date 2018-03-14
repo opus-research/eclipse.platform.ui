@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -16,12 +15,10 @@ import java.util.EventObject;
 /**
  * Event object describing a tree node being expanded
  * or collapsed. The source of these events is the tree viewer.
- * @param <E> Type of an element of the model
- * @param <I> Type of the input
  *
  * @see ITreeViewerListener
  */
-public class TreeExpansionEvent<E,I> extends EventObject {
+public class TreeExpansionEvent extends EventObject {
 
     /**
      * Generated serial version UID for this class.
@@ -32,7 +29,7 @@ public class TreeExpansionEvent<E,I> extends EventObject {
     /**
      * The element that was expanded or collapsed.
      */
-    private E element;
+    private Object element;
 
     /**
      * Creates a new event for the given source and element.
@@ -40,7 +37,7 @@ public class TreeExpansionEvent<E,I> extends EventObject {
      * @param source the tree viewer
      * @param element the element
      */
-    public TreeExpansionEvent(AbstractTreeViewer<E,I> source, E element) {
+    public TreeExpansionEvent(AbstractTreeViewer source, Object element) {
         super(source);
         this.element = element;
     }
@@ -50,7 +47,7 @@ public class TreeExpansionEvent<E,I> extends EventObject {
      *
      * @return the element
      */
-    public E getElement() {
+    public Object getElement() {
         return element;
     }
 
@@ -59,9 +56,7 @@ public class TreeExpansionEvent<E,I> extends EventObject {
      *
      * @return the originating tree viewer
      */
-    public AbstractTreeViewer<E,I> getTreeViewer() {
-    	@SuppressWarnings("unchecked")
-		AbstractTreeViewer<E,I> abstractTreeViewer = (AbstractTreeViewer<E,I>) source;
-        return abstractTreeViewer;
+    public AbstractTreeViewer getTreeViewer() {
+        return (AbstractTreeViewer) source;
     }
 }

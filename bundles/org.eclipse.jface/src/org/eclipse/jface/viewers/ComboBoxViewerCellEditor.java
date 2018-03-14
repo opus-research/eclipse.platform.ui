@@ -35,16 +35,14 @@ import org.eclipse.swt.widgets.Control;
  * A cell editor that presents a list of items in a combo box. In contrast to
  * {@link ComboBoxCellEditor} it wraps the underlying {@link CCombo} using a
  * {@link ComboViewer}
- * @param <E> Type of an element of the model
- * @param <I> Type of the input
  * @since 3.4
  */
-public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
+public class ComboBoxViewerCellEditor extends AbstractComboBoxCellEditor {
 
 	/**
 	 * The custom combo box control.
 	 */
-	ComboViewer<E,I> viewer;
+	ComboViewer viewer;
 
 	Object selectedValue;
 
@@ -81,7 +79,7 @@ public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 
 		CCombo comboBox = new CCombo(parent, getStyle());
 		comboBox.setFont(parent.getFont());
-		viewer = new ComboViewer<>(comboBox);
+		viewer = new ComboViewer(comboBox);
 
 		comboBox.addKeyListener(new KeyAdapter() {
 			// hook key pressed - see PR 14201
@@ -191,7 +189,7 @@ public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 	 *            the label provider used
 	 * @see StructuredViewer#setLabelProvider(IBaseLabelProvider)
 	 */
-	public void setLabelProvider(IBaseLabelProvider<E> labelProvider) {
+	public void setLabelProvider(IBaseLabelProvider labelProvider) {
 		viewer.setLabelProvider(labelProvider);
 	}
 
@@ -201,7 +199,7 @@ public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 	 * @see StructuredViewer#setContentProvider(IContentProvider)
 	 * @since 3.7
 	 */
-	public void setContentProvider(IStructuredContentProvider<E,I> provider) {
+	public void setContentProvider(IStructuredContentProvider provider) {
 		viewer.setContentProvider(provider);
 	}
 
@@ -213,7 +211,7 @@ public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 	 *             {@link #setContentProvider(IStructuredContentProvider)}
 	 */
 	@Deprecated
-	public void setContenProvider(IStructuredContentProvider<E,I> provider) {
+	public void setContenProvider(IStructuredContentProvider provider) {
 		viewer.setContentProvider(provider);
 	}
 
@@ -222,14 +220,14 @@ public class ComboBoxViewerCellEditor<E,I> extends AbstractComboBoxCellEditor {
 	 *            the input used
 	 * @see StructuredViewer#setInput(Object)
 	 */
-	public void setInput(I input) {
+	public void setInput(Object input) {
 		viewer.setInput(input);
 	}
 
 	/**
 	 * @return get the viewer
 	 */
-	public ComboViewer<E,I> getViewer() {
+	public ComboViewer getViewer() {
 		return viewer;
 	}
 

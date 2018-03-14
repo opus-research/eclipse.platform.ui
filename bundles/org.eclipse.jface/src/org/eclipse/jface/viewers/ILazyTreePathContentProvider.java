@@ -15,13 +15,10 @@ package org.eclipse.jface.viewers;
  * The ILazyTreePathContentProvider is a tree path-based content provider for
  * tree viewers created using the SWT.VIRTUAL flag that only wish to return
  * their contents as they are queried.
-
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  */
-public interface ILazyTreePathContentProvider<E,I> extends IContentProvider<I> {
+public interface ILazyTreePathContentProvider extends IContentProvider {
 	/**
 	 * Called when a previously-blank item becomes visible in the TreeViewer. If
 	 * the content provider knows the child element for the given parent at this
@@ -48,7 +45,7 @@ public interface ILazyTreePathContentProvider<E,I> extends IContentProvider<I> {
 	 * @param index
 	 *            The index of the element to update in the tree
 	 */
-	public void updateElement(TreePath<E> parentPath, int index);
+	public void updateElement(TreePath parentPath, int index);
 
 	/**
 	 * Called when the TreeViewer needs an up-to-date child count for the given
@@ -65,7 +62,7 @@ public interface ILazyTreePathContentProvider<E,I> extends IContentProvider<I> {
 	 * @param currentChildCount
 	 * 			  The current child count for the element that needs updating
 	 */
-	public void updateChildCount(TreePath<E> treePath, int currentChildCount);
+	public void updateChildCount(TreePath treePath, int currentChildCount);
 
 	/**
 	 * Called when the TreeViewer needs up-to-date information whether the node
@@ -85,7 +82,7 @@ public interface ILazyTreePathContentProvider<E,I> extends IContentProvider<I> {
 	 *            The tree path for which up-to-date information about children
 	 *            is needed
 	 */
-	public void updateHasChildren(TreePath<E> path);
+	public void updateHasChildren(TreePath path);
 
 	/**
 	 * Return the possible parent paths for the given element. An empty array
@@ -98,5 +95,5 @@ public interface ILazyTreePathContentProvider<E,I> extends IContentProvider<I> {
 	 *            the element
 	 * @return the possible parent paths for the given element
 	 */
-	public TreePath<E>[] getParents(E element);
+	public TreePath[] getParents(Object element);
 }
