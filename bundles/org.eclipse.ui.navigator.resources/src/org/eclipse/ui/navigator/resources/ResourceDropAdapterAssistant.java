@@ -363,12 +363,12 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 	 * @return the resource selection from the LocalSelectionTransfer
 	 */
 	private IResource[] getSelectedResources(IStructuredSelection selection) {
-		ArrayList<IResource> selectedResources = new ArrayList<IResource>();
+		ArrayList selectedResources = new ArrayList();
 
-		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
+		for (Iterator i = selection.iterator(); i.hasNext();) {
 			Object o = i.next();
 			if (o instanceof IResource) {
-				selectedResources.add((IResource)o);
+				selectedResources.add(o);
 			} else if (o instanceof IAdaptable) {
 				IAdaptable a = (IAdaptable) o;
 				IResource r = (IResource) a.getAdapter(IResource.class);
@@ -377,7 +377,8 @@ public class ResourceDropAdapterAssistant extends CommonDropAdapterAssistant {
 				}
 			}
 		}
-		return selectedResources.toArray(new IResource[selectedResources.size()]);
+		return (IResource[]) selectedResources
+				.toArray(new IResource[selectedResources.size()]);
 	}
 
 	/**

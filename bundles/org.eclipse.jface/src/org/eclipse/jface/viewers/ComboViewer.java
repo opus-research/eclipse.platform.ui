@@ -123,16 +123,18 @@ public class ComboViewer extends AbstractListViewer {
 	protected int[] listGetSelectionIndices() {
         if (combo == null) {
             return new int[] { ccombo.getSelectionIndex() };
+        } else {
+            return new int[] { combo.getSelectionIndex() };
         }
-        return new int[] { combo.getSelectionIndex() };
     }
 
     @Override
 	protected int listGetItemCount() {
         if (combo == null) {
             return ccombo.getItemCount();
+        } else {
+            return combo.getItemCount();
         }
-        return combo.getItemCount();
     }
 
     @Override
@@ -162,12 +164,16 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
     @Override
 	public Control getControl() {
         if (combo == null) {
             return ccombo;
+        } else {
+            return combo;
         }
-        return combo;
     }
 
     /**
@@ -202,7 +208,9 @@ public class ComboViewer extends AbstractListViewer {
 	public void reveal(Object element) {
     }
     
-
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listSetSelection(int[])
+     */
     @Override
 	protected void listSetSelection(int[] ixs) {
         if (combo == null) {
@@ -216,6 +224,9 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listDeselectAll()
+     */
     @Override
 	protected void listDeselectAll() {
         if (combo == null) {
@@ -227,6 +238,9 @@ public class ComboViewer extends AbstractListViewer {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractListViewer#listShowSelection()
+     */
     @Override
 	protected void listShowSelection() {
     }
