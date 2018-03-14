@@ -12,6 +12,7 @@ package org.eclipse.e4.ui.model.application.ui.menu.util;
 
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.MContribution;
+import org.eclipse.e4.ui.model.application.MLifecycleAware;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MLocalizable;
@@ -249,6 +250,10 @@ public class MenuAdapterFactory extends AdapterFactoryImpl {
 			@Override
 			public <T extends MUIElement> Adapter caseElementContainer(MElementContainer<T> object) {
 				return createElementContainerAdapter();
+			}
+			@Override
+			public Adapter caseLifecycleAware(MLifecycleAware object) {
+				return createLifecycleAwareAdapter();
 			}
 			@Override
 			public Adapter caseContext(MContext object) {
@@ -769,6 +774,20 @@ public class MenuAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createElementContainerAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.MLifecycleAware <em>Lifecycle Aware</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.e4.ui.model.application.MLifecycleAware
+	 * @generated
+	 */
+	public Adapter createLifecycleAwareAdapter() {
 		return null;
 	}
 
