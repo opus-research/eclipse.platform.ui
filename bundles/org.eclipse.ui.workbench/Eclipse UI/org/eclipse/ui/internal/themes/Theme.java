@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,10 +12,14 @@ package org.eclipse.ui.internal.themes;
 
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.jface.resource.FontRegistry;
+import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.FontData;
@@ -111,21 +115,30 @@ public class Theme extends EventManager implements ITheme {
                     if (key.equals(IWorkbenchPreferenceConstants.CURRENT_THEME_ID)) {
 						return;
 					}
-					String thisTheme = getId();
+                    try {
+                    	String thisTheme = getId();
 
-						if (Util.equals(thisTheme, theme)) {
-						if (getFontRegistry().hasValueFor(key)) {
-							FontData[] data = (FontData[]) event.getNewValue();
-							getFontRegistry().put(key, data);
-							processDefaultsTo(key, data);
-							return;
-						} else if (getColorRegistry().hasValueFor(key)) {
-							RGB rgb = (RGB) event.getNewValue();
-							getColorRegistry().put(key, rgb);
-							processDefaultsTo(key, rgb);
-							return;
+                        if (Util.equals(thisTheme, theme)) {
+							if (getFontRegistry().hasValueFor(key)) {
+								FontData[] data = PreferenceConverter
+										.basicGetFontData((String) event
+												.getNewValue());
+
+								getFontRegistry().put(key, data);
+								processDefaultsTo(key, data);
+								return;
+							}
+							else if (getColorRegistry().hasValueFor(key)) {
+								RGB rgb = StringConverter.asRGB((String) event
+										.getNewValue());
+								getColorRegistry().put(key, rgb);
+								processDefaultsTo(key, rgb);
+								return;
+							}
 						}
-					}
+                    } catch (DataFormatException e) {
+                        //no-op
+                    }
                 }
 
                 /**
