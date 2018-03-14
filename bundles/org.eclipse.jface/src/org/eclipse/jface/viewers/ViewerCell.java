@@ -25,15 +25,18 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * The ViewerCell is the JFace representation of a cell entry in a ViewerRow.
  *
+ * @param <E>
+ *            Type of an element of the model
+ *
  * @since 3.3
  *
  */
-public class ViewerCell {
+public class ViewerCell<E> {
 	private int columnIndex;
 
-	private ViewerRow row;
+	private ViewerRow<E> row;
 
-	private Object element;
+	private E element;
 
 	/**
 	 * Constant denoting the cell above current one (value is 1).
@@ -61,7 +64,7 @@ public class ViewerCell {
 	 * @param row
 	 * @param columnIndex
 	 */
-	ViewerCell(ViewerRow row, int columnIndex, Object element) {
+	ViewerCell(ViewerRow<E> row, int columnIndex, E element) {
 		this.row = row;
 		this.columnIndex = columnIndex;
 		this.element = element;
@@ -90,7 +93,7 @@ public class ViewerCell {
 	 *
 	 * @return {@link Object}
 	 */
-	public Object getElement() {
+	public E getElement() {
 		if (element != null) {
 			return element;
 		}
@@ -211,7 +214,7 @@ public class ViewerCell {
 	 * @param rowItem
 	 * @param column
 	 */
-	void update(ViewerRow rowItem, int column, Object element) {
+	void update(ViewerRow<E> rowItem, int column, E element) {
 		row = rowItem;
 		columnIndex = column;
 		this.element = element;
@@ -261,8 +264,8 @@ public class ViewerCell {
 	 *            if <code>true</code>, only consider cells from sibling rows
 	 * @return the requested neighbor cell, or <code>null</code> if not found
 	 */
-	public ViewerCell getNeighbor(int directionMask, boolean sameLevel) {
-		ViewerRow row;
+	public ViewerCell<E> getNeighbor(int directionMask, boolean sameLevel) {
+		ViewerRow<E> row;
 
 		if ((directionMask & ABOVE) == ABOVE) {
 			row = this.row.getNeighbor(ViewerRow.ABOVE, sameLevel);
@@ -287,10 +290,8 @@ public class ViewerCell {
 			columnIndex += modifier;
 
 			if (columnIndex >= 0 && columnIndex < row.getColumnCount()) {
-				ViewerCell cell = row.getCellAtVisualIndex(columnIndex);
-				if (cell != null) {
-					while (cell != null
-							&& columnIndex < row.getColumnCount() - 1
+				ViewerCell<E> cell = row.getCellAtVisualIndex(columnIndex);
+				while (cell != null && columnIndex < row.getColumnCount() - 1
 							&& columnIndex > 0) {
 						if (cell.isVisible()) {
 							break;
@@ -301,7 +302,7 @@ public class ViewerCell {
 						if (cell == null) {
 							break;
 						}
-					}
+
 				}
 
 				return cell;
@@ -314,7 +315,7 @@ public class ViewerCell {
 	/**
 	 * @return the row
 	 */
-	public ViewerRow getViewerRow() {
+	public ViewerRow<E> getViewerRow() {
 		return row;
 	}
 
@@ -395,7 +396,8 @@ public class ViewerCell {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		final ViewerCell other = (ViewerCell) obj;
+		@SuppressWarnings("unchecked")
+		final ViewerCell<E> other = (ViewerCell<E>) obj;
 		if (columnIndex != other.columnIndex)
 			return false;
 		if (row == null) {

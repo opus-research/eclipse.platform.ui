@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -15,15 +16,17 @@ package org.eclipse.jface.viewers;
 /**
  * TreeViewerLabelProvider is the ViewerLabelProvider that handles TreePaths.
  *
+ * @param <E>
+ *            Type of an element of the model
+ *
  * @since 3.3
  *
  */
-public class TreeColumnViewerLabelProvider extends
-		TableColumnViewerLabelProvider {
-	private ITreePathLabelProvider treePathProvider = new ITreePathLabelProvider() {
-
+public class TreeColumnViewerLabelProvider<E> extends
+		TableColumnViewerLabelProvider<E> {
+	private ITreePathLabelProvider<E> treePathProvider = new ITreePathLabelProvider<E>() {
 		@Override
-		public void updateLabel(ViewerLabel label, TreePath elementPath) {
+		public void updateLabel(ViewerLabel label, TreePath<E> elementPath) {
 			// Do nothing by default
 
 		}
@@ -35,19 +38,19 @@ public class TreeColumnViewerLabelProvider extends
 		}
 
 		@Override
-		public void addListener(ILabelProviderListener listener) {
+		public void addListener(ILabelProviderListener<E> listener) {
 			// Do nothing by default
 
 		}
 
 		@Override
-		public void removeListener(ILabelProviderListener listener) {
+		public void removeListener(ILabelProviderListener<E> listener) {
 			// Do nothing by default
 
 		}
 
 		@Override
-		public boolean isLabelProperty(Object element, String property) {
+		public boolean isLabelProperty(E element, String property) {
 			return false;
 		}
 
@@ -58,7 +61,7 @@ public class TreeColumnViewerLabelProvider extends
 	 *
 	 * @param labelProvider
 	 */
-	public TreeColumnViewerLabelProvider(IBaseLabelProvider labelProvider) {
+	public TreeColumnViewerLabelProvider(IBaseLabelProvider<E> labelProvider) {
 		super(labelProvider);
 	}
 
@@ -68,7 +71,7 @@ public class TreeColumnViewerLabelProvider extends
 	 * @param label
 	 * @param elementPath
 	 */
-	public void updateLabel(ViewerLabel label, TreePath elementPath) {
+	public void updateLabel(ViewerLabel label, TreePath<E> elementPath) {
 		treePathProvider.updateLabel(label, elementPath);
 
 	}
@@ -77,7 +80,7 @@ public class TreeColumnViewerLabelProvider extends
 	public void setProviders(Object provider) {
 		super.setProviders(provider);
 		if (provider instanceof ITreePathLabelProvider)
-			treePathProvider = (ITreePathLabelProvider) provider;
+			treePathProvider = (ITreePathLabelProvider<E>) provider;
 	}
 
 	/**
@@ -85,7 +88,7 @@ public class TreeColumnViewerLabelProvider extends
 	 *
 	 * @return Returns the treePathProvider.
 	 */
-	public ITreePathLabelProvider getTreePathProvider() {
+	public ITreePathLabelProvider<E> getTreePathProvider() {
 		return treePathProvider;
 	}
 
