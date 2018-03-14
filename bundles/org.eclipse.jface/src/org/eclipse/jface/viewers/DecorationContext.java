@@ -38,11 +38,17 @@ public class DecorationContext implements IDecorationContext {
 	}
 	
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IDecorationContext#getProperty(java.lang.String)
+	 */
 	@Override
 	public Object getProperty(String property) {
 		return properties.get(property);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IDecorationContext#getProperties()
+	 */
 	@Override
 	public String[] getProperties() {
 		return (String[]) properties.keySet().toArray(new String[properties.size()]);

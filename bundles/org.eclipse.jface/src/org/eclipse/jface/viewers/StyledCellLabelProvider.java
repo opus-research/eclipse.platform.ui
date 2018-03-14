@@ -153,6 +153,9 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		return this.column;
 	}
 		
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#initialize(org.eclipse.jface.viewers.ColumnViewer, org.eclipse.jface.viewers.ViewerColumn)
+	 */
 	@Override
 	public void initialize(ColumnViewer viewer, ViewerColumn column) {
 		Assert.isTrue(this.viewer == null && this.column == null, "Label provider instance already in use"); //$NON-NLS-1$
@@ -162,6 +165,11 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		super.initialize(viewer, column, isOwnerDrawEnabled());
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.BaseLabelProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (this.cachedTextLayout != null) {
@@ -175,6 +183,11 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		super.dispose();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+	 */
 	@Override
 	public void update(ViewerCell cell) {
 		// clients must override and configure the cell and call super
@@ -250,6 +263,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#measure(org.eclipse.swt.widgets.Event,
+	 *      java.lang.Object)
+	 */
 	@Override
 	protected void measure(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
@@ -298,6 +317,12 @@ public abstract class StyledCellLabelProvider extends OwnerDrawLabelProvider {
 		return textWidthDelta;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#paint(org.eclipse.swt.widgets.Event,
+	 *      java.lang.Object)
+	 */
 	@Override
 	protected void paint(Event event, Object element) {
 		if (!isOwnerDrawEnabled())
