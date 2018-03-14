@@ -26,12 +26,10 @@ public class NewWizard1 extends Wizard implements INewWizard {
 	public NewWizard1() { 
 	}
  
-	@Override
 	public boolean performFinish() { 
 		return false;
 	}
 
-	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) { 
 
 	}

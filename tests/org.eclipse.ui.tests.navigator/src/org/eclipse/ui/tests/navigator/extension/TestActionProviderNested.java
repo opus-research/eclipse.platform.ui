@@ -36,7 +36,6 @@ public class TestActionProviderNested extends CommonActionProvider {
 
 	private ICommonActionExtensionSite site;
 
-	@Override
 	public void init(ICommonActionExtensionSite aSite) {
 		super.init(aSite);
 		site = aSite;
@@ -51,7 +50,6 @@ public class TestActionProviderNested extends CommonActionProvider {
 			 * 
 			 * @see org.eclipse.jface.action.Action#run()
 			 */
-			@Override
 			public void run() {
 
 				IStructuredSelection selection = (IStructuredSelection) getContext()
@@ -74,7 +72,6 @@ public class TestActionProviderNested extends CommonActionProvider {
 		};
 	}
 
-	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		menu.insertAfter(ICommonMenuConstants.GROUP_ADDITIONS, action);
 	}
@@ -84,7 +81,6 @@ public class TestActionProviderNested extends CommonActionProvider {
 	 * 
 	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
 	 */
-	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 		

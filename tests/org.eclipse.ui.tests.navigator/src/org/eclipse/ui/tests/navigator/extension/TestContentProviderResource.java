@@ -23,7 +23,6 @@ public class TestContentProviderResource extends
 		_returnBadObject = false;
 	}
 	
-	@Override
 	public Object[] getChildren(Object parentElement) {
 
 		if (_returnBadObject && parentElement instanceof IProject)

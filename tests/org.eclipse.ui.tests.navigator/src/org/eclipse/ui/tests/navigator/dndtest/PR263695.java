@@ -31,8 +31,7 @@ public class PR263695 {
                 final Display display = new Display();
 
                 Listener listener = new Listener() {
-                        @Override
-						public void handleEvent(Event event) {
+                        public void handleEvent(Event event) {
                                 switch (event.type) {
                                 case SWT.MouseDown:
                                         System.out.println("down");
@@ -73,8 +72,7 @@ public class PR263695 {
                 display.setCursorLocation(downX, downY);
 
                 Thread t = new Thread(new Runnable(){
-                        @Override
-						public void run() {
+                        public void run() {
                                 try { Thread.sleep(2000); } catch
 (InterruptedException e) {}
                                 int sleep = 50;
@@ -140,19 +138,16 @@ public class PR263695 {
                 final DragSource source = new DragSource(label, operations);
                 source.setTransfer(types);
                 source.addDragListener(new DragSourceListener() {
-                        @Override
-						public void dragStart(DragSourceEvent event) {
+                        public void dragStart(DragSourceEvent event) {
                                 event.doit = (label.getText().length() != 0);
                                 System.out.println("dragStart: " + event);
                         }
 
-                        @Override
-						public void dragSetData(DragSourceEvent event) {
+                        public void dragSetData(DragSourceEvent event) {
                                 event.data = label.getText();
                         }
 
-                        @Override
-						public void dragFinished(DragSourceEvent event) {
+                        public void dragFinished(DragSourceEvent event) {
                                 if (event.detail == DND.DROP_MOVE)
                                         label.setText("");
                         }
@@ -161,8 +156,7 @@ public class PR263695 {
                 DropTarget target = new DropTarget(label, operations);
                 target.setTransfer(types);
                 target.addDropListener(new DropTargetAdapter() {
-                        @Override
-						public void drop(DropTargetEvent event) {
+                        public void drop(DropTargetEvent event) {
                                 System.out.println("got event");
                                 if (event.data == null) {
                                         event.detail = DND.DROP_NONE;

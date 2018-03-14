@@ -85,14 +85,12 @@ public class CElement implements IAdaptable {
 			_children.add(child);
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter == IResource.class)
 			return _resource;
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		return getClass().getName() + ": " + _resource;
 	}

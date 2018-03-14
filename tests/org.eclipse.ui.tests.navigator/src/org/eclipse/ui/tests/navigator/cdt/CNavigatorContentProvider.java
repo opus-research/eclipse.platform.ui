@@ -60,22 +60,18 @@ public class CNavigatorContentProvider implements
 	protected CRoot _root;
 	protected Object _realInput;
 
-	@Override
 	public void init(ICommonContentExtensionSite commonContentExtensionSite) {
 		IMemento memento = commonContentExtensionSite.getMemento();
 		restoreState(memento);
 
 	}
 
-	@Override
 	public void restoreState(IMemento memento) {
 	}
 
-	@Override
 	public void saveState(IMemento memento) {
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		_realInput = newInput;
 		if (newInput instanceof IWorkspaceRoot) {
@@ -104,7 +100,6 @@ public class CNavigatorContentProvider implements
 						final CommonNavigator cn = ((CommonNavigator) viewPart);
 						viewPart.getSite().getShell().getDisplay().asyncExec(
 								new Runnable() {
-									@Override
 									public void run() {
 										cn.setLinkingEnabled(true);
 									}
@@ -115,7 +110,6 @@ public class CNavigatorContentProvider implements
 		}
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		Object parent;
 		if (element instanceof CElement)
@@ -129,7 +123,6 @@ public class CNavigatorContentProvider implements
 		return parent;
 	}
 
-	@Override
 	public Object[] getElements(Object parent) {
 		if (parent instanceof IWorkspaceRoot) {
 			IProject[] projects = ((IWorkspaceRoot) parent).getProjects();
@@ -144,12 +137,10 @@ public class CNavigatorContentProvider implements
 		return cElement.getChildren().toArray();
 	}
 
-	@Override
 	public Object[] getChildren(Object element) {
 		return getElements(element);
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IProject) {
 			IProject project = (IProject) element;
@@ -158,12 +149,10 @@ public class CNavigatorContentProvider implements
 		return getChildren(element).length > 0;
 	}
 
-	@Override
 	public void getPipelinedChildren(Object parent, Set currentChildren) {
 		customizeCElements(getChildren(parent), currentChildren);
 	}
 
-	@Override
 	public void getPipelinedElements(Object input, Set currentElements) {
 		// only replace plain resource elements with custom elements
 		// and avoid duplicating elements already customized
@@ -203,12 +192,10 @@ public class CNavigatorContentProvider implements
 		}
 	}
 
-	@Override
 	public Object getPipelinedParent(Object object, Object suggestedParent) {
 		return getParent(object);
 	}
 
-	@Override
 	public PipelinedShapeModification interceptAdd(
 			PipelinedShapeModification addModification) {
 		Object parent = addModification.getParent();
@@ -239,13 +226,11 @@ public class CNavigatorContentProvider implements
 		return addModification;
 	}
 
-	@Override
 	public boolean interceptRefresh(PipelinedViewerUpdate refreshSynchronization) {
 		final Set refreshTargets = refreshSynchronization.getRefreshTargets();
 		return convertToCElements(refreshTargets);
 	}
 
-	@Override
 	public PipelinedShapeModification interceptRemove(
 			PipelinedShapeModification removeModification) {
 		final Set children = removeModification.getChildren();
@@ -253,7 +238,6 @@ public class CNavigatorContentProvider implements
 		return removeModification;
 	}
 
-	@Override
 	public boolean interceptUpdate(PipelinedViewerUpdate updateSynchronization) {
 		final Set refreshTargets = updateSynchronization.getRefreshTargets();
 		return convertToCElements(refreshTargets);
@@ -339,7 +323,6 @@ public class CNavigatorContentProvider implements
 		return project.getName().startsWith("C");
 	}
 
-	@Override
 	public void dispose() {
 	}
 

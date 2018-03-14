@@ -27,7 +27,6 @@ public class TestActionProviderFiltered extends CommonActionProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
 	 */
-	@Override
 	public void init(ICommonActionExtensionSite site) { 
 		super.init(site);
 
@@ -41,7 +40,6 @@ public class TestActionProviderFiltered extends CommonActionProvider {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
 	 */
-	@Override
 	public void fillContextMenu(IMenuManager menu) {
 		if (!filterAction(action)) {
 			menu.add(action);

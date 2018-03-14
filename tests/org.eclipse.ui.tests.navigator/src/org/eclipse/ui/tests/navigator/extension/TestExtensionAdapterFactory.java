@@ -21,7 +21,6 @@ public class TestExtensionAdapterFactory implements IAdapterFactory {
 
 	private static final Class[] ADAPTED_TYPES = new Class[] { IRESOURCE_TYPE, IFILE_TYPE };
 
-	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		 if(IRESOURCE_TYPE == adapterType || IFILE_TYPE == adapterType) {
 			 TestExtensionTreeData data = (TestExtensionTreeData) adaptableObject;
@@ -30,7 +29,6 @@ public class TestExtensionAdapterFactory implements IAdapterFactory {
 		 return null;
 	}
 
-	@Override
 	public Class[] getAdapterList() { 
 		return ADAPTED_TYPES;
 	}

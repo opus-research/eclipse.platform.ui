@@ -37,7 +37,6 @@ public class TestSorterResource extends ViewerSorter {
 		super(collator); 
 	}
 
-	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 	
 		if(e1 instanceof IResource) {
@@ -58,8 +57,7 @@ public class TestSorterResource extends ViewerSorter {
 	}
 
 	
-    @Override
-	public boolean isSorterProperty(Object element, String property) {
+    public boolean isSorterProperty(Object element, String property) {
     	_sorterProperty = property;
     	_sorterElement = element;
         return false;
