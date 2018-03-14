@@ -137,20 +137,12 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 				return createStackElementAdapter();
 			}
 			@Override
-			public <T extends MUIElement> Adapter caseDialog(MDialog<T> object) {
+			public Adapter caseDialog(MDialog object) {
 				return createDialogAdapter();
 			}
 			@Override
-			public Adapter caseWizard(MWizard object) {
-				return createWizardAdapter();
-			}
-			@Override
-			public Adapter caseDialogElement(MDialogElement object) {
-				return createDialogElementAdapter();
-			}
-			@Override
-			public Adapter caseWizardElement(MWizardElement object) {
-				return createWizardElementAdapter();
+			public Adapter caseWizardDialog(MWizardDialog object) {
+				return createWizardDialogAdapter();
 			}
 			@Override
 			public Adapter caseApplicationElement(MApplicationElement object) {
@@ -415,44 +407,16 @@ public class BasicAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizard <em>Wizard</em>}'.
+	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog <em>Wizard Dialog</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizard
+	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog
 	 * @generated
 	 */
-	public Adapter createWizardAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MDialogElement <em>Dialog Element</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MDialogElement
-	 * @generated
-	 */
-	public Adapter createDialogElementAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.ui.basic.MWizardElement <em>Wizard Element</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.ui.basic.MWizardElement
-	 * @generated
-	 */
-	public Adapter createWizardElementAdapter() {
+	public Adapter createWizardDialogAdapter() {
 		return null;
 	}
 
