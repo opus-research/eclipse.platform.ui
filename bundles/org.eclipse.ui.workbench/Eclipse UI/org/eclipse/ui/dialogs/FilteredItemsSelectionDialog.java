@@ -13,7 +13,6 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *  Simon Scholz <simon.scholz@vogella.com> - Bug 452350
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -2296,20 +2295,10 @@ public abstract class FilteredItemsSelectionDialog extends
 		protected SearchPattern patternMatcher;
 
 		/**
-		 * Creates new instance of ItemsFilter with implicit prefix matching.
+		 * Creates new instance of ItemsFilter.
 		 */
 		public ItemsFilter() {
 			this(new SearchPattern());
-		}
-
-		/**
-		 * Creates new instance of ItemsFilter with implicit prefix matching.
-		 * 
-		 * @param searchPattern
-		 *            the pattern to be used when filtering
-		 */
-		public ItemsFilter(SearchPattern searchPattern) {
-			this(searchPattern, true);
 		}
 
 		/**
@@ -2317,21 +2306,13 @@ public abstract class FilteredItemsSelectionDialog extends
 		 * 
 		 * @param searchPattern
 		 *            the pattern to be used when filtering
-		 * @param useImplicitPrefixMatching
-		 *            <code>true</code> if implicit prefix matching should be
-		 *            applied and <code>false</code> otherwise.
 		 */
-		public ItemsFilter(SearchPattern searchPattern, boolean useImplicitPrefixMatching) {
+		public ItemsFilter(SearchPattern searchPattern) {
 			patternMatcher = searchPattern;
 			String stringPattern = ""; //$NON-NLS-1$
 			if (pattern != null && !pattern.getText().equals("*")) { //$NON-NLS-1$
 				stringPattern = pattern.getText();
 			}
-
-			if (useImplicitPrefixMatching && stringPattern.indexOf("*") != 0) {//$NON-NLS-1$
-				stringPattern = "*" + stringPattern; //$NON-NLS-1$
-			}
-
 			patternMatcher.setPattern(stringPattern);
 		}
 
