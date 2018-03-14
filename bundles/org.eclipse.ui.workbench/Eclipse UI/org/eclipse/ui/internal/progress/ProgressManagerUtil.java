@@ -150,7 +150,7 @@ public class ProgressManagerUtil {
 	 *
 	 * @param window
 	 */
-	static void openProgressView(IWorkbenchWindow window) {
+	static void openProgressView(WorkbenchWindow window) {
 		IWorkbenchPage page = window.getActivePage();
 		if (page == null) {
 			return;

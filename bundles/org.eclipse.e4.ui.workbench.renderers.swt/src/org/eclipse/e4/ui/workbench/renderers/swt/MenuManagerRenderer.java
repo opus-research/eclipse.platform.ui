@@ -60,7 +60,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
-import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
@@ -221,25 +220,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					if (manager == null) {
 						return;
 					}
-					boolean visible = menuModel.isVisible();
-					manager.setVisible(visible);
+					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
 						scheduleManagerUpdate(manager.getParent());
-					}
-					if (menuModel.getParent() == null) {
-						if (menuModel instanceof MPopupMenu) {
-							Object data = menuModel.getTransientData().get(IPresentationEngine.RENDERING_PARENT_KEY);
-							if (data instanceof Control) {
-								Menu menu = (Menu) menuModel.getWidget();
-								if (visible && menuModel.isToBeRendered() && menu != null && !menu.isDisposed()) {
-									((Control) data).setMenu(menu);
-								}
-								if (!visible) {
-									((Control) data).setMenu(null);
-								}
-							}
-						}
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -633,30 +617,6 @@ MenuManagerEventHelper.getInstance()
 			final ArrayList<MMenuElement> menuContributionsToRemove) {
 		for (MMenuElement item : menuContributionsToRemove) {
 			menuModel.getChildren().remove(item);
-
-			if (item instanceof MMenu) {
-				removeMenuContribution((MMenu) item);
-			}
-		}
-	}
-
-	/**
-	 * Ensure when a menu contribution is removed, if it contains nested menus,
-	 * their contributions are also removed.
-	 *
-	 * @param menuModel
-	 */
-	private void removeMenuContribution(final MMenu menuModel) {
-		clearModelToContribution(menuModel, modelToContribution.get(menuModel));
-
-		if (menuModel.getChildren() != null) {
-			for (MMenuElement child : menuModel.getChildren()) {
-				if (child instanceof MMenu) {
-					removeMenuContribution((MMenu) child);
-				} else {
-					clearModelToContribution(child, modelToContribution.get(child));
-				}
-			}
 		}
 	}
 
@@ -1187,43 +1147,6 @@ MenuManagerEventHelper.getInstance()
 				clearModelToContribution(menuModel, ici);
 			}
 			menuManager.remove(ici);
-			clearModelToContribution(mMenuElement, ici);
-		}
-	}
-
-	/**
-	 * Remove all dynamic contribution items and their model for the MenuManager
-	 * specified.
-	 *
-	 * @param menuManager
-	 * @param menuModel
-	 */
-	@SuppressWarnings("unchecked")
-	public void removeDynamicMenuContributions(MenuManager menuManager, MMenu menuModel) {
-		for (MMenuElement menuElement : new HashSet<>(modelToContribution.keySet())) {
-			if (menuElement instanceof MDynamicMenuContribution) {
-				//
-				// Find Dynamic MMenuElements for the MenuManager specified.
-				//
-				final IContributionItem contributionItem = modelToContribution.get(menuElement);
-
-				if (contributionItem instanceof DynamicContributionContributionItem) {
-					final DynamicContributionContributionItem dynamicContributionItem = (DynamicContributionContributionItem) contributionItem;
-
-					if ((dynamicContributionItem.getParent() instanceof MenuManager)
-							&& dynamicContributionItem.getParent().equals(menuManager)) {
-						//
-						// Remove the dynamically created menu elements.
-						//
-						final ArrayList<MMenuElement> childElements = (ArrayList<MMenuElement>) menuElement
-								.getTransientData().get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
-
-						if (childElements != null) {
-							removeDynamicMenuContributions(menuManager, menuModel, childElements);
-						}
-					}
-				}
-			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Remy Chi Jian Suen - bug 144102
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.navigator;
@@ -275,7 +274,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             IStructuredSelection ssel = (IStructuredSelection) selection;
 			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
-				IResource resource = Adapters.adapt(o, IResource.class);
+				IResource resource = Adapters.getAdapter(o, IResource.class, true);
                 if (resource != null) {
                     list.add(resource);
                 }
@@ -573,7 +572,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
      * @since 2.0
      */
 	protected IAdaptable getInitialInput() {
-		IResource resource = Adapters.adapt(getSite().getPage().getInput(), IResource.class);
+		IResource resource = Adapters.getAdapter(getSite().getPage().getInput(), IResource.class, true);
 		if (resource != null) {
 			switch (resource.getType()) {
 			case IResource.FILE:
@@ -880,7 +879,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -905,7 +904,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (memento != null) {
                 String sortStr = memento.getString(TAG_SORTER);
                 if (sortStr != null) {
-					sortInt = Integer.parseInt(sortStr);
+					sortInt = new Integer(sortStr).intValue();
 				}
             } else {
                 sortInt = settings.getInt(STORE_SORT_TYPE);
@@ -1494,12 +1493,12 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 				for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
 		            Object o1 = i.next();
 
-					IResource resource = Adapters.adapt(o1, IResource.class);
+					IResource resource = Adapters.getAdapter(o1, IResource.class, true);
 					if (resource != null) {
 						toSelect.add(resource);
 					}
 
-					IMarker marker = Adapters.adapt(o1, IMarker.class);
+					IMarker marker = Adapters.getAdapter(o1, IMarker.class, true);
 					if (marker != null) {
 						IResource r2 = marker.getResource();
 						if (r2.getType() != IResource.ROOT) {
@@ -1510,7 +1509,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
 		    }
 			if (toSelect.isEmpty()) {
 				Object input = context.getInput();
-				IResource resource = Adapters.adapt(input, IResource.class);
+				IResource resource = Adapters.getAdapter(input, IResource.class, true);
 				if (resource != null) {
 					toSelect.add(resource);
 				}

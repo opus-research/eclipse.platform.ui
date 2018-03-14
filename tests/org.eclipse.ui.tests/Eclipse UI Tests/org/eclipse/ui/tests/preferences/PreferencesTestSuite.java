@@ -27,7 +27,6 @@ import org.junit.runners.Suite;
 	WorkingCopyPreferencesTestCase.class,
 	PropertyPageEnablementTest.class,
 	ListenerRemovalTestCase.class,
-	PreferencesDialogTest.class,
-	ZoomAndPreferencesFontTest.class})
+	PreferencesDialogTest.class})
 public class PreferencesTestSuite {
 }
