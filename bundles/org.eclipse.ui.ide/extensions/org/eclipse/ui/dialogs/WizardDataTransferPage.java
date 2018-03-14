@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009, 2015   IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,26 @@
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import java.awt.Composite;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Label;
-import java.security.acl.Group;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 /**
@@ -33,7 +45,7 @@ public abstract class WizardDataTransferPage extends WizardPage implements
     // constants
     protected static final int SIZING_TEXT_FIELD_WIDTH = 250;
 
-	protected static final int COMBO_HISTORY_LENGTH = 20;
+    protected static final int COMBO_HISTORY_LENGTH = 5;
 
     /**
      * Creates a new wizard page.
