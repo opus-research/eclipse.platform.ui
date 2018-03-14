@@ -23,8 +23,6 @@ import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.commands.contexts.ContextManagerEvent;
 import org.eclipse.core.commands.contexts.IContextManagerListener;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.IContextProvider;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.BindingManagerEvent;
@@ -38,7 +36,6 @@ import org.eclipse.ui.commands.ICommand;
 import org.eclipse.ui.commands.ICommandManager;
 import org.eclipse.ui.commands.ICommandManagerListener;
 import org.eclipse.ui.commands.IKeyConfiguration;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.handlers.LegacyHandlerWrapper;
 import org.eclipse.ui.internal.keys.SchemeLegacyWrapper;
 import org.eclipse.ui.internal.util.Util;
@@ -112,14 +109,6 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 	 * @since 3.1
 	 */
 	private final ContextManager contextManager;
-
-	private IContextProvider commandProvider = new IContextProvider() {
-
-		@Override
-		public IEclipseContext getContext() {
-			return WorkbenchPlugin.getDefault().getWorkbenchContext();
-		}
-	};
 
 	/**
 	 * Constructs a new instance of <code>MutableCommandManager</code>. The
@@ -308,7 +297,7 @@ public final class CommandManagerLegacyWrapper implements ICommandManager,
 	public ICommand getCommand(String commandId) {
 		final Command command = commandManager.getCommand(commandId);
 		if (!command.isDefined()) {
-			command.setHandler(HandlerServiceImpl.getHandler(commandId, commandProvider));
+			command.setHandler(HandlerServiceImpl.getHandler(commandId));
 		}
 		return new CommandLegacyWrapper(command, bindingManager);
 	}

@@ -14,7 +14,6 @@ package org.eclipse.ui.internal;
 import java.util.Map;
 import org.eclipse.e4.core.commands.internal.HandlerServiceHandler;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.IContextProvider;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
@@ -28,10 +27,9 @@ public class WorkbenchHandlerServiceHandler extends HandlerServiceHandler implem
 
 	/**
 	 * @param commandId
-	 * @param provider
 	 */
-	public WorkbenchHandlerServiceHandler(String commandId, IContextProvider provider) {
-		super(commandId, provider);
+	public WorkbenchHandlerServiceHandler(String commandId) {
+		super(commandId);
 	}
 
 	@Override

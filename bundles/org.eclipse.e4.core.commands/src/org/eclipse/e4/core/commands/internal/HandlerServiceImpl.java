@@ -53,21 +53,18 @@ public class HandlerServiceImpl implements EHandlerService {
 	public final static String STATIC_CONTEXT = "HandlerServiceImpl.staticContext"; //$NON-NLS-1$
 	public final static String HANDLER_EXCEPTION = "HandlerServiceImpl.exception"; //$NON-NLS-1$
 
-	// private static Map<IEclipseContext, LinkedList<ExecutionContexts>> contextStackMap = new
-	// HashMap<IEclipseContext, LinkedList<ExecutionContexts>>();
+	private static LinkedList<ExecutionContexts> contextStack = new LinkedList<ExecutionContexts>();
 
 	public static ContextFunction handlerGenerator = null;
 
-	private static LinkedList<ExecutionContexts> DEFAULT_STACKLIST = new LinkedList<HandlerServiceImpl.ExecutionContexts>();
-
-	public static IHandler getHandler(String commandId, IContextProvider contextProvider) {
+	public static IHandler getHandler(String commandId) {
 		if (handlerGenerator != null) {
 			return (IHandler) handlerGenerator.compute(null, commandId);
 		}
-		return new HandlerServiceHandler(commandId, contextProvider);
+		return new HandlerServiceHandler(commandId);
 	}
 
-	public static class ExecutionContexts {
+	static class ExecutionContexts {
 		public IEclipseContext context;
 		public IEclipseContext staticContext;
 
@@ -77,25 +74,20 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	static LinkedList<ExecutionContexts> getContextStack(IEclipseContext context) {
-		// the workbench translates plugin.xml extension points when there's no
-		// application context yet
-		if (context == null) {
-			return DEFAULT_STACKLIST;
-		}
-		return (LinkedList<ExecutionContexts>) context.get("_handlerExecutionStack"); //$NON-NLS-1$
+	static LinkedList<ExecutionContexts> getContextStack() {
+		return contextStack;
 	}
 
 	public static void push(IEclipseContext ctx, IEclipseContext staticCtx) {
-		getContextStack(ctx).addFirst(new ExecutionContexts(ctx, staticCtx));
+		getContextStack().addFirst(new ExecutionContexts(ctx, staticCtx));
 	}
 
-	public static ExecutionContexts pop(IEclipseContext ctx) {
-		return getContextStack(ctx).poll();
+	public static ExecutionContexts pop() {
+		return getContextStack().poll();
 	}
 
-	static ExecutionContexts peek(IEclipseContext ctx) {
-		return getContextStack(ctx).peek();
+	static ExecutionContexts peek() {
+		return getContextStack().peek();
 	}
 
 	/**
@@ -184,10 +176,10 @@ public class HandlerServiceImpl implements EHandlerService {
 		push(executionContext, staticContext);
 		try {
 			Command cmd = command.getCommand();
-			cmd.setEnabled(new ExpressionContext(peek(executionContext).context));
+			cmd.setEnabled(new ExpressionContext(peek().context));
 			return cmd.isEnabled();
 		} finally {
-			pop(executionContext);
+			pop();
 			// executionContext.remove(STATIC_CONTEXT);
 		}
 	}
@@ -216,7 +208,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		try {
 			// Command cmd = command.getCommand();
 			return command.executeWithChecks(staticContext.get(SWT_TRIGGER), new ExpressionContext(
-					peek(executionContext).context));
+					peek().context));
 		} catch (ExecutionException e) {
 			staticContext.set(HANDLER_EXCEPTION, e);
 		} catch (NotDefinedException e) {
@@ -226,7 +218,7 @@ public class HandlerServiceImpl implements EHandlerService {
 		} catch (NotHandledException e) {
 			staticContext.set(HANDLER_EXCEPTION, e);
 		} finally {
-			pop(executionContext);
+			pop();
 			// executionContext.remove(STATIC_CONTEXT);
 		}
 		return null;

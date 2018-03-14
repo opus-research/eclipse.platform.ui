@@ -33,16 +33,14 @@ public class HandlerServiceHandler extends AbstractHandler {
 
 	private static final String FAILED_TO_FIND_HANDLER_DURING_EXECUTION = "Failed to find handler during execution"; //$NON-NLS-1$
 	protected String commandId;
-	private final IContextProvider contextProvider;
 
-	public HandlerServiceHandler(String commandId, IContextProvider contextProvider) {
+	public HandlerServiceHandler(String commandId) {
 		this.commandId = commandId;
-		this.contextProvider = contextProvider;
 	}
 
 	@Override
 	public boolean isEnabled() {
-		ExecutionContexts contexts = HandlerServiceImpl.peek(contextProvider.getContext());
+		ExecutionContexts contexts = HandlerServiceImpl.peek();
 		// setEnabled(contexts);
 		IEclipseContext executionContext = contexts != null ? contexts.context : null; // getExecutionContext(contexts);
 		if (executionContext == null) {
@@ -84,7 +82,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 	}
 
 	private IEclipseContext getStaticContext(IEclipseContext executionContext) {
-		final ExecutionContexts pair = HandlerServiceImpl.peek(contextProvider.getContext());
+		final ExecutionContexts pair = HandlerServiceImpl.peek();
 		if (pair != null) {
 			if (pair.context != executionContext) {
 				// log this
@@ -107,7 +105,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 		if (evalObj instanceof IEvaluationContext) {
 			return getExecutionContext(((IEvaluationContext) evalObj).getParent());
 		}
-		final ExecutionContexts pair = HandlerServiceImpl.peek(contextProvider.getContext());
+		final ExecutionContexts pair = HandlerServiceImpl.peek();
 		if (pair != null) {
 			return pair.context;
 		}
@@ -116,7 +114,7 @@ public class HandlerServiceHandler extends AbstractHandler {
 
 	@Override
 	public boolean isHandled() {
-		ExecutionContexts contexts = HandlerServiceImpl.peek(contextProvider.getContext());
+		ExecutionContexts contexts = HandlerServiceImpl.peek();
 		if (contexts != null) {
 			Object handler = HandlerServiceImpl.lookUpHandler(contexts.context, commandId);
 			if (handler instanceof IHandler) {

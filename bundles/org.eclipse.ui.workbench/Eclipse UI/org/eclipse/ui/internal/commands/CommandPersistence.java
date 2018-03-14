@@ -25,12 +25,9 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.IContextProvider;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.Parameter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.services.RegistryPersistence;
 import org.eclipse.ui.internal.util.PrefUtil;
@@ -65,14 +62,6 @@ public final class CommandPersistence extends RegistryPersistence {
 	 * @since 3.2
 	 */
 	private static final int INDEX_PARAMETER_TYPE_DEFINITIONS = 2;
-
-	private static IContextProvider COMMAND_PROVIDER = new IContextProvider() {
-
-		@Override
-		public IEclipseContext getContext() {
-			return WorkbenchPlugin.getDefault().getWorkbenchContext();
-		}
-	};
 
 	/**
 	 * Reads all of the category definitions from the commands extension point.
@@ -218,7 +207,7 @@ public final class CommandPersistence extends RegistryPersistence {
 			}
 			if (!command.isDefined()) {
 				command.define(name, description, category, parameters, returnType, helpContextId);
-				command.setHandler(HandlerServiceImpl.getHandler(commandId, COMMAND_PROVIDER));
+				command.setHandler(HandlerServiceImpl.getHandler(commandId));
 			}
 			readState(configurationElement, warningsToLog, command);
 		}
