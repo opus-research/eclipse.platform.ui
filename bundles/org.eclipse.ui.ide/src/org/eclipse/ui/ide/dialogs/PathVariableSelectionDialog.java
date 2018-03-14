@@ -81,8 +81,10 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         this.variableType = variableType;
         pathVariablesGroup = new PathVariablesGroup(false, variableType,
                 new Listener() {
-                    @Override
-					public void handleEvent(Event event) {
+                    /* (non-Javadoc)
+                     * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+                     */
+                    public void handleEvent(Event event) {
                         updateExtendButtonState();
                     }
                 });
@@ -90,8 +92,11 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
-    @Override
-	protected void buttonPressed(int buttonId) {
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+     */
+    protected void buttonPressed(int buttonId) {
         if (buttonId == EXTEND_ID) {
             PathVariablesGroup.PathVariableElement selection = pathVariablesGroup
                     .getSelection()[0];
@@ -125,15 +130,19 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
                 IIDEHelpContextIds.PATH_VARIABLE_SELECTION_DIALOG);
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
+    protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
                 true);
         createButton(parent, EXTEND_ID, IDEWorkbenchMessages.PathVariableSelectionDialog_extendButton, false);
@@ -142,8 +151,10 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
         updateExtendButtonState();
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
+    protected Control createDialogArea(Composite parent) {
         // create composite 
         Composite dialogArea = (Composite) super.createDialogArea(parent);
 
@@ -152,15 +163,19 @@ public final class PathVariableSelectionDialog extends SelectionDialog {
     }
 
     
-    @Override
-	public boolean close() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#close()
+     */
+    public boolean close() {
         pathVariablesGroup.dispose();
         return super.close();
     }
 
   
-    @Override
-	protected void okPressed() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+     */
+    protected void okPressed() {
 		//Sets the dialog result to the selected path variable name(s). 
         if (pathVariablesGroup.performOk()) {
             PathVariablesGroup.PathVariableElement[] selection = pathVariablesGroup

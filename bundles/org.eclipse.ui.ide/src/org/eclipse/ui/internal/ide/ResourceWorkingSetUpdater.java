@@ -113,7 +113,6 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 				IResourceChangeEvent.POST_CHANGE);
 	}
 
-	@Override
 	public void add(IWorkingSet workingSet) {
 		checkElementExistence(workingSet);
 		synchronized (fWorkingSets) {
@@ -121,7 +120,6 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 		}
 	}
 
-	@Override
 	public boolean remove(IWorkingSet workingSet) {
 		boolean result;
 		synchronized (fWorkingSets) {
@@ -131,14 +129,12 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 		return result;
 	}
 
-	@Override
 	public boolean contains(IWorkingSet workingSet) {
 		synchronized (fWorkingSets) {
 			return fWorkingSets.contains(workingSet);
 		}
 	}
 
-	@Override
 	public void dispose() {
 		synchronized (fWorkingSets) {
 			fWorkingSets.clear();
@@ -146,7 +142,6 @@ public class ResourceWorkingSetUpdater implements IWorkingSetUpdater,
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
 	}
 
-	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
 		IResourceDelta delta = event.getDelta();
 		if (delta == null) {

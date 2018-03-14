@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 444070
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -17,6 +16,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -37,6 +37,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISources;
@@ -72,6 +73,8 @@ public class ShowInMenu extends ContributionItem implements
 	private static final String NO_TARGETS_MSG = WorkbenchMessages.Workbench_showInNoTargets;
 
 	private IWorkbenchWindow window;
+
+	private Map actions = new HashMap(21);
 
 	private boolean dirty = true;
 
@@ -164,7 +167,7 @@ public class ShowInMenu extends ContributionItem implements
 	 * Fills the menu with Show In actions.
 	 */
 	private void fillMenu(IMenuManager innerMgr) {
-		IWorkbenchPage page = locator.getService(IWorkbenchPage.class);
+		IWorkbenchPage page = (IWorkbenchPage) locator.getService(IWorkbenchPage.class);
 		if (page == null) {
 			return;
 		}
@@ -195,7 +198,7 @@ public class ShowInMenu extends ContributionItem implements
 			}
 		}
 		if (sourcePart != null && innerMgr instanceof MenuManager) {
-			ISourceProviderService sps = locator
+			ISourceProviderService sps = (ISourceProviderService) locator
 					.getService(ISourceProviderService.class);
 			ISourceProvider sp = sps
 					.getSourceProvider(ISources.SHOW_IN_SELECTION);
@@ -231,7 +234,7 @@ public class ShowInMenu extends ContributionItem implements
 							workbenchWindow, commandId, commandId,
 							CommandContributionItem.STYLE_PUSH);
 					String label = menuElement.getLabel();
-					if (label != null && label.length() > 0) {
+					if (label.length() > 0) {
 						ccip.label = label;
 						String mnemonics = menuElement.getMnemonics();
 						if (mnemonics != null && mnemonics.length() == 1) {
@@ -261,7 +264,7 @@ public class ShowInMenu extends ContributionItem implements
 		CommandContributionItemParameter parm = new CommandContributionItemParameter(
 				locator, viewDescriptor.getId(), IWorkbenchCommandConstants.NAVIGATE_SHOW_IN,
 				CommandContributionItem.STYLE_PUSH);
-		HashMap<String, String> targetId = new HashMap<String, String>();
+		HashMap targetId = new HashMap();
 		targetId.put(IWorkbenchCommandConstants.NAVIGATE_SHOW_IN_PARM_TARGET,
 				viewDescriptor.getId());
 		parm.parameters = targetId;
@@ -277,8 +280,8 @@ public class ShowInMenu extends ContributionItem implements
 	 * Returns the Show In... target part ids for the given source part. Merges
 	 * the contributions from the current perspective and the source part.
 	 */
-	private ArrayList<Object> getShowInPartIds(IWorkbenchPart sourcePart) {
-		ArrayList<Object> targetIds = new ArrayList<Object>();
+	private ArrayList getShowInPartIds(IWorkbenchPart sourcePart) {
+		ArrayList targetIds = new ArrayList();
 		WorkbenchPage page = (WorkbenchPage) getWindow().getActivePage();
 		if (page != null) {
 			String srcId = sourcePart == null ? null : sourcePart.getSite().getId();
@@ -315,14 +318,24 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @return the source part or <code>null</code>
 	 */
-	protected IWorkbenchPart getSourcePart() {
+	private IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
 
 		if (window == null)
 			return null;
 
 		IWorkbenchPage page = window.getActivePage();
-		return page != null ? page.getActivePart() : null;
+		if (page != null) {
+			IWorkbenchPart activePart = page.getActivePart();
+			/*
+			 * NOTE: Do not use window.getShell() to test since this won't work
+			 * for detached views (see bug 412285)
+			 */
+			Shell activePartShell = activePart.getSite().getShell();
+			if (activePartShell == activePartShell.getDisplay().getActiveShell())
+				return activePart;
+		}
+		return null;
 	}
 
 	/**
@@ -385,30 +398,34 @@ public class ShowInMenu extends ContributionItem implements
 	 * Returns the view descriptors to show in the dialog.
 	 */
 	private IViewDescriptor[] getViewDescriptors(IWorkbenchPart sourcePart) {
-		ArrayList<Object> ids = getShowInPartIds(sourcePart);
-		ArrayList<IViewDescriptor> descs = new ArrayList<IViewDescriptor>();
+		ArrayList ids = getShowInPartIds(sourcePart);
+		ArrayList descs = new ArrayList();
 		IViewRegistry reg = WorkbenchPlugin.getDefault().getViewRegistry();
-		for (Iterator<Object> i = ids.iterator(); i.hasNext();) {
+		for (Iterator i = ids.iterator(); i.hasNext();) {
 			String id = (String) i.next();
 			IViewDescriptor desc = reg.find(id);
 			if (desc != null) {
 				descs.add(desc);
 			}
 		}
-		return descs.toArray(new IViewDescriptor[descs
+		return (IViewDescriptor[]) descs.toArray(new IViewDescriptor[descs
 				.size()]);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.menus.IWorkbenchContribution#initialize(org.eclipse.ui.services.IServiceLocator)
+	 */
 	@Override
 	public void initialize(IServiceLocator serviceLocator) {
 		locator = serviceLocator;
 	}
 
 	protected IWorkbenchWindow getWindow() {
-		if (locator == null)
-			return null;
+		if(locator == null) return null;
 		
-		IWorkbenchLocationService wls = locator
+		IWorkbenchLocationService wls = (IWorkbenchLocationService) locator
 				.getService(IWorkbenchLocationService.class);
 
 		if (window == null) {
@@ -423,6 +440,11 @@ public class ShowInMenu extends ContributionItem implements
 		return window;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.ContributionItem#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (currentManager != null && currentManager.getSize() > 0) {
@@ -437,6 +459,7 @@ public class ShowInMenu extends ContributionItem implements
 		if (getParent() instanceof MenuManager) {
 			((MenuManager) getParent()).removeMenuListener(menuListener);
 		}
+		actions.clear();
 		window=null;
 		locator=null;
 	}

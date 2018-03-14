@@ -313,6 +313,9 @@ public class AggregateWorkingSet extends AbstractWorkingSet implements
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
+	 */
 	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		return new IAdaptable[0];

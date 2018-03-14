@@ -76,8 +76,7 @@ public class GlobalBuildAction extends Action implements
      * 
      * @deprecated use GlobalBuildAction(IWorkbenchWindow, type) instead
      */
-    @Deprecated
-	public GlobalBuildAction(IWorkbench workbench, Shell shell, int type) {
+    public GlobalBuildAction(IWorkbench workbench, Shell shell, int type) {
         // always use active window; ignore shell
         this(workbench.getActiveWorkbenchWindow(), type);
         Assert.isNotNull(shell);
@@ -175,8 +174,7 @@ public class GlobalBuildAction extends Action implements
              * 
              * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
              */
-            @Override
-			protected IStatus run(IProgressMonitor monitor) {
+            protected IStatus run(IProgressMonitor monitor) {
                 monitor.beginTask(getOperationMessage(), 100);
                 try {
                     ResourcesPlugin.getWorkspace().build(buildType,
@@ -194,8 +192,7 @@ public class GlobalBuildAction extends Action implements
              * 
              * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
              */
-            @Override
-			public boolean belongsTo(Object family) {
+            public boolean belongsTo(Object family) {
                 return ResourcesPlugin.FAMILY_MANUAL_BUILD == family;
             }
         };
@@ -217,8 +214,7 @@ public class GlobalBuildAction extends Action implements
      * Builds all projects within the workspace. Saves all editors prior to
      * build depending on user's preference.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -273,8 +269,7 @@ public class GlobalBuildAction extends Action implements
      * 
      * @since 3.0
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
