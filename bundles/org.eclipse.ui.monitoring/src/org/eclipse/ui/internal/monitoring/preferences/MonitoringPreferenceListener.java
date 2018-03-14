@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,7 +49,8 @@ public class MonitoringPreferenceListener implements IPropertyChangeListener {
 				&& !property.equals(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS)
 				&& !property.equals(PreferenceConstants.LOG_TO_ERROR_LOG)
 				&& !property.equals(PreferenceConstants.MAX_STACK_SAMPLES)
-				&& !property.equals(PreferenceConstants.FILTER_TRACES)) {
+				&& !property.equals(PreferenceConstants.UI_THREAD_FILTER)
+				&& !property.equals(PreferenceConstants.NONINTERESTING_THREAD_FILTER)) {
 			return;
 		}
 

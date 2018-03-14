@@ -15,7 +15,7 @@ package org.eclipse.jface.databinding.viewers;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.property.set.SimpleSetProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.internal.databinding.viewers.ViewerObservableSetDecorator;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
  * <li>All <code>observe()</code> methods should return an
  * {@link IViewerObservableSet}
  * </ul>
- * 
+ *
  * @since 1.3
  */
 public abstract class ViewerSetProperty extends SimpleSetProperty implements
@@ -52,7 +52,7 @@ public abstract class ViewerSetProperty extends SimpleSetProperty implements
 
 	@Override
 	public IViewerObservableSet observe(Viewer viewer) {
-		return (IViewerObservableSet) observe(SWTObservables.getRealm(viewer
+		return (IViewerObservableSet) observe(DisplayRealm.getRealm(viewer
 				.getControl().getDisplay()), viewer);
 	}
 }

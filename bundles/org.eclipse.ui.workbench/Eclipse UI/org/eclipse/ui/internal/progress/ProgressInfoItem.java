@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
- *     G.R.Prakash <me@grprakash.com> - Bug 394036
  *******************************************************************************/
 
 package org.eclipse.ui.internal.progress;
@@ -19,10 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.CommandEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.ICommandListener;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -71,9 +67,9 @@ import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
  * ProgressInfoItem is the item used to show jobs.
- * 
+ *
  * @since 3.1
- * 
+ *
  */
 public class ProgressInfoItem extends Composite {
 
@@ -142,8 +138,6 @@ public class ProgressInfoItem extends Composite {
 
 	private Link link;
 
-	private ICommandListener commandListener;
-
 	static {
 		JFaceResources
 				.getImageRegistry()
@@ -197,7 +191,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Create a new instance of the receiver with the specified parent, style
 	 * and info object/
-	 * 
+	 *
 	 * @param parent
 	 * @param style
 	 * @param progressInfo
@@ -256,7 +250,7 @@ public class ProgressInfoItem extends Composite {
 		actionBar.addListener(SWT.Traverse, new Listener() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
 			@Override
@@ -288,7 +282,7 @@ public class ProgressInfoItem extends Composite {
 		mouseListener = new MouseAdapter() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
 			@Override
@@ -317,7 +311,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the layout of the widgets for the no progress case.
-	 * 
+	 *
 	 */
 	private void setLayoutsForNoProgress() {
 
@@ -340,7 +334,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Cancel or remove the reciever.
-	 * 
+	 *
 	 */
 	protected void cancelOrRemove() {
 
@@ -354,7 +348,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the image for the info.
-	 * 
+	 *
 	 * @return Image
 	 */
 	private Image getInfoImage() {
@@ -390,7 +384,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return a resource manager for the receiver.
-	 * 
+	 *
 	 * @return {@link ResourceManager}
 	 */
 	private ResourceManager getResourceManager() {
@@ -402,7 +396,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the main title for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	private String getMainTitle() {
@@ -418,9 +412,9 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the name and status for a jobInfo
-	 * 
+	 *
 	 * @param jobInfo
-	 * 
+	 *
 	 * @return String
 	 */
 	public String getJobNameAndStatus(JobInfo jobInfo) {
@@ -462,7 +456,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return the finished String for a job.
-	 * 
+	 *
 	 * @param job
 	 *            the completed Job
 	 * @param withTime
@@ -482,7 +476,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the time string the finished job
-	 * 
+	 *
 	 * @return String or <code>null</code> if this is not one of the finished
 	 *         jobs.
 	 */
@@ -496,7 +490,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Refresh the contents of the receiver.
-	 * 
+	 *
 	 */
 	void refresh() {
 
@@ -610,7 +604,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is a completed job.
-	 * 
+	 *
 	 * @return boolean <code>true</code> if the state is Job#NONE.
 	 */
 	private boolean isCompleted() {
@@ -627,7 +621,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return the job infos in the receiver.
-	 * 
+	 *
 	 * @return JobInfo[]
 	 */
 	public JobInfo[] getJobInfos() {
@@ -642,7 +636,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is being displayed as running.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	private boolean isRunning() {
@@ -658,7 +652,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Get the current percent done.
-	 * 
+	 *
 	 * @return int
 	 */
 	private int getPercentDone() {
@@ -682,7 +676,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Set the images in the toolbar based on whether the receiver is finished
 	 * or not. Also update tooltips if required.
-	 * 
+	 *
 	 */
 	private void updateToolBarValues() {
 		if (isCompleted()) {
@@ -712,7 +706,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Create the progress bar and apply any style bits from style.
-	 * 
+	 *
 	 * @param style
 	 */
 	void createProgressBar(int style) {
@@ -751,7 +745,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the text of the link to the taskString.
-	 * 
+	 *
 	 * @param taskString
 	 */
 	void setLinkText(Job linkJob, String taskString, int index) {
@@ -786,7 +780,7 @@ public class ProgressInfoItem extends Composite {
 			link.addSelectionListener(new SelectionAdapter() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
 				@Override
@@ -798,7 +792,7 @@ public class ProgressInfoItem extends Composite {
 			link.addListener(SWT.Resize, new Listener() {
 				/*
 				 * (non-Javadoc)
-				 * 
+				 *
 				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 				 */
 				@Override
@@ -830,9 +824,6 @@ public class ProgressInfoItem extends Composite {
 			Object property = actionProperty != null ? actionProperty
 					: commandProperty;
 			updateTrigger(property, link);
-
-			hookCommandListener();
-
 		}
 
 		if (link.getData(TRIGGER_KEY) == null
@@ -900,7 +891,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Update the trigger key if either action is available and enabled or
 	 * command is available
-	 * 
+	 *
 	 * @param trigger
 	 *            {@link Object} or <code>null</code>
 	 * @param link
@@ -914,7 +905,6 @@ public class ProgressInfoItem extends Composite {
 			link.setData(TRIGGER_KEY, trigger);
 		} else if (trigger instanceof ParameterizedCommand) {
 			link.setData(TRIGGER_KEY, trigger);
-			link.setEnabled(((ParameterizedCommand) trigger).getCommand().isEnabled());
 		} else {
 			link.setData(TRIGGER_KEY, null);
 		}
@@ -923,7 +913,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Update the text in the link
-	 * 
+	 *
 	 * @param taskString
 	 * @param link
 	 */
@@ -937,7 +927,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the color base on the index
-	 * 
+	 *
 	 * @param i
 	 */
 	public void setColor(int i) {
@@ -964,7 +954,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the foreground of all widgets to the supplied color.
-	 * 
+	 *
 	 * @param color
 	 */
 	private void setAllForegrounds(Color color) {
@@ -980,7 +970,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the background of all widgets to the supplied color.
-	 * 
+	 *
 	 * @param color
 	 */
 	private void setAllBackgrounds(Color color) {
@@ -998,7 +988,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the focus to the button.
-	 * 
+	 *
 	 */
 	void setButtonFocus() {
 		actionBar.setFocus();
@@ -1006,7 +996,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the selection colors.
-	 * 
+	 *
 	 * @param select
 	 *            boolean that indicates whether or not to show selection.
 	 */
@@ -1020,7 +1010,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set the listener for index changes.
-	 * 
+	 *
 	 * @param indexListener
 	 */
 	void setIndexListener(IndexListener indexListener) {
@@ -1029,7 +1019,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Return whether or not the receiver is selected.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	boolean isSelected() {
@@ -1039,7 +1029,7 @@ public class ProgressInfoItem extends Composite {
 	/**
 	 * Set whether or not the receiver is being displayed based on the top and
 	 * bottom of the currently visible area.
-	 * 
+	 *
 	 * @param top
 	 * @param bottom
 	 */
@@ -1052,7 +1042,7 @@ public class ProgressInfoItem extends Composite {
 
 	/**
 	 * Set whether or not the receiver is being displayed
-	 * 
+	 *
 	 * @param displayed
 	 */
 	private void setDisplayed(boolean displayed) {
@@ -1062,13 +1052,12 @@ public class ProgressInfoItem extends Composite {
 		if (refresh)
 			refresh();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
 	@Override
 	public void dispose() {
-		removeCommandListener();
 		super.dispose();
 		if(resourceManager != null)
 			resourceManager.dispose();
@@ -1080,36 +1069,4 @@ public class ProgressInfoItem extends Composite {
 	public JobTreeElement getInfo() {
 		return info;
 	}
-
-	private void hookCommandListener() {
-
-		Object data = link.getData(TRIGGER_KEY);
-		if (!(data instanceof ParameterizedCommand))
-			return;
-
-		Command command = ((ParameterizedCommand) data).getCommand();
-		commandListener = new ICommandListener() {
-
-			@Override
-			public void commandChanged(CommandEvent commandEvent) {
-				if (link == null || link.isDisposed())
-					return;
-				boolean enabled = commandEvent.getCommand().isEnabled();
-				link.setEnabled(enabled);
-			}
-		};
-
-		command.addCommandListener(commandListener);
-	}
-
-	private void removeCommandListener() {
-
-		if (commandListener == null)
-			return;
-
-		Object data = link.getData(TRIGGER_KEY);
-		if (data instanceof ParameterizedCommand)
-			((ParameterizedCommand) data).getCommand().removeCommandListener(commandListener);
-	}
-
 }
