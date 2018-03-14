@@ -258,16 +258,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		public String getProjectName() {
 			return projectName;
 		}
-		
-		/**
-		 * Returns whether the given project description file was valid
-		 * 
-		 * @return boolean
-		 */
-		public boolean isValidProject() {
-			// projectName can be null e.g. in case the project definition file could not be parsed
-			return projectName != null;
-		}
 
 		/**
 		 * Gets the label to be used when rendering this project record in the
@@ -1043,11 +1033,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 								.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
 						while (filesIterator.hasNext()) {
 							File file = (File) filesIterator.next();
-							ProjectRecord projectRecord = new ProjectRecord(file);
-							if(projectRecord.isValidProject()) {
-								selectedProjects[index] = projectRecord;
-								index++;
-							}
+							selectedProjects[index] = new ProjectRecord(file);
+							index++;
 						}
 					} else {
 						monitor.worked(60);
@@ -1235,10 +1222,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			}
 			String elementLabel = structureProvider.getLabel(child);
 			if (elementLabel.equals(IProjectDescription.DESCRIPTION_FILE_NAME)) {
-				ProjectRecord projectRecord = new ProjectRecord(child, entry, level);
-				if(projectRecord.isValidProject()) {
-					files.add(projectRecord);
-				}
+				files.add(new ProjectRecord(child, entry, level));
 			}
 		}
 		return true;
