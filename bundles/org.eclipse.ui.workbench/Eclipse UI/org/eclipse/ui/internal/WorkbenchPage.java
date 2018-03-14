@@ -1246,6 +1246,23 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			break;
 		case VIEW_CREATE:
 			partService.showPart(part, PartState.CREATE);
+
+			// Report the visibility of the created part
+			MStackElement sElement = part;
+			if (part.getCurSharedRef() != null)
+				sElement = part.getCurSharedRef();
+			MUIElement parentElement = sElement.getParent();
+			if (parentElement instanceof MPartStack) {
+				MPartStack partStack = (MPartStack) parentElement;
+				if (partStack.getSelectedElement() == sElement
+						&& !partStack.getTags().contains(IPresentationEngine.MINIMIZED)) {
+					firePartVisible(part);
+				} else {
+					firePartHidden(part);
+				}
+			} else {
+				firePartVisible(part); // Stand-alone part
+			}
 			break;
 		}
 		return part;
@@ -3944,6 +3961,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
+		if (_perspectiveStack != null) {
+			return _perspectiveStack;
+		}
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
