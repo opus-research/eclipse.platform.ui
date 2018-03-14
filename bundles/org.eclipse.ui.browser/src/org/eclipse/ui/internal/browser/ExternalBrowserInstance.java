@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *     Wind River - Fix the issue that failing to launch browser with space in its path
- *     Tomasz Zarna (Tasktop Technologies) - [429546] External Browser with parameters
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
@@ -46,7 +45,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
+		String params = WebBrowserUtil.createParameterString(parameters, urlText);
 
 		try {
 			if ( Util.isMac()) {
@@ -54,9 +53,9 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
 			}
 
-			for (String param : params) {
-				cmdOptions.add(param);
-			}
+			if (!(params == null || params.length() == 0))
+				cmdOptions.add(params);
+
 			String[] cmd = cmdOptions.toArray(new String[cmdOptions.size()]);
 			Trace.trace(Trace.FINEST, "Launching " + join(" ", cmd)); //$NON-NLS-1$//$NON-NLS-2$
 
