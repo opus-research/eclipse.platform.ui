@@ -13,8 +13,6 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *  Markus Alexander Kuppe <bugs.eclipse.org@lemmster.de> 
- *     - bug 482482 - Allow subclasses of FilteredItemsSelectionDialog to nest list and extended area inside SashForm
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -641,27 +639,6 @@ public abstract class FilteredItemsSelectionDialog extends
 	 */
 	protected abstract Control createExtendedContentArea(Composite parent);
 
-	/**
-	 * Creates the {@link Composite} into which the dialog area's TableViewer
-	 * will be nested.
-	 * 
-	 * @param parent
-	 *            parent to create the TableViewer in
-	 * @return a Composite to hold the TableViewer.
-	 */
-	protected Composite createContentCoposite(final Composite parent) {
-		final Composite comp = new Composite(parent, SWT.NONE);
-		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		comp.setLayout(layout);
-
-		return comp;
-	}
-
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
@@ -691,10 +668,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 		final Label listLabel = createLabels(content);
 
-		final Composite comp = createContentCoposite(content);
-
-		list = new TableViewer(comp,
-				(multi ? SWT.MULTI : SWT.SINGLE)
+		list = new TableViewer(content, (multi ? SWT.MULTI : SWT.SINGLE)
 				| SWT.BORDER | SWT.V_SCROLL | SWT.VIRTUAL);
 		list.getTable().getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
@@ -811,7 +785,7 @@ public abstract class FilteredItemsSelectionDialog extends
 			}
 		});
 
-		createExtendedContentArea(comp);
+		createExtendedContentArea(content);
 
 		details = new DetailsContentViewer(content, SWT.BORDER | SWT.FLAT);
 		details.setVisible(toggleStatusLineAction.isChecked());
