@@ -140,10 +140,13 @@ import org.eclipse.swt.widgets.Display;
         synchronized (this) {
             collector = null;
         }
-        display.asyncExec(() -> {
-		    currentTask = name;
-		    getWrappedProgressMonitor().beginTask(name, totalWork);
-		});
+        display.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                currentTask = name;
+                getWrappedProgressMonitor().beginTask(name, totalWork);
+            }
+        });
     }
 
 	/**
@@ -177,7 +180,12 @@ import org.eclipse.swt.widgets.Display;
         synchronized (this) {
             collector = null;
         }
-        display.asyncExec(() -> getWrappedProgressMonitor().done());
+        display.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                getWrappedProgressMonitor().done();
+            }
+        });
     }
 
 	@Override
@@ -224,10 +232,13 @@ import org.eclipse.swt.widgets.Display;
 			return;
 		}
 
-        display.asyncExec(() -> {
-		    ((IProgressMonitorWithBlocking) pm).clearBlocked();
-		    Dialog.getBlockedHandler().clearBlocked();
-		});
+        display.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                ((IProgressMonitorWithBlocking) pm).clearBlocked();
+                Dialog.getBlockedHandler().clearBlocked();
+            }
+        });
     }
 
     @Override
@@ -240,10 +251,13 @@ import org.eclipse.swt.widgets.Display;
 			return;
 		}
 
-        display.asyncExec(() -> {
-		    ((IProgressMonitorWithBlocking) pm).setBlocked(reason);
-		    //Do not give a shell as we want it to block until it opens.
-		    Dialog.getBlockedHandler().showBlocked(pm, reason, currentTask);
-		});
+        display.asyncExec(new Runnable() {
+            @Override
+			public void run() {
+                ((IProgressMonitorWithBlocking) pm).setBlocked(reason);
+                //Do not give a shell as we want it to block until it opens.
+                Dialog.getBlockedHandler().showBlocked(pm, reason, currentTask);
+            }
+        });
     }
 }

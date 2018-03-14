@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.IStatus;
  * @see Policy#setLog(ILogger)
  * @since 1.1
  */
-@FunctionalInterface
 public interface ILogger {
 
 	/**

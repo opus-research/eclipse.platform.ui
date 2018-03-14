@@ -117,6 +117,10 @@ public class ViewsPreferencePage extends PreferencePage implements
 			GridLayout layout = new GridLayout(1, false);
 			layout.horizontalSpacing = 10;
 			comp.setLayout(layout);
+			Label separator = new Label(comp, SWT.SEPARATOR | SWT.HORIZONTAL);
+			GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			layoutData.verticalIndent = 20;
+			separator.setLayoutData(layoutData);
 			createThemeIndependentComposits(comp);
 			return comp;
 		}
