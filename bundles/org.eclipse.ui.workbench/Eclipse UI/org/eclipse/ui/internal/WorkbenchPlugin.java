@@ -31,7 +31,7 @@ import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.EHelpService;
+import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -204,7 +204,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     
 	private ServiceTracker testableTracker = null;
 	
-	private EHelpService helpService;
+	private IHelpService helpService;
 
 	private ICommandHelpService commandHelpService;
 
@@ -1464,7 +1464,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 				return editorRegistry;
 			}
 		});
-		context.set(EHelpService.class.getName(), new ContextFunction() {
+		context.set(IHelpService.class.getName(), new ContextFunction() {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (helpService == null) {
