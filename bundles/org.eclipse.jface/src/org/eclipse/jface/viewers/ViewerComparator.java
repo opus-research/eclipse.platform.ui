@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430873
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
