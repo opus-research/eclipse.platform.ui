@@ -37,11 +37,11 @@ public class ToolBarContributionRecord {
 	public static final String FACTORY = "ToolBarContributionFactory"; //$NON-NLS-1$
 	static final String STATIC_CONTEXT = "ToolBarContributionFactoryContext"; //$NON-NLS-1$
 
-	private MToolBar toolbarModel;
-	private ArrayList<MToolBarElement> generatedElements = new ArrayList<MToolBarElement>();
-	private HashSet<MToolBarElement> sharedElements = new HashSet<MToolBarElement>();
-	private MToolBarContribution toolbarContribution;
-	private ToolBarManagerRenderer renderer;
+	MToolBar toolbarModel;
+	MToolBarContribution toolbarContribution;
+	ArrayList<MToolBarElement> generatedElements = new ArrayList<MToolBarElement>();
+	HashSet<MToolBarElement> sharedElements = new HashSet<MToolBarElement>();
+	ToolBarManagerRenderer renderer;
 	boolean isVisible = true;
 	private IEclipseContext infoContext;
 	private Runnable factoryDispose;
@@ -241,7 +241,7 @@ public class ToolBarContributionRecord {
 		return infoContext;
 	}
 
-	private MToolBarSeparator findExistingSeparator(String id) {
+	MToolBarSeparator findExistingSeparator(String id) {
 		if (id == null) {
 			return null;
 		}
@@ -308,20 +308,4 @@ public class ToolBarContributionRecord {
 		}
 		return id.equals("additions") ? model.getChildren().size() : -1; //$NON-NLS-1$
 	}
-
-	public ArrayList<MToolBarElement> getGeneratedElements() {
-
-		return generatedElements;
-	}
-
-	public HashSet<MToolBarElement> getSharedElements() {
-
-		return sharedElements;
-	}
-
-	public MToolBar getToolbarModel() {
-
-		return toolbarModel;
-	}
-
 }

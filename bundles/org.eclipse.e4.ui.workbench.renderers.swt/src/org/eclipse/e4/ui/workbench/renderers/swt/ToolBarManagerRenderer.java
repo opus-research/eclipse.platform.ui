@@ -505,16 +505,16 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	protected void cleanUp(MToolBar toolbarModel) {
 		Collection<ToolBarContributionRecord> vals = modelContributionToRecord.values();
 		for (ToolBarContributionRecord record : vals.toArray(new ToolBarContributionRecord[vals.size()])) {
-			if (record.getToolbarModel() == toolbarModel) {
+			if (record.toolbarModel == toolbarModel) {
 				record.dispose();
-				for (MToolBarElement copy : record.getGeneratedElements()) {
+				for (MToolBarElement copy : record.generatedElements) {
 					cleanUpCopy(record, copy);
 				}
-				for (MToolBarElement copy : record.getSharedElements()) {
+				for (MToolBarElement copy : record.sharedElements) {
 					cleanUpCopy(record, copy);
 				}
-				record.getGeneratedElements().clear();
-				record.getSharedElements().clear();
+				record.generatedElements.clear();
+				record.sharedElements.clear();
 			}
 		}
 	}
