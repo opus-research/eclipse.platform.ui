@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Widget;
 public class PerspectiveRenderer extends SWTPartRenderer {
 
 
-	@Override
 	public Widget createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MPerspective)
 				|| !(parent instanceof Composite))
