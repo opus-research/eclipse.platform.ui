@@ -39,7 +39,6 @@ public class SaveAllHandler extends AbstractSaveHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -51,7 +50,6 @@ public class SaveAllHandler extends AbstractSaveHandler {
 		return null;
 	}
 
-	@Override
 	protected EvaluationResult evaluate(IEvaluationContext context) {
 
 		IWorkbenchWindow window = InternalHandlerUtil.getActiveWorkbenchWindow(context);

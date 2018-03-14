@@ -116,7 +116,6 @@ public final class ConfigurationInfo {
 		Arrays.sort(configElements, new Comparator() {
 			Collator collator = Collator.getInstance(Locale.getDefault());
 
-			@Override
 			public int compare(Object a, Object b) {
 				IConfigurationElement element1 = (IConfigurationElement) a;
 				IConfigurationElement element2 = (IConfigurationElement) b;

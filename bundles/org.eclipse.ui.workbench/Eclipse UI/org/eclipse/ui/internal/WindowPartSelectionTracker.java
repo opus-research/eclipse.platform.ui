@@ -34,8 +34,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
      * Part selection listener.
      */
     private final INullSelectionListener selListener = new INullSelectionListener() {
-        @Override
-		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             fireSelection(part, selection);
         }
     };
@@ -44,8 +43,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
      * Part post selection listener
      */
     private final INullSelectionListener postSelListener = new INullSelectionListener() {
-        @Override
-		public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             firePostSelection(part, selection);
         }
     };
@@ -69,15 +67,13 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
     /*
      * @see IPageListener#pageActivated(IWorkbenchPage)
      */
-    @Override
-	public void pageActivated(IWorkbenchPage page) {
+    public void pageActivated(IWorkbenchPage page) {
     }
 
     /*
      * @see IPageListener#pageClosed(IWorkbenchPage)
      */
-    @Override
-	public void pageClosed(IWorkbenchPage page) {
+    public void pageClosed(IWorkbenchPage page) {
         page.removeSelectionListener(getPartId(), selListener);
         page.removePostSelectionListener(getPartId(), postSelListener);
     }
@@ -85,8 +81,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
     /*
      * @see IPageListener#pageOpened(IWorkbenchPage)
      */
-    @Override
-	public void pageOpened(IWorkbenchPage page) {
+    public void pageOpened(IWorkbenchPage page) {
         page.addSelectionListener(getPartId(), selListener);
         page.addPostSelectionListener(getPartId(), postSelListener);
     }
@@ -112,8 +107,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
     /**
      * @see AbstractPartSelectionTracker#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         fWindow = null;
     }
@@ -121,8 +115,7 @@ public class WindowPartSelectionTracker extends AbstractPartSelectionTracker
     /*
      * @see AbstractPartSelectionTracker#getSelection()
      */
-    @Override
-	public ISelection getSelection() {
+    public ISelection getSelection() {
         IWorkbenchPage page = getWindow().getActivePage();
         if (page != null) {
             return page.getSelection(getPartId());

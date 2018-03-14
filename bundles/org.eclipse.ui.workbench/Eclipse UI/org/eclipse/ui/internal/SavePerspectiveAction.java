@@ -39,8 +39,7 @@ public class SavePerspectiveAction extends PerspectiveAction {
     /* (non-Javadoc)
      * Method declared on PerspectiveAction.
      */
-    @Override
-	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
+    protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         PerspectiveDescriptor desc = (PerspectiveDescriptor) persp;
         if (desc != null) {
 			// saveNonSingleton(page, desc);

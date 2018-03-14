@@ -99,7 +99,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 	 * (org.eclipse.swt.widgets.Composite,
 	 * org.eclipse.ui.statushandlers.StatusAdapter)
 	 */
-	@Override
 	public Control createSupportArea(Composite parent,
 			StatusAdapter statusAdapter) {
 		Composite area = createArea(parent);
@@ -131,7 +130,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 
 			ArrayList keyList = new ArrayList();
 
-			@Override
 			public void keyPressed(KeyEvent e) {
 				// get the character. reverse the ctrl modifier if necessary
 				char character = e.character;
@@ -171,14 +169,12 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				}
 			}
 
-			@Override
 			public void keyReleased(KeyEvent e) {
 				// no op
 			}
 		});
 		text.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (text.getSelectionText().length() == 0) {
 					if (copyAction != null && !copyAction.isDisposed()) {
@@ -191,7 +187,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 				}
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				widgetSelected(e);
 			}
@@ -255,18 +250,15 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 		DragSource ds = new DragSource(text, DND.DROP_COPY);
 		ds.setTransfer(new Transfer[] { TextTransfer.getInstance() });
 		ds.addDragListener(new DragSourceListener() {
-			@Override
 			public void dragFinished(DragSourceEvent event) {
 			}
 
-			@Override
 			public void dragSetData(DragSourceEvent event) {
 				if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
 					event.data = text.getSelectionText();
 				}
 			}
 
-			@Override
 			public void dragStart(DragSourceEvent event) {
 			}
 		});
@@ -285,7 +277,6 @@ public class DefaultDetailsArea extends AbstractStatusAreaProvider {
 			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
 			 * .swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				copyToClipboard();
 				super.widgetSelected(e);

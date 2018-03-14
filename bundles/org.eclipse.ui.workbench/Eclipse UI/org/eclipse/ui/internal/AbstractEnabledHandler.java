@@ -29,7 +29,6 @@ public abstract class AbstractEnabledHandler extends AbstractHandler {
 	 * 
 	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
 	 */
-	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
