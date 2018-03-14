@@ -43,7 +43,6 @@ public class TabbedPropertySheetPageDynamicTest extends TestCase {
 
 	private DynamicTestsTreeNode[] treeNodes;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -84,7 +83,6 @@ public class TabbedPropertySheetPageDynamicTest extends TestCase {
 		assertEquals(treeNodes.length, 11);
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 

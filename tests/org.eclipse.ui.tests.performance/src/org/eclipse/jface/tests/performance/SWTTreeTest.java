@@ -65,8 +65,7 @@ public class SWTTreeTest extends BasicPerformanceTest {
 		openBrowser();
 
         exercise(new TestRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 processEvents();
                 startMeasuring();
                 for (int j = 0; j < TreeAddTest.TEST_COUNT; j++) {
@@ -91,8 +90,7 @@ public class SWTTreeTest extends BasicPerformanceTest {
 		openBrowser();
 
         exercise(new TestRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 processEvents();
                 startMeasuring();
                 for (int j = 0; j < TreeAddTest.TEST_COUNT; j++) {

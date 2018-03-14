@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 
 package org.eclipse.ui.internal.activities;
@@ -29,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -503,7 +501,7 @@ public final class MutableActivityManager extends AbstractActivityManager
     }
 
 	private void clearExpressions() {
-		IEvaluationService evaluationService = PlatformUI
+		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		Iterator i = refsByActivityDefinition.values().iterator();
 		while (i.hasNext()) {
@@ -721,7 +719,7 @@ public final class MutableActivityManager extends AbstractActivityManager
         // enabledWhen comes into play
         IEvaluationReference ref = (IEvaluationReference) refsByActivityDefinition
 				.get(activityDefinition);
-		IEvaluationService evaluationService = PlatformUI
+		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		boolean newRef = false;
 		if (activityDefinition != null && evaluationService!=null) {
@@ -913,6 +911,9 @@ public final class MutableActivityManager extends AbstractActivityManager
         activityRegistry.removeActivityRegistryListener(activityRegistryListener);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
 	@Override
 	synchronized public Object clone() {
         MutableActivityManager clone = new MutableActivityManager(advisor, activityRegistry);
@@ -928,9 +929,13 @@ public final class MutableActivityManager extends AbstractActivityManager
      */
     private Job getUpdateJob() {
         if (deferredIdentifierJob == null) {
-            deferredIdentifierJob = Job.create("Identifier Update Job", new IJobFunction() { //$NON-NLS-1$
+            deferredIdentifierJob = new Job("Identifier Update Job") { //$NON-NLS-1$
+
+                /* (non-Javadoc)
+                 * @see org.eclipse.core.internal.jobs.InternalJob#run(org.eclipse.core.runtime.IProgressMonitor)
+                 */
                 @Override
-				public IStatus run(IProgressMonitor monitor) {
+				protected IStatus run(IProgressMonitor monitor) {
                     while (!deferredIdentifiers.isEmpty()) {
                         Identifier identifier = (Identifier) deferredIdentifiers.remove(0);
                         Set activityIds = new HashSet();
@@ -966,7 +971,7 @@ public final class MutableActivityManager extends AbstractActivityManager
                     }
                     return Status.OK_STATUS;
                 }
-			});
+            };
             deferredIdentifierJob.setSystem(true);
         }
         return deferredIdentifierJob;
