@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
@@ -36,7 +37,6 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.internal.MakeHandlersGo;
 import org.eclipse.ui.services.IServiceLocator;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 import org.eclipse.ui.views.contentoutline.ContentOutline;
@@ -57,11 +57,7 @@ public class HandlerActivationTest extends UITestCase {
 			contextId = id;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-		 */
+		@Override
 		public Object execute(ExecutionEvent event) {
 			executionCount++;
 			return null;
@@ -70,6 +66,7 @@ public class HandlerActivationTest extends UITestCase {
 	}
 
 	static class OutlineOnlyHandler extends AbstractHandler {
+		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
 			if (!(part instanceof ContentOutline)) {
@@ -79,6 +76,7 @@ public class HandlerActivationTest extends UITestCase {
 			return null;
 		}
 
+		@Override
 		public void setEnabled(Object evaluationContext) {
 			IWorkbenchPart part = (IWorkbenchPart) HandlerUtil.getVariable(
 					evaluationContext, ISources.ACTIVE_PART_NAME);
@@ -142,11 +140,11 @@ public class HandlerActivationTest extends UITestCase {
 	public HandlerActivationTest(String name) {
 		super(name);
 		services = PlatformUI.getWorkbench();
-		contextService = (IContextService) services
+		contextService = services
 				.getService(IContextService.class);
-		commandService = (ICommandService) services
+		commandService = services
 				.getService(ICommandService.class);
-		handlerService = (IHandlerService) services
+		handlerService = services
 				.getService(IHandlerService.class);
 	}
 
@@ -186,11 +184,7 @@ public class HandlerActivationTest extends UITestCase {
 		makeHandler(handlerId, contextId, expression);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		for (int i = 0; i < CREATE_CONTEXTS.length; i++) {
 			final String[] contextInfo = CREATE_CONTEXTS[i];
@@ -204,16 +198,12 @@ public class HandlerActivationTest extends UITestCase {
 		if (!cmd.isDefined()) {
 			Category cat = commandService.getCategory(CATEGORY_ID);
 			cmd.define("Test Handler", "Test handler activation", cat);
-			cmd.setHandler(new MakeHandlersGo(getWorkbench(), CMD_ID));
+			cmd.setHandler(HandlerServiceImpl.getHandler(CMD_ID));
 		}
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		handlerService.deactivateHandlers(testHandlerActivations.values());
 		testHandlerActivations.clear();

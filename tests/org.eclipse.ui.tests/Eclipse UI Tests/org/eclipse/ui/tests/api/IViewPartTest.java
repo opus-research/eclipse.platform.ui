@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,14 +31,16 @@ public class IViewPartTest extends IWorkbenchPartTest {
     /**
      * @see IWorkbenchPartTest#openPart(IWorkbenchPage)
      */
-    protected MockPart openPart(IWorkbenchPage page) throws Throwable {
+    @Override
+	protected MockPart openPart(IWorkbenchPage page) throws Throwable {
         return (MockWorkbenchPart) page.showView(MockViewPart.ID);
     }
 
     /**
      * @see IWorkbenchPartTest#closePart(IWorkbenchPage, MockWorkbenchPart)
      */
-    protected void closePart(IWorkbenchPage page, MockPart part)
+    @Override
+	protected void closePart(IWorkbenchPage page, MockPart part)
             throws Throwable {
         page.hideView((IViewPart) part);
     }

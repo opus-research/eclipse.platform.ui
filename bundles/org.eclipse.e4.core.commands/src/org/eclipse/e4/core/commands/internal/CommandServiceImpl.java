@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,14 +32,8 @@ public class CommandServiceImpl implements ECommandService {
 		commandManager = m;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.core.commands.ECommandService#createCommand(org.eclipse.core.commands.Command,
-	 * java.util.Map)
-	 */
-	public ParameterizedCommand createCommand(String id, Map parameters) {
+	@Override
+	public ParameterizedCommand createCommand(String id, Map<String, Object> parameters) {
 		Command command = getCommand(id);
 		if (command == null) {
 			return null;
@@ -47,12 +41,7 @@ public class CommandServiceImpl implements ECommandService {
 		return ParameterizedCommand.generateCommand(command, parameters);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.core.commands.ECommandService#defineCategory(java.lang.String,
-	 * java.lang.String, java.lang.String)
-	 */
+	@Override
 	public Category defineCategory(String id, String name, String description) {
 		Category cat = commandManager.getCategory(id);
 		if (!cat.isDefined()) {
@@ -61,37 +50,24 @@ public class CommandServiceImpl implements ECommandService {
 		return cat;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.core.commands.ECommandService#defineCommand(java.lang.String,
-	 * java.lang.String, java.lang.String, org.eclipse.core.commands.Category)
-	 */
+	@Override
 	public Command defineCommand(String id, String name, String description, Category category,
 			IParameter[] parameters) {
 		Command cmd = commandManager.getCommand(id);
 		if (!cmd.isDefined()) {
 			cmd.define(name, description, category, parameters);
+			cmd.setHandler(HandlerServiceImpl.getHandler(id));
 		}
 		return cmd;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.core.commands.ECommandService#getCategory(java.lang.String)
-	 */
+	@Override
 	public Category getCategory(String categoryId) {
 		return commandManager.getCategory(categoryId);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.core.commands.ECommandService#getCommand(java.lang.String)
-	 */
+	@Override
 	public Command getCommand(String commandId) {
 		return commandManager.getCommand(commandId);
 	}
-
 }

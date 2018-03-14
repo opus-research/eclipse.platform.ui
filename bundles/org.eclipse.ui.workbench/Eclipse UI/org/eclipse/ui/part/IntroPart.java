@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.SafeRunnable;
@@ -80,7 +81,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroPart#addPropertyListener(org.eclipse.ui.IPropertyListener)
      */
-    public void addPropertyListener(IPropertyListener l) {
+    @Override
+	public void addPropertyListener(IPropertyListener l) {
         addListenerObject(l);
     }
 
@@ -93,14 +95,16 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * 
      * @see IIntroPart
      */
-    public abstract void createPartControl(Composite parent);
+    @Override
+	public abstract void createPartControl(Composite parent);
 
     /**
      * The <code>IntroPart</code> implementation of this
      * <code>IIntroPart</code> method disposes the title image loaded by
      * <code>setInitializationData</code>. Subclasses may extend.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (titleImage != null) {
             JFaceResources.getResources().destroyImage(imageDescriptor);
             titleImage = null;
@@ -122,9 +126,10 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
         Object[] array = getListeners();
         for (int nX = 0; nX < array.length; nX++) {
             final IPropertyListener l = (IPropertyListener) array[nX];
-            Platform.run(new SafeRunnable() {
+            SafeRunner.run(new SafeRunnable() {
 
-                public void run() {
+                @Override
+				public void run() {
                     l.propertyChanged(this, propertyId);
                 }
             });
@@ -139,7 +144,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * invoke the method on their superclass to ensure that the Platform's
      * adapter manager is consulted).
      */
-    public Object getAdapter(Class adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         return Platform.getAdapterManager().getAdapter(this, adapter);
     }
 
@@ -169,14 +175,16 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * 
      * @see org.eclipse.ui.intro.IIntroPart#getIntroSite()
      */
-    public final IIntroSite getIntroSite() {
+    @Override
+	public final IIntroSite getIntroSite() {
         return partSite;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroPart#getTitleImage()
      */
-    public Image getTitleImage() {
+    @Override
+	public Image getTitleImage() {
         if (titleImage != null) {
             return titleImage;
         }
@@ -186,7 +194,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroPart#getTitle()
      */
-    public String getTitle() {
+    @Override
+	public String getTitle() {
     	if (titleLabel != null) {
     		return titleLabel;
     	}
@@ -215,7 +224,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * @exception PartInitException
      *                if this part was not initialized successfully
      */
-    public void init(IIntroSite site, IMemento memento)
+    @Override
+	public void init(IIntroSite site, IMemento memento)
             throws PartInitException {
         setSite(site);
     }
@@ -235,7 +245,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
     /* (non-Javadoc)
      * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
      */
-    public void removePropertyListener(IPropertyListener l) {
+    @Override
+	public void removePropertyListener(IPropertyListener l) {
         removeListenerObject(l);
     }
 
@@ -246,7 +257,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * @param memento
      *            a memento to receive the object state
      */
-    public void saveState(IMemento memento) {
+    @Override
+	public void saveState(IMemento memento) {
         //no-op
     }
 
@@ -259,7 +271,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * 
      * @see IIntroPart
      */
-    public abstract void setFocus();
+    @Override
+	public abstract void setFocus();
 
     /**
      * The <code>IntroPart</code> implementation of this
@@ -271,7 +284,8 @@ public abstract class IntroPart extends EventManager implements IIntroPart,
      * Should not be called by clients. It is called by the core plugin when
      * creating this executable extension.
      */
-    public void setInitializationData(IConfigurationElement cfig,
+    @Override
+	public void setInitializationData(IConfigurationElement cfig,
             String propertyName, Object data) {
 
         // Save config element.

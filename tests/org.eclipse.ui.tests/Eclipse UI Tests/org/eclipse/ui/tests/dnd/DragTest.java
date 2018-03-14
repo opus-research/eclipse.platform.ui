@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2007 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -160,7 +160,8 @@ public class DragTest extends UITestCaseWithResult {
     	this(dragSource, dropTarget, log, "");
     }
     
-    public void doSetUp() throws Exception {
+    @Override
+	public void doSetUp() throws Exception {
         // don't allow UITestCase to manage the deactivation of our window
         manageWindows(false);
         //window = (WorkbenchWindow)openTestWindow();
@@ -242,7 +243,8 @@ public class DragTest extends UITestCaseWithResult {
     	}
     }
     
-    public String performTest() throws Throwable {
+    @Override
+	public String performTest() throws Throwable {
         // Uncomment the following line to 'stall' the tests here...
         //stallTest();
 

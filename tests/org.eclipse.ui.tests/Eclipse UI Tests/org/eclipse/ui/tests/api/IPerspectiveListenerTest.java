@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,14 +36,16 @@ public class IPerspectiveListenerTest extends UITestCase implements
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fEvent = NONE;
         fWindow = openTestWindow();
         fWindow.addPerspectiveListener(this);
     }
 
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         fWindow.removePerspectiveListener(this);
         super.doTearDown();
     }
@@ -77,7 +79,8 @@ public class IPerspectiveListenerTest extends UITestCase implements
     /**
      * @see IPerspectiveListener#perspectiveActivated(IWorkbenchPage, IPerspectiveDescriptor)
      */
-    public void perspectiveActivated(IWorkbenchPage page,
+    @Override
+	public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         if (page == fPageMask && perspective == fPerMask)
             fEvent = fEvent | ACTIVATED;
@@ -86,7 +89,8 @@ public class IPerspectiveListenerTest extends UITestCase implements
     /**
      * @see IPerspectiveListener#perspectiveChanged(IWorkbenchPage, IPerspectiveDescriptor, String)
      */
-    public void perspectiveChanged(IWorkbenchPage page,
+    @Override
+	public void perspectiveChanged(IWorkbenchPage page,
             IPerspectiveDescriptor perspective, String changeId) {
         if (page == fPageMask && perspective == fPerMask)
         	fEvent = fEvent | CHANGED;

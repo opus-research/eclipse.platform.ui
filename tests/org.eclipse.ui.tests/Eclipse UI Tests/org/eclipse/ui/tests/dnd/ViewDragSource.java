@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2005 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,10 +46,8 @@ public class ViewDragSource extends TestDragSource {
         return getPage().findView(targetPart);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDragSource#getName()
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         IViewDescriptor desc = WorkbenchPlugin.getDefault().getViewRegistry()
                 .find(targetPart);
         String title = desc.getLabel();
@@ -65,10 +63,8 @@ public class ViewDragSource extends TestDragSource {
         return title;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.dnd.TestDragSource#drag(org.eclipse.swt.graphics.Point)
-     */
-    public void drag(TestDropLocation target) {
+    @Override
+	public void drag(TestDropLocation target) {
         IViewPart part = getPart();
 
         WorkbenchPage page = getPage();

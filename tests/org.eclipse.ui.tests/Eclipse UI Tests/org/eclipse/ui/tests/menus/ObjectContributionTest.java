@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -305,18 +305,22 @@ public final class ObjectContributionTest extends UITestCase {
 	public void assertPopupMenus(String name, String[] commandIds,
 			final ISelection selection, Class selectionType, boolean existance) {
 		ISelectionProvider selectionProvider = new ISelectionProvider() {
+			@Override
 			public void addSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
+			@Override
 			public ISelection getSelection() {
 				return selection;
 			}
 
+			@Override
 			public void removeSelectionChangedListener(
 					ISelectionChangedListener listener) {
 			}
 
+			@Override
 			public void setSelection(ISelection selection) {
 			}
 		};

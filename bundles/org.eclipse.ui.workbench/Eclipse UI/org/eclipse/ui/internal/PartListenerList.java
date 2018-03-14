@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -54,7 +54,7 @@ public class PartListenerList extends EventManager {
     		label = description + part.getTitle();
     		UIStats.start(UIStats.NOTIFY_PART_LISTENERS, label);
     	}
-    	Platform.run(runnable);
+    	SafeRunner.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PART_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PART_LISTENERS, listener, label);
 		}
@@ -68,7 +68,8 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partActivated(part);
                 }
             }, l, part, "activated::"); //$NON-NLS-1$
@@ -83,7 +84,8 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partBroughtToTop(part);
                 }
             }, l, part, "broughtToTop::"); //$NON-NLS-1$
@@ -98,7 +100,8 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partClosed(part);
                 }
             }, l, part, "closed::"); //$NON-NLS-1$
@@ -113,7 +116,8 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partDeactivated(part);
                 }
             }, l, part, "deactivated::"); //$NON-NLS-1$
@@ -128,7 +132,8 @@ public class PartListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener l = (IPartListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partOpened(part);
                 }
             }, l, part, "opened::"); //$NON-NLS-1$

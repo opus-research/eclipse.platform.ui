@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,10 +46,8 @@ public class RawIViewPartTest extends UITestCase {
     boolean contentChangeEvent = false;
 
     private IPropertyListener propertyListener = new IPropertyListener() {
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
-         */
-        public void propertyChanged(Object source, int propId) {
+        @Override
+		public void propertyChanged(Object source, int propId) {
             switch (propId) {
             case IWorkbenchPartConstants.PROP_TITLE:
                 titleChangeEvent = true;
@@ -64,7 +62,8 @@ public class RawIViewPartTest extends UITestCase {
         }
     };
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         window = openTestWindow();
         page = window.getActivePage();
@@ -78,10 +77,8 @@ public class RawIViewPartTest extends UITestCase {
         contentChangeEvent = false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
-     */
-    protected void doTearDown() throws Exception {
+    @Override
+	protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);
         page.hideView(view);
         super.doTearDown();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -86,6 +87,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		return logStatus==null?"No message":logStatus.getMessage();
 	}
 	ILogListener openAndHideListener = new ILogListener() {
+		@Override
 		public void logging(IStatus status, String plugin) {
 			logStatus = status;
 			logCount++;
@@ -100,31 +102,39 @@ public class IWorkbenchPageTest extends UITestCase {
 	private int partActiveCount = 0;
 	private IWorkbenchPartReference partActiveRef = null;
 	IPartListener2 partListener2 = new IPartListener2() {
+		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
 			partActiveCount++;
 			partActiveRef = partRef;
 		}
 
+		@Override
 		public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partClosed(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partDeactivated(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partHidden(IWorkbenchPartReference partRef) {
 			partHiddenCount++;
 			partHiddenRef = partRef;
 		}
 
+		@Override
 		public void partInputChanged(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partOpened(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partVisible(IWorkbenchPartReference partRef) {
 			partVisibleCount++;
 			partVisibleRef = partRef;
@@ -135,6 +145,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		fWin = openTestWindow();
@@ -144,6 +155,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		Platform.addLogListener(openAndHideListener);
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if (proj != null) {
@@ -233,6 +245,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		sets[0] = new IWorkingSet[0];
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				IWorkingSet[] oldSets = (IWorkingSet[]) event.getOldValue();
 				assertTrue(Arrays.equals(sets[0], oldSets));
@@ -263,6 +276,53 @@ public class IWorkbenchPageTest extends UITestCase {
 	}
 
 	/**
+	 * Test if the WorkingSet related settings are persisted across sessions.
+	 */
+	public void testWorkingSetsPersisted_Bug385592() {
+		IWorkingSetManager manager = fActivePage.getWorkbenchWindow()
+				.getWorkbench().getWorkingSetManager();
+
+		// get initial state and save it
+		IWorkingSet[] workingSetsBeforeSave = fActivePage.getWorkingSets();
+		String aggrWorkingSetIdBeforeSave = fActivePage
+				.getAggregateWorkingSet().getName();
+		((WorkbenchPage) fActivePage).saveWorkingSets();
+		assertNotNull(workingSetsBeforeSave);
+		assertNotNull(aggrWorkingSetIdBeforeSave);
+		assertEquals(0, workingSetsBeforeSave.length);
+
+		IWorkingSet set1 = null;
+		try {
+			set1 = manager.createWorkingSet("w1", new IAdaptable[0]);
+			manager.addWorkingSet(set1);
+
+			// change the working sets
+			fActivePage.setWorkingSets(new IWorkingSet[] { set1 });
+			assertNotNull(fActivePage.getWorkingSets());
+			assertEquals(1, fActivePage.getWorkingSets().length);
+
+			// restore the previous state
+			((WorkbenchPage) fActivePage).restoreWorkingSets();
+			assertEquals(aggrWorkingSetIdBeforeSave, fActivePage
+					.getAggregateWorkingSet().getName());
+			assertNotNull(fActivePage.getWorkingSets());
+			assertEquals(workingSetsBeforeSave.length,
+					fActivePage.getWorkingSets().length);
+
+			// change again, save and restore the settings
+			fActivePage.setWorkingSets(new IWorkingSet[] { set1 });
+			((WorkbenchPage) fActivePage).saveWorkingSets();
+			((WorkbenchPage) fActivePage).restoreWorkingSets();
+			assertEquals(aggrWorkingSetIdBeforeSave, fActivePage
+					.getAggregateWorkingSet().getName());
+			assertEquals(1, fActivePage.getWorkingSets().length);
+		} finally {
+			if (set1 != null)
+				manager.removeWorkingSet(set1);
+		}
+	}
+
+	/**	
 	 * Test the VIEW_VISIBLE parameter for showView, opening the view in the
 	 * stack that does not contain the active view. Ensures that the created
 	 * view is not the active part but is the top part in its stack.
@@ -285,6 +345,30 @@ public class IWorkbenchPageTest extends UITestCase {
 		assertEquals(fActivePage.findView(MockViewPart.ID), stack[1]);
 
 		assertTrue(fActivePage.isPartVisible(createdPart));
+
+		assertEquals(activePart, fActivePage.getActivePart());
+	}
+
+	/**
+	 * Test the VIEW_ACTIVE parameter for showView, opening the view in the stack that does not
+	 * contain the active view. Ensures that the created view is not the active part but is the top
+	 * part in its stack.
+	 */
+	public void testView_ACTIVE2() throws PartInitException {
+		fActivePage.setPerspective(WorkbenchPlugin.getDefault().getPerspectiveRegistry().findPerspectiveWithId("org.eclipse.ui.tests.api.ViewPerspective"));
+
+		// create a part to be active
+		fActivePage.showView(MockViewPart.ID3);
+
+		IViewPart activePart= fActivePage.showView(MockViewPart.ID2, null, IWorkbenchPage.VIEW_ACTIVATE);
+
+		IViewPart[] stack= fActivePage.getViewStack(activePart);
+		assertEquals(2, stack.length);
+
+		assertEquals(activePart, stack[0]);
+		assertEquals(fActivePage.findView(MockViewPart.ID), stack[1]);
+
+		assertTrue(fActivePage.isPartVisible(activePart));
 
 		assertEquals(activePart, fActivePage.getActivePart());
 	}
@@ -1034,15 +1118,11 @@ public class IWorkbenchPageTest extends UITestCase {
 	}
 
 	public void testFindSecondaryViewReference() throws Throwable {
-		fActivePage
-				.getWorkbenchWindow()
-				.getWorkbench()
-				.showPerspective(SessionPerspective.ID,
-						fActivePage.getWorkbenchWindow());
+		fActivePage.getWorkbenchWindow().getWorkbench().showPerspective(
+				SessionPerspective.ID, fActivePage.getWorkbenchWindow());
 		assertNull(fActivePage.findViewReference(MockViewPart.IDMULT, "1"));
-
-		fActivePage.showView(MockViewPart.IDMULT, "1",
-				IWorkbenchPage.VIEW_ACTIVATE);
+		
+		fActivePage.showView(MockViewPart.IDMULT, "1", IWorkbenchPage.VIEW_ACTIVATE);
 		assertNotNull(fActivePage.findViewReference(MockViewPart.IDMULT, "1"));
 	}
 	
@@ -1900,7 +1980,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		IPerspectiveDescriptor persp = fActivePage.getPerspective();
 		
-		ICommandService commandService = (ICommandService) fWorkbench.getService(ICommandService.class);
+		ICommandService commandService = fWorkbench.getService(ICommandService.class);
 		Command command = commandService.getCommand("org.eclipse.ui.window.closePerspective");
 		
 		HashMap<String, String> parameters = new HashMap<String, String>();
@@ -1908,7 +1988,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(command, parameters);
 		
-		IHandlerService handlerService = (IHandlerService) fWorkbench
+		IHandlerService handlerService = fWorkbench
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(pCommand, null);
@@ -2835,7 +2915,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.activate(editor);
 
 		processEvents();
-		ICommandService cs = (ICommandService) fActivePage.getWorkbenchWindow()
+		ICommandService cs = fActivePage.getWorkbenchWindow()
 				.getService(ICommandService.class);
 		Command undo = cs.getCommand("org.eclipse.ui.edit.undo");
 		assertTrue(undo.isDefined());

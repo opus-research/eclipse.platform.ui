@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,8 @@ public class PluginActionSet implements IActionSet {
     /**
      * Disposes of this action set.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         Iterator iter = pluginActions.iterator();
         while (iter.hasNext()) {
             WWinPluginAction action = (WWinPluginAction) iter.next();
@@ -113,7 +114,8 @@ public class PluginActionSet implements IActionSet {
      * @param window the workbench window
      * @param bars the action bars
      */
-    public void init(IWorkbenchWindow window, IActionBars bars) {
+    @Override
+	public void init(IWorkbenchWindow window, IActionBars bars) {
         this.bars = (ActionSetActionBars) bars;
     }
 

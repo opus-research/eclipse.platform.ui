@@ -36,6 +36,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		super(parentShell, start, end);
 	}
 
+	@Override
 	public void renderStep(AnimationEngine engine) {
 		if (shellRegion != null) {
 			shellRegion.dispose();
@@ -60,9 +61,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().getDisplay().update();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
-	 */
+	@Override
 	public void initialize(AnimationEngine engine) {
 		Color color = getAnimationShell().getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
 		getAnimationShell().setBackground(color);
@@ -72,9 +71,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 		getAnimationShell().setRegion(shellRegion);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#dispose()
-	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		
@@ -86,6 +83,7 @@ public class LegacyAnimationFeedback extends RectangleAnimationFeedbackBase {
 	 * Perform any initialization you want to have happen -before- the
 	 * amination starts
 	 */
+	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		if (!super.jobInit(engine))
 			return false;
