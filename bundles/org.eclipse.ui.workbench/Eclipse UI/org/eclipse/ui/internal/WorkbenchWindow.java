@@ -806,7 +806,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
-		getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
@@ -834,7 +833,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
 				"PerspectiveSwitcher", model); //$NON-NLS-1$
-		if (switcherControl == null && getWindowConfigurer().getShowPerspectiveBar()) {
+		if (switcherControl == null) {
 			switcherControl = modelService.createModelElement(MToolControl.class);
 			switcherControl.setToBeRendered(getWindowConfigurer().getShowPerspectiveBar());
 			switcherControl.setElementId("PerspectiveSwitcher"); //$NON-NLS-1$
@@ -842,8 +841,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			switcherControl
 					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher"); //$NON-NLS-1$
 			trimBar.getChildren().add(switcherControl);
-		} else if (switcherControl != null && !getWindowConfigurer().getShowPerspectiveBar()) {
-			trimBar.getChildren().remove(switcherControl);
 		}
 
 		// render now after everything has been added so contributions can be
