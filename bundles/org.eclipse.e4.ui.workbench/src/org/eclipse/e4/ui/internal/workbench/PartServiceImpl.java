@@ -591,11 +591,25 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
+	 * .MPart)
+	 */
 	@Override
 	public void activate(MPart part) {
 		activate(part, true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#activate(org.eclipse.e4.ui.model.application
+	 * .MPart,boolean)
+	 */
 	@Override
 	public void activate(MPart part, boolean requiresFocus) {
 		activate(part, requiresFocus, true);
@@ -723,6 +737,11 @@ public class PartServiceImpl implements EPartService {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getActivePart()
+	 */
 	@Override
 	public MPart getActivePart() {
 		return activePart;
@@ -1270,6 +1289,11 @@ public class PartServiceImpl implements EPartService {
 		return context != null && context.getParent().getActiveChild() == context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.modeling.EPartService#getDirtyParts()
+	 */
 	@Override
 	public Collection<MPart> getDirtyParts() {
 		List<MPart> dirtyParts = new ArrayList<MPart>();
@@ -1281,6 +1305,13 @@ public class PartServiceImpl implements EPartService {
 		return dirtyParts;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.modeling.EPartService#save(org.eclipse.e4.ui.model.application.
+	 * MSaveablePart, boolean)
+	 */
 	@Override
 	public boolean savePart(MPart part, boolean confirm) {
 		if (!part.isDirty()) {

@@ -28,8 +28,7 @@ import org.eclipse.swt.graphics.Image;
 
 public abstract class StructuredViewerTest extends ViewerTestCase {
     public static class TestLabelFilter extends ViewerFilter {
-        @Override
-		public boolean select(Viewer viewer, Object parent, Object element) {
+        public boolean select(Viewer viewer, Object parent, Object element) {
             String label = ((TestElement) element).getLabel();
             int count = label.indexOf("-");
             if (count < 0)
@@ -38,15 +37,13 @@ public abstract class StructuredViewerTest extends ViewerTestCase {
             return ((Integer.parseInt(number) % 2) == 0);
         }
 
-        @Override
-		public boolean isFilterProperty(Object element, String property) {
+        public boolean isFilterProperty(Object element, String property) {
             return property.equals(IBasicPropertyConstants.P_TEXT);
         }
     }
 
     public static class TestLabelFilter2 extends ViewerFilter {
-        @Override
-		public boolean select(Viewer viewer, Object parent, Object element) {
+        public boolean select(Viewer viewer, Object parent, Object element) {
             String label = ((TestElement) element).getLabel();
             int count = label.indexOf("-");
             if (count < 0)
@@ -55,23 +52,20 @@ public abstract class StructuredViewerTest extends ViewerTestCase {
             return Integer.parseInt(number) == 0;
         }
 
-        @Override
-		public boolean isFilterProperty(Object element, String property) {
+        public boolean isFilterProperty(Object element, String property) {
             return property.equals(IBasicPropertyConstants.P_TEXT);
         }
     }
     
     public static class TestLabelSorter extends ViewerSorter {
-        @Override
-		public int compare(Viewer v, Object e1, Object e2) {
+        public int compare(Viewer v, Object e1, Object e2) {
             // put greater labels first
             String name1 = ((TestElement) e1).getLabel();
             String name2 = ((TestElement) e2).getLabel();
             return name2.compareTo(name1);
         }
 
-        @Override
-		public boolean isSorterProperty(Object element, String property) {
+        public boolean isSorterProperty(Object element, String property) {
             return property.equals(IBasicPropertyConstants.P_TEXT);
         }
     }
@@ -82,13 +76,11 @@ public abstract class StructuredViewerTest extends ViewerTestCase {
         static Image fgImage = ImageDescriptor.createFromFile(
                 TestLabelProvider.class, "images/java.gif").createImage();
 
-        @Override
-		public String getText(Object element) {
+        public String getText(Object element) {
             return providedString((TestElement) element);
         }
 
-        @Override
-		public Image getImage(Object element) {
+        public Image getImage(Object element) {
             return fgImage;
         }
 
@@ -167,7 +159,6 @@ public abstract class StructuredViewerTest extends ViewerTestCase {
     	assertEquals(0, fViewer.getFilters().length);
     	fViewer.addFilter(new ViewerFilter() {
 
-			@Override
 			public boolean select(Viewer viewer, Object parentElement,
 					Object element) {
 				return false;

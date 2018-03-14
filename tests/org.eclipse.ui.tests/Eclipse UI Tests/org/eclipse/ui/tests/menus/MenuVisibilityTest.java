@@ -241,7 +241,7 @@ public class MenuVisibilityTest extends UITestCase {
 		assertFalse(item.isEnabled());
 		assertFalse("starting state", item.isVisible());
 
-		IHandlerService handlers = window
+		IHandlerService handlers = (IHandlerService) window
 				.getService(IHandlerService.class);
 		TestEnabled handler = new TestEnabled();
 		IHandlerActivation activateHandler = handlers.activateHandler(
@@ -277,8 +277,8 @@ public class MenuVisibilityTest extends UITestCase {
 		super.doSetUp();
 
 		window = openTestWindow();
-		menuService = window.getService(IMenuService.class);
-		contextService = window
+		menuService = (IMenuService) window.getService(IMenuService.class);
+		contextService = (IContextService) window
 				.getService(IContextService.class);
 		Context context1 = contextService
 				.getContext(MenuContributionHarness.CONTEXT_TEST1_ID);
