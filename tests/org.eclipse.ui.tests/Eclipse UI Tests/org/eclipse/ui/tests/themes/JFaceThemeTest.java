@@ -18,7 +18,6 @@ import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.themes.ITheme;
 import org.eclipse.ui.themes.IThemeManager;
@@ -29,12 +28,6 @@ import org.eclipse.ui.themes.IThemeManager;
  * @since 3.0
  */
 public class JFaceThemeTest extends ThemeTest {
-	
-	/**
-	 * 
-	 */
-	private static final String THEME_WITH_FONT_OVERRIDE = "org.eclipse.ui.tests.theme.e4_classic";
-	private static final String FONT_ID = "org.eclipse.ui.workbench.TAB_TEXT_FONT";
 
     public JFaceThemeTest(String testName) {
         super(testName);
@@ -107,16 +100,5 @@ public class JFaceThemeTest extends ThemeTest {
 		color = desc.createColor(getWorkbench().getDisplay());
 		assertNotNull(color);
 		color.dispose();
-	}
-	
-	public void testColorOverride() {
-		FontRegistry jfaceFonts = JFaceResources.getFontRegistry();
-		FontData[] originalData = jfaceFonts.getFontData(FONT_ID);
-		assertEquals(1, originalData.length);
-		assertEquals("Sans", originalData[0].name);
-		fThemeEngine.setTheme(THEME_WITH_FONT_OVERRIDE, false);
-		FontData[] changedData = jfaceFonts.getFontData(FONT_ID);
-		assertEquals(1, changedData.length);
-		assertEquals("Sans", changedData[0].name);
 	}
 }
