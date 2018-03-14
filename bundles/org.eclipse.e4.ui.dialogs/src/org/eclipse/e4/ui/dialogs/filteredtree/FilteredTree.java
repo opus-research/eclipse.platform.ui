@@ -1,12 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2014 vogella GmbH and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     Simon Scholz <simon.scholz@vogella.com> - initial API and implementation based on org.eclipse.ui.dialogs.FilteredTree
+ *     IBM Corporation - initial API and implementation
+ *     Jacek Pospychala - bug 187762
+ *     Mohamed Tarief - tarief@eg.ibm.com - IBM - Bug 174481
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440381
  *******************************************************************************/
 package org.eclipse.e4.ui.dialogs.filteredtree;
 
@@ -20,10 +23,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.ui.dialogs.textbundles.E4DialogMessages;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -56,7 +58,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -77,27 +78,43 @@ public class FilteredTree extends Composite {
 	 * <code>null</code> if there is no filter widget, or if the controls have
 	 * not yet been created.
 	 */
-	private Text filterText;
+	protected Text filterText;
 
 	/**
 	 * The control representing the clear button for the filter text entry. This
 	 * value may be <code>null</code> if no such button exists, or if the
 	 * controls have not yet been created.
+	 * <p>
+	 * <strong>Note:</strong> As of 3.5, this is not used if the new look is
+	 * chosen.
+	 * </p>
 	 */
-	private Control clearButtonControl;
+	protected ToolBarManager filterToolBar;
+
+	/**
+	 * The control representing the clear button for the filter text entry. This
+	 * value may be <code>null</code> if no such button exists, or if the
+	 * controls have not yet been created.
+	 * <p>
+	 * <strong>Note:</strong> This is only used if the new look is chosen.
+	 * </p>
+	 *
+	 * @since 3.5
+	 */
+	protected Control clearButtonControl;
 
 	/**
 	 * The viewer for the filtered tree. This value should never be
 	 * <code>null</code> after the widget creation methods are complete.
 	 */
-	private TreeViewer treeViewer;
+	protected TreeViewer treeViewer;
 
 	/**
 	 * The Composite on which the filter controls are created. This is used to
 	 * set the background color of the filter controls to match the surrounding
 	 * controls.
 	 */
-	private Composite filterComposite;
+	protected Composite filterComposite;
 
 	/**
 	 * The pattern filter for the tree. This value must not be <code>null</code>
@@ -108,7 +125,7 @@ public class FilteredTree extends Composite {
 	/**
 	 * The text to initially show in the filter text control.
 	 */
-	private String initialText = ""; //$NON-NLS-1$
+	protected String initialText = ""; //$NON-NLS-1$
 
 	/**
 	 * The job used to refresh the tree.
@@ -116,12 +133,26 @@ public class FilteredTree extends Composite {
 	private Job refreshJob;
 
 	/**
-	 * Whether or not to show the filter controls (text and clear button). The
-	 * default is to show these controls.
+	 * The parent composite of the filtered tree.
+	 *
+	 * @since 3.3
 	 */
-	private boolean showFilterControls;
+	protected Composite parent;
 
-	private Composite treeComposite;
+	/**
+	 * Whether or not to show the filter controls (text and clear button). The
+	 * default is to show these controls. This can be overridden by providing a
+	 * setting in the product configuration file. The setting to add to not show
+	 * these controls is:
+	 *
+	 * org.eclipse.ui/SHOW_FILTERED_TEXTS=false
+	 */
+	protected boolean showFilterControls;
+
+	/**
+	 * @since 3.3
+	 */
+	protected Composite treeComposite;
 
 	/**
 	 * Image descriptor for enabled clear button.
@@ -132,11 +163,6 @@ public class FilteredTree extends Composite {
 	 * Image descriptor for disabled clear button.
 	 */
 	private static final String DISABLED_CLEAR_ICON = "org.eclipse.ui.internal.dialogs.DCLEAR_ICON"; //$NON-NLS-1$
-
-	/**
-	 * Image descriptor for disabled clear button.
-	 */
-	private static final String PRESSED_CLEAR_ICON = "org.eclipse.ui.internal.dialogs.PRESSED_CLEAR_ICON"; //$NON-NLS-1$
 
 	/**
 	 * Maximum time spent expanding the tree after the filter text has been
@@ -155,8 +181,6 @@ public class FilteredTree extends Composite {
 		ImageDescriptor enabledDesc = ImageDescriptor.createFromURL(enabledURL);
 		if (enabledDesc != null) {
 			JFaceResources.getImageRegistry().put(CLEAR_ICON, enabledDesc);
-			JFaceResources.getImageRegistry().put(PRESSED_CLEAR_ICON,
-					ImageDescriptor.createWithFlags(enabledDesc, SWT.IMAGE_GRAY));
 		}
 
 		IPath disabledPath = new Path("$nl$/icons/full/dtool16/clear_co.png");
@@ -178,10 +202,34 @@ public class FilteredTree extends Composite {
 	 *            the style bits for the <code>Tree</code>
 	 * @param filter
 	 *            the filter to be used
+	 * @since 3.5
 	 */
 	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter) {
 		super(parent, SWT.NONE);
+		this.parent = parent;
 		init(treeStyle, filter);
+	}
+
+	/**
+	 * Create a new instance of the receiver.
+	 *
+	 * @param parent
+	 *            the parent <code>Composite</code>
+	 * @param treeStyle
+	 *            the style bits for the <code>Tree</code>
+	 * @param filter
+	 *            the filter to be used
+	 * @param useNewLook
+	 *            ignored, look introduced in 3.5 is always used
+	 * @since 3.5
+	 *
+	 * @deprecated use FilteredTree(Composite parent, int treeStyle,
+	 *             PatternFilter filter)
+	 */
+	@Deprecated
+	public FilteredTree(Composite parent, int treeStyle, PatternFilter filter,
+			boolean useNewLook) {
+		this(parent, treeStyle, filter);
 	}
 
 	/**
@@ -194,9 +242,32 @@ public class FilteredTree extends Composite {
 	 *            the parent <code>Composite</code>
 	 * @see #init(int, PatternFilter)
 	 *
+	 * @since 3.5
 	 */
 	protected FilteredTree(Composite parent) {
 		super(parent, SWT.NONE);
+		this.parent = parent;
+	}
+
+	/**
+	 * Create a new instance of the receiver. Subclasses that wish to override
+	 * the default creation behavior may use this constructor, but must ensure
+	 * that the <code>init(composite, int, PatternFilter)</code> method is
+	 * called in the overriding constructor.
+	 *
+	 * @param parent
+	 *            the parent <code>Composite</code>
+	 * @param useNewLook
+	 *            ignored, look introduced in 3.5 is always used
+	 * @see #init(int, PatternFilter)
+	 *
+	 * @since 3.5
+	 *
+	 * @deprecated use FilteredTree(Composite parent) instead
+	 */
+	@Deprecated
+	protected FilteredTree(Composite parent, boolean useNewLook) {
+		this(parent);
 	}
 
 	/**
@@ -211,11 +282,12 @@ public class FilteredTree extends Composite {
 	 */
 	protected void init(int treeStyle, PatternFilter filter) {
 		patternFilter = filter;
-		setShowFilterControls(true);
-		createControl(getParent(), treeStyle);
+		showFilterControls = true; // PlatformUI.getPreferenceStore().getBoolean(
+		// IWorkbenchPreferenceConstants.SHOW_FILTERED_TEXTS);
+		createControl(parent, treeStyle);
 		createRefreshJob();
 		setInitialText(E4DialogMessages.FilteredTree_FilterMessage);
-		setFont(getParent().getFont());
+		setFont(parent.getFont());
 	}
 
 	/**
@@ -231,23 +303,24 @@ public class FilteredTree extends Composite {
 		setLayout(layout);
 		setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		if (useNativeSearchField(parent)) {
-			filterComposite = new Composite(this, SWT.NONE);
-		} else {
-			filterComposite = new Composite(this, SWT.BORDER);
-			filterComposite.setBackground(getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-		}
-		GridLayout filterLayout = new GridLayout(2, false);
-		filterLayout.marginHeight = 0;
-		filterLayout.marginWidth = 0;
-		filterComposite.setLayout(filterLayout);
-		filterComposite.setFont(parent.getFont());
+		if (showFilterControls) {
+			if (useNativeSearchField(parent)) {
+				filterComposite = new Composite(this, SWT.NONE);
+			} else {
+				filterComposite = new Composite(this, SWT.BORDER);
+				filterComposite.setBackground(getDisplay().getSystemColor(
+						SWT.COLOR_LIST_BACKGROUND));
+			}
+			GridLayout filterLayout = new GridLayout(2, false);
+			filterLayout.marginHeight = 0;
+			filterLayout.marginWidth = 0;
+			filterComposite.setLayout(filterLayout);
+			filterComposite.setFont(parent.getFont());
 
-		createFilterControls(filterComposite);
-		GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-		filterComposite.setVisible(isShowFilterControls());
-		gridData.exclude = !isShowFilterControls();
-		filterComposite.setLayoutData(gridData);
+			createFilterControls(filterComposite);
+			filterComposite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
+					true, false));
+		}
 
 		treeComposite = new Composite(this, SWT.NONE);
 		GridLayout treeCompositeLayout = new GridLayout();
@@ -294,6 +367,11 @@ public class FilteredTree extends Composite {
 		if (clearButtonControl != null) {
 			// initially there is no text to clear
 			clearButtonControl.setVisible(false);
+		}
+		if (filterToolBar != null) {
+			filterToolBar.update(false);
+			// initially there is no text to clear
+			filterToolBar.getControl().setVisible(false);
 		}
 		return parent;
 	}
@@ -380,7 +458,7 @@ public class FilteredTree extends Composite {
 	 * @since 3.4
 	 */
 	protected BasicUIJob doCreateRefreshJob() {
-		return new BasicUIJob("Refresh Filter", getDisplay()) {//$NON-NLS-1$
+		return new BasicUIJob("Refresh Filter", parent.getDisplay()) {//$NON-NLS-1$
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (treeViewer.getControl().isDisposed()) {
@@ -510,6 +588,9 @@ public class FilteredTree extends Composite {
 	protected void updateToolbar(boolean visible) {
 		if (clearButtonControl != null) {
 			clearButtonControl.setVisible(visible);
+		}
+		if (filterToolBar != null) {
+			filterToolBar.getControl().setVisible(visible);
 		}
 	}
 
@@ -734,6 +815,9 @@ public class FilteredTree extends Composite {
 		if (filterComposite != null && (useNativeSearchField(filterComposite))) {
 			filterComposite.setBackground(background);
 		}
+		if (filterToolBar != null && filterToolBar.getControl() != null) {
+			filterToolBar.getControl().setBackground(background);
+		}
 	}
 
 
@@ -747,17 +831,14 @@ public class FilteredTree extends Composite {
 		// only create the button if the text widget doesn't support one
 		// natively
 		if ((filterText.getStyle() & SWT.ICON_CANCEL) == 0) {
+			final Image inactiveImage = JFaceResources.getImageRegistry()
+					.getDescriptor(DISABLED_CLEAR_ICON).createImage();
+			final Image activeImage = JFaceResources.getImageRegistry()
+					.getDescriptor(CLEAR_ICON).createImage();
+			final Image pressedImage = new Image(getDisplay(), activeImage,
+					SWT.IMAGE_GRAY);
 
 			final Label clearButton = new Label(parent, SWT.NONE);
-			ResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources(), clearButton);
-
-			final Image inactiveImage = resourceManager.createImage(JFaceResources.getImageRegistry().getDescriptor(
-					DISABLED_CLEAR_ICON));
-			final Image activeImage = resourceManager.createImage(JFaceResources.getImageRegistry()
-					.getDescriptor(CLEAR_ICON));
-			final Image pressedImage = resourceManager.createImage(JFaceResources.getImageRegistry().getDescriptor(
-					PRESSED_CLEAR_ICON));
-
 			clearButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER,
 					false, false));
 			clearButton.setImage(inactiveImage);
@@ -766,7 +847,6 @@ public class FilteredTree extends Composite {
 			clearButton
 			.setToolTipText(E4DialogMessages.FilteredTree_ClearToolTip);
 			clearButton.addMouseListener(new MouseAdapter() {
-
 				private MouseMoveListener fMoveListener;
 
 				@Override
@@ -780,7 +860,9 @@ public class FilteredTree extends Composite {
 							boolean mouseInButton = isMouseInButton(e);
 							if (mouseInButton != fMouseInButton) {
 								fMouseInButton = mouseInButton;
-								clearButton.setImage(mouseInButton ? pressedImage : inactiveImage);
+								clearButton
+								.setImage(mouseInButton ? pressedImage
+										: inactiveImage);
 							}
 						}
 					};
@@ -793,7 +875,8 @@ public class FilteredTree extends Composite {
 						clearButton.removeMouseMoveListener(fMoveListener);
 						fMoveListener = null;
 						boolean mouseInButton = isMouseInButton(e);
-						clearButton.setImage(mouseInButton ? activeImage : inactiveImage);
+						clearButton.setImage(mouseInButton ? activeImage
+								: inactiveImage);
 						if (mouseInButton) {
 							clearText();
 							filterText.setFocus();
@@ -820,6 +903,14 @@ public class FilteredTree extends Composite {
 
 				@Override
 				public void mouseHover(MouseEvent e) {
+				}
+			});
+			clearButton.addDisposeListener(new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					inactiveImage.dispose();
+					activeImage.dispose();
+					pressedImage.dispose();
 				}
 			});
 			clearButton.getAccessible().addAccessibleListener(
@@ -991,24 +1082,6 @@ public class FilteredTree extends Composite {
 			}
 		}
 		return null;
-	}
-
-	public boolean isShowFilterControls() {
-		return showFilterControls;
-	}
-
-	public void setShowFilterControls(boolean showFilterControls) {
-		this.showFilterControls = showFilterControls;
-		if (filterComposite != null) {
-			Object filterCompositeLayoutData = filterComposite.getLayoutData();
-			if (filterCompositeLayoutData instanceof GridData) {
-				((GridData) filterCompositeLayoutData).exclude = !isShowFilterControls();
-			} else if (filterCompositeLayoutData instanceof RowData) {
-				((RowData) filterCompositeLayoutData).exclude = !isShowFilterControls();
-			}
-			filterComposite.setVisible(isShowFilterControls());
-			layout();
-		}
 	}
 
 	/**
