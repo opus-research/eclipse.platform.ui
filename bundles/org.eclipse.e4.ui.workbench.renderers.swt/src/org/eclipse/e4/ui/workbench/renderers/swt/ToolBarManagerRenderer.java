@@ -383,8 +383,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MToolBar) || !(parent instanceof Composite)
-				|| (element.getTags().contains(HIDDEN_BY_USER)))
+		if (!(element instanceof MToolBar) || !(parent instanceof Composite))
 			return null;
 
 		final MToolBar toolbarModel = (MToolBar) element;
