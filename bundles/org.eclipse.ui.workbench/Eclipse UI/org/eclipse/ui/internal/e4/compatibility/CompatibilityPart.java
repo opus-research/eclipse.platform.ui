@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin <steven@spungin.tv> - Bug 436908
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799, 446864
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *     Snjezana Peco <snjezana.peco@redhat.com> - Bug 414888
  ******************************************************************************/
 
@@ -367,9 +367,10 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 						part.getTransientData().put(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY,
 								newImage);
 					}
-					String titleToolTip = wrapped.getTitleToolTip();
-					if (titleToolTip != null) {
-						part.getTransientData().put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY, titleToolTip);
+					if (wrapped.getTitleToolTip() != null && wrapped.getTitleToolTip().length() > 0) {
+						part.getTransientData()
+								.put(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY,
+								wrapped.getTitleToolTip());
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
