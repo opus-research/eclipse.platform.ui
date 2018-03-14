@@ -161,10 +161,12 @@ public class ImportExportPespectiveHandler {
 		String perspToOverwriteId = perspToOverwrite.getId();
 		// a perspective with the same label exists, but has different ID
 		if (!perspective.getElementId().equals(perspToOverwriteId)) {
-			perspective.setElementId(perspToOverwriteId);
+			logger.warn(String.format("Cannot import perspective \"%s\" because a perspective" //$NON-NLS-1$
+					+ " with the same label but different ID exists in the workbench", perspective.getElementId())); //$NON-NLS-1$
+		} else {
+			perspectiveRegistry.deletePerspective(perspToOverwrite);
+			perspectiveRegistry.addPerspective(perspective);
 		}
-		perspectiveRegistry.deletePerspective(perspToOverwrite);
-		perspectiveRegistry.addPerspective(perspective);
 		importToolbarsLocation(perspective);
 	}
 
