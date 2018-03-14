@@ -21,7 +21,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -193,10 +192,9 @@ public class UIDialogs extends TestCase {
 		// Get the view identifier, if any.
 		IEclipseContext ctx = workbench.getService(IEclipseContext.class);
 		EModelService modelService = workbench.getService(EModelService.class);
-		EPartService partService = workbench.getService(EPartService.class);
 		MApplication app = workbench.getService(MApplication.class);
 		MWindow window = workbench.getService(MWindow.class);
-		Dialog dialog = new ShowViewDialog(shell, app, window, modelService, partService, ctx);
+        Dialog dialog = new ShowViewDialog(shell, app,window, modelService, ctx);
         DialogCheck.assertDialog(dialog, this);
     }
     /**
