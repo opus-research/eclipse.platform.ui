@@ -13,8 +13,6 @@
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -28,7 +26,6 @@ import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
-import org.eclipse.e4.ui.model.application.impl.ApplicationPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -60,9 +57,7 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
-import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
@@ -200,7 +195,7 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MElementContainer<?>) {
 			if (searchRoot instanceof MPerspectiveStack) {
 				if ((searchFlags & IN_ANY_PERSPECTIVE) != 0) {
-					// Search *all* the perspectiN_Aves
+					// Search *all* the perspectives
 					MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
 					List<MUIElement> children = container.getChildren();
 					for (MUIElement child : children) {
@@ -310,86 +305,9 @@ public class ModelServiceImpl implements EModelService {
 	@Override
 	public <T> List<T> findElements(MApplicationElement searchRoot, Class<T> clazz,
 			int searchFlags, Selector matcher) {
-		Assert.isLegal(searchRoot != null);
-
 		List<T> elements = new ArrayList<T>();
-		//FLAG Conversion
-		Collection<FLAGS> flags = new HashSet<FLAGS>();
-
-		if ((searchFlags & IN_ANY_PERSPECTIVE) != 0) {
-			flags.add(FLAGS.IN_ANY_PERSPECTIVE);
-		}
-		if ((searchFlags & IN_ACTIVE_PERSPECTIVE) != 0) {
-			flags.add(FLAGS.IN_ACTIVE_PERSPECTIVE);
-		}
-		if (searchFlags == ANYWHERE) {
-			flags.add(FLAGS.ANYWHERE);
-		}
-
-		if ((searchFlags & IN_MAIN_MENU) != 0) {
-			flags.add(FLAGS.IN_MAIN_MENU);
-		}
-		if ((searchFlags & IN_PART) != 0) {
-			flags.add(FLAGS.IN_PART);
-		}
-
-		for (FLAGS flag : flags) {
-			findElementsRecursive((EObject) searchRoot, clazz, matcher, elements, flag);
-		}
-
-		// findElementsRecursive(searchRoot, clazz, matcher, elements, searchFlags);
+		findElementsRecursive(searchRoot, clazz, matcher, elements, searchFlags);
 		return elements;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> void findElementsRecursive(EObject root, Class<T> clazz, Selector selector,
-			List<T> elements, FLAGS flag) {
-
-		boolean classMatch = clazz == null ? isAllowWithFlags(root, flag) : clazz.isInstance(root)
-				&& isAllowWithFlags(root, flag);
-		if (classMatch && selector.select((MApplicationElement) root)) {
-			if (!elements.contains(root)) {
-				elements.add((T) root);
-			}
-		}
-
-		EClass eClass = root.eClass();
-
-		List<Integer> f = flag.getFeatures_by_class().get(eClass);
-
-		if (f != null) {
-
-			for (Integer featureId : f) {
-				EStructuralFeature feature = eClass.getEStructuralFeature(featureId);
-				if (feature == null)
-					continue;
-
-				Object value = root.eGet(feature, false);
-				if (value == null)
-					continue;
-
-				if (feature.isMany()) {
-					for (EObject eObject : (Collection<? extends EObject>) value) {
-						findElementsRecursive(eObject, clazz, selector, elements, flag);
-					}
-				} else {
-					findElementsRecursive((EObject) value, clazz, selector, elements, flag);
-				}
-			}
-		}
-	}
-
-	private boolean isAllowWithFlags(EObject eObject, FLAGS flag) {
-
-		if (flag.isAllowWithFlags(eObject)) {
-			if (flag == FLAGS.IN_ACTIVE_PERSPECTIVE) {
-				return !(eObject.eContainer().eClass()
-						.equals(ApplicationPackageImpl.Literals.APPLICATION));
-			}
-			return true;
-		}
-
-		return false;
 	}
 
 	private <T> List<T> findPerspectiveElements(MUIElement searchRoot, String id,

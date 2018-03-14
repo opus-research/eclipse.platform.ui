@@ -68,7 +68,6 @@ public class EModelServiceFindTest extends TestCase {
 	private MApplication createApplication() {
 		MApplication app = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		app.setContext(applicationContext);
-
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setElementId("singleValidId");
 		app.getChildren().add(window);
@@ -193,7 +192,8 @@ public class EModelServiceFindTest extends TestCase {
 
 		// Should find all the elements
 		List<MUIElement> uiElements = modelService.findElements(application,
-				null, null, null, EModelService.ANYWHERE);
+				null, null, null, EModelService.ANYWHERE
+						| EModelService.IN_MAIN_MENU | EModelService.IN_PART);
 		assertEquals(15, uiElements.size());
 
 		// Should match 0 since String is not an MUIElement
@@ -307,6 +307,10 @@ public class EModelServiceFindTest extends TestCase {
 	public void testFlags() {
 		MApplication application = createApplication();
 
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
+
 		List<MToolBarElement> toolBarElements = modelService.findElements(
 				application, null, MToolBarElement.class, null,
 				EModelService.IN_ANY_PERSPECTIVE);
@@ -320,7 +324,7 @@ public class EModelServiceFindTest extends TestCase {
 		List<MMenuElement> menuElements = modelService.findElements(
 				application, null, MMenuElement.class, null,
 				EModelService.IN_ANY_PERSPECTIVE);
-		assertEquals(3, menuElements.size());
+		assertEquals(0, menuElements.size());
 
 		menuElements = modelService.findElements(application, null,
 				MMenuElement.class, null, EModelService.IN_ANY_PERSPECTIVE
@@ -328,7 +332,8 @@ public class EModelServiceFindTest extends TestCase {
 		assertEquals(3, menuElements.size());
 
 		menuElements = modelService.findElements(application, null,
-				MMenuElement.class, null, EModelService.IN_MAIN_MENU);
+				MMenuElement.class, null, EModelService.IN_ANY_PERSPECTIVE
+						| EModelService.IN_MAIN_MENU);
 		assertEquals(2, menuElements.size());
 	}
 
@@ -353,6 +358,10 @@ public class EModelServiceFindTest extends TestCase {
 
 	public void testFindHandler() {
 		MApplication application = createApplication();
+
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
 
 		MHandler handler1 = CommandsFactoryImpl.eINSTANCE.createHandler();
 		handler1.setElementId("handler1");
@@ -383,6 +392,9 @@ public class EModelServiceFindTest extends TestCase {
 
 	public void testFindMKeyBindings() {
 		MApplication application = createApplication();
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
 
 		MBindingTable bindingTable = MCommandsFactory.INSTANCE
 				.createBindingTable();
@@ -405,6 +417,7 @@ public class EModelServiceFindTest extends TestCase {
 
 	public void testBug314685() {
 		MApplication application = createApplication();
+		application.setContext(applicationContext);
 
 		MWindow window = modelService.createModelElement(MWindow.class);
 		application.getChildren().add(window);
@@ -438,25 +451,14 @@ public class EModelServiceFindTest extends TestCase {
 		placeholderB.setRef(partStack);
 		perspectiveB.getChildren().add(placeholderB);
 
+		EModelService modelService = (EModelService) application.getContext()
+				.get(EModelService.class.getName());
+		assertNotNull(modelService);
+
 		List<MPart> elements = modelService.findElements(window, null,
 				MPart.class, null);
 		assertNotNull(elements);
 		assertEquals(1, elements.size());
 		assertEquals(part, elements.get(0));
-	}
-
-	public void testFindPlaceholder() {
-		MApplication application = createApplication();
-
-		MPartStack stack = modelService.findElements(application, null,
-				MPartStack.class, null).get(0);
-
-		MPlaceholder ph = modelService.createModelElement(MPlaceholder.class);
-		ph.setRef(BasicFactoryImpl.eINSTANCE.createPart());
-		stack.getChildren().add(ph);
-
-		List<MPlaceholder> elements = modelService.findElements(application,
-				null, MPlaceholder.class, null);
-		assertEquals(1, elements.size());
 	}
 }
