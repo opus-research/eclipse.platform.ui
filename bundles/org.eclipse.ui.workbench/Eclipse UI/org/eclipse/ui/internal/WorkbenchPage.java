@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -354,21 +354,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object clientObject = part.getObject();
 			if (clientObject instanceof CompatibilityPart) {
 				return ((CompatibilityPart) clientObject).getPart();
-			} else if (part.getObject() != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -2137,21 +2122,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			Object object = part.getObject();
 			if (object instanceof CompatibilityPart) {
 				return ((CompatibilityPart) object).getPart();
-			} else if (part.getObject() != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					return (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
-
-				ViewReference viewReference = getViewReference(part);
-				E4PartWrapper legacyPart = new E4PartWrapper(part);
-				try {
-					viewReference.initialize(legacyPart);
-				} catch (PartInitException e) {
-					WorkbenchPlugin.log(e);
-				}
-				part.getTransientData().put(E4PartWrapper.E4_WRAPPER_KEY, legacyPart);
-				return legacyPart;
 			}
 		}
 		return null;
@@ -4328,7 +4298,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				for (Object child : parent.getChildren()) {
 					MPart siblingPart = child instanceof MPart ? (MPart) child
 							: (MPart) ((MPlaceholder) child).getRef();
-					Object siblingObject = siblingPart.getObject();
+					// Bug 398433 - guard against NPE
+					Object siblingObject = siblingPart != null ? siblingPart.getObject() : null;
 					if (siblingObject instanceof CompatibilityView) {
 						stack.add((CompatibilityView) siblingObject);
 					}

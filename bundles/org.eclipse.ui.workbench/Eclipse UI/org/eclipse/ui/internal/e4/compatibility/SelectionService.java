@@ -34,7 +34,6 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.internal.E4PartWrapper;
 import org.eclipse.ui.internal.WorkbenchPage;
 
 public class SelectionService implements ISelectionChangedListener, ISelectionService {
@@ -131,11 +130,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 			if (client instanceof CompatibilityPart) {
 				IWorkbenchPart workbenchPart = ((CompatibilityPart) client).getPart();
 				activePart = workbenchPart;
-			} else if (part.getObject() != null) {
-				if (part.getTransientData().get(E4PartWrapper.E4_WRAPPER_KEY) instanceof E4PartWrapper) {
-					activePart = (IWorkbenchPart) part.getTransientData().get(
-							E4PartWrapper.E4_WRAPPER_KEY);
-				}
 			}
 		}
 	}
