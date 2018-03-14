@@ -38,7 +38,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return getChildren(inputElement);
 		}
@@ -46,7 +45,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 		 */
-		@Override
 		public Object[] getChildren(Object parentElement) {
 			if (parentElement instanceof List){
 				List children = new ArrayList();
@@ -69,7 +67,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 		 */
-		@Override
 		public Object getParent(Object element) {
 			if (element instanceof TeamMember){
 				return ((TeamMember)element).team;
@@ -80,7 +77,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 		 */
-		@Override
 		public boolean hasChildren(Object element) {
 	        if (element instanceof Team) {
 	            if (getChildren(element).length > 0) {
@@ -93,7 +89,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			List oldElement = (List) oldInput;
 	        if (oldElement != null) {
@@ -183,7 +178,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		return (TreeViewer)fViewer;
 	}
 	
-	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		Tree tree = new Tree(fShell, SWT.SINGLE | SWT.H_SCROLL
                 | SWT.V_SCROLL | SWT.BORDER);
@@ -193,7 +187,6 @@ public class TreeViewerComparatorTest extends ViewerComparatorTest{
 		return viewer;
 	}
 
-	@Override
 	protected void setInput() {
 		List input = new ArrayList(3);
 		input.add(team1);

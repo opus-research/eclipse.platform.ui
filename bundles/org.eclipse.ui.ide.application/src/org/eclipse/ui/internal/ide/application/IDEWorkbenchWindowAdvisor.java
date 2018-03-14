@@ -573,7 +573,6 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	 * Open the welcome editor for the primary feature and for any newly
 	 * installed features.
 	 */
-	@SuppressWarnings("rawtypes")
 	private void openWelcomeEditors(IWorkbenchWindow window) {
 		if (IDEWorkbenchPlugin.getDefault().getPreferenceStore().getBoolean(
 				IDEInternalPreferences.WELCOME_DIALOG)) {
@@ -595,7 +594,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			openWelcomeEditor(window, new WelcomeEditorInput(productInfo), null);
 		} else {
 			// Show the welcome page for any newly installed features
-			List<AboutInfo> welcomeFeatures = new ArrayList<AboutInfo>();
+			List welcomeFeatures = new ArrayList();
 			for (Iterator it = wbAdvisor.getNewlyAddedBundleGroups().entrySet()
 					.iterator(); it.hasNext();) {
 				Map.Entry entry = (Map.Entry) it.next();
@@ -628,7 +627,7 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 			int wCount = getWorkbench().getWorkbenchWindowCount();
 			for (int i = 0; i < welcomeFeatures.size(); i++) {
-				AboutInfo newInfo = welcomeFeatures.get(i);
+				AboutInfo newInfo = (AboutInfo) welcomeFeatures.get(i);
 				String id = newInfo.getWelcomePerspectiveId();
 				// Other editors were already opened in postWindowRestore(..)
 				if (id == null || i >= wCount) {

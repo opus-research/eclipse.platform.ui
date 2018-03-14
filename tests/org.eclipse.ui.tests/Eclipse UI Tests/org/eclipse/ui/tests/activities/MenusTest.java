@@ -96,7 +96,7 @@ public class MenusTest extends UITestCase {
 		window = openTestWindow();
 		enabledActivities = window.getWorkbench().getActivitySupport()
 				.getActivityManager().getEnabledActivityIds();
-		service = window.getService(IMenuService.class);
+		service = (IMenuService) window.getService(IMenuService.class);
 		assertNotNull(service);
 	}
 

@@ -26,8 +26,6 @@ public class WorkbenchMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.messages";//$NON-NLS-1$
 
 
-	public static String ThemingDisabled;
-
 	public static String ThemeChangeWarningText;
 
 	public static String BundleSigningTray_Cant_Find_Service;
@@ -649,7 +647,6 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_create_element_returned_null;
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
-	public static String EditorManager_largeDocumentWarning;
     
 	public static String EditorPane_pinEditor;
 

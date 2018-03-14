@@ -181,13 +181,13 @@ public class IPartServiceTest extends UITestCase {
     }
     
     public void testLocalPartService() throws Throwable {
-    	IPartService service = fWindow
+    	IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 
 		MockViewPart view = (MockViewPart) fPage.showView(MockViewPart.ID);
 		MockViewPart view2 = (MockViewPart) fPage.showView(MockViewPart.ID2);
 
-		IPartService slaveService = view.getSite()
+		IPartService slaveService = (IPartService) view.getSite()
 				.getService(IPartService.class);
 
 		assertTrue(service != slaveService);
@@ -228,7 +228,7 @@ public class IPartServiceTest extends UITestCase {
     public void testAddPartListenerToWindow() throws Throwable {
         // From Javadoc: "Adds the given listener for part lifecycle events.
 		// Has no effect if an identical listener is already registered."
-		IPartService service = fWindow
+		IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);
@@ -288,7 +288,7 @@ public class IPartServiceTest extends UITestCase {
 		// Has no affect if an identical listener is not registered."
 
 		// Add and remove listener.
-		IPartService service = fWindow
+		IPartService service = (IPartService) fWindow
 				.getService(IPartService.class);
 		service.addPartListener(partListener);
 		service.addPartListener(partListener2);

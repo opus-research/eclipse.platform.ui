@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> -
  *     		Bug 186522 - [KeyBindings] New Keys preference page does not resort by binding with conflicts
  *     		Bug 226342 - [KeyBindings] Keys preference page conflict table is hard to read
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442215
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -369,7 +367,7 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		public String getText(Object element) {
 			String rc = getColumnText(element, 0);
 			if (rc == null) {
-				rc = super.getText(element);
+				super.getText(element);
 			}
 			StringBuffer buf = new StringBuffer(rc);
 			for (int i = 1; i < USER_DELTA_COLUMN; i++) {
@@ -1275,13 +1273,13 @@ public class NewKeysPreferencePage extends PreferencePage implements
 		keyController = new KeyController();
 		keyController.init(workbench);
 
-		commandService = workbench
+		commandService = (ICommandService) workbench
 				.getService(ICommandService.class);
 		fDefaultCategory = commandService.getCategory(null);
-		fBindingService = workbench
+		fBindingService = (IBindingService) workbench
 				.getService(IBindingService.class);
 
-		commandImageService = workbench
+		commandImageService = (ICommandImageService) workbench
 				.getService(ICommandImageService.class);
 	}
 

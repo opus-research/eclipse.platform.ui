@@ -34,8 +34,7 @@ public abstract class IWorkbenchPartSiteTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -124,7 +123,7 @@ public abstract class IWorkbenchPartSiteTest extends UITestCase {
     public void testINestableService() throws Throwable {
     	IWorkbenchPart part = createTestPart(fPage);
     	IWorkbenchPartSite site = part.getSite();
-		DummyService service = site.getService(DummyService.class);
+    	DummyService service = (DummyService) site.getService(DummyService.class);
 
     	assertTrue(service.isActive());
     	if(part instanceof IViewPart)

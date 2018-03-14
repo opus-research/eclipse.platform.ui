@@ -103,7 +103,7 @@ public class PerspectiveTests extends DynamicTestCase {
 	}
 	
 	private MPerspective findPerspective(IWorkbenchWindow window, String id) {
-		EModelService modelService = window
+		EModelService modelService = (EModelService) window
 				.getService(EModelService.class);
 		return (MPerspective) modelService.find(id,
 				((WorkbenchWindow) window).getModel());
