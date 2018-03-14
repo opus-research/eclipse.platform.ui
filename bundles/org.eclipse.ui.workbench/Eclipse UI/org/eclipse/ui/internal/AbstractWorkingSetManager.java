@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - 266030 support for a default workingset
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -100,6 +100,7 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 	});
     
     private List recentWorkingSets = new ArrayList();
+	private IWorkingSet defaultWorkingSet;
 
     private BundleContext bundleContext;
     private Map/*<String, IWorkingSetUpdater>*/ updaters= new HashMap();
@@ -134,6 +135,8 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 		public void dispose() {
 		}
 	};
+
+	private static final String TAG_DEFAULT_WORKING_SET_NAME = "default"; //$NON-NLS-1$
 		
     /**
      * Returns the descriptors for the given editable working set ids. If an id
@@ -298,6 +301,21 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 	public IWorkingSet[] getRecentWorkingSets() {
         return (IWorkingSet[]) recentWorkingSets.toArray(new IWorkingSet[recentWorkingSets.size()]);
     }
+
+	@Override
+	public IWorkingSet getDefaultWorkingSet() {
+		return this.defaultWorkingSet;
+	}
+
+	@Override
+	public void setDefaultWorkingSet(IWorkingSet workingSet) {
+		if (workingSet != this.defaultWorkingSet) {
+			IWorkingSet previous = this.defaultWorkingSet;
+			this.defaultWorkingSet = workingSet;
+			firePropertyChange(IWorkingSetManager.CHANGE_WORKING_SET_DEFAULT, previous,
+					this.defaultWorkingSet);
+		}
+	}
 
     /**
      * Adds the specified working set to the list of recently used
@@ -593,6 +611,36 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
         }
     }
 
+	/**
+	 * Saves the configuration for default working set
+	 */
+	protected void saveDefaultWorkingSet(IMemento memento) {
+		String workingSetName;
+		if (this.defaultWorkingSet == null) {
+			workingSetName = ""; //$NON-NLS-1$
+		} else {
+			workingSetName = this.defaultWorkingSet.getName();
+		}
+		memento.putString(AbstractWorkingSetManager.TAG_DEFAULT_WORKING_SET_NAME, workingSetName);
+    }
+
+	/**
+	 * Restores the configuration for default working set
+	 * 
+	 * @param memento
+	 *            the persistence store
+	 */
+	protected void restoreDefaultWorkingSet(IMemento memento) {
+		String defaultWorkingSetName = memento
+				.getString(AbstractWorkingSetManager.TAG_DEFAULT_WORKING_SET_NAME);
+		if (defaultWorkingSetName != null) {
+			IWorkingSet workingSet = getWorkingSet(defaultWorkingSetName);
+			if (workingSet != null) {
+				setDefaultWorkingSet(workingSet);
+			}
+		}
+    }
+
     //---- user interface support -----------------------------------------------------
     
     /**
@@ -805,14 +853,18 @@ public abstract class AbstractWorkingSetManager extends EventManager implements
 	public void saveState(File stateFile) throws IOException {
 		XMLMemento memento = XMLMemento
 				.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET_MANAGER);
-		saveWorkingSetState(memento);
-		saveMruList(memento);
-	
+		saveState(memento);
+		
 		FileOutputStream stream = new FileOutputStream(stateFile);
 		OutputStreamWriter writer = new OutputStreamWriter(stream, "utf-8"); //$NON-NLS-1$
 		memento.save(writer);
 		writer.close();
+	}
 	
+	public void saveState(IMemento memento) {
+		saveWorkingSetState(memento);
+		saveMruList(memento);
+		saveDefaultWorkingSet(memento);
 	}
 	
 	@Override

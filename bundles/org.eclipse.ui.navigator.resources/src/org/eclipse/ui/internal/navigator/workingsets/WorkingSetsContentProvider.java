@@ -10,21 +10,24 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.workingsets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.runtime.IAdaptable;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.Viewer;
-
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.IWorkingSetManager;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.navigator.NavigatorContentService;
 import org.eclipse.ui.navigator.CommonNavigator;
 import org.eclipse.ui.navigator.CommonViewer;
@@ -52,9 +55,6 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	 */
 	public static final String SHOW_TOP_LEVEL_WORKING_SETS = EXTENSION_ID + ".showTopLevelWorkingSets"; //$NON-NLS-1$
 
-
-	private static final Object[] NO_CHILDREN = new Object[0];
-
 	private WorkingSetHelper helper;
 	private IAggregateWorkingSet workingSetRoot;
 	private IExtensionStateModel extensionStateModel;
@@ -71,6 +71,8 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		}
 
 	};
+
+	private IWorkingSetManager manager;
 	
 
 	@Override
@@ -97,19 +99,34 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
+		IAdaptable[] children = new IAdaptable[0];
 		if (parentElement instanceof IWorkingSet) {
 			IWorkingSet workingSet = (IWorkingSet) parentElement;
 			if (workingSet.isAggregateWorkingSet() && projectExplorer != null) {
 				switch (projectExplorer.getRootMode()) {
 					case ProjectExplorer.WORKING_SETS :
-						return ((IAggregateWorkingSet) workingSet).getComponents();
-					case ProjectExplorer.PROJECTS :
-						return getWorkingSetElements(workingSet);
+						children = ((IAggregateWorkingSet) workingSet).getComponents();
+						break;
+					case ProjectExplorer.PROJECTS : //$FALL-THROUGH$
+					default:
+						children = getWorkingSetElements(workingSet);
+						break;
 				}
+			} else {
+				children = getWorkingSetElements(workingSet);
 			}
-			return getWorkingSetElements(workingSet);
+			if (workingSet == manager.getDefaultWorkingSet()) {
+				List<IAdaptable> res = new ArrayList<IAdaptable>(children.length);
+				res.addAll(Arrays.asList(children));
+				for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+					if (helper.getParent(project) == null) {
+						res.add(project);
+					}
+				}
+				children = res.toArray(new IAdaptable[res.size()]);
+			}
 		}
-		return NO_CHILDREN;
+		return children;
 	}
 
 	private IAdaptable[] getWorkingSetElements(IWorkingSet workingSet) {
@@ -157,10 +174,14 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		if (projectExplorer == null) {
 			return;
 		}
-		if( extensionStateModel.getBooleanProperty(SHOW_TOP_LEVEL_WORKING_SETS) )
+		if( extensionStateModel.getBooleanProperty(SHOW_TOP_LEVEL_WORKING_SETS) ) {
 			projectExplorer.setRootMode(ProjectExplorer.WORKING_SETS);
-		else
+			if (this.manager == null) {
+				this.manager = PlatformUI.getWorkbench().getWorkingSetManager();
+			}
+		} else {
 			projectExplorer.setRootMode(ProjectExplorer.PROJECTS);
+		}
 	}
 
 	protected class WorkingSetHelper {

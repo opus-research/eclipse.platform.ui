@@ -98,10 +98,21 @@ public interface IWorkingSetManager {
     public static final String CHANGE_WORKING_SET_UPDATER_UNINSTALLED = "workingSetUpdaterUninstalled"; //$NON-NLS-1$
 
     /**
-     * Adds a property change listener.
-     * 
-     * @param listener the property change listener to add
-     */
+	 * Change event id when default working set is used.
+	 */
+	public static final String CHANGE_WORKING_SET_USEDEFAULT = "workingSetDefaultToggle"; //$NON-NLS-1$
+
+	/**
+	 * Change event id when default working set is changed.
+	 */
+	public static final String CHANGE_WORKING_SET_DEFAULT = "workingSetDefault"; //$NON-NLS-1$
+
+	/**
+	 * Adds a property change listener.
+	 * 
+	 * @param listener
+	 *            the property change listener to add
+	 */
     public void addPropertyChangeListener(IPropertyChangeListener listener);
 
     /**
@@ -368,4 +379,16 @@ public interface IWorkingSetManager {
 	 * @since 3.7
 	 */
 	public int getRecentWorkingSetsLength();
+
+	/**
+	 * @return the default working set. Can be null if none is configured
+	 */
+	public IWorkingSet getDefaultWorkingSet();
+
+	/**
+	 * @param defaultWorkingSet
+	 *            the new default working set, or null if we don't want to use a
+	 *            default working set.
+	 */
+	public void setDefaultWorkingSet(IWorkingSet defaultWorkingSet);
 }

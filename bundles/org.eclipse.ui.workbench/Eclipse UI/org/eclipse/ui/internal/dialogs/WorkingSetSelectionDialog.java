@@ -255,7 +255,8 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
         addModifyButtons(viewerComposite);
         
         addSelectionButtons(composite);
-        
+
+		addDefaultWorkingSetConfiguration(composite);
 
 		listViewer.setInput(Arrays.asList(WorkbenchPlugin.getDefault()
 				.getWorkingSetManager().getWorkingSets()));
