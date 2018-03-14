@@ -26,8 +26,7 @@ final class FilteredModelCheckListener implements CheckListener {
 	private final ActionSetFilter filter;
 	private final StructuredViewer viewer;
 
-	FilteredModelCheckListener(ActionSetFilter filter,
-			StructuredViewer viewer) {
+	FilteredModelCheckListener(ActionSetFilter filter, StructuredViewer viewer) {
 		this.filter = filter;
 		this.viewer = viewer;
 	}

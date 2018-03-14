@@ -30,8 +30,7 @@ import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.DisplayIte
  *
  * @since 3.5
  */
-class UnavailableContributionItemCheckListener implements
-		ICheckStateListener {
+class UnavailableContributionItemCheckListener implements ICheckStateListener {
 
 	private final CustomizePerspectiveDialog dialog;
 	private CheckboxTreeViewer viewer;
