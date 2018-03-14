@@ -147,7 +147,7 @@ import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.dialogs.EditorSelectionDialog;
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog;
+import org.eclipse.ui.internal.dialogs.CustomizePerspectiveDialog;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityView;
@@ -1777,13 +1777,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return false;
 		}
 
-		Collection<MPart> partsToHide = partService.getParts();
-		// workaround for bug 455281
-		List<MPart> partsOutsidePersp = modelService.findElements(window, null, MPart.class, null,
-				EModelService.OUTSIDE_PERSPECTIVE);
-		partsToHide.removeAll(partsOutsidePersp);
-
-		for (MPart part : partsToHide) {
+		for (MPart part : partService.getParts()) {
 			// no save, no confirm, force
 			hidePart(part, false, true, true);
 		}
