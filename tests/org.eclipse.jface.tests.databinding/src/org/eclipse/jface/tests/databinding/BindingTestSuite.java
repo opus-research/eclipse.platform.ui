@@ -27,7 +27,6 @@ import org.eclipse.core.tests.databinding.BindingTest;
 import org.eclipse.core.tests.databinding.DatabindingContextTest;
 import org.eclipse.core.tests.databinding.ListBindingTest;
 import org.eclipse.core.tests.databinding.ObservablesManagerTest;
-import org.eclipse.core.tests.databinding.SideEffectTest;
 import org.eclipse.core.tests.databinding.UpdateListStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateSetStrategyTest;
 import org.eclipse.core.tests.databinding.UpdateStrategyTest;
@@ -255,7 +254,6 @@ public class BindingTestSuite extends TestSuite {
 		addTestSuite(UpdateValueStrategyTest.class);
 		addTestSuite(ValueBindingTest.class);
 		addTestSuite(ObservablesManagerTest.class);
-		addTestSuite(SideEffectTest.class);
 
 		// org.eclipse.core.tests.databinding.util
 		addTestSuite(PolicyTest.class);
