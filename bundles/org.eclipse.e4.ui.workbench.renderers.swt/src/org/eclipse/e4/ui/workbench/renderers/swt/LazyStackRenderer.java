@@ -43,6 +43,7 @@ import org.osgi.service.event.EventHandler;
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
 	private EventHandler lazyLoader = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
@@ -86,6 +87,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(lazyLoader);
 	}
 
+	@Override
 	public void postProcess(MUIElement element) {
 		if (!(element instanceof MGenericStack<?>))
 			return;
@@ -160,13 +162,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		if (element == null || element.getWidget() == null)
 			return;
 
-		if (element instanceof MPartStack
-				&& element.getRenderer() instanceof StackRenderer) {
-			StackRenderer sr = (StackRenderer) element.getRenderer();
-			CTabFolder ctf = (CTabFolder) element.getWidget();
-			sr.clearTR(ctf);
-		}
-
 		if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
 			element = ph.getRef();
@@ -220,7 +215,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			if (curSel instanceof MPlaceholder) {
 				part.setCurSharedRef((MPlaceholder) curSel);
 			}
-			sr.adjustTR(ctf, part);
+			sr.adjustTopRight(ctf);
 		}
 
 		if (element instanceof MPlaceholder && element.getWidget() != null) {

@@ -198,6 +198,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 		IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 		this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbenchWindow, null,
 				new IDisposable() {
+					@Override
 					public void dispose() {
 						// not sure what to do here
 					}
@@ -236,6 +237,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 						getWorkbenchWindow(), this, null, null, 2));
 		// added back for legacy reasons
 		serviceLocator.registerService(IWorkbenchPartSite.class, this);
+		serviceLocator.registerService(IWorkbenchPart.class, getPart());
 
 		e4Context.set(IWorkbenchSiteProgressService.class.getName(), new ContextFunction() {
 			@Override
@@ -385,6 +387,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPartSite#getId()
 	 */
+	@Override
 	public String getId() {
 		return extensionId == null ? element == null ? model.getElementId() : element
 				.getAttribute(IWorkbenchRegistryConstants.ATT_ID)
@@ -396,6 +399,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPartSite#getPluginId()
 	 */
+	@Override
 	public String getPluginId() {
 		return element == null ? model.getElementId() : element.getNamespaceIdentifier();
 	}
@@ -405,6 +409,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @see org.eclipse.ui.IWorkbenchPartSite#getRegisteredName()
 	 */
+	@Override
 	public String getRegisteredName() {
 		return element == null ? model.getLocalizedLabel() : element
 				.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
@@ -415,6 +420,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @return the page containing this part
 	 */
+	@Override
 	public IWorkbenchPage getPage() {
 		return getWorkbenchWindow().getActivePage();
 	}
@@ -423,6 +429,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Returns the part.
 	 */
+	@Override
 	public IWorkbenchPart getPart() {
 		return part;
 	}
@@ -437,6 +444,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Returns the selection provider for a part.
 	 */
+	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return selectionProvider;
 	}
@@ -446,6 +454,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @return the shell containing this part
 	 */
+	@Override
 	public Shell getShell() {
 
 		// Compatibility: This method should not be used outside the UI
@@ -492,6 +501,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @return the workbench window containing this part
 	 */
+	@Override
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return workbenchWindow;
 	}
@@ -499,6 +509,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Register a popup menu for extension.
 	 */
+	@Override
 	public void registerContextMenu(String menuID, MenuManager menuMgr,
 			ISelectionProvider selProvider) {
 		if (menuExtenders == null) {
@@ -511,6 +522,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Register a popup menu with the default id for extension.
 	 */
+	@Override
 	public void registerContextMenu(MenuManager menuMgr,
 			ISelectionProvider selProvider) {
 		registerContextMenu(getId(), menuMgr, selProvider);
@@ -551,6 +563,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/**
 	 * Set the selection provider for a part.
 	 */
+	@Override
 	public void setSelectionProvider(ISelectionProvider provider) {
 		selectionProvider = provider;
 	}
@@ -558,6 +571,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	/*
 	 * @see IWorkbenchPartSite#getKeyBindingService()
 	 */
+	@Override
 	public IKeyBindingService getKeyBindingService() {
 		return (IKeyBindingService) e4Context.get(IKeyBindingService.class.getName());
 	}
@@ -572,6 +586,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * @param adapter
 	 * @return
 	 */
+	@Override
 	public final Object getAdapter(Class adapter) {
 
 		if (IWorkbenchSiteProgressService.class == adapter) {
@@ -614,10 +629,12 @@ public abstract class PartSite implements IWorkbenchPartSite {
 				.getName());
 	}
 
+	@Override
 	public final Object getService(final Class key) {
 		return serviceLocator.getService(key);
 	}
 
+	@Override
 	public final boolean hasService(final Class key) {
 		return serviceLocator.hasService(key);
 	}
@@ -628,6 +645,7 @@ public abstract class PartSite implements IWorkbenchPartSite {
 	 * 
 	 * @since 3.2
 	 */
+	@Override
 	public String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("PartSite(id="); //$NON-NLS-1$

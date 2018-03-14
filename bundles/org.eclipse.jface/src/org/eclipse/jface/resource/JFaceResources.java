@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093, 440080
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -60,7 +61,7 @@ public class JFaceResources {
 	 * Map of Display onto DeviceResourceManager. Holds all the resources for
 	 * the associated display.
 	 */
-	private static final Map registries = new HashMap();
+	private static final Map<Display,DeviceResourceManager> registries = new HashMap<Display,DeviceResourceManager>();
 
 	/**
 	 * The symbolic font name for the banner font (value
@@ -121,6 +122,7 @@ public class JFaceResources {
 	 * 
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static final String VIEWER_FONT = "org.eclipse.jface.viewerfont"; //$NON-NLS-1$
 
 	/**
@@ -129,6 +131,7 @@ public class JFaceResources {
 	 * 
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static final String WINDOW_FONT = "org.eclipse.jface.windowfont"; //$NON-NLS-1$
 
 	/**
@@ -183,7 +186,6 @@ public class JFaceResources {
 	public static ColorRegistry getColorRegistry() {
 		if (colorRegistry == null) {
 			colorRegistry = new ColorRegistry();
-			initializeDefaultColors();
 		}
 		return colorRegistry;
 	}
@@ -198,18 +200,19 @@ public class JFaceResources {
 	 * @return the global resource manager for the given display
 	 */
 	public static ResourceManager getResources(final Display toQuery) {
-		ResourceManager reg = (ResourceManager) registries.get(toQuery);
+		ResourceManager reg = registries.get(toQuery);
 
 		if (reg == null) {
 			final DeviceResourceManager mgr = new DeviceResourceManager(toQuery);
 			reg = mgr;
-			registries.put(toQuery, reg);
+			registries.put(toQuery, mgr);
 			toQuery.disposeExec(new Runnable() {
 				/*
 				 * (non-Javadoc)
 				 * 
 				 * @see java.lang.Runnable#run()
 				 */
+				@Override
 				public void run() {
 					mgr.dispose();
 					registries.remove(toQuery);
@@ -419,19 +422,19 @@ public class JFaceResources {
 		} catch (NoClassDefFoundError exception) {
 			// Test to see if OSGI is present
 		}
-		declareImage(bundle, Wizard.DEFAULT_IMAGE, ICONS_PATH + "page.gif", //$NON-NLS-1$
-				Wizard.class, "images/page.gif"); //$NON-NLS-1$
+		declareImage(bundle, Wizard.DEFAULT_IMAGE, ICONS_PATH + "page.png", //$NON-NLS-1$
+				Wizard.class, "images/page.png"); //$NON-NLS-1$
 
 		// register default images for dialogs
 		declareImage(bundle, Dialog.DLG_IMG_MESSAGE_INFO, ICONS_PATH
-				+ "message_info.gif", Dialog.class, "images/message_info.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+				+ "message_info.png", Dialog.class, "images/message_info.png"); //$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(bundle, Dialog.DLG_IMG_MESSAGE_WARNING, ICONS_PATH
-				+ "message_warning.gif", Dialog.class, //$NON-NLS-1$
-				"images/message_warning.gif"); //$NON-NLS-1$
+				+ "message_warning.png", Dialog.class, //$NON-NLS-1$
+				"images/message_warning.png"); //$NON-NLS-1$
 		declareImage(bundle, Dialog.DLG_IMG_MESSAGE_ERROR, ICONS_PATH
-				+ "message_error.gif", Dialog.class, "images/message_error.gif");//$NON-NLS-1$ //$NON-NLS-2$
+				+ "message_error.png", Dialog.class, "images/message_error.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(bundle, Dialog.DLG_IMG_HELP,
-				ICONS_PATH + "help.gif", Dialog.class, "images/help.gif");//$NON-NLS-1$ //$NON-NLS-2$
+				ICONS_PATH + "help.png", Dialog.class, "images/help.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(
 				bundle,
 				TitleAreaDialog.DLG_IMG_TITLE_BANNER,
@@ -439,7 +442,7 @@ public class JFaceResources {
 		declareImage(
 				bundle,
 				PreferenceDialog.PREF_DLG_TITLE_IMG,
-				ICONS_PATH + "pref_dialog_title.gif", PreferenceDialog.class, "images/pref_dialog_title.gif");//$NON-NLS-1$ //$NON-NLS-2$
+				ICONS_PATH + "pref_dialog_title.png", PreferenceDialog.class, "images/pref_dialog_title.png");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(bundle, PopupDialog.POPUP_IMG_MENU, ICONS_PATH
 				+ "popup_menu.gif", PopupDialog.class, "images/popup_menu.gif");//$NON-NLS-1$ //$NON-NLS-2$
 		declareImage(
@@ -469,7 +472,7 @@ public class JFaceResources {
 	 * 
 	 */
 	private static final void declareImage(Object bundle, String key,
-			String path, Class fallback, String fallbackPath) {
+			String path, Class<?> fallback, String fallbackPath) {
 
 		ImageDescriptor descriptor = null;
 
@@ -560,6 +563,7 @@ public class JFaceResources {
 	 * @return the font
 	 * @deprecated This font is not in use
 	 */
+	@Deprecated
 	public static Font getViewerFont() {
 		return getFontRegistry().get(VIEWER_FONT);
 	}
@@ -586,11 +590,4 @@ public class JFaceResources {
 		// no-op
 	}
 
-	/*
-	 * Initialize any JFace colors that may not be initialized via a client.
-	 */
-	private static void initializeDefaultColors() {
-		// JFace Colors that may not be defined in a workbench theme should be
-		// defined here.
-	}
 }

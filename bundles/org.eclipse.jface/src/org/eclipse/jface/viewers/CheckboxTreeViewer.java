@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,10 +93,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         super(tree);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void addCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void addCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.add(listener);
     }
     
@@ -116,7 +114,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
     /*
      * Extends this method to update check box states.
      */
-    protected void doUpdateItem(Item item, Object element) {
+    @Override
+	protected void doUpdateItem(Item item, Object element) {
     	super.doUpdateItem(item, element);
     	if(!item.isDisposed() && checkStateProvider != null) {
 			setChecked(element, checkStateProvider.isChecked(element));
@@ -162,7 +161,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.checkStateChanged(event);
                 }
             });
@@ -199,10 +199,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean getChecked(Object element) {
+    @Override
+	public boolean getChecked(Object element) {
         Widget widget = findItem(element);
         if (widget instanceof TreeItem) {
 			return ((TreeItem) widget).getChecked();
@@ -264,10 +262,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         return result.toArray();
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
-    protected void handleDoubleSelect(SelectionEvent event) {
+    @Override
+	protected void handleDoubleSelect(SelectionEvent event) {
 
         if (lastClickedItem != null) {
             TreeItem item = lastClickedItem;
@@ -284,10 +280,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on StructuredViewer.
-     */
-    protected void handleSelect(SelectionEvent event) {
+    @Override
+	protected void handleSelect(SelectionEvent event) {
 
         lastClickedItem = null;
         if (event.detail == SWT.CHECK) {
@@ -390,10 +384,8 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on Viewer.
-     */
-    protected void preservingSelection(Runnable updateCode) {
+    @Override
+	protected void preservingSelection(Runnable updateCode) {
     	if (!getPreserveSelection()) {
     		return;
     	}
@@ -418,17 +410,13 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
         applyState(checkedNodes, grayedNodes, getControl());
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public void removeCheckStateListener(ICheckStateListener listener) {
+    @Override
+	public void removeCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * Method declared on ICheckable.
-     */
-    public boolean setChecked(Object element, boolean state) {
+    @Override
+	public boolean setChecked(Object element, boolean state) {
         Assert.isNotNull(element);
         Widget widget = internalExpand(element, false);
         if (widget instanceof TreeItem) {
@@ -623,6 +611,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
      *  
      *  @since 3.2
      */
+	@Deprecated
 	public void setAllChecked(boolean state) {
 		setAllChecked(state,  getTree().getItems());
 		
@@ -635,6 +624,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 	 * @deprecated
 	 * @see #setAllChecked(boolean)
 	 */
+	@Deprecated
 	private void setAllChecked(boolean state, TreeItem[] items) {
 		for (int i = 0; i < items.length; i++) {
 			items[i].setChecked(state);			
@@ -643,6 +633,7 @@ public class CheckboxTreeViewer extends TreeViewer implements ICheckable {
 		}
 	}
 	
+	@Override
 	boolean optionallyPruneChildren(Item item, Object element) {
 		return false;
 	}
