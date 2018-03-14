@@ -17,7 +17,6 @@
  * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
- * Mickael Istria (Red Hat Inc.) - [108668] More about encodings
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -498,7 +497,6 @@ public class IDEWorkbenchMessages extends NLS {
 	// --- Workbench ---
 	public static String WorkbenchPreference_encoding;
 	public static String WorkbenchPreference_defaultEncoding;
-	public static String WorkbenchPreference_defaultEncoding_tooltip;
 	public static String WorkbenchPreference_otherEncoding;
 	public static String WorkbenchPreference_unsupportedEncoding;
 	public static String WorkbenchPreference_encoding_encodingMessage;
