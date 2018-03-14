@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,12 +35,11 @@ public class ThemesExtension implements IThemesExtension {
 	 * @see org.eclipse.e4.ui.internal.css.swt.definition.IThemesExtension#
 	 * addFontDefinition(java.lang.String)
 	 */
-	@Override
 	public void addFontDefinition(String symbolicName) {
 		FontDefinition definition = new FontDefinition(formatDefaultName(FontDefinition.class,
 				symbolicName), symbolicName, null, null, DEFAULT_CATEGORY_ID, true,
 				getDefaultDescription());
-		definition.appendState(ThemeElementDefinition.State.ADDED_BY_CSS);
+		definition.setAddedByCss(true);
 		definitions.add(definition);
 	}
 
@@ -50,12 +49,11 @@ public class ThemesExtension implements IThemesExtension {
 	 * @see org.eclipse.e4.ui.internal.css.swt.definition.IThemesExtension#
 	 * addColorDefinition(java.lang.String)
 	 */
-	@Override
 	public void addColorDefinition(String symbolicName) {
 		ColorDefinition definition = new ColorDefinition(formatDefaultName(ColorDefinition.class,
 				symbolicName), symbolicName, null, null, DEFAULT_CATEGORY_ID, true,
 				getDefaultDescription(), getPluginId());
-		definition.appendState(ThemeElementDefinition.State.ADDED_BY_CSS);
+		definition.setAddedByCss(true);
 		definitions.add(definition);
 	}
 

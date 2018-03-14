@@ -131,8 +131,7 @@ public abstract class BaseSelectionListenerAction extends Action implements
      * a structured one. Subclasses should override the <code>updateSelection</code>
      * method to react to selection changes.
      */
-    @Override
-	public final void selectionChanged(SelectionChangedEvent event) {
+    public final void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
         if (selection instanceof IStructuredSelection) {
 			selectionChanged((IStructuredSelection) selection);
@@ -161,8 +160,7 @@ public abstract class BaseSelectionListenerAction extends Action implements
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
      */
-    @Override
-	public void runWithEvent(Event event) {
+    public void runWithEvent(Event event) {
         // Set the running flag during the run so that selection changes are deferred.
         // See selectionChanged(IStructuredSelection) for more details.
         running = true;
