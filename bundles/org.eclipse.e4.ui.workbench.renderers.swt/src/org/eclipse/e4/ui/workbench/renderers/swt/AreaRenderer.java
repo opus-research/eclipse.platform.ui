@@ -12,8 +12,6 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -67,38 +65,33 @@ public class AreaRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@Inject
+	@Optional
+	private void handleTopicWidgets(@UIEventTopic(UIElement.TOPIC_WIDGET) Event event)
+	{
+		final MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
+		if (!(changedElement instanceof MPartStack))
+			return;
+
+		MArea areaModel = findArea(changedElement);
+		if (areaModel != null)
+			synchCTFState(areaModel);
+	}
+
 	private EventHandler widgetListener = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
-			final MUIElement changedElement = (MUIElement) event
-					.getProperty(EventTags.ELEMENT);
-			if (!(changedElement instanceof MPartStack))
-				return;
-
-			MArea areaModel = findArea(changedElement);
-			if (areaModel != null)
-				synchCTFState(areaModel);
-		}
-
-		private MArea findArea(MUIElement element) {
-			MUIElement parent = element.getParent();
-			while (parent != null) {
-				if (parent instanceof MArea)
-					return (MArea) parent;
-				parent = parent.getParent();
-			}
-			return null;
 		}
 	};
 
-	@PostConstruct
-	void init() {
-		eventBroker.subscribe(UIElement.TOPIC_WIDGET, widgetListener);
-	}
-
-	@PreDestroy
-	void contextDisposed() {
-		eventBroker.unsubscribe(widgetListener);
+	private MArea findArea(MUIElement element) {
+		MUIElement parent = element.getParent();
+		while (parent != null) {
+			if (parent instanceof MArea)
+				return (MArea) parent;
+			parent = parent.getParent();
+		}
+		return null;
 	}
 
 	@Override
