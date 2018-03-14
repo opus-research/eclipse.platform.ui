@@ -18,7 +18,7 @@ package org.eclipse.e4.ui.css.core.dom.properties.converters;
  *
  */
 public class CSSValueConverterConfigColorImpl implements
-		ICSSValueConverterColorConfig {
+ICSSValueConverterColorConfig {
 
 	public static final ICSSValueConverterConfig COLOR_HEXA_FORMAT_CONFIG = new CSSValueConverterConfigColorImpl(
 			COLOR_HEXA_FORMAT);
@@ -35,11 +35,7 @@ public class CSSValueConverterConfigColorImpl implements
 		this.format = format;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverterColorConfig#getFormat()
-	 */
+	@Override
 	public int getFormat() {
 		return format;
 	}

@@ -32,7 +32,8 @@ public class ValidationStatus extends Status {
 	 * @param exception
 	 */
 	private ValidationStatus(int severity, String message, Throwable exception) {
-		super(severity, Policy.JFACE_DATABINDING, IStatus.OK, message, exception);
+		super(severity, Policy.JFACE_DATABINDING, IStatus.OK, message,
+				exception);
 	}
 
 	/**
@@ -42,7 +43,7 @@ public class ValidationStatus extends Status {
 	 * @param message
 	 */
 	private ValidationStatus(int severity, String message) {
-		super(severity, Policy.JFACE_DATABINDING,IStatus.OK, message, null);
+		super(severity, Policy.JFACE_DATABINDING, IStatus.OK, message, null);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class ValidationStatus extends Status {
 	public static IStatus cancel(String message) {
 		return new ValidationStatus(IStatus.CANCEL, message);
 	}
-	
+
 	/**
 	 * Creates a new validation error status with the given message and
 	 * exception.
@@ -86,7 +87,7 @@ public class ValidationStatus extends Status {
 	public static IStatus warning(String message) {
 		return new ValidationStatus(IStatus.WARNING, message);
 	}
-	
+
 	/**
 	 * Creates a new validation info status with the given message.
 	 * 
@@ -96,7 +97,7 @@ public class ValidationStatus extends Status {
 	public static IStatus info(String message) {
 		return new ValidationStatus(IStatus.INFO, message);
 	}
-	
+
 	/**
 	 * Returns an OK status.
 	 * 

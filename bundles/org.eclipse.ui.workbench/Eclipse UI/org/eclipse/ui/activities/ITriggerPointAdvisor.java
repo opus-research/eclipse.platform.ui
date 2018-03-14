@@ -49,7 +49,7 @@ public interface ITriggerPointAdvisor {
 	 *         required activities the change should be verified by consulting
 	 *         {@link IActivityManager#getEnabledActivityIds()}.
 	 */
-	Set allow(ITriggerPoint triggerPoint, IIdentifier identifier);
+	Set<String> allow(ITriggerPoint triggerPoint, IIdentifier identifier);
 
 	/**
 	 * Calculate the identifier's enabled state for a combination of activities

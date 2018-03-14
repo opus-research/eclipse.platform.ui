@@ -68,7 +68,7 @@ public interface IActivityManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-    Set getDefinedActivityIds();
+	Set<String> getDefinedActivityIds();
 
     /**
      * Returns the set of identifiers to defined categories.
@@ -82,7 +82,7 @@ public interface IActivityManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-    Set getDefinedCategoryIds();
+	Set<String> getDefinedCategoryIds();
 
     /**
      * Returns the set of identifiers to enabled activities.
@@ -96,7 +96,7 @@ public interface IActivityManager {
      *         set is not empty, it is guaranteed to only contain instances of
      *         <code>String</code>.
      */
-    Set getEnabledActivityIds();
+	Set<String> getEnabledActivityIds();
 
     /**
      * Returns an instance of <code>IIdentifier</code> given an identifier.
