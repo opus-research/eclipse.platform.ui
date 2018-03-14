@@ -15,7 +15,6 @@ import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -48,7 +47,6 @@ public final class ActiveShellExpression extends Expression {
 	 * <code>true</code>. If this value is <code>null</code>, then any
 	 * shell may be active.
 	 */
-	@Nullable
 	private final Shell activeShell;
 
 	/**
@@ -58,7 +56,7 @@ public final class ActiveShellExpression extends Expression {
 	 *            The shell to match with the active shell; <code>null</code>
 	 *            if it will match any active shell.
 	 */
-	public ActiveShellExpression(@Nullable final Shell activeShell) {
+	public ActiveShellExpression(final Shell activeShell) {
 		this.activeShell = activeShell;
 	}
 

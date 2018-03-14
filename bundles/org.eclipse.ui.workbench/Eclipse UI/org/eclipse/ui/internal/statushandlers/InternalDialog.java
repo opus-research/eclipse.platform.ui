@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2016 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473973
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 package org.eclipse.ui.internal.statushandlers;
 
@@ -54,7 +52,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -372,9 +369,6 @@ public class InternalDialog extends TrayDialog {
 	}
 
 	void refreshDialogSize() {
-		if (dialogArea == null || dialogArea.isDisposed()) {
-			return;
-		}
 		Point newSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
 		getShell().setSize(newSize);
 	}
@@ -470,6 +464,7 @@ public class InternalDialog extends TrayDialog {
 
 	@Override
 	public Point getInitialLocation(Point initialSize) {
+		// TODO Auto-generated method stub
 		return super.getInitialLocation(initialSize);
 	}
 
@@ -948,10 +943,8 @@ public class InternalDialog extends TrayDialog {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					IWorkbenchWindow window = Workbench.getInstance().getActiveWorkbenchWindow();
-					if (window != null && window.getActivePage() != null) {
-						window.getActivePage().showView(LOG_VIEW_ID);
-					}
+					Workbench.getInstance().getActiveWorkbenchWindow()
+							.getActivePage().showView(LOG_VIEW_ID);
 				} catch (CoreException ce) {
 					StatusManager.getManager().handle(ce,
 							WorkbenchPlugin.PI_WORKBENCH);

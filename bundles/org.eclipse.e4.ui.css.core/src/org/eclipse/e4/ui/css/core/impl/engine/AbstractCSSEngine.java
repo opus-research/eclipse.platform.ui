@@ -13,7 +13,6 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428715
  *     Brian de Alwis (MTI) - Performance tweaks (Bug 430829)
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 479896
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 500402
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.engine;
 
@@ -95,11 +94,6 @@ import org.w3c.dom.stylesheets.StyleSheet;
 public abstract class AbstractCSSEngine implements CSSEngine {
 
 	/**
-	 * Archives are deliberately identified by exclamation mark in URLs
-	 */
-	private static final String ARCHIVE_IDENTIFIER = "!";
-
-	/**
 	 * Default {@link IResourcesLocatorManager} used to get InputStream, Reader
 	 * resource like Image.
 	 */
@@ -137,7 +131,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	/**
 	 * An ordered list of ICSSPropertyHandlerProvider
 	 */
-	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<>();
+	protected List<ICSSPropertyHandlerProvider> propertyHandlerProviders = new ArrayList<ICSSPropertyHandlerProvider>();
 
 	private Map<String, String> currentCSSPropertiesApplyed;
 
@@ -199,11 +193,11 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			} else {
 				Path p = new Path(source.getURI());
 				IPath trim = p.removeLastSegments(1);
-				boolean isArchive = source.getURI().contains(ARCHIVE_IDENTIFIER);
+
 				url = FileLocator.resolve(new URL(trim.addTrailingSeparator()
 						.toString() + ((CSSImportRule) rule).getHref()));
 				File testFile = new File(url.getFile());
-				if (!isArchive&&!testFile.exists()) {
+				if (!testFile.exists()) {
 					// look in platform default
 					String path = getResourcesLocatorManager().resolve(
 							(importRule).getHref());
@@ -538,7 +532,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		// Apply style
 		boolean avoidanceCacheInstalled = currentCSSPropertiesApplyed == null;
 		if (avoidanceCacheInstalled) {
-			currentCSSPropertiesApplyed = new HashMap<>();
+			currentCSSPropertiesApplyed = new HashMap<String, String>();
 		}
 		List<ICSSPropertyHandler2> handlers2 = null;
 		for (int i = 0; i < style.getLength(); i++) {
@@ -558,7 +552,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 				}
 				if (propertyHandler2 != null) {
 					if (handlers2 == null) {
-						handlers2 = new ArrayList<>();
+						handlers2 = new ArrayList<ICSSPropertyHandler2>();
 					}
 					if (!handlers2.contains(propertyHandler2)) {
 						handlers2.add(propertyHandler2);
@@ -574,7 +568,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		if (handlers2 != null) {
 			for (ICSSPropertyHandler2 handler2 : handlers2) {
 				try {
-					handler2.onAllCSSPropertiesApplyed(element, this, pseudo);
+					handler2.onAllCSSPropertiesApplyed(element, this);
 				} catch (Exception e) {
 					handleExceptions(e);
 				}
@@ -830,14 +824,14 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
-		Collection<ICSSPropertyHandler> handlers = new ArrayList<>();
+		Collection<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			Collection<ICSSPropertyHandler> h = provider
 					.getCSSPropertyHandlers(property);
 			if (handlers == null) {
 				handlers = h;
 			} else {
-				handlers = new ArrayList<>(handlers);
+				handlers = new ArrayList<ICSSPropertyHandler>(handlers);
 				handlers.addAll(h);
 			}
 		}
@@ -852,7 +846,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	 */
 	@Override
 	public Collection<String> getCSSProperties(Object element) {
-		Set<String> properties = new HashSet<>();
+		Set<String> properties = new HashSet<String>();
 		for (ICSSPropertyHandlerProvider provider : propertyHandlerProviders) {
 			properties.addAll(provider.getCSSProperties(element));
 		}
@@ -956,7 +950,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 
 	protected Map<Object, CSSElementContext> getElementsContext() {
 		if (elementsContext == null) {
-			elementsContext = new HashMap<>();
+			elementsContext = new HashMap<Object, CSSElementContext>();
 		}
 		return elementsContext;
 	}
@@ -1084,7 +1078,7 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 	@Override
 	public void registerCSSValueConverter(ICSSValueConverter converter) {
 		if (valueConverters == null) {
-			valueConverters = new HashMap<>();
+			valueConverters = new HashMap<Object, ICSSValueConverter>();
 		}
 		valueConverters.put(converter.getToType(), converter);
 	}

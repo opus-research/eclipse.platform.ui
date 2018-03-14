@@ -61,7 +61,7 @@ public class CommandParameterTypeTest extends UITestCase {
 	public void testSubtractTypeError() {
 		try {
 			// try to pass a Boolean instead of an Integer
-			testSubtract(Integer.valueOf(3), Boolean.FALSE, 3);
+			testSubtract(new Integer(3), Boolean.FALSE, 3);
 			fail("expected ParameterValueConversionException");
 		}
 		catch (ParameterValueConversionException ex) {
@@ -76,7 +76,7 @@ public class CommandParameterTypeTest extends UITestCase {
 	 * Test the complete execution flow for the subtract command
 	 */
 	private void testSubtract(int minuend, int subtrahend, int difference) throws CommandException {
-		testSubtract(Integer.valueOf(minuend), Integer.valueOf(subtrahend), difference);
+		testSubtract(new Integer(minuend), new Integer(subtrahend), difference);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class CommandParameterTypeTest extends UITestCase {
 			converted = type.getValueConverter().convertToObject(value);
 		}
 
-		assertEquals(Integer.valueOf(expected), converted);
+		assertEquals(new Integer(expected), converted);
 	}
 
 	/**
@@ -147,9 +147,9 @@ public class CommandParameterTypeTest extends UITestCase {
 	 * converter used in this test suite.
 	 */
 	public void testConvertIntegerToString() throws CommandException {
-		testConvertIntegerToString(Integer.valueOf(6), "6", false);
-		testConvertIntegerToString(Integer.valueOf(0), "0", false);
-		testConvertIntegerToString(Integer.valueOf(-32), "-32", false);
+		testConvertIntegerToString(new Integer(6), "6", false);
+		testConvertIntegerToString(new Integer(0), "0", false);
+		testConvertIntegerToString(new Integer(-32), "-32", false);
 		testConvertIntegerToString(null, null, true);
 		testConvertIntegerToString(Boolean.TRUE, null, true);
 	}
@@ -184,9 +184,9 @@ public class CommandParameterTypeTest extends UITestCase {
 		ICommandService commandService = getCommandService();
 		ParameterType type = commandService.getParameterType(TYPE);
 
-		assertTrue(type.isCompatible(Integer.valueOf(4)));
-		assertTrue(type.isCompatible(Integer.valueOf(0)));
-		assertTrue(type.isCompatible(Integer.valueOf(-434)));
+		assertTrue(type.isCompatible(new Integer(4)));
+		assertTrue(type.isCompatible(new Integer(0)));
+		assertTrue(type.isCompatible(new Integer(-434)));
 		assertFalse(type.isCompatible(null));
 		assertFalse(type.isCompatible("4"));
 	}
@@ -197,7 +197,7 @@ public class CommandParameterTypeTest extends UITestCase {
 	 * command used elsewhere in this test suite.
 	 */
 	public void testFindIntegerParamCommand() throws CommandException {
-		Integer value = Integer.valueOf(6);
+		Integer value = new Integer(6);
 
 		ICommandService commandService = getCommandService();
 		Command[] commands = commandService.getDefinedCommands();

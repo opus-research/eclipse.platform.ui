@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.w3c.dom.Attr;
@@ -81,7 +80,7 @@ public final class XMLMemento implements IMemento {
      * @return a memento on the first <code>Element</code> for reading the document
      * @throws WorkbenchException if IO problems, invalid format, or no element.
      */
-	public static XMLMemento createReadRoot(Reader reader, @Nullable String baseDir)
+    public static XMLMemento createReadRoot(Reader reader, String baseDir)
             throws WorkbenchException {
         String errorMessage = null;
         Exception exception = null;
@@ -370,7 +369,7 @@ public final class XMLMemento implements IMemento {
 		}
         String strValue = attr.getValue();
         try {
-			return Integer.valueOf(strValue);
+            return new Integer(strValue);
         } catch (NumberFormatException e) {
             WorkbenchPlugin
                     .log("Memento problem - invalid integer for key: " + key //$NON-NLS-1$
@@ -441,7 +440,6 @@ public final class XMLMemento implements IMemento {
      * @return the Text node of the memento, or <code>null</code> if
      * the memento has no Text node.
      */
-	@Nullable
     private Text getTextNode() {
         // Get the nodes.
         NodeList nodes = element.getChildNodes();
@@ -720,7 +718,6 @@ public final class XMLMemento implements IMemento {
     		return result.toString();
     	}
 
-		@Nullable
     	private static String getReplacement(char c) {
     		// Encode special XML characters into the equivalent character references.
 			// The first five are defined by default for all XML documents.

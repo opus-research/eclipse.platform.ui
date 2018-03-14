@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * An editor can implement this interface and participate in the workbench
  * session save/restore cycle using <code>IMemento</code>, similar to how
@@ -44,5 +42,5 @@ public interface IPersistableEditor extends IPersistable {
 	 * @param memento
 	 *            the saved state for this editor. May be <code>null</code>.
 	 */
-	public void restoreState(@Nullable IMemento memento);
+	public void restoreState(IMemento memento);
 }

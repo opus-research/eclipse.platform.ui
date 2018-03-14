@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,6 @@ package org.eclipse.ui;
 import java.util.Map;
 import org.eclipse.core.commands.util.Tracing;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.ui.internal.misc.Policy;
 import org.eclipse.ui.services.IServiceLocator;
 
@@ -42,7 +40,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 * The listeners to this source provider. This value is never
 	 * <code>null</code>.
 	 */
-	private final ListenerList<ISourceProviderListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
+	private final ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
 
 	@Override
@@ -67,9 +65,10 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 *            The new value for the source; may be <code>null</code>.
 	 */
 	protected final void fireSourceChanged(final int sourcePriority,
-			final String sourceName, @Nullable final Object sourceValue) {
-		for (ISourceProviderListener listener : listeners) {
-			listener.sourceChanged(sourcePriority, sourceName, sourceValue);
+			final String sourceName, final Object sourceValue) {
+		for (Object listener : listeners.getListeners()) {
+			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceName,
+					sourceValue);
 		}
 	}
 
@@ -85,10 +84,10 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 *            <code>null</code>, but the values may be <code>null</code>.
 	 */
 	protected final void fireSourceChanged(final int sourcePriority,
-			final Map<@NonNull String, Object> sourceValuesByName) {
+			final Map sourceValuesByName) {
 
-		for (ISourceProviderListener listener : listeners) {
-			listener.sourceChanged(sourcePriority, sourceValuesByName);
+		for (Object listener : listeners.getListeners()) {
+			((ISourceProviderListener) listener).sourceChanged(sourcePriority, sourceValuesByName);
 		}
 	}
 
@@ -102,7 +101,7 @@ public abstract class AbstractSourceProvider implements ISourceProvider {
 	 *            nothing is logged.
 	 * @since 3.2
 	 */
-	protected final void logDebuggingInfo(@Nullable final String message) {
+	protected final void logDebuggingInfo(final String message) {
 		if (DEBUG && (message != null)) {
 			Tracing.printTrace("SOURCES", message); //$NON-NLS-1$
 		}

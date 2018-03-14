@@ -12,7 +12,6 @@ package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
@@ -341,7 +340,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *            the id of the view extension to use
 	 * @return the view, or <code>null</code> if none is found
 	 */
-	@Nullable
 	public IViewPart findView(String viewId);
 
 	/**
@@ -352,7 +350,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return the view reference, or <code>null</code> if none is found
 	 * @since 3.0
 	 */
-	@Nullable
 	public IViewReference findViewReference(String viewId);
 
 	/**
@@ -366,7 +363,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return the view reference, or <code>null</code> if none is found
 	 * @since 3.0
 	 */
-	public IViewReference findViewReference(String viewId, @Nullable String secondaryId);
+	public IViewReference findViewReference(String viewId, String secondaryId);
 
 	/**
 	 * Returns the active editor open in this page.
@@ -377,7 +374,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *
 	 * @return the active editor, or <code>null</code> if no editor is active
 	 */
-	@Nullable
 	public IEditorPart getActiveEditor();
 
 	/**
@@ -388,7 +384,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *            the editor input
 	 * @return an editor with input equals to <code>input</code>
 	 */
-	@Nullable
 	public IEditorPart findEditor(IEditorInput input);
 
 	/**
@@ -412,7 +407,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #MATCH_ID
 	 * @since 3.2
 	 */
-	public IEditorReference[] findEditors(@Nullable IEditorInput input, @Nullable String editorId,
+	public IEditorReference[] findEditors(IEditorInput input, String editorId,
 			int matchFlags);
 
 	/**
@@ -455,7 +450,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *
 	 * @return the input for this page, or <code>null</code> if none
 	 */
-	@Nullable
 	public IAdaptable getInput();
 
 	/**
@@ -474,7 +468,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #setPerspective
 	 * @see #savePerspective
 	 */
-	@Nullable
 	public IPerspectiveDescriptor getPerspective();
 
 	/**
@@ -610,7 +603,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @exception PartInitException
 	 *                if the editor could not be created or initialized
 	 */
-	@Nullable
 	public IEditorPart openEditor(IEditorInput input, String editorId)
 			throws PartInitException;
 
@@ -638,7 +630,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return an open editor, or <code>null</code> if an external editor was opened
 	 * @exception PartInitException if the editor could not be created or initialized
 	 */
-	@Nullable
 	public IEditorPart openEditor(IEditorInput input, String editorId,
 			boolean activate) throws PartInitException;
 
@@ -673,7 +664,6 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #MATCH_ID
 	 * @since 3.2
 	 */
-	@Nullable
 	public IEditorPart openEditor(final IEditorInput input,
 			final String editorId, final boolean activate, final int matchFlags)
 			throws PartInitException;
@@ -862,7 +852,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *                if the supplied mode is not valid
 	 * @since 3.0
 	 */
-	public IViewPart showView(String viewId, @Nullable String secondaryId, int mode)
+	public IViewPart showView(String viewId, String secondaryId, int mode)
 			throws PartInitException;
 
 	/**
@@ -909,18 +899,15 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	public INavigationHistory getNavigationHistory();
 
 	/**
-	 * Returns an array of IViewParts that are stacked with the given part in
-	 * the currently active perspective.
+	 * Returns an array of IViewParts that are stacked with the given part.
 	 *
 	 * @param part
 	 *            the part to test
 	 * @return the parts that are stacked with this part, including the part in
 	 *         question. <code>null</code> is returned if the part does not
-	 *         belong to this page or the part is not contained in the active
-	 *         perspective. The parts are in LRU order.
+	 *         belong to this page. The parts are in LRU order.
 	 * @since 3.0
 	 */
-	@Nullable
 	IViewPart[] getViewStack(IViewPart part);
 
 	/**
@@ -1161,8 +1148,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *         reference can be found.
 	 * @since 3.2
 	 */
-	@Nullable
-	public IWorkbenchPartReference getReference(@Nullable IWorkbenchPart part);
+	public IWorkbenchPartReference getReference(IWorkbenchPart part);
 
 	/**
 	 * Add back an open but non-participating editor
@@ -1235,11 +1221,13 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * org.eclipse.ui.IWorkbenchPage
 	 * #getEditorState(org.eclipse.ui.IEditorReference []):
 	 * <ol>
-	 * <li>If the mementos contain the 'input' information then only the memento
+	 * <li>
+	 * If the mementos contain the 'input' information then only the memento
 	 * itself is required since it can be used to re-create the editor input and
 	 * its editorID. If all the mementos are of this type then the inputs and
 	 * editorIDs arrays may be null.</li>
-	 * <li>If the supplied memento only contains the editor state then both the
+	 * <li>
+	 * If the supplied memento only contains the editor state then both the
 	 * input and editorID must be non-null.</li>
 	 * </ol>
 	 * </p>
@@ -1256,9 +1244,9 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * editors are opened using pairs of { input[i], editorIDs[i] }.
 	 * </p>
 	 * <p>
-	 * The mementos array may be null but if not must match the input array in
-	 * length. Entries in the mementos array may also be {@code null} if no
-	 * state is desired for that particular editor.
+	 * The mementos array mat be null but if not must match the input array in
+	 * length. Entries in the mementos array may also be null if no state is
+	 * desired for that particular editor.
 	 * </p>
 	 *
 	 * @param inputs
@@ -1288,8 +1276,8 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #MATCH_ID
 	 * @since 3.8.2
 	 */
-	public IEditorReference[] openEditors(@Nullable final IEditorInput[] inputs, @Nullable final String[] editorIDs,
-			@Nullable final IMemento[] mementos, final int matchFlags, final int activateIndex)
+	public IEditorReference[] openEditors(final IEditorInput[] inputs, final String[] editorIDs,
+			final IMemento[] mementos, final int matchFlags, final int activateIndex)
 			throws MultiPartInitException;
 
 	/**

@@ -11,7 +11,6 @@
  *******************************************************************************/
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
@@ -38,7 +37,6 @@ public interface IFileEditorMapping {
      *   is no default editor registered. Will also return <code>null</code> if
      *   the default editor exists but fails the Expressions check.
      */
-	@Nullable
     public IEditorDescriptor getDefaultEditor();
 
     /**

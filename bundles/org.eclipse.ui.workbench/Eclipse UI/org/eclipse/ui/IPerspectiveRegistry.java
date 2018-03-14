@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui;
 
-import org.eclipse.jdt.annotation.Nullable;
-
 /**
  * The workbench's global registry of perspectives.
  * <p>
@@ -57,7 +55,6 @@ public interface IPerspectiveRegistry {
      * @return the perspective, or <code>null</code> if none
      * @see IPerspectiveDescriptor#getId
      */
-	@Nullable
     public IPerspectiveDescriptor findPerspectiveWithId(String perspectiveId);
 
     /**
@@ -67,7 +64,6 @@ public interface IPerspectiveRegistry {
      * @return the perspective, or <code>null</code> if none
      * @see IPerspectiveDescriptor#getLabel
      */
-	@Nullable
     public IPerspectiveDescriptor findPerspectiveWithLabel(String label);
 
     /**
@@ -79,8 +75,7 @@ public interface IPerspectiveRegistry {
      *
      * @return the default perspective id, or <code>null</code>
      */
-	@Nullable
-	public String getDefaultPerspective();
+    public String getDefaultPerspective();
 
     /**
      * Returns a list of the perspectives known to the workbench.
@@ -99,7 +94,7 @@ public interface IPerspectiveRegistry {
      *
      * @param id a perspective id, or <code>null</code>
      */
-	public void setDefaultPerspective(@Nullable String id);
+    public void setDefaultPerspective(String id);
 
     /**
      * Reverts a perspective back to its original definition

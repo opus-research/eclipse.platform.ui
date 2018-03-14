@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -39,7 +40,9 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IMessage;
@@ -359,7 +362,7 @@ public class FormHeading extends Canvas {
 		private CLabel messageLabel;
 		private IMessage[] messages;
 		private Hyperlink messageHyperlink;
-		private ListenerList<IHyperlinkListener> listeners;
+		private ListenerList listeners;
 		private Color fg;
 		private int fontHeight = -1;
 		private int fontBaselineHeight = -1;
@@ -471,7 +474,7 @@ public class FormHeading extends Canvas {
 
 		public void addMessageHyperlinkListener(IHyperlinkListener listener) {
 			if (listeners == null)
-				listeners = new ListenerList<>();
+				listeners = new ListenerList();
 			listeners.add(listener);
 			ensureControlExists();
 			if (messageHyperlink != null)
@@ -503,9 +506,10 @@ public class FormHeading extends Canvas {
 					messageHyperlink.setBackground(getBackground());
 					messageHyperlink.setText(message);
 					messageHyperlink.setHref(messages);
-					for (IHyperlinkListener element : listeners)
+					Object[] llist = listeners.getListeners();
+					for (Object element : llist)
 						messageHyperlink
-								.addHyperlinkListener(element);
+								.addHyperlinkListener((IHyperlinkListener) element);
 					if (messageToolTipManager != null)
 						messageToolTipManager.createToolTip(messageHyperlink, false);
 				} else if (!messageHyperlink.getVisible()) {
@@ -574,18 +578,35 @@ public class FormHeading extends Canvas {
 	public FormHeading(Composite parent, int style) {
 		super(parent, style);
 		setBackgroundMode(SWT.INHERIT_DEFAULT);
-		addListener(SWT.Paint, e -> onPaint(e.gc));
-		addListener(SWT.Dispose, e -> {
-			if (gradientImage != null) {
-				FormImages.getInstance().markFinished(gradientImage, getDisplay());
-				gradientImage = null;
+		addListener(SWT.Paint, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				onPaint(e.gc);
 			}
 		});
-		addListener(SWT.Resize, e -> {
-			if (gradientInfo != null || (backgroundImage != null && !isBackgroundImageTiled()))
-				updateGradientImage();
+		addListener(SWT.Dispose, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (gradientImage != null) {
+					FormImages.getInstance().markFinished(gradientImage, getDisplay());
+					gradientImage = null;
+				}
+			}
 		});
-		addMouseMoveListener(e -> updateTitleRegionHoverState(e));
+		addListener(SWT.Resize, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (gradientInfo != null
+						|| (backgroundImage != null && !isBackgroundImageTiled()))
+					updateGradientImage();
+			}
+		});
+		addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				updateTitleRegionHoverState(e);
+			}
+		});
 		addMouseTrackListener(new MouseTrackListener() {
 			@Override
 			public void mouseEnter(MouseEvent e) {

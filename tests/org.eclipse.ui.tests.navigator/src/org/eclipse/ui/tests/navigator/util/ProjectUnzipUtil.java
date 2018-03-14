@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,8 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
+import org.eclipse.ui.tests.navigator.NavigatorTestsPlugin;
 
 public class ProjectUnzipUtil {
 
@@ -48,8 +47,7 @@ public class ProjectUnzipUtil {
 	}
 
 	public IPath getLocalPath(IPath zipFilePath) {
-		Bundle bundle = FrameworkUtil.getBundle(ProjectUnzipUtil.class);
-		URL url = FileLocator.find(bundle, zipFilePath, null);
+		URL url = FileLocator.find(NavigatorTestsPlugin.getDefault().getBundle(), zipFilePath, null);
 		try {
 			url = FileLocator.toFileURL(url);
 		} catch (IOException e) {
@@ -63,7 +61,10 @@ public class ProjectUnzipUtil {
 			expandZip();
 			ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, null);
 			buildProjects();
-		} catch (CoreException | IOException e) {
+		} catch (CoreException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -75,7 +76,10 @@ public class ProjectUnzipUtil {
 		try {
 			expandZip();
 			ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (CoreException | IOException e) {
+		} catch (CoreException e) {
+			e.printStackTrace();
+			return false;
+		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -89,10 +93,16 @@ public class ProjectUnzipUtil {
 
 	private void expandZip() throws CoreException, IOException {
 		IProgressMonitor monitor = getProgessMonitor();
-		try (ZipFile zipFile = new ZipFile(zipLocation.toFile())) {
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		ZipFile zipFile = null;
+		try {
+			zipFile = new ZipFile(zipLocation.toFile());
+		} catch (IOException e1) {
+			throw e1;
+		}
+		try {
+			Enumeration entries = zipFile.entries();
 			while (entries.hasMoreElements()) {
-				ZipEntry entry = entries.nextElement();
+				ZipEntry entry = (ZipEntry) entries.nextElement();
 				monitor.subTask(entry.getName());
 				File aFile = computeLocation(entry.getName()).toFile();
 				File parentFile = null;
@@ -114,6 +124,8 @@ public class ProjectUnzipUtil {
 				}
 				monitor.worked(1);
 			}
+		} finally {
+			zipFile.close();
 		}
 	}
 
