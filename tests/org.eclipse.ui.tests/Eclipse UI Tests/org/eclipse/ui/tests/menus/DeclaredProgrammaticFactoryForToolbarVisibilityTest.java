@@ -35,8 +35,7 @@ public class DeclaredProgrammaticFactoryForToolbarVisibilityTest extends Extensi
 
     public static final String TEST_MENU_MANAGER_WITH_ALWAYS_TRUE_VISIBLE_WHEN = "TestMenuManagerWithAlwaysTrueVisibleWhen"; //$NON-NLS-1$
 
-    @Override
-	public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
+    public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
         addContribution(additions, new TestAction(TEST_ITEM_WITHOUT_VISIBLE_WHEN), null);
         addContribution(additions, new TestAction(TEST_ITEM_WITH_ALWAYS_TRUE_VISIBLE_WHEN), AlwaysEnabledExpression.INSTANCE);
         addContribution(additions, new TestAction(TEST_ITEM_WITH_ALWAYS_FALSE_VISIBLE_WHEN), new AlwaysDisabledExpression());
@@ -57,6 +56,17 @@ public class DeclaredProgrammaticFactoryForToolbarVisibilityTest extends Extensi
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.gmf.runtime.common.ui.action.ActionMenuManager which is
+     * an implementation of an <code>IMenuManager</code> that inherits its UI
+     * (text + icon + hints) from a given action. When filled in a toolbar, the
+     * menu is rendered as a tool item.
+     *
+     * See Bug 410426 which corrects a ClassCastException in
+     * ToolbarManagerRenderer while looking for a IContributionItem parent ToolBarManager.
+     */
     private static class TestActionMenuManager extends MenuManager {
         private ActionContributionItem actionContributionItem;
 
@@ -66,11 +76,22 @@ public class DeclaredProgrammaticFactoryForToolbarVisibilityTest extends Extensi
             add(new TestAction(TEST_ITEM_WITHOUT_VISIBLE_WHEN));
         }
 
-        @Override
-		public void fill(ToolBar parent, int index) {
+        /*
+         * (non-Javadoc)
+         *
+         * @see
+         * org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets
+         * .ToolBar, int)
+         */
+        public void fill(ToolBar parent, int index) {
             actionContributionItem.fill(parent, index);
         }
 
+        /*
+         * (non-Javadoc)
+         *
+         * @see org.eclipse.jface.action.MenuManager#dispose()
+         */
         @Override
         public void dispose() {
             super.dispose();
@@ -79,8 +100,7 @@ public class DeclaredProgrammaticFactoryForToolbarVisibilityTest extends Extensi
     }
 
     private static class AlwaysDisabledExpression extends Expression {
-        @Override
-		public EvaluationResult evaluate(IEvaluationContext context) {
+        public EvaluationResult evaluate(IEvaluationContext context) {
             return EvaluationResult.FALSE;
         }
     }

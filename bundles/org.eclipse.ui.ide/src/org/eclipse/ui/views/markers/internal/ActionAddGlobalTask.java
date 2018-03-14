@@ -37,8 +37,7 @@ public class ActionAddGlobalTask extends Action {
         this.part = part;
     }
 
-    @Override
-	public void run() {
+    public void run() {
         DialogTaskProperties dialog = new DialogTaskProperties(part.getSite()
                 .getShell(), MarkerMessages.addGlobalTaskDialog_title);
         dialog.open();

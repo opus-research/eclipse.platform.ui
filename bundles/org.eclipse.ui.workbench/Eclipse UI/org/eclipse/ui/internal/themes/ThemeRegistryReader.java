@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -310,7 +311,13 @@ public class ThemeRegistryReader extends RegistryReader {
                 }
             }
             return true;
-		}
+        } else if (elementName.equals(IWorkbenchRegistryConstants.TAG_CATEGORYPRESENTATIONBINDING)) {
+            String categoryId = element.getAttribute(IWorkbenchRegistryConstants.ATT_CATEGORY_ID);
+            String presentationId = element.getAttribute(IWorkbenchRegistryConstants.ATT_PRESENTATIONID);
+            themeRegistry.addCategoryPresentationBinding(categoryId,
+                    presentationId);
+            return true;
+        }
 
         return false;
     }

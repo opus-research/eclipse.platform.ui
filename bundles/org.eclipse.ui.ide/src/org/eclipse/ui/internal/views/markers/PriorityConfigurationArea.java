@@ -46,7 +46,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#apply(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void apply(MarkerFieldFilter filter) {
 		((PriorityMarkerFieldFilter) filter).selectedPriorities = priorities;
 
@@ -57,7 +56,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createContents(Composite parent) {
 		
 		parent.setLayout(new GridLayout(3,false));
@@ -70,7 +68,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_HIGH,
 						highButton.getSelection());
@@ -86,7 +83,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_NORMAL,
 						normalButton.getSelection());
@@ -101,7 +97,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updatePriorities(PriorityMarkerFieldFilter.PRIORITY_LOW,
 						lowButton.getSelection());
@@ -127,7 +122,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#initialize(org.eclipse.ui.internal.provisional.views.markers.api.MarkerFieldFilter)
 	 */
-	@Override
 	public void initialize(MarkerFieldFilter filter) {
 		priorities = ((PriorityMarkerFieldFilter) filter).selectedPriorities;
 
@@ -143,7 +137,6 @@ public class PriorityConfigurationArea extends FilterConfigurationArea {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.FilterConfigurationArea#getTitle()
 	 */
-	@Override
 	public String getTitle() {
 		return MarkerMessages.filtersDialog_priorityTitle;
 	}

@@ -56,6 +56,9 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider.
+     */
     @Override
 	public void dispose() {
         super.dispose();
@@ -76,6 +79,9 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         return getImage(element);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ITableLabelProvider.
+     */
     @Override
 	public String getColumnText(Object element, int row) {
         return getText(element);
@@ -97,6 +103,9 @@ public class FileEditorMappingLabelProvider extends LabelProvider implements
         return null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider.
+     */
     @Override
 	public String getText(Object element) {
         if (element instanceof IFileEditorMapping) {

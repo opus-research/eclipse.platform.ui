@@ -128,10 +128,9 @@ public class CSSSWTColorHelper {
 	 */
 	private static Field[] getFields() {
 		if (cachedFields == null) {
-			Class<?> clazz = SWT.class;
+			Class clazz = SWT.class;
 			Field[] allFields = clazz.getDeclaredFields();
-			ArrayList<Field> applicableFields = new ArrayList<Field>(
-					allFields.length);
+			ArrayList applicableFields = new ArrayList(allFields.length);
 
 			for (Field field : allFields) {
 				if (field.getType() == Integer.TYPE
@@ -143,7 +142,7 @@ public class CSSSWTColorHelper {
 					applicableFields.add(field);
 				}
 			}
-			cachedFields = applicableFields.toArray(new Field [applicableFields.size()]);
+			cachedFields = (Field []) applicableFields.toArray(new Field [applicableFields.size()]);
 		}
 		return cachedFields;
 	}

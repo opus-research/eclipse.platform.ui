@@ -35,8 +35,7 @@ public class MockWorkingSetTest extends TestCase {
     /**
      * @see junit.framework.TestCase#setUp()
      */
-    @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         fRegistry = WorkbenchPlugin.getDefault().getWorkingSetRegistry();
     }

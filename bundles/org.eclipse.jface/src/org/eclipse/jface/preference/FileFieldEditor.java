@@ -96,6 +96,10 @@ public class FileFieldEditor extends StringButtonFieldEditor {
         createControl(parent);
     }
 
+    /* (non-Javadoc)
+     * Method declared on StringButtonFieldEditor.
+     * Opens the file chooser dialog and returns the selected file.
+     */
     @Override
 	protected String changePressed() {
         File f = new File(getTextControl().getText());
@@ -110,6 +114,10 @@ public class FileFieldEditor extends StringButtonFieldEditor {
         return d.getAbsolutePath();
     }
 
+    /* (non-Javadoc)
+     * Method declared on StringFieldEditor.
+     * Checks whether the text input field specifies an existing file.
+     */
     @Override
 	protected boolean checkState() {
 

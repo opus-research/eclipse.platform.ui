@@ -57,12 +57,10 @@ public class ListChangeEvent extends ObservableEvent {
 		return (IObservableList) getSource();
 	}
 
-	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IListChangeListener) listener).handleListChange(this);
 	}
 
-	@Override
 	protected Object getListenerType() {
 		return TYPE;
 	}

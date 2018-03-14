@@ -115,6 +115,9 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return input;
     }
 
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
     @Override
 	public void dispose() {
     	PlatformUI.getWorkbench().getEditorRegistry().removePropertyListener(editorRegistryListener);
@@ -173,6 +176,9 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 		return resourceManager;
 	}
 
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
     @Override
 	public final Image getImage(Object element) {
         //obtain the base image by querying the element
@@ -236,6 +242,9 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 		return StyledString.DECORATIONS_STYLER;
 	}
 
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
     @Override
 	public final String getText(Object element) {
         //query the element for its label
@@ -249,16 +258,25 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return decorateText(label, element);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+     */
     @Override
 	public Color getForeground(Object element) {
         return getColor(element, true);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+     */
     @Override
 	public Color getBackground(Object element) {
         return getColor(element, false);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+     */
     @Override
 	public Font getFont(Object element) {
         IWorkbenchAdapter2 adapter = getAdapter2(element);

@@ -130,6 +130,9 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
         selectionChanged(selection);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
+	 */
 	@Override
 	public void dispose() {
 		workbenchWindow = null;

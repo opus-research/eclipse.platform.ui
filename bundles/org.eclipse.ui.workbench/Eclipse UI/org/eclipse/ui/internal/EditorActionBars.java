@@ -73,6 +73,13 @@ public class EditorActionBars extends SubActionBars2 {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.jface.action.IContributionManagerOverrides#getVisible
+		 * (org.eclipse.jface.action.IContributionItem)
+		 */
 		@Override
 		public Boolean getVisible(IContributionItem item) {
 			return null;
@@ -131,11 +138,17 @@ public class EditorActionBars extends SubActionBars2 {
 		++refCount;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on SubActionBars.
+	 */
 	@Override
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new EditorMenuManager(parent);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on SubActionBars.
+	 */
 	@Override
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, editor actions are managed by CoolItemToolBarManagers

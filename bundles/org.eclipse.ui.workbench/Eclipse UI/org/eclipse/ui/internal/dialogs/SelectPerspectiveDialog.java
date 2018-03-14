@@ -77,12 +77,22 @@ public class SelectPerspectiveDialog extends Dialog implements
 		setShellStyle(getShellStyle() | SWT.SHEET);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.dialogs.Dialog#cancelPressed()
+     */
     @Override
 	protected void cancelPressed() {
         perspDesc = null;
         super.cancelPressed();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -150,6 +160,9 @@ public class SelectPerspectiveDialog extends Dialog implements
                 .setText(ActivityMessages.Perspective_showAll);
         showAllButton.addSelectionListener(new SelectionAdapter() {
 
+            /* (non-Javadoc)
+             * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+             */
             @Override
 			public void widgetSelected(SelectionEvent e) {
                 if (showAllButton.getSelection()) {
@@ -246,6 +259,9 @@ public class SelectPerspectiveDialog extends Dialog implements
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+     */
     @Override
 	protected void okPressed() {
         ITriggerPoint triggerPoint = PlatformUI.getWorkbench()
@@ -256,6 +272,10 @@ public class SelectPerspectiveDialog extends Dialog implements
 		}
     }
     
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
     	return true;

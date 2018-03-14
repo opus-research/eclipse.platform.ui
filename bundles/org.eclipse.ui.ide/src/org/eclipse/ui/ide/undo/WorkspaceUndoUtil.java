@@ -136,7 +136,6 @@ public class WorkspaceUndoUtil {
 	 */
 	public static IAdaptable getUIInfoAdapter(final Shell shell) {
 		return new IAdaptable() {
-			@Override
 			public Object getAdapter(Class clazz) {
 				if (clazz == Shell.class) {
 					return shell;
@@ -920,13 +919,11 @@ public class WorkspaceUndoUtil {
 						IDialogConstants.YES_TO_ALL_LABEL,
 						IDialogConstants.NO_LABEL,
 						IDialogConstants.CANCEL_LABEL }, 0) {
-			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
 			}
 		};
 		shell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				dialog.open();
 			}

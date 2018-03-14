@@ -37,8 +37,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * Returns an image descriptor for this object.
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object o) {
+    public ImageDescriptor getImageDescriptor(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : getBaseImage(resource);
     }
@@ -46,8 +45,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
     /**
      * getLabel method comment.
      */
-    @Override
-	public String getLabel(Object o) {
+    public String getLabel(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getName();
     }
@@ -56,8 +54,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * Returns the parent of the given object.  Returns null if the
      * parent is not available.
      */
-    @Override
-	public Object getParent(Object o) {
+    public Object getParent(Object o) {
         IResource resource = getResource(o);
         return resource == null ? null : resource.getParent();
     }
@@ -85,8 +82,7 @@ public abstract class WorkbenchResource extends WorkbenchAdapter implements
      * @param value the attribute value
      * @return <code>true</code> if the attribute matches; <code>false</code> otherwise
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         if (!(target instanceof IResource)) {
             return false;
         }

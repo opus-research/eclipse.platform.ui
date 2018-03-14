@@ -30,7 +30,7 @@ public class DnDAddon {
 
 	@Inject
 	@Optional
-	void subscribeTopicWidget(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
+	public void subscribeTopicWidget(@UIEventTopic(UIEvents.UIElement.TOPIC_WIDGET) Event event) {
 		MUIElement changedElement = (MUIElement) event.getProperty(EventTags.ELEMENT);
 		if (!(changedElement instanceof MWindow))
 			return;

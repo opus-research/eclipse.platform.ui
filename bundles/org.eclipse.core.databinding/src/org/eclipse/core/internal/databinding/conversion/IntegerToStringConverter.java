@@ -43,7 +43,11 @@ public class IntegerToStringConverter extends Converter {
 		this.boxedType = boxedType;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object fromObject) {
 		// Null is allowed when the type is not primitve.
 		if (fromObject == null && !primitive) {

@@ -16,7 +16,6 @@ package org.eclipse.ui.views.framelist;
  * @deprecated These messages are not API and should not be referenced
  * outside of this plug-in.
  */
-@Deprecated
 class FrameListMessages {
 
     private FrameListMessages() {

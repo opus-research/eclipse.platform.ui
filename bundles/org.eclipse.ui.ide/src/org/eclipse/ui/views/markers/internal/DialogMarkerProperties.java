@@ -268,7 +268,6 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * Method declared on Window.
 	 */
-	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
         if (title == null) {
@@ -281,7 +280,6 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * Method declared on Dialog.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		// initialize resources/properties
 		if (marker != null) {
@@ -347,7 +345,6 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * Creates the OK and Cancel buttons.
 	 */
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);
@@ -367,7 +364,6 @@ public class DialogMarkerProperties extends TrayDialog {
 		descriptionText.setLayoutData(gridData);
 
 		descriptionText.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				markDirty();
 			}
@@ -487,7 +483,6 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * Method declared on Dialog
 	 */
-	@Override
 	protected void okPressed() {
 		if (marker == null || Util.isEditable(marker)) {
 			saveChanges();
@@ -598,7 +593,6 @@ public class DialogMarkerProperties extends TrayDialog {
      * 
      * @since 3.2
      */
-	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
@@ -643,8 +637,7 @@ public class DialogMarkerProperties extends TrayDialog {
      * (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#isResizable()
      */
-    @Override
-	protected boolean isResizable() {
+    protected boolean isResizable() {
     	return true;
     }
 

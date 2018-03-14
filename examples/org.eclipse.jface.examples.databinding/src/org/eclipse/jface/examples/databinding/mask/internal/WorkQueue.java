@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Listener;
  *
  */
 public class WorkQueue {
-
+	
     private boolean updateScheduled = false;
 
     private boolean paintListenerAttached = false;
@@ -36,16 +36,14 @@ public class WorkQueue {
     private Set pendingWorkSet = new HashSet();
 
     private Runnable updateJob = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             doUpdate();
             updateScheduled = false;
         }
     };
 
     private Listener paintListener = new Listener() {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             paintListenerAttached = false;
             d.removeFilter(SWT.Paint, this);
             doUpdate();
@@ -72,7 +70,7 @@ public class WorkQueue {
 
             next.run();
         }
-
+        
     }
 
     /**
@@ -80,7 +78,7 @@ public class WorkQueue {
      * possible, the work will happen before the next control redraws. The given
      * runnable will only be run once. Has no effect if this runnable has
      * already been queued for execution.
-     *
+     * 
      * @param work
      *            runnable to execute
      */
@@ -101,7 +99,7 @@ public class WorkQueue {
      * possible, the work will happen before the next control redraws. Unlike
      * runOnce, calling asyncExec twice with the same runnable will cause that
      * runnable to run twice.
-     *
+     * 
      * @param work
      *            runnable to execute
      */
@@ -127,7 +125,7 @@ public class WorkQueue {
     /**
      * Cancels a previously-scheduled runnable. Has no effect if the given
      * runnable was not previously scheduled or has already executed.
-     *
+     * 
      * @param toCancel
      *            runnable to cancel
      */

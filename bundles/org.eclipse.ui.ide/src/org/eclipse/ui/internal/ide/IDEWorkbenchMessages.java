@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,6 @@
  * Serge Beauchamp (Freescale Semiconductor) - [252996] Resource filters
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
- * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
- * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
- * Christian Georgi (SAP)              - Bug 432480 - Show workspace location
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -151,9 +148,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String Workbench_addTask;
 	public static String Workbench_addTaskToolTip;
 
-
-	// --- Perspective Menu ---
-	public static String Workbench_perspective;
 
 	// --- Navigate Menu ---
 	public static String Workbench_navigate;
@@ -518,8 +512,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkspacePreference_relatedLink;
 	public static String IDEWorkspacePreference_openReferencedProjects;
 	public static String IDEWorkspacePreference_closeUnrelatedProjectsToolTip;
-	public static String IDEWorkspacePreference_workspaceLocation;
-	public static String IDEWorkspacePreference_showLocationInWindowTitle;
 	public static String IDEWorkspacePreference_workspaceName;
 	public static String IDEWorkbenchPreference_workbenchSystemExplorer;
 
@@ -891,8 +883,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ScrubLocalAction_progress;
 
 	public static String ShowInSystemExplorerHandler_commandUnavailable;
+
 	public static String ShowInSystemExplorerHandler_notDetermineLocation;
-	public static String ShowInSystemExplorerHandler_jobTitle;
 
 	public static String TextAction_selectAll;
 	public static String Cut;
@@ -958,11 +950,8 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEApplication_workspaceCannotBeSetMessage;
 	public static String IDEApplication_workspaceCannotLockTitle;
 	public static String IDEApplication_workspaceCannotLockMessage;
-	public static String IDEApplication_versionTitle_newerWorkspace;
-	public static String IDEApplication_versionTitle_olderWorkspace;
-	public static String IDEApplication_versionMessage_newerWorkspace;
-	public static String IDEApplication_versionMessage_olderWorkspace;
-	public static String IDEApplication_version_doNotWarnAgain;
+	public static String IDEApplication_versionTitle;
+	public static String IDEApplication_versionMessage;
 	public static String GlobalBuildAction_BuildRunningTitle;
 	public static String GlobalBuildAction_BuildRunningMessage;
 	public static String CleanDialog_buildCleanAuto;

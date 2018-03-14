@@ -39,7 +39,6 @@ public final class WidgetSelectionProperty extends
 	private IValueProperty slider;
 	private IValueProperty spinner;
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Button) {
 			if (button == null)

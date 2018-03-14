@@ -57,6 +57,5 @@ public class LocalWorkingSetManager extends AbstractWorkingSetManager implements
 		Assert.isTrue(getWorkingSets().length == 0);
         restoreWorkingSetState(memento);
         restoreMruList(memento);
-		restoreDefaultWorkingSet(memento);
 	}
 }

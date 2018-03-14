@@ -212,6 +212,9 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
         setValid(valid);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PreferencePage.
+     */
     @Override
 	protected Control createContents(Composite parent) {
         fieldEditorParent = new Composite(parent, SWT.NULL);
@@ -369,6 +372,9 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IDialog.
+     */
     @Override
 	public void setVisible(boolean visible) {
         super.setVisible(visible);

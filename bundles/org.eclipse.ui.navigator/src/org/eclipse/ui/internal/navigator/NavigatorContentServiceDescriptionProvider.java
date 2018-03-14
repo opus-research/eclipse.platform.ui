@@ -39,7 +39,6 @@ public final class NavigatorContentServiceDescriptionProvider implements
 		contentService = aContentService;
 	}
 
-	@Override
 	public String getDescription(Object anElement) {
 
 		Object target;

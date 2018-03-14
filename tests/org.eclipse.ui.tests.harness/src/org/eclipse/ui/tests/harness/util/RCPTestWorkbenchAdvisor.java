@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,20 +25,20 @@ import org.eclipse.ui.application.WorkbenchAdvisor;
  * The number of times the idle is called before exiting can be configured. Test
  * cases should subclass this advisor and add their own callback methods if
  * needed.
- *
+ * 
  * @since 3.1
  */
 public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	public static Boolean asyncDuringStartup = null;
-
+	
 	// the following fields are set by the threads that attempt sync/asyncs
 	// during startup.
 	public static volatile Boolean syncWithDisplayAccess = null;
 	public static volatile Boolean asyncWithDisplayAccess = null;
 	public static volatile Boolean syncWithoutDisplayAccess = null;
 	public static volatile Boolean asyncWithoutDisplayAccess = null;
-
+	
 	private static boolean started = false;
 
 	public static boolean isSTARTED() {
@@ -63,23 +63,27 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 		// close
 		this.idleBeforeExit = -1;
 	}
-
+	
 	public RCPTestWorkbenchAdvisor(int idleBeforeExit) {
 		this.idleBeforeExit = idleBeforeExit;
 	}
 
 	/**
-	 *
+	 * 
 	 * Enables the RCP application to runwithout a workbench window
-	 *
+	 * 
 	 * @param runWithoutWindow
-	 *
+	 * 
 	 */
 	public RCPTestWorkbenchAdvisor(boolean windowlessApp) {
 		this.windowlessApp = windowlessApp;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#initialize(org.eclipse.ui.application.IWorkbenchConfigurer)
+	 */
 	public void initialize(IWorkbenchConfigurer configurer) {
 		super.initialize(configurer);
 
@@ -96,20 +100,23 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 		prefs.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP,
 				false);
 		prefs.setValue(IWorkbenchPreferenceConstants.SHOW_INTRO, false);
-
+		
 		if(windowlessApp) {
 			configurer.setSaveAndRestore(true);
 			configurer.setExitOnLastWindowClose(false);
 		}
-
+		
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getInitialWindowPerspectiveId()
+	 */
 	public String getInitialWindowPerspectiveId() {
 		return EmptyPerspective.PERSP_ID;
 	}
 
-	@Override
 	public void eventLoopIdle(final Display display) {
 		// Bug 107369: RCP test suite hangs on GTK
 		if (idleBeforeExit != -1 && --idleBeforeExit <= 0)
@@ -125,14 +132,15 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 			return;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
+	 */
 	public void preStartup() {
 		super.preStartup();
 		final Display display = Display.getCurrent();
 		if (display != null) {
 			display.asyncExec(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isSTARTED())
 						asyncDuringStartup = Boolean.FALSE;
@@ -141,17 +149,17 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 				}
 			});
 		}
-
+		
 		// start a bunch of threads that are going to do a/sync execs. For some
 		// of them, call DisplayAccess.accessDisplayDuringStartup. For others,
 		// dont. Those that call this method should have their runnables invoked
 		// prior to the method isSTARTED returning true.
-
+		
 		setupAsyncDisplayThread(true, display);
 		setupSyncDisplayThread(true, display);
 		setupAsyncDisplayThread(false, display);
 		setupSyncDisplayThread(false, display);
-
+		
 		try {
 			DisplayAccess.accessDisplayDuringStartup();
 			displayAccessInUIThreadAllowed = true;
@@ -166,13 +174,14 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	private void setupSyncDisplayThread(final boolean callDisplayAccess, final Display display) {
 		Thread syncThread = new Thread() {
-			@Override
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
 			public void run() {
 				if (callDisplayAccess)
 					DisplayAccess.accessDisplayDuringStartup();
 				try {
 					display.syncExec(new Runnable() {
-						@Override
 						public void run() {
 							synchronized (RCPTestWorkbenchAdvisor.class) {
 								if (callDisplayAccess)
@@ -200,12 +209,13 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	private void setupAsyncDisplayThread(final boolean callDisplayAccess, final Display display) {
 		Thread asyncThread = new Thread() {
-			@Override
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
 			public void run() {
 				if (callDisplayAccess)
 					DisplayAccess.accessDisplayDuringStartup();
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						synchronized (RCPTestWorkbenchAdvisor.class) {
 							if (callDisplayAccess)
@@ -221,8 +231,12 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 		asyncThread.setDaemon(true);
 		asyncThread.start();
 	}
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
+	 */
 	public void postStartup() {
 		super.postStartup();
 		synchronized (RCPTestWorkbenchAdvisor.class) {

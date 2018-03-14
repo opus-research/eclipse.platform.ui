@@ -94,12 +94,10 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * @return The Image that will be used as the icon when anElement is displayed in the viewer.
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 	 */
-	@Override
 	public Image getImage(Object anElement) {
 		return getColumnImage(anElement, -1);
 	}
 
-	@Override
 	public Image getColumnImage(Object element, int columnIndex) {
 		Collection contentExtensions = contentService.findPossibleLabelExtensions(element);
 		Image image = null; 
@@ -120,12 +118,10 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * @return The String label to display for the object when represented in the viewer.
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
-	@Override
 	public String getText(Object anElement) {
 		return getColumnText(anElement, -1);
 	}
 
-	@Override
 	public String getColumnText(Object anElement, int aColumn) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
 		if (labelProviders.length == 0)
@@ -142,7 +138,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return text;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
+	 */
 	public StyledString getStyledText(Object anElement) {
 		Collection extensions = contentService.findPossibleLabelExtensions(anElement);
 		if (extensions.size() == 0)
@@ -201,7 +199,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return image;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
 	public Font getFont(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
 		for (int i = 0; i < labelProviders.length; i++) {
@@ -217,7 +217,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
 	public Color getForeground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
 		for (int i = 0; i < labelProviders.length; i++) {
@@ -233,7 +235,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
 	public Color getBackground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
 		for (int i = 0; i < labelProviders.length; i++) {
@@ -264,7 +268,6 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	@Override
 	public boolean isLabelProperty(Object anElement, String aProperty) {
 		boolean result = false;
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
@@ -283,7 +286,6 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * {@inheritDoc}
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
-	@Override
 	public void addListener(ILabelProviderListener aListener) {
 		addListenerObject(aListener);
 	}
@@ -296,7 +298,6 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * {@inheritDoc}
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 	 */
-	@Override
 	public void removeListener(ILabelProviderListener aListener) {
 		removeListenerObject(aListener);
 	}
@@ -313,7 +314,6 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 	 * {@inheritDoc}
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 	 */
-	@Override
 	public void dispose() {
 		if (isContentServiceSelfManaged) {
 			contentService.dispose();
@@ -335,8 +335,7 @@ public class NavigatorContentServiceLabelProvider extends EventManager
         for (int i = 0; i < theListeners.length; ++i) {
             final ILabelProviderListener l = (ILabelProviderListener) theListeners[i];
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.labelProviderChanged(event);
                 }
             });
@@ -344,7 +343,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
         }
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, org.eclipse.jface.viewers.TreePath)
+	 */
 	public void updateLabel(ViewerLabel label, TreePath elementPath) { 
 		 
 		Collection contentExtensions = contentService.findPossibleLabelExtensions(elementPath.getLastSegment());
@@ -372,7 +373,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		}
 	}
  
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
+	 */
 	public void labelProviderChanged(LabelProviderChangedEvent event) { 
 		fireLabelProviderChanged(event);		
 	}

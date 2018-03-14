@@ -20,12 +20,19 @@ import org.eclipse.swt.widgets.Text;
 
 public class TextFieldAssistWindow extends AbstractFieldAssistWindow {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.jface.tests.fieldassist.AbstractFieldAssistWindow#
+	 * createFieldAssistControl(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createFieldAssistControl(Composite parent) {
 		return new Text(parent, SWT.SINGLE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.tests.fieldassist.AbstractFieldAssistWindow#getControlContentAdapter()
+	 */
 	protected IControlContentAdapter getControlContentAdapter() {
 		return new TextContentAdapter();
 	}

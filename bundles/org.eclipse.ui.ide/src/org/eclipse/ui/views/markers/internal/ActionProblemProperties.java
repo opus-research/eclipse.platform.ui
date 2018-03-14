@@ -40,8 +40,7 @@ public class ActionProblemProperties extends MarkerSelectionProviderAction {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.Action#run()
      */
-    @Override
-	public void run() {
+    public void run() {
  
     	IMarker marker = getSelectedMarker();
         DialogMarkerProperties dialog = new DialogProblemProperties(part
@@ -53,8 +52,7 @@ public class ActionProblemProperties extends MarkerSelectionProviderAction {
     /* (non-Javadoc)
      * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
      */
-    @Override
-	public void selectionChanged(IStructuredSelection selection) {
+    public void selectionChanged(IStructuredSelection selection) {
         setEnabled(Util.isSingleConcreteSelection(selection));
     }
 }

@@ -212,6 +212,10 @@ public class NavigationHistory implements INavigationHistory {
         });
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public void markLocation(IEditorPart part) {
         addEntry(part);
@@ -258,6 +262,10 @@ public class NavigationHistory implements INavigationHistory {
         return entries;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public INavigationLocation[] getLocations() {
         INavigationLocation result[] = new INavigationLocation[history.size()];
@@ -268,6 +276,10 @@ public class NavigationHistory implements INavigationHistory {
         return result;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
     @Override
 	public INavigationLocation getCurrentLocation() {
         NavigationHistoryEntry entry = getEntry(activeEntry);

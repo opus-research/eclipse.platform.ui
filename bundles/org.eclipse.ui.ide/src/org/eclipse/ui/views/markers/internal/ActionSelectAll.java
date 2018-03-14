@@ -48,7 +48,6 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 
 		if (view.getMarkerAdapter().isBuilding())
@@ -60,7 +59,6 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 			 * 
 			 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 			 */
-			@Override
 			public void run(IProgressMonitor monitor) {
 
 				try {
@@ -143,7 +141,6 @@ public class ActionSelectAll extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(!selection.isEmpty());
 	}

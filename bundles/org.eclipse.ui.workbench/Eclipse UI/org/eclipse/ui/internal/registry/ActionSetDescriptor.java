@@ -237,10 +237,4 @@ public class ActionSetDescriptor implements IActionSetDescriptor, IAdaptable,
 	public int hashCode() {
         return id.hashCode() + pluginId.hashCode();
     }
-
-	@Override
-	public String toString() {
-		return "ActionSetDescriptor [id=" + id + ", visible=" + visible + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

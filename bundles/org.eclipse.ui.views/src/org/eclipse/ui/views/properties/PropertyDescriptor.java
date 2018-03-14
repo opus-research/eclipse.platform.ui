@@ -115,8 +115,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      * Since no cell editor is returned, the property is read only.
      * </p>
      */
-    @Override
-	public CellEditor createPropertyEditor(Composite parent) {
+    public CellEditor createPropertyEditor(Composite parent) {
         return null;
     }
 
@@ -140,8 +139,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      *
      * @see #setCategory
      */
-    @Override
-	public String getCategory() {
+    public String getCategory() {
         return category;
     }
 
@@ -153,8 +151,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      *
      * @see #setDescription
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -163,8 +160,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      * <code>IPropertyDescriptor</code> method returns the value supplied
      * on the constructor.
      */
-    @Override
-	public String getDisplayName() {
+    public String getDisplayName() {
         return display;
     }
 
@@ -177,8 +173,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      * Valid values for these flags are declared as constants on 
      *  <code>IPropertySheetEntry</code>
      */
-    @Override
-	public String[] getFilterFlags() {
+    public String[] getFilterFlags() {
         return filterFlags;
     }
 
@@ -190,8 +185,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      *
      * @see #setHelpContextIds
      */
-    @Override
-	public Object getHelpContextIds() {
+    public Object getHelpContextIds() {
         return helpIds;
     }
 
@@ -200,8 +194,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      * <code>IPropertyDescriptor</code> method returns the value supplied
      * on the constructor.
      */
-    @Override
-	public Object getId() {
+    public Object getId() {
         return id;
     }
 
@@ -213,8 +206,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      *
      * @see #setLabelProvider
      */
-    @Override
-	public ILabelProvider getLabelProvider() {
+    public ILabelProvider getLabelProvider() {
         if (labelProvider != null) {
 			return labelProvider;
 		}
@@ -247,8 +239,7 @@ public class PropertyDescriptor implements IPropertyDescriptor {
      * property has the same id and category and <code>getAlwaysIncompatible()</code>
      * returns false
      */
-    @Override
-	public boolean isCompatibleWith(IPropertyDescriptor anotherProperty) {
+    public boolean isCompatibleWith(IPropertyDescriptor anotherProperty) {
         if (getAlwaysIncompatible()) {
 			return false;
 		}
