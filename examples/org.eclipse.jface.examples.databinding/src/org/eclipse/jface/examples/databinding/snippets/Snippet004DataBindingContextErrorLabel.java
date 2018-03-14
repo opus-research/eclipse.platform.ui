@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Text;
  * 
  * @since 3.2
  */
+
 public class Snippet004DataBindingContextErrorLabel {
 	public static void main(String[] args) {
 		final Display display = new Display();
@@ -55,16 +56,15 @@ public class Snippet004DataBindingContextErrorLabel {
 
 				Label errorLabel = new Label(shell, SWT.BORDER);
 				errorLabel.setForeground(display.getSystemColor(SWT.COLOR_RED));
-				GridDataFactory.swtDefaults().hint(200, SWT.DEFAULT).applyTo(
-						errorLabel);
+				GridDataFactory.swtDefaults().hint(200, SWT.DEFAULT)
+						.applyTo(errorLabel);
 
 				DataBindingContext dbc = new DataBindingContext();
 
 				// Bind the text to the value.
-				dbc.bindValue(
-						SWTObservables.observeText(text, SWT.Modify),
-						value,
-						new UpdateValueStrategy().setAfterConvertValidator(new FiveValidator()),
+				dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+						value, new UpdateValueStrategy()
+								.setAfterConvertValidator(new FiveValidator()),
 						null);
 
 				// Bind the error label to the validation error on the dbc.
