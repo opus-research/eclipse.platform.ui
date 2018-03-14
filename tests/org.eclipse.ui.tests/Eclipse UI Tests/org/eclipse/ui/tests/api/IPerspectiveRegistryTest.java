@@ -44,15 +44,15 @@ public class IPerspectiveRegistryTest extends TestCase {
         assertNull(suspect);
     }
 
-    /*
+    /*	
      public void testFindPerspectiveWithLabel()
      {
      IPerspectiveDescriptor pers = ( IPerspectiveDescriptor )ArrayUtil.pickRandom( fReg.getPerspectives() );
-
+     
      IPerspectiveDescriptor suspect = fReg.findPerspectiveWithLabel( pers.getLabel() );
      assertNotNull( suspect );
      assertEquals( pers, suspect );
-
+     
      suspect = fReg.findPerspectiveWithLabel( IConstants.FakeLabel );
      assertNull( suspect );
      }
@@ -77,23 +77,22 @@ public class IPerspectiveRegistryTest extends TestCase {
         IPerspectiveDescriptor[] pers = fReg.getPerspectives();
         assertNotNull(pers);
 
-        for (IPerspectiveDescriptor per : pers) {
-			assertNotNull(per);
-		}
+        for (int i = 0; i < pers.length; i++)
+            assertNotNull(pers[i]);
     }
-
+    
     public void XXXtestDeleteClonedPerspective() {
 		IWorkbenchPage page = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage();
 		String perspId = page.getPerspective().getId() + ".1";
 		IPerspectiveDescriptor desc = fReg.clonePerspective(perspId, perspId, page.getPerspective());
 		page.setPerspective(desc);
-
+		
 		assertNotNull(fReg.findPerspectiveWithId(perspId));
-
+		
 		page.closePerspective(desc, false, false);
 		fReg.deletePerspective(desc);
-
+		
 		assertNull(fReg.findPerspectiveWithId(perspId));
 	}
 }

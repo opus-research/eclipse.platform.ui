@@ -31,40 +31,37 @@ public class IFileEditorMappingTest extends TestCase {
     }
 
     public void testGetName() throws Throwable {
-        for (IFileEditorMapping fMapping : fMappings) {
-			assertNotNull(fMapping.getName());
-		}
+        for (int i = 0; i < fMappings.length; i++)
+            assertNotNull(fMappings[i].getName());
     }
 
     public void testGetLabel() throws Throwable {
         String label;
-        for (IFileEditorMapping fMapping : fMappings) {
-            label = fMapping.getLabel();
+        for (int i = 0; i < fMappings.length; i++) {
+            label = fMappings[i].getLabel();
             assertNotNull(label);
-            assertEquals(label, fMapping.getName() + "."
-                    + fMapping.getExtension());
+            assertEquals(label, fMappings[i].getName() + "."
+                    + fMappings[i].getExtension());
         }
     }
 
     public void testGetExtension() throws Throwable {
-        for (IFileEditorMapping fMapping : fMappings) {
-			assertNotNull(fMapping.getExtension());
-		}
+        for (int i = 0; i < fMappings.length; i++)
+            assertNotNull(fMappings[i].getExtension());
     }
 
     public void testGetEditors() throws Throwable {
         IEditorDescriptor[] editors;
 
-        for (IFileEditorMapping fMapping : fMappings) {
-            editors = fMapping.getEditors();
+        for (int i = 0; i < fMappings.length; i++) {
+            editors = fMappings[i].getEditors();
             assertTrue(ArrayUtil.checkNotNull(editors) == true);
         }
     }
 
     public void testGetImageDescriptor() throws Throwable {
-        for (IFileEditorMapping fMapping : fMappings) {
-			assertNotNull(fMapping.getImageDescriptor());
-		}
+        for (int i = 0; i < fMappings.length; i++)
+            assertNotNull(fMappings[i].getImageDescriptor());
     }
 
     //how do i set the default editor?
