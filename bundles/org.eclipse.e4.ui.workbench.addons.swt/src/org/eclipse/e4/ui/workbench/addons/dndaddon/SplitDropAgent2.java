@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,20 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
-import org.eclipse.e4.ui.workbench.PartSizeInfo;
-
 import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
@@ -223,6 +218,12 @@ public class SplitDropAgent2 extends DropAgent {
 		return onEdge;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragEnter(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
+	 */
 	@Override
 	public void dragEnter(final MUIElement dragElement, DnDInfo info) {
 		super.dragEnter(dragElement, info);
@@ -270,6 +271,12 @@ public class SplitDropAgent2 extends DropAgent {
 		return -1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave(org.eclipse.e4.ui.model.
+	 * application.ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
+	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		dndManager.clearOverlay();
@@ -283,16 +290,6 @@ public class SplitDropAgent2 extends DropAgent {
 
 	@Override
 	public boolean drop(MUIElement dragElement, DnDInfo info) {
-
-		// Do this before removing dragElement from parent
-		MUIElement hasSizeData = dragElement;
-		while (hasSizeData != null
-				&& (MUIElement) hasSizeData.getParent() instanceof MPartSashContainer == false) {
-			hasSizeData = hasSizeData.getParent();
-		}
-
-		MElementContainer<MUIElement> originalParent = dragElement.getParent();
-
 		MPartSashContainerElement toInsert = (MPartSashContainerElement) dragElement;
 		if (dragElement instanceof MPartStack) {
 			// Ensure we restore the stack to the presentation first
@@ -344,18 +341,6 @@ public class SplitDropAgent2 extends DropAgent {
 			}
 		}
 
-		// Preserve the resize mode
-		if (hasSizeData != null) {
-			PartSizeInfo newSizeInfo = PartSizeInfo.get(toInsert);
-			newSizeInfo.setResizeMode(PartSizeInfo.get(hasSizeData).getResizeMode());
-			newSizeInfo.storeInfo();
-			newSizeInfo.notifyChanged();
-		} else {
-			PartSizeInfo newSizeInfo = PartSizeInfo.get(toInsert);
-			newSizeInfo.setResizeMode(PartSizeInfo.get(originalParent).getResizeMode());
-			newSizeInfo.storeInfo();
-			newSizeInfo.notifyChanged();
-		}
 		dndManager.getModelService().insert(toInsert, (MPartSashContainerElement) relToElement,
 				where, ratio);
 		// reactivatePart(dragElement);
@@ -369,6 +354,13 @@ public class SplitDropAgent2 extends DropAgent {
 						.getModelService().isLastEditorStack(relToElement));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#track(org.eclipse.e4.ui.model.application
+	 * .ui.MUIElement, org.eclipse.e4.ui.workbench.addons.dndaddon.DnDInfo)
+	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (getTargetElement(dragElement, info) != relToElement) {

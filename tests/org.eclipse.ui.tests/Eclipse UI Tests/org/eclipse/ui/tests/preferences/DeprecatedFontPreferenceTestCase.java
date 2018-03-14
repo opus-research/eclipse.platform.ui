@@ -45,8 +45,7 @@ public class DeprecatedFontPreferenceTestCase extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         AbstractUIPlugin plugin = (AbstractUIPlugin) Platform
                 .getPlugin(PlatformUI.PLUGIN_ID);

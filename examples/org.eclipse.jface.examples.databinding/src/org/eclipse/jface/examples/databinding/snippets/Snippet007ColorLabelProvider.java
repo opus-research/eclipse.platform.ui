@@ -26,8 +26,8 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -146,7 +146,8 @@ public class Snippet007ColorLabelProvider {
 				button.addSelectionListener(new SelectionAdapter() {
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
-						IStructuredSelection selection = viewer.getStructuredSelection();
+						StructuredSelection selection = (StructuredSelection) viewer
+								.getSelection();
 						if (selection != null && !selection.isEmpty()) {
 							Person person = (Person) selection
 									.getFirstElement();

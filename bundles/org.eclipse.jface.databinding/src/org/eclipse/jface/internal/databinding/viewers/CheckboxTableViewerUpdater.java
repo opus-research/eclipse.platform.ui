@@ -25,7 +25,6 @@ public class CheckboxTableViewerUpdater extends TableViewerUpdater {
 		checkboxViewer = viewer;
 	}
 
-	@Override
 	public void move(Object element, int oldPosition, int newPosition) {
 		if (isElementOrderPreserved()) {
 			boolean wasChecked = checkboxViewer.getChecked(element);

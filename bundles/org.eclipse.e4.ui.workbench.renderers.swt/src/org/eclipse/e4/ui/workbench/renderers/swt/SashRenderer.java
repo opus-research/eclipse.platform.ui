@@ -8,11 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150, 441120
- *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
-
-import org.eclipse.e4.ui.workbench.PartSizeInfo;
 
 import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -22,13 +19,11 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.UIEvents.ApplicationElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.osgi.service.event.Event;
 
@@ -38,7 +33,11 @@ import org.osgi.service.event.Event;
  */
 public class SashRenderer extends SWTPartRenderer {
 
+	private static final int UNDEFINED_WEIGHT = -1;
+	private static final int DEFAULT_WEIGHT = 5000;
+
 	private int processedContent = 0;
+
 
 	@SuppressWarnings("unchecked")
 	@Inject
@@ -59,20 +58,6 @@ public class SashRenderer extends SWTPartRenderer {
 	@Optional
 	private void subscribeTopicSashWeightChanged(
 			@UIEventTopic(UIEvents.UIElement.TOPIC_CONTAINERDATA) Event event) {
-		// Ensure that this event is for a MPartSashContainer
-		MUIElement element = (MUIElement) event
-				.getProperty(UIEvents.EventTags.ELEMENT);
-		if (element.getRenderer() != SashRenderer.this) {
-			return;
-		}
-		forceLayout((MElementContainer<MUIElement>) element);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Inject
-	@Optional
-	private void subscribeTopicSizeInfoChanged(
-			@UIEventTopic(ApplicationElement.TOPIC_TRANSIENTDATA) Event event) {
 		// Ensure that this event is for a MPartSashContainer
 		MUIElement element = (MUIElement) event
 				.getProperty(UIEvents.EventTags.ELEMENT);
@@ -147,26 +132,15 @@ public class SashRenderer extends SWTPartRenderer {
 
 	@Override
 	public void childRendered(MElementContainer<MUIElement> parentElement,
-			final MUIElement element) {
+			MUIElement element) {
 		super.childRendered(parentElement, element);
 
-		// Load the part size info into the element's transient data
-		final PartSizeInfo partSizeInfo = new PartSizeInfo(element);
-		element.getTransientData().put(PartSizeInfo.KEY_TRANSIENT_DATA,
-				partSizeInfo);
-
-		// Store the part size info into persistedData when the control is
-		// disposed
-		if (element.getWidget() instanceof Control) {
-			((Control) element.getWidget())
-					.addDisposeListener(new DisposeListener() {
-
-						@Override
-						public void widgetDisposed(DisposeEvent e) {
-							partSizeInfo.storeInfo();
-						}
-					});
+		// Ensure that the element's 'containerInfo' is initialized
+		int weight = getWeight(element);
+		if (weight == UNDEFINED_WEIGHT) {
+			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
 		}
+
 		forceLayout(parentElement);
 	}
 
@@ -205,4 +179,18 @@ public class SashRenderer extends SWTPartRenderer {
 		return null;
 	}
 
+	private static int getWeight(MUIElement element) {
+		String info = element.getContainerData();
+		if (info == null || info.length() == 0) {
+			element.setContainerData(Integer.toString(10000));
+			info = element.getContainerData();
+		}
+
+		try {
+			int value = Integer.parseInt(info);
+			return value;
+		} catch (NumberFormatException e) {
+			return UNDEFINED_WEIGHT;
+		}
+	}
 }

@@ -21,10 +21,6 @@
             beforefragment="true"
             class="org.eclipse.e4.ui.workbench.addons.swt.SplitterProcessor">
       </processor>
-      <processor
-            beforefragment="true"
-            class="org.eclipse.e4.ui.workbench.addons.swt.PartLockProcessor">
-      </processor>
    </extension>
 
 </plugin>

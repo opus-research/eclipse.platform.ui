@@ -70,7 +70,6 @@ public class NavigatorSorterService implements INavigatorSorterService, Visibili
 	 * 
 	 * @see org.eclipse.ui.navigator.INavigatorSorterService#findSorterForParent(java.lang.Object)
 	 */
-	@Override
 	public ViewerSorter findSorterForParent(Object aParent) {
 
 		CommonSorterDescriptor[] descriptors = CommonSorterDescriptorManager
@@ -98,7 +97,6 @@ public class NavigatorSorterService implements INavigatorSorterService, Visibili
 	 * @see org.eclipse.ui.navigator.INavigatorSorterService#findSorterForParent(org.eclipse.ui.navigator.INavigatorContentDescriptor,
 	 *      java.lang.Object, java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public synchronized ViewerSorter findSorter(INavigatorContentDescriptor source, 
 			Object parent, Object lvalue, Object rvalue) { 
 		
@@ -132,7 +130,6 @@ public class NavigatorSorterService implements INavigatorSorterService, Visibili
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.INavigatorSorterService#findAvailableSorters(org.eclipse.ui.navigator.INavigatorContentDescriptor)
 	 */
-	@Override
 	public Map findAvailableSorters(INavigatorContentDescriptor theSource) {
 		
 		CommonSorterDescriptor[] descriptors = CommonSorterDescriptorManager.getInstance().findApplicableSorters(theSource);
@@ -152,7 +149,6 @@ public class NavigatorSorterService implements INavigatorSorterService, Visibili
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
 	 */
-	@Override
 	public void onVisibilityOrActivationChange() {
 		computeSortOnlyDescriptors();
 	}

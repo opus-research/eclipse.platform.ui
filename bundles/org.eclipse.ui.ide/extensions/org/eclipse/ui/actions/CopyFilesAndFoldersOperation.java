@@ -281,7 +281,6 @@ public class CopyFilesAndFoldersOperation {
 
 		// Dialogs need to be created and opened in the UI thread
 		Runnable query = new Runnable() {
-			@Override
 			public void run() {
 				String message;
 				int resultId[] = { IDialogConstants.YES_ID,
@@ -336,7 +335,6 @@ public class CopyFilesAndFoldersOperation {
 						messageShell,
 						IDEWorkbenchMessages.CopyFilesAndFoldersOperation_resourceExists,
 						null, message, MessageDialog.QUESTION, labels, 0) {
-					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
 					}
@@ -424,7 +422,6 @@ public class CopyFilesAndFoldersOperation {
 	 *             created in
 	 *             {@link #getUndoableCopyOrMoveOperation(IResource[], IPath)}
 	 */
-	@Deprecated
 	protected void copy(IResource[] resources, IPath destination,
 			IProgressMonitor subMonitor) throws CoreException {
 
@@ -623,7 +620,6 @@ public class CopyFilesAndFoldersOperation {
 		}
 
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				copyResources(resources, destinationPath, copiedResources,
 						monitor);
@@ -887,7 +883,6 @@ public class CopyFilesAndFoldersOperation {
 	private void reportFileInfoNotFound(final String fileName) {
 
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog
 						.openError(
@@ -928,7 +923,6 @@ public class CopyFilesAndFoldersOperation {
 
 		if (fork) {
 			WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
-				@Override
 				public void execute(IProgressMonitor monitor) {
 					copyFileStores(stores, destinationPath, monitor);
 				}
@@ -960,7 +954,6 @@ public class CopyFilesAndFoldersOperation {
 	 */
 	private void displayError(final IStatus status) {
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog.openError(messageShell, getProblemsTitle(), null,
 						status);
@@ -1039,7 +1032,6 @@ public class CopyFilesAndFoldersOperation {
 	 */
 	private void displayError(final String message) {
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				MessageDialog.openError(messageShell, getProblemsTitle(),
 						message);
@@ -1072,7 +1064,6 @@ public class CopyFilesAndFoldersOperation {
 	 *             class and is only provided for backwards compatability with
 	 *             subclasses of the receiver.
 	 */
-	@Deprecated
 	protected File[] getFiles(String[] fileNames) {
 		File[] files = new File[fileNames.length];
 
@@ -1115,10 +1106,8 @@ public class CopyFilesAndFoldersOperation {
 		final String returnValue[] = { "" }; //$NON-NLS-1$
 
 		messageShell.getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				IInputValidator validator = new IInputValidator() {
-					@Override
 					public String isValid(String string) {
 						if (resource.getName().equals(string)) {
 							return IDEWorkbenchMessages.CopyFilesAndFoldersOperation_nameMustBeDifferent;
@@ -1391,7 +1380,6 @@ public class CopyFilesAndFoldersOperation {
 	private void performFileImport(IFileStore[] stores, IContainer target,
 			IProgressMonitor monitor) {
 		IOverwriteQuery query = new IOverwriteQuery() {
-			@Override
 			public String queryOverwrite(String pathString) {
 				if (alwaysOverwrite) {
 					return ALL;
@@ -1407,13 +1395,11 @@ public class CopyFilesAndFoldersOperation {
 						IDialogConstants.NO_LABEL,
 						IDialogConstants.CANCEL_LABEL };
 				messageShell.getDisplay().syncExec(new Runnable() {
-					@Override
 					public void run() {
 						MessageDialog dialog = new MessageDialog(
 								messageShell,
 								IDEWorkbenchMessages.CopyFilesAndFoldersOperation_question,
 								null, msg, MessageDialog.QUESTION, options, 0) {
-							@Override
 							protected int getShellStyle() {
 								return super.getShellStyle() | SWT.SHEET;
 							}

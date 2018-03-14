@@ -7,12 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.cleanupaddon;
-
-import org.eclipse.e4.ui.workbench.PartSizeInfo;
 
 import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -127,7 +124,8 @@ public class CleanupAddon {
 										container.setWidget(tmp);
 									}
 								}
-								PartSizeInfo.copy(theChild, container);
+
+								theChild.setContainerData(container.getContainerData());
 								container.getChildren().remove(theChild);
 								parentContainer.getChildren().add(index, theChild);
 								container.setToBeRendered(false);

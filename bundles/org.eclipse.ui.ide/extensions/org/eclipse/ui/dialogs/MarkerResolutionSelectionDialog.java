@@ -88,8 +88,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared on Window.
      */
-    @Override
-	protected void configureShell(Shell newShell) {
+    protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
                 IIDEHelpContextIds.MARKER_RESOLUTION_SELECTION_DIALOG);
@@ -98,8 +97,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
 
         // Create label
@@ -114,8 +112,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         listViewer.getList().setFont(parent.getFont());
         // Set the label provider		
         listViewer.setLabelProvider(new LabelProvider() {
-            @Override
-			public String getText(Object element) {
+            public String getText(Object element) {
                 // Return the resolution's label.
                 return element == null ? "" : ((IMarkerResolution) element).getLabel(); //$NON-NLS-1$
             }
@@ -133,8 +130,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
 
         // Add a selection change listener
         listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 // Update OK button enablement
                 getOkButton().setEnabled(!event.getSelection().isEmpty());
             }
@@ -142,8 +138,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
 
         // Add double-click listener
         listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 okPressed();
             }
         });
@@ -153,8 +148,7 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer
                 .getSelection();
         setResult(selection.toList());
