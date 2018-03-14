@@ -130,5 +130,4 @@ Import-Package: com.ibm.icu.text,
  org.w3c.dom.css;version="2.0.0",
  org.xml.sax
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Service-Component: OSGI-INF/ColorAndFontProvider.xml,
- OSGI-INF/compatregschemehandler.xml
+Service-Component: OSGI-INF/ColorAndFontProvider.xml

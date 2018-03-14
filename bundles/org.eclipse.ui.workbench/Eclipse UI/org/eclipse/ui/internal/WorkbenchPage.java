@@ -159,7 +159,6 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.misc.UIListenerLogging;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
 import org.eclipse.ui.internal.registry.ActionSetRegistry;
-import org.eclipse.ui.internal.registry.CompatRegistrySchemeHandler;
 import org.eclipse.ui.internal.registry.EditorDescriptor;
 import org.eclipse.ui.internal.registry.IActionSetDescriptor;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
@@ -4616,9 +4615,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		if (descriptor != null) {
 			IConfigurationElement element = descriptor.getConfigurationElement();
 			if (element != null) {
-				iconURI = CompatRegistrySchemeHandler.createIconUri("editor", //$NON-NLS-1$
-						element.getAttribute(IWorkbenchRegistryConstants.ATT_ID));
-
+				iconURI = MenuHelper.getIconURI(element, IWorkbenchRegistryConstants.ATT_ICON);
 			}
 		}
 		return iconURI;
