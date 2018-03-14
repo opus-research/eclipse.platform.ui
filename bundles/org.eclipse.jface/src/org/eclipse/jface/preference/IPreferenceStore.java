@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,38 +56,38 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 public interface IPreferenceStore {
 
     /**
-     * The default-default value for boolean preferences (<code>false</code>).
-     */
+	 * The default value for boolean preferences (<code>false</code>).
+	 */
     public static final boolean BOOLEAN_DEFAULT_DEFAULT = false;
 
     /**
-     * The default-default value for double preferences (<code>0.0</code>).
-     */
+	 * The default value for double preferences (<code>0.0</code>).
+	 */
     public static final double DOUBLE_DEFAULT_DEFAULT = 0.0;
 
     /**
-     * The default-default value for float preferences (<code>0.0f</code>).
-     */
+	 * The default value for float preferences (<code>0.0f</code>).
+	 */
     public static final float FLOAT_DEFAULT_DEFAULT = 0.0f;
 
     /**
-     * The default-default value for int preferences (<code>0</code>).
-     */
+	 * The default value for int preferences (<code>0</code>).
+	 */
     public static final int INT_DEFAULT_DEFAULT = 0;
 
     /**
-     * The default-default value for long preferences (<code>0L</code>).
-     */
+	 * The default value for long preferences (<code>0L</code>).
+	 */
     public static final long LONG_DEFAULT_DEFAULT = 0L;
 
     /**
-     * The default-default value for String preferences (<code>""</code>).
-     */
+	 * The default value for String preferences (<code>""</code>).
+	 */
     public static final String STRING_DEFAULT_DEFAULT = ""; //$NON-NLS-1$
 
     /**
-     * The string representation used for <code>true</code> (<code>"true"</code>).
-     */
+	 * The representation used for <code>true</code> (<code>"true"</code>).
+	 */
     public static final String TRUE = "true"; //$NON-NLS-1$
 
     /**
@@ -164,147 +164,147 @@ public interface IPreferenceStore {
             Object newValue);
 
     /**
-     * Returns the current value of the boolean-valued preference with the
-     * given name.
-     * Returns the default-default value (<code>false</code>) if there
-     * is no preference with the given name, or if the current value
-     * cannot be treated as a boolean.
-     *
-     * @param name the name of the preference
-     * @return the boolean-valued preference
-     */
+	 * Returns the current value of the boolean-valued preference with the given
+	 * name. Returns the default value (<code>false</code>) if there is no
+	 * preference with the given name, or if the current value cannot be treated
+	 * as a boolean.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the boolean-valued preference
+	 */
     public boolean getBoolean(String name);
 
     /**
-     * Returns the default value for the boolean-valued preference
-     * with the given name.
-     * Returns the default-default value (<code>false</code>) if there
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as a boolean.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the boolean-valued preference with the
+	 * given name. Returns the default value (<code>false</code>) if there is no
+	 * default preference with the given name, or if the default value cannot be
+	 * treated as a boolean.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public boolean getDefaultBoolean(String name);
 
     /**
-     * Returns the default value for the double-valued preference
-     * with the given name.
-     * Returns the default-default value (<code>0.0</code>) if there
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as a double.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the double-valued preference with the given
+	 * name. Returns the default value (<code>0.0</code>) if there is no default
+	 * preference with the given name, or if the default value cannot be treated
+	 * as a double.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public double getDefaultDouble(String name);
 
     /**
-     * Returns the default value for the float-valued preference
-     * with the given name.
-     * Returns the default-default value (<code>0.0f</code>) if there
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as a float.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the float-valued preference with the given
+	 * name. Returns the default value (<code>0.0f</code>) if there is no
+	 * default preference with the given name, or if the default value cannot be
+	 * treated as a float.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public float getDefaultFloat(String name);
 
     /**
-     * Returns the default value for the integer-valued preference
-     * with the given name.
-     * Returns the default-default value (<code>0</code>) if there
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as an integer.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the integer-valued preference with the
+	 * given name. Returns the default value (<code>0</code>) if there is no
+	 * default preference with the given name, or if the default value cannot be
+	 * treated as an integer.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public int getDefaultInt(String name);
 
     /**
-     * Returns the default value for the long-valued preference
-     * with the given name.
-     * Returns the default-default value (<code>0L</code>) if there
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as a long.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the long-valued preference with the given
+	 * name. Returns the default value (<code>0L</code>) if there is no default
+	 * preference with the given name, or if the default value cannot be treated
+	 * as a long.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public long getDefaultLong(String name);
 
     /**
-     * Returns the default value for the string-valued preference
-     * with the given name.
-     * Returns the default-default value (the empty string <code>""</code>)
-     * is no default preference with the given name, or if the default
-     * value cannot be treated as a string.
-     *
-     * @param name the name of the preference
-     * @return the default value of the named preference
-     */
+	 * Returns the default value for the string-valued preference with the given
+	 * name. Returns the default value (the empty string <code>""</code>) is no
+	 * default preference with the given name, or if the default value cannot be
+	 * treated as a string.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the default value of the named preference
+	 */
     public String getDefaultString(String name);
 
     /**
-     * Returns the current value of the double-valued preference with the
-     * given name.
-     * Returns the default-default value (<code>0.0</code>) if there
-     * is no preference with the given name, or if the current value
-     * cannot be treated as a double.
-     *
-     * @param name the name of the preference
-     * @return the double-valued preference
-     */
+	 * Returns the current value of the double-valued preference with the given
+	 * name. Returns the default value (<code>0.0</code>) if there is no
+	 * preference with the given name, or if the current value cannot be treated
+	 * as a double.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the double-valued preference
+	 */
     public double getDouble(String name);
 
     /**
-     * Returns the current value of the float-valued preference with the
-     * given name.
-     * Returns the default-default value (<code>0.0f</code>) if there
-     * is no preference with the given name, or if the current value
-     * cannot be treated as a float.
-     *
-     * @param name the name of the preference
-     * @return the float-valued preference
-     */
+	 * Returns the current value of the float-valued preference with the given
+	 * name. Returns the default value (<code>0.0f</code>) if there is no
+	 * preference with the given name, or if the current value cannot be treated
+	 * as a float.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the float-valued preference
+	 */
     public float getFloat(String name);
 
     /**
-     * Returns the current value of the integer-valued preference with the
-     * given name.
-     * Returns the default-default value (<code>0</code>) if there
-     * is no preference with the given name, or if the current value
-     * cannot be treated as an integter.
-     *
-     * @param name the name of the preference
-     * @return the int-valued preference
-     */
+	 * Returns the current value of the integer-valued preference with the given
+	 * name. Returns the default-default value (<code>0</code>) if there is no
+	 * preference with the given name, or if the current value cannot be treated
+	 * as an integer.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the int-valued preference
+	 */
     public int getInt(String name);
 
     /**
-     * Returns the current value of the long-valued preference with the
-     * given name.
-     * Returns the default-default value (<code>0L</code>) if there
-     * is no preference with the given name, or if the current value
-     * cannot be treated as a long.
-     *
-     * @param name the name of the preference
-     * @return the long-valued preference
-     */
+	 * Returns the current value of the long-valued preference with the given
+	 * name. Returns the default value (<code>0L</code>) if there is no
+	 * preference with the given name, or if the current value cannot be treated
+	 * as a long.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the long-valued preference
+	 */
     public long getLong(String name);
 
     /**
-     * Returns the current value of the string-valued preference with the
-     * given name.
-     * Returns the default-default value (the empty string <code>""</code>)
-     * if there is no preference with the given name, or if the current value
-     * cannot be treated as a string.
-     *
-     * @param name the name of the preference
-     * @return the string-valued preference
-     */
+	 * Returns the current value of the string-valued preference with the given
+	 * name. Returns the default value (the empty string <code>""</code>) if
+	 * there is no preference with the given name, or if the current value
+	 * cannot be treated as a string.
+	 *
+	 * @param name
+	 *            the name of the preference
+	 * @return the string-valued preference
+	 */
     public String getString(String name);
 
     /**
