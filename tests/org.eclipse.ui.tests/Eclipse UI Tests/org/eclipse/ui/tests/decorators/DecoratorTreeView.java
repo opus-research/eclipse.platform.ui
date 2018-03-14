@@ -15,29 +15,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * The DecoratorTreeView is a TreeView that tests the 
+ * The DecoratorTreeView is a TreeView that tests the
  * font and color decorations.
  */
 public class DecoratorTreeView extends DecoratorTestPart {
-	
+
 	TreeViewer viewer;
 
 	/**
-	 * 
+	 *
 	 */
 	public DecoratorTreeView() {
 		super();
 		// XXX Auto-generated constructor stub
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 		 viewer = new TreeViewer(parent){
-		 	/* (non-Javadoc)
-			 * @see org.eclipse.jface.viewers.AbstractTreeViewer#labelProviderChanged()
-			 */
+			@Override
 			protected void labelProviderChanged() {
 				super.labelProviderChanged();
 			}
@@ -50,15 +46,13 @@ public class DecoratorTreeView extends DecoratorTestPart {
 
 		GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL
 				| GridData.FILL_BOTH);
-		
+
 		viewer.getControl().setLayoutData(data);
 
 	}
 
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
+	@Override
 	public void setFocus() {
 		// XXX Auto-generated method stub
 

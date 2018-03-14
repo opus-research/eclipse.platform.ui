@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,17 +26,15 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 /**
  * This class provides information regarding the structure and
  * content of specified file system File objects.
- * 
+ *
  * class copied from org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider as its singleton
  */
 public class FileSystemStructureProvider implements IImportStructureProvider {
 
 	private Set visitedDirs;
 
-    /* (non-Javadoc)
-     * Method declared on IImportStructureProvider
-     */
-    public List getChildren(Object element) {
+    @Override
+	public List getChildren(Object element) {
         File folder = (File) element;
         String[] children = folder.list();
         int childrenLength = children == null ? 0 : children.length;
@@ -48,7 +46,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
         		continue;
         	result.add(file);
 		}
-        
+
         return result;
     }
 
@@ -57,7 +55,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
     		visitedDirs = new HashSet();
     	}
     }
-    
+
 	private boolean isRecursiveLink(File childFile) {
 
 		if (childFile.isDirectory()) {
@@ -72,10 +70,8 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
 		return false;
 	}
 
-	/* (non-Javadoc)
-     * Method declared on IImportStructureProvider
-     */
-    public InputStream getContents(Object element) {
+    @Override
+	public InputStream getContents(Object element) {
         try {
             return new FileInputStream((File) element);
         } catch (FileNotFoundException e) {
@@ -84,17 +80,13 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IImportStructureProvider
-     */
-    public String getFullPath(Object element) {
+    @Override
+	public String getFullPath(Object element) {
         return ((File) element).getPath();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IImportStructureProvider
-     */
-    public String getLabel(Object element) {
+    @Override
+	public String getLabel(Object element) {
 
         //Get the name - if it is empty then return the path as it is a file root
         File file = (File) element;
@@ -105,13 +97,11 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
         return name;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IImportStructureProvider
-     */
-    public boolean isFolder(Object element) {
+    @Override
+	public boolean isFolder(Object element) {
         return ((File) element).isDirectory();
     }
-    
+
     /**
      * Clears the visited dir information
      */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,28 +43,29 @@ import org.eclipse.core.internal.commands.util.Util;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.1
  * @see ContextManager
  */
+@SuppressWarnings("rawtypes")
 public final class Context extends NamedHandleObject implements Comparable {
 
     /**
      * The collection of all objects listening to changes on this context. This
      * value is <code>null</code> if there are no listeners.
      */
-    private Set listeners = null;
+    private Set<IContextListener> listeners;
 
     /**
      * The parent identifier for this context. The meaning of a parent is
      * dependent on the system using contexts. This value can be
      * <code>null</code> if the context has no parent.
      */
-    private String parentId = null;
+    private String parentId;
 
     /**
      * Constructs a new instance of <code>Context</code>.
-     * 
+     *
      * @param id
      *            The id for this context; must not be <code>null</code>.
      */
@@ -75,7 +76,7 @@ public final class Context extends NamedHandleObject implements Comparable {
     /**
      * Registers an instance of <code>IContextListener</code> to listen for
      * changes to properties of this instance.
-     * 
+     *
      * @param listener
      *            the instance to register. Must not be <code>null</code>. If
      *            an attempt is made to register an instance which is already
@@ -87,16 +88,14 @@ public final class Context extends NamedHandleObject implements Comparable {
         }
 
         if (listeners == null) {
-            listeners = new HashSet();
+            listeners = new HashSet<>();
         }
 
         listeners.add(listener);
-    } 
-    
-    /* (non-Javadoc)
-     * @see java.lang.Comparable#compareTo(java.lang.Object)
-     */
-    public final int compareTo(final Object object) {
+    }
+
+    @Override
+	public final int compareTo(final Object object) {
         final Context scheme = (Context) object;
         int compareTo = Util.compare(this.id, scheme.id);
         if (compareTo == 0) {
@@ -104,8 +103,7 @@ public final class Context extends NamedHandleObject implements Comparable {
             if (compareTo == 0) {
                 compareTo = Util.compare(this.parentId, scheme.parentId);
                 if (compareTo == 0) {
-                    compareTo = Util.compare(this.description,
-                            scheme.description);
+					compareTo = Util.compare(this.description, scheme.description);
                     if (compareTo == 0) {
                         compareTo = Util.compare(this.defined, scheme.defined);
                     }
@@ -125,7 +123,7 @@ public final class Context extends NamedHandleObject implements Comparable {
      * <p>
      * Notification is sent to all listeners that something has changed.
      * </p>
-     * 
+     *
      * @param name
      *            The name of this context; must not be <code>null</code>.
      * @param description
@@ -134,11 +132,9 @@ public final class Context extends NamedHandleObject implements Comparable {
      *            The parent identifier for this context; may be
      *            <code>null</code>.
      */
-    public final void define(final String name, final String description,
-            final String parentId) {
+	public final void define(final String name, final String description, final String parentId) {
         if (name == null) {
-            throw new NullPointerException(
-                    "The name of a context cannot be null"); //$NON-NLS-1$
+			throw new NullPointerException("The name of a context cannot be null"); //$NON-NLS-1$
         }
 
         final boolean definedChanged = !this.defined;
@@ -154,32 +150,29 @@ public final class Context extends NamedHandleObject implements Comparable {
         final boolean parentIdChanged = !Util.equals(this.parentId, parentId);
         this.parentId = parentId;
 
-        fireContextChanged(new ContextEvent(this, definedChanged, nameChanged,
-                descriptionChanged, parentIdChanged));
+		fireContextChanged(new ContextEvent(this, definedChanged, nameChanged, descriptionChanged, parentIdChanged));
     }
 
     /**
      * Notifies all listeners that this context has changed. This sends the
      * given event to all of the listeners, if any.
-     * 
+     *
      * @param event
      *            The event to send to the listeners; must not be
      *            <code>null</code>.
      */
     private final void fireContextChanged(final ContextEvent event) {
         if (event == null) {
-            throw new NullPointerException(
-                    "Cannot send a null event to listeners."); //$NON-NLS-1$
+			throw new NullPointerException("Cannot send a null event to listeners."); //$NON-NLS-1$
         }
 
         if (listeners == null) {
             return;
         }
 
-        final Iterator listenerItr = listeners.iterator();
+        final Iterator<IContextListener> listenerItr = listeners.iterator();
         while (listenerItr.hasNext()) {
-            final IContextListener listener = (IContextListener) listenerItr
-                    .next();
+			final IContextListener listener = listenerItr.next();
             listener.contextChanged(event);
         }
     }
@@ -190,7 +183,7 @@ public final class Context extends NamedHandleObject implements Comparable {
      * Notification is sent to all registered listeners if this property
      * changes.
      * </p>
-     * 
+     *
      * @return the identifier of the parent of this instance. May be
      *         <code>null</code>.
      * @throws NotDefinedException
@@ -198,9 +191,8 @@ public final class Context extends NamedHandleObject implements Comparable {
      */
     public final String getParentId() throws NotDefinedException {
         if (!defined) {
-            throw new NotDefinedException(
-                    "Cannot get the parent identifier from an undefined context. " //$NON-NLS-1$
-            		+id);
+			throw new NotDefinedException("Cannot get the parent identifier from an undefined context. " //$NON-NLS-1$
+					+ id);
         }
 
         return parentId;
@@ -209,15 +201,14 @@ public final class Context extends NamedHandleObject implements Comparable {
     /**
      * Unregisters an instance of <code>IContextListener</code> listening for
      * changes to properties of this instance.
-     * 
+     *
      * @param contextListener
      *            the instance to unregister. Must not be <code>null</code>.
      *            If an attempt is made to unregister an instance which is not
      *            already registered with this instance, no operation is
      *            performed.
      */
-    public final void removeContextListener(
-            final IContextListener contextListener) {
+	public final void removeContextListener(final IContextListener contextListener) {
         if (contextListener == null) {
             throw new NullPointerException("Cannot remove a null listener."); //$NON-NLS-1$
         }
@@ -236,10 +227,11 @@ public final class Context extends NamedHandleObject implements Comparable {
     /**
      * The string representation of this context -- for debugging purposes only.
      * This string should not be shown to an end user.
-     * 
+     *
      * @return The string representation; never <code>null</code>.
      */
-    public final String toString() {
+    @Override
+	public final String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("Context("); //$NON-NLS-1$
@@ -263,7 +255,8 @@ public final class Context extends NamedHandleObject implements Comparable {
      * the name, description and parent identifier to <code>null</code>.
      * Notification is sent to all listeners.
      */
-    public final void undefine() {
+    @Override
+	public final void undefine() {
         string = null;
 
         final boolean definedChanged = defined;
@@ -278,7 +271,6 @@ public final class Context extends NamedHandleObject implements Comparable {
         final boolean parentIdChanged = parentId != null;
         parentId = null;
 
-        fireContextChanged(new ContextEvent(this, definedChanged, nameChanged,
-                descriptionChanged, parentIdChanged));
+		fireContextChanged(new ContextEvent(this, definedChanged, nameChanged, descriptionChanged, parentIdChanged));
     }
 }

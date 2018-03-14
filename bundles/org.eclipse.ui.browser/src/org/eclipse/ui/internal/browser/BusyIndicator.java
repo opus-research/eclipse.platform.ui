@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2005 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - Initial API and implementation
  *******************************************************************************/
@@ -36,37 +36,41 @@ public class BusyIndicator extends Canvas {
 	 */
 	public BusyIndicator(Composite parent, int style) {
 		super(parent, style);
-	
+
 		images = ImageResource.getBusyImages();
-	
+
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent event) {
 				onPaint(event);
 			}
 		});
-	
+
 		image = images[0];
 	}
-	
+
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		return new Point(25, 25);
 	}
-	
+
 	/**
 	 * Creates a thread to animate the image.
 	 */
 	protected synchronized void createBusyThread() {
 		if (busyThread != null)
 			return;
-	
+
 		stop = false;
 		busyThread = new Thread() {
 			protected int count;
+			@Override
 			public void run() {
 				try {
 					count = 1;
 					while (!stop) {
 						Display.getDefault().syncExec(new Runnable() {
+							@Override
 							public void run() {
 								if (!stop) {
 									if (count < 13)
@@ -85,6 +89,7 @@ public class BusyIndicator extends Canvas {
 					}
 					if (busyThread == null)
 						Display.getDefault().syncExec(new Thread() {
+							@Override
 							public void run() {
 								setImage(images[0]);
 							}
@@ -94,18 +99,19 @@ public class BusyIndicator extends Canvas {
 				}
 			}
 		};
-	
+
 		busyThread.setPriority(Thread.NORM_PRIORITY + 2);
 		busyThread.setDaemon(true);
 		busyThread.start();
 	}
-	
+
+	@Override
 	public void dispose() {
 		stop = true;
 		busyThread = null;
 		super.dispose();
 	}
-	
+
 	/**
 	 * Return the image or <code>null</code>.
 	 */
@@ -122,14 +128,14 @@ public class BusyIndicator extends Canvas {
 		return (busyThread != null);
 	}
 
-	/* 
+	/*
 	 * Process the paint event
 	 */
 	protected void onPaint(PaintEvent event) {
 		Rectangle rect = getClientArea();
 		if (rect.width == 0 || rect.height == 0)
 			return;
-	
+
 		GC gc = event.gc;
 		if (image != null)
 			gc.drawImage(image, 2, 2);

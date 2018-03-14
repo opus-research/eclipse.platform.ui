@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,16 +23,16 @@ import org.eclipse.ui.internal.preferences.SettingsTransferRegistryReader;
  *
  */
 public abstract class SettingsTransfer {
-	
+
 	/**
-	 * Return the configuration elements for all of the settings 
+	 * Return the configuration elements for all of the settings
 	 * transfers.
 	 * @return IConfigurationElement[]
 	 */
 	public static IConfigurationElement[] getSettingsTransfers(){
 		return (new SettingsTransferRegistryReader()).getSettingTransfers();
 	}
-	
+
 	/**
 	 * Transfer the settings to a workspace rooted at newWorkspacwe
 	 * @param newWorkspaceRoot

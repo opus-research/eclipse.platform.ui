@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ package org.eclipse.ui.commands;
  * <p>
  * This class is not intended to be extended by clients.
  * </p>
- * 
+ *
  * @since 3.0
  * @see IKeyConfigurationListener#keyConfigurationChanged(KeyConfigurationEvent)
  * @deprecated Please use the bindings support in the "org.eclipse.jface"
@@ -56,7 +56,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Creates a new instance of this class.
-     * 
+     *
      * @param keyConfiguration
      *            the instance of the interface that changed.
      * @param activeChanged
@@ -85,7 +85,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Returns the instance of the interface that changed.
-     * 
+     *
      * @return the instance of the interface that changed. Guaranteed not to be
      *         <code>null</code>.
      */
@@ -96,7 +96,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Returns whether or not the active property changed.
-     * 
+     *
      * @return true, iff the active property changed.
      */
 	@Deprecated
@@ -106,7 +106,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Returns whether or not the defined property changed.
-     * 
+     *
      * @return true, iff the defined property changed.
      */
 	@Deprecated
@@ -116,7 +116,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Returns whether or not the name property changed.
-     * 
+     *
      * @return true, iff the name property changed.
      */
 	@Deprecated
@@ -126,7 +126,7 @@ public final class KeyConfigurationEvent {
 
     /**
      * Returns whether or not the parentId property changed.
-     * 
+     *
      * @return true, iff the parentId property changed.
      */
 	@Deprecated

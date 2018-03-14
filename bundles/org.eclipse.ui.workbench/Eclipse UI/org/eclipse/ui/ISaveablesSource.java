@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ import org.eclipse.ui.part.EditorPart;
  * <p>
  * These conditions may be relaxed in future releases.
  * </p>
- * 
+ *
  * @since 3.2
  */
 public interface ISaveablesSource {
@@ -83,9 +83,9 @@ public interface ISaveablesSource {
 	 * implement {@link IReusableEditor} must notify when their input is changed
 	 * through {@link IReusableEditor#setInput(IEditorInput)}.
 	 * </p>
-	 * 
+	 *
 	 * @return the saveables presented by the workbench part
-	 * 
+	 *
 	 * @see ISaveablesLifecycleListener
 	 */
 	Saveable[] getSaveables();
@@ -97,7 +97,7 @@ public interface ISaveablesSource {
 	 * in the active part. For example, the active saveables could be determined
 	 * based on the current selection in the part.
 	 * </p>
-	 * 
+	 *
 	 * @return the saveables currently active in the workbench part
 	 */
 	Saveable[] getActiveSaveables();

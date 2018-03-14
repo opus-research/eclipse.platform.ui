@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.util.Util;
 
 /**
  * Opens a perspective.
- * 
+ *
  * @since 3.1
  */
 public final class OpenPerspectiveAction extends Action implements
@@ -42,7 +42,7 @@ public final class OpenPerspectiveAction extends Action implements
 
     /**
      * Constructs a new instance of <code>OpenPerspectiveAction</code>
-     * 
+     *
      * @param window
      *            The workbench window in which this action is created; should
      *            not be <code>null</code>.
@@ -70,30 +70,17 @@ public final class OpenPerspectiveAction extends Action implements
                 IWorkbenchHelpContextIds.OPEN_PERSPECTIVE_ACTION);
     }
 
-  
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IAction#runWithEvent(org.eclipse.swt.widgets.Event)
-     */
+
     @Override
 	public final void runWithEvent(final Event event) {
         callback.run(descriptor, new SelectionEvent(event));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.activities.support.IPluginContribution#getLocalId()
-     */
     @Override
 	public String getLocalId() {
         return descriptor.getId();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.activities.support.IPluginContribution#getPluginId()
-     */
     @Override
 	public String getPluginId() {
         return descriptor instanceof IPluginContribution ? ((IPluginContribution) descriptor)

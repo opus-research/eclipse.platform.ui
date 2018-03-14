@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 409996 - 'Restore Defaults' does not work properly on Project Properties > Resource tab
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784, 474273
  *******************************************************************************/
 package org.eclipse.ui.ide.dialogs;
 
@@ -20,7 +21,6 @@ import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -52,7 +52,7 @@ import org.osgi.service.prefs.Preferences;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEditor {
@@ -73,14 +73,14 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	/**
 	 * Creates a new encoding field editor for setting the encoding on the given
 	 * resource.
-	 * 
+	 *
 	 * @param labelText
 	 *            the label text of the field editor
 	 * @param parent
 	 *            the parent of the field editor's control
 	 * @param charsetResource
 	 *            must be an <code>IContainer</code> or an <code>IFile</code>.
-	 * 
+	 *
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 */
@@ -90,11 +90,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		setLabelAndResource(labelText, charsetResource);
 		createControl(parent);
 	}
-	
+
 	/**
 	 * Creates a new encoding field editor for setting the encoding on the given
 	 * resource.
-	 * 
+	 *
 	 * @param labelText
 	 *            the label text of the field editor
 	 * @param parent
@@ -105,7 +105,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	 *  		  the title for the field editor's control. If groupTitle is
 	 *            <code>null</code> the control will be unlabelled
 	 *            (by default a {@link Composite} instead of a {@link Group}.
-	 * 
+	 *
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 * @see AbstractEncodingFieldEditor#setGroupTitle(String)
@@ -132,11 +132,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		this.resource = charsetResource;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
-	 */
+	@Override
 	protected String getStoredValue() {
 		try {
 			if (resource instanceof IContainer) {
@@ -185,11 +181,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 						.getSelection() == getStoredSeparateDerivedEncodingsValue()));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
-	 */
+	@Override
 	protected void doStore() {
 
 		String encoding = getSelectedEncoding();
@@ -218,13 +210,10 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 					shell,
 					IDEWorkbenchMessages.ResourceEncodingFieldEditor_EncodingConflictTitle,
 					null,
-					NLS
-							.bind(
-									IDEWorkbenchMessages.ResourceEncodingFieldEditor_EncodingConflictMessage,
-									encoding, descriptionCharset),
-					MessageDialog.WARNING, new String[] {
-							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL }, 0) {
+					NLS.bind(IDEWorkbenchMessages.ResourceEncodingFieldEditor_EncodingConflictMessage, encoding,
+							descriptionCharset),
+					MessageDialog.WARNING, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL) {
+				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -239,78 +228,59 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 		final String finalEncoding = encoding;
 
-		Job charsetJob = new Job(IDEWorkbenchMessages.IDEEncoding_EncodingJob) {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
-			 */
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					if (!hasSameEncoding) {
-						if (resource instanceof IContainer) {
-							((IContainer) resource).setDefaultCharset(
-									finalEncoding, monitor);
-						} else {
-							((IFile) resource).setCharset(finalEncoding,
-									monitor);
-						}
+		Job charsetJob = Job.create(IDEWorkbenchMessages.IDEEncoding_EncodingJob, monitor -> {
+			try {
+				if (!hasSameEncoding) {
+					if (resource instanceof IContainer) {
+						((IContainer) resource).setDefaultCharset(
+								finalEncoding, monitor);
+					} else {
+						((IFile) resource).setCharset(finalEncoding,
+								monitor);
 					}
-					if (!hasSameSeparateDerivedEncodings) {
-						Preferences prefs = new ProjectScope((IProject) resource).getNode(ResourcesPlugin.PI_RESOURCES);
-						boolean newValue = !getStoredSeparateDerivedEncodingsValue();
-						// Remove the pref if it's the default, otherwise store it.
-						if (newValue == DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS)
-							prefs.remove(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS);
-						else
-							prefs.putBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, newValue);
-						prefs.flush();
-					}
-					return Status.OK_STATUS;
-				} catch (CoreException e) {// If there is an error return the
-					// default
-					IDEWorkbenchPlugin
-							.log(
-									IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorStoringMessage,
-									e.getStatus());
-					return e.getStatus();
-				} catch (BackingStoreException e) {
-					IDEWorkbenchPlugin.log(IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorStoringMessage, e);
-					return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e);
 				}
+				if (!hasSameSeparateDerivedEncodings) {
+					Preferences prefs = new ProjectScope((IProject) resource).getNode(ResourcesPlugin.PI_RESOURCES);
+					boolean newValue = !getStoredSeparateDerivedEncodingsValue();
+					// Remove the pref if it's the default, otherwise store it.
+					if (newValue == DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS)
+						prefs.remove(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS);
+					else
+						prefs.putBoolean(ResourcesPlugin.PREF_SEPARATE_DERIVED_ENCODINGS, newValue);
+					prefs.flush();
+				}
+				return Status.OK_STATUS;
+			} catch (CoreException e1) {// If there is an error return the
+				// default
+				IDEWorkbenchPlugin
+						.log(
+								IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorStoringMessage,
+								e1.getStatus());
+				return e1.getStatus();
+			} catch (BackingStoreException e2) {
+				IDEWorkbenchPlugin.log(IDEWorkbenchMessages.ResourceEncodingFieldEditor_ErrorStoringMessage, e2);
+				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e2.getMessage(), e2);
 			}
-		};
+		});
 
 		charsetJob.schedule();
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.FieldEditor#store()
-	 */
+	@Override
 	public void store() {
 		// Override the store method as we are not using a preference store
 		doStore();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.FieldEditor#load()
-	 */
+	@Override
 	public void load() {
 		// Override the load method as we are not using a preference store
 		setPresentsDefaultValue(false);
 		doLoad();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.preference.FieldEditor#loadDefault()
-	 */
+	@Override
 	public void loadDefault() {
 		// Override the loadDefault method as we are not using a preference store
 		setPresentsDefaultValue(true);
@@ -318,20 +288,14 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		refreshValidState();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
-	 */
+	@Override
 	protected void doLoadDefault() {
 		super.doLoadDefault();
 		if (separateDerivedEncodingsButton != null)
 			separateDerivedEncodingsButton.setSelection(DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#findDefaultEncoding()
-	 */
+	@Override
 	protected String findDefaultEncoding() {
 
 		if (resource instanceof IWorkspaceRoot) {
@@ -359,7 +323,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	/**
 	 * Returns the charset from the content description if there is one.
-	 * 
+	 *
 	 * @return the charset from the content description, or <code>null</code>
 	 */
 	private String getCharsetFromDescription() {
@@ -370,11 +334,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#defaultButtonText()
-	 */
+	@Override
 	protected String defaultButtonText() {
 
 		if (resource instanceof IWorkspaceRoot) {
@@ -419,12 +379,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#createEncodingGroup(org.eclipse.swt.widgets.Composite,
-	 *      int)
-	 */
+	@Override
 	protected Composite createEncodingGroup(Composite parent, int numColumns) {
 		group = super.createEncodingGroup(parent, numColumns);
 		String byteOrderLabel = IDEEncoding
@@ -458,7 +413,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	/**
 	 * Returns the content description of the resource if it is a file and it
 	 * has a content description.
-	 * 
+	 *
 	 * @return the content description or <code>null</code> if resource is not
 	 *         an <code>IFile</code> or it does not have a description
 	 */
@@ -473,9 +428,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean, org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		group.setEnabled(enabled);

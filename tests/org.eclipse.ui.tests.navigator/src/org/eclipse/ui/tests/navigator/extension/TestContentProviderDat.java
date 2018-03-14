@@ -20,35 +20,41 @@ import org.eclipse.ui.navigator.PipelinedShapeModification;
 import org.eclipse.ui.navigator.PipelinedViewerUpdate;
 
 public class TestContentProviderDat implements ITreeContentProvider {
-	   
+
 	private TestExtensionTreeData child = new TestExtensionTreeData(null, "Child", null, null);
 
-	public Object[] getChildren(Object parentElement) { 
+	@Override
+	public Object[] getChildren(Object parentElement) {
 		return new Object[] { child } ;
 	}
 
-	public Object getParent(Object element) { 
+	@Override
+	public Object getParent(Object element) {
 		return null;
 	}
 
-	public boolean hasChildren(Object element) { 
+	@Override
+	public boolean hasChildren(Object element) {
 		return getChildren(element).length > 0;
 	}
 
-	public Object[] getElements(Object inputElement) { 
+	@Override
+	public Object[] getElements(Object inputElement) {
 		return null;
 	}
 
-	public void dispose() { 
+	@Override
+	public void dispose() {
 	}
 
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) { 
+	@Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 	}
 
 	//
 	// IPipelinedTreeContentProvider (not currently implemented)
 	//
-	
+
 	public void getPipelinedChildren(Object parent, Set theCurrentChildren) {
 	}
 
@@ -82,11 +88,11 @@ public class TestContentProviderDat implements ITreeContentProvider {
 	}
 
 	public void restoreState(IMemento memento) {
-		
+
 	}
 
 	public void saveState(IMemento memento) {
-		
+
 	}
 
 }

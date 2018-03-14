@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 247997)
  *     Matthew Hall - bug 264306
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property.value;
@@ -17,6 +18,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.internal.databinding.property.value.ListDelegatingValueObservableList;
@@ -24,12 +26,16 @@ import org.eclipse.core.internal.databinding.property.value.MapDelegatingValueOb
 import org.eclipse.core.internal.databinding.property.value.SetDelegatingValueObservableMap;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <T>
+ *            type of the value of the property
  * @since 1.2
- * 
+ *
  */
-public abstract class DelegatingValueProperty extends ValueProperty {
+public abstract class DelegatingValueProperty<S, T> extends ValueProperty<S, T> {
 	private final Object valueType;
-	private final IValueProperty nullProperty = new NullValueProperty();
+	private final IValueProperty<S, T> nullProperty = new NullValueProperty();
 
 	protected DelegatingValueProperty() {
 		this(null);
@@ -43,15 +49,15 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Repeated calls to this method with the same source object returns the
 	 * same delegate instance.
-	 * 
+	 *
 	 * @param source
 	 *            the property source (may be null)
 	 * @return the property to delegate to for the specified source object.
 	 */
-	public final IValueProperty getDelegate(Object source) {
+	public final IValueProperty<S, T> getDelegate(S source) {
 		if (source == null)
 			return nullProperty;
-		IValueProperty delegate = doGetDelegate(source);
+		IValueProperty<S, T> delegate = doGetDelegate(source);
 		if (delegate == null)
 			delegate = nullProperty;
 		return delegate;
@@ -61,59 +67,70 @@ public abstract class DelegatingValueProperty extends ValueProperty {
 	 * Returns the property to delegate to for the specified source object.
 	 * Implementers must ensure that repeated calls to this method with the same
 	 * source object returns the same delegate instance.
-	 * 
+	 *
 	 * @param source
 	 *            the property source
 	 * @return the property to delegate to for the specified source object.
 	 */
-	protected abstract IValueProperty doGetDelegate(Object source);
+	protected abstract IValueProperty<S, T> doGetDelegate(S source);
 
-	protected Object doGetValue(Object source) {
+	@Override
+	protected T doGetValue(S source) {
 		return getDelegate(source).getValue(source);
 	}
 
-	protected void doSetValue(Object source, Object value) {
+	@Override
+	protected void doSetValue(S source, T value) {
 		getDelegate(source).setValue(source, value);
 	}
 
+	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	public IObservableValue observe(Object source) {
+	@Override
+	public IObservableValue<T> observe(S source) {
 		return getDelegate(source).observe(source);
 	}
 
-	public IObservableValue observe(Realm realm, Object source) {
+	@Override
+	public IObservableValue<T> observe(Realm realm, S source) {
 		return getDelegate(source).observe(realm, source);
 	}
 
-	public IObservableList observeDetail(IObservableList master) {
-		return new ListDelegatingValueObservableList(master, this);
+	@Override
+	public <U extends S> IObservableList<T> observeDetail(IObservableList<U> master) {
+		return new ListDelegatingValueObservableList<S, U, T>(master, this);
 	}
 
-	public IObservableMap observeDetail(IObservableSet master) {
-		return new SetDelegatingValueObservableMap(master, this);
+	@Override
+	public <U extends S> IObservableMap<U, T> observeDetail(IObservableSet<U> master) {
+		return new SetDelegatingValueObservableMap<S, U, T>(master, this);
 	}
 
-	public IObservableMap observeDetail(IObservableMap master) {
-		return new MapDelegatingValueObservableMap(master, this);
+	@Override
+	public <K, V extends S> IObservableMap<K, T> observeDetail(IObservableMap<K, V> master) {
+		return new MapDelegatingValueObservableMap<S, K, V, T>(master, this);
 	}
 
-	private class NullValueProperty extends SimpleValueProperty {
+	private class NullValueProperty extends SimpleValueProperty<S, T> {
+		@Override
 		public Object getValueType() {
 			return valueType;
 		}
 
-		protected Object doGetValue(Object source) {
+		@Override
+		protected T doGetValue(S source) {
 			return null;
 		}
 
-		protected void doSetValue(Object source, Object value) {
+		@Override
+		protected void doSetValue(S source, T value) {
 		}
 
-		public INativePropertyListener adaptListener(
-				ISimplePropertyListener listener) {
+		@Override
+		public INativePropertyListener<S> adaptListener(ISimplePropertyListener<S, ValueDiff<? extends T>> listener) {
 			return null;
 		}
 	}

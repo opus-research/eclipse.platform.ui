@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,25 +48,25 @@ public class NewWizardMenu extends BaseNewWizardMenu {
      * <p>
      * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
      * </p>
-     * 
+     *
      * @param window
      *            the window containing the menu
      */
     public NewWizardMenu(IWorkbenchWindow window) {
         this(window, null);
-        
+
     }
-    
+
     /**
      * Creates a new wizard shortcut menu for the IDE.
      * <p>
      * <strong>Note:</strong> Clients must dispose this menu when it is no longer required.
      * </p>
-     * 
+     *
      * @param window
      *            the window containing the menu
      * @param id
-     *            the identifier for this contribution item 
+     *            the identifier for this contribution item
      */
     public NewWizardMenu(IWorkbenchWindow window, String id) {
         super(window, id);
@@ -75,12 +75,12 @@ public class NewWizardMenu extends BaseNewWizardMenu {
     }
 
     /**
-     * Create a new wizard shortcut menu.  
+     * Create a new wizard shortcut menu.
      * <p>
      * If the menu will appear on a semi-permanent basis, for instance within
      * a toolbar or menubar, the value passed for <code>register</code> should be true.
      * If set, the menu will listen to perspective activation and update itself
-     * to suit.  In this case clients are expected to call <code>deregister</code> 
+     * to suit.  In this case clients are expected to call <code>deregister</code>
      * when the menu is no longer needed.  This will unhook any perspective
      * listeners.
      * </p>
@@ -94,16 +94,14 @@ public class NewWizardMenu extends BaseNewWizardMenu {
      *      the window
      * @deprecated use NewWizardMenu(IWorkbenchWindow) instead
      */
-    public NewWizardMenu(IMenuManager innerMgr, IWorkbenchWindow window,
+    @Deprecated
+	public NewWizardMenu(IMenuManager innerMgr, IWorkbenchWindow window,
             boolean register) {
         this(window, null);
         fillMenu(innerMgr);
         // Must be done after constructor to ensure field initialization.
     }
-    
-    /* (non-Javadoc)
-     * Fills the menu with New Wizards.
-     */
+
     private void fillMenu(IContributionManager innerMgr) {
         // Remove all.
         innerMgr.removeAll();
@@ -120,16 +118,17 @@ public class NewWizardMenu extends BaseNewWizardMenu {
      * This method should only be called if the shortcut menu is created with
      * <code>register = true</code>.
      * </p>
-     * 
+     *
      * @deprecated has no effect
      */
-    public void deregisterListeners() {
+    @Deprecated
+	public void deregisterListeners() {
         // do nothing
     }
 
     /**
      * Return whether or not any examples are in the current install.
-     * 
+     *
      * @return boolean
      */
 	private boolean hasExamples() {
@@ -144,7 +143,7 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		}
 		return false;
 	}
-	
+
 	private boolean hasWizards(IWizardCategory category) {
 		IWizardDescriptor[] wizards = category.getWizards();
 		if (wizards.length>0) {
@@ -163,13 +162,11 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		return false;
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.actions.BaseNewWizardMenu#addItems(org.eclipse.jface.action.IContributionManager)
-     */
-    protected void addItems(List list) {
+    @Override
+	protected void addItems(List list) {
     	ArrayList shortCuts= new ArrayList();
     	addShortcuts(shortCuts);
-    	
+
     	for (Iterator iterator= shortCuts.iterator(); iterator.hasNext();) {
 			Object curr= iterator.next();
 			if (curr instanceof ActionContributionItem && isNewProjectWizardAction(((ActionContributionItem) curr).getAction())) {
@@ -202,27 +199,23 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		}
 		return false;
 	}
-    
-	/* (non-Javadoc)
-	 * Method declared on IContributionItem.
-	 */
+
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
 	/**
 	 * Sets the enabled state of the receiver.
-	 * 
+	 *
 	 * @param enabledValue if <code>true</code> the menu is enabled; else
 	 * 		it is disabled
 	 */
 	public void setEnabled(boolean enabledValue) {
 		this.enabled = enabledValue;
 	}
-    
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.actions.BaseNewWizardMenu#getContributionItems()
-	 */
+
+	@Override
 	protected IContributionItem[] getContributionItems() {
 		if (isEnabled()) {
 			return super.getContributionItems();

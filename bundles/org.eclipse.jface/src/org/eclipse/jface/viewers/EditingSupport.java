@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,11 +67,11 @@ public abstract class EditingSupport {
 	 * methods are called, either directly or through some kind of listener
 	 * mechanism on the implementer's model, to cause the new value to appear in
 	 * the viewer.
-	 * 
+	 *
 	 * <p>
 	 * <b>Subclasses should overwrite.</b>
 	 * </p>
-	 * 
+	 *
 	 * @param element
 	 *            the model element
 	 * @param value

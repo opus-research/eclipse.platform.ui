@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -41,9 +42,9 @@ import org.eclipse.ui.part.WorkbenchPart;
  * its pages however it wishes. As long as the view creates a
  * {@link PageSwitcher} object, {@link CyclePageHandler} will handle the cycling
  * of pages.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class CyclePageHandler extends CycleBaseHandler {
 
@@ -81,7 +82,7 @@ public class CyclePageHandler extends CycleBaseHandler {
 			item.setText(name);
 		}
 	}
-	
+
 	@Override
 	protected int getCurrentItemIndex() {
 		return pageSwitcher.getCurrentPageIndex();
@@ -89,7 +90,7 @@ public class CyclePageHandler extends CycleBaseHandler {
 
 	@Override
 	protected ParameterizedCommand getBackwardCommand() {
-		final ICommandService commandService = (ICommandService) window
+		final ICommandService commandService = window
 				.getWorkbench().getService(ICommandService.class);
 		final Command command = commandService
 .getCommand(IWorkbenchCommandConstants.NAVIGATE_PREVIOUS_PAGE);
@@ -99,7 +100,7 @@ public class CyclePageHandler extends CycleBaseHandler {
 
 	@Override
 	protected ParameterizedCommand getForwardCommand() {
-		final ICommandService commandService = (ICommandService) window
+		final ICommandService commandService = window
 				.getWorkbench().getService(ICommandService.class);
 		final Command command= commandService.getCommand(IWorkbenchCommandConstants.NAVIGATE_NEXT_PAGE);
 		ParameterizedCommand commandF = new ParameterizedCommand(command, null);
@@ -138,7 +139,7 @@ public class CyclePageHandler extends CycleBaseHandler {
 
 		// Default to center on the display
 		Point dlgAnchor = Geometry.centerPoint(dialog.getDisplay().getBounds());
-		
+
 		// Center the dialog within the activePart's pane (if any)
 		if (activePart != null) {
 			WorkbenchPart wbPart = (WorkbenchPart) activePart;
@@ -148,11 +149,11 @@ public class CyclePageHandler extends CycleBaseHandler {
 			// Get the center of the view pane's control
 			Rectangle viewBounds = paneCtrl.getBounds();
 			Point vCenter = Geometry.centerPoint(viewBounds);
-			
+
 			// Map it to the display
 			dlgAnchor = paneCtrl.getParent().toDisplay(vCenter);
 		}
-		
+
 		// Offset the point by half the dialog size
 		Rectangle dialogBounds = dialog.getBounds();
 		dlgAnchor.x -= (dialogBounds.width / 2);

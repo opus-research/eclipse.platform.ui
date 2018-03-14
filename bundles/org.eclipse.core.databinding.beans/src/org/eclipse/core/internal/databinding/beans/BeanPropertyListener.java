@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Matthew Hall and others.
+ * Copyright (c) 2009, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.property.NativePropertyListener;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public abstract class BeanPropertyListener extends NativePropertyListener
 		implements PropertyChangeListener {
@@ -35,6 +35,7 @@ public abstract class BeanPropertyListener extends NativePropertyListener
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
+	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
 		if (evt.getPropertyName() == null
 				|| propertyDescriptor.getName().equals(evt.getPropertyName())) {
@@ -52,11 +53,13 @@ public abstract class BeanPropertyListener extends NativePropertyListener
 
 	protected abstract IDiff computeDiff(Object oldValue, Object newValue);
 
+	@Override
 	protected void doAddTo(Object source) {
 		BeanPropertyListenerSupport.hookListener(source, propertyDescriptor
 				.getName(), this);
 	}
 
+	@Override
 	protected void doRemoveFrom(Object source) {
 		BeanPropertyListenerSupport.unhookListener(source, propertyDescriptor
 				.getName(), this);

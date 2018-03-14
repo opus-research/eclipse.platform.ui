@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class ProgressMessages extends NLS {
 	public static String ProgressView_CancelAction;
 	public static String ProgressView_ClearAllAction;
 	public static String ProgressView_NoOperations;
-	
+
 	public static String NewProgressView_RemoveAllJobsToolTip;
 	public static String NewProgressView_CancelJobToolTip;
 	public static String NewProgressView_ClearJobToolTip;
@@ -71,16 +71,16 @@ public class ProgressMessages extends NLS {
 	public static String JobErrorDialog_CloseDialogTitle;
 	public static String JobsViewPreferenceDialog_Title;
 	public static String JobErrorDialog_DoNotShowAgainMessage;
-	
+
 	public static String EventLoopProgressMonitor_OpenDialogJobName;
-	
+
 	public static String WorkbenchPreference_RunInBackgroundButton;
 	public static String WorkbenchPreference_RunInBackgroundToolTip;
-	
+
 	public static String TrimCommon_Progress_TrimName;
-	
+
 	public static String StatusUtil_errorOccurred;
-	
+
 //	public static String ProgressView_ClearAll; //TODO E4
 
 	static {

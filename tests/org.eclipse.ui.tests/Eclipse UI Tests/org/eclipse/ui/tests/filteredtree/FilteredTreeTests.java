@@ -32,26 +32,27 @@ public class FilteredTreeTests extends UITestCase {
 	// create an 8000-item Tree
 	private static int DEPTH = 3;
 	private static int NUM_ITEMS = 20;
-	
+
 	private class MyFilteredTree extends FilteredTree{
 		public MyFilteredTree(Composite comp, int style) {
 			super(comp);
 			doSomeStuffBeforeWidgetCreation();
 			init(style, new PatternFilter());
 		}
-		
+
 		private void doSomeStuffBeforeWidgetCreation(){
 			// do nothing
 		}
 	}
-	
+
 	private abstract class FilteredTreeDialog extends Dialog {
 		private int style;
-		
+
 		public FilteredTreeDialog(Shell shell, int treeStyle){
 			super(shell);
 			style = treeStyle;
 		}
+		@Override
 		protected Control createContents(Composite parent) {
 			Composite c = new Composite(parent, SWT.NONE);
 			c.setLayout(new GridLayout());
@@ -63,10 +64,10 @@ public class FilteredTreeTests extends UITestCase {
 			return parent;
 		}
 
-		protected abstract FilteredTree doCreateFilteredTree(Composite comp, int style); 
-		
-	};	
-	
+		protected abstract FilteredTree doCreateFilteredTree(Composite comp, int style);
+
+	};
+
 	/**
 	 * @param testName
 	 */
@@ -78,7 +79,7 @@ public class FilteredTreeTests extends UITestCase {
 		runFilteredTreeTest(SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER);
 	}
-	
+
 	public void testCreateCheckboxFilteredTree(){
 		runFilteredTreeTest(SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.BORDER | SWT.CHECK);
@@ -87,10 +88,11 @@ public class FilteredTreeTests extends UITestCase {
 	 * Tests creation of a subclass of filtered tree, using alternate constructor.
 	 */
 	public void testCreateMyFilteredTree(){
-		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);	
+		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);
 		final int treeStyle = SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL |SWT.FLAT;
-		
+
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
+			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createMyFilteredTree(comp, treeStyle);
 			}
@@ -103,11 +105,12 @@ public class FilteredTreeTests extends UITestCase {
 				+ " does not match expected: " + NUM_ITEMS);
 		dialog.close();
 	}
-	
+
 	private void runFilteredTreeTest(final int treeStyle){
-		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);	
-		
+		fRootElement = TestElement.createModel(DEPTH, NUM_ITEMS);
+
 		Dialog dialog = new FilteredTreeDialog((Shell)null, treeStyle){
+			@Override
 			protected FilteredTree doCreateFilteredTree(Composite comp, int style) {
 				return createFilteredTree(comp, treeStyle);
 			}
@@ -120,7 +123,7 @@ public class FilteredTreeTests extends UITestCase {
 				+ " does not match expected: " + NUM_ITEMS);
 		dialog.close();
 	}
-	
+
 	private FilteredTree createFilteredTree(Composite parent, int style){
 	      Composite c = new Composite(parent, SWT.NONE);
 	      c.setLayout(new GridLayout());
@@ -133,9 +136,9 @@ public class FilteredTreeTests extends UITestCase {
 		  fTree.getViewer().setContentProvider(new TestModelContentProvider());
 		  fTree.getViewer().setLabelProvider(new LabelProvider());
 
-	      return fTree;	
+	      return fTree;
 	}
-	
+
 	private FilteredTree createMyFilteredTree(Composite parent, int style){
 		Composite c = new Composite(parent, SWT.NONE);
 	    c.setLayout(new GridLayout());
@@ -148,16 +151,17 @@ public class FilteredTreeTests extends UITestCase {
 		fTree.getViewer().setLabelProvider(new LabelProvider());
 		return fTree;
 	}
-	
+
 	private void setInput() {
 		fTreeViewer.getViewer().setInput(fRootElement);
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		fTreeViewer = null;
 		fRootElement = null;
-	}	
-	
-	
+	}
+
+
 }

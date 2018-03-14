@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,8 @@ import java.util.Set;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
@@ -47,10 +47,10 @@ import org.eclipse.ui.navigator.INavigatorFilterService;
 
 /**
  * @since 3.2
- * 
+ *
  */
-public class CommonFiltersTab extends CustomizationTab { 
- 
+public class CommonFiltersTab extends CustomizationTab {
+
 	private static final String ALL = "*"; //$NON-NLS-1$
 
 	private String initialFilterTextValue = CommonNavigatorMessages.CommonFilterSelectionDialog_enter_name_of_filte_;
@@ -67,41 +67,37 @@ public class CommonFiltersTab extends CustomizationTab {
 			INavigatorContentService aContentService) {
 		super(parent, aContentService);
 		createControl();
-	} 
-	  
-	private void createControl() {  
+	}
+
+	private void createControl() {
 
 		createInstructionsLabel(CommonNavigatorMessages.CommonFilterSelectionDialog_Select_the_filters_to_apply);
-		
+
 		createPatternFilterText(this);
-		
-		createTable(); 
+
+		createTable();
 
 		getTableViewer().setContentProvider(filterContentProvider);
 		getTableViewer().setLabelProvider(filterLabelProvider);
-		getTableViewer().setSorter(new CommonFilterSorter());
+		getTableViewer().setComparator(new CommonFilterComparator());
 		getTableViewer().setInput(getContentService());
-		
+
 		getTableViewer().addFilter(patternFilter);
-		
+
 		updateFiltersCheckState();
 
 	}
 
 	private void createPatternFilterText(Composite composite) {
 		filterText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL); 
+		GridData filterTextGridData = new GridData(GridData.FILL_HORIZONTAL);
 		filterText.setLayoutData(filterTextGridData);
 		filterText.setText(initialFilterTextValue);
 		filterText.setFont(composite.getFont());
 
 		filterText.getAccessible().addAccessibleListener(
 				new AccessibleAdapter() {
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @see org.eclipse.swt.accessibility.AccessibleListener#getName(org.eclipse.swt.accessibility.AccessibleEvent)
-					 */
+					@Override
 					public void getName(AccessibleEvent e) {
 						String filterTextString = filterText.getText();
 						if (filterTextString.length() == 0) {
@@ -113,11 +109,7 @@ public class CommonFiltersTab extends CustomizationTab {
 				});
 
 		filterText.addFocusListener(new FocusAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt.events.FocusEvent)
-			 */
+			@Override
 			public void focusGained(FocusEvent e) {
 				if (initialFilterTextValue.equals(filterText.getText().trim())) {
 					filterText.selectAll();
@@ -126,11 +118,7 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addMouseListener(new MouseAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.MouseAdapter#mouseUp(org.eclipse.swt.events.MouseEvent)
-			 */
+			@Override
 			public void mouseUp(MouseEvent e) {
 				super.mouseUp(e);
 				if (initialFilterTextValue.equals(filterText.getText().trim())) {
@@ -140,11 +128,7 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addKeyListener(new KeyAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
-			 */
+			@Override
 			public void keyPressed(KeyEvent e) {
 				// on a CR we want to transfer focus to the list
 				boolean hasItems = getTable().getItemCount() > 0;
@@ -158,6 +142,7 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		// enter key set focus to tree
 		filterText.addTraverseListener(new TraverseListener() {
+			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN) {
 					e.doit = false;
@@ -196,11 +181,7 @@ public class CommonFiltersTab extends CustomizationTab {
 		});
 
 		filterText.addModifyListener(new ModifyListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
-			 */
+			@Override
 			public void modifyText(ModifyEvent e) {
 				textChanged();
 			}
@@ -210,16 +191,16 @@ public class CommonFiltersTab extends CustomizationTab {
 	void setInitialFocus() {
 		filterText.forceFocus();
 	}
-	
+
 	private void textChanged() {
 		patternFilter.setPattern(filterText.getText());
 		getTableViewer().refresh();
-		
-		Set checkedItems = getCheckedItems();
-		for (Iterator iterator = checkedItems.iterator(); iterator.hasNext();) {  
+
+		Set<Object> checkedItems = getCheckedItems();
+		for (Iterator<Object> iterator = checkedItems.iterator(); iterator.hasNext();) {
 			getTableViewer().setChecked(iterator.next(), true);
 		}
-	} 
+	}
 
 	private void updateFiltersCheckState() {
 		Object[] children = filterContentProvider
@@ -242,12 +223,7 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		private StringMatcher matcher = null;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
-		 *      java.lang.Object, java.lang.Object)
-		 */
+		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
 			return match(filterLabelProvider.getText(element));
@@ -255,20 +231,20 @@ public class CommonFiltersTab extends CustomizationTab {
 
 		protected void setPattern(String newPattern) {
 			if (newPattern == null || newPattern.trim().length() == 0) {
-				matcher = new StringMatcher(ALL, true, false);  
+				matcher = new StringMatcher(ALL, true, false);
 			} else {
-				String patternString = ALL + newPattern + ALL; 
+				String patternString = ALL + newPattern + ALL;
 				matcher = new StringMatcher(patternString, true, false);
 			}
 
-		} 
+		}
 
 		/**
 		 * Answers whether the given String matches the pattern.
-		 * 
+		 *
 		 * @param input
 		 *            the String to test
-		 * 
+		 *
 		 * @return whether the string matches the pattern
 		 */
 		protected boolean match(String input) {
@@ -278,25 +254,21 @@ public class CommonFiltersTab extends CustomizationTab {
 			return matcher == null || matcher.match(input);
 		}
 	}
- 
-	private class CommonFilterSorter extends ViewerSorter {
-		
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.ViewerSorter#sort(org.eclipse.jface.viewers.Viewer, java.lang.Object[])
-		 */
+
+	private class CommonFilterComparator extends ViewerComparator {
+
+		@Override
 		public void sort(Viewer viewer, Object[] elements) {
 			Arrays.sort(elements, new Comparator() {
-				/* (non-Javadoc)
-				 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-				 */
-				public int compare(Object o1, Object o2) { 
+				@Override
+				public int compare(Object o1, Object o2) {
 					ICommonFilterDescriptor lvalue = (ICommonFilterDescriptor) o1;
 					ICommonFilterDescriptor rvalue = (ICommonFilterDescriptor) o2;
-					
+
 					return lvalue.getName().compareTo(rvalue.getName());
 				}
 			});
-		
+
 		}
 
 	}

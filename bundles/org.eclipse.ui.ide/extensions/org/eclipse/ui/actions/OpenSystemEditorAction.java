@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,10 +88,8 @@ public class OpenSystemEditorAction extends SelectionListenerAction {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
-    public void run() {
+    @Override
+	public void run() {
         Iterator itr = getSelectedResources().iterator();
         while (itr.hasNext()) {
             IResource resource = (IResource) itr.next();
@@ -106,7 +104,8 @@ public class OpenSystemEditorAction extends SelectionListenerAction {
      * <code>SelectionListenerAction</code> method enables the action only
      * if the selection contains just file resources.
      */
-    protected boolean updateSelection(IStructuredSelection selection) {
+    @Override
+	protected boolean updateSelection(IStructuredSelection selection) {
         return super.updateSelection(selection)
                 && selectionIsOfType(IResource.FILE);
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,17 +43,17 @@ import org.eclipse.core.runtime.ListenerList;
  * </p>
  */
 public class OpenStrategy {
-    /** 
+    /**
      * Default behavior. Double click to open the item.
      */
     public static final int DOUBLE_CLICK = 0;
 
-    /** 
+    /**
      * Single click will open the item.
      */
     public static final int SINGLE_CLICK = 1;
 
-    /** 
+    /**
      * Hover will select the item.
      */
     public static final int SELECT_ON_HOVER = 1 << 1;
@@ -65,7 +65,7 @@ public class OpenStrategy {
 
     /** A single click will generate
      * an open event but key arrows will not do anything.
-     * 
+     *
      * @deprecated
      */
     @Deprecated
@@ -74,7 +74,7 @@ public class OpenStrategy {
     /** A single click will generate an open
      * event and key arrows will generate an open event after a
      * small time.
-     * 
+     *
      * @deprecated
      */
     @Deprecated
@@ -82,7 +82,7 @@ public class OpenStrategy {
 
     /** Pointing to an item will change the selection
      * and a single click will gererate an open event
-     * 
+     *
      * @deprecated
      */
     @Deprecated
@@ -94,7 +94,7 @@ public class OpenStrategy {
 
 	/**
 	 * Returns the delay for post selection events.
-	 * 
+	 *
 	 * @return the delay for post selection events in milliseconds
 	 * @since 3.7
 	 */
@@ -175,7 +175,7 @@ public class OpenStrategy {
      * This method is internal to the framework; it should not be implemented outside
      * the framework.
      * @return the current used single/double-click method
-     * 
+     *
      */
     public static int getOpenMethod() {
         return CURRENT_METHOD;
@@ -183,7 +183,7 @@ public class OpenStrategy {
 
     /**
      * Set the current used single/double-click method.
-     * 
+     *
      * This method is internal to the framework; it should not be implemented outside
      * the framework.
      * @param method the method to be used
@@ -207,7 +207,7 @@ public class OpenStrategy {
     }
 
     /**
-     * @return true if editors should be activated when opened. 
+     * @return true if editors should be activated when opened.
      */
     public static boolean activateOnOpen() {
         return getOpenMethod() == DOUBLE_CLICK;
@@ -342,19 +342,16 @@ public class OpenStrategy {
 					}
                     mouseMoveEvent = e;
                     final Runnable runnable[] = new Runnable[1];
-                    runnable[0] = new Runnable() {
-                        @Override
-						public void run() {
-                            long time = System.currentTimeMillis();
-                            int diff = (int) (time - startTime);
-                            if (diff <= TIME) {
-                                display.timerExec(diff * 2 / 3, runnable[0]);
-                            } else {
-                                timerStarted = false;
-                                setSelection(mouseMoveEvent);
-                            }
-                        }
-                    };
+                    runnable[0] = () -> {
+					    long time = System.currentTimeMillis();
+					    int diff = (int) (time - startTime);
+					    if (diff <= TIME) {
+					        display.timerExec(diff * 2 / 3, runnable[0]);
+					    } else {
+					        timerStarted = false;
+					        setSelection(mouseMoveEvent);
+					    }
+					};
                     startTime = System.currentTimeMillis();
                     if (!timerStarted) {
                         timerStarted = true;
@@ -418,29 +415,22 @@ public class OpenStrategy {
                     // want to delay any selection until the last arrowDown/Up occurs.  This
                     // handles the case where the user presses arrowDown/Up successively.
                     // We only want to open an editor for the last selected item.
-                    display.asyncExec(new Runnable() {
-                        @Override
-						public void run() {
-                            if (arrowKeyDown) {
-                                display.timerExec(TIME, new Runnable() {
-
-                                    @Override
-									public void run() {
-                                        if (id == count[0]) {
-                                            firePostSelectionEvent(new SelectionEvent(
-                                                    e));
-                                            if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
-												fireOpenEvent(new SelectionEvent(
-                                                        e));
-											}
-                                        }
-                                    }
-                                });
-                            } else {
-                                firePostSelectionEvent(new SelectionEvent(e));
-                            }
-                        }
-                    });
+                    display.asyncExec(() -> {
+					    if (arrowKeyDown) {
+					        display.timerExec(TIME, () -> {
+							    if (id == count[0]) {
+							        firePostSelectionEvent(new SelectionEvent(
+							                e));
+							        if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
+										fireOpenEvent(new SelectionEvent(
+							                    e));
+									}
+							    }
+							});
+					    } else {
+					        firePostSelectionEvent(new SelectionEvent(e));
+					    }
+					});
                     break;
                 }
             }
@@ -465,7 +455,7 @@ public class OpenStrategy {
                 SelectionEvent selEvent = new SelectionEvent(e);
 
                 /*ISSUE: May have to create a interface with method:
-                 setSelection(Point p) so that user's custom widgets 
+                 setSelection(Point p) so that user's custom widgets
                  can use this class. If we keep this option. */
                 if (w instanceof Tree) {
                     Tree tree = (Tree) w;

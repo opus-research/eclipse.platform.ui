@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,14 +29,14 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 /**
  * Ensures that a given set of content extensions is <i>active</i> and a second
  * non-intersecting set of content extensions are not <i>active</i>.
- * 
+ *
  * <p>
  * This operation is smart enough not to force any change if each id in each set
  * is already in its desired state (<i>active</i> or <i>inactive</i>).
  * </p>
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class UpdateActiveExtensionsOperation extends AbstractOperation {
 
@@ -48,12 +48,12 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 
 	/**
 	 * Create an operation to activate extensions and refresh the viewer.
-	 * 
+	 *
 	 * p> To use only one part of this operation (either "activate" or
 	 * "deactivate", but not both), then supply <b>null</b> for the array state
 	 * you are not concerned with.
 	 * </p>
-	 * 
+	 *
 	 * @param aCommonViewer
 	 *            The CommonViewer instance to update
 	 * @param theExtensionsToActivate
@@ -70,24 +70,19 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#execute(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
+	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) {
 
 		boolean updateExtensionActivation = false;
 
 		// we sort the array in order to use Array.binarySearch();
 		Arrays.sort(contentExtensionsToActivate);
-		
+
 		IStructuredSelection ssel = null;
-	
+
 		try {
 			commonViewer.getControl().setRedraw(false);
-			
+
 			ISelection selection = commonViewer.getSelection();
 			if(selection instanceof IStructuredSelection)
 				ssel = (IStructuredSelection) selection;
@@ -115,50 +110,40 @@ public class UpdateActiveExtensionsOperation extends AbstractOperation {
 
 			/* If so, update */
 			if (updateExtensionActivation) {
-				 
+
 				contentService.getActivationService().activateExtensions(
 						contentExtensionsToActivate, true);
 				contentService.getActivationService()
 						.persistExtensionActivations();
-				
+
 
 				Object[] expandedElements = commonViewer.getExpandedElements();
 
 				contentService.update();
 
 				commonViewer.refresh();
-				
-				Object[] originalObjects = ssel.toArray(); 
-				
+
+				Object[] originalObjects = ssel.toArray();
+
 				commonViewer.setExpandedElements(expandedElements);
 
 				IStructuredSelection newSelection = new StructuredSelection(originalObjects);
-				commonViewer.setSelection(newSelection, true); 				
+				commonViewer.setSelection(newSelection, true);
 			}
 
 		} finally {
 			commonViewer.getControl().setRedraw(true);
-		} 
+		}
 
 		return Status.OK_STATUS;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#redo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
+	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.operations.AbstractOperation#undo(org.eclipse.core.runtime.IProgressMonitor,
-	 *      org.eclipse.core.runtime.IAdaptable)
-	 */
+	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) {
 		return null;
 	}

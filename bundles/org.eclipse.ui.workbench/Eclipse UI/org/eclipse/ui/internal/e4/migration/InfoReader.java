@@ -78,7 +78,7 @@ public class InfoReader extends MementoReader {
 		IMemento folder = getFolder();
 		if (folder != null) {
 			IMemento[] pageMems = folder.getChildren(IWorkbenchConstants.TAG_PAGE);
-			pages = new ArrayList<PageReader>(pageMems.length);
+			pages = new ArrayList<>(pageMems.length);
 			for (IMemento pageMem : pageMems) {
 				pages.add(new PageReader(pageMem));
 			}

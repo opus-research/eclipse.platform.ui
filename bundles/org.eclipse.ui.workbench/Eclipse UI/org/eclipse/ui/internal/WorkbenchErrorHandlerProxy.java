@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,34 +17,25 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 /**
  * A proxy handler which passes all statuses to handler assigned to current
  * application workbench advisor.
- * 
+ *
  * <strong>EXPERIMENTAL</strong> This class or interface has been added as part
  * of a work in progress. This API may change at any given time. Please do not
  * use this API without consulting with the Platform/UI team.
- * 
+ *
  * @since 3.3
  */
 public class WorkbenchErrorHandlerProxy extends AbstractStatusHandler {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
-	 *      int)
-	 */
 	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
 		Workbench.getInstance().getAdvisor().getWorkbenchErrorHandler().handle(
 				statusAdapter, style);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.statushandlers.AbstractStatusHandler#supportsNotification(int)
-	 */
 	@Override
 	public boolean supportsNotification(int type) {
 		return Workbench.getInstance().getAdvisor().getWorkbenchErrorHandler()
 				.supportsNotification(type);
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.ui.internal.ide.actions;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -43,7 +43,7 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
 
     /**
      * Create a new dialog.
-     * 
+     *
      * @param window the window
      */
     public ProjectPropertyDialogAction(IWorkbenchWindow window) {
@@ -64,7 +64,8 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
     /**
      * Opens the project properties dialog.
      */
-    public void run() {
+    @Override
+	public void run() {
         IProject project = getProject();
         if (project == null) {
 			return;
@@ -80,14 +81,16 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
     /**
      * Update the enablement state when a the selection changes.
      */
-    public void selectionChanged(IWorkbenchPart part, ISelection sel) {
+    @Override
+	public void selectionChanged(IWorkbenchPart part, ISelection sel) {
         setEnabled(getProject() != null);
     }
 
     /**
      * Update the enablement state when a new part is activated.
      */
-    public void partActivated(IWorkbenchPart part) {
+    @Override
+	public void partActivated(IWorkbenchPart part) {
         super.partActivated(part);
         setEnabled(getProject() != null);
     }
@@ -107,24 +110,15 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
 				selection = ((IStructuredSelection) sel).getFirstElement();
 			}
         }
-        if (selection == null) {
-			return null;
-		}
-        if (!(selection instanceof IAdaptable)) {
-			return null;
-		}
-        IResource resource = (IResource) ((IAdaptable) selection)
-                .getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(selection, IResource.class);
         if (resource == null) {
 			return null;
 		}
         return resource.getProject();
     }
 
-    /* (non-javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
@@ -140,21 +134,25 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
     private static final class SelProvider implements ISelectionProvider {
         protected IStructuredSelection projectSelection = StructuredSelection.EMPTY;
 
-        public void addSelectionChangedListener(
+        @Override
+		public void addSelectionChangedListener(
                 ISelectionChangedListener listener) {
             // do nothing
         }
 
-        public ISelection getSelection() {
+        @Override
+		public ISelection getSelection() {
             return projectSelection;
         }
 
-        public void removeSelectionChangedListener(
+        @Override
+		public void removeSelectionChangedListener(
                 ISelectionChangedListener listener) {
             // do nothing
         }
 
-        public void setSelection(ISelection selection) {
+        @Override
+		public void setSelection(ISelection selection) {
             // do nothing
         }
     }

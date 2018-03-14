@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221351, 247875, 246782, 249526, 268022, 251424
  *     Ovidio Mallo - bug 241318
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -34,29 +36,33 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Assert;
 
 /**
+ * @param <M>
+ *            type of the master observable
+ * @param <E>
+ *            type of the elements in the inner observable list
  * @since 3.2
- * 
+ *
  */
-
-public class DetailObservableList extends ObservableList implements IObserving {
+public class DetailObservableList<M, E> extends ObservableList<E>implements IObserving {
 
 	private boolean updating = false;
 
-	private IListChangeListener innerChangeListener = new IListChangeListener() {
-		public void handleListChange(ListChangeEvent event) {
+	private IListChangeListener<E> innerChangeListener = new IListChangeListener<E>() {
+		@Override
+		public void handleListChange(ListChangeEvent<? extends E> event) {
 			if (!updating) {
-				fireListChange(event.diff);
+				fireListChange(Diffs.unmodifiableDiff(event.diff));
 			}
 		}
 	};
 
-	private Object currentOuterValue;
+	private M currentOuterValue;
 
-	private IObservableList innerObservableList;
+	private IObservableList<E> innerObservableList;
 
-	private IObservableFactory factory;
+	private IObservableFactory<? super M, IObservableList<E>> factory;
 
-	private IObservableValue outerObservableValue;
+	private IObservableValue<M> outerObservableValue;
 
 	private Object detailType;
 
@@ -65,10 +71,10 @@ public class DetailObservableList extends ObservableList implements IObserving {
 	 * @param outerObservableValue
 	 * @param detailType
 	 */
-	public DetailObservableList(IObservableFactory factory,
-			IObservableValue outerObservableValue, Object detailType) {
-		super(outerObservableValue.getRealm(), Collections.EMPTY_LIST,
-				detailType);
+	public DetailObservableList(
+			IObservableFactory<? super M, IObservableList<E>> factory,
+			IObservableValue<M> outerObservableValue, Object detailType) {
+		super(outerObservableValue.getRealm(), Collections.<E> emptyList(), detailType);
 		Assert.isTrue(!outerObservableValue.isDisposed(),
 				"Master observable is disposed"); //$NON-NLS-1$
 
@@ -77,6 +83,7 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		this.detailType = detailType;
 
 		outerObservableValue.addDisposeListener(new IDisposeListener() {
+			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				dispose();
 			}
@@ -91,13 +98,14 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		outerObservableValue.addValueChangeListener(outerChangeListener);
 	}
 
-	IValueChangeListener outerChangeListener = new IValueChangeListener() {
-		public void handleValueChange(ValueChangeEvent event) {
+	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
+		@Override
+		public void handleValueChange(ValueChangeEvent<? extends M> event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);
 			try {
-				List oldList = new ArrayList(wrappedList);
+				List<E> oldList = new ArrayList<E>(wrappedList);
 				updateInnerObservableList();
 				fireListChange(Diffs.computeListDiff(oldList, wrappedList));
 			} finally {
@@ -114,11 +122,11 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		currentOuterValue = outerObservableValue.getValue();
 		if (currentOuterValue == null) {
 			innerObservableList = null;
-			wrappedList = Collections.EMPTY_LIST;
+			wrappedList = Collections.emptyList();
 		} else {
 			ObservableTracker.setIgnore(true);
 			try {
-				innerObservableList = (IObservableList) factory
+				innerObservableList = factory
 						.createObservable(currentOuterValue);
 			} finally {
 				ObservableTracker.setIgnore(false);
@@ -136,7 +144,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public boolean add(final Object o) {
+	@Override
+	public boolean add(final E o) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.add(o);
@@ -145,7 +154,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public void add(final int index, final Object element) {
+	@Override
+	public void add(final int index, final E element) {
 		ObservableTracker.setIgnore(true);
 		try {
 			wrappedList.add(index, element);
@@ -154,6 +164,7 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
+	@Override
 	public boolean remove(final Object o) {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -163,7 +174,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public Object set(final int index, final Object element) {
+	@Override
+	public E set(final int index, final E element) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.set(index, element);
@@ -172,7 +184,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public Object move(final int oldIndex, final int newIndex) {
+	@Override
+	public E move(final int oldIndex, final int newIndex) {
 		if (innerObservableList != null) {
 			ObservableTracker.setIgnore(true);
 			try {
@@ -184,7 +197,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		return super.move(oldIndex, newIndex);
 	}
 
-	public Object remove(final int index) {
+	@Override
+	public E remove(final int index) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.remove(index);
@@ -193,7 +207,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public boolean addAll(final Collection c) {
+	@Override
+	public boolean addAll(final Collection<? extends E> c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.addAll(c);
@@ -202,7 +217,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public boolean addAll(final int index, final Collection c) {
+	@Override
+	public boolean addAll(final int index, final Collection<? extends E> c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.addAll(index, c);
@@ -211,7 +227,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public boolean removeAll(final Collection c) {
+	@Override
+	public boolean removeAll(final Collection<?> c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.removeAll(c);
@@ -220,7 +237,8 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
-	public boolean retainAll(final Collection c) {
+	@Override
+	public boolean retainAll(final Collection<?> c) {
 		ObservableTracker.setIgnore(true);
 		try {
 			return wrappedList.retainAll(c);
@@ -229,6 +247,7 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
+	@Override
 	public void clear() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -238,6 +257,7 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		}
 	}
 
+	@Override
 	public synchronized void dispose() {
 		super.dispose();
 
@@ -256,6 +276,7 @@ public class DetailObservableList extends ObservableList implements IObserving {
 		innerChangeListener = null;
 	}
 
+	@Override
 	public Object getObserved() {
 		if (innerObservableList instanceof IObserving) {
 			return ((IObserving) innerObservableList).getObserved();

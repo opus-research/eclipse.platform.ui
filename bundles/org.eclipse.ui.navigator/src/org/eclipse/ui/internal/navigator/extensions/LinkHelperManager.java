@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.navigator.INavigatorContentService;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class LinkHelperManager {
 
@@ -32,7 +32,7 @@ public class LinkHelperManager {
 
 	private static final LinkHelperDescriptor[] NO_DESCRIPTORS = new LinkHelperDescriptor[0];
 
-	private List descriptors;
+	private List<LinkHelperDescriptor> descriptors;
 
 	/**
 	 * @return the singleton instance.
@@ -48,7 +48,7 @@ public class LinkHelperManager {
 	/**
 	 * Return the link helper descriptors for a given selection and content
 	 * service.
-	 * 
+	 *
 	 * @param anObject
 	 *            An object from the viewer.
 	 * @param aContentService
@@ -62,10 +62,10 @@ public class LinkHelperManager {
 			Object anObject,
 			INavigatorContentService aContentService) {
 
-		List helpersList = new ArrayList();
+		List<LinkHelperDescriptor> helpersList = new ArrayList<LinkHelperDescriptor>();
 		LinkHelperDescriptor descriptor = null;
-		for (Iterator itr = getDescriptors().iterator(); itr.hasNext();) {
-			descriptor = (LinkHelperDescriptor) itr.next();
+		for (Iterator<LinkHelperDescriptor> itr = getDescriptors().iterator(); itr.hasNext();) {
+			descriptor = itr.next();
 			if (aContentService.isVisible(descriptor.getId())
 					&& descriptor.isEnabledFor(anObject)) {
 				helpersList.add(descriptor);
@@ -74,7 +74,7 @@ public class LinkHelperManager {
 		if (helpersList.size() == 0) {
 			return NO_DESCRIPTORS;
 		}
-		return (LinkHelperDescriptor[]) helpersList
+		return helpersList
 				.toArray(new LinkHelperDescriptor[helpersList.size()]);
 
 	}
@@ -82,7 +82,7 @@ public class LinkHelperManager {
 	/**
 	 * Return the link helper descriptors for a given selection and content
 	 * service.
-	 * 
+	 *
 	 * @param anInput
 	 *            The input of the active viewer.
 	 * @param aContentService
@@ -95,10 +95,10 @@ public class LinkHelperManager {
 	public LinkHelperDescriptor[] getLinkHelpersFor(IEditorInput anInput,
 			INavigatorContentService aContentService) {
 
-		List helpersList = new ArrayList();
+		List<LinkHelperDescriptor> helpersList = new ArrayList<LinkHelperDescriptor>();
 		LinkHelperDescriptor descriptor = null;
-		for (Iterator itr = getDescriptors().iterator(); itr.hasNext();) {
-			descriptor = (LinkHelperDescriptor) itr.next();
+		for (Iterator<LinkHelperDescriptor> itr = getDescriptors().iterator(); itr.hasNext();) {
+			descriptor = itr.next();
 			if (aContentService.isVisible(descriptor.getId())
 					&& descriptor.isEnabledFor(anInput)) {
 				helpersList.add(descriptor);
@@ -107,14 +107,14 @@ public class LinkHelperManager {
 		if (helpersList.size() == 0) {
 			return NO_DESCRIPTORS;
 		}
-		return (LinkHelperDescriptor[]) helpersList
+		return helpersList
 				.toArray(new LinkHelperDescriptor[helpersList.size()]);
 
 	}
 
-	protected List getDescriptors() {
+	protected List<LinkHelperDescriptor> getDescriptors() {
 		if (descriptors == null) {
-			descriptors = new ArrayList();
+			descriptors = new ArrayList<LinkHelperDescriptor>();
 		}
 		return descriptors;
 	}
@@ -126,10 +126,12 @@ public class LinkHelperManager {
 			super(NavigatorPlugin.PLUGIN_ID, LINK_HELPER);
 		}
 
+		@Override
 		public boolean readElement(final IConfigurationElement element) {
 			if (LINK_HELPER.equals(element.getName())) {
 				final boolean retValue[] = new boolean[1];
 				SafeRunner.run(new NavigatorSafeRunnable(element) {
+					@Override
 					public void run() throws Exception {
 						getDescriptors().add(new LinkHelperDescriptor(element));
 						retValue[0] = true;
