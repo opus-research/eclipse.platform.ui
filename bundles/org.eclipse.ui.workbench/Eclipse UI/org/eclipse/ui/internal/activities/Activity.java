@@ -360,6 +360,9 @@ final class Activity implements IActivity {
         return string;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IActivity#getDescription()
+     */
     @Override
 	public String getDescription() throws NotDefinedException {
         if (!defined) {
@@ -369,6 +372,9 @@ final class Activity implements IActivity {
         return description;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IActivity#isDefaultEnabled()
+     */
     @Override
 	public boolean isDefaultEnabled() {
         return defaultEnabled;

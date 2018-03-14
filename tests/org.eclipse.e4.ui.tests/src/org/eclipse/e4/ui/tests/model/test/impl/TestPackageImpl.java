@@ -99,7 +99,6 @@ public class TestPackageImpl extends EPackageImpl implements MTestPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EClass getTestHarness() {
 		return testHarnessEClass;
 	}
@@ -108,7 +107,6 @@ public class TestPackageImpl extends EPackageImpl implements MTestPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public MTestFactory getTestFactory() {
 		return (MTestFactory)getEFactoryInstance();
 	}

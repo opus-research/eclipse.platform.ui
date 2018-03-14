@@ -76,6 +76,12 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
             IProgressMonitor superMonitor = TimeTriggeredProgressMonitorDialog.super
                     .getProgressMonitor();
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
+			 *      int)
+			 */
             @Override
 			public void beginTask(String name, int totalWork) {
                 superMonitor.beginTask(name, totalWork);
@@ -97,29 +103,54 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
 
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#done()
+			 */
             @Override
 			public void done() {
                 superMonitor.done();
                 checkTicking();
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
+			 */
             @Override
 			public void internalWorked(double work) {
                 superMonitor.internalWorked(work);
                 checkTicking();
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
+			 */
             @Override
 			public boolean isCanceled() {
                 return superMonitor.isCanceled();
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
+			 */
             @Override
 			public void setCanceled(boolean value) {
                 superMonitor.setCanceled(value);
 
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+			 */
             @Override
 			public void setTaskName(String name) {
                 superMonitor.setTaskName(name);
@@ -127,12 +158,22 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
 
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+			 */
             @Override
 			public void subTask(String name) {
                 superMonitor.subTask(name);
                 checkTicking();
             }
 
+            /*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
+			 */
             @Override
 			public void worked(int work) {
                 superMonitor.worked(work);
@@ -142,6 +183,11 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
         };
     }
 
+    /*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getProgressMonitor()
+	 */
     @Override
 	public IProgressMonitor getProgressMonitor() {
         if (wrapperedMonitor == null) {
@@ -150,6 +196,11 @@ public class TimeTriggeredProgressMonitorDialog extends ProgressMonitorDialog {
         return wrapperedMonitor;
     }
 
+   /*
+    * (non-Javadoc)
+    *
+    * @see org.eclipse.jface.operations.IRunnableContext#run(boolean, boolean, IRunnableWithProgress)
+    */
     @Override
 	public void run(final boolean fork, final boolean cancelable,
             final IRunnableWithProgress runnable) throws InvocationTargetException,

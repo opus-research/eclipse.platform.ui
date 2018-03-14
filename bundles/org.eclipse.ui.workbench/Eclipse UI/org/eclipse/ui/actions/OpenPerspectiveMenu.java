@@ -137,6 +137,9 @@ public class OpenPerspectiveMenu extends PerspectiveMenu {
         openPage(desc, event.stateMask);
     }
 
+    /* (non-Javadoc)
+     * Opens a new page with a particular perspective and input.
+     */
     private void openPage(IPerspectiveDescriptor desc, int keyStateMask) {
         // Verify page input.
         if (pageInput == null) {

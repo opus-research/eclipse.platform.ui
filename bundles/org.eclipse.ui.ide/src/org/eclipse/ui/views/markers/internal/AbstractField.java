@@ -19,6 +19,9 @@ public abstract class AbstractField implements IField {
 
 	boolean visible = true;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.markers.internal.IField#isShowing()
+	 */
 	@Override
 	public boolean isShowing() {
 		return visible;

@@ -35,13 +35,23 @@ public class Activator extends Plugin {
 	public Activator() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
+	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+	 */
 	public void stop(BundleContext context) throws Exception {
 		if (eventAdminTracker != null) {
 			eventAdminTracker.close();

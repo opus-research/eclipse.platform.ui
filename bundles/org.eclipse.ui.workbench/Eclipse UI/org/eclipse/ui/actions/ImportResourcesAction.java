@@ -110,6 +110,10 @@ public class ImportResourcesAction extends BaseSelectionListenerAction
         selectionChanged(selection);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ActionFactory.IWorkbenchAction.
+     * @since 3.0
+     */
     @Override
 	public void dispose() {
     	workbenchWindow = null;

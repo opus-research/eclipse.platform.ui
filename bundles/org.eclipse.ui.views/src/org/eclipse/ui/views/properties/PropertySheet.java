@@ -17,7 +17,6 @@ package org.eclipse.ui.views.properties;
 
 import java.util.HashSet;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -41,6 +40,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.views.ViewsPlugin;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.part.IPage;
@@ -134,7 +134,8 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IPage createDefaultPage(PageBook book) {
-		IPageBookViewPage page = (IPageBookViewPage) Adapters.adapt(this, IPropertySheetPage.class);
+        IPageBookViewPage page = (IPageBookViewPage) ViewsPlugin.getAdapter(this,
+                IPropertySheetPage.class, false);
         if(page == null) {
         	page = new PropertySheetPage();
         }
@@ -196,7 +197,8 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     	if(part instanceof PropertySheet) {
     		return null;
     	}
-		IPropertySheetPage page = Adapters.adapt(part, IPropertySheetPage.class);
+		IPropertySheetPage page = ViewsPlugin.getAdapter(part,
+                IPropertySheetPage.class, false);
         if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
@@ -280,7 +282,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
      */
     @Override
 	public void partActivated(IWorkbenchPart part) {
-		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
+    	// Look for a declaratively-contributed adapter - including not yet loaded adapter factories.
+    	// See bug 86362 [PropertiesView] Can not access AdapterFactory, when plugin is not loaded.
+		IContributedContentsView view = ViewsPlugin.getAdapter(part,
+                IContributedContentsView.class, true);
         IWorkbenchPart source = null;
         if (view != null) {
 			source = view.getContributingPart();
@@ -312,10 +317,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		// we ignore selection if we are hidden OR selection is coming from
 		// another source as the last one
 		if (part == null || !part.equals(currentPart)) {
-			return;
-		}
-		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
-		if (!visible) {
 			return;
 		}
 
@@ -427,11 +428,11 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
 				IExtension[] extensions = ep.getExtensions();
-				for (IExtension extension : extensions) {
-					IConfigurationElement[] elements = extension.getConfigurationElements();
-					for (IConfigurationElement element : elements) {
-						if ("excludeSources".equalsIgnoreCase(element.getName())) { //$NON-NLS-1$
-							String id = element.getAttribute("id"); //$NON-NLS-1$
+				for (int i = 0; i < extensions.length; i++) {
+					IConfigurationElement[] elements = extensions[i].getConfigurationElements();
+					for (int j = 0; j < elements.length; j++) {
+						if ("excludeSources".equalsIgnoreCase(elements[j].getName())) { //$NON-NLS-1$
+							String id = elements[j].getAttribute("id"); //$NON-NLS-1$
 							if (id != null)
 								ignoredViews.add(id);
 						}

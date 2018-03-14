@@ -88,6 +88,9 @@ public class OpenSystemEditorAction extends SelectionListenerAction {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         Iterator itr = getSelectedResources().iterator();

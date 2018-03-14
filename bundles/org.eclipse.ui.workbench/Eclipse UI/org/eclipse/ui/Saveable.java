@@ -280,7 +280,9 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	public void enableUI(IWorkbenchPart[] parts) {
 		for (int i = 0; i < parts.length; i++) {
 			IWorkbenchPart workbenchPart = parts[i];
-			Composite paneComposite = (Composite) ((PartSite) workbenchPart.getSite()).getModel().getWidget();
+			Composite paneComposite = (Composite) ((PartSite) workbenchPart
+.getSite()).getModel()
+					.getWidget();
 			Control[] paneChildren = paneComposite.getChildren();
 			Composite toEnable = ((Composite) paneChildren[0]);
 			paneComposite.setCursor(originalCursor);
@@ -302,7 +304,7 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	 * @since 3.3
 	 */
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		return null;
 	}
 }

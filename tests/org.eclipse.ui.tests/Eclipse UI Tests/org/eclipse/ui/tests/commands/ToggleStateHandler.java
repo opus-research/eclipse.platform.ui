@@ -21,7 +21,7 @@ public class ToggleStateHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		boolean oldValue = HandlerUtil.toggleCommandState(event.getCommand());
-		return Boolean.valueOf(oldValue);
+		return new Boolean(oldValue);
 	}
 
 }

@@ -17,7 +17,6 @@ package org.eclipse.core.databinding.observable;
  *
  * @since 1.2
  */
-@FunctionalInterface
 public interface IDisposeListener extends IObservablesListener {
 	/**
 	 * Handle the event that the given observable object has been disposed. The

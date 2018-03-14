@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
@@ -518,8 +518,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
                     if (!ColorsAndFontsPreferencePage.equals(def.getCategoryId(), myCategory)) {
                     	if (isDefault(themeElement))
-							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
-               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), themeElement.getName(), def.getName() ); //$NON-NLS-1$
+							return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_default"), new Object[] { themeElement.getName(), def.getName() }); //$NON-NLS-1$
+               			return MessageFormat.format(RESOURCE_BUNDLE.getString("defaultFormat_override"), new Object[] { themeElement.getName(), def.getName() }); //$NON-NLS-1$
                     }
                 }
             }
@@ -593,7 +593,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * made by the user. These changes need to be stored into the preference
 	 * store.
 	 */
-	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<>(7);
+	private Map<ColorDefinition, RGB> colorPreferencesToSet = new HashMap<ColorDefinition, RGB>(7);
 
     private CascadingColorRegistry colorRegistry;
 
@@ -670,7 +670,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	 * explicitly made by the user. These changes need to be stored into the
 	 * preference store.
 	 */
-	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<>(
+	private Map<FontDefinition, FontData[]> fontPreferencesToSet = new HashMap<FontDefinition, FontData[]>(
 			7);
 
     private CascadingFontRegistry fontRegistry;

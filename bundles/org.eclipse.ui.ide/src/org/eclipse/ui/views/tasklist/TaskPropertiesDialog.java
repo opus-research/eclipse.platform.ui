@@ -43,6 +43,13 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 		super(parentShell);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
+	 *
+	 * @since 3.2
+	 */
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()

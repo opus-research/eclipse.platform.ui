@@ -35,6 +35,9 @@ public class WorkbenchPartTestable implements IWorkbenchPartTestable {
 		this.composite = ((Composite) paneChildren[0]);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.testing.IWorkbenchPartTestable#getControl()
+	 */
 	@Override
 	public Composite getControl() {
 		return composite;

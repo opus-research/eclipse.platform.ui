@@ -47,6 +47,9 @@ class BookmarkLabelProvider extends LabelProvider implements
         image = JFaceResources.getResources().createImageWithDefault(desc);
     }
 
+    /* (non-Javadoc)
+     * Method declared on LabelProvider.
+     */
     @Override
 	public void dispose() {
         if (image != null) {
@@ -55,6 +58,9 @@ class BookmarkLabelProvider extends LabelProvider implements
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on LabelProvider.
+     */
     @Override
 	public Image getImage(Object element) {
         return image;
