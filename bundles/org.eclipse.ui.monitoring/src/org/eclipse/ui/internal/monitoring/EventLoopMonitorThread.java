@@ -52,14 +52,6 @@ public class EventLoopMonitorThread extends Thread {
 	private static final String TRACE_PREFIX = "Event Loop Monitor"; //$NON-NLS-1$
 	private static final Tracer tracer =
 			Tracer.create(TRACE_PREFIX, PreferenceConstants.PLUGIN_ID + TRACE_EVENT_MONITOR);
-	private static final FilterHandler NON_INTERESTING_THREAD_FILTER = new FilterHandler(
-			"org.eclipse.core.internal.jobs.WorkerPool.sleep" //$NON-NLS-1$
-			+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob" //$NON-NLS-1$
-			+ ",org.eclipse.core.internal.jobs.Worker.run" //$NON-NLS-1$
-			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent" //$NON-NLS-1$
-			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run" //$NON-NLS-1$
-			+ ",org.eclipse.equinox.internal.util.impl.tpt.timer.TimerImpl.run" //$NON-NLS-1$
-			+ ",org.eclipse.equinox.internal.util.impl.tpt.threadpool.Executor.run"); //$NON-NLS-1$
 
 	/* NOTE: All time-related values in this class are in milliseconds. */
 
@@ -166,6 +158,9 @@ public class EventLoopMonitorThread extends Thread {
 			 */
 			switch (event.type) {
 			case SWT.PreEvent:
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -174,6 +169,9 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(true, true);
 				break;
 			case SWT.PostEvent:
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -198,6 +196,7 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(false, nestingLevel > 0);
 				break;
 			default:
+				break;
 			}
 		}
 
@@ -626,47 +625,33 @@ public class EventLoopMonitorThread extends Thread {
 	}
 
 	private ThreadInfo[] captureThreadStacks(boolean dumpAllThreads) {
+		ThreadInfo[] threadStacks;
 		if (dumpAllThreads) {
-			ThreadInfo[] threadStacks =
+			ThreadInfo[] rawThreadStacks =
 					threadMXBean.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers);
 			// Remove the info for the monitoring thread.
+			threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
 			int index = 0;
-			for (int i = 0; i < threadStacks.length; i++) {
-				ThreadInfo thread = threadStacks[i];
+
+			for (int i = 0; i < rawThreadStacks.length; i++) {
+				ThreadInfo thread = rawThreadStacks[i];
 				long threadId = thread.getThreadId();
 				// Skip the stack trace of the event loop monitoring thread.
 				if (threadId != monitoringThreadId) {
-					if (threadId == uiThreadId) {
-						// Swap the UI thread to first slot in the array if it is not there already.
-						if (index != 0) {
-							thread = threadStacks[0];
-							threadStacks[0] = threadStacks[i];
-						}
-					} else if (!isInteresting(thread)) {
-						continue; // Skip the non-interesting thread.
+					if (threadId == uiThreadId && i != 0) {
+						// Swap the UI thread to first slot in the array if it is not
+						// there already.
+						thread = threadStacks[0];
+						threadStacks[0] = rawThreadStacks[i];
 					}
 					threadStacks[index++] = thread;
 				}
 			}
-			return Arrays.copyOf(threadStacks, index);
 		} else {
-			return new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
+			threadStacks =
+					new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
 		}
-	}
-
-	/**
-	 * A thread is considered interesting if its stack trace includes at least one frame not
-	 * matching "java.*", "sun.*", or any of the methods in {@link #NON_INTERESTING_THREAD_FILTER}.
-	 */
-	private boolean isInteresting(ThreadInfo thread) {
-		for (StackTraceElement element : thread.getStackTrace()) {
-			String className = element.getClassName();
-			if (!className.startsWith("java.") && !className.startsWith("sun.") && //$NON-NLS-1$ //$NON-NLS-2$
-					!NON_INTERESTING_THREAD_FILTER.matchesFilter(element)) {
-				return true;
-			}
-		}
-		return false;
+		return threadStacks;
 	}
 
 	private static Display getDisplay() throws IllegalStateException {

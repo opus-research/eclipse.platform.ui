@@ -24,17 +24,17 @@ public class FilterHandler {
 	/**
 	 * Groups the class name and method name defined in the filter.
 	 */
-	private class StackFrame implements Comparable<StackFrame> {
+	private class Filter implements Comparable<Filter> {
 		final String className;
 		final String methodName;
 
-		public StackFrame(String className, String methodName) {
+		public Filter(String className, String methodName) {
 			this.className = className;
 			this.methodName = methodName;
 		}
 
 		@Override
-		public int compareTo(StackFrame other) {
+		public int compareTo(Filter other) {
 			int c = methodName.compareTo(other.methodName);
 			if (c != 0) {
 				return c;
@@ -43,26 +43,26 @@ public class FilterHandler {
 		}
 	}
 
-	private final StackFrame[] filterMethods;
+	private final Filter[] filters;
 
-	/**
-	 * Creates the filter.
-	 *
-	 * @param commaSeparatedMethods comma separated fully qualified method names to filter on
-	 */
-	public FilterHandler(String commaSeparatedMethods) {
-		String[] methods = commaSeparatedMethods.split(","); //$NON-NLS-1$
-		filterMethods = new StackFrame[methods.length];
+	public FilterHandler(String unparsedFilters) {
+		String[] rawFilters = unparsedFilters.split(","); //$NON-NLS-1$
+		filters = new Filter[rawFilters.length];
 
-		for (int i = 0; i < methods.length; i++) {
-			String method = methods[i];
-			int lastDot = method.lastIndexOf('.');
-			filterMethods[i] = lastDot >= 0 ?
-					new StackFrame(method.substring(0, lastDot), method.substring(lastDot + 1)) :
-					new StackFrame("", method); //$NON-NLS-1$
+		for (int i = 0; i < rawFilters.length; i++) {
+			String currentFilter = rawFilters[i];
+			int period = currentFilter.lastIndexOf('.');
+
+			if (period < 0) {
+				filters[i] = new Filter("", currentFilter); //$NON-NLS-1$
+				continue;
+			}
+
+			filters[i] = new Filter(currentFilter.substring(0, period),
+					currentFilter.substring(period + 1));
 		}
 
-		Arrays.sort(filterMethods);
+		Arrays.sort(filters);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class FilterHandler {
 	 */
 	public boolean shouldLogEvent(StackSample[] stackSamples, int numSamples,
 			long displayThreadId) {
-		if (filterMethods.length > 0) {
+		if (filters.length > 0) {
 			for (int i = 0; i < numSamples; i++) {
 				if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
 					return false;
@@ -87,17 +87,13 @@ public class FilterHandler {
 	}
 
 	/**
-	 * Checks if the stack trace of the display thread contains any frame that matches the filter.
+	 * Checks if the stack trace contains fully qualified names of the methods that should be
+	 * ignored.
 	 */
 	private boolean hasFilteredTraces(ThreadInfo[] stackTraces, long displayThreadId) {
 		for (ThreadInfo threadInfo : stackTraces) {
 			if (threadInfo.getThreadId() == displayThreadId) {
-				for (StackTraceElement element : threadInfo.getStackTrace()) {
-					if (matchesFilter(element)) {
-						return true;
-					}
-				}
-				return false;
+				return matchesFilter(threadInfo.getStackTrace());
 			}
 		}
 
@@ -105,28 +101,27 @@ public class FilterHandler {
 		return false;
 	}
 
-	/**
-	 * Checks whether the given stack frame matches the filter.
-	 */
-	boolean matchesFilter(StackTraceElement stackFrame) {
-		String methodName = stackFrame.getMethodName();
-		String className = stackFrame.getClassName();
-		// Binary search.
-		int low = 0;
-		int high = filterMethods.length;
-		while (low < high) {
-			int mid = (low + high) >>> 1;
-			StackFrame filter = filterMethods[mid];
-			int c = methodName.compareTo(filter.methodName);
-			if (c == 0) {
-				c = className.compareTo(filter.className);
-			}
-			if (c == 0) {
-				return true;
-			} else if (c < 0) {
-				high = mid;
-			} else {
-				low = mid + 1;
+	private boolean matchesFilter(StackTraceElement[] stackTraces) {
+		for (StackTraceElement element : stackTraces) {
+			String methodName = element.getMethodName();
+			String className = element.getClassName();
+			// Binary search.
+			int low = 0;
+			int high = filters.length;
+			while (low < high) {
+				int mid = (low + high) >>> 1;
+				Filter filter = filters[mid];
+				int c = methodName.compareTo(filter.methodName);
+				if (c == 0) {
+					c = className.compareTo(filter.className);
+				}
+				if (c == 0) {
+					return true;
+				} else if (c < 0) {
+					high = mid;
+				} else {
+					low = mid + 1;
+				}
 			}
 		}
 		return false;
