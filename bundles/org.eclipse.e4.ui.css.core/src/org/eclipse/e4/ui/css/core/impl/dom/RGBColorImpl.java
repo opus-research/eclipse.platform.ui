@@ -32,32 +32,50 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor {
 		blue = new Measure(nextUnit);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.RGBColor#getRed()
+	 */
 	public CSSPrimitiveValue getRed() {
 		return red;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.RGBColor#getGreen()
+	 */
 	public CSSPrimitiveValue getGreen() {
 		return green;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.RGBColor#getBlue()
+	 */
 	public CSSPrimitiveValue getBlue() {
 		return blue;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getRGBColorValue()
+	 */
 	public RGBColor getRGBColorValue() throws DOMException {
 		return this;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getPrimitiveType()
+	 */
 	public short getPrimitiveType() {
 		return CSS_RGBCOLOR;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssText()
+	 */
 	public String getCssText() {
 		return "rgb(" + red.getCssText() + ", " + green.getCssText() + ", "
 				+ blue.getCssText() + ")";

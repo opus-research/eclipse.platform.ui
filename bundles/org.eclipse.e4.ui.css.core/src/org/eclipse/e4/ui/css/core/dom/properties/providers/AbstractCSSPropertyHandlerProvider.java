@@ -20,12 +20,17 @@ import org.w3c.dom.css.CSSStyleDeclaration;
  * Abstract CSS Property handler.
  */
 public abstract class AbstractCSSPropertyHandlerProvider implements
-ICSSPropertyHandlerProvider {
+		ICSSPropertyHandlerProvider {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
+	 *      java.lang.Object, org.w3c.dom.css.CSSStyleDeclaration)
+	 */
 	public CSSStyleDeclaration getDefaultCSSStyleDeclaration(CSSEngine engine,
 			Object widget, CSSStyleDeclaration newStyle, String pseudoE)
-					throws Exception {
+			throws Exception {
 		Element elt = engine.getElement(widget);
 		if (elt != null) {
 			if (elt instanceof CSSStylableElement) {

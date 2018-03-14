@@ -38,7 +38,6 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		// When SWT Display will dispose, all SWT resources stored
 		// into cache will be dispose it too.
 		display.addListener(SWT.Dispose, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				dispose();
 			}
@@ -60,6 +59,12 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		return resource;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.core.css.resources.AbstractResourcesRegistry#registerResource(java.lang.String,
+	 *      java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public void registerResource(Object type, Object key, Object resource) {
 		if (resource == null)
@@ -85,6 +90,12 @@ public class SWTResourcesRegistry extends AbstractResourcesRegistry {
 		super.registerResource(type, key, resource);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.core.css.resources.AbstractResourcesRegistry#disposeResource(java.lang.Object,
+	 *      java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void disposeResource(Object type, Object key, Object resource) {
 		// Dispose SWT Resource

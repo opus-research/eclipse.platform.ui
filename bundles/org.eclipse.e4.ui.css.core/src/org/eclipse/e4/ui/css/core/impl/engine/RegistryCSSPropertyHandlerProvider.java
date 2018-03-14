@@ -35,7 +35,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
 public class RegistryCSSPropertyHandlerProvider extends
-AbstractCSSPropertyHandlerProvider {
+		AbstractCSSPropertyHandlerProvider {
 	private static final String ATTR_COMPOSITE = "composite";
 	private static final String ATTR_ADAPTER = "adapter";
 	private static final String ATTR_NAME = "name";
@@ -50,7 +50,7 @@ AbstractCSSPropertyHandlerProvider {
 
 	private IExtensionRegistry registry;
 	private boolean hasDeprecatedProperties = false; // mild optimization for
-	// getCSSProperties()
+														// getCSSProperties()
 
 	private Map<String, Map<String, ICSSPropertyHandler>> propertyHandlerMap = new HashMap<String, Map<String, ICSSPropertyHandler>>();;
 
@@ -108,8 +108,8 @@ AbstractCSSPropertyHandlerProvider {
 								.get(adapter);
 						if (adaptersMap == null) {
 							handlersMap
-							.put(adapter,
-									adaptersMap = new HashMap<String, ICSSPropertyHandler>());
+									.put(adapter,
+											adaptersMap = new HashMap<String, ICSSPropertyHandler>());
 						}
 						if (!adaptersMap.containsKey(name)) {
 							Object t = ce
@@ -117,11 +117,11 @@ AbstractCSSPropertyHandlerProvider {
 							if (t instanceof ICSSPropertyHandler) {
 								for (int i = 0; i < names.length; i++) {
 									adaptersMap
-									.put(names[i],
-											deprecated[i] == null ? (ICSSPropertyHandler) t
-													: new DeprecatedPropertyHandlerWrapper(
-															(ICSSPropertyHandler) t,
-															deprecated[i]));
+											.put(names[i],
+													deprecated[i] == null ? (ICSSPropertyHandler) t
+															: new DeprecatedPropertyHandlerWrapper(
+																	(ICSSPropertyHandler) t,
+																	deprecated[i]));
 								}
 							} else {
 								logError("invalid property handler for " + name);
@@ -138,7 +138,6 @@ AbstractCSSPropertyHandlerProvider {
 		return true;
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
@@ -152,13 +151,21 @@ AbstractCSSPropertyHandlerProvider {
 		return handlers;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.
+	 * AbstractCSSPropertyHandlerProvider
+	 * #getDefaultCSSStyleDeclaration(org.eclipse
+	 * .e4.ui.css.core.engine.CSSEngine,
+	 * org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
+	 * org.w3c.dom.css.CSSStyleDeclaration)
+	 */
 	protected CSSStyleDeclaration getDefaultCSSStyleDeclaration(
 			CSSEngine engine, CSSStylableElement stylableElement,
 			CSSStyleDeclaration newStyle, String pseudoE) throws Exception {
-		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null) {
+		if (stylableElement.getDefaultStyleDeclaration(pseudoE) != null)
 			return stylableElement.getDefaultStyleDeclaration(pseudoE);
-		}
 		if (newStyle != null) {
 			StringBuffer style = null;
 			int length = newStyle.getLength();
@@ -167,14 +174,13 @@ AbstractCSSPropertyHandlerProvider {
 				String[] compositePropertiesNames = engine
 						.getCSSCompositePropertiesNames(propertyName);
 				if (compositePropertiesNames != null) {
-					for (String compositePropertiesName : compositePropertiesNames) {
-						propertyName = compositePropertiesName;
+					for (int j = 0; j < compositePropertiesNames.length; j++) {
+						propertyName = compositePropertiesNames[j];
 						String s = getCSSPropertyStyle(engine, stylableElement,
 								propertyName, pseudoE);
 						if (s != null) {
-							if (style == null) {
+							if (style == null)
 								style = new StringBuffer();
-							}
 							style.append(s);
 						}
 					}
@@ -182,9 +188,8 @@ AbstractCSSPropertyHandlerProvider {
 					String s = getCSSPropertyStyle(engine, stylableElement,
 							propertyName, pseudoE);
 					if (s != null) {
-						if (style == null) {
+						if (style == null)
 							style = new StringBuffer();
-						}
 						style.append(s);
 					}
 				}
@@ -200,7 +205,6 @@ AbstractCSSPropertyHandlerProvider {
 		return stylableElement.getDefaultStyleDeclaration(pseudoE);
 	}
 
-	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		List<ICSSPropertyHandler> handlers = new ArrayList<ICSSPropertyHandler>();
@@ -218,7 +222,6 @@ AbstractCSSPropertyHandlerProvider {
 		return handlers;
 	}
 
-	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		// don't include deprecated elements
 		Set<String> properties = new HashSet<String>();
@@ -250,7 +253,7 @@ AbstractCSSPropertyHandlerProvider {
 	}
 
 	private class DeprecatedPropertyHandlerWrapper implements
-	ICSSPropertyHandler {
+			ICSSPropertyHandler {
 		private ICSSPropertyHandler delegate;
 		private String message;
 		private Set<String> logged = new HashSet<String>();
@@ -261,16 +264,14 @@ AbstractCSSPropertyHandlerProvider {
 			this.message = message;
 		}
 
-		@Override
 		public boolean applyCSSProperty(Object element, String property,
 				CSSValue value, String pseudo, CSSEngine engine)
-						throws Exception {
+				throws Exception {
 			logIfNecessary(property);
 			return delegate.applyCSSProperty(element, property, value, pseudo,
 					engine);
 		}
 
-		@Override
 		public String retrieveCSSProperty(Object element, String property,
 				String pseudo, CSSEngine engine) throws Exception {
 			logIfNecessary(property);

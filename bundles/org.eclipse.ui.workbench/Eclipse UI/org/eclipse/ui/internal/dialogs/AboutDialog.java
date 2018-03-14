@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.dialogs;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
 import org.eclipse.core.runtime.IBundleGroup;
 import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.IProduct;
@@ -74,7 +75,7 @@ public class AboutDialog extends TrayDialog {
 
     private AboutBundleGroupData[] bundleGroupInfos;
 
-	private ArrayList<Image> images = new ArrayList<Image>();
+    private ArrayList images = new ArrayList();
 
     private AboutFeaturesButtonManager buttonManager = new AboutFeaturesButtonManager();
 
@@ -99,7 +100,7 @@ public class AboutDialog extends TrayDialog {
 
         // create a descriptive object for each BundleGroup
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
+        LinkedList groups = new LinkedList();
         if (providers != null) {
 			for (int i = 0; i < providers.length; ++i) {
                 IBundleGroup[] bundleGroups = providers[i].getBundleGroups();
@@ -108,10 +109,13 @@ public class AboutDialog extends TrayDialog {
 				}
             }
 		}
-		bundleGroupInfos = groups.toArray(new AboutBundleGroupData[0]);
+        bundleGroupInfos = (AboutBundleGroupData[]) groups
+                .toArray(new AboutBundleGroupData[0]);
     }
 
-	@Override
+    /*
+     * (non-Javadoc) Method declared on Dialog.
+     */
     protected void buttonPressed(int buttonId) {
         switch (buttonId) {
         case DETAILS_ID:
@@ -133,14 +137,16 @@ public class AboutDialog extends TrayDialog {
     public boolean close() {
         // dispose all images
         for (int i = 0; i < images.size(); ++i) {
-			Image image = images.get(i);
+            Image image = (Image) images.get(i);
             image.dispose();
         }
 
         return super.close();
     }
 
-	@Override
+    /*
+     * (non-Javadoc) Method declared on Window.
+     */
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(NLS.bind(WorkbenchMessages.AboutDialog_shellTitle,productName ));
@@ -441,7 +447,9 @@ public class AboutDialog extends TrayDialog {
         button.setToolTipText(info.getProviderName());
         
         button.getAccessible().addAccessibleListener(new AccessibleAdapter(){
-			@Override
+        	/* (non-Javadoc)
+			 * @see org.eclipse.swt.accessibility.AccessibleAdapter#getName(org.eclipse.swt.accessibility.AccessibleEvent)
+			 */
 			public void getName(AccessibleEvent e) {
 				e.result = info.getProviderName();
 			}
@@ -462,7 +470,11 @@ public class AboutDialog extends TrayDialog {
         return button;
     }
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	protected boolean isResizable() {
 		return true;
 	}

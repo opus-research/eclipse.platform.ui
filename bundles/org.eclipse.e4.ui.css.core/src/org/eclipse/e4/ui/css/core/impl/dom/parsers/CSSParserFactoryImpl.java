@@ -22,7 +22,11 @@ import org.eclipse.e4.ui.css.core.dom.parsers.CSSParserFactory;
  */
 public class CSSParserFactoryImpl extends CSSParserFactory {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.parsers.ICSSParserFactory#makeCSSParser()
+	 */
 	public CSSParser makeCSSParser() {
 		return new CSSParserImpl();
 	}
