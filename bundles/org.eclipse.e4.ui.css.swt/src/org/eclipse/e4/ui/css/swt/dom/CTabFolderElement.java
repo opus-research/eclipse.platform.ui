@@ -8,6 +8,7 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 401439
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.dom;
 
@@ -15,6 +16,7 @@ import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.ICTabRendering;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -71,11 +73,26 @@ public class CTabFolderElement extends CompositeElement {
 		int childCount = 0;
 		if (widget instanceof Composite) {
 			childCount = ((Composite) widget).getChildren().length;
-
 			if (widget instanceof CTabFolder) {
 				// if it's a CTabFolder, include the child items in the count
-				childCount += ((CTabFolder) widget).getItemCount();
+				for (CTabItem tabItem : ((CTabFolder) widget).getItems()) {
+					if (tabItem.isDisposed()) {
+						// This is a workaround for bug 401439.
+						// widget (CTabFolder) is internally marked as inDispose
+						// It has disposed the CTabItem, but has not taken it out of the items array.
+						// The actual part is not attached to the model, but also was not disposed because of an uncaught exception.
+						//
+						// Do not return disposed items to the CSS engine by not including any elements after this disposed item.
+						// Worst case is that several visible items will not be styled.
+						//
+						// Other patches have prevented this code from getting called, so this just is a cautionary measure that may eventually be removed.
+						break;
+					} else {
+						childCount++;
+					}
+				}
 			}
+
 		}
 		return childCount;
 	}
