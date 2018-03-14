@@ -23,7 +23,7 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class BeanValuePropertyTest extends AbstractDefaultRealmTestCase {
 	public void testChangeListenerIsOnlyNotifiedWhenWatchedPropertyChanges()
@@ -34,7 +34,6 @@ public class BeanValuePropertyTest extends AbstractDefaultRealmTestCase {
 		class Listener implements IValueChangeListener {
 			private int count = 0;
 
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				count++;
 			}

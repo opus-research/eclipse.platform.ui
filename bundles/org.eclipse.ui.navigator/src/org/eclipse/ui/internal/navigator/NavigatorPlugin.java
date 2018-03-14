@@ -34,16 +34,16 @@ import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 
 /**
- * The main plugin class for the Navigator.
- *
+ * The main plugin class for the Navigator. 
+ *  
  * @since 3.2
  */
 public class NavigatorPlugin extends AbstractUIPlugin {
 	// The shared instance.
 	private static NavigatorPlugin plugin;
-
+	
 	private static final int LOG_DELAY = 100;
-
+	
 	/**
 	 * The delay before updating the action bars. Must be shorter than the
 	 * LINK_HELPER_DELAY to make sure the linking works after the boot.
@@ -56,12 +56,11 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	 */
 	public static final int LINK_HELPER_DELAY = ACTION_BAR_DELAY + 20;
 
-	private static class LogJob extends Job {
-
-
+	private static class LogJob extends Job { 		
+		
+		
 		private ListenerList messages = new ListenerList() {
-
-			@Override
+			
 			public synchronized Object[] getListeners() {
 				Object[] mesgs = super.getListeners();
 				clear();
@@ -69,28 +68,30 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 			}
 		};
 
-
+		
 		/**
 		 * Creates a Job which offloads the logging work into a non-UI thread.
 		 *
 		 */
 		public LogJob() {
 			super("");  //$NON-NLS-1$
-			setSystem(true);
+			setSystem(true); 
 		}
-
-		@Override
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		protected IStatus run(IProgressMonitor monitor) {
-
+			
 			Object[] mesgs = messages.getListeners();
 			ILog pluginLog = getDefault().getLog();
 			for (int i = 0; i < mesgs.length; i++) {
 				pluginLog.log((IStatus)mesgs[i]);
 			}
 			return Status.OK_STATUS;
-
+						
 		}
-
+		
 		/**
 		 * @param mesg The message to add to the Plugin's log.
 		 */
@@ -98,16 +99,15 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 			messages.add(mesg);
 
 		}
-
+		
 	}
-
-	private static final LogJob logJob = new LogJob();
+	
+	private static final LogJob logJob = new LogJob(); 
 
 	/** The id of the orge.eclipse.ui.navigator plugin. */
 	public static String PLUGIN_ID = "org.eclipse.ui.navigator"; //$NON-NLS-1$
 
 	private BundleListener bundleListener = new BundleListener() {
-		@Override
 		public void bundleChanged(BundleEvent event) {
 			NavigatorSaveablesService.bundleChanged(event);
 		}
@@ -131,23 +131,23 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in
 	 * relative path.
-	 *
+	 * 
 	 * @param path
 	 *            the path
 	 * @return the image descriptor
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
-
+	} 
+	
 
 	/**
 	 * Returns an image descriptor for the image file at the given plug-in
 	 * relative path.
-	 *
+	 * 
 	 * @param path
 	 *            the path
-	 * @return the image
+	 * @return the image 
 	 */
 	public Image getImage(String path) {
 		Image image = getImageRegistry().get(path);
@@ -158,11 +158,11 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 			}
 		}
 		return image;
-	}
+	} 
 
 	/**
-	 * Record an error against this plugin's log.
-	 *
+	 * Record an error against this plugin's log. 
+	 * 
 	 * @param aCode
 	 * @param aMessage
 	 * @param anException
@@ -174,9 +174,9 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 *
-	 * Record a message against this plugin's log.
-	 *
+	 * 
+	 * Record a message against this plugin's log. 
+	 * 
 	 * @param severity
 	 * @param aCode
 	 * @param aMessage
@@ -188,9 +188,9 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 *
-	 * Record a status against this plugin's log.
-	 *
+	 * 
+	 * Record a status against this plugin's log. 
+	 * 
 	 * @param aStatus
 	 */
 	public static void log(IStatus aStatus) {
@@ -219,7 +219,7 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 * @param selection
+	 * @param selection 
 	 * @return an evaluation context
 	 */
 	public static IEvaluationContext getEvalContext(Object selection) {
@@ -227,8 +227,8 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		c.setAllowPluginActivation(true);
 		return c;
 	}
-
-
+	
+	
 	/**
 	 * Helper class to evaluate an expression.
 	 */
@@ -237,12 +237,10 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		Expression expression;
 		IEvaluationContext scope;
 
-		@Override
 		public void handleException(Throwable exception) {
 			result = EvaluationResult.FALSE;
 		}
 
-		@Override
 		public void run() throws Exception {
 			result = expression.evaluate(scope);
 		}
@@ -250,7 +248,7 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Safely evaluation an expression, logging appropriately on error
-	 *
+	 * 
 	 * @param expression
 	 * @param scope
 	 * @return the EvaluationResult
@@ -262,10 +260,10 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		SafeRunner.run(evaluator);
 		return evaluator.result;
 	}
-
+	
 	/**
 	 * Create a status associated with this plugin.
-	 *
+	 *  
 	 * @param severity
 	 * @param aCode
 	 * @param aMessage
@@ -279,7 +277,7 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param aCode
 	 * @param aMessage
 	 * @param exception
@@ -290,18 +288,16 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		return createStatus(IStatus.ERROR, aCode, aMessage, exception);
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		// System.out.println("Navigator plugin starting"); //$NON-NLS-1$
 		super.start(context);
 		context.addBundleListener(bundleListener);
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		context.removeBundleListener(bundleListener);
 		super.stop(context);
 		// System.out.println("Navigator plugin stopped"); //$NON-NLS-1$
 	}
-
+	
 }

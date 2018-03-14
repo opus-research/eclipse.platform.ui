@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 431404
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -25,7 +24,6 @@ import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -38,9 +36,7 @@ public class StackDropAgent extends DropAgent {
 	private MPartStack dropStack;
 	private CTabFolder dropCTF;
 
-	private List<Rectangle> itemRects;
-	private List<Image> images;
-	private int imagesHeight;
+	private ArrayList<Rectangle> itemRects;
 	private int curDropIndex = -2;
 
 	/**
@@ -48,20 +44,6 @@ public class StackDropAgent extends DropAgent {
 	 */
 	public StackDropAgent(DnDManager manager) {
 		super(manager);
-		Display display = Display.getCurrent();
-		imagesHeight = 16;
-		images = Arrays.asList(new Image(display, 12, 2), new Image(display, 10, 2), new Image(display, 8, 2),
-				new Image(display, 6, 2), new Image(display, 4, 2), new Image(display, 2, 2));
-	}
-
-	@Override
-	public void dispose() {
-		for (Image img : images) {
-			if (!img.isDisposed()) {
-				img.dispose();
-			}
-		}
-		super.dispose();
 	}
 
 	@Override
@@ -87,15 +69,14 @@ public class StackDropAgent extends DropAgent {
 		if (stack == dragElement)
 			return false;
 
-		// You can only drag MParts from window to window
-		// NOTE: Disabled again due to too many issues, see bug 445305 for details
-		// if (!(dragElement instanceof MPart)) {
+		// You can only drag MParts from window to window 68
+		if (!(dragElement instanceof MPart)) {
 			EModelService ms = dndManager.getModelService();
 			MWindow dragElementWin = ms.getTopLevelWindowFor(dragElement);
 			MWindow dropWin = ms.getTopLevelWindowFor(stack);
 			if (dragElementWin != dropWin)
 				return false;
-		// }
+		}
 
 		// only allow dropping into the the area
 		Rectangle areaRect = getTabAreaRect((CTabFolder) stack.getWidget());
@@ -163,6 +144,11 @@ public class StackDropAgent extends DropAgent {
 		return -1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 		dndManager.clearOverlay();
@@ -180,6 +166,11 @@ public class StackDropAgent extends DropAgent {
 		super.dragLeave(dragElement, info);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.workbench.addons.dndaddon.DropAgent#dragLeave()
+	 */
 	@Override
 	public boolean track(MUIElement dragElement, DnDInfo info) {
 		if (!tabArea.contains(info.cursorPos) || dropStack == null || !dropStack.isToBeRendered())
@@ -204,13 +195,13 @@ public class StackDropAgent extends DropAgent {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex).getBounds();
 				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else if (dropCTF.getItemCount() > 0) {
 				Rectangle itemBounds = dropCTF.getItem(dropIndex - 1).getBounds();
 				itemBounds.x = itemBounds.x + itemBounds.width;
 				itemBounds.width = 2;
 				itemBounds = Display.getCurrent().map(dropCTF, null, itemBounds);
-				addDropFeedback(itemBounds);
+				dndManager.frameRect(itemBounds);
 			} else {
 				Rectangle fr = new Rectangle(tabArea.x, tabArea.y, tabArea.width, tabArea.height);
 				fr.width = 2;
@@ -225,23 +216,6 @@ public class StackDropAgent extends DropAgent {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Add drop feedback image, centered at the top-left point of the given item
-	 * bounds. The image is an arrow made by stacked rectangles
-	 */
-	private void addDropFeedback(Rectangle itemBounds) {
-		dndManager.clearOverlay();
-		int y = itemBounds.y - imagesHeight / 2;
-		for (int i = 0; i < images.size(); i++) {
-			Image img = images.get(i);
-			Rectangle bounds = img.getBounds();
-			int x = itemBounds.x - bounds.width / 2;
-			Rectangle imageRect = new Rectangle(x, y, bounds.width, bounds.height);
-			dndManager.addImage(imageRect, img);
-			y += bounds.height;
-		}
 	}
 
 	/**

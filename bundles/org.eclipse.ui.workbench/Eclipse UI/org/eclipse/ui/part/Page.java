@@ -50,17 +50,20 @@ public abstract class Page implements IPageBookViewPage {
      */
     private IPageSite site;
 
-    /*
+    /* 
      * Creates a new page for a pagebook view.
      */
     protected Page() {
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPage.
+     */
     @Override
 	public abstract void createControl(Composite parent);
 
     /**
-     * The <code>Page</code> implementation of this <code>IPage</code> method
+     * The <code>Page</code> implementation of this <code>IPage</code> method 
      * disposes of this page's control (if it has one and it has not already
      * been disposed). Subclasses may extend.
      */
@@ -79,19 +82,18 @@ public abstract class Page implements IPageBookViewPage {
     @Override
 	public abstract Control getControl();
 
-	/**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
-	 */
+    /* (non-Javadoc)
+     * This method exists for backward compatibility.
+     * Subclasses should reimplement <code>init</code>.
+     */
     public void makeContributions(IMenuManager menuManager,
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
     }
 
-
-	/**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
-	 */
+    /* (non-Javadoc)
+     * This method exists for backward compatibility.
+     * Subclasses should reimplement <code>init</code>.
+     */
     @Override
 	public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
@@ -100,12 +102,12 @@ public abstract class Page implements IPageBookViewPage {
 
     /**
      * The <code>Page</code> implementation of this <code>IPageBookViewPage</code> method
-     * stores a reference to the supplied site (the site which contains this
-     * page).
+     * stores a reference to the supplied site (the site which contains this 
+     * page). 
      * <p>
      * Subclasses may extend.
      * </p>
-     *
+     * 
      * @since 2.0
      */
     @Override
@@ -115,7 +117,7 @@ public abstract class Page implements IPageBookViewPage {
 
     /**
      * Returns the site which contains this page.
-     *
+     * 
      * @return the site which contains this page
      */
     @Override

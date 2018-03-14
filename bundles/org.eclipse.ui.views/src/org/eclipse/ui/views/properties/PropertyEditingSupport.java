@@ -24,9 +24,9 @@ import org.eclipse.swt.widgets.Composite;
  * {@link TableViewer}) based on an {@link IPropertySourceProvider},
  * forwarding requests to the {@link IPropertySource} or
  * {@link IPropertyDescriptor} for the given property ID.
- *
+ * 
  * @since 3.3
- *
+ * 
  * @see PropertyColumnLabelProvider
  */
 public class PropertyEditingSupport extends EditingSupport {
@@ -36,7 +36,7 @@ public class PropertyEditingSupport extends EditingSupport {
 	/**
 	 * Creates a new instance to be used with the given viewer, based on the
 	 * given property source provider and property ID.
-	 *
+	 * 
 	 * @param viewer
 	 *            the column viewer
 	 * @param propertySourceProvider
@@ -51,7 +51,6 @@ public class PropertyEditingSupport extends EditingSupport {
 		this.propertyID = propertyID;
 	}
 
-	@Override
 	protected boolean canEdit(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
@@ -66,7 +65,6 @@ public class PropertyEditingSupport extends EditingSupport {
 		return false;
 	}
 
-	@Override
 	protected CellEditor getCellEditor(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
@@ -83,7 +81,6 @@ public class PropertyEditingSupport extends EditingSupport {
 		return null;
 	}
 
-	@Override
 	protected Object getValue(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
@@ -96,7 +93,6 @@ public class PropertyEditingSupport extends EditingSupport {
 		return value;
 	}
 
-	@Override
 	protected void setValue(Object object, Object value) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);

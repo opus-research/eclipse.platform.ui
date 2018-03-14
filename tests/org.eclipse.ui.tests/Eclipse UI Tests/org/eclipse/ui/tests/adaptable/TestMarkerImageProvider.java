@@ -17,8 +17,7 @@ import org.eclipse.ui.internal.ide.IMarkerImageProvider;
  * A test marker image provider.
  */
 public class TestMarkerImageProvider implements IMarkerImageProvider {
-    @Override
-	public String getImagePath(IMarker marker) {
+    public String getImagePath(IMarker marker) {
         return "icons/anything.gif"; //$NON-NLS-1$
     }
 }

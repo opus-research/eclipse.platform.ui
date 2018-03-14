@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ package org.eclipse.jface.bindings.keys;
  * used to retrieve instances of look-ups defined by this package. It also
  * allows you to define your own look-up for use in the classes.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class KeyLookupFactory {
@@ -35,7 +35,7 @@ public final class KeyLookupFactory {
 
 	/**
 	 * Provides an instance of <code>SWTKeyLookup</code>.
-	 *
+	 * 
 	 * @return The SWT look-up table for key stroke format information; never
 	 *         <code>null</code>.
 	 */
@@ -45,7 +45,7 @@ public final class KeyLookupFactory {
 
 	/**
 	 * An accessor for the current default look-up.
-	 *
+	 * 
 	 * @return The default look-up; never <code>null</code>.
 	 */
 	public static final IKeyLookup getDefault() {
@@ -54,7 +54,7 @@ public final class KeyLookupFactory {
 
 	/**
 	 * Sets the default look-up.
-	 *
+	 * 
 	 * @param defaultLookup
 	 *            the default look-up. Must not be <code>null</code>.
 	 */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -82,11 +84,14 @@ public class FontFieldEditor extends FieldEditor {
         public DefaultPreviewer(String s, Composite parent) {
             string = s;
             text = new Text(parent, SWT.READ_ONLY | SWT.BORDER);
-            text.addDisposeListener(e -> {
-			    if (font != null) {
-					font.dispose();
-				}
-			});
+            text.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent e) {
+                    if (font != null) {
+						font.dispose();
+					}
+                }
+            });
             if (string != null) {
 				text.setText(string);
 			}
@@ -120,14 +125,14 @@ public class FontFieldEditor extends FieldEditor {
     }
 
     /**
-     * Creates a new font field editor
+     * Creates a new font field editor 
      */
     protected FontFieldEditor() {
     }
 
     /**
      * Creates a font field editor with an optional preview area.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param previewAreaText the text used for the preview window. If it is
@@ -145,7 +150,7 @@ public class FontFieldEditor extends FieldEditor {
 
     /**
      * Creates a font field editor without a preview.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -155,6 +160,9 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void adjustForNumColumns(int numColumns) {
 
@@ -167,6 +175,9 @@ public class FontFieldEditor extends FieldEditor {
         valueControl.setLayoutData(data);
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void applyFont() {
         if (chosenFont != null && previewer != null) {
@@ -174,6 +185,9 @@ public class FontFieldEditor extends FieldEditor {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
         getLabelControl(parent);
@@ -202,6 +216,9 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doLoad() {
         if (changeFontButton == null) {
@@ -211,6 +228,9 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceName()));
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doLoadDefault() {
         if (changeFontButton == null) {
@@ -220,6 +240,9 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceStore(), getPreferenceName()));
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	protected void doStore() {
         if (chosenFont != null) {
@@ -264,7 +287,12 @@ public class FontFieldEditor extends FieldEditor {
 
                 }
             });
-            changeFontButton.addDisposeListener(event -> changeFontButton = null);
+            changeFontButton.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    changeFontButton = null;
+                }
+            });
             changeFontButton.setFont(parent.getFont());
             setButtonLayoutData(changeFontButton);
         } else {
@@ -273,17 +301,20 @@ public class FontFieldEditor extends FieldEditor {
         return changeFontButton;
     }
 
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
     @Override
 	public int getNumberOfControls() {
         if (previewer == null) {
 			return 3;
 		}
-
+        
         return 4;
     }
 
     /**
-     * Returns the preferred preview height.
+     * Returns the preferred preview height. 
      *
      * @return the height, or <code>-1</code> if no previewer
      *  is installed
@@ -318,7 +349,12 @@ public class FontFieldEditor extends FieldEditor {
         if (valueControl == null) {
             valueControl = new Label(parent, SWT.LEFT);
             valueControl.setFont(parent.getFont());
-            valueControl.addDisposeListener(event -> valueControl = null);
+            valueControl.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    valueControl = null;
+                }
+            });
         } else {
             checkParent(valueControl, parent);
         }

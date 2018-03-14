@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.ui.views.properties.tabbed.ITypeMapper;
 
 /**
  * A section descriptor for the dynamic tests view.
- *
+ * 
  * @author Anthony Hunter
  */
 public class DynamicTestsCircleSectionDescriptor extends
@@ -27,7 +27,7 @@ public class DynamicTestsCircleSectionDescriptor extends
 
 	/**
 	 * Constructor for DynamicTestsCircleSectionDescriptor.
-	 *
+	 * 
 	 * @param typeMapper
 	 *            the optional type mapper for the section.
 	 */
@@ -35,22 +35,18 @@ public class DynamicTestsCircleSectionDescriptor extends
 		super(typeMapper);
 	}
 
-	@Override
 	public IFilter getFilter() {
 		return new DynamicTestsCircleSectionFilter();
 	}
 
-	@Override
 	public String getId() {
 		return "DynamicTestsCircleSection"; //$NON-NLS-1$
 	}
 
-	@Override
 	public ISection getSectionClass() {
 		return new DynamicTestsCircleSection();
 	}
 
-	@Override
 	public String getTargetTab() {
 		return "ShapeTab"; //$NON-NLS-1$
 	}

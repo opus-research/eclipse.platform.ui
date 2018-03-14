@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * A simple TreeViewer to demonstrate usage of an ILazyContentProvider.
- *
+ * 
  */
 public class Snippet047VirtualLazyTreeViewer {
 	private class MyContentProvider implements ILazyTreeContentProvider {
@@ -43,6 +43,11 @@ public class Snippet047VirtualLazyTreeViewer {
 			this.elements = (IntermediateNode[]) newInput;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#getParent(java.lang.Object)
+		 */
 		@Override
 		public Object getParent(Object element) {
 			if (element instanceof LeafNode)
@@ -50,33 +55,45 @@ public class Snippet047VirtualLazyTreeViewer {
 			return elements;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateChildCount(java.lang.Object,
+		 *      int)
+		 */
 		@Override
 		public void updateChildCount(Object element, int currentChildCount) {
-
+			
 			int length = 0;
 			if (element instanceof IntermediateNode) {
 				IntermediateNode node = (IntermediateNode) element;
 				length =  node.children.length;
-			}
+			} 
 			if(element == elements)
 				length = elements.length;
 			viewer.setChildCount(element, length);
-
+			
 
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#updateElement(java.lang.Object,
+		 *      int)
+		 */
 		@Override
 		public void updateElement(Object parent, int index) {
-
+			
 			Object element;
-			if (parent instanceof IntermediateNode)
+			if (parent instanceof IntermediateNode) 
 				element = ((IntermediateNode) parent).children[index];
-
+			
 			else
 				element =  elements[index];
 			viewer.replace(parent, index, element);
 			updateChildCount(element, -1);
-
+			
 		}
 
 	}

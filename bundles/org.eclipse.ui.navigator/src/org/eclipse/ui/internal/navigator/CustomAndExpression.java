@@ -26,17 +26,17 @@ import org.eclipse.core.runtime.SafeRunner;
 /**
  * Create an AND-type core expression from an IConfigurationElement of arbitrary
  * name.
- *
+ * 
  */
 public class CustomAndExpression extends Expression {
 
-	protected List<Expression> fExpressions;
+	protected List fExpressions;
 
 	/**
 	 * Create an AND-type core expression from an IConfigurationElement of
 	 * arbitrary name. The children elements are combined using boolean AND
 	 * semantics to evaluate the expression.
-	 *
+	 * 
 	 * @param element
 	 *            An IConfigurationElement of arbitrary name.
 	 */
@@ -47,9 +47,8 @@ public class CustomAndExpression extends Expression {
 		if (children.length == 0)
 			return;
 		SafeRunner.run(new NavigatorSafeRunnable() {
-			@Override
 			public void run() throws Exception {
-				fExpressions = new ArrayList<Expression>();
+				fExpressions = new ArrayList();
 				for (int i = 0; i < children.length; i++) {
 					fExpressions.add(ElementHandler.getDefault().create(
 							ExpressionConverter.getDefault(), children[i]));
@@ -59,15 +58,14 @@ public class CustomAndExpression extends Expression {
 
 	}
 
-	@Override
 	public EvaluationResult evaluate(IEvaluationContext scope) {
 		if (fExpressions == null) {
 			return EvaluationResult.TRUE;
 		}
 		NavigatorPlugin.Evaluator evaluator = new NavigatorPlugin.Evaluator();
 		EvaluationResult result = EvaluationResult.TRUE;
-		for (Iterator<Expression> iter = fExpressions.iterator(); iter.hasNext();) {
-			Expression expression = iter.next();
+		for (Iterator iter = fExpressions.iterator(); iter.hasNext();) {
+			Expression expression = (Expression) iter.next();
 			evaluator.expression = expression;
 			evaluator.scope = scope;
 			SafeRunner.run(evaluator);

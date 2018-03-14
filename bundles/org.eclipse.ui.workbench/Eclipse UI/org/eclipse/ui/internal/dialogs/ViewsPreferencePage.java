@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278, 472654
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -28,15 +26,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
-import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -47,6 +41,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -73,7 +68,6 @@ import org.eclipse.ui.internal.tweaklets.PreferencePageEnhancer;
 import org.eclipse.ui.internal.tweaklets.Tweaklets;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.themes.IThemeManager;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The ViewsPreferencePage is the page used to set preferences for the
@@ -91,9 +85,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private ITheme currentTheme;
 	private String defaultTheme;
 	private Button enableAnimations;
-	private Button enableMru;
 	private Button useColoredLabels;
-
+	
 	private Text colorsAndFontsThemeDescriptionText;
 	private ComboViewer colorsAndFontsThemeCombo;
 	private ControlDecoration colorFontsDecorator;
@@ -101,30 +94,18 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private Map<String, String> themeAssociations;
 	private boolean highContrastMode;
 
-	private Button themingEnabled;
-
 	@Override
 	protected Control createContents(Composite parent) {
 		initializeDialogUnits(parent);
 
 		Composite comp = new Composite(parent, SWT.NONE);
-
-		themingEnabled = createCheckButton(comp, WorkbenchMessages.ThemingEnabled, engine != null);
-
-		// if started with "-cssTheme none", CSS settings should be disabled
-		// but other appearance settings should be *not* disabled
-		if (engine == null) {
-			GridLayout layout = new GridLayout(1, false);
-			layout.horizontalSpacing = 10;
-			comp.setLayout(layout);
-			createThemeIndependentComposits(comp);
-			return comp;
-		}
-
 		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		comp.setLayout(layout);
-
+		if (engine == null) {
+			new Label(comp, SWT.NONE).setText(WorkbenchMessages.ThemingDisabled);
+			return comp;
+		}
 		new Label(comp, SWT.NONE).setText(WorkbenchMessages.ViewsPreferencePage_Theme);
 		highContrastMode = parent.getDisplay().getHighContrast();
 
@@ -158,6 +139,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 				} else {
 					themeComboDecorator.hide();
 				}
+				engine.setTheme(selection, false);
 				try {
 					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 							.setSelection(selection);
@@ -171,8 +153,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 		currentColorsAndFontsTheme = getCurrentColorsAndFontsTheme();
 		createColorsAndFontsThemeCombo(comp);
 		createColorsAndFontsThemeDescriptionText(comp);
-
-		createThemeIndependentComposits(comp);
+		createEnableAnimationsPref(comp);
+		createColoredLabelsPref(comp);
 
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 				.setSelection(currentTheme);
@@ -191,21 +173,15 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return comp;
 	}
 
-	private void createThemeIndependentComposits(Composite comp) {
-		createEnableAnimationsPref(comp);
-		createColoredLabelsPref(comp);
-		createEnableMruPref(comp);
-	}
-
 	private List<ITheme> getCSSThemes(boolean highContrastMode) {
-		List<ITheme> themes = new ArrayList<>();
+		List<ITheme> themes = new ArrayList<ITheme>();
 		for (ITheme theme : engine.getThemes()) {
 			/*
 			 * When we have Win32 OS - when the high contrast mode is enabled on
 			 * the platform, we display the 'high-contrast' special theme only.
 			 * If not, we don't want to mess the themes combo with the theme
 			 * since it is the special variation of the 'classic' one
-			 *
+			 * 
 			 * When we have GTK - we have to display the entire list of the
 			 * themes since we are not able to figure out if the high contrast
 			 * mode is enabled on the platform. The user has to manually select
@@ -237,29 +213,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return button;
 	}
 
-	private Label createLabel(Composite composite, String text) {
-		Label label = new Label(composite, SWT.NONE);
-		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
-		label.setLayoutData(data);
-		label.setText(text);
-		return label;
-	}
-
-	protected void createEnableMruPref(Composite composite) {
-		createLabel(composite, ""); //$NON-NLS-1$
-		createLabel(composite, WorkbenchMessages.ViewsPreference_visibleTabs_description);
-		IEclipsePreferences prefs = getSwtRendererPreferences();
-		if (engine != null) {
-			boolean mruControlledByCSS = prefs.getBoolean(StackRenderer.MRU_CONTROLLED_BY_CSS_KEY, false);
-			if (mruControlledByCSS) {
-				return;
-			}
-		}
-		boolean defaultValue = getDefaultMRUValue();
-		boolean actualValue = prefs.getBoolean(StackRenderer.MRU_KEY, defaultValue);
-		enableMru = createCheckButton(composite, WorkbenchMessages.ViewsPreference_enableMRU, actualValue);
-	}
-
 	protected void createEnableAnimationsPref(Composite composite) {
 		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
 
@@ -270,12 +223,12 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	/** @return the currently selected theme or null if there are no themes */
 	private ITheme getSelectedTheme() {
-		return (ITheme) (themeIdCombo.getStructuredSelection().getFirstElement());
+		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
-		MApplication application = workbench.getService(MApplication.class);
+		MApplication application = (MApplication) workbench.getService(MApplication.class);
 		IEclipseContext context = application.getContext();
 		defaultTheme = (String) context.get(E4Application.THEME_ID);
 		engine = context.get(IThemeEngine.class);
@@ -288,31 +241,15 @@ public class ViewsPreferencePage extends PreferencePage implements
 			if (theme != null) {
 				engine.setTheme(getSelectedTheme(), !highContrastMode);
 			}
-		}
-		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
-		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS, enableAnimations.getSelection());
-		apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS, useColoredLabels.getSelection());
-		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 
-		IEclipsePreferences prefs = getSwtRendererPreferences();
-		if (enableMru != null) {
-			prefs.putBoolean(StackRenderer.MRU_KEY, enableMru.getSelection());
-		}
-		prefs.putBoolean(PartRenderingEngine.ENABLED_THEME_KEY, themingEnabled.getSelection());
-		try {
-			prefs.flush();
-		} catch (BackingStoreException e) {
-			WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
+			IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
+			apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
+					enableAnimations.getSelection());
+			apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS,
+					useColoredLabels.getSelection());
+			((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 		}
 		return super.performOk();
-	}
-
-	private IEclipsePreferences getSwtRendererPreferences() {
-		return InstanceScope.INSTANCE.getNode("org.eclipse.e4.ui.workbench.renderers.swt"); //$NON-NLS-1$
-	}
-
-	private boolean getDefaultMRUValue() {
-		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, StackRenderer.MRU_DEFAULT);
 	}
 
 	private void setColorsAndFontsTheme(ColorsAndFontsTheme theme) {
@@ -333,12 +270,11 @@ public class ViewsPreferencePage extends PreferencePage implements
 			if (engine.getActiveTheme() != null) {
 				themeIdCombo.setSelection(new StructuredSelection(engine.getActiveTheme()));
 			}
-		}
-		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
-		enableAnimations.setSelection(apiStore.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
-		useColoredLabels.setSelection(apiStore.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
-		if (enableMru != null) {
-			enableMru.setSelection(getDefaultMRUValue());
+			IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
+			enableAnimations.setSelection(apiStore
+					.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
+			useColoredLabels.setSelection(apiStore
+					.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
 		}
 		super.performDefaults();
 	}
@@ -407,13 +343,13 @@ public class ViewsPreferencePage extends PreferencePage implements
 				refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
 				setColorsAndFontsTheme(colorsAndFontsTheme);
 			}
-		});
+		});		
 	}
 
 	/**
 	 * Create the text box that will contain the current theme description text
 	 * (if any).
-	 *
+	 * 
 	 * @param parent
 	 *            the parent <code>Composite</code>.
 	 */
@@ -471,7 +407,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private Map<String, String> createThemeAssociations() {
-		Map<String, String> result = new HashMap<>();
+		Map<String, String> result = new HashMap<String, String>();
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(E4_THEME_EXTENSION_POINT);
 
@@ -489,7 +425,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private List<ColorsAndFontsTheme> getColorsAndFontsThemes() {
-		List<ColorsAndFontsTheme> result = new ArrayList<>();
+		List<ColorsAndFontsTheme> result = new ArrayList<ColorsAndFontsTheme>();
 		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
 				.getCurrentTheme();
 
@@ -517,7 +453,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private void refreshColorsAndFontsThemeDescriptionText(ColorsAndFontsTheme theme) {
 		String description = ""; //$NON-NLS-1$
 		IThemeDescriptor[] descs = WorkbenchPlugin.getDefault().getThemeRegistry().getThemes();
-
+		
 		for (int i = 0; theme != null && description == null && i < descs.length; i++) {
 			if (descs[i].getId().equals(theme.getId())) {
 				description = descs[i].getDescription();
@@ -527,7 +463,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private ColorsAndFontsTheme getSelectedColorsAndFontsTheme() {
-		return (ColorsAndFontsTheme) colorsAndFontsThemeCombo.getStructuredSelection().getFirstElement();
+		return (ColorsAndFontsTheme) ((IStructuredSelection) colorsAndFontsThemeCombo
+				.getSelection()).getFirstElement();
 	}
 
 	private ColorsAndFontsTheme getCurrentColorsAndFontsTheme() {

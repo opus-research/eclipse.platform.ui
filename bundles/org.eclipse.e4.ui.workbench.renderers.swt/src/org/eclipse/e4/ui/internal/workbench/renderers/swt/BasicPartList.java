@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.renderers.swt;
@@ -81,7 +80,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 		@Override
 		public String getToolTipText(Object element) {
-			return renderer.getToolTip((MUILabel) element);
+			return ((MUILabel) element).getLocalizedTooltip();
 		}
 
 		@Override
@@ -105,26 +104,14 @@ public class BasicPartList extends AbstractTableInformationControl {
 
 	public BasicPartList(Shell parent, int shellStyle, int treeStyler,
 			EPartService partService, MElementContainer<?> input,
-			StackRenderer renderer, boolean mru) {
+			StackRenderer renderer, boolean alphabetical) {
 		super(parent, shellStyle, treeStyler);
 		this.partService = partService;
 		this.input = input;
 		this.renderer = renderer;
 		// this.saveHandler = saveHandler;
-		if (mru && getTableViewer() != null) {
-			getTableViewer().setComparator(new ViewerComparator() {
-				@Override
-				public int category(Object element) {
-					if (element instanceof MPart) {
-						MPart part = (MPart) element;
-						CTabItem item = BasicPartList.this.renderer.findItemForPart(part);
-						if (item != null && !item.isShowing()) {
-							return -1;
-						}
-					}
-					return 0;
-				}
-			});
+		if (alphabetical && getTableViewer() != null) {
+			getTableViewer().setComparator(new ViewerComparator());
 		}
 	}
 
@@ -143,7 +130,7 @@ public class BasicPartList extends AbstractTableInformationControl {
 	}
 
 	private List<Object> getInput() {
-		List<Object> list = new ArrayList<>();
+		List<Object> list = new ArrayList<Object>();
 		for (MUIElement element : input.getChildren()) {
 			if (element instanceof MPlaceholder) {
 				if (!element.isToBeRendered() || !element.isVisible()) {

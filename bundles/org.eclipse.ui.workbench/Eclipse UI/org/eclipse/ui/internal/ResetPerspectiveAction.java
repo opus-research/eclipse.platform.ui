@@ -40,11 +40,14 @@ public class ResetPerspectiveAction extends PerspectiveAction {
         setText(WorkbenchMessages.ResetPerspective_text);
         setActionDefinitionId(IWorkbenchCommandConstants.WINDOW_RESET_PERSPECTIVE);
         // @issue missing action id
-        setToolTipText(WorkbenchMessages.ResetPerspective_toolTip);
+        setToolTipText(WorkbenchMessages.ResetPerspective_toolTip); 
         window.getWorkbench().getHelpSystem().setHelp(this,
 				IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PerspectiveAction.
+     */
     @Override
 	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         String message = NLS.bind(WorkbenchMessages.ResetPerspective_message, persp.getLabel() );

@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -52,7 +53,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * selection facilities.
  * </p>
  * <p>
- * Subclasses must implement
+ * Subclasses must implement 
  * <ul>
  *   <li><code>createDestinationGroup</code></li>
  * </ul>
@@ -87,7 +88,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     private final static String DESELECT_ALL_TITLE = IDEWorkbenchMessages.WizardTransferPage_deselectAll;
 
     /**
-     * Creates an export wizard page. If the current resource selection
+     * Creates an export wizard page. If the current resource selection 
      * is not empty then it will be used as the initial collection of resources
      * selected for export.
      *
@@ -102,12 +103,11 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     }
 
     /**
-     * The <code>addToHierarchyToCheckedStore</code> implementation of this
-     * <code>WizardDataTransferPage</code> method returns <code>false</code>.
+     * The <code>addToHierarchyToCheckedStore</code> implementation of this 
+     * <code>WizardDataTransferPage</code> method returns <code>false</code>. 
      * Subclasses may override this method.
      */
-    @Override
-	protected boolean allowNewContainerName() {
+    protected boolean allowNewContainerName() {
         return false;
     }
 
@@ -119,14 +119,14 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      * including button presses and registers
      * default buttons with its shell.
      * The button id is stored as the buttons client data.
-     * Note that the parent's layout is assumed to be a GridLayout and
+     * Note that the parent's layout is assumed to be a GridLayout and 
      * the number of columns in this layout is incremented.
      * Subclasses may override.
      * </p>
      *
      * @param parent the parent composite
      * @param id the id of the button (see
-     *  <code>IDialogConstants.*_ID</code> constants
+     *  <code>IDialogConstants.*_ID</code> constants 
      *  for standard dialog button ids)
      * @param label the label from the button
      * @param defaultButton <code>true</code> if the button is to be the
@@ -184,8 +184,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
                 IDialogConstants.SELECT_TYPES_ID, SELECT_TYPES_TITLE, false);
 
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 handleTypesEditButtonPressed();
             }
         };
@@ -197,8 +196,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 resourceGroup.setAllSelections(true);
                 updateWidgetEnablements();
             }
@@ -211,8 +209,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 resourceGroup.setAllSelections(false);
                 updateWidgetEnablements();
             }
@@ -223,8 +220,10 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
 
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
+    public void createControl(Composite parent) {
 
         initializeDialogUnits(parent);
 
@@ -250,7 +249,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
         updateWidgetEnablements();
         setPageComplete(determinePageCompletion());
         setErrorMessage(null);	// should not initially have error message
-
+        
         setControl(composite);
     }
 
@@ -288,17 +287,20 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
                 getResourceProvider(IResource.FILE), WorkbenchLabelProvider
                         .getDecoratingWorkbenchLabelProvider(), SWT.NONE,
                 DialogUtil.inRegularFontMode(parent));
-
-        ICheckStateListener listener = event -> updateWidgetEnablements();
-
+        
+        ICheckStateListener listener = new ICheckStateListener() {
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                updateWidgetEnablements();
+            }
+        };
+        
         this.resourceGroup.addCheckStateListener(listener);
     }
 
     /*
      * @see WizardDataTransferPage.getErrorDialogTitle()
      */
-    @Override
-	protected String getErrorDialogTitle() {
+    protected String getErrorDialogTitle() {
         return IDEWorkbenchMessages.WizardExportPage_errorDialogTitle;
     }
 
@@ -308,18 +310,17 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      *
      * @deprecated Only retained for backwards compatibility.
      */
-    @Deprecated
-	protected boolean ensureResourcesLocal(List resources) {
+    protected boolean ensureResourcesLocal(List resources) {
         return true;
     }
 
     /**
-     * Returns a new subcollection containing only those resources which are not
+     * Returns a new subcollection containing only those resources which are not 
      * local.
      *
-     * @param originalList the original list of resources (element type:
+     * @param originalList the original list of resources (element type: 
      *   <code>IResource</code>)
-     * @return the new list of non-local resources (element type:
+     * @return the new list of non-local resources (element type: 
      *   <code>IResource</code>)
      */
     protected List extractNonLocalResources(List originalList) {
@@ -337,13 +338,12 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns a content provider for <code>IResource</code>s that returns
+     * Returns a content provider for <code>IResource</code>s that returns 
      * only children of the given resource type.
      */
     private ITreeContentProvider getResourceProvider(final int resourceType) {
         return new WorkbenchContentProvider() {
-            @Override
-			public Object[] getChildren(Object o) {
+            public Object[] getChildren(Object o) {
                 if (o instanceof IContainer) {
                     IResource[] members = null;
                     try {
@@ -362,22 +362,22 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
                         }
                     }
                     return results.toArray();
-                }
+                } 
                 //input element case
                 if (o instanceof ArrayList) {
                     return ((ArrayList) o).toArray();
-                }
+                } 
                 return new Object[0];
             }
         };
     }
 
     /**
-     * Returns this page's collection of currently-specified resources to be
-     * exported. This is the primary resource selection facility accessor for
+     * Returns this page's collection of currently-specified resources to be 
+     * exported. This is the primary resource selection facility accessor for 
      * subclasses.
      *
-     * @return a collection of resources currently selected
+     * @return a collection of resources currently selected 
      * for export (element type: <code>IResource</code>)
      */
     protected List getSelectedResources() {
@@ -391,11 +391,11 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns this page's collection of currently-specified resources to be
-     * exported. This is the primary resource selection facility accessor for
+     * Returns this page's collection of currently-specified resources to be 
+     * exported. This is the primary resource selection facility accessor for 
      * subclasses.
      *
-     * @return an iterator over the collection of resources currently selected
+     * @return an iterator over the collection of resources currently selected 
      * for export (element type: <code>IResource</code>). This will include
      * white checked folders and individually checked files.
      */
@@ -406,7 +406,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     /**
      * Returns the resource extensions currently specified to be exported.
      *
-     * @return the resource extensions currently specified to be exported (element
+     * @return the resource extensions currently specified to be exported (element 
      *   type: <code>String</code>)
      */
     protected List getTypesToExport() {
@@ -415,11 +415,11 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     }
 
     /**
-     * Returns this page's collection of currently-specified resources to be
+     * Returns this page's collection of currently-specified resources to be 
      * exported. This returns both folders and files - for just the files use
      * getSelectedResources.
      *
-     * @return a collection of resources currently selected
+     * @return a collection of resources currently selected 
      * for export (element type: <code>IResource</code>)
      */
     protected List getWhiteCheckedResources() {
@@ -449,7 +449,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      * has been specified for export by the user.
      *
      * @param resourceName the resource name
-     * @return <code>true</code> if the resource name is suitable for export based
+     * @return <code>true</code> if the resource name is suitable for export based 
      *   upon its extension
      */
     protected boolean hasExportableExtension(String resourceName) {
@@ -477,7 +477,7 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     /**
      * Persists additional setting that are to be restored in the next instance of
      * this page.
-     * <p>
+     * <p> 
      * The <code>WizardImportPage</code> implementation of this method does
      * nothing. Subclasses may extend to persist additional settings.
      * </p>
@@ -489,8 +489,8 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      * Queries the user for the resource types that are to be exported and returns
      * these types as an array.
      *
-     * @return the resource types selected for export (element type:
-     *   <code>String</code>), or <code>null</code> if the user canceled the
+     * @return the resource types selected for export (element type: 
+     *   <code>String</code>), or <code>null</code> if the user canceled the 
      *   selection
      */
     protected Object[] queryResourceTypesToExport() {
@@ -514,11 +514,10 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
     /**
      * Persists resource specification control setting that are to be restored
      * in the next instance of this page. Subclasses wishing to persist additional
-     * setting for their controls should extend hook method
+     * setting for their controls should extend hook method 
      * <code>internalSaveWidgetValues</code>.
      */
-    @Override
-	protected void saveWidgetValues() {
+    protected void saveWidgetValues() {
 
         // allow subclasses to save values
         internalSaveWidgetValues();
@@ -546,31 +545,33 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
      */
     private void setupSelectionsBasedOnSelectedTypes() {
 
-        Runnable runnable = () -> {
-		    Map selectionMap = new Hashtable();
-		    //Only get the white selected ones
-		    Iterator resourceIterator = resourceGroup
-		            .getAllWhiteCheckedItems().iterator();
-		    while (resourceIterator.hasNext()) {
-		        //handle the files here - white checked containers require recursion
-		        IResource resource = (IResource) resourceIterator.next();
-		        if (resource.getType() == IResource.FILE) {
-		            if (hasExportableExtension(resource.getName())) {
-		                List resourceList = new ArrayList();
-		                IContainer parent = resource.getParent();
-		                if (selectionMap.containsKey(parent)) {
-							resourceList = (List) selectionMap.get(parent);
-						}
-		                resourceList.add(resource);
-		                selectionMap.put(parent, resourceList);
-		            }
-		        } else {
-					setupSelectionsBasedOnSelectedTypes(selectionMap,
-		                    (IContainer) resource);
-				}
-		    }
-		    resourceGroup.updateSelections(selectionMap);
-		};
+        Runnable runnable = new Runnable() {
+            public void run() {
+                Map selectionMap = new Hashtable();
+                //Only get the white selected ones
+                Iterator resourceIterator = resourceGroup
+                        .getAllWhiteCheckedItems().iterator();
+                while (resourceIterator.hasNext()) {
+                    //handle the files here - white checked containers require recursion
+                    IResource resource = (IResource) resourceIterator.next();
+                    if (resource.getType() == IResource.FILE) {
+                        if (hasExportableExtension(resource.getName())) {
+                            List resourceList = new ArrayList();
+                            IContainer parent = resource.getParent();
+                            if (selectionMap.containsKey(parent)) {
+								resourceList = (List) selectionMap.get(parent);
+							}
+                            resourceList.add(resource);
+                            selectionMap.put(parent, resourceList);
+                        }
+                    } else {
+						setupSelectionsBasedOnSelectedTypes(selectionMap,
+                                (IContainer) resource);
+					}
+                }
+                resourceGroup.updateSelections(selectionMap);
+            }
+        };
 
         BusyIndicator.showWhile(getShell().getDisplay(), runnable);
 
@@ -622,12 +623,11 @@ public abstract class WizardExportResourcesPage extends WizardDataTransferPage {
         return IDEWorkbenchPlugin.getDefault().getWorkbench().saveAllEditors(
                 true);
     }
-
+    
     /**
      * Check if widgets are enabled or disabled by a change in the dialog.
      */
-    @Override
-	protected void updateWidgetEnablements() {
+    protected void updateWidgetEnablements() {
 
         boolean pageComplete = determinePageCompletion();
         setPageComplete(pageComplete);

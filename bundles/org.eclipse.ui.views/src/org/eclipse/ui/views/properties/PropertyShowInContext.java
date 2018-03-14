@@ -17,7 +17,7 @@ import org.eclipse.ui.part.ShowInContext;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class PropertyShowInContext extends ShowInContext {
 
@@ -57,7 +57,9 @@ public class PropertyShowInContext extends ShowInContext {
 		this.part = part;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -67,7 +69,9 @@ public class PropertyShowInContext extends ShowInContext {
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

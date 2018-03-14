@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -77,14 +78,14 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Returns the data map.
-     *
+     * 
      * @return the data map
      */
     public Map getData() {
         return dataMap;
     }
 
-    /**
+    /**     
      * Returns the font definitions.
      *
      * @return the font definitions
@@ -95,7 +96,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Read a category.
-     *
+     * 
      * @param element the element to read
      * @return the new category
      */
@@ -120,7 +121,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Read a color.
-     *
+     * 
      * @param element the element to read
      * @return the new color
      */
@@ -166,9 +167,9 @@ public class ThemeRegistryReader extends RegistryReader {
     }
 
     /**
-     * Gets the color value, either via the value attribute or from a color
+     * Gets the color value, either via the value attribute or from a color 
      * factory.
-     *
+     * 
      * @param element the element to check
      * @return the color string
      */
@@ -185,9 +186,9 @@ public class ThemeRegistryReader extends RegistryReader {
     }
 
     /**
-     * Check for platform specific color values.  This will return the
+     * Check for platform specific color values.  This will return the 
      * "best match" for the current platform.
-     *
+     * 
      * @param elements the elements to check
      * @return the platform specific color, if any
      */
@@ -197,9 +198,9 @@ public class ThemeRegistryReader extends RegistryReader {
     }
 
     /**
-     * Get the element that has os/ws attributes that best match the current
+     * Get the element that has os/ws attributes that best match the current 
      * platform.
-     *
+     * 
      * @param elements the elements to check
      * @return the best match, if any
      */
@@ -229,6 +230,9 @@ public class ThemeRegistryReader extends RegistryReader {
         return match;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.RegistryReader#readElement(org.eclipse.core.runtime.IConfigurationElement)
+     */
     @Override
 	public boolean readElement(IConfigurationElement element) {
         String elementName = element.getName();
@@ -244,7 +248,7 @@ public class ThemeRegistryReader extends RegistryReader {
         } else if (themeDescriptor != null
                 && elementName.equals(IWorkbenchRegistryConstants.TAG_COLOROVERRIDE)) {
             ColorDefinition definition = readColor(element);
-            if (definition != null) {
+            if (definition != null) {                
                 themeDescriptor.add(definition);
             }
             return true;
@@ -295,7 +299,7 @@ public class ThemeRegistryReader extends RegistryReader {
             String name = element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME);
             String value = element.getAttribute(IWorkbenchRegistryConstants.ATT_VALUE);
             if (name == null || value == null) {
-                logError(element, RESOURCE_BUNDLE.getString("Data.badData")); //$NON-NLS-1$
+                logError(element, RESOURCE_BUNDLE.getString("Data.badData")); //$NON-NLS-1$			    
             } else {
                 if (themeDescriptor != null) {
                     themeDescriptor.setData(name, value);
@@ -307,14 +311,20 @@ public class ThemeRegistryReader extends RegistryReader {
                 }
             }
             return true;
-		}
+        } else if (elementName.equals(IWorkbenchRegistryConstants.TAG_CATEGORYPRESENTATIONBINDING)) {
+            String categoryId = element.getAttribute(IWorkbenchRegistryConstants.ATT_CATEGORY_ID);
+            String presentationId = element.getAttribute(IWorkbenchRegistryConstants.ATT_PRESENTATIONID);
+            themeRegistry.addCategoryPresentationBinding(categoryId,
+                    presentationId);
+            return true;
+        }
 
         return false;
     }
 
     /**
      * Read a font.
-     *
+     * 
      * @param element the element to read
      * @return the new font
      */
@@ -358,9 +368,9 @@ public class ThemeRegistryReader extends RegistryReader {
     }
 
     /**
-     * Check for platform specific font values.  This will return the
+     * Check for platform specific font values.  This will return the 
      * "best match" for the current platform.
-     *
+     * 
      * @param elements the elements to check
      * @return the platform specific font, if any
      */
@@ -370,7 +380,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Gets the font valu from the value attribute.
-     *
+     * 
      * @param element the element to check
      * @return the font string
      */
@@ -385,7 +395,7 @@ public class ThemeRegistryReader extends RegistryReader {
     /**
      * Attempt to load the color value from the colorFactory attribute.
      *
-     * @param element the element to load from
+     * @param element the element to load from 
      * @return the value, or null if it could not be obtained
      */
     private String checkColorFactory(IConfigurationElement element) {
@@ -398,7 +408,7 @@ public class ThemeRegistryReader extends RegistryReader {
                 value = StringConverter.asString(factory.createColor());
             } catch (Exception e) {
                 WorkbenchPlugin.log(RESOURCE_BUNDLE
-                        .getString("Colors.badFactory"), //$NON-NLS-1$
+                        .getString("Colors.badFactory"), //$NON-NLS-1$ 
                         WorkbenchPlugin.getStatus(e));
             }
         }
@@ -407,7 +417,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Read a theme.
-     *
+     * 
      * @param element the element to read
      * @return the new theme
      */
@@ -427,13 +437,13 @@ public class ThemeRegistryReader extends RegistryReader {
         }
         //set the name as applicable
         desc.extractName(element);
-
+    
         return desc;
     }
 
     /**
      * Read the theme extensions within a registry.
-     *
+     * 
      * @param in the registry to read
      * @param out the registry to write to
      */
@@ -449,7 +459,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
     /**
      * Set the output registry.
-     *
+     * 
      * @param out the output registry
      */
     public void setRegistry(ThemeRegistry out) {

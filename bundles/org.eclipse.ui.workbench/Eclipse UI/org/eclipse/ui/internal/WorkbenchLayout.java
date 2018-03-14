@@ -36,9 +36,9 @@ import org.eclipse.ui.internal.layout.TrimCommonUIHandle;
  * without consulting the Platform UI group. No guarantees are made as to the
  * stability of the API.
  * </p>
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class WorkbenchLayout extends Layout {
 	private static int defaultMargin = 5;
@@ -46,9 +46,9 @@ public class WorkbenchLayout extends Layout {
 	/**
 	 * This is a convenience class that caches information for a single 'tiled'
 	 * line of trim.
-	 *
+	 * 
 	 * @since 3.2
-	 *
+	 * 
 	 */
 	private class TrimLine {
 		/**
@@ -82,12 +82,18 @@ public class WorkbenchLayout extends Layout {
 	 * <p>
 	 * NOTE: This class is expected to be removed once the CBanner mods are in.
 	 * </p>
-	 *
+	 * 
 	 * @since 3.2
-	 *
+	 * 
 	 */
 	private class LeftBannerLayout extends Layout {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+		 *      int, int, boolean)
+		 */
 		@Override
 		protected Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
@@ -96,6 +102,12 @@ public class WorkbenchLayout extends Layout {
 			return new Point(wHint, WorkbenchLayout.this.topMax);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+		 *      boolean)
+		 */
 		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 		}
@@ -172,7 +184,7 @@ public class WorkbenchLayout extends Layout {
 	/**
 	 * Create the CBanner control used to control the horizontal span of the
 	 * primary and secondary command areas.
-	 *
+	 * 
 	 * @param workbenchComposite
 	 *            The workbench acting as the parent of the CBanner
 	 */
@@ -185,6 +197,12 @@ public class WorkbenchLayout extends Layout {
 		// Create the left composite and override its 'computeSize'
 		// to delegate to the 'primary' command trim area
 		Composite bannerLeft = new Composite(banner, SWT.NONE) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			@Override
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
@@ -204,6 +222,12 @@ public class WorkbenchLayout extends Layout {
 
 		// Create the right hand part of the CBanner
 		Composite bannerRight = new Composite(banner, SWT.NONE) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int,
+			 *      boolean)
+			 */
 			@Override
 			public Point computeSize(int wHint, int hHint, boolean changed) {
 				// If we're doing a 'real' workbench layout then delegate to the
@@ -238,6 +262,15 @@ public class WorkbenchLayout extends Layout {
 		banner.moveBelow(null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
+	 *      int, int, boolean)
+	 * 
+	 * Note that this is arbitrary since the we're a top level shell (so
+	 * computeSize won't be called.
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
@@ -251,6 +284,14 @@ public class WorkbenchLayout extends Layout {
 		return size;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 *      boolean)
+	 * 
+	 * TODO: Supply a full description of the layout mechanicsS
+	 */
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		layoutComposite = composite;
@@ -336,7 +377,7 @@ public class WorkbenchLayout extends Layout {
 	/**
 	 * Indicates whether or not the layout should use the CBanner or tile the
 	 * primary and secondary trim areas one above the other.
-	 *
+	 * 
 	 * @return <code>true</code> iff the layout should use the CBanner.
 	 */
 	private boolean useCBanner() {
@@ -426,12 +467,12 @@ public class WorkbenchLayout extends Layout {
 	 * the trim area's controls into multiple lines based on the length of the
 	 * major dimension.
 	 * </p>
-	 *
+	 * 
 	 * @param areaId
 	 *            The area id to compute the size for
 	 * @param majorHint
 	 *            The length of the major dimension
-	 *
+	 * 
 	 * @return The computed size
 	 */
 	private Point computeSize(String areaId, int majorHint) {
@@ -477,10 +518,10 @@ public class WorkbenchLayout extends Layout {
 	 * dimension. The result is a complete cache of the information needed to
 	 * lay the controls in the trim area out.
 	 * </p>
-	 *
+	 * 
 	 * @param trimArea The trim area to create the cache info for
 	 * @param majorHint The length of the major dimension
-	 *
+	 * 
 	 * @return A List of <code>TrimLine</code> elements
 	 */
 	private List computeWrappedTrim(TrimArea trimArea, int majorHint) {
@@ -707,9 +748,9 @@ public class WorkbenchLayout extends Layout {
 
 	/**
 	 * Return the SWT side that the trim area is on
-	 *
+	 * 
 	 * @param areaId The id of the area to get the orientation of
-	 *
+	 * 
 	 * @return The SWT  side corresponding that the given area
 	 */
 	public static int getOrientation(String areaId) {
@@ -735,7 +776,7 @@ public class WorkbenchLayout extends Layout {
 	/**
 	 * Calculate a size for the handle that will be large enough to show the
 	 * CoolBar's drag affordance.
-	 *
+	 * 
 	 * @return The size that the handle has to be, based on the orientation
 	 */
 	private int getHandleSize(boolean horizontal) {

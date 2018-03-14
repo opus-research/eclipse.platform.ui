@@ -19,6 +19,11 @@ import org.eclipse.swt.widgets.Control;
 public class ProgressViewerLabelProvider extends LabelProvider {
     private Control control;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+     */
     @Override
 	public String getText(Object element) {
         JobTreeElement info = (JobTreeElement) element;
@@ -28,7 +33,7 @@ public class ProgressViewerLabelProvider extends LabelProvider {
 
     /**
      * Create a new instance of the receiver within the control.
-     *
+     * 
      * @param progressControl The control that the label is
      * being created for.
      */

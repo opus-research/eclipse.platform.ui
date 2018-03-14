@@ -68,7 +68,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 	private ImageBindingRegistry activityImageBindingRegistry;
 
 	private ImageBindingRegistry categoryImageBindingRegistry;
-
+	
 	private ITriggerPointManager triggerPointManager;
 
 	private ITriggerPointAdvisor advisor;
@@ -88,6 +88,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                     private Set lastEnabled = new HashSet(
                             mutableActivityManager.getEnabledActivityIds());
 
+                    /* (non-Javadoc)
+                     * @see org.eclipse.ui.activities.IActivityManagerListener#activityManagerChanged(org.eclipse.ui.activities.ActivityManagerEvent)
+                     */
                     @Override
 					public void activityManagerChanged(
                             ActivityManagerEvent activityManagerEvent) {
@@ -126,6 +129,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                          */
                                         private boolean dialogOpened = false;
 
+                                        /* (non-Javadoc)
+                                         * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+                                         */
                                         @Override
 										public void run(IProgressMonitor monitor) {
 
@@ -141,14 +147,14 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                                             ActivityMessages.ManagerTask, 2);
 
                                             monitor
-                                                    .subTask(ActivityMessages.ManagerWindowSubTask);
+                                                    .subTask(ActivityMessages.ManagerWindowSubTask); 
 
                                             //update window managers...
                                             updateWindowBars(window);
                                             monitor.worked(1);
 
                                             monitor
-                                                    .subTask(ActivityMessages.ManagerViewsSubTask);
+                                                    .subTask(ActivityMessages.ManagerViewsSubTask); 
                                             // update all of the (realized) views in all of the pages
                                             IWorkbenchPage[] pages = window
                                                     .getPages();
@@ -171,7 +177,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
                                         /**
                                          * Update the managers on the given given view.
-                                         *
+                                         * 
                                          * @param part the view to update
                                          */
                                         private void updateViewBars(
@@ -202,7 +208,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
                                         /**
                                          * Update the managers on the given window.
-                                         *
+                                         * 
                                          * @param window the window to update
                                          */
                                         private void updateWindowBars(
@@ -231,9 +237,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
                                         /**
                                          * Update the given manager in the UI thread.
-                                         * This may also open the progress dialog if
+                                         * This may also open the progress dialog if 
                                          * the operation is taking too long.
-                                         *
+                                         * 
                                          * @param manager the manager to update
                                          */
                                         private void updateManager(
@@ -256,6 +262,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                     workbench.getDisplay().asyncExec(
                                             new Runnable() {
 
+                                                /* (non-Javadoc)
+                                                 * @see java.lang.Runnable#run()
+                                                 */
                                                 @Override
 												public void run() {
                                                     BusyIndicator
@@ -264,6 +273,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
                                                                             .getDisplay(),
                                                                     new Runnable() {
 
+                                                                        /* (non-Javadoc)
+                                                                         * @see java.lang.Runnable#run()
+                                                                         */
                                                                         @Override
 																		public void run() {
                                                                             try {
@@ -288,26 +300,35 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
                     /**
                      * Logs an error message to the workbench log.
-                     *
+                     * 
                      * @param e the exception to log
                      */
                     private void log(Exception e) {
                         StatusUtil.newStatus(IStatus.ERROR,
-                                "Could not update contribution managers", e); //$NON-NLS-1$
+                                "Could not update contribution managers", e); //$NON-NLS-1$ 
                     }
                 });
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getActivityManager()
+     */
     @Override
 	public IActivityManager getActivityManager() {
         return proxyActivityManager;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#setEnabledActivityIds(java.util.Set)
+     */
     @Override
 	public void setEnabledActivityIds(Set enabledActivityIds) {
         mutableActivityManager.setEnabledActivityIds(enabledActivityIds);
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.IActivity)
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(IActivity activity) {
 		if (activity.isDefined()) {
@@ -321,6 +342,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_ACTIVITY);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getImageDescriptor(org.eclipse.ui.activities.ICategory)
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor(ICategory category) {
 		if (category.isDefined()) {
@@ -333,11 +357,11 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_ACTIVITY_CATEGORY);
 	}
-
-
+	
+	
 	/**
 	 * Return the activity image registry.
-	 *
+	 * 
 	 * @return the activity image registry
 	 * @since 3.1
 	 */
@@ -354,16 +378,16 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 		}
 		return activityImageBindingRegistry;
 	}
-
+	
 	/**
 	 * Return the category image registry.
-	 *
+	 * 
 	 * @return the category image registry
 	 * @since 3.1
 	 */
 	private ImageBindingRegistry getCategoryImageBindingRegistry() {
 		if (categoryImageBindingRegistry == null) {
-			categoryImageBindingRegistry = new ImageBindingRegistry(IWorkbenchRegistryConstants.TAG_CATEGORY_IMAGE_BINDING);
+			categoryImageBindingRegistry = new ImageBindingRegistry(IWorkbenchRegistryConstants.TAG_CATEGORY_IMAGE_BINDING); 
 			PlatformUI
 			.getWorkbench()
 			.getExtensionTracker()
@@ -377,7 +401,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
 	/**
 	 * Dispose of the image registries.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	public void dispose() {
@@ -389,15 +413,15 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 			categoryImageBindingRegistry.dispose();
 			PlatformUI.getWorkbench().getExtensionTracker().unregisterHandler(categoryImageBindingRegistry);
 		}
-
+		
 		PlatformUI.getWorkbench().getExtensionTracker().unregisterHandler(this);
 	}
-
+	
 	/**
 	 * Return the trigger point advisor.
-	 *
+	 * 
 	 * TODO: should this be part of the interface?
-	 *
+	 * 
 	 * @return the trigger point advisor
 	 * @since 3.1
 	 */
@@ -405,32 +429,38 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 		if (advisor != null) {
 			return advisor;
 		}
-
+		
 		IProduct product = Platform.getProduct();
         if (product != null) {
 			TriggerPointAdvisorDescriptor descriptor = TriggerPointAdvisorRegistry
 					.getInstance().getAdvisorForProduct(product.getId());
 			if (descriptor != null) {
 				try {
-					advisor = descriptor.createAdvisor();
+					advisor = descriptor.createAdvisor();					
 				} catch (CoreException e) {
 					WorkbenchPlugin.log("could not create trigger point advisor", e); //$NON-NLS-1$
 				}
 			}
         }
-
+		
 		if (advisor == null) {
 			advisor = new WorkbenchTriggerPointAdvisor();
 		}
-
+		
 		return advisor;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#getTriggerPointManager()
+	 */
 	@Override
 	public ITriggerPointManager getTriggerPointManager() {
 		return triggerPointManager;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		// reset the advisor if it's the "default" advisor.
@@ -443,7 +473,7 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 
     /**
      * Return the activity support extension point.
-     *
+     * 
      * @return the activity support extension point.
      * @since 3.1
      */
@@ -452,6 +482,9 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_ACTIVITYSUPPORT);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
@@ -461,7 +494,10 @@ public class WorkbenchActivitySupport implements IWorkbenchActivitySupport, IExt
 			}
 		}
 	}
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.activities.IWorkbenchActivitySupport#createWorkingCopy()
+     */
     @Override
 	public IMutableActivityManager createWorkingCopy() {
         MutableActivityManager clone = (MutableActivityManager) mutableActivityManager.clone();

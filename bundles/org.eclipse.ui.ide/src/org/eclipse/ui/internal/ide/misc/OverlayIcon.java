@@ -70,8 +70,7 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /**
      * @see CompositeImageDescriptor#drawCompositeImage(int, int)
      */
-    @Override
-	protected void drawCompositeImage(int width, int height) {
+    protected void drawCompositeImage(int width, int height) {
         ImageData bg;
         if (fBase == null || (bg = fBase.getImageData()) == null) {
 			bg = DEFAULT_IMAGE_DATA;
@@ -130,8 +129,7 @@ public class OverlayIcon extends CompositeImageDescriptor {
     /**
      * @see CompositeImageDescriptor#getSize()
      */
-    @Override
-	protected Point getSize() {
+    protected Point getSize() {
         return fSize;
     }
 }

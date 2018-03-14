@@ -16,7 +16,7 @@ import org.eclipse.ui.ISaveablePart;
 /**
  * Mock view part that implements ISaveablePart. Used for testing hideView and
  * other view lifecycle on saveable views.
- *
+ * 
  * @since 3.0.1
  */
 public class UserSaveableSharedViewPart extends MockViewPart implements
@@ -29,41 +29,61 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	public static class SharedModel {
 		public boolean isDirty = true;
 	}
-
+	
 	private SharedModel fSharedModel = new SharedModel();
-
-	@Override
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave");
 		fSharedModel.isDirty = false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	public void doSaveAs() {
 		callTrace.add("doSaveAs");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	public boolean isDirty() {
 		callTrace.add("isDirty");
 		return fSharedModel.isDirty;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded");
 		return fSharedModel.isDirty;
 	}
-
+	
 	public void setSharedModel(SharedModel s) {
 		fSharedModel = s;
 	}
-
+	
 	public SharedModel getSharedModel() {
 		return fSharedModel;
 	}

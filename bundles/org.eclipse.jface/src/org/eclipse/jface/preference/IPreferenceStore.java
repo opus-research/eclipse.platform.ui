@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -272,15 +272,15 @@ public interface IPreferenceStore {
     public float getFloat(String name);
 
     /**
-	 * Returns the current value of the integer-valued preference with the given
-	 * name. Returns the default-default value (<code>0</code>) if there is no
-	 * preference with the given name, or if the current value cannot be treated
-	 * as an integer.
-	 *
-	 * @param name
-	 *            the name of the preference
-	 * @return the int-valued preference
-	 */
+     * Returns the current value of the integer-valued preference with the
+     * given name.
+     * Returns the default-default value (<code>0</code>) if there
+     * is no preference with the given name, or if the current value
+     * cannot be treated as an integter.
+     *
+     * @param name the name of the preference
+     * @return the int-valued preference
+     */
     public int getInt(String name);
 
     /**
@@ -346,7 +346,7 @@ public interface IPreferenceStore {
 	/**
 	 * Removes the given listener from this preference store. Has no effect if the listener is not
 	 * registered.
-	 *
+	 * 
 	 * @param listener a property change listener, must not be <code>null</code>
 	 */
     public void removePropertyChangeListener(IPropertyChangeListener listener);

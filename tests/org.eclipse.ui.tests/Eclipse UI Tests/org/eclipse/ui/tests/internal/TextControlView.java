@@ -25,7 +25,7 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * @since 3.5
- *
+ * 
  */
 public class TextControlView extends ViewPart {
 	public static final String ID = "org.eclipse.ui.tests.textHandlerView";
@@ -52,7 +52,13 @@ public class TextControlView extends ViewPart {
 		};
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+	 * .Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		Composite c = new Composite(parent, SWT.NONE);
 		c.setLayout(new GridLayout(3, true));
@@ -69,7 +75,11 @@ public class TextControlView extends ViewPart {
 		delegator.setPasteAction(pasteDummyAction);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		editableText.setFocus();
 	}

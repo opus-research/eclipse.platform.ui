@@ -22,7 +22,7 @@ import com.ibm.icu.text.NumberFormat;
  * This class is a temporary as this ability exists in NumberToStringConverter
  * except that short and byte are missing.
  * </p>
- *
+ * 
  * @since 1.0
  */
 public class IntegerToStringConverter extends Converter {
@@ -43,7 +43,11 @@ public class IntegerToStringConverter extends Converter {
 		this.boxedType = boxedType;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object fromObject) {
 		// Null is allowed when the type is not primitve.
 		if (fromObject == null && !primitive) {

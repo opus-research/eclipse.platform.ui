@@ -90,7 +90,7 @@ public class StartupPreferencePage extends PreferencePage implements
 		viewer.setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(Object element) {
-				return Platform.getBundle(((ContributionInfo) element).getBundleId())
+				return (String) Platform.getBundle(((ContributionInfo) element).getBundleId())
 						.getHeaders().get(
 						Constants.BUNDLE_NAME);
 			}
@@ -142,7 +142,8 @@ public class StartupPreferencePage extends PreferencePage implements
         }
         String pref = preference.toString();
         IPreferenceStore store = PrefUtil.getInternalPreferenceStore();
-		store.setValue(IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP, pref);
+        store.putValue(IPreferenceConstants.PLUGINS_NOT_ACTIVATED_ON_STARTUP,
+                pref);
         PrefUtil.savePrefs();
         return true;
     }

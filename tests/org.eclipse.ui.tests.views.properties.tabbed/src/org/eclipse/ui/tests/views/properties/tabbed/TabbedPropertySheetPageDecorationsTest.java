@@ -34,8 +34,7 @@ public class TabbedPropertySheetPageDecorationsTest extends TestCase {
 
     private TreeNode[] treeNodes;
 
-    @Override
-	protected void setUp()
+    protected void setUp()
         throws Exception {
         super.setUp();
 
@@ -74,8 +73,7 @@ public class TabbedPropertySheetPageDecorationsTest extends TestCase {
         assertEquals(treeNodes.length, 8);
     }
 
-    @Override
-	protected void tearDown()
+    protected void tearDown()
         throws Exception {
         super.tearDown();
 
@@ -94,7 +92,7 @@ public class TabbedPropertySheetPageDecorationsTest extends TestCase {
 
     /**
      * Set the selection in the view to cause the properties view to change.
-     *
+     * 
      * @param selectedNodes
      *            nodes to select in the view.
      */

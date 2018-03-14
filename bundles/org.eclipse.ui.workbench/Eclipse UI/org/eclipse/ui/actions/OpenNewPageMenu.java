@@ -19,12 +19,12 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.statushandlers.StatusManager;
 
 /**
- * A menu for page creation in the workbench.
+ * A menu for page creation in the workbench.  
  * <p>
  * An <code>OpenNewPageMenu</code> is used to populate a menu with
  * "Open Page" actions.  One item is added for each shortcut perspective,
- * as defined by the product ini.  If the user selects one of these items a new page is
- * created in the workbench with the given perspective.
+ * as defined by the product ini.  If the user selects one of these items a new page is 
+ * created in the workbench with the given perspective.  
  * </p><p>
  * The visible perspectives within the menu may also be updated dynamically to
  * reflect user preference.
@@ -44,7 +44,7 @@ public class OpenNewPageMenu extends PerspectiveMenu {
     private IAdaptable pageInput;
 
     /**
-     * Constructs a new instance of <code>OpenNewPageMenu</code>.
+     * Constructs a new instance of <code>OpenNewPageMenu</code>. 
      * <p>
      * If this method is used be sure to set the page input by invoking
      * <code>setPageInput</code>.  The page input is required when the user
@@ -61,7 +61,7 @@ public class OpenNewPageMenu extends PerspectiveMenu {
     }
 
     /**
-     * Constructs a new instance of <code>OpenNewPageMenu</code>.
+     * Constructs a new instance of <code>OpenNewPageMenu</code>.  
      *
      * @param window the window where a new page is created if an item within
      *		the menu is selected
@@ -72,10 +72,13 @@ public class OpenNewPageMenu extends PerspectiveMenu {
         this.pageInput = input;
     }
 
+    /* (non-Javadoc)
+     * Opens a new page with a particular perspective and input.
+     */
     @Override
 	protected void run(IPerspectiveDescriptor desc) {
         // Verify page input.
-        if (pageInput == null) {
+        if (pageInput == null) {	
 			StatusUtil.handleStatus(
 					WorkbenchMessages.OpenNewPageMenu_dialogTitle + ": " + //$NON-NLS-1$
 							WorkbenchMessages.OpenNewPageMenu_unknownPageInput,
@@ -94,7 +97,7 @@ public class OpenNewPageMenu extends PerspectiveMenu {
     }
 
     /**
-     * Sets the page input.
+     * Sets the page input.  
      *
      * @param input the page input
      */

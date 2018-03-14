@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,13 +23,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
- * For creating folder resources that currently do not exist,
+ * For creating folder resources that currently do not exist, 
  * along a given workspace path.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
@@ -113,16 +114,21 @@ public class ContainerGenerator {
      */
     private IProject createProject(IProject projectHandle,
             IProgressMonitor monitor) throws CoreException {
-		SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
-		projectHandle.create(subMonitor.newChild(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
+        try {
+            monitor.beginTask("", 2000);//$NON-NLS-1$
 
-		projectHandle.open(subMonitor.newChild(1));
-		if (monitor.isCanceled()) {
-			throw new OperationCanceledException();
-		}
+            projectHandle.create(new SubProgressMonitor(monitor, 1000));
+            if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+
+            projectHandle.open(new SubProgressMonitor(monitor, 1000));
+            if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+        } finally {
+            monitor.done();
+        }
 
         return projectHandle;
     }
@@ -156,45 +162,50 @@ public class ContainerGenerator {
      */
     public IContainer generateContainer(IProgressMonitor monitor)
             throws CoreException {
-        IDEWorkbenchPlugin.getPluginWorkspace().run(monitor1 -> {
-			SubMonitor subMonitor = SubMonitor.convert(monitor1,
-					IDEWorkbenchMessages.ContainerGenerator_progressMessage, containerFullPath.segmentCount());
-		    if (container != null) {
-				return;
-			}
+        IDEWorkbenchPlugin.getPluginWorkspace().run(new IWorkspaceRunnable() {
+            public void run(IProgressMonitor monitor) throws CoreException {
+                monitor
+                        .beginTask(
+                                IDEWorkbenchMessages.ContainerGenerator_progressMessage, 1000 * containerFullPath.segmentCount());
+                if (container != null) {
+					return;
+				}
 
-		    // Does the container exist already?
-		    IWorkspaceRoot root = getWorkspaceRoot();
-		    container = (IContainer) root.findMember(containerFullPath);
-		    if (container != null) {
-				return;
-			}
+                // Does the container exist already?
+                IWorkspaceRoot root = getWorkspaceRoot();
+                container = (IContainer) root.findMember(containerFullPath);
+                if (container != null) {
+					return;
+				}
 
-		    // Create the container for the given path
-		    container = root;
-		    for (int i = 0; i < containerFullPath.segmentCount(); i++) {
-		        String currentSegment = containerFullPath.segment(i);
-		        IResource resource = container.findMember(currentSegment);
-		        if (resource != null) {
-		        	if (resource.getType() == IResource.FILE) {
-		        		String msg = NLS.bind(IDEWorkbenchMessages.ContainerGenerator_pathOccupied, resource.getFullPath().makeRelative());
-		        		throw new CoreException(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 1, msg, null));
-		        	}
-		            container = (IContainer) resource;
-					subMonitor.worked(1);
-		        } else {
-		            if (i == 0) {
-		                IProject projectHandle = createProjectHandle(root,
-		                        currentSegment);
-						container = createProject(projectHandle, subMonitor.newChild(1));
-		            } else {
-		                IFolder folderHandle = createFolderHandle(
-		                        container, currentSegment);
-						container = createFolder(folderHandle, subMonitor.newChild(1));
-		            }
-		        }
-		    }
-		}, null, IResource.NONE, monitor);
+                // Create the container for the given path
+                container = root;
+                for (int i = 0; i < containerFullPath.segmentCount(); i++) {
+                    String currentSegment = containerFullPath.segment(i);
+                    IResource resource = container.findMember(currentSegment);
+                    if (resource != null) {
+                    	if (resource.getType() == IResource.FILE) {
+                    		String msg = NLS.bind(IDEWorkbenchMessages.ContainerGenerator_pathOccupied, resource.getFullPath().makeRelative());
+                    		throw new CoreException(new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 1, msg, null));
+                    	}
+                        container = (IContainer) resource;
+                        monitor.worked(1000);
+                    } else {
+                        if (i == 0) {
+                            IProject projectHandle = createProjectHandle(root,
+                                    currentSegment);
+                            container = createProject(projectHandle,
+                                    new SubProgressMonitor(monitor, 1000));
+                        } else {
+                            IFolder folderHandle = createFolderHandle(
+                                    container, currentSegment);
+                            container = createFolder(folderHandle,
+                                    new SubProgressMonitor(monitor, 1000));
+                        }
+                    }
+                }
+            }
+        }, null, IResource.NONE, monitor);
         return container;
     }
 

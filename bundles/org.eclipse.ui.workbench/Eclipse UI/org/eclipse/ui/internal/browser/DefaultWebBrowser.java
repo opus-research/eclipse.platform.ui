@@ -26,7 +26,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * This class is used when no alternative implementation is plugged in via the
  * 'org.eclipse.ui.browserSupport' extension point.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public class DefaultWebBrowser extends AbstractWebBrowser {
@@ -38,7 +38,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 
 	/**
 	 * Creates the browser instance.
-	 *
+	 * 
 	 * @param support
 	 * @param id
 	 */
@@ -47,6 +47,11 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 		this.support = support;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
+	 */
 	@Override
 	public void openURL(URL url) throws PartInitException {
 		// format the href for an html file (file:///<filename.html>
@@ -112,6 +117,11 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.browser.IWebBrowser#close()
+	 */
 	@Override
 	public boolean close() {
 		support.unregisterBrowser(this);
@@ -122,7 +132,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 * This method encodes the url, removes the spaces from the url and replaces
 	 * the same with <code>"%20"</code>. This method is required to fix Bug
 	 * 77840.
-	 *
+	 * 
 	 */
 	private String urlEncodeForSpaces(char[] input) {
 		StringBuffer retu = new StringBuffer(input.length);
@@ -157,7 +167,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 				webBrowser = "netscape"; //$NON-NLS-1$
 			}
 		}
-
+		
 		if (p == null) {
 			try {
 				p = Runtime.getRuntime().exec(webBrowser + " " + href); //$NON-NLS-1$;
@@ -166,7 +176,7 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 				throw e;
 			}
 		}
-
+		
 		return p;
 	}
 

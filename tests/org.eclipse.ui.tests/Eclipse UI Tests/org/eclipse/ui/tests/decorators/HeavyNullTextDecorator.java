@@ -34,45 +34,39 @@ public class HeavyNullTextDecorator implements ILabelDecorator {
     /**
      * @see ILabelDecorator#addListener
      */
-    @Override
-	public void addListener(ILabelProviderListener listener) {
+    public void addListener(ILabelProviderListener listener) {
     }
 
     /**
      * @see ILabelDecorator#dispose
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     /**
      * @see ILabelDecorator#isLabelProperty
      */
-    @Override
-	public boolean isLabelProperty(Object element, String property) {
+    public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
     /**
      * @see ILabelDecorator#removeListener
      */
-    @Override
-	public void removeListener(ILabelProviderListener listener) {
+    public void removeListener(ILabelProviderListener listener) {
     }
 
     /**
      * @see ILabelDecorator#decorateImage
      */
-    @Override
-	public Image decorateImage(Image image, Object element) {
+    public Image decorateImage(Image image, Object element) {
         return image;
     }
 
     /**
      * @see ILabelDecorator#decorateText
      */
-    @Override
-	public String decorateText(String text, Object element) {
+    public String decorateText(String text, Object element) {
         if (fail) {
             fail = false;
             throw new ForcedException("Heavy text decorator boom");

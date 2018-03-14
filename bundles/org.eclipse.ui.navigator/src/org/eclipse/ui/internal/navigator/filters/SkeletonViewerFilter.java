@@ -15,12 +15,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
- *
+ * 
  * A no-op viewer filter used to prevent null return values from
  * {@link CommonFilterDescriptor#createFilter()}.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class SkeletonViewerFilter extends ViewerFilter {
 
@@ -32,7 +32,12 @@ public class SkeletonViewerFilter extends ViewerFilter {
 	private SkeletonViewerFilter() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
+	 *      java.lang.Object, java.lang.Object)
+	 */
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
 
 		return true;
