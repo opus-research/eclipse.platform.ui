@@ -10,13 +10,11 @@
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
- *     Andrey Loskutov <loskutov@gmx.de> - Cleaned up code, Bug 404348, 421178
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -55,39 +53,12 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
-
-			// read explicitly disabled sets.
-			String hiddenIDs = page.getHiddenItems();
-			List<String> alwaysOff = new ArrayList<String>();
-
-			String[] hiddenIds = hiddenIDs.split(","); //$NON-NLS-1$
-			for (String id : hiddenIds) {
-				if (!id.startsWith(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX)) {
-					continue;
-				}
-				id = id.substring(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX.length());
-				if (!alwaysOff.contains(id)) {
-					alwaysOff.add(id);
-				}
-			}
-
-			ids.removeAll(alwaysOff);
-
 			List<IActionSetDescriptor> temp = new ArrayList<IActionSetDescriptor>();
+			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
 			createInitialActionSets(temp, ids);
-
 			for (IActionSetDescriptor descriptor : temp) {
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
-				}
-			}
-
-			temp = new ArrayList<IActionSetDescriptor>();
-			createInitialActionSets(temp, alwaysOff);
-			for (IActionSetDescriptor descriptor : temp) {
-				if (!alwaysOffActionSets.contains(descriptor)) {
-					alwaysOffActionSets.add(descriptor);
 				}
 			}
 		}
@@ -144,16 +115,6 @@ public class Perspective {
 	}
 
 	/**
-	 * Returns the ids of the parts to list in the Show In... dialog. This is a
-	 * List of Strings.
-	 *
-	 * @return non null list of strings
-	 */
-	public List<?> getShowInPartIds() {
-		return page.getShowInPartIds();
-	}
-
-	/**
 	 * Returns the show view shortcuts associated with this perspective.
 	 *
 	 * @return an array of view identifiers
@@ -204,16 +165,6 @@ public class Perspective {
 		if (removed) {
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_UNMASK);
 		}
-	}
-
-	/**
-	 * Returns the ActionSets read from perspectiveExtensions in the registry.
-	 */
-	protected List<?> getPerspectiveExtensionActionSets() {
-		if (descriptor == null) {
-			return Collections.emptyList();
-		}
-		return page.getPerspectiveExtensionActionSets(descriptor.getOriginalId());
 	}
 
 	public void turnOnActionSets(IActionSetDescriptor[] newArray) {
@@ -277,9 +228,11 @@ public class Perspective {
 				}
 			}
 			addAlwaysOff(toRemove);
-			// doesn't make sense to *remove* tag, it is "disabled" now
-			// String tag = ModeledPageLayout.ACTION_SET_TAG + id;
-			// layout.getTags().remove(tag);
+			// remove tag
+			String tag = ModeledPageLayout.ACTION_SET_TAG + id;
+			if (layout.getTags().contains(tag)) {
+				layout.getTags().remove(tag);
+			}
 		} finally {
 			service.deferUpdates(false);
 		}
