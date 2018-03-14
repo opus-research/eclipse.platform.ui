@@ -453,7 +453,7 @@ public class WorkbenchThemeManager extends EventManager implements
 				if (def.isOverridden()) {
 					def.resetToDefaultValue();
 					fontRegistry.put(def.getId(), def.getValue() != null ? def.getValue()
-							: PreferenceConverter.getFontDataArrayDefaultDefault());
+							: PreferenceConverter.FONTDATA_ARRAY_DEFAULT_DEFAULT);
 				}
 			}
 			for (ColorDefinition def : themeRegistry.getColors()) {

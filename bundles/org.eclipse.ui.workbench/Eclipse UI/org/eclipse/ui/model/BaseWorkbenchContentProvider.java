@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.ui.model;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * Tree content provider for objects that can be adapted to the interface
@@ -34,6 +34,9 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void dispose() {
         // do nothing
@@ -50,9 +53,12 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
      * @return the corresponding workbench adapter object
      */
     protected IWorkbenchAdapter getAdapter(Object element) {
-        return Adapters.adapt(element, IWorkbenchAdapter.class);
+        return Util.getAdapter(element, IWorkbenchAdapter.class);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
     @Override
 	public Object[] getChildren(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
@@ -62,11 +68,17 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         return new Object[0];
     }
 
+    /* (non-Javadoc)
+     * Method declared on IStructuredContentProvider.
+     */
     @Override
 	public Object[] getElements(Object element) {
         return getChildren(element);
     }
 
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
     @Override
 	public Object getParent(Object element) {
         IWorkbenchAdapter adapter = getAdapter(element);
@@ -76,11 +88,17 @@ public class BaseWorkbenchContentProvider implements ITreeContentProvider {
         return null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on ITreeContentProvider.
+     */
     @Override
 	public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         // do nothing

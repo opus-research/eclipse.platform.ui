@@ -91,6 +91,9 @@ public class CacheWrapper {
 
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.layout.ICachingLayout#flush(org.eclipse.swt.widgets.Control)
+         */
         @Override
 		public void flush(Control dirtyControl) {
             CacheWrapper.this.flushCache();

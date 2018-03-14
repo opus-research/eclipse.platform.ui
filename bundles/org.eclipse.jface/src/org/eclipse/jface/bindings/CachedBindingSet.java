@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,7 +62,7 @@ final class CachedBindingSet {
 	 * a trigger (<code>TriggerSequence</code>) to binding (<code>Binding</code>).
 	 * This value may be <code>null</code> if it has not yet been initialized.
 	 */
-	private volatile Map bindingsByTrigger;
+	private Map bindingsByTrigger = null;
 
 	/**
 	 * A map of triggers to collections of bindings. If this binding set
@@ -70,7 +70,7 @@ final class CachedBindingSet {
 	 *
 	 * @since 3.3
 	 */
-	private volatile Map conflictsByTrigger;
+	private Map conflictsByTrigger = null;
 
 	/**
 	 * The hash code for this object. This value is computed lazily, and marked
@@ -120,7 +120,7 @@ final class CachedBindingSet {
 	 * to command identifier (<code>String</code>). This value is
 	 * <code>null</code> if it has not yet been initialized.
 	 */
-	private volatile Map prefixTable;
+	private Map prefixTable = null;
 
 	/**
 	 * <p>
@@ -143,7 +143,7 @@ final class CachedBindingSet {
 	 * of <code>TriggerSequence</code>). This value may be <code>null</code>
 	 * if it has not yet been initialized.
 	 */
-	private volatile Map triggersByCommandId;
+	private Map triggersByCommandId = null;
 
 	/**
 	 * Constructs a new instance of <code>CachedBindingSet</code>.
@@ -373,13 +373,5 @@ final class CachedBindingSet {
 		}
 
 		this.triggersByCommandId = triggersByCommandId;
-	}
-
-	/**
-	 * @return true if all the required maps are computed and non null
-	 */
-	final boolean isInitialized() {
-		return bindingsByTrigger != null && triggersByCommandId != null && conflictsByTrigger != null
-				&& prefixTable != null;
 	}
 }
