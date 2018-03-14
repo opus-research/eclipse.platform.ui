@@ -31,6 +31,9 @@ public class EditorTabDropTarget extends WorkbenchWindowDropTarget {
         return getPage().getEditors()[editorIdx];
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
+     */
     @Override
 	public String toString() {
         return "editor " + editorIdx + " tab area";
@@ -41,6 +44,9 @@ public class EditorTabDropTarget extends WorkbenchWindowDropTarget {
     	return getPart().getSite().getShell();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
+     */
     @Override
 	public Point getLocation() {
         Rectangle bounds = DragOperations.getDisplayBounds(DragOperations

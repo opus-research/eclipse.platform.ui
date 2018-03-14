@@ -139,6 +139,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		titlePathUpdater = (TitlePathUpdater) Tweaklets.get(TitlePathUpdater.KEY);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#createActionBarAdvisor(org.eclipse.ui.application.IActionBarConfigurer)
+	 */
 	@Override
 	public ActionBarAdvisor createActionBarAdvisor(
 			IActionBarConfigurer configurer) {
@@ -154,6 +159,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return getWindowConfigurer().getWorkbenchConfigurer().getWorkbench();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preWindowShellClose
+	 */
 	@Override
 	public boolean preWindowShellClose() {
 		if (getWorkbench().getWorkbenchWindowCount() > 1) {
@@ -228,6 +238,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preWindowOpen
+	 */
 	@Override
 	public void preWindowOpen() {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -502,6 +517,11 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		recomputeTitle();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postWindowRestore
+	 */
 	@Override
 	public void postWindowRestore() throws WorkbenchException {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
@@ -727,6 +747,12 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		return;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#createEmptyWindowContents(org.eclipse.ui.application.IWorkbenchWindowConfigurer,
+	 *      org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public Control createEmptyWindowContents(Composite parent) {
 		final IWorkbenchWindow window = getWindowConfigurer().getWindow();
@@ -753,6 +779,9 @@ public class IDEWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		toolBar.setBackground(bgCol);
 		return composite;
 	}
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (propertyChangeListener != null) {

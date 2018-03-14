@@ -81,16 +81,36 @@ public class NavigatorContentExtension implements IMementoAware,
 		viewerManager = aViewerManager;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #getId()
+	 */
 	@Override
 	public String getId() {
 		return descriptor.getId();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #getDescriptor()
+	 */
 	@Override
 	public INavigatorContentDescriptor getDescriptor() {
 		return descriptor;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.navigator.INavigatorContentExtension#getContentProvider()
+	 */
 	@Override
 	public ITreeContentProvider getContentProvider() {
 		return internalGetContentProvider().getDelegateContentProvider();
@@ -139,6 +159,13 @@ public class NavigatorContentExtension implements IMementoAware,
 		return contentProvider;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #getLabelProvider()
+	 */
 	@Override
 	public ICommonLabelProvider getLabelProvider() {
 		if (labelProvider != null || labelProviderInitializationFailed) {
@@ -213,6 +240,18 @@ public class NavigatorContentExtension implements IMementoAware,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #getAdapter(java.lang.Class)
+	 */
 	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
@@ -240,6 +279,13 @@ public class NavigatorContentExtension implements IMementoAware,
 		return contentProviderInitializationFailed;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #isLoaded()
+	 */
 	@Override
 	public boolean isLoaded() {
 		return contentProvider != null;
@@ -281,6 +327,13 @@ public class NavigatorContentExtension implements IMementoAware,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.navigator.extensions.INavigatorContentExtension
+	 * #getStateModel()
+	 */
 	@Override
 	public IExtensionStateModel getStateModel() {
 		return contentService.getExtensionStateService()
@@ -356,6 +409,11 @@ public class NavigatorContentExtension implements IMementoAware,
 				.toArray(new NavigatorContentExtension[overridingExtensions.size()]);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return descriptor.toString() + " Instance"; //$NON-NLS-1$

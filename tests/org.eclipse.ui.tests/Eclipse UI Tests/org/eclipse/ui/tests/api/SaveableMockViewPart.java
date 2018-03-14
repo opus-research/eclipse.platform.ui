@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -97,28 +96,43 @@ public class SaveableMockViewPart extends MockViewPart implements
 		this.adapt = selection;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
@@ -138,12 +152,18 @@ public class SaveableMockViewPart extends MockViewPart implements
         this.saveNeeded = isSaveOnCloseNeeded;
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablesSource#getActiveSaveables()
+	 */
 	@Override
 	public Saveable[] getActiveSaveables() {
 		// TODO Auto-generated method stub
 		return getSaveables();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablesSource#getSaveables()
+	 */
 	@Override
 	public Saveable[] getSaveables() {
 		Saveable[] result = new Saveable[1];
@@ -155,7 +175,7 @@ public class SaveableMockViewPart extends MockViewPart implements
 					ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
 						
 						@Override
-						public boolean visit(IResource resource) {
+						public boolean visit(IResource resource) throws CoreException {
 							if (someFile[0] != null) {
 								return false;
 							}

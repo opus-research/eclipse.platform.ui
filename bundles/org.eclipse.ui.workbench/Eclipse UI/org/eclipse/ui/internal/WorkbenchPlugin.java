@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -30,7 +30,7 @@ import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.internal.workbench.EHelpService;
+import org.eclipse.e4.ui.internal.workbench.IHelpService;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -203,7 +203,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     
 	private ServiceTracker testableTracker = null;
 	
-	private EHelpService helpService;
+	private IHelpService helpService;
 
 	private ICommandHelpService commandHelpService;
 
@@ -225,7 +225,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         editorRegistry = null;
 
         if (decoratorManager != null) {
-			decoratorManager.shutdown();
+            decoratorManager.dispose();
             decoratorManager = null;
         }
 
@@ -454,7 +454,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return the workbench action set registry
      */
     public ActionSetRegistry getActionSetRegistry() {
-		return e4Context.get(ActionSetRegistry.class);
+		return (ActionSetRegistry) e4Context.get(ActionSetRegistry.class.getName());
     }
 
     /**
@@ -474,7 +474,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      */
 
     public IEditorRegistry getEditorRegistry() {
-		return e4Context.get(IEditorRegistry.class);
+		return (IEditorRegistry) e4Context.get(IEditorRegistry.class.getName());
     }
 
     /**
@@ -530,7 +530,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return IPerspectiveRegistry. The registry for the receiver.
      */
     public IPerspectiveRegistry getPerspectiveRegistry() {
-		return e4Context.get(IPerspectiveRegistry.class);
+		return (IPerspectiveRegistry) e4Context.get(IPerspectiveRegistry.class.getName());
     }
 
     /**
@@ -540,7 +540,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 2.0
      */
     public IWorkingSetManager getWorkingSetManager() {
-		return e4Context.get(IWorkingSetManager.class);
+		return (IWorkingSetManager) e4Context.get(IWorkingSetManager.class.getName());
     }
 
     /**
@@ -550,7 +550,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 2.0
      */
     public WorkingSetRegistry getWorkingSetRegistry() {
-		return e4Context.get(WorkingSetRegistry.class);
+		return (WorkingSetRegistry) e4Context.get(WorkingSetRegistry.class.getName());
     }
 
     /**
@@ -560,7 +560,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.0
      */
     public IIntroRegistry getIntroRegistry() {
-		return e4Context.get(IIntroRegistry.class);
+		return (IIntroRegistry) e4Context.get(IIntroRegistry.class.getName());
     }
     
     /**
@@ -586,7 +586,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * the receiver.
      */
     public PreferenceManager getPreferenceManager() {
-		return e4Context.get(PreferenceManager.class);
+		return (PreferenceManager) e4Context.get(PreferenceManager.class.getName());
     }
 
     /**
@@ -601,7 +601,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     	if(e4Context == null) {
     		return sharedImages;
     	}
-		return e4Context.get(ISharedImages.class);
+		return (ISharedImages) e4Context.get(ISharedImages.class.getName());
     }
 
     /**
@@ -610,7 +610,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @return the theme registry
      */
     public IThemeRegistry getThemeRegistry() {
-		return e4Context.get(IThemeRegistry.class);
+		return (IThemeRegistry) e4Context.get(IThemeRegistry.class.getName());
     }
 
     /**
@@ -619,7 +619,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * receiver.
      */
     public IViewRegistry getViewRegistry() {
-		return e4Context.get(IViewRegistry.class);
+		return (IViewRegistry) e4Context.get(IViewRegistry.class.getName());
     }
 
     /**
@@ -780,9 +780,13 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * for the receiver.
      */
     public DecoratorManager getDecoratorManager() {
-		return (DecoratorManager) e4Context.get(IDecoratorManager.class);
+		return (DecoratorManager) e4Context.get(IDecoratorManager.class.getName());
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+     */
     @Override
 	public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
@@ -1078,6 +1082,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         return productInfo;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+     */
     @Override
 	public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
@@ -1102,7 +1109,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getNewWizardRegistry() {
-		return e4Context.get(NewWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(NewWizardRegistry.class.getName());
     }
     
     /**
@@ -1112,7 +1119,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getImportWizardRegistry() {
-		return e4Context.get(ImportWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(ImportWizardRegistry.class.getName());
     }
     
     /**
@@ -1122,7 +1129,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * @since 3.1
      */
     public IWizardRegistry getExportWizardRegistry() {
-		return e4Context.get(ExportWizardRegistry.class);
+		return (IWizardRegistry) e4Context.get(ExportWizardRegistry.class.getName());
     }
     
     /**
@@ -1456,7 +1463,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 				return editorRegistry;
 			}
 		});
-		context.set(EHelpService.class.getName(), new ContextFunction() {
+		context.set(IHelpService.class.getName(), new ContextFunction() {
 			@Override
 			public Object compute(IEclipseContext context, String contextKey) {
 				if (helpService == null) {

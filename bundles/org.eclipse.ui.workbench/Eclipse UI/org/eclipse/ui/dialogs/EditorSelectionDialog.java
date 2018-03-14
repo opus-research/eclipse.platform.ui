@@ -144,6 +144,9 @@ public class EditorSelectionDialog extends Dialog {
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -496,6 +499,11 @@ public class EditorSelectionDialog extends Dialog {
 
 	private class DialogListener implements Listener {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+		 */
 		@Override
 		public void handleEvent(Event event) {
 			if (event.type == SWT.MouseDoubleClick) {
@@ -520,6 +528,10 @@ public class EditorSelectionDialog extends Dialog {
 
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 * @since 3.4
+	 */
 	@Override
 	protected boolean isResizable() {
 		return true;

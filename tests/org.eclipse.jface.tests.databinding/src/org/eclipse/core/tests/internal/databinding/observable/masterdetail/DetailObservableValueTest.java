@@ -40,7 +40,6 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 	private WritableValue outerObservable;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		outerObservable = new WritableValue();
@@ -99,7 +98,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		class OuterObservable extends WritableValue {
 			boolean disposed = false;
 
-			@Override
 			public synchronized void dispose() {
 				disposed = true;
 				super.dispose();
@@ -141,7 +139,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		final IObservableValue[] detailObservable = new IObservableValue[1];
 
 		master.addValueChangeListener(new IValueChangeListener() {
-			@Override
 			public void handleValueChange(ValueChangeEvent event) {
 				detailObservable[0].dispose();
 			}
@@ -161,7 +158,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		WritableValue innerObservable;
 		Object type;
 
-		@Override
 		public IObservable createObservable(Object target) {
 			return innerObservable = new WritableValue(realm == null ? Realm
 					.getDefault() : realm, target, type);
@@ -192,7 +188,6 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 		private Object valueType;
 		private Realm previousRealm;
 
-		@Override
 		public void setUp() {
 			super.setUp();
 			valueType = new Object();
@@ -201,13 +196,11 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 			RealmTester.setDefault(new CurrentRealm());
 		}
 
-		@Override
 		public void tearDown() {
 			RealmTester.setDefault(previousRealm);
 			super.tearDown();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			WritableValueFactory valueFactory = new WritableValueFactory();
 			valueFactory.realm = realm;
@@ -218,17 +211,14 @@ public class DetailObservableValueTest extends AbstractDefaultRealmTestCase {
 					valueFactory, valueType);
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return new Object();
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return valueType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			DetailObservableValueStub value = (DetailObservableValueStub) observable;
 			value.outerObservableValue.setValue(createValue(value));

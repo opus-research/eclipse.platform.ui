@@ -50,6 +50,11 @@ public abstract class DynamicTestCase extends UITestCase implements
 		super(testName);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();

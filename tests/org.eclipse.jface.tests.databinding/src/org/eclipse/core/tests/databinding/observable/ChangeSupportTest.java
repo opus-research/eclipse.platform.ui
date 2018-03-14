@@ -31,7 +31,6 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 public class ChangeSupportTest extends AbstractDefaultRealmTestCase {
 	private ChangeSupportStub changeSupport;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -40,12 +39,10 @@ public class ChangeSupportTest extends AbstractDefaultRealmTestCase {
 
 	public void testAddDisposeListener_HasListenersFalse() {
 		IDisposeListener disposeListener = new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 			}
 		};
 		IStaleListener staleListener = new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 			}
 		};
@@ -80,17 +77,14 @@ public class ChangeSupportTest extends AbstractDefaultRealmTestCase {
 			super(realm);
 		}
 
-		@Override
 		protected void firstListenerAdded() {
 			log.add(ADD_FIRST);
 		}
 
-		@Override
 		protected void lastListenerRemoved() {
 			log.add(REMOVE_LAST);
 		}
 
-		@Override
 		protected boolean hasListeners() {
 			return super.hasListeners();
 		}
