@@ -23,7 +23,7 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-	<unitTestSuite>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</unitTestSuite>
+	<testSuiteMonitoring>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</testSuiteMonitoring>
  	<skipTests>false</skipTests>
   </properties>
 
@@ -35,7 +35,7 @@
   			<version>${tycho.version}</version>
 			<configuration>
 				<testSuite>org.eclipse.ui.monitoring.tests</testSuite>
-				<testClass>${unitTestSuite}</testClass>
+				<testClass>${testSuiteMonitoring}</testClass>
 				<useUIHarness>true</useUIHarness>
 				<useUIThread>true</useUIThread>
 	  			<dependencies>
