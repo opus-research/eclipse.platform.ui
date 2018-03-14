@@ -62,6 +62,7 @@ public class MozillaBrowser extends AbstractWebBrowser {
 	/*
 	 * @see IBrowser#displayURL(String)
 	 */
+	@Override
 	public void openURL(URL url2) {
 		String url = null;
 		if (url2 != null) {

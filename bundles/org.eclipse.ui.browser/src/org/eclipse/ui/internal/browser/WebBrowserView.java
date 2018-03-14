@@ -78,6 +78,7 @@ public class WebBrowserView extends ViewPart implements
 		viewer.setFocus();
 	}
 
+	@Override
 	public boolean close() {
 		try {
 			getSite().getPage().hideView(this);
@@ -87,10 +88,12 @@ public class WebBrowserView extends ViewPart implements
 		}
 	}
 
+	@Override
 	public IActionBars getActionBars() {
 		return getViewSite().getActionBars();
 	}
 
+	@Override
 	public void openInExternalBrowser(String url) {
 		try {
 			URL theURL = new URL(url);
@@ -109,6 +112,7 @@ public class WebBrowserView extends ViewPart implements
 			return;
 
 		listener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(IWorkbenchPart part,
 					ISelection selection) {
 				onSelectionChange(selection);
@@ -180,6 +184,7 @@ public class WebBrowserView extends ViewPart implements
 		dropTarget.addDropListener(new WebBrowserViewDropAdapter(viewer));
 	}
 
+	@Override
 	public void selectReveal(ISelection selection) {
 		onSelectionChange(selection);
 	}

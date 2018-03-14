@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,8 @@ public abstract class FallbackScrolledComposite extends ScrolledComposite {
     public FallbackScrolledComposite(Composite parent, int style) {
         super(parent, style);
         addListener(SWT.Resize, new Listener() {
-            public void handleEvent(Event e) {
+            @Override
+			public void handleEvent(Event e) {
                 reflow(true);
             }
         });

@@ -152,6 +152,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * @return an element, or <code>null</code> if the element could not be
 	 *         created
 	 */
+	@Override
 	public IAdaptable createElement(IMemento memento) {
 		int style = 0;
 		Integer integer = memento.getInteger(MEMENTO_STYLE);
@@ -207,6 +208,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	/*
 	 * Returns whether the editor input exists.
 	 */
+	@Override
 	public boolean exists() {
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) != 0)
 			return false;
@@ -223,6 +225,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * @return a object castable to the given class, or <code>null</code> if
 	 *         this object does not have an adapter for the given class
 	 */
+	@Override
 	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
@@ -234,10 +237,12 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 *
 	 * @return the element factory ID
 	 */
+	@Override
 	public String getFactoryId() {
 		return ELEMENT_FACTORY_ID;
 	}
 
+	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return ImageResource
 				.getImageDescriptor(ImageResource.IMG_INTERNAL_BROWSER);
@@ -261,6 +266,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 *
 	 * @return the file name string
 	 */
+	@Override
 	public String getName() {
 		if (name != null)
 			return name;
@@ -273,6 +279,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * input. @return the persistable element, or <code>null</code> if this
 	 * editor input cannot be persisted
 	 */
+	@Override
 	public IPersistableElement getPersistable() {
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) == 0)
 			return null;
@@ -280,6 +287,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 		return this;
 	}
 
+	@Override
 	public String getToolTipText() {
 		if (tooltip != null)
 			return tooltip;
@@ -347,6 +355,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * @param memento
 	 *            the storage area for element state
 	 */
+	@Override
 	public void saveState(IMemento memento) {
 		memento.putInteger(MEMENTO_STYLE, style);
 		if ((style & IWorkbenchBrowserSupport.PERSISTENT) != 0 && url != null) {

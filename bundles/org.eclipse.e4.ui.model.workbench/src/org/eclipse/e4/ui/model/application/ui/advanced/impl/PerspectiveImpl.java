@@ -359,7 +359,6 @@ public class PerspectiveImpl extends ElementContainerImpl<MPartSashContainerElem
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 */
-	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(
