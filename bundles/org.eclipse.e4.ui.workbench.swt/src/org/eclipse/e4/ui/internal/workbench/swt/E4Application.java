@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -125,12 +126,7 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
-	 * IApplicationContext)
-	 */
+	@Override
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -204,12 +200,18 @@ public class E4Application implements IApplication {
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
+			@Override
 			public void syncExec(Runnable runnable) {
-				display.syncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.syncExec(runnable);
+				}
 			}
 
+			@Override
 			public void asyncExec(Runnable runnable) {
-				display.asyncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.asyncExec(runnable);
+				}
 			}
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
@@ -217,13 +219,6 @@ public class E4Application implements IApplication {
 		// This context will be used by the injector for its
 		// extended data suppliers
 		ContextInjectionFactory.setDefault(appContext);
-
-		// Check if DS is running
-		if (!appContext
-				.containsKey("org.eclipse.e4.ui.workbench.modeling.EPartService")) {
-			throw new IllegalStateException(
-					"Core services not available. Please make sure that a declarative service implementation (such as the bundle 'org.eclipse.equinox.ds') is available!");
-		}
 
 		// Get the factory to create DI instances with
 		IContributionFactory factory = (IContributionFactory) appContext
@@ -294,7 +289,6 @@ public class E4Application implements IApplication {
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
-		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
@@ -302,12 +296,19 @@ public class E4Application implements IApplication {
 			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
-		// Temporary to support old property as well
-		if (cssURI != null && !cssURI.startsWith("platform:")) {
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		if (themeId == null && cssURI == null) {
+			themeId = DEFAULT_THEME_ID;
+		}
+		appContext.set(E4Application.THEME_ID, themeId);
+
+		// validate static CSS URI
+		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
 			System.err
-					.println("Warning "
-							+ cssURI
-							+ " changed its meaning it is used now to run without theme support");
+					.println("Warning. "
+							+ "Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" "
+							+ "URI for the \"" + IWorkbench.CSS_URI_ARG + "\" parameter."); //$NON-NLS-1$
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
@@ -438,6 +439,7 @@ public class E4Application implements IApplication {
 				: brandingProperty;
 	}
 
+	@Override
 	public void stop() {
 		if (workbench != null) {
 			workbench.close();
@@ -455,13 +457,6 @@ public class E4Application implements IApplication {
 		serviceContext.set(IContributionFactory.class, contributionFactory);
 		serviceContext.set(IExceptionHandler.class, exceptionHandler);
 		serviceContext.set(IExtensionRegistry.class, registry);
-
-		// translation
-		String locale = Locale.getDefault().toString();
-		serviceContext.set(TranslationService.LOCALE, locale);
-		TranslationService bundleTranslationProvider = TranslationProviderFactory
-				.bundleTranslationService(serviceContext);
-		serviceContext.set(TranslationService.class, bundleTranslationProvider);
 
 		serviceContext.set(Adapter.class, ContextInjectionFactory.make(
 				EclipseAdapter.class, serviceContext));
@@ -498,23 +493,35 @@ public class E4Application implements IApplication {
 						E4Workbench.LOCAL_ACTIVE_SHELL));
 
 		appContext.set(IStylingEngine.class, new IStylingEngine() {
+			@Override
 			public void setClassname(Object widget, String classname) {
 			}
 
+			@Override
 			public void setId(Object widget, String id) {
 			}
 
+			@Override
 			public void style(Object widget) {
 			}
 
+			@Override
 			public CSSStyleDeclaration getStyle(Object widget) {
 				return null;
 			}
 
+			@Override
 			public void setClassnameAndId(Object widget, String classname,
 					String id) {
 			}
 		});
+
+		// translation
+		String locale = Locale.getDefault().toString();
+		appContext.set(TranslationService.LOCALE, locale);
+		TranslationService bundleTranslationProvider = TranslationProviderFactory
+				.bundleTranslationService(appContext);
+		appContext.set(TranslationService.class, bundleTranslationProvider);
 
 		return appContext;
 	}
@@ -664,11 +671,6 @@ public class E4Application implements IApplication {
 		return mbox.open() == SWT.OK;
 	}
 
-	private String getThemeId(IApplicationContext appContext) {
-		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
-		return themeId != null ? themeId : DEFAULT_THEME_ID;
-	}
-
 	/**
 	 * Look at the argument URL for the workspace's version information. Return
 	 * that version if found and null otherwise.
@@ -787,6 +789,7 @@ public class E4Application implements IApplication {
 			initializeWindowServices(childWindow);
 		}
 		((EObject) appModel).eAdapters().add(new AdapterImpl() {
+			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MApplication.class) != UiPackageImpl.ELEMENT_CONTAINER__CHILDREN)
 					return;
@@ -803,6 +806,7 @@ public class E4Application implements IApplication {
 		// we add a special tracker to bring up current selection from
 		// the active window to the application level
 		appContext.runAndTrack(new RunAndTrack() {
+			@Override
 			public boolean changed(IEclipseContext context) {
 				IEclipseContext activeChildContext = context.getActiveChild();
 				if (activeChildContext != null) {
@@ -819,6 +823,7 @@ public class E4Application implements IApplication {
 		// about as handle needs to know its context
 		appContext.set(ESelectionService.class.getName(),
 				new ContextFunction() {
+					@Override
 					public Object compute(IEclipseContext context,
 							String contextKey) {
 						return ContextInjectionFactory.make(
@@ -833,6 +838,7 @@ public class E4Application implements IApplication {
 		// Mostly MWindow contexts are lazily created by renderers and is not
 		// set at this point.
 		((EObject) childWindow).eAdapters().add(new AdapterImpl() {
+			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MWindow.class) != BasicPackageImpl.WINDOW__CONTEXT)
 					return;

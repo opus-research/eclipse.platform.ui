@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 BestSolution.at and others.
+ * Copyright (c) 2010, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464
+ *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -19,13 +21,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -37,6 +39,7 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MModelFragment;
 import org.eclipse.e4.ui.model.fragment.MModelFragments;
 import org.eclipse.e4.ui.model.fragment.impl.FragmentPackageImpl;
+import org.eclipse.e4.ui.model.internal.ModelUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -47,8 +50,9 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.osgi.framework.Bundle;
-import org.osgi.service.packageadmin.PackageAdmin;
-import org.osgi.service.packageadmin.RequiredBundle;
+import org.osgi.framework.namespace.BundleNamespace;
+import org.osgi.framework.wiring.BundleWire;
+import org.osgi.framework.wiring.BundleWiring;
 
 /**
  *
@@ -63,144 +67,173 @@ public class ModelAssembler {
 	@Inject
 	private IEclipseContext context;
 
+	@Inject
+	private IExtensionRegistry registry;
+
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
+
+	//	private static final String ALWAYS = "always"; //$NON-NLS-1$
+	private static final String INITIAL = "initial"; //$NON-NLS-1$ 
+	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$ 
 
 	/**
 	 * Process the model
 	 */
-	public void processModel() {
-		IExtensionRegistry registry = RegistryFactory.getRegistry();
+	public void processModel(boolean initial) {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
 
 		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
-		E4XMIResource applicationResource = (E4XMIResource) ((EObject) application).eResource();
-		ResourceSet resourceSet = applicationResource.getResourceSet();
-
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] ces = extension.getConfigurationElements();
-			for (IConfigurationElement ce : ces) {
-				if (!"processor".equals(ce.getName()) || !Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
-				}
-				runProcessor(ce);
-			}
-		}
-
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] ces = extension.getConfigurationElements();
-			for (IConfigurationElement ce : ces) {
-				if (!"fragment".equals(ce.getName())) { //$NON-NLS-1$
-					continue;
-				}
-				IContributor contributor = ce.getContributor();
-				String attrURI = ce.getAttribute("uri"); //$NON-NLS-1$
-				if (attrURI == null) {
-					logger.warn("Unable to find location for the model extension \"{0}\"", //$NON-NLS-1$
-							contributor.getName());
-					continue;
-				}
-
-				URI uri;
-
-				try {
-					// check if the attrURI is already a platform URI
-					if (URIHelper.isPlatformURI(attrURI)) {
-						uri = URI.createURI(attrURI);
-					} else {
-						String bundleName = contributor.getName();
-						String path = bundleName + '/' + attrURI;
-						uri = URI.createPlatformPluginURI(path, false);
-					}
-				} catch (RuntimeException e) {
-					logger.warn(e, "Model extension has invalid location"); //$NON-NLS-1$
-					continue;
-				}
-
-				String contributorURI = URIHelper.constructPlatformURI(contributor);
-				Resource resource;
-				try {
-					resource = resourceSet.getResource(uri, true);
-				} catch (RuntimeException e) {
-					logger.warn(e, "Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
-					continue;
-				}
-
-				EList<?> contents = resource.getContents();
-				if (contents.isEmpty()) {
-					continue;
-				}
-
-				Object extensionRoot = contents.get(0);
-
-				if (!(extensionRoot instanceof MModelFragments)) {
-					logger.warn("Unable to create model extension \"{0}\"", //$NON-NLS-1$
-							contributor.getName());
-					continue;
-				}
-
-				MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
-				List<MModelFragment> fragments = fragmentsContainer.getFragments();
-				boolean evalImports = false;
-				for (MModelFragment fragment : fragments) {
-					List<MApplicationElement> elements = fragment.getElements();
-					if (elements.size() == 0) {
-						continue;
-					}
-
-					for (MApplicationElement el : elements) {
-						EObject o = (EObject) el;
-
-						E4XMIResource r = (E4XMIResource) o.eResource();
-						applicationResource.setID(o, r.getID(o));
-
-						if (contributorURI != null)
-							el.setContributorURI(contributorURI);
-
-						// Remember IDs of subitems
-						TreeIterator<EObject> treeIt = EcoreUtil.getAllContents(o, true);
-						while (treeIt.hasNext()) {
-							EObject eObj = treeIt.next();
-							r = (E4XMIResource) eObj.eResource();
-							if (contributorURI != null && (eObj instanceof MApplicationElement))
-								((MApplicationElement) eObj).setContributorURI(contributorURI);
-							applicationResource.setID(eObj, r.getInternalId(eObj));
-						}
-					}
-
-					List<MApplicationElement> merged = fragment.merge(application);
-
-					if (merged.size() > 0) {
-						evalImports = true;
-						addedElements.addAll(merged);
-					} else {
-						logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$				
-					}
-				}
-
-				if (evalImports) {
-					List<MApplicationElement> localImports = fragmentsContainer.getImports();
-					if (localImports != null) {
-						imports.addAll(localImports);
-					}
-				}
-			}
-		}
-
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] ces = extension.getConfigurationElements();
-			for (IConfigurationElement ce : ces) {
-				if (!"processor".equals(ce.getName()) || Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
-				}
-
-				runProcessor(ce);
-			}
-		}
+		// run processors which are marked to run before fragments
+		runProcessors(extensions, initial, false);
+		processFragments(extensions, imports, addedElements, initial);
+		// run processors which are marked to run after fragments
+		runProcessors(extensions, initial, true);
 
 		resolveImports(imports, addedElements);
+	}
+
+	/**
+	 * @param extensions
+	 * @param imports
+	 * @param addedElements
+	 */
+	private void processFragments(IExtension[] extensions, List<MApplicationElement> imports,
+			List<MApplicationElement> addedElements, boolean initial) {
+
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] ces = extension.getConfigurationElements();
+			for (IConfigurationElement ce : ces) {
+				if ("fragment".equals(ce.getName())) { //$NON-NLS-1$
+					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
+						processFragment(ce, imports, addedElements, initial);
+					}
+				}
+			}
+		}
+	}
+
+	private void processFragment(IConfigurationElement ce, List<MApplicationElement> imports,
+			List<MApplicationElement> addedElements, boolean initial) {
+		E4XMIResource applicationResource = (E4XMIResource) ((EObject) application).eResource();
+		ResourceSet resourceSet = applicationResource.getResourceSet();
+		IContributor contributor = ce.getContributor();
+		String attrURI = ce.getAttribute("uri"); //$NON-NLS-1$
+		if (attrURI == null) {
+			logger.warn("Unable to find location for the model extension \"{0}\"", //$NON-NLS-1$
+					contributor.getName());
+			return;
+		}
+
+		URI uri;
+
+		try {
+			// check if the attrURI is already a platform URI
+			if (URIHelper.isPlatformURI(attrURI)) {
+				uri = URI.createURI(attrURI);
+			} else {
+				String bundleName = contributor.getName();
+				String path = bundleName + '/' + attrURI;
+				uri = URI.createPlatformPluginURI(path, false);
+			}
+		} catch (RuntimeException e) {
+			logger.warn(e, "Model extension has invalid location"); //$NON-NLS-1$
+			return;
+		}
+
+		String contributorURI = URIHelper.constructPlatformURI(contributor);
+		Resource resource;
+		try {
+			resource = resourceSet.getResource(uri, true);
+		} catch (RuntimeException e) {
+			logger.warn(e, "Unable to read model extension from " + uri.toString()); //$NON-NLS-1$
+			return;
+		}
+
+		EList<?> contents = resource.getContents();
+		if (contents.isEmpty()) {
+			return;
+		}
+
+		Object extensionRoot = contents.get(0);
+
+		if (!(extensionRoot instanceof MModelFragments)) {
+			logger.warn("Unable to create model extension \"{0}\"", //$NON-NLS-1$
+					contributor.getName());
+			return;
+		}
+		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$ 
+
+		MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
+		List<MModelFragment> fragments = fragmentsContainer.getFragments();
+		boolean evalImports = false;
+		for (MModelFragment fragment : fragments) {
+			List<MApplicationElement> elements = fragment.getElements();
+			if (elements.size() == 0) {
+				continue;
+			}
+
+			for (MApplicationElement el : elements) {
+				EObject o = (EObject) el;
+
+				E4XMIResource r = (E4XMIResource) o.eResource();
+
+				if (checkExist && applicationResource.getIDToEObjectMap().containsKey(r.getID(o))) {
+					continue;
+				}
+
+				applicationResource.setID(o, r.getID(o));
+
+				if (contributorURI != null)
+					el.setContributorURI(contributorURI);
+
+				// Remember IDs of subitems
+				TreeIterator<EObject> treeIt = EcoreUtil.getAllContents(o, true);
+				while (treeIt.hasNext()) {
+					EObject eObj = treeIt.next();
+					r = (E4XMIResource) eObj.eResource();
+					if (contributorURI != null && (eObj instanceof MApplicationElement))
+						((MApplicationElement) eObj).setContributorURI(contributorURI);
+					applicationResource.setID(eObj, r.getInternalId(eObj));
+				}
+			}
+
+			List<MApplicationElement> merged = fragment.merge(application);
+
+			if (merged.size() > 0) {
+				evalImports = true;
+				addedElements.addAll(merged);
+			} else {
+				logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
+			}
+		}
+
+		if (evalImports) {
+			List<MApplicationElement> localImports = fragmentsContainer.getImports();
+			if (localImports != null) {
+				imports.addAll(localImports);
+			}
+		}
+	}
+
+	/**
+	 * @param extensions
+	 * @param afterFragments
+	 */
+	private void runProcessors(IExtension[] extensions, boolean initial, Boolean afterFragments) {
+		for (IExtension extension : extensions) {
+			IConfigurationElement[] ces = extension.getConfigurationElements();
+			for (IConfigurationElement ce : ces) {
+				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
+				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$
+					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
+						runProcessor(ce);
+					}
+				}
+			}
+		}
 	}
 
 	private void runProcessor(IConfigurationElement ce) {
@@ -220,7 +253,7 @@ public class ModelAssembler {
 				key = id;
 			}
 
-			MApplicationElement el = findElementById(application, id);
+			MApplicationElement el = ModelUtils.findElementById(application, id);
 			if (el == null) {
 				logger.warn("Could not find element with id '" + id + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -248,7 +281,7 @@ public class ModelAssembler {
 		// now that we have all components loaded, resolve imports
 		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
 		for (MApplicationElement importedElement : imports) {
-			MApplicationElement realElement = findElementById(application,
+			MApplicationElement realElement = ModelUtils.findElementById(application,
 					importedElement.getElementId());
 			if (realElement == null) {
 				logger.warn("Could not resolve an import element for '" + realElement + "'"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -283,9 +316,11 @@ public class ModelAssembler {
 
 					commands.add(new Runnable() {
 
+						@Override
 						public void run() {
 							if (internalFeature.isMany()) {
 								System.err.println("Replacing"); //$NON-NLS-1$
+								@SuppressWarnings("unchecked")
 								List<Object> l = (List<Object>) interalTarget.eGet(internalFeature);
 								int index = l.indexOf(internalImportObject);
 								if (index >= 0) {
@@ -318,7 +353,6 @@ public class ModelAssembler {
 			return extensions;
 		}
 
-		PackageAdmin admin = Activator.getDefault().getBundleAdmin();
 		final Map<String, Collection<IExtension>> mappedExtensions = new HashMap<String, Collection<IExtension>>();
 		// Captures the bundles that are listed as requirements for a particular bundle.
 		final Map<String, Collection<String>> requires = new HashMap<String, Collection<String>>();
@@ -359,9 +393,13 @@ public class ModelAssembler {
 		// now populate the dependency graph
 		for (String bundleId : mappedExtensions.keySet()) {
 			assert requires.containsKey(bundleId) && depends.containsKey(bundleId);
-			for (RequiredBundle requiredBundle : admin.getRequiredBundles(bundleId)) {
+
+			// can only be one, because ExtensionPoints require the singleton setting
+			// on a bundle
+			Bundle requiredBundle = Activator.getDefault().getBundleForName(bundleId);
+			if (requiredBundle != null) {
 				assert requiredBundle.getSymbolicName().equals(bundleId);
-				for (Bundle dependentBundle : requiredBundle.getRequiringBundles()) {
+				for (Bundle dependentBundle : resolveRequiringBundle(requiredBundle)) {
 					if (!mappedExtensions.containsKey(dependentBundle.getSymbolicName())) {
 						// not a contributor of an extension
 						continue;
@@ -383,6 +421,7 @@ public class ModelAssembler {
 		// to explicitly resort anyways
 		List<String> sortedByOutdegree = new ArrayList<String>(requires.keySet());
 		Comparator<String> outdegreeSorter = new Comparator<String>() {
+			@Override
 			public int compare(String o1, String o2) {
 				assert requires.containsKey(o1) && requires.containsKey(o2);
 				return requires.get(o1).size() - requires.get(o2).size();
@@ -415,22 +454,62 @@ public class ModelAssembler {
 		return extensions;
 	}
 
-	// FIXME Should we not reuse ModelUtils???
-	private static MApplicationElement findElementById(MApplicationElement element, String id) {
-		if (id == null || id.length() == 0)
-			return null;
-		// is it me?
-		if (id.equals(element.getElementId()))
-			return element;
-		// Recurse if this is a container
-		EList<EObject> elements = ((EObject) element).eContents();
-		for (EObject childElement : elements) {
-			if (!(childElement instanceof MApplicationElement))
-				continue;
-			MApplicationElement result = findElementById((MApplicationElement) childElement, id);
-			if (result != null)
-				return result;
+	/**
+	 * Returns the bundles that currently require the given bundle.
+	 * <p>
+	 * If this required bundle is required and then re-exported by another bundle then all the
+	 * requiring bundles of the re-exporting bundle are included in the returned array.
+	 * </p>
+	 * @return An unmodifiable {@link Iterable} set of bundles currently requiring this required
+	 *         bundle. An empty {@link Iterable} will be returned if the given {@code Bundle} object
+	 *         has become stale or no bundles require the given bundle.
+	 * @throws NullPointerException
+	 *             if the given bundle is <code>null</code>
+	 */
+	private static Iterable<Bundle> resolveRequiringBundle(Bundle bundle) {
+		BundleWiring providerWiring = bundle.adapt(BundleWiring.class);
+		if (!providerWiring.isInUse()) {
+			return Collections.emptySet();
 		}
-		return null;
+
+		Set<Bundle> requiring = new HashSet<Bundle>();
+
+		addRequirers(requiring, providerWiring);
+		return Collections.unmodifiableSet(requiring);
 	}
+
+	/**
+	 * Recursively collects all bundles which depend-on/require the given {@link BundleWiring}.
+	 * <p>
+	 * All re-exports will be followed and also be contained in the result.
+	 * </p>
+	 * @param requiring
+	 *            the result which will contain all the bundles which require the given
+	 *            {@link BundleWiring}
+	 * @param providerWiring
+	 *            the {@link BundleWiring} for which the requirers should be resolved
+	 * @throws NullPointerException
+	 *             if either the requiring or the providerWiring is <code>null</code>
+	 */
+	private static void addRequirers(Set<Bundle> requiring, BundleWiring providerWiring) {
+		List<BundleWire> requirerWires = providerWiring
+				.getProvidedWires(BundleNamespace.BUNDLE_NAMESPACE);
+		if (requirerWires == null) {
+			// we don't hold locks while checking the graph, just return if no longer isInUse
+			return;
+		}
+		for (BundleWire requireBundleWire : requirerWires) {
+			Bundle requirer = requireBundleWire.getRequirer().getBundle();
+			if (requiring.contains(requirer)) {
+				continue;
+			}
+			requiring.add(requirer);
+			String reExport = requireBundleWire.getRequirement().getDirectives()
+					.get(BundleNamespace.REQUIREMENT_VISIBILITY_DIRECTIVE);
+			if (BundleNamespace.VISIBILITY_REEXPORT.equals(reExport)) {
+				addRequirers(requiring, requireBundleWire.getRequirerWiring());
+			}
+		}
+	}
+
 }
