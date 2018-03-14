@@ -24,6 +24,7 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -33,16 +34,13 @@ import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -57,8 +55,6 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -461,17 +457,14 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.8
 	 */
 	private void addDoubleClickListener() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				ISelection selection = event.getSelection();
-				if(selection instanceof ITreeSelection) {
-					ITreeSelection ss = (ITreeSelection) selection;
-					if(ss.size() == 1) {
-						Object obj = ss.getFirstElement();
-						if(viewer.isExpandable(obj)) {
-							viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
-						}
+		viewer.addDoubleClickListener(event -> {
+			ISelection selection = event.getSelection();
+			if(selection instanceof ITreeSelection) {
+				ITreeSelection ss = (ITreeSelection) selection;
+				if(ss.size() == 1) {
+					Object obj = ss.getFirstElement();
+					if(viewer.isExpandable(obj)) {
+						viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
 					}
 				}
 			}
@@ -496,13 +489,10 @@ public class ExtendedMarkersView extends ViewPart {
 	 *
 	 */
 	private void addSelectionListener() {
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection selection = event.getSelection();
-				if (selection instanceof IStructuredSelection){
-					updateStatusLine((IStructuredSelection)selection);
-				}
+		viewer.addSelectionChangedListener(event -> {
+			ISelection selection = event.getSelection();
+			if (selection instanceof IStructuredSelection){
+				updateStatusLine((IStructuredSelection)selection);
 			}
 		});
 	}
@@ -512,19 +502,13 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	private void addHelpListener() {
 		// Set help on the view itself
-		viewer.getControl().addHelpListener(new HelpListener() {
+		viewer.getControl().addHelpListener(e -> {
+			IContextProvider provider = Adapters.adapt(ExtendedMarkersView.this, IContextProvider.class);
+			if (provider == null)
+				return;
 
-			@Override
-			public void helpRequested(HelpEvent e) {
-				Object provider = getAdapter(IContextProvider.class);
-				if (provider == null)
-					return;
-
-				IContext context = ((IContextProvider) provider)
-						.getContext(viewer.getControl());
-				PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
-			}
-
+			IContext context = provider.getContext(viewer.getControl());
+			PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
 		});
 	}
 
@@ -1042,9 +1026,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		builder.restoreState(m);
 
-		Object service = site.getAdapter(IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = Adapters.adapt(site, IWorkbenchSiteProgressService.class);
 		if (service != null) {
-			builder.setProgressService((IWorkbenchSiteProgressService) service);
+			builder.setProgressService(service);
 		}
 		this.memento = m;
 
@@ -1302,7 +1286,7 @@ public class ExtendedMarkersView extends ViewPart {
 	private void setPrimarySortField(MarkerField field, TreeColumn column) {
 		builder.setPrimarySortField(field);
 
-		IWorkbenchSiteProgressService service = getViewSite().getAdapter(IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = Adapters.adapt(getViewSite(), IWorkbenchSiteProgressService.class);
 		builder.refreshContents(service);
 		updateDirectionIndicator(column, field);
 	}
@@ -1723,7 +1707,7 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.7
 	 */
 	protected IUndoContext getUndoContext() {
-		return ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+		return Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
 	}
 
 	/**
