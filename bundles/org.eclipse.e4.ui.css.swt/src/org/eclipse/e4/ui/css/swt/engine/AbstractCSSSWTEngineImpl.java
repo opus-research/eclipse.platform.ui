@@ -25,25 +25,15 @@ import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTImageConverter
 import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTRGBConverterImpl;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
 /**
  * CSS SWT Engine implementation which configure CSSEngineImpl to apply styles
  * to SWT widgets.
- *
- * The redraw listeners are required to workaround the Bug 433858
  */
 public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
-	private static final String NEEDS_REDRAW = "AbstractCSSSWTEngineImpl.needsRedraw";
-
-	private static final String HAS_REFRESH_LISTENERS = "AbstractCSSSWTEngineImpl.hasRefreshListeners";
 
 	protected Display display;
 
@@ -149,74 +139,4 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 		return false;
 	}
 
-	@Override
-	public void applyStyles(Object element, boolean applyStylesToChildNodes,
-			boolean computeDefaultStyle) {
-		super.applyStyles(element, applyStylesToChildNodes, computeDefaultStyle);
-
-		if (needsRefreshListeners(element)) {
-			initRefreshListeners((Widget) element);
-		}
-	}
-
-	// Workaround for the refreshing issue, reported with the Bug 433858
-	private boolean needsRefreshListeners(Object element) {
-		return element instanceof Tree;
-	}
-
-	private void initRefreshListeners(Widget widget) {
-		if (widget.getData(HAS_REFRESH_LISTENERS) != null) {
-			return; // already initialized;
-		}
-		widget.setData(HAS_REFRESH_LISTENERS, true);
-
-		Listener focusInListener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				event.widget.setData(NEEDS_REDRAW, true);
-			}
-		};
-		widget.addListener(SWT.FocusIn, focusInListener);
-
-		Listener selectionChangedListener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				if (event.widget.getData(NEEDS_REDRAW) != null) {
-					event.widget.setData(NEEDS_REDRAW, null);
-
-					if (needsToBeRedrawn(event.widget, event.item)) {
-						((Control) event.widget).redraw();
-					}
-				}
-			}
-
-			private boolean needsToBeRedrawn(Widget widget, Widget item) {
-				if (!(widget instanceof Tree)) {
-					return false;
-				}
-
-				Tree tree = (Tree) widget;
-
-				// The same single selection
-				if (tree.getSelectionCount() == 1
-						&& tree.getSelection()[0] == item) {
-					return true;
-				}
-
-				// For multi selection we always redraw the entire Widget for
-				// simplicity (selection with M1 or M2 keys)
-				if (tree.getSelectionCount() > 1) {
-					return true;
-				}
-
-				// Previous selection gets unselected (selection with M1 key)
-				if (tree.getSelectionCount() == 0) {
-					return true;
-				}
-
-				return false;
-			}
-		};
-		widget.addListener(SWT.Selection, selectionChangedListener);
-	}
 }

@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * The Heap Status control, which shows the heap usage statistics in the window trim.
@@ -588,11 +587,7 @@ public class HeapStatus extends Composite {
     	 */
     	@Override
 		public void run(){
-			WorkbenchWindow wbw = (WorkbenchWindow) PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow();
-			if (wbw != null) {
-				wbw.showHeapStatus(false);
-			}
+    		dispose();
     	}
     }
 
