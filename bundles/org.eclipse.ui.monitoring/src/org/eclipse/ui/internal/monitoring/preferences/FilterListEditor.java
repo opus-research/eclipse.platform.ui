@@ -69,14 +69,6 @@ public class FilterListEditor extends ListEditor {
 
 	@Override
 	protected String[] parseString(String stringList) {
-		if (stringList.isEmpty()) {
-			return new String[0];
-		}
 		return stringList.split(","); //$NON-NLS-1$
-	}
-
-	@Override
-	protected void refreshValidState() {
-		selectionChanged();
 	}
 }
