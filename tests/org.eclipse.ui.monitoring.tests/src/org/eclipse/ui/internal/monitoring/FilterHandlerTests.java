@@ -15,8 +15,6 @@ package org.eclipse.ui.internal.monitoring;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -30,42 +28,34 @@ public class FilterHandlerTests extends TestCase {
 			"org.eclipse.ui.internal.monitoring.FilterHandlerTests.createFilteredStackSamples";
 	private static final long THREAD_ID = Thread.currentThread().getId();
 
-	private StackSample[] createStackSamples() throws Exception {
+	private StackSample[] createStackSamples() {
 		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
-		ThreadInfo threadInfo =
+		ThreadInfo thread =
 				jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
-		// Remove the top 4 frames of the stack trace so that createFilteredStackSamples or
-		// createUnfilteredStackSamples appears at the top of the stack. We have to use reflection
-		// since ThreadInfo.stackTrace field is private and cannot be changed through the public
-		// methods.
-		StackTraceElement[] stackTrace = threadInfo.getStackTrace();
-		Field field = ThreadInfo.class.getDeclaredField("stackTrace");
-		field.setAccessible(true);
-		field.set(threadInfo, Arrays.copyOfRange(stackTrace, 4, stackTrace.length));
-		return new StackSample[] { new StackSample(0, new ThreadInfo[] { threadInfo }) };
+		return new StackSample[] { new StackSample(0, new ThreadInfo[] { thread }) };
 	}
 
 	/**
 	 * Creates stack samples that should not be filtered.
 	 */
-	private StackSample[] createUnfilteredStackSamples() throws Exception {
+	private StackSample[] createUnfilteredStackSamples() {
 		return createStackSamples();
 	}
 
 	/**
 	 * Creates stack samples that should be filtered.
 	 */
-	private StackSample[] createFilteredStackSamples() throws Exception {
+	private StackSample[] createFilteredStackSamples() {
 		return createStackSamples();
 	}
 
-	public void testUnfilteredEventLogging() throws Exception {
+	public void testUnfilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
 		StackSample[] samples = createUnfilteredStackSamples();
 		assertTrue(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
 	}
 
-	public void testFilteredEventLogging() throws Exception {
+	public void testFilteredEventLogging() {
 		FilterHandler filterHandler = new FilterHandler(FILTER_TRACES);
 		StackSample[] samples = createFilteredStackSamples();
 		assertFalse(filterHandler.shouldLogEvent(samples, samples.length, THREAD_ID));
