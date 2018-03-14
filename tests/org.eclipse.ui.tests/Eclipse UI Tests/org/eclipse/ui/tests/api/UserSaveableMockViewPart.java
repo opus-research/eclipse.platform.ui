@@ -33,7 +33,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
 		isDirty = false;
@@ -43,7 +42,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
@@ -51,7 +49,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
@@ -60,7 +57,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
@@ -69,7 +65,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
 		return saveNeeded;
@@ -88,7 +83,6 @@ public class UserSaveableMockViewPart extends MockViewPart implements
         this.saveNeeded = isSaveOnCloseNeeded;
     }
 
-	@Override
 	public int promptToSaveOnClose() {
 		return ISaveablePart2.DEFAULT;
 	}

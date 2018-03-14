@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Combo;
 public class ComboContentAssistCommandAdapterTest extends
 		AbstractContentAssistCommandAdapterTest {
 
-	@Override
 	protected AbstractFieldAssistWindow createFieldAssistWindow() {
 		return new ComboCommandFieldAssistWindow();
 	}

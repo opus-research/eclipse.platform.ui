@@ -52,8 +52,7 @@ public class FontPreferenceTestCase extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         AbstractUIPlugin plugin = (AbstractUIPlugin) Platform
                 .getPlugin(PlatformUI.PLUGIN_ID);
@@ -150,7 +149,6 @@ public class FontPreferenceTestCase extends UITestCase {
 		final boolean[] errorLogged = new boolean[] { false };
 		ILogger logger = Policy.getLog();
 		Policy.setLog(new ILogger() {
-			@Override
 			public void log(IStatus status) {
 				if (status != null && status.getSeverity() == IStatus.ERROR && status.getPlugin().equals(Policy.JFACE))
 					errorLogged[0] = true;
@@ -158,7 +156,6 @@ public class FontPreferenceTestCase extends UITestCase {
 		
 		
     	Job job = new Job("Non-UI thread FontRegistry Access Test") {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				// this should produce no exception, but should log a error 
 				boolean created = checkFont(fontRegistry);

@@ -56,7 +56,6 @@ public class MenuTestCase extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -78,7 +77,6 @@ public class MenuTestCase extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);

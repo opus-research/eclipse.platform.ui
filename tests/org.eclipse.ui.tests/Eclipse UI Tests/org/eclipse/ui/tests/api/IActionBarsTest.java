@@ -43,8 +43,7 @@ public class IActionBarsTest extends UITestCase {
             super();
         }
 
-        @Override
-		public void run() {
+        public void run() {
             hasRun = true;
         }
     }
@@ -56,8 +55,7 @@ public class IActionBarsTest extends UITestCase {
         super(testName);
     }
 
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
