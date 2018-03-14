@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -76,12 +75,9 @@ public class PartServiceImpl implements EPartService {
 				if (oldSelected instanceof MPlaceholder) {
 					oldSelected = ((MPlaceholder) oldSelected).getRef();
 				}
-
-				MPlaceholder placeholder = null;
 				Object selected = event.getProperty(UIEvents.EventTags.NEW_VALUE);
 				if (selected instanceof MPlaceholder) {
-					placeholder = (MPlaceholder) selected;
-					selected = placeholder.getRef();
+					selected = ((MPlaceholder) selected).getRef();
 				}
 
 				MPart oldSelectedPart = oldSelected instanceof MPart ? (MPart) oldSelected : null;
@@ -93,6 +89,7 @@ public class PartServiceImpl implements EPartService {
 
 				if (selectedPart != null && selectedPart.isToBeRendered()
 						&& getParts().contains(selectedPart)) {
+					MPlaceholder placeholder = selectedPart.getCurSharedRef();
 					// ask the renderer to create this part
 					if (placeholder == null) {
 						if (selectedPart.getParent().getRenderer() != null) {
