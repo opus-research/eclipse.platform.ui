@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -29,6 +30,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -39,14 +41,14 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.emf.ecore.EObject;
@@ -56,6 +58,7 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManagerOverrides;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
@@ -73,6 +76,13 @@ import org.osgi.service.event.EventHandler;
  * Create a contribute part.
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
+
+	private static final Selector ALL_SELECTOR = new Selector() {
+
+		public boolean select(MApplicationElement element) {
+			return true;
+		}
+	};
 
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
@@ -169,8 +179,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					return;
 				}
 				ici.setVisible(itemModel.isVisible());
-				ToolBarManager parent = (ToolBarManager) ((ContributionItem) ici)
-						.getParent();
+
+				ToolBarManager parent = null;
+				if (ici instanceof MenuManager) {
+					parent = (ToolBarManager) ((MenuManager) ici).getParent();
+				} else if (ici instanceof ContributionItem) {
+					parent = (ToolBarManager) ((ContributionItem) ici)
+							.getParent();
+				}
+
 				if (parent != null) {
 					parent.markDirty();
 					parent.update(true);
@@ -235,7 +252,31 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Optional
 	void dirtyChanged(
 			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
-		updateEnablement();
+		getUpdater().updateContributionItems(ALL_SELECTOR);
+	}
+
+	@Inject
+	@Optional
+	void updateRequest(
+			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
+		final Object v = eventData.getProperty(IEventBroker.DATA);
+		Selector s;
+		if (v instanceof Selector) {
+			s = (Selector) v;
+		} else {
+			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
+				s = ALL_SELECTOR;
+			} else {
+				s = new Selector() {
+
+					public boolean select(MApplicationElement element) {
+						return v.equals(element.getElementId());
+					}
+				};
+			}
+		}
+
+		getUpdater().updateContributionItems(s);
 	}
 
 	@PostConstruct
@@ -265,7 +306,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				for (String var : updateVariables) {
 					context.get(var);
 				}
-				updateEnablement();
+				getUpdater().updateContributionItems(ALL_SELECTOR);
 				return true;
 			}
 		};
@@ -385,7 +426,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 						public void run() {
 							manager.update(false);
-							updateEnablement();
+							getUpdater().updateContributionItems(ALL_SELECTOR);
 						}
 					});
 					// disposeToolbarIfNecessary(toolbarModel);
@@ -612,8 +653,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	private void modelProcessSwitch(ToolBarManager parentManager,
 			MToolBarElement childME) {
-		if (childME instanceof MOpaqueToolItem) {
-			MOpaqueToolItem itemModel = (MOpaqueToolItem) childME;
+		if (OpaqueElementUtil.isOpaqueToolItem(childME)) {
+			MToolItem itemModel = (MToolItem) childME;
 			processOpaqueItem(parentManager, itemModel);
 		} else if (childME instanceof MHandledToolItem) {
 			MHandledToolItem itemModel = (MHandledToolItem) childME;
@@ -719,13 +760,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	}
 
 	void processOpaqueItem(ToolBarManager parentManager,
-			MOpaqueToolItem itemModel) {
+			MToolItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
 		}
+
 		itemModel.setRenderer(this);
-		Object obj = itemModel.getOpaqueItem();
+		Object obj = OpaqueElementUtil.getOpaqueItem(itemModel);
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
 		} else {
@@ -819,10 +861,10 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void reconcileManagerToModel(IToolBarManager menuManager,
 			MToolBar toolBar) {
 		List<MToolBarElement> modelChildren = toolBar.getChildren();
-		HashSet<MOpaqueToolItem> oldModelItems = new HashSet<MOpaqueToolItem>();
+		HashSet<MToolItem> oldModelItems = new HashSet<MToolItem>();
 		for (MToolBarElement itemModel : modelChildren) {
-			if (itemModel instanceof MOpaqueToolItem) {
-				oldModelItems.add((MOpaqueToolItem) itemModel);
+			if (OpaqueElementUtil.isOpaqueToolItem(itemModel)) {
+				oldModelItems.add((MToolItem) itemModel);
 			}
 		}
 
@@ -831,15 +873,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionItem item = items[src];
 			MToolBarElement element = getToolElement(item);
 			if (element == null) {
-				MOpaqueToolItem legacyItem = MenuFactoryImpl.eINSTANCE
-						.createOpaqueToolItem();
+				MToolItem legacyItem = OpaqueElementUtil.createOpaqueToolItem();
 				legacyItem.setElementId(item.getId());
 				legacyItem.setVisible(item.isVisible());
-				legacyItem.setOpaqueItem(item);
+				OpaqueElementUtil.setOpaqueItem(legacyItem, item);
 				linkModelToContribution(legacyItem, item);
 				modelChildren.add(dest, legacyItem);
-			} else if (element instanceof MOpaqueToolItem) {
-				MOpaqueToolItem legacyItem = (MOpaqueToolItem) element;
+			} else if (OpaqueElementUtil.isOpaqueToolItem(element)) {
+				MToolItem legacyItem = (MToolItem) element;
 				oldModelItems.remove(legacyItem);
 				if (modelChildren.size() > dest) {
 					if (modelChildren.get(dest) != legacyItem) {
@@ -854,9 +895,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		if (!oldModelItems.isEmpty()) {
 			modelChildren.removeAll(oldModelItems);
-			for (MOpaqueToolItem model : oldModelItems) {
-				clearModelToContribution(model,
-						(IContributionItem) model.getOpaqueItem());
+			for (MToolItem model : oldModelItems) {
+				Object obj = OpaqueElementUtil.getOpaqueItem(model);
+				clearModelToContribution(model, (IContributionItem) obj);
 			}
 		}
 	}
@@ -892,9 +933,5 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	ToolItemUpdater getUpdater() {
 		return enablementUpdater;
-	}
-
-	public void updateEnablement() {
-		enablementUpdater.updateContributionItems();
 	}
 }
