@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     											 - fix in bug: 174355,171126,,195908,198035,215069,227421
- *     Hendrik Still <hendrik.still@gammas.de> - bug 413973
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -28,12 +27,11 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * TreeViewerRow is the Tree implementation of ViewerRow.
- * @param <E> Type of an element of the model
  *
  * @since 3.3
  *
  */
-public class TreeViewerRow<E> extends ViewerRow<E> {
+public class TreeViewerRow extends ViewerRow {
 	private TreeItem item;
 
 	/**
@@ -124,7 +122,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public ViewerRow<E> getNeighbor(int direction, boolean sameLevel) {
+	public ViewerRow getNeighbor(int direction, boolean sameLevel) {
 		if (direction == ViewerRow.ABOVE) {
 			return getRowAbove(sameLevel);
 		} else if (direction == ViewerRow.BELOW) {
@@ -135,7 +133,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 		}
 	}
 
-	private ViewerRow<E> getRowBelow(boolean sameLevel) {
+	private ViewerRow getRowBelow(boolean sameLevel) {
 		Tree tree = item.getParent();
 
 		// This means we have top-level item
@@ -144,10 +142,10 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 				int index = tree.indexOf(item) + 1;
 
 				if (index < tree.getItemCount()) {
-					return new TreeViewerRow<>(tree.getItem(index));
+					return new TreeViewerRow(tree.getItem(index));
 				}
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow<>(item.getItem(0));
+				return new TreeViewerRow(item.getItem(0));
 			}
 		} else {
 			if (sameLevel || !item.getExpanded()) {
@@ -166,18 +164,18 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 				}
 
 				if (itemAfter != null) {
-					return new TreeViewerRow<>(itemAfter);
+					return new TreeViewerRow(itemAfter);
 				}
 
 			} else if (item.getExpanded() && item.getItemCount() > 0) {
-				return new TreeViewerRow<>(item.getItem(0));
+				return new TreeViewerRow(item.getItem(0));
 			}
 		}
 
 		return null;
 	}
 
-	private ViewerRow<E> getRowAbove(boolean sameLevel) {
+	private ViewerRow getRowAbove(boolean sameLevel) {
 		Tree tree = item.getParent();
 
 		// This means we have top-level item
@@ -191,10 +189,10 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 
 			if (nextTopItem != null) {
 				if (sameLevel) {
-					return new TreeViewerRow<>(nextTopItem);
+					return new TreeViewerRow(nextTopItem);
 				}
 
-				return new TreeViewerRow<>(findLastVisibleItem(nextTopItem));
+				return new TreeViewerRow(findLastVisibleItem(nextTopItem));
 			}
 		} else {
 			TreeItem parentItem = item.getParentItem();
@@ -213,7 +211,7 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 			}
 
 			if (itemBefore != null) {
-				return new TreeViewerRow<>(itemBefore);
+				return new TreeViewerRow(itemBefore);
 			}
 		}
 
@@ -264,19 +262,17 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 	}
 
 	@Override
-	public TreePath<E> getTreePath() {
+	public TreePath getTreePath() {
 		TreeItem tItem = item;
-		LinkedList<E> segments = new LinkedList<>();
+		LinkedList segments = new LinkedList();
 		while (tItem != null) {
-			@SuppressWarnings("unchecked")
-			E segment = (E) tItem.getData();
+			Object segment = tItem.getData();
 			Assert.isNotNull(segment);
 			segments.addFirst(segment);
 			tItem = tItem.getParentItem();
 		}
-		@SuppressWarnings("unchecked")
-		E[] segmentsArray = (E[]) segments.toArray();
-		return new TreePath<>(segmentsArray);
+
+		return new TreePath(segments.toArray());
 	}
 
 	void setItem(TreeItem item) {
@@ -285,14 +281,12 @@ public class TreeViewerRow<E> extends ViewerRow<E> {
 
 	@Override
 	public Object clone() {
-		return new TreeViewerRow<E>(item);
+		return new TreeViewerRow(item);
 	}
 
 	@Override
-	public E getElement() {
-		@SuppressWarnings("unchecked")
-		E element = (E) item.getData();
-		return element;
+	public Object getElement() {
+		return item.getData();
 	}
 
 	@Override
