@@ -220,10 +220,25 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					if (manager == null) {
 						return;
 					}
-					manager.setVisible(menuModel.isVisible());
+					boolean visible = menuModel.isVisible();
+					manager.setVisible(visible);
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
 						scheduleManagerUpdate(manager.getParent());
+					}
+					if (menuModel.getParent() == null) {
+						if (menuModel instanceof MPopupMenu) {
+							Object data = getUIContainer(menuModel);
+							if (data instanceof Control) {
+								Menu menu = (Menu) menuModel.getWidget();
+								if (visible && menuModel.isToBeRendered() && menu != null && !menu.isDisposed()) {
+									((Control) data).setMenu(menu);
+								}
+								if (!visible) {
+									((Control) data).setMenu(null);
+								}
+							}
+						}
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -401,9 +416,15 @@ MenuManagerEventHelper.getInstance()
 			newMenu = menuManager.createContextMenu((Control) parent);
 			// we can't be sure this is the correct parent.
 			// ((Control) parent).setMenu(newMenu);
+			if (element instanceof MPopupMenu && element.isVisible()) {
+				Object data = getUIContainer(element);
+				if (data instanceof Control && parent.equals(data)) {
+					((Control) parent).setMenu(newMenu);
+				}
+			}
 			newMenu.setData(menuManager);
 		}
-		if (!menuManager.getRemoveAllWhenShown()) {
+		if (menuManager != null && !menuManager.getRemoveAllWhenShown()) {
 			processContributions(menuModel, menuModel.getElementId(), menuBar,
 					menuModel instanceof MPopupMenu);
 		}
