@@ -403,6 +403,18 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
                     IWorkbenchActionConstants.TOOLBAR_FILE));
         }
 
+        coolBar.add(new GroupMarker(IIDEActionConstants.GROUP_EDIT));
+        { // Edit group
+            IToolBarManager editToolBar = actionBarConfigurer.createToolBarManager();
+            editToolBar.add(new Separator(IWorkbenchActionConstants.EDIT_GROUP));
+            editToolBar.add(undoAction);
+            editToolBar.add(redoAction);
+
+            // Add to the cool bar manager
+            coolBar.add(actionBarConfigurer.createToolBarContributionItem(editToolBar,
+                    IWorkbenchActionConstants.TOOLBAR_EDIT));
+        }
+
         coolBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
         coolBar.add(new GroupMarker(IIDEActionConstants.GROUP_NAV));
