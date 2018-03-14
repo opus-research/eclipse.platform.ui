@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 195222, 263868, 264954
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 476109
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property;
@@ -103,20 +102,6 @@ public class Properties {
 	}
 
 	/**
-	 * Returns a value property which takes the source object itself as the
-	 * property value. This property may be used to wrap an object in an
-	 * unmodifiable {@link IObservableValue}.
-	 *
-	 * @param valueType
-	 *            the value type of the property
-	 * @return a value property which takes the source object itself as the
-	 *         property value.
-	 */
-	public static <T> IValueProperty<T, T> selfValue(Class<T> valueType) {
-		return new SelfValueProperty<T>(valueType);
-	}
-
-	/**
 	 * Returns a list property which takes the source object (a {@link List}) as
 	 * the property list. This property may be used to wrap an arbitrary List
 	 * instance in an {@link IObservableList}.
@@ -131,20 +116,6 @@ public class Properties {
 	}
 
 	/**
-	 * Returns a list property which takes the source object (a {@link List}) as
-	 * the property list. This property may be used to wrap an arbitrary List
-	 * instance in an {@link IObservableList}.
-	 *
-	 * @param elementType
-	 *            the element type of the property
-	 * @return a list property which takes the source object (a {@link List}) as
-	 *         the property list.
-	 */
-	public static <E> IListProperty<List<E>, E> selfList(Class<E> elementType) {
-		return new SelfListProperty<E>(elementType);
-	}
-
-	/**
 	 * Returns a set property which takes the source object (a {@link Set}) as
 	 * the property set. This property may be used to wrap an arbitrary Set
 	 * instance in an {@link IObservableSet}.
@@ -155,20 +126,6 @@ public class Properties {
 	 *         the property set.
 	 */
 	public static <E> ISetProperty<Set<E>, E> selfSet(Object elementType) {
-		return new SelfSetProperty<E>(elementType);
-	}
-
-	/**
-	 * Returns a set property which takes the source object (a {@link Set}) as
-	 * the property set. This property may be used to wrap an arbitrary Set
-	 * instance in an {@link IObservableSet}.
-	 *
-	 * @param elementType
-	 *            the element type of the property
-	 * @return a set property which takes the source object (a {@link Set}) as
-	 *         the property set.
-	 */
-	public static <E> ISetProperty<Set<E>, E> selfSet(Class<E> elementType) {
 		return new SelfSetProperty<E>(elementType);
 	}
 
@@ -189,22 +146,6 @@ public class Properties {
 	}
 
 	/**
-	 * Returns a map property which takes the source object (a {@link Map}) as
-	 * the property map. This property may be used to wrap an arbitrary Map
-	 * instance in an {@link IObservableMap}.
-	 *
-	 * @param keyType
-	 *            the key type of the property
-	 * @param valueType
-	 *            the value type of the property
-	 * @return a map property which takes the source object (a {@link Map} as
-	 *         the property map.
-	 */
-	public static <K, V> IMapProperty<Map<K, V>, K, V> selfMap(Class<K> keyType, Class<V> valueType) {
-		return new SelfMapProperty<K, V>(keyType, valueType);
-	}
-
-	/**
 	 * Returns a value property which observes the value of an
 	 * {@link IObservableValue}. This property may be used e.g. for observing
 	 * the respective values of an {@link IObservableList} &lt;
@@ -220,25 +161,6 @@ public class Properties {
 	 *         {@link IObservableValue}.
 	 */
 	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(Object valueType) {
-		return new ObservableValueProperty<T>(valueType);
-	}
-
-	/**
-	 * Returns a value property which observes the value of an
-	 * {@link IObservableValue}. This property may be used e.g. for observing
-	 * the respective values of an {@link IObservableList} &lt;
-	 * {@link IObservableValue} &gt;.
-	 * <p>
-	 * Calls to {@link IValueProperty#observe(Object)} or
-	 * {@link IValueProperty#observe(Realm, Object)} just cast the argument to
-	 * {@link IObservableValue} and return it (the realm argument is ignored).
-	 *
-	 * @param valueType
-	 *            the value type of the property
-	 * @return a value property which observes the value of an
-	 *         {@link IObservableValue}.
-	 */
-	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(Class<T> valueType) {
 		return new ObservableValueProperty<T>(valueType);
 	}
 }
