@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -77,7 +76,7 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.bindings.keys.formatting.KeyFormatterFactory;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -882,8 +881,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
 				MUIElement selectedElement = container.getSelectedElement();
 				List<MUIElement> children = container.getChildren();
-				List<MUIElement> childrenCopy = new ArrayList<MUIElement>(children);
-				for (MUIElement child : childrenCopy) {
+				for (MUIElement child : children) {
 					// remove stuff in the "back" first
 					if (child != selectedElement) {
 						removeGui(child);
@@ -1031,7 +1029,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			display = Display.getDefault();
 			runContext.set(Display.class, display);
 		}
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 
 			@Override
 			public void run() {

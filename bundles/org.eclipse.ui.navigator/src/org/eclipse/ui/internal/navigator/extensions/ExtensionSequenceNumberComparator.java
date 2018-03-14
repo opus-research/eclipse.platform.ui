@@ -45,7 +45,11 @@ public class ExtensionSequenceNumberComparator implements Comparator {
 		sortAscending = toSortAscending ? 1 : -1; 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
 	public int compare(Object o1, Object o2) {
 
 		INavigatorContentDescriptor lvalue = null;

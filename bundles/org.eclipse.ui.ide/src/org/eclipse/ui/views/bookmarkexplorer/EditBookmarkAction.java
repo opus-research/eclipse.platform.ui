@@ -32,8 +32,7 @@ class EditBookmarkAction extends BookmarkAction {
 
     private IMarker marker;
 
-    @Override
-	public void run() {
+    public void run() {
         if (marker != null) {
 			editBookmark();
 		}
@@ -45,8 +44,7 @@ class EditBookmarkAction extends BookmarkAction {
      * resource is an instance of <code>org.eclipse.core.resources.IFile<code>.
      * Otherwise sets marker to null.
      */
-    @Override
-	public void selectionChanged(IStructuredSelection selection) {
+    public void selectionChanged(IStructuredSelection selection) {
         marker = null;
         setEnabled(false);
 

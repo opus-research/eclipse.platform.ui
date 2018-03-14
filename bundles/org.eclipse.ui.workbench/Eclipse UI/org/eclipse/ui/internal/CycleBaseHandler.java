@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 276324
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -21,9 +19,6 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
-import org.eclipse.e4.ui.workbench.modeling.EPartService;
-import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
 import org.eclipse.jface.bindings.Trigger;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -60,9 +55,9 @@ import org.eclipse.ui.keys.IBindingService;
 
 /**
  * Its a base class for switching between views/editors/perspectives.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 
 public abstract class CycleBaseHandler extends AbstractHandler implements
@@ -86,6 +81,11 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 */
 	private TriggerSequence[] forwardTriggerSequences = null;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 
 	/**
 	 * Add all items to the dialog in the activation order
@@ -220,7 +220,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 		setDialogLocation(dialog, activePart);
 
-		final IContextService contextService = window
+		final IContextService contextService = (IContextService) window
 				.getWorkbench().getService(IContextService.class);
 		try {
 			dialog.open();
@@ -294,7 +294,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		commandForward = getForwardCommand();
 		commandBackward = getBackwardCommand();
 
-		final IBindingService bindingService = window
+		final IBindingService bindingService = (IBindingService) window
 				.getWorkbench().getService(IBindingService.class);
 		forwardTriggerSequences = bindingService
 				.getActiveBindingsFor(commandForward);
@@ -429,7 +429,7 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 
 	/**
 	 * Activate the selected item.
-	 *
+	 * 
 	 * @param page
 	 *            the page
 	 * @param selectedItem
@@ -437,13 +437,6 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 	 */
 	protected void activate(IWorkbenchPage page, Object selectedItem) {
 		if (selectedItem != null) {
-			if (selectedItem instanceof MStackElement) {
-				EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
-				partService.showPart(((MStackElement) selectedItem).getElementId(), PartState.ACTIVATE);
-
-				// the if conditions below do not need to be checked then
-				return;
-			}
 			if (selectedItem instanceof IEditorReference) {
 				page.setEditorAreaVisible(true);
 			}
@@ -453,9 +446,8 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 				if (part != null) {
 					page.activate(part);
 				}
-				// the if conditions below do not need to be checked then
-				return;
 			}
+			
 			if (selectedItem instanceof IPerspectiveDescriptor){
 	            IPerspectiveDescriptor persp = (IPerspectiveDescriptor) selectedItem;
 	            page.setPerspective(persp);
@@ -526,6 +518,12 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		return forwardTriggerSequences;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
+	 *      java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {

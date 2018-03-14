@@ -55,6 +55,11 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         IWorkbenchWindow window;
 		IExtensionTracker tracker;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.services.IDisposable#dispose()
+		 */
 		@Override
 		public void dispose() {
 			if (tracker != null) {
@@ -113,6 +118,9 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         registerBinding(set);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
     @Override
 	protected ActionDescriptor createActionDescriptor(
             IConfigurationElement element) {
@@ -141,6 +149,9 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
         return desc;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginActionBuilder.
+     */
     @Override
 	protected BasicContribution createContribution() {
         return new ActionSetContribution(actionSet.getDesc().getId(), window);
@@ -483,6 +494,9 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
             return false;
         }
 
+        /* (non-Javadoc)
+         * Method declared on Basic Contribution.
+         */
         @Override
 		protected void insertMenuGroup(IMenuManager menu,
                 AbstractGroupMarker marker) {
@@ -561,6 +575,9 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
             return adjunctActions.size() > 0;
         }
 
+        /* (non-Javadoc)
+         * Method declared on Basic Contribution.
+         */
         @Override
 		protected void insertAfter(IContributionManager mgr, String refId,
                 IContributionItem item) {
