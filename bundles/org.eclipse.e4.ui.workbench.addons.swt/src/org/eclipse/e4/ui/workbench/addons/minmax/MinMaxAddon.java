@@ -606,12 +606,8 @@ public class MinMaxAddon {
 		MWindow window = modelService.getTopLevelWindowFor(element);
 		String trimId = element.getElementId() + getMinimizedElementSuffix(element);
 		MToolControl trimStack = (MToolControl) modelService.find(trimId, window);
-		if (trimStack == null || trimStack.getObject() == null) {
-			if (element instanceof MPerspectiveStack) {
-				element.setVisible(true);
-			}
+		if (trimStack == null || trimStack.getObject() == null)
 			return;
-		}
 
 		TrimStack ts = (TrimStack) trimStack.getObject();
 		ts.restoreStack();
