@@ -75,7 +75,6 @@ public class ApplicationFactoryImpl extends EFactoryImpl implements MApplication
 			case ApplicationPackageImpl.APPLICATION: return (EObject)createApplication();
 			case ApplicationPackageImpl.ADDON: return (EObject)createAddon();
 			case ApplicationPackageImpl.STRING_TO_OBJECT_MAP: return (EObject)createStringToObjectMap();
-			case ApplicationPackageImpl.LIFECYCLE_CONTRIBUTION: return (EObject)createLifecycleContribution();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -145,16 +144,6 @@ public class ApplicationFactoryImpl extends EFactoryImpl implements MApplication
 	public Map.Entry<String, Object> createStringToObjectMap() {
 		StringToObjectMapImpl stringToObjectMap = new StringToObjectMapImpl();
 		return stringToObjectMap;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MLifecycleContribution createLifecycleContribution() {
-		LifecycleContributionImpl lifecycleContribution = new LifecycleContributionImpl();
-		return lifecycleContribution;
 	}
 
 	/**
