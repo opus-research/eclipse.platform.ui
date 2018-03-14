@@ -175,6 +175,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					continue;
 				}
 
+				dynamicMenuContext.dispose();
+
 				// remove existing entries for this dynamic contribution item if
 				// there are any
 				Map<String, Object> storageMap = currentMenuElement
