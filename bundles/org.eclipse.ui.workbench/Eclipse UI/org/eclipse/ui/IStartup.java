@@ -20,7 +20,8 @@ package org.eclipse.ui;
  */
 public interface IStartup {
     /**
-     * Will be called in a separate thread after the workbench initializes.
+     * Will be called in a separate thread and possibly in parallel with other
+     * startup extensions after the workbench initializes.
      * <p>
      * Note that most workbench methods must be called in the UI thread
      * since they may access SWT.  For example, to obtain the current workbench

@@ -73,6 +73,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -348,6 +349,19 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * Family for the early startup job.
 	 */
 	public static final String EARLY_STARTUP_FAMILY = "earlyStartup"; //$NON-NLS-1$
+
+	private static abstract class EarlyStartupJob extends Job {
+		public EarlyStartupJob(JobGroup group) {
+			super("Workbench early stattup job"); //$NON-NLS-1$
+			setSystem(true);
+			setJobGroup(group);
+		}
+
+		@Override
+		public boolean belongsTo(Object family) {
+			return EARLY_STARTUP_FAMILY.equals(family);
+		}
+	}
 
 	static final String VERSION_STRING[] = { "0.046", "2.0" }; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -2782,37 +2796,41 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (extensions.length == 0) {
 			return;
 		}
-		Job job = new Job("Workbench early startup") { //$NON-NLS-1$
+
+		int numProcessors = Runtime.getRuntime().availableProcessors();
+		// Assume that early startup actions are a 50-50 mixture of CPU and IO
+		// and set the maxThreads of the job group to numProcessors * 2.
+		final JobGroup jobGroup = new JobGroup("Workbench early startup job group", numProcessors * 2, 1); //$NON-NLS-1$
+		new EarlyStartupJob(jobGroup) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				HashSet disabledPlugins = new HashSet(Arrays
-						.asList(getDisabledEarlyActivatedPlugins()));
+				HashSet<String> disabledPlugins = new HashSet<String>(
+						Arrays.asList(getDisabledEarlyActivatedPlugins()));
 				monitor.beginTask(WorkbenchMessages.Workbench_startingPlugins, extensions.length);
 				for (int i = 0; i < extensions.length; ++i) {
 					if (monitor.isCanceled() || !isRunning()) {
 						return Status.CANCEL_STATUS;
 					}
-					IExtension extension = extensions[i];
-
+					final IExtension extension = extensions[i];
 					// if the plugin is not in the set of disabled plugins, then
 					// execute the code to start it
 					if (!disabledPlugins.contains(extension.getNamespace())) {
-						monitor.subTask(extension.getNamespace());
-						SafeRunner.run(new EarlyStartupRunnable(extension));
+						new EarlyStartupJob(jobGroup) {
+							@Override
+							protected IStatus run(IProgressMonitor monitor) {
+								monitor.beginTask(extension.getNamespaceIdentifier(), 1);
+								SafeRunner.run(new EarlyStartupRunnable(extension));
+								monitor.done();
+								return Status.OK_STATUS;
+							}
+						}.schedule();
 					}
 					monitor.worked(1);
 				}
 				monitor.done();
 				return Status.OK_STATUS;
 			}
-
-			@Override
-			public boolean belongsTo(Object family) {
-				return EARLY_STARTUP_FAMILY.equals(family);
-			}
-		};
-		job.setSystem(true);
-		job.schedule();
+		}.schedule();
 	}
 
 	/**
