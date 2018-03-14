@@ -27,28 +27,32 @@ import org.eclipse.core.databinding.observable.list.AbstractObservableList;
 import org.eclipse.core.databinding.observable.list.ListDiff;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.property.INativePropertyListener;
-import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.SimplePropertyEvent;
 import org.eclipse.core.databinding.property.list.SimpleListProperty;
 
 /**
+ * @param <S>
+ *            type of the source object
+ * @param <E>
+ *            type of the elements in the list
  * @since 1.2
  *
  */
-public class SimplePropertyObservableList extends AbstractObservableList
-		implements IPropertyObservable {
-	private Object source;
-	private SimpleListProperty property;
+public class SimplePropertyObservableList<S, E> extends
+		AbstractObservableList<E> implements
+		IPropertyObservable<SimpleListProperty<S, E>> {
+	private S source;
+	private SimpleListProperty<S, E> property;
 
 	private volatile boolean updating = false;
 
 	private volatile int modCount = 0;
 
-	private INativePropertyListener listener;
+	private INativePropertyListener<S> listener;
 
-	private List cachedList;
+	private List<E> cachedList;
 	private boolean stale;
 
 	/**
@@ -56,8 +60,8 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	 * @param source
 	 * @param property
 	 */
-	public SimplePropertyObservableList(Realm realm, Object source,
-			SimpleListProperty property) {
+	public SimplePropertyObservableList(Realm realm, S source,
+			SimpleListProperty<S, E> property) {
 		super(realm);
 		this.source = source;
 		this.property = property;
@@ -68,17 +72,17 @@ public class SimplePropertyObservableList extends AbstractObservableList
 		if (!isDisposed()) {
 			if (listener == null) {
 				listener = property
-						.adaptListener(new ISimplePropertyListener() {
+						.adaptListener(new ISimplePropertyListener<ListDiff<E>>() {
 							@Override
 							public void handleEvent(
-									final SimplePropertyEvent event) {
+									final SimplePropertyEvent<ListDiff<E>> event) {
 								if (!isDisposed() && !updating) {
 									getRealm().exec(new Runnable() {
 										@Override
 										public void run() {
 											if (event.type == SimplePropertyEvent.CHANGE) {
 												modCount++;
-												notifyIfChanged((ListDiff) event.diff);
+												notifyIfChanged(event.diff);
 											} else if (event.type == SimplePropertyEvent.STALE
 													&& !stale) {
 												stale = true;
@@ -94,7 +98,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			getRealm().exec(new Runnable() {
 				@Override
 				public void run() {
-					cachedList = new ArrayList(getList());
+					cachedList = new ArrayList<E>(getList());
 					stale = false;
 
 					if (listener != null)
@@ -124,7 +128,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 
 	// Queries
 
-	private List getList() {
+	private List<E> getList() {
 		return property.getList(source);
 	}
 
@@ -140,13 +144,13 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public boolean containsAll(Collection c) {
+	public boolean containsAll(Collection<?> c) {
 		getterCalled();
 		return getList().containsAll(c);
 	}
 
 	@Override
-	public Object get(int index) {
+	public E get(int index) {
 		getterCalled();
 		return getList().get(index);
 	}
@@ -176,14 +180,14 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public Object[] toArray(Object[] a) {
+	public <T> T[] toArray(T[] a) {
 		getterCalled();
 		return getList().toArray(a);
 	}
 
 	// Single change operations
 
-	private void updateList(List list, ListDiff diff) {
+	private void updateList(List<E> list, ListDiff<E> diff) {
 		if (!diff.isEmpty()) {
 			boolean wasUpdating = updating;
 			updating = true;
@@ -199,41 +203,41 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public boolean add(Object o) {
+	public boolean add(E o) {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(list
-				.size(), true, o));
+		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+				list.size(), true, o));
 		updateList(list, diff);
 
 		return true;
 	}
 
 	@Override
-	public void add(int index, Object o) {
+	public void add(int index, E o) {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 
 		if (index < 0 || index > list.size())
 			throw new IndexOutOfBoundsException();
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
-				true, o));
+		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+				index, true, o));
 		updateList(list, diff);
 	}
 
 	@Override
-	public Iterator iterator() {
+	public Iterator<E> iterator() {
 		getterCalled();
-		return new Iterator() {
+		return new Iterator<E>() {
 			int expectedModCount = modCount;
-			List list = new ArrayList(getList());
-			ListIterator iterator = list.listIterator();
+			List<E> list = new ArrayList<E>(getList());
+			ListIterator<E> iterator = list.listIterator();
 
-			Object lastElement = null;
+			E lastElement = null;
 			int lastIndex = -1;
 
 			@Override
@@ -244,10 +248,10 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			}
 
 			@Override
-			public Object next() {
+			public E next() {
 				getterCalled();
 				checkForComodification();
-				Object next = lastElement = iterator.next();
+				E next = lastElement = iterator.next();
 				lastIndex = iterator.previousIndex();
 				return next;
 			}
@@ -260,8 +264,8 @@ public class SimplePropertyObservableList extends AbstractObservableList
 					throw new IllegalStateException();
 
 				iterator.remove(); // stay in sync
-				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-						lastIndex, false, lastElement));
+				ListDiff<E> diff = Diffs.createListDiff(Diffs
+						.createListDiffEntry(lastIndex, false, lastElement));
 
 				updateList(list, diff);
 
@@ -279,10 +283,10 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public Object move(int oldIndex, int newIndex) {
+	public E move(int oldIndex, int newIndex) {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 		int size = list.size();
 		if (oldIndex < 0 || oldIndex >= size || newIndex < 0
 				|| newIndex >= size)
@@ -291,11 +295,11 @@ public class SimplePropertyObservableList extends AbstractObservableList
 		if (oldIndex == newIndex)
 			return list.get(oldIndex);
 
-		Object element = list.get(oldIndex);
+		E element = list.get(oldIndex);
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-				oldIndex, false, element), Diffs.createListDiffEntry(newIndex,
-				true, element));
+		ListDiff<E> diff = Diffs.createListDiff(
+				Diffs.createListDiffEntry(oldIndex, false, element),
+				Diffs.createListDiffEntry(newIndex, true, element));
 		updateList(list, diff);
 
 		return element;
@@ -305,33 +309,35 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	public boolean remove(Object o) {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 
 		int index = list.indexOf(o);
 		if (index == -1)
 			return false;
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
-				false, o));
+		@SuppressWarnings("unchecked")
+		// o can only be of type E
+		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+				index, false, (E) o));
 		updateList(list, diff);
 
 		return true;
 	}
 
 	@Override
-	public ListIterator listIterator() {
+	public ListIterator<E> listIterator() {
 		return listIterator(0);
 	}
 
 	@Override
-	public ListIterator listIterator(final int index) {
+	public ListIterator<E> listIterator(final int index) {
 		getterCalled();
-		return new ListIterator() {
+		return new ListIterator<E>() {
 			int expectedModCount = modCount;
-			List list = new ArrayList(getList());
-			ListIterator iterator = list.listIterator(index);
+			List<E> list = new ArrayList<E>(getList());
+			ListIterator<E> iterator = list.listIterator(index);
 
-			Object lastElement = null;
+			E lastElement = null;
 			int lastIndex = -1;
 
 			@Override
@@ -349,7 +355,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			}
 
 			@Override
-			public Object next() {
+			public E next() {
 				getterCalled();
 				checkForComodification();
 				lastElement = iterator.next();
@@ -372,7 +378,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			}
 
 			@Override
-			public Object previous() {
+			public E previous() {
 				getterCalled();
 				checkForComodification();
 				lastElement = iterator.previous();
@@ -381,13 +387,13 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			}
 
 			@Override
-			public void add(Object o) {
+			public void add(E o) {
 				checkRealm();
 				checkForComodification();
 				int index = iterator.nextIndex();
 
-				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-						index, true, o));
+				ListDiff<E> diff = Diffs.createListDiff(Diffs
+						.createListDiffEntry(index, true, o));
 				updateList(list, diff);
 
 				iterator.add(o); // keep in sync
@@ -398,13 +404,13 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			}
 
 			@Override
-			public void set(Object o) {
+			public void set(E o) {
 				checkRealm();
 				checkForComodification();
 
-				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-						lastIndex, false, lastElement), Diffs
-						.createListDiffEntry(lastIndex, true, o));
+				ListDiff<E> diff = Diffs.createListDiff(Diffs
+						.createListDiffEntry(lastIndex, false, lastElement),
+						Diffs.createListDiffEntry(lastIndex, true, o));
 				updateList(list, diff);
 
 				iterator.set(o);
@@ -420,8 +426,8 @@ public class SimplePropertyObservableList extends AbstractObservableList
 				if (lastIndex == -1)
 					throw new IllegalStateException();
 
-				ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(
-						lastIndex, false, lastElement));
+				ListDiff<E> diff = Diffs.createListDiff(Diffs
+						.createListDiffEntry(lastIndex, false, lastElement));
 				updateList(list, diff);
 
 				iterator.remove(); // keep in sync
@@ -439,35 +445,36 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public Object remove(int index) {
+	public E remove(int index) {
 		checkRealm();
 
-		List list = getList();
-		Object element = list.get(index);
+		List<E> list = getList();
+		E element = list.get(index);
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
-				false, element));
+		ListDiff<E> diff = Diffs.createListDiff(Diffs.createListDiffEntry(
+				index, false, element));
 		updateList(list, diff);
 
 		return element;
 	}
 
 	@Override
-	public Object set(int index, Object o) {
+	public E set(int index, E o) {
 		checkRealm();
 
-		List list = getList();
-		Object oldElement = list.get(index);
+		List<E> list = getList();
+		E oldElement = list.get(index);
 
-		ListDiff diff = Diffs.createListDiff(Diffs.createListDiffEntry(index,
-				false, oldElement), Diffs.createListDiffEntry(index, true, o));
+		ListDiff<E> diff = Diffs.createListDiff(
+				Diffs.createListDiffEntry(index, false, oldElement),
+				Diffs.createListDiffEntry(index, true, o));
 		updateList(list, diff);
 
 		return oldElement;
 	}
 
 	@Override
-	public List subList(int fromIndex, int toIndex) {
+	public List<E> subList(int fromIndex, int toIndex) {
 		getterCalled();
 		return Collections.unmodifiableList(getList().subList(fromIndex,
 				toIndex));
@@ -476,18 +483,18 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	// Bulk change operations
 
 	@Override
-	public boolean addAll(Collection c) {
+	public boolean addAll(Collection<? extends E> c) {
 		checkRealm();
 
 		if (c.isEmpty())
 			return false;
 
-		List list = getList();
+		List<E> list = getList();
 		return addAll(list, list.size(), c);
 	}
 
 	@Override
-	public boolean addAll(int index, Collection c) {
+	public boolean addAll(int index, Collection<? extends E> c) {
 		checkRealm();
 
 		if (c.isEmpty())
@@ -496,19 +503,19 @@ public class SimplePropertyObservableList extends AbstractObservableList
 		return addAll(getList(), index, c);
 	}
 
-	private boolean addAll(List list, int index, Collection c) {
+	private boolean addAll(List<E> list, int index, Collection<? extends E> c) {
 		if (index < 0 || index > list.size())
 			throw new IndexOutOfBoundsException();
 
-		ListDiffEntry[] entries = new ListDiffEntry[c.size()];
+		List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>(
+				c.size());
 		int offsetIndex = 0;
-		for (Iterator it = c.iterator(); it.hasNext();) {
-			Object element = it.next();
-			entries[offsetIndex] = Diffs.createListDiffEntry(index
-					+ offsetIndex, true, element);
+		for (E element : c) {
+			entries.add(Diffs.createListDiffEntry(index + offsetIndex, true,
+					element));
 			offsetIndex++;
 		}
-		ListDiff diff = Diffs.createListDiff(entries);
+		ListDiff<E> diff = Diffs.createListDiff(entries);
 
 		updateList(list, diff);
 
@@ -516,20 +523,20 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public boolean removeAll(Collection c) {
+	public boolean removeAll(Collection<?> c) {
 		checkRealm();
 
 		if (c.isEmpty())
 			return false;
 
-		List list = getList();
+		List<E> list = getList();
 		if (list.isEmpty())
 			return false;
 
-		List entries = new ArrayList();
-		for (ListIterator it = list.listIterator(); it.hasNext();) {
+		List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>();
+		for (ListIterator<E> it = list.listIterator(); it.hasNext();) {
 			int index = it.nextIndex() - entries.size();
-			Object element = it.next();
+			E element = it.next();
 			if (c.contains(element)) {
 				entries.add(Diffs.createListDiffEntry(index, false, element));
 			}
@@ -538,18 +545,17 @@ public class SimplePropertyObservableList extends AbstractObservableList
 		if (entries.isEmpty())
 			return false;
 
-		ListDiff diff = Diffs.createListDiff((ListDiffEntry[]) entries
-				.toArray(new ListDiffEntry[entries.size()]));
+		ListDiff<E> diff = Diffs.createListDiff(entries);
 		updateList(list, diff);
 
 		return true;
 	}
 
 	@Override
-	public boolean retainAll(Collection c) {
+	public boolean retainAll(Collection<?> c) {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 		if (list.isEmpty())
 			return false;
 
@@ -558,10 +564,10 @@ public class SimplePropertyObservableList extends AbstractObservableList
 			return true;
 		}
 
-		List entries = new ArrayList();
-		for (ListIterator it = list.listIterator(); it.hasNext();) {
+		List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>();
+		for (ListIterator<E> it = list.listIterator(); it.hasNext();) {
 			int index = it.nextIndex() - entries.size();
-			Object element = it.next();
+			E element = it.next();
 			if (!c.contains(element)) {
 				entries.add(Diffs.createListDiffEntry(index, false, element));
 			}
@@ -570,8 +576,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 		if (entries.isEmpty())
 			return false;
 
-		ListDiff diff = Diffs.createListDiff((ListDiffEntry[]) entries
-				.toArray(new ListDiffEntry[entries.size()]));
+		ListDiff<E> diff = Diffs.createListDiff(entries);
 		updateList(list, diff);
 
 		return true;
@@ -581,27 +586,27 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	public void clear() {
 		checkRealm();
 
-		List list = getList();
+		List<E> list = getList();
 		if (list.isEmpty())
 			return;
 
-		List entries = new ArrayList();
-		for (ListIterator it = list.listIterator(list.size()); it.hasPrevious();) {
+		List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>();
+		for (ListIterator<E> it = list.listIterator(list.size()); it
+				.hasPrevious();) {
 			// always report 0 as the remove index
 			int index = it.previousIndex();
-			Object element = it.previous();
+			E element = it.previous();
 			entries.add(Diffs.createListDiffEntry(index, false, element));
 		}
-		ListDiff diff = Diffs.createListDiff((ListDiffEntry[]) entries
-				.toArray(new ListDiffEntry[entries.size()]));
+		ListDiff<E> diff = Diffs.createListDiff(entries);
 
 		updateList(list, diff);
 	}
 
-	private void notifyIfChanged(ListDiff diff) {
+	private void notifyIfChanged(ListDiff<E> diff) {
 		if (hasListeners()) {
-			List oldList = cachedList;
-			List newList = cachedList = new ArrayList(getList());
+			List<E> oldList = cachedList;
+			List<E> newList = cachedList = new ArrayList<E>(getList());
 			if (diff == null)
 				diff = Diffs.computeListDiff(oldList, newList);
 			if (!diff.isEmpty() || stale) {
@@ -635,7 +640,7 @@ public class SimplePropertyObservableList extends AbstractObservableList
 	}
 
 	@Override
-	public IProperty getProperty() {
+	public SimpleListProperty<S, E> getProperty() {
 		return property;
 	}
 

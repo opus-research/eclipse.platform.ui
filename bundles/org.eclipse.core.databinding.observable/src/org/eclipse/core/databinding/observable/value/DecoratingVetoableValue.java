@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 263691)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -16,9 +15,8 @@ import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An {@link IVetoableValue} decorator for an observable value.
- *
+ * 
  * @param <T>
- *            the type of value being observed
  * @since 1.2
  */
 public class DecoratingVetoableValue<T> extends DecoratingObservableValue<T>
@@ -66,7 +64,7 @@ public class DecoratingVetoableValue<T> extends DecoratingObservableValue<T>
 	protected boolean fireValueChanging(ValueDiff<T> diff) {
 		checkRealm();
 
-		ValueChangingEvent<T> event = new ValueChangingEvent<>(this, diff);
+		ValueChangingEvent<T> event = new ValueChangingEvent<T>(this, diff);
 		fireEvent(event);
 		return !event.veto;
 	}

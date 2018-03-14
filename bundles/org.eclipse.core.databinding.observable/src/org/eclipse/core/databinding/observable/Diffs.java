@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 226216
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -39,18 +38,18 @@ public class Diffs {
 	/**
 	 * Returns a {@link ListDiff} describing the change between the specified
 	 * old and new list states.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param oldList
 	 *            the old list state
 	 * @param newList
 	 *            the new list state
 	 * @return the differences between oldList and newList
 	 */
-	public static <E> ListDiff<E> computeListDiff(List<? extends E> oldList, List<? extends E> newList) {
-		List<ListDiffEntry<E>> diffEntries = new ArrayList<>();
+	public static <E> ListDiff<E> computeListDiff(List<E> oldList,
+			List<E> newList) {
+		List<ListDiffEntry<E>> diffEntries = new ArrayList<ListDiffEntry<E>>();
 		createListDiffs(new ArrayList<E>(oldList), newList, diffEntries);
 		ListDiff<E> listDiff = createListDiff(diffEntries);
 		return listDiff;
@@ -59,10 +58,9 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link ListDiff} describing the change between
 	 * the specified old and new list states.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param oldList
 	 *            the old list state
 	 * @param newList
@@ -71,13 +69,13 @@ public class Diffs {
 	 *         the specified old and new list states.
 	 * @since 1.3
 	 */
-	public static <E> ListDiff<E> computeLazyListDiff(final List<? extends E> oldList,
-			final List<? extends E> newList) {
+	public static <E> ListDiff<E> computeLazyListDiff(final List<E> oldList,
+			final List<E> newList) {
 		return new ListDiff<E>() {
 			ListDiff<E> lazyDiff;
 
 			@Override
-			public ListDiffEntry<E>[] getDifferences() {
+			public ListDiffEntry<?>[] getDifferences() {
 				if (lazyDiff == null) {
 					lazyDiff = Diffs.computeListDiff(oldList, newList);
 				}
@@ -89,10 +87,10 @@ public class Diffs {
 	/**
 	 * adapted from EMF's ListDifferenceAnalyzer
 	 */
-	private static <E> void createListDiffs(List<E> oldList, List<? extends E> newList,
+	private static <E> void createListDiffs(List<E> oldList, List<E> newList,
 			List<ListDiffEntry<E>> listDiffs) {
 		int index = 0;
-		for (Iterator<? extends E> it = newList.iterator(); it.hasNext();) {
+		for (Iterator<E> it = newList.iterator(); it.hasNext();) {
 			E newValue = it.next();
 			if (oldList.size() <= index) {
 				// append newValue to newList
@@ -198,10 +196,9 @@ public class Diffs {
 	/**
 	 * Returns a {@link SetDiff} describing the change between the specified old
 	 * and new set states.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param oldSet
 	 *            the old set state
 	 * @param newSet
@@ -209,7 +206,7 @@ public class Diffs {
 	 * @return a {@link SetDiff} describing the change between the specified old
 	 *         and new set states.
 	 */
-	public static <E> SetDiff<E> computeSetDiff(Set<? extends E> oldSet, Set<? extends E> newSet) {
+	public static <E> SetDiff<E> computeSetDiff(Set<E> oldSet, Set<E> newSet) {
 		Set<E> additions = new HashSet<E>(newSet);
 		additions.removeAll(oldSet);
 		Set<E> removals = new HashSet<E>(oldSet);
@@ -220,10 +217,9 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link SetDiff} describing the change between
 	 * the specified old and new set states.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param oldSet
 	 *            the old set state
 	 * @param newSet
@@ -232,7 +228,8 @@ public class Diffs {
 	 *         the specified old and new set states.
 	 * @since 1.3
 	 */
-	public static <E> SetDiff<E> computeLazySetDiff(final Set<? extends E> oldSet, final Set<? extends E> newSet) {
+	public static <E> SetDiff<E> computeLazySetDiff(final Set<E> oldSet,
+			final Set<E> newSet) {
 		return new SetDiff<E>() {
 
 			private SetDiff<E> lazyDiff;
@@ -260,7 +257,7 @@ public class Diffs {
 	/**
 	 * Returns a {@link MapDiff} describing the change between the specified old
 	 * and new map states.
-	 *
+	 * 
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>
@@ -272,8 +269,8 @@ public class Diffs {
 	 * @return a {@link MapDiff} describing the change between the specified old
 	 *         and new map states.
 	 */
-	public static <K, V> MapDiff<K, V> computeMapDiff(Map<? extends K, ? extends V> oldMap,
-			Map<? extends K, ? extends V> newMap) {
+	public static <K, V> MapDiff<K, V> computeMapDiff(Map<K, V> oldMap,
+			Map<K, V> newMap) {
 		// starts out with all keys from the new map, we will remove keys from
 		// the old map as we go
 		final Set<K> addedKeys = new HashSet<K>(newMap.keySet());
@@ -281,7 +278,9 @@ public class Diffs {
 		final Set<K> changedKeys = new HashSet<K>();
 		final Map<K, V> oldValues = new HashMap<K, V>();
 		final Map<K, V> newValues = new HashMap<K, V>();
-		for (Entry<? extends K, ? extends V> oldEntry : oldMap.entrySet()) {
+		for (Iterator<Entry<K, V>> it = oldMap.entrySet().iterator(); it
+				.hasNext();) {
+			Map.Entry<K, V> oldEntry = it.next();
 			K oldKey = oldEntry.getKey();
 			if (addedKeys.remove(oldKey)) {
 				// potentially changed key since it is in oldMap and newMap
@@ -302,7 +301,7 @@ public class Diffs {
 			newValues.put(newKey, newMap.get(newKey));
 		}
 		return new MapDiff<K, V>() {
-			@Override
+                        @Override
 			public Set<K> getAddedKeys() {
 				return addedKeys;
 			}
@@ -332,7 +331,7 @@ public class Diffs {
 	/**
 	 * Returns a lazily computed {@link MapDiff} describing the change between
 	 * the specified old and new map states.
-	 *
+	 * 
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>
@@ -345,8 +344,8 @@ public class Diffs {
 	 *         the specified old and new map states.
 	 * @since 1.3
 	 */
-	public static <K, V> MapDiff<K, V> computeLazyMapDiff(final Map<? extends K, ? extends V> oldMap,
-			final Map<? extends K, ? extends V> newMap) {
+	public static <K, V> MapDiff<K, V> computeLazyMapDiff(
+			final Map<K, V> oldMap, final Map<K, V> newMap) {
 		return new MapDiff<K, V>() {
 
 			private MapDiff<K, V> lazyDiff;
@@ -359,17 +358,17 @@ public class Diffs {
 			}
 
 			@Override
-			public Set<? extends K> getAddedKeys() {
+			public Set<K> getAddedKeys() {
 				return getLazyDiff().getAddedKeys();
 			}
 
 			@Override
-			public Set<? extends K> getRemovedKeys() {
+			public Set<K> getRemovedKeys() {
 				return getLazyDiff().getRemovedKeys();
 			}
 
 			@Override
-			public Set<? extends K> getChangedKeys() {
+			public Set<K> getChangedKeys() {
 				return getLazyDiff().getChangedKeys();
 			}
 
@@ -387,15 +386,13 @@ public class Diffs {
 	}
 
 	/**
-	 * Creates a diff between two values
-	 *
 	 * @param <T>
-	 *            the value type
 	 * @param oldValue
 	 * @param newValue
 	 * @return a value diff
 	 */
-	public static <T> ValueDiff<T> createValueDiff(final T oldValue, final T newValue) {
+	public static <T> ValueDiff<T> createValueDiff(final T oldValue,
+			final T newValue) {
 		return new ValueDiff<T>() {
 
 			@Override
@@ -412,12 +409,11 @@ public class Diffs {
 
 	/**
 	 * @param <E>
-	 *            the set element type
 	 * @param additions
 	 * @param removals
 	 * @return a set diff
 	 */
-	public static <E> SetDiff<E> createSetDiff(Set<? extends E> additions, Set<? extends E> removals) {
+	public static <E> SetDiff<E> createSetDiff(Set<E> additions, Set<E> removals) {
 		final Set<E> unmodifiableAdditions = Collections
 				.unmodifiableSet(additions);
 		final Set<E> unmodifiableRemovals = Collections
@@ -438,7 +434,6 @@ public class Diffs {
 
 	/**
 	 * @param <E>
-	 *            the list element type
 	 * @param difference
 	 * @return a list diff with one differing entry
 	 */
@@ -448,56 +443,50 @@ public class Diffs {
 
 	/**
 	 * @param <E>
-	 *            the list element type
 	 * @param difference1
 	 * @param difference2
 	 * @return a list diff with two differing entries
 	 */
 	public static <E> ListDiff<E> createListDiff(ListDiffEntry<E> difference1,
 			ListDiffEntry<E> difference2) {
-		List<ListDiffEntry<E>> differences = new ArrayList<>(2);
+		List<ListDiffEntry<E>> differences = new ArrayList<ListDiffEntry<E>>(2);
 		differences.add(difference1);
 		differences.add(difference2);
 		return createListDiff(differences);
 	}
 
 	/**
-	 * Creates a new ListDiff object given its constituent ListDiffEntry
-	 * objects.
-	 * <p>
 	 * This form cannot be used in a type-safe manner because it is not possible
-	 * to construct an array of generic types in a type-safe manner. Use the
-	 * form below which takes a properly parameterized List.
-	 *
+	 * to construct an array of generic types in a type-safe manner. The form
+	 * below which takes a properly parameterized List is recommended.
+	 * 
 	 * @param <E>
-	 *            the list element type
 	 * @param differences
 	 * @return a list diff with the given entries
 	 */
-	public static <E> ListDiff<E> createListDiff(final ListDiffEntry<E>[] differences) {
+	public static <E> ListDiff<E> createListDiff(
+			final ListDiffEntry<E>[] differences) {
 		return new ListDiff<E>() {
 			@Override
-			public ListDiffEntry<E>[] getDifferences() {
+			public ListDiffEntry<?>[] getDifferences() {
 				return differences;
 			}
 		};
 	}
 
 	/**
-	 * Creates a new ListDiff object given its constituent ListDiffEntry
-	 * objects.
-	 *
 	 * @param <E>
-	 *            the list element type
 	 * @param differences
 	 * @return a list diff with the given entries
-	 * @since 1.6
+	 * @since 1.5
 	 */
-	public static <E> ListDiff<E> createListDiff(final List<ListDiffEntry<E>> differences) {
-		final ListDiffEntry<E>[] differencesArray = differences.toArray(new ListDiffEntry[differences.size()]);
+	public static <E> ListDiff<E> createListDiff(
+			final List<ListDiffEntry<E>> differences) {
+		final ListDiffEntry<?>[] differencesArray = differences
+				.toArray(new ListDiffEntry[differences.size()]);
 		return new ListDiff<E>() {
 			@Override
-			public ListDiffEntry<E>[] getDifferences() {
+			public ListDiffEntry<?>[] getDifferences() {
 				return differencesArray;
 			}
 		};
@@ -505,7 +494,6 @@ public class Diffs {
 
 	/**
 	 * @param <E>
-	 *            the list element type
 	 * @param position
 	 * @param isAddition
 	 * @param element
@@ -533,8 +521,6 @@ public class Diffs {
 	}
 
 	/**
-	 * Creates a MapDiff representing the addition of a single added key
-	 *
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>
@@ -706,18 +692,18 @@ public class Diffs {
 	 * @param newValues
 	 * @return a map diff
 	 */
-	public static <K, V> MapDiff<K, V> createMapDiff(final Set<? extends K> addedKeys,
-			final Set<? extends K> removedKeys, final Set<? extends K> changedKeys,
-			final Map<? extends K, ? extends V> oldValues, final Map<? extends K, ? extends V> newValues) {
+	public static <K, V> MapDiff<K, V> createMapDiff(final Set<K> addedKeys,
+			final Set<K> removedKeys, final Set<K> changedKeys,
+			final Map<K, V> oldValues, final Map<K, V> newValues) {
 		return new MapDiff<K, V>() {
 
 			@Override
-			public Set<? extends K> getAddedKeys() {
+			public Set<K> getAddedKeys() {
 				return addedKeys;
 			}
 
 			@Override
-			public Set<? extends K> getChangedKeys() {
+			public Set<K> getChangedKeys() {
 				return changedKeys;
 			}
 
@@ -732,7 +718,7 @@ public class Diffs {
 			}
 
 			@Override
-			public Set<? extends K> getRemovedKeys() {
+			public Set<K> getRemovedKeys() {
 				return removedKeys;
 			}
 		};

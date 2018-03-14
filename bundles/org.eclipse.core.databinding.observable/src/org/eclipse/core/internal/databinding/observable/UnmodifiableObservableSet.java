@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Matthew Hall and others.
+ * Copyright (c) 2007, 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Brad Reynolds - initial API and implementation
  *         (through UnmodifiableObservableList.java)
  *     Matthew Hall - bug 237718
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -27,10 +26,9 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * ObservableList implementation that prevents modification by consumers. Events
  * in the originating wrapped list are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
- *
+ * 
  * @param <E>
- *            the type of the elements in this set
- *
+ * 
  * @since 1.1
  */
 public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 164653
  *     Matthew Hall - bugs 226289, 274450
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -29,15 +28,14 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <K>
- *            the type of the keys in this map
  * @param <V>
- *            the type of the values in this map
- *
+ * 
  * @since 1.0
  */
-public class ObservableMap<K, V> extends AbstractObservable implements IObservableMap<K, V> {
+public class ObservableMap<K, V> extends AbstractObservable implements
+		IObservableMap<K, V> {
 
 	protected Map<K, V> wrappedMap;
 
@@ -60,12 +58,14 @@ public class ObservableMap<K, V> extends AbstractObservable implements IObservab
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void addMapChangeListener(
+			IMapChangeListener<K, V> listener) {
 		addListener(MapChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void removeMapChangeListener(
+			IMapChangeListener<K, V> listener) {
 		removeListener(MapChangeEvent.TYPE, listener);
 	}
 
@@ -89,13 +89,13 @@ public class ObservableMap<K, V> extends AbstractObservable implements IObservab
 		ObservableTracker.getterCalled(this);
 	}
 
-	protected void fireMapChange(MapDiff<? extends K, ? extends V> diff) {
+	protected void fireMapChange(MapDiff<K, V> diff) {
 		checkRealm();
 
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new MapChangeEvent<>(this, diff));
+		fireEvent(new MapChangeEvent<K, V>(this, diff));
 	}
 
 	@Override

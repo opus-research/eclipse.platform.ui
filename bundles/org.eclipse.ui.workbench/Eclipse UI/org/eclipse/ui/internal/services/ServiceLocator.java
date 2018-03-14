@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 436225
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -82,7 +81,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	private IEclipseContext e4Context;
 
-	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<Class<?>, Object>();
 
 	/**
 	 * Constructs a service locator with no parent.

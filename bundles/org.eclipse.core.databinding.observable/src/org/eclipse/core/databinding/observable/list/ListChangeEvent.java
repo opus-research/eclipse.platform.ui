@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -18,13 +17,12 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * List change event describing an incremental change of an
  * {@link IObservableList} object.
- *
+ * 
  * @param <E>
- *            the type of the elements in this change event
- *
+ * 
  * @since 1.0
  */
-public class ListChangeEvent<E> extends ObservableEvent {
+public class ListChangeEvent<E> extends ObservableEvent<ListChangeEvent<E>> {
 
 	/**
 	 *
@@ -37,7 +35,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * Description of the change to the source observable list. Listeners must
 	 * not change this field.
 	 */
-	public ListDiff<? extends E> diff;
+	public ListDiff<E> diff;
 
 	/**
 	 * Always identical to <code>EventObject.source</code> but the type
@@ -53,7 +51,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 	 * @param diff
 	 *            the list change
 	 */
-	public ListChangeEvent(IObservableList<E> source, ListDiff<? extends E> diff) {
+	public ListChangeEvent(IObservableList<E> source, ListDiff<E> diff) {
 		super(source);
 		this.typedSource = source;
 		this.diff = diff;
@@ -68,7 +66,6 @@ public class ListChangeEvent<E> extends ObservableEvent {
 		return typedSource;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IListChangeListener<E>) listener).handleListChange(this);

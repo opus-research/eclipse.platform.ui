@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
@@ -31,9 +31,8 @@ import org.eclipse.core.databinding.observable.list.ListDiffEntry;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <E>
- *            the type of elements in the collection
  * @since 1.0
  *
  */
@@ -44,11 +43,12 @@ public class ListToSetAdapter<E> extends ObservableSet<E> {
 	private IListChangeListener<E> listener = new IListChangeListener<E>() {
 
 		@Override
-		public void handleListChange(ListChangeEvent<? extends E> event) {
-			Set<E> added = new HashSet<>();
-			Set<E> removed = new HashSet<>();
-			ListDiffEntry<? extends E>[] differences = event.diff.getDifferences();
-			for (ListDiffEntry<? extends E> entry : differences) {
+		public void handleListChange(ListChangeEvent<E> event) {
+			Set<E> added = new HashSet<E>();
+			Set<E> removed = new HashSet<E>();
+			List<ListDiffEntry<E>> differences = event.diff
+					.getDifferencesAsList();
+			for (ListDiffEntry<E> entry : differences) {
 				E element = entry.getElement();
 				if (entry.isAddition()) {
 					if (wrappedSet.add(element)) {

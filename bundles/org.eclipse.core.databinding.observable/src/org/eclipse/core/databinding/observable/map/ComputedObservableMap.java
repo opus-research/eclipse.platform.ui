@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Matthew Hall - bugs 241585, 247394, 226289, 194734, 190881, 266754,
  *                    268688
  *     Ovidio Mallo - bug 303847
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -37,13 +36,14 @@ import org.eclipse.core.internal.databinding.identity.IdentitySet;
 /**
  * Maps objects to one of their attributes. Tracks changes to the underlying
  * observable set of objects (keys), as well as changes to attribute values.
- *
+ * 
  * @param <K>
  *            type of the keys to the map
  * @param <V>
  *            type of the values in the map
  */
-public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<K, V> {
+public abstract class ComputedObservableMap<K, V> extends
+		AbstractObservableMap<K, V> {
 
 	private IObservableSet<K> keySet;
 
@@ -53,11 +53,11 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 
 	private ISetChangeListener<K> setChangeListener = new ISetChangeListener<K>() {
 		@Override
-		public void handleSetChange(SetChangeEvent<? extends K> event) {
+		public void handleSetChange(SetChangeEvent<K> event) {
 			Set<K> addedKeys = new HashSet<K>(event.diff.getAdditions());
 			Set<K> removedKeys = new HashSet<K>(event.diff.getRemovals());
-			Map<K, V> oldValues = new HashMap<>();
-			Map<K, V> newValues = new HashMap<>();
+			Map<K, V> oldValues = new HashMap<K, V>();
+			Map<K, V> newValues = new HashMap<K, V>();
 			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
 				K removedKey = it.next();
 				V oldValue = null;
@@ -191,7 +191,7 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 
 	private void hookListeners() {
 		if (keySet != null) {
-			knownKeys = new IdentitySet<>();
+			knownKeys = new IdentitySet<K>();
 			keySet.addSetChangeListener(setChangeListener);
 			keySet.addStaleListener(staleListener);
 			for (Iterator<K> it = this.keySet.iterator(); it.hasNext();) {
@@ -269,7 +269,6 @@ public abstract class ComputedObservableMap<K, V> extends AbstractObservableMap<
 		return keySet;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	final public V get(Object key) {
 		getterCalled();

@@ -19,7 +19,8 @@ import org.eclipse.core.runtime.AssertionFailedException;
 /**
  * @since 1.0
  */
-public abstract class AbstractObservable extends ChangeManager implements IObservable {
+public abstract class AbstractObservable extends ChangeManager implements
+		IObservable {
 	private boolean disposed = false;
 
 	/**
@@ -32,12 +33,12 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 
 	@Override
 	public synchronized void addChangeListener(IChangeListener listener) {
-		addListener(ChangeEvent.TYPE, listener);
+		addListener(AbstractChangeEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeChangeListener(IChangeListener listener) {
-		removeListener(ChangeEvent.TYPE, listener);
+		removeListener(AbstractChangeEvent.TYPE, listener);
 	}
 
 	@Override
@@ -100,7 +101,8 @@ public abstract class AbstractObservable extends ChangeManager implements IObser
 	 * Asserts that the realm is the current realm.
 	 *
 	 * @see Realm#isCurrent()
-	 * @throws AssertionFailedException if the realm is not the current realm
+	 * @throws AssertionFailedException
+	 *             if the realm is not the current realm
 	 */
 	protected void checkRealm() {
 		Assert.isTrue(getRealm().isCurrent(),

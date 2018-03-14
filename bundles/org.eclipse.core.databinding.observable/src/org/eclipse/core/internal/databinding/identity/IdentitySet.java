@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Matthew Hall - bug 124684
  *         (through ViewerElementSet.java)
  *     Matthew Hall - bugs 262269, 303847
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.identity;
@@ -29,9 +28,8 @@ import java.util.Set;
  * This class is <i>not</i> a strict implementation the {@link Set} interface.
  * It intentionally violates the {@link Set} contract, which requires the use of
  * {@link #equals(Object)} when comparing elements.
- *
+ * 
  * @param <E>
- *            the type of the elements in this collection
  * @since 1.2
  */
 public class IdentitySet<E> implements Set<E> {
@@ -41,7 +39,7 @@ public class IdentitySet<E> implements Set<E> {
 	 * Constructs an IdentitySet.
 	 */
 	public IdentitySet() {
-		this.wrappedSet = new HashSet<>();
+		this.wrappedSet = new HashSet<IdentityWrapper<E>>();
 	}
 
 	/**
@@ -64,7 +62,8 @@ public class IdentitySet<E> implements Set<E> {
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		boolean changed = false;
-		for (E element : c) {
+		for (Iterator<? extends E> iterator = c.iterator(); iterator.hasNext();) {
+			E element = iterator.next();
 			changed |= wrappedSet.add(IdentityWrapper.wrap(element));
 		}
 		return changed;
@@ -158,13 +157,13 @@ public class IdentitySet<E> implements Set<E> {
 		return toArray(new Object[wrappedSet.size()]);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T[] toArray(T[] a) {
 		int size = wrappedSet.size();
 		T[] result = a;
 		if (a.length < size) {
-			result = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+			result = (T[]) Array.newInstance(a.getClass().getComponentType(),
+					size);
 		}
 
 		int i = 0;
