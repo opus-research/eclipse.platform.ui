@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
- *     Brian de Alwis - Fix size computation to account for trim
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -53,6 +52,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -282,12 +282,12 @@ public class SearchField {
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
-		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
-		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		FontMetrics fm = gc.getFontMetrics();
+		int width = text.computeSize(fm.getAverageCharWidth() * text.getMessage().length(),
+				SWT.DEFAULT).x + 15 /* some extra space */;
 		gc.dispose();
 
-		// computeTrim() may result in r.x < 0
-		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
+		GridDataFactory.fillDefaults().hint(width, SWT.DEFAULT).applyTo(text);
 		return text;
 	}
 

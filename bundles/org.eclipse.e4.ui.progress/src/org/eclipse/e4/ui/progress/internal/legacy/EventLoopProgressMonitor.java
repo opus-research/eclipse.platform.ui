@@ -57,32 +57,42 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         super(monitor);
     }
 
-    @Override
+    /** 
+     * @see IProgressMonitor#beginTask
+     */
     public void beginTask(String name, int totalWork) {
         super.beginTask(name, totalWork);
         taskName = name;
         runEventLoop();
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+     */
     public void clearBlocked() {
         Dialog.getBlockedHandler().clearBlocked();
     }
 
-     @Override
+    /**
+     * @see IProgressMonitor#done
+     */
     public void done() {
         super.done();
         taskName = null;
         runEventLoop();
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#internalWorked
+     */
     public void internalWorked(double work) {
         super.internalWorked(work);
         runEventLoop();
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#isCanceled
+     */
     public boolean isCanceled() {
         runEventLoop();
         return super.isCanceled();
@@ -129,26 +139,34 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         }
     }
 
-    @Override
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+     */
     public void setBlocked(IStatus reason) {
         Dialog.getBlockedHandler().showBlocked(this, reason, taskName);
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#setCanceled
+     */
     public void setCanceled(boolean b) {
         super.setCanceled(b);
         taskName = null;
         runEventLoop();
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#setTaskName
+     */
     public void setTaskName(String name) {
         super.setTaskName(name);
         taskName = name;
         runEventLoop();
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#subTask
+     */
     public void subTask(String name) {
         //Be prepared in case the first task was null
         if (taskName == null) {
@@ -158,7 +176,9 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         runEventLoop();
     }
 
-    @Override
+    /**
+     * @see IProgressMonitor#worked
+     */
     public void worked(int work) {
         super.worked(work);
         runEventLoop();
