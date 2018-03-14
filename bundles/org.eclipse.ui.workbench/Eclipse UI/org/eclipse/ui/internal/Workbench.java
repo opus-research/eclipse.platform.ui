@@ -194,6 +194,7 @@ import org.eclipse.ui.internal.contexts.ActiveContextSourceProvider;
 import org.eclipse.ui.internal.contexts.ContextService;
 import org.eclipse.ui.internal.contexts.WorkbenchContextSupport;
 import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
+import org.eclipse.ui.internal.dialogs.WorkbenchPreferenceManager;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.e4.compatibility.E4Util;
@@ -3114,6 +3115,13 @@ UIEvents.Context.TOPIC_CONTEXT,
 		WorkbenchThemeManager.getInstance().dispose();
 		PropertyPageContributorManager.getManager().dispose();
 		ObjectActionContributorManager.getManager().dispose();
+
+		PreferenceManager preferenceManager = (PreferenceManager) e4Context
+				.get(PreferenceManager.class.getName());
+		if (preferenceManager instanceof WorkbenchPreferenceManager) {
+			((WorkbenchPreferenceManager) preferenceManager).dispose();
+		}
+
 		if (tracker != null) {
 			tracker.close();
 		}
