@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -53,6 +53,7 @@ public class ViewRegistry implements IViewRegistry {
 
 	@Inject
 	private IWorkbench workbench;
+
 
 	private Map<String, IViewDescriptor> descriptors = new HashMap<String, IViewDescriptor>();
 
@@ -196,11 +197,8 @@ public class ViewRegistry implements IViewRegistry {
 	}
 
 	/**
-	 * Method does nothing, should not be called anymore
 	 *
-	 * @deprecated
 	 */
-	@Deprecated
 	public void dispose() {
 
 	}
