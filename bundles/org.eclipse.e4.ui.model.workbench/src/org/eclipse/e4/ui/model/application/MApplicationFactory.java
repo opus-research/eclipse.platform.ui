@@ -46,4 +46,13 @@ public interface MApplicationFactory {
 	 */
 	MAddon createAddon();
 
+	/**
+	 * Returns a new object of class '<em>Lifecycle Contribution</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Lifecycle Contribution</em>'.
+	 * @generated
+	 */
+	MLifecycleContribution createLifecycleContribution();
+
 } //MApplicationFactory
