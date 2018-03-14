@@ -18,7 +18,6 @@ public class EditMaskLexerAndTokenTest extends TestCase {
 
 	private EditMaskLexerAndToken token;
 	
-	@Override
 	protected void setUp() throws Exception {
 		token = new EditMaskLexerAndToken();
 	}

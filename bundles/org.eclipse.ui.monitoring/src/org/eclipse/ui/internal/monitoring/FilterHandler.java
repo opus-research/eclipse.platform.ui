@@ -14,6 +14,7 @@ package org.eclipse.ui.internal.monitoring;
 import java.lang.management.ThreadInfo;
 import java.util.Arrays;
 
+import org.eclipse.jface.util.Util;
 import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
 
@@ -76,19 +77,17 @@ public class FilterHandler {
 	 */
 	public boolean shouldLogEvent(StackSample[] stackSamples, int numSamples,
 			long displayThreadId) {
-		if (filters.length > 0) {
-			for (int i = 0; i < numSamples; i++) {
-				if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
-					return false;
-				}
+		for (int i = 0; i < numSamples; i++) {
+			if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
+				return false;
 			}
 		}
 		return true;
 	}
 
 	/**
-	 * Checks if the stack trace contains fully qualified names of the methods that should be
-	 * ignored.
+	 * Checks if the top frame of the stack trace of the display thread contains the fully qualified
+	 * name of a method that should be ignored.
 	 */
 	private boolean hasFilteredTraces(ThreadInfo[] stackTraces, long displayThreadId) {
 		for (ThreadInfo threadInfo : stackTraces) {
@@ -102,9 +101,19 @@ public class FilterHandler {
 	}
 
 	private boolean matchesFilter(StackTraceElement[] stackTraces) {
-		for (StackTraceElement element : stackTraces) {
+		if (stackTraces.length > 0) {
+			StackTraceElement element = stackTraces[0];
 			String methodName = element.getMethodName();
 			String className = element.getClassName();
+			if (Util.isCocoa()
+					&& methodName.startsWith("objc_msgSend") //$NON-NLS-1$
+					&& className.equals("org.eclipse.swt.internal.cocoa.OS") //$NON-NLS-1$
+					&& stackTraces.length > 1) {
+				// Skip the objc_msgSend frame at the top of the stack on Cocoa.
+				element = stackTraces[1];
+				methodName = element.getMethodName();
+				className = element.getClassName();
+			}
 			// Binary search.
 			int low = 0;
 			int high = filters.length;

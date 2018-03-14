@@ -230,6 +230,9 @@ public class IntroTest extends UITestCase {
 		assertNull(workbench.getIntroManager().getIntro());
 	}
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+     */
     @Override
 	protected void doSetUp() throws Exception {
         super.doSetUp();
@@ -246,6 +249,9 @@ public class IntroTest extends UITestCase {
         window = openTestWindow();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+     */
     @Override
 	protected void doTearDown() throws Exception {
         super.doTearDown();

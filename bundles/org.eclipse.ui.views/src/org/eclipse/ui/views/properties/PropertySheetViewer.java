@@ -604,6 +604,9 @@ class PropertySheetViewer extends Viewer {
         return getSortedEntries(getFilteredEntries(category.getChildEntries()));
     }
 
+    /*
+     * (non-Javadoc) Method declared on Viewer.
+     */
     @Override
 	public Control getControl() {
         return tree;
@@ -798,6 +801,9 @@ class PropertySheetViewer extends Viewer {
         // Part1: Double click only (allow traversal via keyboard without
         // activation
         tree.addSelectionListener(new SelectionAdapter() {
+            /* (non-Javadoc)
+             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+             */
             @Override
 			public void widgetSelected(SelectionEvent e) {
             	// The viewer only owns the status line when there is
@@ -807,6 +813,9 @@ class PropertySheetViewer extends Viewer {
 				}
 			}
 
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				if (e.item instanceof TreeItem)
@@ -1033,6 +1042,10 @@ class PropertySheetViewer extends Viewer {
         setInput(input);
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection, boolean)
+     */
     @Override
 	public void setSelection(ISelection selection, boolean reveal) {
         //Do nothing by default

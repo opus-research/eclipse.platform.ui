@@ -96,6 +96,11 @@ public class CommandEnablementTest extends UITestCase {
 		super(testName);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -118,6 +123,11 @@ public class CommandEnablementTest extends UITestCase {
 		contextHandler = new CheckContextHandler();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		if (activation1 != null) {
@@ -141,6 +151,11 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class DefaultHandler extends AbstractHandler {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
@@ -150,12 +165,22 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class DisabledHandler extends AbstractHandler {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+		 */
 		@Override
 		public boolean isEnabled() {
 			return false;
@@ -164,6 +189,11 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class EnableEventHandler extends AbstractHandler {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
@@ -172,6 +202,11 @@ public class CommandEnablementTest extends UITestCase {
 
 		private boolean fEnabled = true;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+		 */
 		@Override
 		public boolean isEnabled() {
 			return fEnabled;
@@ -187,6 +222,11 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class CheckContextHandler extends AbstractHandler {
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActivePartChecked(event);
@@ -204,6 +244,11 @@ public class CommandEnablementTest extends UITestCase {
 	private static class EnablementListener implements ICommandListener {
 		public int enabledChanged = 0;
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.ICommandListener#commandChanged(org.eclipse.core.commands.CommandEvent)
+		 */
 		@Override
 		public void commandChanged(CommandEvent commandEvent) {
 			if (commandEvent.isEnabledChanged()) {

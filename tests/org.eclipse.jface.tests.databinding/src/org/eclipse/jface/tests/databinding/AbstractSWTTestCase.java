@@ -27,7 +27,6 @@ public abstract class AbstractSWTTestCase extends AbstractDefaultRealmTestCase {
 	 *
 	 * @see org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -37,7 +36,6 @@ public abstract class AbstractSWTTestCase extends AbstractDefaultRealmTestCase {
 	 *
 	 * @see org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#tearDown()
 	 */
-	@Override
 	protected void tearDown() throws Exception {
 		if (shell != null && !shell.isDisposed()) {
 			shell.dispose();

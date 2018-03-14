@@ -68,6 +68,9 @@ public class UIJobTest extends UITestCase {
         uiJobFinishedBeforeBackgroundThread = false;
 
         final UIJob testJob = new UIJob("blah blah blah") {
+	        /* (non-Javadoc)
+	         * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+	         */
 	        @Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 	            backgroundThreadFinishedBeforeUIJob = backgroundThreadFinished;
@@ -83,6 +86,9 @@ public class UIJobTest extends UITestCase {
         // it should lock up since we're intentionally blocking the UI thread, preventing
         // it from running.
         Thread testThread = new Thread() {
+        /* (non-Javadoc)
+         * @see java.lang.Thread#run()
+         */
         @Override
 		public void run() {
             testJob.schedule();
