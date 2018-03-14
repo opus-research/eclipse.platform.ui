@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -58,7 +58,7 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 	@Override
 	protected IObservable doCreateObservable() {
 		return getObservableContractDelegate().createObservable(
-				DisplayRealm.getRealm(Display.getDefault()));
+				SWTObservables.getRealm(Display.getDefault()));
 	}
 
 	public void testGetValue() throws Exception {
@@ -74,8 +74,8 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 	}
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite(
-				ScaleObservableValueSelectionTest.class.toString());
+		TestSuite suite = new TestSuite(ScaleObservableValueSelectionTest.class
+				.toString());
 		suite.addTestSuite(ScaleObservableValueSelectionTest.class);
 		suite.addTest(SWTMutableObservableValueContractTest
 				.suite(new Delegate()));
@@ -107,8 +107,9 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 
 		@Override
 		public void change(IObservable observable) {
-			scale.setSelection(createIntegerValue((IObservableValue) observable)
-					.intValue());
+			scale
+					.setSelection(createIntegerValue(
+							(IObservableValue) observable).intValue());
 			scale.notifyListeners(SWT.Selection, null);
 		}
 
