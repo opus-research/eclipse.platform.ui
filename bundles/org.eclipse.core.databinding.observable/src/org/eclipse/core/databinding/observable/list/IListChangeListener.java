@@ -22,7 +22,6 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
  *
  * @since 1.0
  */
-@FunctionalInterface
 public interface IListChangeListener<E> extends IObservablesListener {
 
 	/**
@@ -34,4 +33,5 @@ public interface IListChangeListener<E> extends IObservablesListener {
 	 * @param event
 	 */
 	void handleListChange(ListChangeEvent<? extends E> event);
+
 }

@@ -23,7 +23,6 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
  * @since 1.0
  *
  */
-@FunctionalInterface
 public interface IValueChangeListener<T> extends IObservablesListener {
 
 	/**
@@ -36,4 +35,5 @@ public interface IValueChangeListener<T> extends IObservablesListener {
 	 *            the event
 	 */
 	void handleValueChange(ValueChangeEvent<? extends T> event);
+
 }

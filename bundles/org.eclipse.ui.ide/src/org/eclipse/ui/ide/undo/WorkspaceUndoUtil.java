@@ -29,7 +29,6 @@ import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
@@ -958,9 +957,11 @@ public class WorkspaceUndoUtil {
 	 * @return the Shell that can be used to show information
 	 */
 	public static Shell getShell(IAdaptable uiInfo) {
-		Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
-		if (shell != null) {
-			return shell;
+		if (uiInfo != null) {
+			Shell shell = uiInfo.getAdapter(Shell.class);
+			if (shell != null) {
+				return shell;
+			}
 		}
 		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	}
