@@ -34,7 +34,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
 public class ModelUtils {
 	//public static final String CONTAINING_CONTEXT = "ModelUtils.containingContext";
 	public static final String CONTAINING_PARENT = "ModelUtils.containingParent";
-	public static final String DYNAMIC_MENU_CONTEXT = "ModelUtils.dynamicMenuContext";
 
 	public static EClassifier getTypeArgument(EClass eClass,
 			EGenericType eGenericType) {
@@ -94,42 +93,42 @@ public class ModelUtils {
 				PositionInfo posInfo = PositionInfo.parse(positionInList);
 
 				if( posInfo != null ){
-					switch (posInfo.getPosition()){
-					case FIRST:
-						index = 0;
-						break;
+				  switch (posInfo.getPosition()){
+				    case FIRST:
+				      index = 0;
+				      break;
 
-					case INDEX:
-						index = posInfo.getPositionReferenceAsInteger();
-						break;
+				    case INDEX:
+				      index = posInfo.getPositionReferenceAsInteger();
+				      break;
 
-					case BEFORE:
-					case AFTER:
-						int tmpIndex = -1;
-						String elementId = posInfo.getPositionReference();
+				    case BEFORE:
+				    case AFTER:
+				      int tmpIndex = -1;
+				      String elementId = posInfo.getPositionReference();
 
-						for( int i = 0; i < list.size(); i++ ) {
-							if( elementId.equals((list.get(i)).getElementId()) ) {
-								tmpIndex = i;
-								break;
-							}
-						}
+				      for( int i = 0; i < list.size(); i++ ) {
+		            if( elementId.equals((list.get(i)).getElementId()) ) {
+		              tmpIndex = i;
+		              break;
+		            }
+		          }
 
-						if( tmpIndex != -1 ) {
-							if( posInfo.getPosition() == Position.BEFORE ) {
-								index = tmpIndex;
-							} else {
-								index = tmpIndex + 1;
-							}
-						} else {
-							System.err.println("Could not find element with Id '"+elementId+"'");
-						}
+				      if( tmpIndex != -1 ) {
+		            if( posInfo.getPosition() == Position.BEFORE ) {
+		              index = tmpIndex;
+		            } else {
+		              index = tmpIndex + 1;
+		            }
+		          } else {
+		            System.err.println("Could not find element with Id '"+elementId+"'");
+		          }
 
-					case LAST:
-					default:
-						// both no special operation, because the default is adding it at the last position
-						break;
-					}
+				    case LAST:
+				      default:
+				        // both no special operation, because the default is adding it at the last position
+				        break;
+				  }
 				} else {
 					System.err.println("Not a valid list position.");
 				}
@@ -208,8 +207,6 @@ public class ModelUtils {
 			return ((MUIElement)element).getCurSharedRef().getParent();
 		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
-		} else if (element.getTransientData().get(DYNAMIC_MENU_CONTEXT) instanceof MApplicationElement) {
-			return (MApplicationElement) element.getTransientData().get(DYNAMIC_MENU_CONTEXT);
 		} else if (element instanceof EObject) {
 			EObject eContainer = ((EObject) element).eContainer();
 			if (eContainer instanceof MApplicationElement) {
