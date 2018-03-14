@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,7 +74,8 @@ public abstract class UIJob extends Job {
      *      Note: this message is marked final. Implementors should use
      *      runInUIThread() instead.
      */
-    public final IStatus run(final IProgressMonitor monitor) {
+    @Override
+	public final IStatus run(final IProgressMonitor monitor) {
         if (monitor.isCanceled()) {
             return Status.CANCEL_STATUS;
         }
@@ -83,7 +84,8 @@ public abstract class UIJob extends Job {
             return Status.CANCEL_STATUS;
         }
         uiSynchronize.asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 IStatus result = null;
                 Throwable throwable = null;
                 try {

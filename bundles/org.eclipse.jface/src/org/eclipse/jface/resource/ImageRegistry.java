@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,12 +54,7 @@ public class ImageRegistry {
 
     private Map<String, Entry> table;
 
-    private Runnable disposeRunnable = new Runnable() {
-        @Override
-		public void run() {
-            dispose();
-        }
-    };
+    private Runnable disposeRunnable = () -> dispose();
 
     /**
      * Contains the data for an entry in the registry.
@@ -195,12 +190,7 @@ public class ImageRegistry {
             if (swtKey != -1) {
                 final Image[] image = new Image[1];
                 final int id = swtKey;
-                display.syncExec(new Runnable() {
-                    @Override
-					public void run() {
-                        image[0] = display.getSystemImage(id);
-                    }
-                });
+                display.syncExec(() -> image[0] = display.getSystemImage(id));
                 return image[0];
             }
         }
@@ -324,7 +314,7 @@ public class ImageRegistry {
 
     private Map<String, Entry> getTable() {
         if (table == null) {
-            table = new HashMap<String, Entry>(10);
+            table = new HashMap<>(10);
         }
         return table;
     }
