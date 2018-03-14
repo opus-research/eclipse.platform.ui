@@ -67,7 +67,7 @@ import org.eclipse.core.runtime.IStatus;
  * IObservableValue target1 = SWTObservables.observeText(text1, SWT.Modify);
  *
  * // Binding in two stages (from target to middle, then from middle to model)
- * // simplifies the validation logic. Using the middle observables saves
+ * // simplifies the validation logic.  Using the middle observables saves
  * // the trouble of converting the target values (Strings) to the model type
  * // (integers) manually during validation.
  * final IObservableValue middle0 = new WritableValue(null, Integer.TYPE);
@@ -88,7 +88,7 @@ import org.eclipse.core.runtime.IStatus;
  * 	}
  * };
  * dbc.addValidationStatusProvider(validator);
- * 
+ *
  * // Bind the middle observables to the model observables.
  * IObservableValue model0 = new WritableValue(new Integer(2), Integer.TYPE);
  * IObservableValue model1 = new WritableValue(new Integer(4), Integer.TYPE);
@@ -125,24 +125,25 @@ import org.eclipse.core.runtime.IStatus;
 public abstract class MultiValidator extends ValidationStatusProvider {
 	private Realm realm;
 	private ValidationStatusObservableValue validationStatus;
-	private IObservableValue<IStatus> unmodifiableValidationStatus;
-	private WritableList<IObservable> targets;
-	private IObservableList<IObservable> unmodifiableTargets;
-	private IObservableList<IObservable> models;
+	private IObservableValue unmodifiableValidationStatus;
+	private WritableList targets;
+	private IObservableList unmodifiableTargets;
+	private IObservableList models;
 
-	IListChangeListener<IObservable> targetsListener = new IListChangeListener<IObservable>() {
-		public void handleListChange(ListChangeEvent<IObservable> event) {
-			event.diff.accept(new ListDiffVisitor<IObservable>() {
+	IListChangeListener targetsListener = new IListChangeListener() {
+		@Override
+		public void handleListChange(ListChangeEvent event) {
+			event.diff.accept(new ListDiffVisitor() {
 				@Override
-				public void handleAdd(int index, IObservable element) {
-					IObservable dependency = element;
+				public void handleAdd(int index, Object element) {
+					IObservable dependency = (IObservable) element;
 					dependency.addChangeListener(dependencyListener);
 					dependency.addStaleListener(dependencyListener);
 				}
 
 				@Override
-				public void handleRemove(int index, IObservable element) {
-					IObservable dependency = element;
+				public void handleRemove(int index, Object element) {
+					IObservable dependency = (IObservable) element;
 					dependency.removeChangeListener(dependencyListener);
 					dependency.removeStaleListener(dependencyListener);
 				}
@@ -185,8 +186,8 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 		try {
 			validationStatus = new ValidationStatusObservableValue(realm);
 
-			targets = new WritableList<IObservable>(realm,
-					new ArrayList<IObservable>(), IObservable.class);
+			targets = new WritableList(realm, new ArrayList(),
+					IObservable.class);
 			targets.addListChangeListener(targetsListener);
 			unmodifiableTargets = Observables
 					.unmodifiableObservableList(targets);
@@ -199,8 +200,9 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 
 	private void checkObservable(IObservable target) {
 		Assert.isNotNull(target, "Target observable cannot be null"); //$NON-NLS-1$
-		Assert.isTrue(realm.equals(target.getRealm()),
-				"Target observable must be in the same realm as MultiValidator"); //$NON-NLS-1$
+		Assert
+				.isTrue(realm.equals(target.getRealm()),
+						"Target observable must be in the same realm as MultiValidator"); //$NON-NLS-1$
 	}
 
 	/**
@@ -212,7 +214,7 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 *         validation status of this MultiValidator.
 	 */
 	@Override
-	public IObservableValue<IStatus> getValidationStatus() {
+	public IObservableValue getValidationStatus() {
 		if (unmodifiableValidationStatus == null) {
 			ObservableTracker.setIgnore(true);
 			try {
@@ -267,14 +269,12 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 
 		ObservableTracker.setIgnore(true);
 		try {
-			List<IObservable> newTargets = new ArrayList<IObservable>(
-					Arrays.asList(dependencies));
+			List newTargets = new ArrayList(Arrays.asList(dependencies));
 
 			// Internal observables should not be dependencies
 			// (prevent dependency loop)
-			for (Iterator<IObservable> itNew = newTargets.iterator(); itNew
-					.hasNext();) {
-				IObservable newDependency = itNew.next();
+			for (Iterator itNew = newTargets.iterator(); itNew.hasNext();) {
+				Object newDependency = itNew.next();
 				if (newDependency == validationStatus
 						|| newDependency == unmodifiableValidationStatus
 						|| newDependency == targets
@@ -290,9 +290,8 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 			// Except that dependencies are compared by identity instead of
 			// equality
 			outer: for (int i = targets.size() - 1; i >= 0; i--) {
-				IObservable oldDependency = targets.get(i);
-				for (Iterator<IObservable> itNew = newTargets.iterator(); itNew
-						.hasNext();) {
+				Object oldDependency = targets.get(i);
+				for (Iterator itNew = newTargets.iterator(); itNew.hasNext();) {
 					Object newDependency = itNew.next();
 					if (oldDependency == newDependency) {
 						// Dependency is already known--remove from list of
@@ -355,10 +354,9 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * @return an IObservableValue which stays in sync with the given target
 	 *         observable only with the validation status is valid.
 	 */
-	public <T> IObservableValue<T> observeValidatedValue(
-			IObservableValue<T> target) {
+	public IObservableValue observeValidatedValue(IObservableValue target) {
 		checkObservable(target);
-		return new ValidatedObservableValue<T>(target, getValidationStatus());
+		return new ValidatedObservableValue(target, getValidationStatus());
 	}
 
 	/**
@@ -383,9 +381,9 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * @return an IObservableValue which stays in sync with the given target
 	 *         observable only with the validation status is valid.
 	 */
-	public <E> IObservableList<E> observeValidatedList(IObservableList<E> target) {
+	public IObservableList observeValidatedList(IObservableList target) {
 		checkObservable(target);
-		return new ValidatedObservableList<E>(target, getValidationStatus());
+		return new ValidatedObservableList(target, getValidationStatus());
 	}
 
 	/**
@@ -410,9 +408,9 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * @return an IObservableValue which stays in sync with the given target
 	 *         observable only with the validation status is valid.
 	 */
-	public <E> IObservableSet<E> observeValidatedSet(IObservableSet<E> target) {
+	public IObservableSet observeValidatedSet(IObservableSet target) {
 		checkObservable(target);
-		return new ValidatedObservableSet<E>(target, getValidationStatus());
+		return new ValidatedObservableSet(target, getValidationStatus());
 	}
 
 	/**
@@ -437,19 +435,18 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	 * @return an IObservableValue which stays in sync with the given target
 	 *         observable only with the validation status is valid.
 	 */
-	public <K, V> IObservableMap<K, V> observeValidatedMap(
-			IObservableMap<K, V> target) {
+	public IObservableMap observeValidatedMap(IObservableMap target) {
 		checkObservable(target);
-		return new ValidatedObservableMap<K, V>(target, getValidationStatus());
+		return new ValidatedObservableMap(target, getValidationStatus());
 	}
 
 	@Override
-	public IObservableList<IObservable> getTargets() {
+	public IObservableList getTargets() {
 		return unmodifiableTargets;
 	}
 
 	@Override
-	public IObservableList<IObservable> getModels() {
+	public IObservableList getModels() {
 		return models;
 	}
 
@@ -490,8 +487,8 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 	}
 
 	private class ValidationStatusObservableValue extends
-			AbstractObservableValue<IStatus> {
-		private IStatus value = ValidationStatus.ok();
+			AbstractObservableValue {
+		private Object value = ValidationStatus.ok();
 
 		private boolean stale = false;
 
@@ -500,27 +497,26 @@ public abstract class MultiValidator extends ValidationStatusProvider {
 		}
 
 		@Override
-		protected IStatus doGetValue() {
+		protected Object doGetValue() {
 			return value;
 		}
 
 		@Override
-		protected void doSetValue(IStatus value) {
+		protected void doSetValue(Object value) {
 			boolean oldStale = stale;
 
 			// Update the staleness state by checking whether any of the current
 			// dependencies is stale.
 			stale = false;
-			for (Iterator<IObservable> iter = targets.iterator(); iter
-					.hasNext();) {
-				IObservable dependency = iter.next();
+			for (Iterator iter = targets.iterator(); iter.hasNext();) {
+				IObservable dependency = (IObservable) iter.next();
 				if (dependency.isStale()) {
 					stale = true;
 					break;
 				}
 			}
 
-			IStatus oldValue = this.value;
+			Object oldValue = this.value;
 			this.value = value;
 
 			// If either becoming non-stale or setting a new value, we must fire

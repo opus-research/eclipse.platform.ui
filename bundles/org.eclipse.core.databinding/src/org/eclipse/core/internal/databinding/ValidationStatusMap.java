@@ -35,13 +35,13 @@ import org.eclipse.core.runtime.IStatus;
  * @since 1.0
  *
  */
-public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
+public class ValidationStatusMap extends ObservableMap {
 
 	private boolean isDirty = true;
 
-	private final WritableList<Binding<?, ?>> bindings;
+	private final WritableList bindings;
 
-	private List<IObservableValue<IStatus>> dependencies = new ArrayList<IObservableValue<IStatus>>();
+	private List dependencies = new ArrayList();
 
 	private IChangeListener markDirtyChangeListener = new IChangeListener() {
 		@Override
@@ -54,8 +54,8 @@ public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
 	 * @param realm
 	 * @param bindings
 	 */
-	public ValidationStatusMap(Realm realm, WritableList<Binding<?, ?>> bindings) {
-		super(realm, new HashMap<Binding<?, ?>, IStatus>());
+	public ValidationStatusMap(Realm realm, WritableList bindings) {
+		super(realm, new HashMap());
 		this.bindings = bindings;
 		bindings.addChangeListener(markDirtyChangeListener);
 	}
@@ -79,10 +79,10 @@ public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
 	private void markDirty() {
 		// since we are dirty, we don't need to listen anymore
 		removeElementChangeListener();
-		final Map<Binding<?, ?>, IStatus> oldMap = wrappedMap;
+		final Map oldMap = wrappedMap;
 		// lazy computation of diff
-		MapDiff<Binding<?, ?>, IStatus> mapDiff = new MapDiff<Binding<?, ?>, IStatus>() {
-			private MapDiff<Binding<?, ?>, IStatus> cachedDiff = null;
+		MapDiff mapDiff = new MapDiff() {
+			private MapDiff cachedDiff = null;
 
 			private void ensureCached() {
 				if (cachedDiff == null) {
@@ -92,50 +92,51 @@ public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
 			}
 
 			@Override
-			public Set<Binding<?, ?>> getAddedKeys() {
+			public Set getAddedKeys() {
 				ensureCached();
 				return cachedDiff.getAddedKeys();
 			}
 
 			@Override
-			public Set<Binding<?, ?>> getChangedKeys() {
+			public Set getChangedKeys() {
 				ensureCached();
 				return cachedDiff.getChangedKeys();
 			}
 
 			@Override
-			public IStatus getNewValue(Object key) {
+			public Object getNewValue(Object key) {
 				ensureCached();
 				return cachedDiff.getNewValue(key);
 			}
 
 			@Override
-			public IStatus getOldValue(Object key) {
+			public Object getOldValue(Object key) {
 				ensureCached();
 				return cachedDiff.getOldValue(key);
 			}
 
 			@Override
-			public Set<Binding<?, ?>> getRemovedKeys() {
+			public Set getRemovedKeys() {
 				ensureCached();
 				return cachedDiff.getRemovedKeys();
 			}
 		};
-		wrappedMap = new HashMap<Binding<?, ?>, IStatus>();
+		wrappedMap = new HashMap();
 		isDirty = true;
 		fireMapChange(mapDiff);
 	}
 
 	private void recompute() {
 		if (isDirty) {
-			Map<Binding<?, ?>, IStatus> newContents = new HashMap<Binding<?, ?>, IStatus>();
-			for (Iterator<Binding<?, ?>> it = bindings.iterator(); it.hasNext();) {
-				Binding<?, ?> binding = it.next();
-				IObservableValue<IStatus> validationError = binding
+			Map newContents = new HashMap();
+			for (Iterator it = bindings.iterator(); it.hasNext();) {
+				Binding binding = (Binding) it.next();
+				IObservableValue validationError = binding
 						.getValidationStatus();
 				dependencies.add(validationError);
 				validationError.addChangeListener(markDirtyChangeListener);
-				IStatus validationStatusValue = validationError.getValue();
+				IStatus validationStatusValue = (IStatus) validationError
+						.getValue();
 				newContents.put(binding, validationStatusValue);
 			}
 			wrappedMap.putAll(newContents);
@@ -151,9 +152,8 @@ public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
 	}
 
 	private void removeElementChangeListener() {
-		for (Iterator<IObservableValue<IStatus>> it = dependencies.iterator(); it
-				.hasNext();) {
-			IObservableValue<IStatus> observableValue = it.next();
+		for (Iterator it = dependencies.iterator(); it.hasNext();) {
+			IObservableValue observableValue = (IObservableValue) it.next();
 			observableValue.removeChangeListener(markDirtyChangeListener);
 		}
 	}
@@ -166,8 +166,7 @@ public class ValidationStatusMap extends ObservableMap<Binding<?, ?>, IStatus> {
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(
-			IMapChangeListener<Binding<?, ?>, IStatus> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		// this ensures that the next change will be seen by the new listener.
 		recompute();
 		super.addMapChangeListener(listener);

@@ -12,7 +12,6 @@
 package org.eclipse.core.internal.databinding;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.databinding.util.ILogger;
 import org.eclipse.core.databinding.util.Policy;
@@ -34,7 +33,7 @@ public class Activator implements BundleActivator {
 	 */
 	public static final String PLUGIN_ID = "org.eclipse.core.databinding"; //$NON-NLS-1$
 
-	private volatile static ServiceTracker<?, FrameworkLog> _frameworkLogTracker;
+	private volatile static ServiceTracker _frameworkLogTracker;
 
 	/**
 	 * The constructor
@@ -44,24 +43,21 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		_frameworkLogTracker = new ServiceTracker<Object, FrameworkLog>(
-				context, FrameworkLog.class.getName(), null);
+		_frameworkLogTracker = new ServiceTracker(context, FrameworkLog.class.getName(), null);
 		_frameworkLogTracker.open();
 
 		Policy.setLog(new ILogger() {
 
 			@Override
 			public void log(IStatus status) {
-				ServiceTracker<?, FrameworkLog> frameworkLogTracker = _frameworkLogTracker;
-				FrameworkLog log = frameworkLogTracker == null ? null
-						: frameworkLogTracker.getService();
+				ServiceTracker frameworkLogTracker = _frameworkLogTracker;
+				FrameworkLog log = frameworkLogTracker == null ? null : (FrameworkLog) frameworkLogTracker.getService();
 				if (log != null) {
 					log.log(createLogEntry(status));
 				} else {
 					// fall back to System.err
-					System.err.println(status.getPlugin()
-							+ " - " + status.getCode() + " - " + status.getMessage()); //$NON-NLS-1$//$NON-NLS-2$
-					if (status.getException() != null) {
+					System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage());  //$NON-NLS-1$//$NON-NLS-2$
+					if( status.getException() != null ) {
 						status.getException().printStackTrace(System.err);
 					}
 				}
@@ -74,7 +70,7 @@ public class Activator implements BundleActivator {
 	// hard?
 	FrameworkLogEntry createLogEntry(IStatus status) {
 		Throwable t = status.getException();
-		List<FrameworkLogEntry> childlist = new ArrayList<FrameworkLogEntry>();
+		ArrayList childlist = new ArrayList();
 
 		int stackCode = t instanceof CoreException ? 1 : 0;
 		// ensure a substatus inside a CoreException is properly logged
@@ -92,12 +88,11 @@ public class Activator implements BundleActivator {
 			}
 		}
 
-		FrameworkLogEntry[] children = childlist.size() == 0 ? null : childlist
-				.toArray(new FrameworkLogEntry[childlist.size()]);
+		FrameworkLogEntry[] children = (FrameworkLogEntry[]) (childlist.size() == 0 ? null : childlist.toArray(new FrameworkLogEntry[childlist.size()]));
 
-		return new FrameworkLogEntry(status.getPlugin(), status.getSeverity(),
-				status.getCode(), status.getMessage(), stackCode, t, children);
+		return new FrameworkLogEntry(status.getPlugin(), status.getSeverity(), status.getCode(), status.getMessage(), stackCode, t, children);
 	}
+
 
 	@Override
 	public void stop(BundleContext context) throws Exception {

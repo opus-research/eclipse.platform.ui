@@ -19,15 +19,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 /**
- * Base class for validators that validate if a Number can fit in another Number
- * type.
+ * Base class for validators that validate if a Number can fit in another Number type.
  * <p>
  * Class is thread safe.
  * </p>
  *
  * @since 1.0
  */
-public abstract class NumberToNumberValidator implements IValidator<Object> {
+public abstract class NumberToNumberValidator implements IValidator {
 	private final NumberToNumberConverter converter;
 
 	private final Number min;
@@ -51,7 +50,7 @@ public abstract class NumberToNumberValidator implements IValidator<Object> {
 		this.min = min;
 		this.max = max;
 
-		primitive = ((Class<?>) converter.getToType()).isPrimitive();
+		primitive = ((Class) converter.getToType()).isPrimitive();
 	}
 
 	@Override
@@ -78,8 +77,8 @@ public abstract class NumberToNumberValidator implements IValidator<Object> {
 		synchronized (this) {
 			if (outOfRangeMessage == null && min != null && max != null) {
 				outOfRangeMessage = StringToNumberParser
-						.createOutOfRangeMessage(min, max,
-								converter.getNumberFormat());
+						.createOutOfRangeMessage(min, max, converter
+								.getNumberFormat());
 			}
 
 			return ValidationStatus.error(outOfRangeMessage);
