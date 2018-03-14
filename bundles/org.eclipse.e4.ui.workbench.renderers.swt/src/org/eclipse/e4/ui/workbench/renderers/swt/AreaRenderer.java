@@ -35,6 +35,8 @@ import org.osgi.service.event.EventHandler;
  */
 public class AreaRenderer extends SWTPartRenderer {
 
+	private static final String MAXIMIZEABLE_CHILDREN_TAG = "MaximizeableChildren"; //$NON-NLS-1$
+
 	@Inject
 	private IEventBroker eventBroker;
 
@@ -149,8 +151,10 @@ public class AreaRenderer extends SWTPartRenderer {
 			ctf.setMinimized(curCTF.getMinimized());
 			ctf.setMaximized(curCTF.getMaximized());
 
-			curCTF.setMinimizeVisible(false);
-			curCTF.setMaximizeVisible(false);
+			if (!areaModel.getTags().contains(MAXIMIZEABLE_CHILDREN_TAG)) {
+				curCTF.setMinimizeVisible(false);
+				curCTF.setMaximizeVisible(false);
+			}
 		}
 
 		CTabItem cti = new CTabItem(ctf, SWT.NONE);
