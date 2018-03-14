@@ -235,7 +235,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				// client code may have errors so we need to catch it
 				logger.error(e);
 			}
-			wrapped = null;
 		}
 
 		internalDisposeSite(site);

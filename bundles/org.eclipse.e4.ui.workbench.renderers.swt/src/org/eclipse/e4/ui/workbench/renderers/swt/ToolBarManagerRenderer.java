@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -112,7 +112,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	private MApplication application;
 
-	@SuppressWarnings("hiding")
 	@Inject
 	EModelService modelService;
 
@@ -265,7 +264,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private HashSet<String> updateVariables = new HashSet<String>();
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
@@ -321,7 +319,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicAppStartup(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event) {
@@ -420,11 +417,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
-					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
-					if (dispose instanceof Runnable) {
-						((Runnable) dispose).run();
-					}
-					transientData.remove(POST_PROCESSING_DISPOSE);
 					transientData.remove(DISPOSE_ADDED);
 				}
 			});
