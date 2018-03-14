@@ -41,11 +41,19 @@ public abstract class AnimationItem {
 
     //Create a containter that does nothing by default
     IAnimationContainer animationContainer = new IAnimationContainer() {
-        public void animationDone() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationDone()
+         */
+        @Override
+		public void animationDone() {
             //Do nothing by default
         }
 
-        public void animationStart() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationStart()
+         */
+        @Override
+		public void animationStart() {
             //Do nothing by default
         }
     };
@@ -70,20 +78,39 @@ public abstract class AnimationItem {
         Control animationItem = createAnimationItem(parent);
 
         animationItem.addMouseListener(new MouseListener() {
-            public void mouseDoubleClick(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+             */
+            @Override
+			public void mouseDoubleClick(MouseEvent arg0) {
                 ProgressManagerUtil.openProgressView();
             }
 
-            public void mouseDown(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+             */
+            @Override
+			public void mouseDown(MouseEvent arg0) {
                 //Do nothing
             }
 
-            public void mouseUp(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+             */
+            @Override
+			public void mouseUp(MouseEvent arg0) {
                 //Do nothing
             }
         });
         animationItem.addDisposeListener(new DisposeListener() {
-            public void widgetDisposed(DisposeEvent e) {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
                 animationManager.removeItem(AnimationItem.this);
             }
         });

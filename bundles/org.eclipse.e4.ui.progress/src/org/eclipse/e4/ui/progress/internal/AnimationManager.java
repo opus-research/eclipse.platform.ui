@@ -66,7 +66,13 @@ public class AnimationManager {
 
         animationUpdateJob = new UIJob(ProgressMessages.AnimationManager_AnimationStart) {
 
-            public IStatus runInUIThread(IProgressMonitor monitor) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+             */
+            @Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
 
                 if (animated) {
 					animationProcessor.animationStarted();
@@ -133,11 +139,23 @@ public class AnimationManager {
         return new IJobProgressManagerListener() {
             Set<Job> jobs = Collections.synchronizedSet(new HashSet<Job>());
 
-            public void addJob(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addJob(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            @Override
+			public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
-            public void refreshJobInfo(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            @Override
+			public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
                 if (state == Job.RUNNING) {
 					addJob(info);
@@ -146,7 +164,13 @@ public class AnimationManager {
 				}
             }
 
-            public void refreshAll() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
+             */
+            @Override
+			public void refreshAll() {
                 jobs.clear();
                 setAnimated(false);
                 JobInfo[] currentInfos = progressManager.getJobInfos(showsDebug());
@@ -155,11 +179,23 @@ public class AnimationManager {
                 }
             }
 
-            public void removeJob(JobInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#remove(org.eclipse.ui.internal.progress.JobInfo)
+             */
+            @Override
+			public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
-            public boolean showsDebug() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
+             */
+            @Override
+			public boolean showsDebug() {
                 return false;
             }
 
@@ -194,15 +230,33 @@ public class AnimationManager {
                         || animationProcessor.isProcessorJob(job);
             }
 
-            public void addGroup(GroupInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            @Override
+			public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
-            public void removeGroup(GroupInfo group) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            @Override
+			public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
-            public void refreshGroup(GroupInfo info) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
+             */
+            @Override
+			public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
             }
         };

@@ -102,6 +102,9 @@ public class WizardFileSystemResourceExportPage1 extends
         destinationNameField.add(value);
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         super.createControl(parent);

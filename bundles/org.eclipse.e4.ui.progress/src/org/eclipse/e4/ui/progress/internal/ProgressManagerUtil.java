@@ -40,6 +40,7 @@ public class ProgressManagerUtil {
 
 	@SuppressWarnings("unchecked")
 	static class ProgressViewerComparator extends ViewerComparator {
+		@Override
 		@SuppressWarnings("rawtypes")
 		public int compare(Viewer testViewer, Object e1, Object e2) {
 			return ((Comparable) e1).compareTo(e2);
@@ -62,6 +63,7 @@ public class ProgressManagerUtil {
 			for (int retries = 3; retries > 0; retries--) {
 				try {
 					Arrays.sort(elements, new Comparator<Object>() {
+						@Override
 						public int compare(Object a, Object b) {
 							return ProgressViewerComparator.this.compare(viewer, a, b);
 						}
@@ -458,6 +460,11 @@ public class ProgressManagerUtil {
 //	static IShellProvider getShellProvider() {
 //		return new IShellProvider() {
 //
+//			/*
+//			 * (non-Javadoc)
+//			 *
+//			 * @see org.eclipse.jface.window.IShellProvider#getShell()
+//			 */
 //			@Override
 //            public Shell getShell() {
 //				return getDefaultParent();

@@ -51,7 +51,13 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     int nestingDepth = 0;
 
-    public void clearBlocked() {
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#clearBlocked()
+     */
+    @Override
+	public void clearBlocked() {
         if (nestingDepth == 0) {
 			return;
 		}
@@ -66,7 +72,15 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     }
 
-    public void showBlocked(Shell parentShell,
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.swt.widgets.Shell,
+     *      org.eclipse.core.runtime.IProgressMonitor,
+     *      org.eclipse.core.runtime.IStatus, java.lang.String)
+     */
+    @Override
+	public void showBlocked(Shell parentShell,
             IProgressMonitor blockingMonitor, IStatus blockingStatus,
             String blockedName) {
 
@@ -84,7 +98,14 @@ public class WorkbenchDialogBlockedHandler implements IDialogBlockedHandler {
 
     }
 
-    public void showBlocked(IProgressMonitor blocking, IStatus blockingStatus,
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.dialogs.IDialogBlockedHandler#showBlocked(org.eclipse.core.runtime.IProgressMonitor,
+     *      org.eclipse.core.runtime.IStatus, java.lang.String)
+     */
+    @Override
+	public void showBlocked(IProgressMonitor blocking, IStatus blockingStatus,
             String blockedName) {
         showBlocked(null, blocking, blockingStatus, blockedName);
     }
