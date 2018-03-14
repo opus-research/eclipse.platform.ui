@@ -128,10 +128,10 @@ public interface IWorkbenchHelpSystem {
 	 * May only be called from a UI thread.
 	 * <p>
 	 *
-	 * @param helpContextId
+	 * @param helphelpContextId
 	 *            the id of the context to display
 	 */
-	void displayHelp(String helpContextId);
+	void displayHelp(String helphelpContextId);
 
 	/**
 	 * Displays context-sensitive help for the given context.
