@@ -47,7 +47,7 @@ public class ModelReconcilingService implements IModelReconcilingService {
 		}
 
 		MultiStatus multiStatus = new MultiStatus(Activator.PI_WORKBENCH, 0, "", null); //$NON-NLS-1$
-		LinkedList<ModelDelta> delayedDeltas = new LinkedList<ModelDelta>();
+		LinkedList<ModelDelta> delayedDeltas = new LinkedList<>();
 
 		deltaIterationLoop: for (final ModelDelta delta : deltas) {
 			for (String filter : filters) {
