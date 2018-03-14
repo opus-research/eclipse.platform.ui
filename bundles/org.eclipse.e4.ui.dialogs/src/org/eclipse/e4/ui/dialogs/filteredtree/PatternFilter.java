@@ -16,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -273,13 +277,30 @@ public class PatternFilter extends ViewerFilter {
 	 * @return true if the given element's label matches the filter text
 	 */
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
-		String labelText = ((ILabelProvider) ((StructuredViewer) viewer)
-				.getLabelProvider()).getText(element);
+		IBaseLabelProvider baseLabelProvider = ((StructuredViewer) viewer).getLabelProvider();
+		String labelText = getTextFromLabelProvider(baseLabelProvider, element);
 
 		if (labelText == null) {
-			return false;
+			// also check for CellLabelProvider, which are also ILabelProvider,
+			// e.g., ColumnLabelProvider
+			CellLabelProvider cellLabelProvider = null;
+			if (viewer instanceof ColumnViewer) {
+				cellLabelProvider = ((ColumnViewer) viewer).getLabelProvider(0);
+			}
+			labelText = getTextFromLabelProvider(cellLabelProvider, element);
 		}
 		return wordMatches(labelText);
+	}
+
+	private String getTextFromLabelProvider(IBaseLabelProvider baseLabelProvider, Object element) {
+		String labelText = null;
+		if (baseLabelProvider instanceof ILabelProvider) {
+			labelText = ((ILabelProvider) baseLabelProvider).getText(element);
+		} else if (baseLabelProvider instanceof IStyledLabelProvider) {
+			labelText = ((IStyledLabelProvider) baseLabelProvider).getStyledText(element).getString();
+		}
+
+		return labelText;
 	}
 
 	/**
