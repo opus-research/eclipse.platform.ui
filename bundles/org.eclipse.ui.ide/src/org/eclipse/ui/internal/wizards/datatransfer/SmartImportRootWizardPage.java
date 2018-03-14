@@ -26,11 +26,13 @@ import java.util.Set;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -45,6 +47,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
@@ -73,6 +76,7 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.dialogs.WorkingSetConfigurationBlock;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
 /**
@@ -99,7 +103,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	private Set<File> alreadyExistingProjects;
 	private Set<File> notAlreadyExistingProjects;
 	private Label selectionSummary;
-	protected Map<File, List<ProjectConfigurator>> potentialProjects;
+	protected Map<File, List<ProjectConfigurator>> potentialProjects = Collections.emptyMap();
 
 	private class FolderForProjectsLabelProvider extends CellLabelProvider implements IColorProvider {
 		public String getText(Object o) {
@@ -209,6 +213,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 	public void createControl(Composite parent) {
 		setTitle(DataTransferMessages.SmartImportWizardPage_importProjectsInFolderTitle);
 		setDescription(DataTransferMessages.SmartImportWizardPage_importProjectsInFolderDescription);
+		initializeDialogUnits(parent);
 		Composite res = new Composite(parent, SWT.NONE);
 		res.setLayout(new GridLayout(4, false));
 
@@ -303,8 +308,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 				.setDescriptionText(DataTransferMessages.SmartImportWizardPage_incorrectRootDirectory);
 		this.rootDirectoryTextDecorator.hide();
 		Button directoryButton = new Button(res, SWT.PUSH);
-		GridDataFactory.defaultsFor(directoryButton).applyTo(directoryButton);
 		directoryButton.setText(DataTransferMessages.SmartImportWizardPage_browse);
+		setButtonLayoutData(directoryButton);
 		directoryButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -329,8 +334,8 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 		});
 		Button browseArchiveButton = new Button(res, SWT.PUSH);
-		GridDataFactory.defaultsFor(browseArchiveButton).applyTo(browseArchiveButton);
 		browseArchiveButton.setText(DataTransferMessages.SmartImportWizardPage_selectArchiveButton);
+		setButtonLayoutData(browseArchiveButton);
 		browseArchiveButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -493,7 +498,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 		GridLayoutFactory.fillDefaults().applyTo(selectionButtonsGroup);
 		selectionButtonsGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 		Button selectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
-		GridDataFactory.defaultsFor(selectAllButton).applyTo(selectAllButton);
+		setButtonLayoutData(selectAllButton);
 		selectAllButton.setText(DataTransferMessages.DataTransfer_selectAll);
 		selectAllButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -503,7 +508,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 		});
 		Button deselectAllButton = new Button(selectionButtonsGroup, SWT.PUSH);
-		GridDataFactory.defaultsFor(deselectAllButton).applyTo(deselectAllButton);
+		setButtonLayoutData(deselectAllButton);
 		deselectAllButton.setText(DataTransferMessages.DataTransfer_deselectAll);
 		deselectAllButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -516,7 +521,37 @@ public class SmartImportRootWizardPage extends WizardPage {
 		selectionSummary = new Label(selectionButtonsGroup, SWT.NONE);
 		selectionSummary.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1));
 		selectionSummary.setText(NLS.bind(DataTransferMessages.SmartImportProposals_selectionSummary, 0, 0));
+		Button hideProjectsAlreadyInWorkspace = new Button(selectionButtonsGroup, SWT.CHECK);
+		hideProjectsAlreadyInWorkspace.setText(DataTransferMessages.SmartImportProposals_hideExistingProjects);
+		hideProjectsAlreadyInWorkspace.addSelectionListener(new SelectionAdapter() {
+			final ViewerFilter existingProjectsFilter = new ViewerFilter() {
+				@Override
+				public boolean select(Viewer viewer, Object parentElement, Object element) {
+					return !alreadyExistingProjects.contains(element);
+				}
+			};
 
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				ViewerFilter[] currentFilters = tree.getFilters();
+				ViewerFilter[] newFilters = null;
+				if (((Button) e.widget).getSelection()) {
+					newFilters = new ViewerFilter[currentFilters.length + 1];
+					System.arraycopy(currentFilters, 0, newFilters, 0, currentFilters.length);
+					newFilters[newFilters.length - 1] = existingProjectsFilter;
+				} else {
+					List<ViewerFilter> filters = new ArrayList<>(
+							currentFilters.length > 0 ? currentFilters.length - 1 : 0);
+					for (ViewerFilter filter : currentFilters) {
+						if (filter != existingProjectsFilter) {
+							filters.add(filter);
+						}
+					}
+					newFilters = filters.toArray(new ViewerFilter[filters.size()]);
+				}
+				tree.setFilters(newFilters);
+			}
+		});
 		tree.setInput(Collections.emptyMap());
 	}
 
@@ -630,7 +665,7 @@ public class SmartImportRootWizardPage extends WizardPage {
 				Point initialSelection = rootDirectoryText.getSelection();
 				getContainer().run(true, true, new IRunnableWithProgress() {
 					@Override
-					public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					public void run(IProgressMonitor monitor) {
 						SmartImportRootWizardPage.this.potentialProjects = getWizard().getImportJob()
 								.getImportProposals(monitor);
 						if (!potentialProjects.containsKey(getWizard().getImportJob().getRoot())) {
@@ -641,9 +676,12 @@ public class SmartImportRootWizardPage extends WizardPage {
 								potentialProjects.keySet());
 						SmartImportRootWizardPage.this.alreadyExistingProjects = new HashSet<>();
 						for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-							SmartImportRootWizardPage.this.notAlreadyExistingProjects
-									.remove(project.getLocation().toFile());
-							SmartImportRootWizardPage.this.alreadyExistingProjects.add(project.getLocation().toFile());
+							IPath location = project.getLocation();
+							if (location == null) {
+								continue;
+							}
+							SmartImportRootWizardPage.this.notAlreadyExistingProjects.remove(location.toFile());
+							SmartImportRootWizardPage.this.alreadyExistingProjects.add(location.toFile());
 						}
 					}
 				});
@@ -656,10 +694,12 @@ public class SmartImportRootWizardPage extends WizardPage {
 			}
 			tree.setInput(potentialProjects);
 			tree.setCheckedElements(this.notAlreadyExistingProjects.toArray());
-		} catch (Exception ex) {
-			MessageDialog.openError(getShell(), ex.getMessage(), ex.getMessage());
-			IDEWorkbenchPlugin.log(ex.getMessage(), ex);
+		} catch (InvocationTargetException ite) {
 			this.selection = null;
+			IStatus status = new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, DataTransferMessages.SmartImportWizardPage_scanProjectsFailed,
+					ite.getCause());
+			StatusManager.getManager().handle(status, StatusManager.LOG | StatusManager.SHOW);
+		} catch (InterruptedException operationCanceled) {
 		}
 		proposalsSelectionChanged();
 		SmartImportRootWizardPage.this.validatePage();
