@@ -20,9 +20,6 @@ public class ToolItemUpdater {
 	private List<HandledContributionItem> itemsToCheck = new ArrayList<HandledContributionItem>();
 	private final List<HandledContributionItem> orphanedToolItems = new ArrayList<HandledContributionItem>();
 
-	private List<DirectContributionItem> directItemsToCheck = new ArrayList<DirectContributionItem>();
-	private final List<DirectContributionItem> directOrphanedToolItems = new ArrayList<DirectContributionItem>();
-
 	void registerItem(HandledContributionItem item) {
 		if (!itemsToCheck.contains(item)) {
 			itemsToCheck.add(item);
@@ -31,16 +28,6 @@ public class ToolItemUpdater {
 
 	void removeItem(HandledContributionItem item) {
 		itemsToCheck.remove(item);
-	}
-
-	void registerItem(DirectContributionItem item) {
-		if (!directItemsToCheck.contains(item)) {
-			directItemsToCheck.add(item);
-		}
-	}
-
-	void removeItem(DirectContributionItem item) {
-		directItemsToCheck.remove(item);
 	}
 
 	public void updateContributionItems(Selector selector) {
@@ -57,16 +44,5 @@ public class ToolItemUpdater {
 			orphanedToolItems.clear();
 		}
 
-		for (final DirectContributionItem dci : directItemsToCheck) {
-			if (dci.getModel() != null && dci.getModel().getParent() != null && selector.select(dci.getModel())) {
-				dci.updateItemEnablement();
-			} else {
-				directOrphanedToolItems.add(dci);
-			}
-		}
-		if (!directOrphanedToolItems.isEmpty()) {
-			directItemsToCheck.removeAll(directOrphanedToolItems);
-			directOrphanedToolItems.clear();
-		}
 	}
 }
