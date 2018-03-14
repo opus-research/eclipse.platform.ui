@@ -11,9 +11,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine.StylingPreferencesHandler;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Listener;
 import org.osgi.service.event.Event;
 
 import junit.framework.TestCase;
@@ -81,35 +79,38 @@ public class StylingPreferencesHandlerTest extends TestCase {
 		assertFalse(result.isEmpty());
 	}
 
-	public void testAddOnDisplayDisposed() throws Exception {
-		//given
-		final Listener listener = mock(Listener.class);
+	public void testOnDisplayDisposed() throws Exception {
+		final boolean[] result = new boolean[] {false};
+		final Throwable[] exceptionDuringExecution = new Throwable[] {null};
 
-		Display display = mock(Display.class);
+		Thread threadForNewDisplay = new Thread(new Runnable() {
+			public void run() {
+				try {
+					//given
+					Display display = new Display();
 
-		//when
-		new StylingPreferencesHandler(display) {
-			@Override
-			protected Listener createOnDisplayDisposedListener() {
-				return listener;
+					new StylingPreferencesHandler(display) {
+						@Override
+						protected void resetOverriddenPreferences() {
+							result[0] = true;
+						}
+					};
+
+					//when
+					display.dispose();
+
+				} catch(Throwable exc) {
+					exceptionDuringExecution[0] = exc;
+				}
 			}
-		};
+		});
+
+		threadForNewDisplay.start();
+		threadForNewDisplay.join();
 
 		//then
-		verify(display, times(1)).addListener(SWT.Dispose, listener);
-	}
-
-	public void testOnDisplayDisposedListener() throws Exception {
-		//given
-		StylingPreferencesHandlerTestable handler = spy(new StylingPreferencesHandlerTestable(mock(Display.class)));
-
-		Listener listener = handler.createOnDisplayDisposedListener();
-
-		//when
-		listener.handleEvent(mock(org.eclipse.swt.widgets.Event.class));
-
-		//then
-		verify(handler, times(1)).resetOverriddenPreferences();
+		assertNull(exceptionDuringExecution[0]);
+		assertTrue(result[0]);
 	}
 
 	protected static class StylingPreferencesHandlerTestable extends StylingPreferencesHandler {
@@ -141,11 +142,6 @@ public class StylingPreferencesHandlerTest extends TestCase {
 		@Override
 		public void removeOverriddenPropertyNames(IEclipsePreferences preferences) {
 			super.removeOverriddenPropertyNames(preferences);
-		}
-
-		@Override
-		public Listener createOnDisplayDisposedListener() {
-			return super.createOnDisplayDisposedListener();
 		}
 	}
 }
