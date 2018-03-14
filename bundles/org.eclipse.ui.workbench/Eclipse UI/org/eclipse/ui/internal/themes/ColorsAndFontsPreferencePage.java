@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
+import static org.eclipse.ui.internal.themes.WorkbenchThemeManager.EMPRY_FONT_DATA_VALUE;
 import static org.eclipse.ui.internal.themes.WorkbenchThemeManager.EMPTY_COLOR_VALUE;
 
 import com.ibm.icu.text.MessageFormat;
@@ -473,7 +474,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 				Display display = tree.getDisplay();
                 Color c = colorRegistry
                         .get(((ColorDefinition) element).getId());
-				Color foregroundColor = display.getSystemColor(SWT.COLOR_BLACK);
+				Color foregroundColor = tree.getViewer().getControl().getForeground();
 				if (!isAvailableInCurrentTheme((ColorDefinition) element)) {
 					c = display.getSystemColor(SWT.COLOR_WHITE);
 					foregroundColor = display.getSystemColor(DEFINITION_NOT_AVAIL_COLOR);
@@ -1018,13 +1019,13 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 				if (element instanceof ThemeElementDefinition) {
 					ThemeElementDefinition definition = (ThemeElementDefinition) element;
-					if (definition.isOverridden() || definition.isAddedByCss()) {
+					if (definition.isOverridden() || definition.isAddedByCss()
+							|| !isAvailableInCurrentTheme(definition)) {
 						return;
 					}
 					if (element instanceof FontDefinition) {
 						editFont(tree.getDisplay());
-					} else if (element instanceof ColorDefinition
-							&& isAvailableInCurrentTheme(definition)) {
+					} else if (element instanceof ColorDefinition) {
 						editColor(tree.getDisplay());
 					}
 					updateControls();
@@ -1924,29 +1925,36 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	protected void updateControls() {
 		FontDefinition fontDefinition = getSelectedFontDefinition();
         if (fontDefinition != null) {
-			boolean definedByCSS = fontDefinition.isOverridden() || fontDefinition.isAddedByCss();
-			boolean isDefault = isDefault(fontDefinition);
+			boolean isDefault = isAvailableInCurrentTheme(fontDefinition)
+					&& isDefault(fontDefinition);
 			boolean hasDefault = fontDefinition.getDefaultsTo() != null;
-			fontChangeButton.setEnabled(!definedByCSS);
-			fontSystemButton.setEnabled(!definedByCSS);
-			fontResetButton.setEnabled(!isDefault && !definedByCSS);
-			editDefaultButton.setEnabled(hasDefault && isDefault && !definedByCSS);
-			goToDefaultButton.setEnabled(hasDefault && !definedByCSS);
+			fontChangeButton.setEnabled(!fontDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(fontDefinition));
+			fontSystemButton.setEnabled(!fontDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(fontDefinition));
+			fontResetButton.setEnabled(!isDefault && !fontDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(fontDefinition));
+			editDefaultButton.setEnabled(hasDefault && isDefault && !fontDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(fontDefinition));
+			goToDefaultButton.setEnabled(hasDefault && !fontDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(fontDefinition));
             setCurrentFont(fontDefinition);
             return;
         }
         ColorDefinition colorDefinition = getSelectedColorDefinition();
         if (colorDefinition != null) {
-			boolean definedByCSS = colorDefinition.isOverridden() || colorDefinition.isAddedByCss();
-			boolean availableInTheme = isAvailableInCurrentTheme(colorDefinition);
-			boolean isDefault = isDefault(getSelectedColorDefinition());
+			boolean isDefault = isAvailableInCurrentTheme(colorDefinition)
+					&& isDefault(getSelectedColorDefinition());
 			boolean hasDefault = colorDefinition.getDefaultsTo() != null;
-			fontChangeButton.setEnabled(!definedByCSS && availableInTheme);
+			fontChangeButton.setEnabled(!colorDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(colorDefinition));
             fontSystemButton.setEnabled(false);
-			fontResetButton.setEnabled(!isDefault && !definedByCSS && availableInTheme);
-			editDefaultButton.setEnabled(hasDefault && isDefault && !definedByCSS
-					&& availableInTheme);
-			goToDefaultButton.setEnabled(hasDefault && !definedByCSS && availableInTheme);
+			fontResetButton.setEnabled(!isDefault && !colorDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(colorDefinition));
+			editDefaultButton.setEnabled(hasDefault && isDefault && !colorDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(colorDefinition));
+			goToDefaultButton.setEnabled(hasDefault && !colorDefinition.isOverridden()
+					&& isAvailableInCurrentTheme(colorDefinition));
             setCurrentColor(colorDefinition);
             return;
         }
@@ -2173,7 +2181,9 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof FontDefinition) {
-			return fontRegistry.get(definition.getId()) != null;
+			FontData[] value = ((FontDefinition) definition).getValue();
+			return value != null && value != EMPRY_FONT_DATA_VALUE
+					&& fontRegistry.get(definition.getId()) != null;
 		}
 		RGB value = ((ColorDefinition) definition).getValue();
 		return value != null && value != EMPTY_COLOR_VALUE
