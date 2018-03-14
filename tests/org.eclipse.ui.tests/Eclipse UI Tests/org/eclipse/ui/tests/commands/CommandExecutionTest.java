@@ -58,29 +58,35 @@ public class CommandExecutionTest extends UITestCase {
 		ArrayList<Pair> methods = new ArrayList<Pair>();
 		IWorkbenchWindow wbw;
 
+		@Override
 		public void preExecute(String commandId, ExecutionEvent event) {
 			methods.add(new Pair("preExecute", event));
 			// ensure HandlerUtil has proper access. See bug 412681.
 			wbw = HandlerUtil.getActiveWorkbenchWindow(event);
 		}
 
+		@Override
 		public void postExecuteSuccess(String commandId, Object returnValue) {
 			methods.add(new Pair("postExecuteSuccess", returnValue));
 		}
 
+		@Override
 		public void postExecuteFailure(String commandId,
 				ExecutionException exception) {
 			methods.add(new Pair("postExecuteFailure", exception));
 		}
 
+		@Override
 		public void notHandled(String commandId, NotHandledException exception) {
 			methods.add(new Pair("notHandled", exception));
 		}
 
+		@Override
 		public void notEnabled(String commandId, NotEnabledException exception) {
 			methods.add(new Pair("notEnabled", exception));
 		}
 
+		@Override
 		public void notDefined(String commandId, NotDefinedException exception) {
 			methods.add(new Pair("notDefined", exception));
 		}
@@ -102,10 +108,10 @@ public class CommandExecutionTest extends UITestCase {
 
 	public void testCommandServiceExecute() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(
@@ -121,12 +127,12 @@ public class CommandExecutionTest extends UITestCase {
 
 	public void testCommandExecute() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.FILE_CLOSE_OTHERS);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);
@@ -154,12 +160,12 @@ public class CommandExecutionTest extends UITestCase {
 	
 	public void testCommandListenerExecute() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.FILE_CLOSE_OTHERS);
 		cmd.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);
@@ -176,10 +182,10 @@ public class CommandExecutionTest extends UITestCase {
 
 	public void testCommandServiceExecuteRefresh() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(
@@ -195,12 +201,12 @@ public class CommandExecutionTest extends UITestCase {
 
 	public void testCommandExecuteRefresh() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.FILE_REFRESH);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);
@@ -217,12 +223,12 @@ public class CommandExecutionTest extends UITestCase {
 	
 	public void testCommandListenerExecuteRefresh() throws Exception {
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.FILE_REFRESH);
 		cmd.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);
@@ -241,10 +247,10 @@ public class CommandExecutionTest extends UITestCase {
 		getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.showView(IPageLayout.ID_PROGRESS_VIEW);
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(
@@ -262,12 +268,12 @@ public class CommandExecutionTest extends UITestCase {
 		getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.showView(IPageLayout.ID_PROGRESS_VIEW);
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		cmdService.addExecutionListener(listener);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.WINDOW_CLOSE_PART);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);
@@ -286,12 +292,12 @@ public class CommandExecutionTest extends UITestCase {
 		getWorkbench().getActiveWorkbenchWindow().getActivePage()
 				.showView(IPageLayout.ID_PROGRESS_VIEW);
 		EL listener = new EL();
-		ICommandService cmdService = (ICommandService) getWorkbench()
+		ICommandService cmdService = getWorkbench()
 				.getService(ICommandService.class);
 		final Command cmd = cmdService
 				.getCommand(IWorkbenchCommandConstants.WINDOW_CLOSE_PART);
 		cmd.addExecutionListener(listener);
-		IHandlerService handlerService = (IHandlerService) getWorkbench()
+		IHandlerService handlerService = getWorkbench()
 				.getService(IHandlerService.class);
 		final ExecutionEvent event = handlerService.createExecutionEvent(cmd,
 				null);

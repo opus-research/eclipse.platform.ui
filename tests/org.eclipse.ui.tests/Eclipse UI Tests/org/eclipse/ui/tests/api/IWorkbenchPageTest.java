@@ -87,6 +87,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		return logStatus==null?"No message":logStatus.getMessage();
 	}
 	ILogListener openAndHideListener = new ILogListener() {
+		@Override
 		public void logging(IStatus status, String plugin) {
 			logStatus = status;
 			logCount++;
@@ -101,31 +102,39 @@ public class IWorkbenchPageTest extends UITestCase {
 	private int partActiveCount = 0;
 	private IWorkbenchPartReference partActiveRef = null;
 	IPartListener2 partListener2 = new IPartListener2() {
+		@Override
 		public void partActivated(IWorkbenchPartReference partRef) {
 			partActiveCount++;
 			partActiveRef = partRef;
 		}
 
+		@Override
 		public void partBroughtToTop(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partClosed(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partDeactivated(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partHidden(IWorkbenchPartReference partRef) {
 			partHiddenCount++;
 			partHiddenRef = partRef;
 		}
 
+		@Override
 		public void partInputChanged(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partOpened(IWorkbenchPartReference partRef) {
 		}
 
+		@Override
 		public void partVisible(IWorkbenchPartReference partRef) {
 			partVisibleCount++;
 			partVisibleRef = partRef;
@@ -136,6 +145,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		super(testName);
 	}
 
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		fWin = openTestWindow();
@@ -145,6 +155,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		Platform.addLogListener(openAndHideListener);
 	}
 
+	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 		if (proj != null) {
@@ -234,6 +245,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		sets[0] = new IWorkingSet[0];
 		IPropertyChangeListener listener = new IPropertyChangeListener() {
 
+			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				IWorkingSet[] oldSets = (IWorkingSet[]) event.getOldValue();
 				assertTrue(Arrays.equals(sets[0], oldSets));
@@ -1943,7 +1955,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		IPerspectiveDescriptor persp = fActivePage.getPerspective();
 		
-		ICommandService commandService = (ICommandService) fWorkbench.getService(ICommandService.class);
+		ICommandService commandService = fWorkbench.getService(ICommandService.class);
 		Command command = commandService.getCommand("org.eclipse.ui.window.closePerspective");
 		
 		HashMap<String, String> parameters = new HashMap<String, String>();
@@ -1951,7 +1963,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		
 		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(command, parameters);
 		
-		IHandlerService handlerService = (IHandlerService) fWorkbench
+		IHandlerService handlerService = fWorkbench
 				.getService(IHandlerService.class);
 		try {
 			handlerService.executeCommand(pCommand, null);
@@ -2878,7 +2890,7 @@ public class IWorkbenchPageTest extends UITestCase {
 		fActivePage.activate(editor);
 
 		processEvents();
-		ICommandService cs = (ICommandService) fActivePage.getWorkbenchWindow()
+		ICommandService cs = fActivePage.getWorkbenchWindow()
 				.getService(ICommandService.class);
 		Command undo = cs.getCommand("org.eclipse.ui.edit.undo");
 		assertTrue(undo.isDefined());

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -249,7 +250,7 @@ public class ThemeEngine implements IThemeEngine {
 	public synchronized void registerStylesheet(String uri, String... themes) {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
-		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
 
 		uri = uri.replaceAll("\\$os\\$", osname).replaceAll("\\$ws\\$", wsname);
 
@@ -613,6 +614,10 @@ public class ThemeEngine implements IThemeEngine {
 	public void addCSSEngine(CSSEngine cssEngine) {
 		cssEngines.add(cssEngine);
 		resetCurrentTheme();
+	}
+
+	public Collection<CSSEngine> getCSSEngines() {
+		return cssEngines;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
@@ -143,6 +144,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		 * 
 		 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 		 */
+		@Override
 		public void widgetSelected(SelectionEvent e) {
 			// Change the column titles.
 			final int oldSortIndex = sortOrder[0];
@@ -519,11 +521,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.preference.PreferencePage#applyData(java.lang.Object)
 	 */
+	@Override
 	public void applyData(Object data) {
 		if(data instanceof Binding) {
 			editBinding((Binding) data);
 		}
 	}
+	@Override
 	protected final Control createContents(final Composite parent) {
 		
 		PlatformUI.getWorkbench().getHelpSystem()
@@ -586,6 +590,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboScheme.setVisibleItemCount(ITEMS_TO_SHOW);
 
 		comboScheme.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent e) {
 				selectedComboScheme();
 			}
@@ -620,6 +625,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboCategory.setVisibleItemCount(ITEMS_TO_SHOW);
 
 		comboCategory.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent e) {
 				update();
 			}
@@ -638,6 +644,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboCommand.setVisibleItemCount(9);
 
 		comboCommand.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent e) {
 				update();
 			}
@@ -680,6 +687,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		tableBindingsForCommand.addMouseListener(new MouseAdapter() {
 
+			@Override
 			public void mouseDoubleClick(MouseEvent mouseEvent) {
 				update();
 			}
@@ -687,6 +695,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		tableBindingsForCommand.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				selectedTableBindingsForCommand();
 			}
@@ -715,20 +724,24 @@ public final class KeysPreferencePage extends PreferencePage implements
 		gridData.widthHint = 300;
 		textTriggerSequence.setLayoutData(gridData);
 		textTriggerSequence.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				update();
 			}
 		});
 		textTriggerSequence.addFocusListener(new FocusListener() {
+			@Override
 			public void focusGained(FocusEvent e) {
 				bindingService.setKeyFilterEnabled(false);
 			}
 
+			@Override
 			public void focusLost(FocusEvent e) {
 				bindingService.setKeyFilterEnabled(true);
 			}
 		});
 		textTriggerSequence.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				if (!bindingService.isKeyFilterEnabled()) {
 					bindingService.setKeyFilterEnabled(true);
@@ -772,6 +785,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			menuItem.setText(trappedKey.format());
 			menuItem.addSelectionListener(new SelectionAdapter() {
 
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					textTriggerSequenceManager.insert(trappedKey);
 					textTriggerSequence.setFocus();
@@ -782,6 +796,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		}
 		buttonAddKey.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				Point buttonLocation = buttonAddKey.getLocation();
 				buttonLocation = groupKeySequence.toDisplay(buttonLocation.x,
@@ -829,6 +844,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		tableBindingsForTriggerSequence.addMouseListener(new MouseAdapter() {
 
+			@Override
 			public void mouseDoubleClick(MouseEvent mouseEvent) {
 				update();
 			}
@@ -837,6 +853,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		tableBindingsForTriggerSequence
 				.addSelectionListener(new SelectionAdapter() {
 
+					@Override
 					public void widgetSelected(SelectionEvent selectionEvent) {
 						selectedTableBindingsForTriggerSequence();
 					}
@@ -858,6 +875,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboContext.setVisibleItemCount(ITEMS_TO_SHOW);
 
 		comboContext.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetSelected(final SelectionEvent e) {
 				update();
 			}
@@ -884,6 +902,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		buttonAdd.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				selectedButtonAdd();
 			}
@@ -900,6 +919,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		buttonRemove.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				selectedButtonRemove();
 			}
@@ -916,6 +936,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		buttonRestore.addSelectionListener(new SelectionAdapter() {
 
+			@Override
 			public void widgetSelected(SelectionEvent selectionEvent) {
 				selectedButtonRestore();
 			}
@@ -981,6 +1002,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		tableColumnContext.addSelectionListener(new SortOrderSelectionListener(
 				VIEW_CONTEXT_COLUMN_INDEX));
 		tableBindings.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public final void widgetDefaultSelected(final SelectionEvent e) {
 				selectedTableKeyBindings();
 			}
@@ -1008,6 +1030,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public final void widgetDefaultSelected(final SelectionEvent event) {
 				selectedTableKeyBindings();
 			}
@@ -1017,6 +1040,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				widgetDefaultSelected(e);
 			}
@@ -1038,6 +1062,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public final void widgetDefaultSelected(final SelectionEvent event) {
 				selectedButtonExport();
 			}
@@ -1047,6 +1072,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			 * 
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				widgetDefaultSelected(e);
 			}
@@ -1055,6 +1081,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		return composite;
 	}
 
+	@Override
 	protected IPreferenceStore doGetPreferenceStore() {
 		return PrefUtil.getInternalPreferenceStore();
 	}
@@ -1215,11 +1242,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 				: null;
 	}
 
+	@Override
 	public final void init(final IWorkbench workbench) {
 		activityManager = workbench.getActivitySupport().getActivityManager();
-		bindingService = (IBindingService) workbench.getService(IBindingService.class);
-		commandService = (ICommandService) workbench.getService(ICommandService.class);
-		contextService = (IContextService) workbench.getService(IContextService.class);
+		bindingService = workbench.getService(IBindingService.class);
+		commandService = workbench.getService(ICommandService.class);
+		contextService = workbench.getService(IContextService.class);
 	}
 
 	/**
@@ -1258,6 +1286,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		StatusUtil.handleStatus(message, exception, StatusManager.SHOW);
 	}
 
+	@Override
 	public final boolean performCancel() {
 		// Save the selected tab for future reference.
 		persistSelectedTab();
@@ -1265,6 +1294,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		return super.performCancel();
 	}
 
+	@Override
 	protected final void performDefaults() {
 		// Ask the user to confirm
 		final String title = Util.translateString(RESOURCE_BUNDLE,
@@ -1313,6 +1343,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		super.performDefaults();
 	}
 
+	@Override
 	public final boolean performOk() {
 		// Save the preferences.
 		try {
@@ -1376,6 +1407,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		}
 
 		final SafeRunnable runnable = new SafeRunnable() {
+			@Override
 			public final void run() throws IOException {
 				Writer fileWriter = null;
 				try {
@@ -1620,6 +1652,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 	 * Builds the internal look-up tables before allowing the page to become
 	 * visible.
 	 */
+	@Override
 	public final void setVisible(final boolean visible) {
 		if (visible == true) {
 			Map contextsByName = new HashMap();
@@ -2006,6 +2039,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 		// this comparator is based on the ParameterizedCommands#compareTo(*)
 		// method, but uses the collator.
 		Comparator comparator = new Comparator() {
+			@Override
 			public int compare(Object o1, Object o2) {
 				String name1 = null;
 				String name2 = null;
@@ -2322,6 +2356,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			 *         comparison is based on the current sort order.
 			 * @since 3.1
 			 */
+			@Override
 			public final int compare(final Object object1, final Object object2) {
 				final Binding binding1 = (Binding) object1;
 				final Binding binding2 = (Binding) object2;
@@ -2422,6 +2457,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 			/**
 			 * @see Object#equals(java.lang.Object)
 			 */
+			@Override
 			public final boolean equals(final Object object) {
 				return super.equals(object);
 			}

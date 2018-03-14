@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.progress;
@@ -241,6 +241,7 @@ public class ProgressInfoItem extends Composite {
 		actionButton
 				.setToolTipText(ProgressMessages.NewProgressView_CancelJobToolTip);
 		actionButton.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				actionButton.setEnabled(false);
 				cancelOrRemove();
@@ -252,6 +253,7 @@ public class ProgressInfoItem extends Composite {
 			 * 
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				if (indexListener == null) {
 					return;
@@ -283,6 +285,7 @@ public class ProgressInfoItem extends Composite {
 			 * 
 			 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 			 */
+			@Override
 			public void mouseDown(MouseEvent e) {
 				if (indexListener != null) {
 					indexListener.select();
@@ -780,6 +783,7 @@ public class ProgressInfoItem extends Composite {
 				 * 
 				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 				 */
+				@Override
 				public void widgetSelected(SelectionEvent e) {
 					executeTrigger();
 				}
@@ -791,6 +795,7 @@ public class ProgressInfoItem extends Composite {
 				 * 
 				 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 				 */
+				@Override
 				public void handleEvent(Event event) {
 
 					Object text = link.getData(TEXT_KEY);
@@ -844,7 +849,7 @@ public class ProgressInfoItem extends Composite {
 		} else if (data instanceof ParameterizedCommand) {
 			IWorkbench workbench = PlatformUI
 					.getWorkbench();
-			IHandlerService handlerService = (IHandlerService) workbench
+			IHandlerService handlerService = workbench
 					.getService(
 							IHandlerService.class);
 			IStatus status = Status.OK_STATUS;
@@ -1051,6 +1056,7 @@ public class ProgressInfoItem extends Composite {
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Widget#dispose()
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		if(resourceManager != null)

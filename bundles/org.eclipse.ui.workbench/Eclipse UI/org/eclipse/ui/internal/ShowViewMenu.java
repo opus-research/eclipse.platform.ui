@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -62,11 +63,13 @@ public class ShowViewMenu extends ContributionItem {
 	/**
 	 * @deprecated As of 3.5, replaced by {@link IWorkbenchCommandConstants#VIEWS_SHOW_VIEW}
 	 */
+	@Deprecated
 	public static final String SHOW_VIEW_ID= IWorkbenchCommandConstants.VIEWS_SHOW_VIEW;
 	/**
 	 * @deprecated As of 3.6, replaced by
 	 *             {@link IWorkbenchCommandConstants#VIEWS_SHOW_VIEW_PARM_ID}
 	 */
+	@Deprecated
 	public static final String VIEW_ID_PARM = IWorkbenchCommandConstants.VIEWS_SHOW_VIEW_PARM_ID;
 
 	private IWorkbenchWindow window;
@@ -74,6 +77,7 @@ public class ShowViewMenu extends ContributionItem {
 	private static final String NO_TARGETS_MSG = WorkbenchMessages.Workbench_showInNoTargets;
 
 	private Comparator actionComparator = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {
 			if (collator == null) {
 				collator = Collator.getInstance();
@@ -94,6 +98,7 @@ public class ShowViewMenu extends ContributionItem {
 	private MenuManager menuManager;
 
 	private IMenuListener menuListener = new IMenuListener() {
+		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			manager.markDirty();
 		}
@@ -129,13 +134,14 @@ public class ShowViewMenu extends ContributionItem {
 		super(id);
 		this.window = window;
 		this.makeFast = makeFast;
-		final IHandlerService handlerService = (IHandlerService) window
+		final IHandlerService handlerService = window
 				.getService(IHandlerService.class);
-		final ICommandService commandService = (ICommandService) window
+		final ICommandService commandService = window
 				.getService(ICommandService.class);
 		final ParameterizedCommand cmd = getCommand(commandService, makeFast);
 
 		showDlgAction = new Action(WorkbenchMessages.ShowView_title) {
+			@Override
 			public void run() {
 				try {
 					handlerService.executeCommand(cmd, null);
@@ -166,6 +172,7 @@ public class ShowViewMenu extends ContributionItem {
 	/**
 	 * Overridden to always return true and force dynamic menu building.
 	 */
+	@Override
 	public boolean isDynamic() {
 		return true;
 	}
@@ -244,6 +251,7 @@ public class ShowViewMenu extends ContributionItem {
 		 * 
 		 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 		 */
+		@Override
 		public String getLocalId() {
 			return localId;
 		}
@@ -253,6 +261,7 @@ public class ShowViewMenu extends ContributionItem {
 		 * 
 		 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 		 */
+		@Override
 		public String getPluginId() {
 			return pluginId;
 		}
@@ -311,6 +320,7 @@ public class ShowViewMenu extends ContributionItem {
 		return parts;
 	}
 
+	@Override
 	public void fill(Menu menu, int index) {
 		if (getParent() instanceof MenuManager) {
 			((MenuManager) getParent()).addMenuListener(menuListener);

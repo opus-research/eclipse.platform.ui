@@ -58,10 +58,12 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 	private Button removeButton;
 
 
+	@Override
 	public void init(IWorkbench workbench) {
 		workspacesData = new ChooseWorkspaceData(Platform.getInstanceLocation().getURL());
 	}
 
+	@Override
 	public Control createContents(Composite parent) {
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IWorkbenchHelpContextIds.WORKSPACES_PREFERENCE_PAGE);
@@ -90,6 +92,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 
 		promptOption.setSelection(workspacesData.getShowDialog());
 		promptOption.addSelectionListener(new SelectionAdapter(){
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					workspacesData.toggleShowDialog();
 				}
@@ -128,6 +131,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		removeButton.setEnabled(false);
 
 		removeButton.addSelectionListener(new SelectionAdapter(){
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					removeSelectedWorkspaces();
 					updateRemoveButton();
@@ -135,6 +139,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 			});
 
 		workspacesList.addSelectionListener(new SelectionAdapter() {
+				@Override
 				public void widgetSelected(SelectionEvent event) {
 					updateRemoveButton();
 				}
@@ -154,7 +159,7 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 		// This would be a lot less code if we could use Jakarta CollectionUtils and/or ArrayUtils
 
 		int[] selected = workspacesList.getSelectionIndices();
-		java.util.List workspaces = new ArrayList(Arrays.asList(workspacesList.getItems()));
+		java.util.List<String> workspaces = new ArrayList<String>(Arrays.asList(workspacesList.getItems()));
 
 		// Iterate bottom-up because removal changes indices in the list
 		for (int i = selected.length-1; i >= 0; i--) {
@@ -167,12 +172,14 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 	}
 
 
+	@Override
 	protected void performDefaults() {
 		promptOption.setSelection(true);
 		super.performDefaults();
 	}
 
 
+	@Override
 	public boolean performOk() {
 		int maxWorkspaces = maxWorkspacesField.getSelection();
 		String[] workspaces = new String[maxWorkspaces];

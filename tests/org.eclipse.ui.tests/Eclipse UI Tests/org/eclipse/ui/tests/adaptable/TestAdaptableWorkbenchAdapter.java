@@ -36,7 +36,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /*
      * @see IWorkbenchAdapter#getChildren(Object)
      */
-    public Object[] getChildren(Object o) {
+    @Override
+	public Object[] getChildren(Object o) {
         if (o instanceof AdaptableResourceWrapper)
             return ((AdaptableResourceWrapper) o).getChildren();
         if (o instanceof IResource) {
@@ -50,28 +51,29 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /*
      * @see IWorkbenchAdapter#getImageDescriptor(Object)
      */
-    public ImageDescriptor getImageDescriptor(Object object) {
+    @Override
+	public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
     /*
      * @see IWorkbenchAdapter#getLabel(Object)
      */
-    public String getLabel(Object o) {
+    @Override
+	public String getLabel(Object o) {
         if (o instanceof AdaptableResourceWrapper)
             return ((AdaptableResourceWrapper) o).getLabel();
-        else
-            return null;
+		return null;
     }
 
     /*
      * @see IWorkbenchAdapter#getParent(Object)
      */
-    public Object getParent(Object o) {
+    @Override
+	public Object getParent(Object o) {
         if (o instanceof AdaptableResourceWrapper)
             return ((AdaptableResourceWrapper) o).getParent();
-        else
-            return null;
+		return null;
     }
 
     /**
@@ -106,7 +108,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /**
      * Disposes of all allocated images.
      */
-    public final void dispose() {
+    @Override
+	public final void dispose() {
     }
 
     /**
@@ -125,7 +128,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider
      */
-    public final Image getImage(Object element) {
+    @Override
+	public final Image getImage(Object element) {
         //obtain the base image by querying the element
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null)
@@ -143,7 +147,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     /* (non-Javadoc)
      * Method declared on ILabelProvider
      */
-    public final String getText(Object element) {
+    @Override
+	public final String getText(Object element) {
         //query the element for its label
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null)

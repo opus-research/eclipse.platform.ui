@@ -54,11 +54,12 @@ import org.eclipse.ui.internal.registry.EditorRegistry;
 /**
  * This class is used to allow the user to select a dialog from the set of
  * internal and external editors.
- * 
+ *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
  */
 
-public final class EditorSelectionDialog extends Dialog {
+public class EditorSelectionDialog extends Dialog {
 	private EditorDescriptor selectedEditor;
 
 	private EditorDescriptor hiddenSelectedEditor;
@@ -75,7 +76,13 @@ public final class EditorSelectionDialog extends Dialog {
 
 	private Button okButton;
 
-	private static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
+	/**
+	 * For internal use only.
+	 *
+	 * @noreference This field is not intended to be referenced by clients.
+	 * @since 3.7
+	 */
+	protected static final String STORE_ID_INTERNAL_EXTERNAL = "EditorSelectionDialog.STORE_ID_INTERNAL_EXTERNAL";//$NON-NLS-1$
 
 	private String message = WorkbenchMessages.EditorSelection_chooseAnEditor;
 
@@ -118,6 +125,7 @@ public final class EditorSelectionDialog extends Dialog {
 	/**
 	 * This method is called if a button has been pressed.
 	 */
+	@Override
 	protected void buttonPressed(int buttonId) {
 		if (buttonId == IDialogConstants.OK_ID) {
 			saveWidgetValues();
@@ -128,6 +136,7 @@ public final class EditorSelectionDialog extends Dialog {
 	/**
 	 * Close the window.
 	 */
+	@Override
 	public boolean close() {
 		boolean result = super.close();
 		resourceManager.dispose();
@@ -138,6 +147,7 @@ public final class EditorSelectionDialog extends Dialog {
 	/*
 	 * (non-Javadoc) Method declared in Window.
 	 */
+	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(WorkbenchMessages.EditorSelection_title);
@@ -155,6 +165,7 @@ public final class EditorSelectionDialog extends Dialog {
 	 *            the parent composite to contain the dialog area
 	 * @return the dialog area control
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Font font = parent.getFont();
 		// create main group
@@ -162,10 +173,13 @@ public final class EditorSelectionDialog extends Dialog {
 		((GridLayout) contents.getLayout()).numColumns = 2;
 
 		// begin the layout
-		Label textLabel = new Label(contents, SWT.NONE);
+		Label textLabel = new Label(contents, SWT.WRAP);
+
 		textLabel.setText(message);
 		GridData data = new GridData();
 		data.horizontalSpan = 2;
+		data.horizontalAlignment = SWT.FILL;
+		data.widthHint = TABLE_WIDTH;
 		textLabel.setLayoutData(data);
 		textLabel.setFont(font);
 
@@ -202,11 +216,13 @@ public final class EditorSelectionDialog extends Dialog {
 		editorTableViewer = new TableViewer(editorTable);
 		editorTableViewer.setContentProvider(ArrayContentProvider.getInstance());
 		editorTableViewer.setLabelProvider(new LabelProvider() {
+			@Override
 			public String getText(Object element) {
 				IEditorDescriptor d = (IEditorDescriptor) element;
 				return TextProcessor.process(d.getLabel(), "."); //$NON-NLS-1$
 			}
 
+			@Override
 			public Image getImage(Object element) {
 				IEditorDescriptor d = (IEditorDescriptor) element;
 				return (Image) resourceManager.get(d.getImageDescriptor());
@@ -453,6 +469,7 @@ public final class EditorSelectionDialog extends Dialog {
 		updateOkButton();
 	}
 
+	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		okButton = createButton(parent, IDialogConstants.OK_ID,
 				IDialogConstants.OK_LABEL, true);
@@ -487,6 +504,7 @@ public final class EditorSelectionDialog extends Dialog {
 		 * 
 		 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 		 */
+		@Override
 		public void handleEvent(Event event) {
 			if (event.type == SWT.MouseDoubleClick) {
 				handleDoubleClickEvent();
@@ -514,6 +532,7 @@ public final class EditorSelectionDialog extends Dialog {
 	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
 	 * @since 3.4
 	 */
+	@Override
 	protected boolean isResizable() {
 		return true;
 	}

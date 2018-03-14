@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Freescale Semiconductor and others.
+ * Copyright (c) 2008, 2014 Freescale Semiconductor and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - [252996] initial API and implementation
  *     IBM Corporation - ongoing implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -24,17 +25,18 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
  */
 public class ResourceFilterDecorator implements ILightweightLabelDecorator {
 
-	private static final String IMG_MARKERS_RESOURCE_FILTER_DECORATION_PATH = "ovr16/filterapplied_ovr.gif"; //$NON-NLS-1$
+	private static final String IMG_MARKERS_RESOURCE_FILTER_DECORATION_PATH = "ovr16/filterapplied_ovr.png"; //$NON-NLS-1$
 	ImageDescriptor descriptorImage = null;
 
 	/**
-	 * 
+	 *
 	 */
 	public ResourceFilterDecorator() {
 		descriptorImage = IDEWorkbenchPlugin
 				.getIDEImageDescriptor(IMG_MARKERS_RESOURCE_FILTER_DECORATION_PATH);
 	}
 
+	@Override
 	public void decorate(Object element, IDecoration decoration) {
 
 		if (element instanceof IContainer == false) {
@@ -51,16 +53,20 @@ public class ResourceFilterDecorator implements ILightweightLabelDecorator {
 		}
 	}
 
+	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
+	@Override
 	public void dispose() {
 	}
 
+	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
+	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
