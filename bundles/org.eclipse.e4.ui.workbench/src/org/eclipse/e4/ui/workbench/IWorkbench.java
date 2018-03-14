@@ -95,10 +95,10 @@ public interface IWorkbench {
 	 * (like e.g., e4) this is the direct child of the root context which is
 	 * retrieved from
 	 * {@link EclipseContextFactory#getServiceContext(org.osgi.framework.BundleContext)}
-	 *
+	 * 
 	 * @since 1.4
 	 */
-	public final static String APPLICATION_CONTEXT_KEY = "applicationContext"; //$NON-NLS-1$
+	public final static String APPLICATION_CONTEXT_KEY = "ApplicationContext"; //$NON-NLS-1$
 
 	/**
 	 * Close the workbench instance
