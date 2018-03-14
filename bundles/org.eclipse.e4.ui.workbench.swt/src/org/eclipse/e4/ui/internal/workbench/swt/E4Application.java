@@ -126,12 +126,7 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
-	 * IApplicationContext)
-	 */
+	@Override
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -206,11 +201,15 @@ public class E4Application implements IApplication {
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
 			public void syncExec(Runnable runnable) {
-				display.syncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.syncExec(runnable);
+				}
 			}
 
 			public void asyncExec(Runnable runnable) {
-				display.asyncExec(runnable);
+				if (display != null && !display.isDisposed()) {
+					display.asyncExec(runnable);
+				}
 			}
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
@@ -302,12 +301,11 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(E4Application.THEME_ID, themeId);
 
-		// Temporary to support old property as well
-		if (cssURI != null && !cssURI.startsWith("platform:")) {
+		// validate static CSS URI
+		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
 			System.err
-					.println("Warning "
-							+ cssURI
-							+ " changed its meaning it is used now to run without theme support");
+					.println("Warning. Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" URI for the  parameter:   "
+							+ IWorkbench.CSS_URI_ARG); //$NON-NLS-1$
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
