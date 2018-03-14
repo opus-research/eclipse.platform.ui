@@ -36,7 +36,11 @@ public class TabbedPropertySheetPageOverrideTest extends TestCase {
 
 	private OverrideTestsView overrideTestsView;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -66,7 +70,11 @@ public class TabbedPropertySheetPageOverrideTest extends TestCase {
 		overrideTestsView = (OverrideTestsView) view;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	protected void tearDown() throws Exception {
 		super.tearDown();
 

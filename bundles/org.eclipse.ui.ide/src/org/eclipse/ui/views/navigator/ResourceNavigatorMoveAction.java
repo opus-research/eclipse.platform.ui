@@ -54,6 +54,9 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
         this.moveProjectAction = new MoveProjectAction(shell);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         if (moveProjectAction.isEnabled()) {

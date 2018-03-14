@@ -26,6 +26,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -275,7 +277,12 @@ import org.eclipse.swt.widgets.ToolItem;
 			}
 		});
 
-		addDisposeListener(e -> handleDispose());
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				handleDispose();
+			}
+		});
 
 		// StatusLineManager skips over the standard status line widgets
 		// in its update method. There is thus a dependency
@@ -320,10 +327,13 @@ import org.eclipse.swt.widgets.ToolItem;
 				setCanceled(true);
 			}
 		});
-		fCancelButton.addDisposeListener(e -> {
-			Image i = fCancelButton.getImage();
-			if ((i != null) && (!i.isDisposed())) {
-				i.dispose();
+		fCancelButton.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Image i = fCancelButton.getImage();
+				if ((i != null) && (!i.isDisposed())) {
+					i.dispose();
+				}
 			}
 		});
 
@@ -363,7 +373,12 @@ import org.eclipse.swt.widgets.ToolItem;
 		final boolean animated = (totalWork == UNKNOWN || totalWork == 0);
 		// make sure the progress bar is made visible while
 		// the task is running. Fixes bug 32198 for the non-animated case.
-		Runnable timer = () -> StatusLine.this.startTask(timestamp, animated);
+		Runnable timer = new Runnable() {
+			@Override
+			public void run() {
+				StatusLine.this.startTask(timestamp, animated);
+			}
+		};
 		if (fProgressBar == null) {
 			return;
 		}

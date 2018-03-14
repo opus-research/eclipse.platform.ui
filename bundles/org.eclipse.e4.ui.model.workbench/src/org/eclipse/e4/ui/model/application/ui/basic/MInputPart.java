@@ -32,6 +32,5 @@ import org.eclipse.e4.ui.model.application.ui.MInput;
  * @model
  * @generated
  */
-@Deprecated
 public interface MInputPart extends MPart, MInput {
 } // MInputPart

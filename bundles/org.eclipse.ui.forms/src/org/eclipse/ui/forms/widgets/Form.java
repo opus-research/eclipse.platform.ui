@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,17 +106,14 @@ public class Form extends Composite {
 	private MessageManager messageManager;
 
 	private class FormLayout extends Layout implements ILayoutExtension {
-		@Override
 		public int computeMinimumWidth(Composite composite, boolean flushCache) {
 			return computeSize(composite, 5, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public int computeMaximumWidth(Composite composite, boolean flushCache) {
 			return computeSize(composite, SWT.DEFAULT, SWT.DEFAULT, flushCache).x;
 		}
 
-		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
 			if (flushCache) {
@@ -147,7 +144,6 @@ public class Form extends Composite {
 			return new Point(width, height);
 		}
 
-		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 			if (flushCache) {
 				bodyCache.flush();
@@ -185,7 +181,6 @@ public class Form extends Composite {
 	 * @param menu
 	 *            the parent menu
 	 */
-	@Override
 	public void setMenu(Menu menu) {
 		super.setMenu(menu);
 		head.setMenu(menu);
@@ -195,7 +190,6 @@ public class Form extends Composite {
 	/**
 	 * Fully delegates the size computation to the internal layout manager.
 	 */
-	@Override
 	public final Point computeSize(int wHint, int hHint, boolean changed) {
 		return ((FormLayout) getLayout()).computeSize(this, wHint, hHint,
 				changed);
@@ -204,7 +198,6 @@ public class Form extends Composite {
 	/**
 	 * Prevents from changing the custom control layout.
 	 */
-	@Override
 	public final void setLayout(Layout layout) {
 	}
 
@@ -234,7 +227,6 @@ public class Form extends Composite {
 	 * @param fg
 	 *            the foreground color
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		head.setForeground(fg);
@@ -248,7 +240,6 @@ public class Form extends Composite {
 	 * @param bg
 	 *            the background color
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		head.setBackground(bg);
@@ -261,7 +252,6 @@ public class Form extends Composite {
 	 * @param font
 	 *            the new font
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		head.setFont(font);
@@ -334,7 +324,6 @@ public class Form extends Composite {
 	 *
 	 * @return the background image or <code>null</code> if not specified.
 	 */
-	@Override
 	public Image getBackgroundImage() {
 		return head.getHeadingBackgroundImage();
 	}
@@ -352,7 +341,6 @@ public class Form extends Composite {
 	 *            the head background image.
 	 *
 	 */
-	@Override
 	public void setBackgroundImage(Image backgroundImage) {
 		head.setHeadingBackgroundImage(backgroundImage);
 	}
@@ -492,7 +480,6 @@ public class Form extends Composite {
 	 *             either painted at 0,0 and/or tiled.
 	 * @return SWT.LEFT
 	 */
-	@Deprecated
 	public int getBackgroundImageAlignment() {
 		return SWT.LEFT;
 	}
@@ -506,7 +493,6 @@ public class Form extends Composite {
 	 *            The backgroundImageAlignment to set.
 	 * @since 3.1
 	 */
-	@Deprecated
 	public void setBackgroundImageAlignment(int backgroundImageAlignment) {
 	}
 
@@ -518,7 +504,6 @@ public class Form extends Composite {
 	 * @return true
 	 * @since 3.1
 	 */
-	@Deprecated
 	public boolean isBackgroundImageClipped() {
 		return true;
 	}
@@ -532,7 +517,6 @@ public class Form extends Composite {
 	 *            the value to set
 	 * @since 3.1
 	 */
-	@Deprecated
 	public void setBackgroundImageClipped(boolean backgroundImageClipped) {
 	}
 
@@ -571,7 +555,6 @@ public class Form extends Composite {
 	 * @deprecated use <code>getHeadColor(IFormColors.H_BOTTOM_KEYLINE2)</code>
 	 */
 
-	@Deprecated
 	public Color getSeparatorColor() {
 		return head.getColor(IFormColors.H_BOTTOM_KEYLINE2);
 	}
@@ -586,7 +569,6 @@ public class Form extends Composite {
 	 * @deprecated use
 	 *             <code>setHeadColor(IFormColors.H_BOTTOM_KEYLINE2, separatorColor)</code>
 	 */
-	@Deprecated
 	public void setSeparatorColor(Color separatorColor) {
 		head.putColor(IFormColors.H_BOTTOM_KEYLINE2, separatorColor);
 	}
@@ -774,10 +756,20 @@ public class Form extends Composite {
 		head.addDropSupport(operations, transferTypes, listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+	 */
 	public String getMessage() {
 		return head.getMessage();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+	 */
 	public int getMessageType() {
 		return head.getMessageType();
 	}

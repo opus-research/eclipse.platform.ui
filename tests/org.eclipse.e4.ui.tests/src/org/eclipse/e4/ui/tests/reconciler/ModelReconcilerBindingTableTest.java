@@ -11,10 +11,6 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
@@ -22,12 +18,10 @@ import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerBindingTableTest extends
 		ModelReconcilerTest {
 
-	@Test
 	public void testBindingTable_BindingContext_Set() {
 		MApplication application = createApplication();
 
@@ -69,7 +63,6 @@ public abstract class ModelReconcilerBindingTableTest extends
 				.get(0));
 	}
 
-	@Test
 	public void testBindingTable_BindingContext_Unset() {
 		MApplication application = createApplication();
 

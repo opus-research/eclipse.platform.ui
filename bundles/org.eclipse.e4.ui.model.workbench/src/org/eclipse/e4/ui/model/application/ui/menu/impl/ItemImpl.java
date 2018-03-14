@@ -330,7 +330,6 @@ public abstract class ItemImpl extends UIElementImpl implements MItem {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 */
-	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(

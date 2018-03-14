@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093, 440080, 440270, 475873
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093, 440080, 440270
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -24,13 +24,13 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.internal.JFaceActivator;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 
 /**
  * Utility methods to access JFace-specific resources.
@@ -61,7 +61,7 @@ public class JFaceResources {
 	 * Map of Display onto DeviceResourceManager. Holds all the resources for
 	 * the associated display.
 	 */
-	private static final Map<Display,DeviceResourceManager> registries = new HashMap<>();
+	private static final Map<Display,DeviceResourceManager> registries = new HashMap<Display,DeviceResourceManager>();
 
 	/**
 	 * The symbolic font name for the banner font (value
@@ -144,7 +144,7 @@ public class JFaceResources {
 	 *            the message arguments
 	 * @return the string
 	 */
-	public static String format(String key, Object... args) {
+	public static String format(String key, Object[] args) {
 		return MessageFormat.format(getString(key), args);
 	}
 
@@ -162,7 +162,7 @@ public class JFaceResources {
 	}
 
 	/**
-	 * Returns the resource bundle for JFace itself. The resource bundle is
+	 * Returns the resource bundle for JFace itself. The resouble bundle is
 	 * obtained from
 	 * <code>ResourceBundle.getBundle("org.eclipse.jface.jface_nls")</code>.
 	 * <p>
@@ -206,9 +206,12 @@ public class JFaceResources {
 			final DeviceResourceManager mgr = new DeviceResourceManager(toQuery);
 			reg = mgr;
 			registries.put(toQuery, mgr);
-			toQuery.disposeExec(() -> {
-				mgr.dispose();
-				registries.remove(toQuery);
+			toQuery.disposeExec(new Runnable() {
+				@Override
+				public void run() {
+					mgr.dispose();
+					registries.remove(toQuery);
+				}
 			});
 		}
 
@@ -334,7 +337,8 @@ public class JFaceResources {
 	 */
 	public static FontRegistry getFontRegistry() {
 		if (fontRegistry == null) {
-			fontRegistry = new FontRegistry("org.eclipse.jface.resource.jfacefonts"); //$NON-NLS-1$
+			fontRegistry = new FontRegistry(
+					"org.eclipse.jface.resource.jfacefonts"); //$NON-NLS-1$
 		}
 		return fontRegistry;
 	}
@@ -394,7 +398,8 @@ public class JFaceResources {
 	 */
 	public static ImageRegistry getImageRegistry() {
 		if (imageRegistry == null) {
-			imageRegistry = new ImageRegistry(getResources(Display.getCurrent()));
+			imageRegistry = new ImageRegistry(
+					getResources(Display.getCurrent()));
 			initializeDefaultImages();
 		}
 		return imageRegistry;
@@ -408,8 +413,8 @@ public class JFaceResources {
 
 		Object bundle = null;
 		try {
-			bundle = FrameworkUtil.getBundle(JFaceResources.class);
-		} catch (Throwable exception) {
+			bundle = JFaceActivator.getBundle();
+		} catch (NoClassDefFoundError exception) {
 			// Test to see if OSGI is present
 		}
 		declareImage(bundle, Wizard.DEFAULT_IMAGE, ICONS_PATH + "page.png", //$NON-NLS-1$
@@ -461,8 +466,8 @@ public class JFaceResources {
 	 *            the path relative to the fallback {@link Class}
 	 *
 	 */
-	private static final void declareImage(Object bundle, String key, String path, Class<?> fallback,
-			String fallbackPath) {
+	private static final void declareImage(Object bundle, String key,
+			String path, Class<?> fallback, String fallbackPath) {
 
 		ImageDescriptor descriptor = null;
 
@@ -568,7 +573,8 @@ public class JFaceResources {
 	 *            a font registry
 	 */
 	public static void setFontRegistry(FontRegistry registry) {
-		Assert.isTrue(fontRegistry == null, "Font registry can only be set once."); //$NON-NLS-1$
+		Assert.isTrue(fontRegistry == null,
+				"Font registry can only be set once."); //$NON-NLS-1$
 		fontRegistry = registry;
 	}
 

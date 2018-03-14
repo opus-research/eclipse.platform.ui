@@ -103,6 +103,9 @@ public class TarLeveledStructureProvider implements
 		childList.add(entry);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public List getChildren(Object element) {
 		if (children == null) {
@@ -112,6 +115,9 @@ public class TarLeveledStructureProvider implements
 		return ((List) children.get(element));
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public InputStream getContents(Object element) {
 		try {
@@ -139,11 +145,17 @@ public class TarLeveledStructureProvider implements
 		return attributes;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public String getFullPath(Object element) {
 		return stripPath(((TarEntry) element).getName());
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public String getLabel(Object element) {
 		if (element.equals(root)) {
@@ -172,6 +184,10 @@ public class TarLeveledStructureProvider implements
 		return tarFile;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider#closeArchive()
+	 */
 	@Override
 	public boolean closeArchive(){
 		try {
@@ -212,6 +228,9 @@ public class TarLeveledStructureProvider implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public boolean isFolder(Object element) {
 		return (((TarEntry) element).getFileType() == TarEntry.DIRECTORY);

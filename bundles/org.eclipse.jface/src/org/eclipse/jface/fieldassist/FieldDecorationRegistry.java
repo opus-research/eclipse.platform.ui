@@ -223,7 +223,7 @@ public class FieldDecorationRegistry {
 	private int maxDecorationWidth = 0;
 	private int maxDecorationHeight = 0;
 
-	private HashMap<String, Entry> decorations = new HashMap<>();
+	private HashMap<String, Entry> decorations = new HashMap<String, Entry>();
 
 	/**
 	 * Get the default FieldDecorationRegistry.

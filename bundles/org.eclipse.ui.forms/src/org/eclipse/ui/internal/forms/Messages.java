@@ -25,6 +25,8 @@ public class Messages extends NLS {
 
 	public static String FormDialog_defaultTitle;
 	public static String FormText_copy;
+	public static String Form_tooltip_minimize;
+	public static String Form_tooltip_restore;
 	/*
 	 * Message manager
 	 */

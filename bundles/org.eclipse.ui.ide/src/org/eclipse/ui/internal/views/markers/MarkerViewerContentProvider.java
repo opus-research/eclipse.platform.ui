@@ -33,17 +33,34 @@ class MarkerViewerContentProvider implements ITreeContentProvider {
 		this.markersView = extendedMarkersView;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse
+	 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		// this.viewer = (MarkersTreeViewer) viewer;
 		this.input = newInput;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	@Override
 	public void dispose() {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java
+	 * .lang.Object)
+	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		MarkerSupportItem[] children = ((MarkerSupportItem) parentElement)
@@ -52,6 +69,12 @@ class MarkerViewerContentProvider implements ITreeContentProvider {
 		return getLimitedChildren(children);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements
+	 * (java.lang.Object)
+	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		//use clone
@@ -77,6 +100,12 @@ class MarkerViewerContentProvider implements ITreeContentProvider {
 		return newChildren;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ILazyTreeContentProvider#getParent(
+	 * java.lang.Object)
+	 */
 	@Override
 	public Object getParent(Object element) {
 		Object parent = ((MarkerSupportItem) element).getParent();
@@ -85,6 +114,12 @@ class MarkerViewerContentProvider implements ITreeContentProvider {
 		return parent;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java
+	 * .lang.Object)
+	 */
 	@Override
 	public boolean hasChildren(Object element) {
 		return ((MarkerSupportItem) element).getChildren().length > 0;
