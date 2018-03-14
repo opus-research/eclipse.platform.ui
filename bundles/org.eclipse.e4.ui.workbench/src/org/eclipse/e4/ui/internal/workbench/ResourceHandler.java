@@ -148,15 +148,7 @@ public class ResourceHandler implements IModelResourceHandler {
 					context.set(MApplication.class, appElement);
 					ModelAssembler contribProcessor = ContextInjectionFactory.make(
 							ModelAssembler.class, context);
-
-					// bug 376486
-					String xmiUriArg = System
-							.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
-					if (!("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg))) { //$NON-NLS-1$
-						contribProcessor.processModel(ModelAssembler.PURE_E4);
-					} else {
-						contribProcessor.processModel(ModelAssembler.LEGACY_E4STEP);
-					}
+					contribProcessor.processModel();
 
 					File deltaOldFile = new File(baseLocation, "deltas_42M7migration.xml"); //$NON-NLS-1$
 					deltaFile.renameTo(deltaOldFile);
@@ -221,16 +213,11 @@ public class ResourceHandler implements IModelResourceHandler {
 		// Add model items described in the model extension point
 		// This has to be done before commands are put into the context
 		MApplication appElement = (MApplication) resource.getContents().get(0);
+
 		this.context.set(MApplication.class, appElement);
 		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
 				context);
-		// bug 376486
-		String xmiUriArg = System.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
-		if (!("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg))) { //$NON-NLS-1$
-			contribProcessor.processModel(ModelAssembler.PURE_E4);
-		} else {
-			contribProcessor.processModel(ModelAssembler.LEGACY_E4STEP);
-		}
+		contribProcessor.processModel();
 
 		if (!clearPersistedState) {
 			CommandLineOptionModelProcessor processor = ContextInjectionFactory.make(
