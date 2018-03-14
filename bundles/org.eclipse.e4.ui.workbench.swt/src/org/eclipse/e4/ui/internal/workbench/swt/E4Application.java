@@ -196,8 +196,7 @@ public class E4Application implements IApplication {
 		}
 	}
 
-	public E4Workbench createE4Workbench(
-			IApplicationContext applicationContext, final Display display) {
+	public E4Workbench createE4Workbench(IApplicationContext applicationContext, final Display display) {
 		args = (String[]) applicationContext.getArguments().get(IApplicationContext.APPLICATION_ARGS);
 
 		IEclipseContext appContext = createDefaultContext();
@@ -235,8 +234,7 @@ public class E4Application implements IApplication {
 			lcManager = factory.create(lifeCycleURI, appContext);
 			if (lcManager != null) {
 				// Let the manager manipulate the appContext if desired
-				ContextInjectionFactory.invoke(lcManager,
-						PostContextCreate.class, appContext, null);
+				ContextInjectionFactory.invoke(lcManager, PostContextCreate.class, appContext, null);
 			}
 		}
 
@@ -339,12 +337,10 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 	}
 
-	private MApplication loadApplicationModel(IApplicationContext appContext,
-			IEclipseContext eclipseContext) {
+	private MApplication loadApplicationModel(IApplicationContext appContext, IEclipseContext eclipseContext) {
 		MApplication theApp = null;
 
-		Location instanceLocation = WorkbenchSWTActivator.getDefault()
-				.getInstanceLocation();
+		Location instanceLocation = WorkbenchSWTActivator.getDefault().getInstanceLocation();
 
 
 		URI applicationModelURI = determineApplicationModelURI(appContext);
@@ -356,8 +352,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 		saveAndRestore = value == null || Boolean.parseBoolean(value);
 
-		eclipseContext.set(IWorkbench.PERSIST_STATE,
-				Boolean.valueOf(saveAndRestore));
+		eclipseContext.set(IWorkbench.PERSIST_STATE, Boolean.valueOf(saveAndRestore));
 
 		// when -data @none or -data @noDefault options
 		if (instanceLocation != null && instanceLocation.getURL() != null) {
@@ -370,28 +365,23 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		boolean clearPersistedState;
 		value = getArgValue(IWorkbench.CLEAR_PERSISTED_STATE, appContext, true);
 		clearPersistedState = value != null && Boolean.parseBoolean(value);
-		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE,
-				Boolean.valueOf(clearPersistedState));
+		eclipseContext.set(IWorkbench.CLEAR_PERSISTED_STATE, Boolean.valueOf(clearPersistedState));
 
 		// Delta save and restore
 		boolean deltaRestore;
 		value = getArgValue(E4Workbench.DELTA_RESTORE, appContext, false);
 		deltaRestore = value == null || Boolean.parseBoolean(value);
-		eclipseContext.set(E4Workbench.DELTA_RESTORE,
-				Boolean.valueOf(deltaRestore));
+		eclipseContext.set(E4Workbench.DELTA_RESTORE, Boolean.valueOf(deltaRestore));
 
 		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false);
 
 		if (resourceHandler == null) {
-			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
-					+ ResourceHandler.class.getName();
+			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName();
 		}
 
-		IContributionFactory factory = eclipseContext
-				.get(IContributionFactory.class);
+		IContributionFactory factory = eclipseContext.get(IContributionFactory.class);
 
-		handler = (IModelResourceHandler) factory.create(resourceHandler,
-				eclipseContext);
+		handler = (IModelResourceHandler) factory.create(resourceHandler, eclipseContext);
 		eclipseContext.set(IModelResourceHandler.class, handler);
 
 		Resource resource = handler.loadMostRecentModel();
@@ -412,8 +402,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 				appModelPath = brandingBundle.getSymbolicName() + "/" + E4Application.APPLICATION_MODEL_PATH_DEFAULT;
 			else {
 				Logger logger = new WorkbenchLogger(PLUGIN_ID);
-				logger.error(new Exception(), // log a stack trace for debugging
-						"applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
+				logger.error(new Exception(), "applicationXMI parameter not set and no branding plugin defined. "); //$NON-NLS-1$
 			}
 		}
 
