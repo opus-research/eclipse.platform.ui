@@ -43,7 +43,7 @@
 					<configuration>
 		  				<testClass>org.eclipse.ui.tests.UiTestSuite</testClass>
 						<work>${project.build.directory}/work-nouithread</work>
-		  			  	<useUIHarness>true</useUIHarness>
+		  			  	<useUIHarness>false</useUIHarness>
 			  			<useUIThread>false</useUIThread>
 		  				<dependencies>
 		  					<dependency>
