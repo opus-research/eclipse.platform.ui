@@ -168,7 +168,7 @@ public interface IWorkbenchActionConstants {
 	public static final String M_WORKBENCH = MENU_PREFIX + "workbench"; //$NON-NLS-1$
 
     // menu reorg
-
+    
 	/**
 	 * Name of standard Perspective menu (value <code>"perspective"</code>).
 	 *
