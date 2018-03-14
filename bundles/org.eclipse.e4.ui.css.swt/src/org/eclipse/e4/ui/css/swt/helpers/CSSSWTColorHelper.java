@@ -10,7 +10,6 @@
  *     IBM Corporation
  *     Kai Toedter - added radial gradient support
  *     Robin Stocker - Bug 420035 - [CSS] Support SWT color constants in gradients
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 459961
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.helpers;
 
@@ -45,10 +44,6 @@ public class CSSSWTColorHelper {
 	private static Field[] cachedFields;
 
 	/*--------------- SWT Color Helper -----------------*/
-
-	public static Color getSWTTransparentColor(Display display) {
-		return new Color(display, 0, 0, 0, 0);
-	}
 
 	public static Color getSWTColor(RGBColor rgbColor, Display display) {
 		RGB rgb = getRGB(rgbColor);
