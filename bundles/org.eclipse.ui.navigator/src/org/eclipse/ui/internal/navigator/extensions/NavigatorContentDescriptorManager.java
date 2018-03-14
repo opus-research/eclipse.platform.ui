@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,10 @@
  * Contributors:
  * IBM Corporation - initial API and implementation
  * Bug 349224 Navigator content provider "appearsBefore" creates hard reference to named id - paul.fullbright@oracle.com
- * C. Sean Young <csyoung@google.com> - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.extensions;
 
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,56 +49,13 @@ public class NavigatorContentDescriptorManager {
 
 	private final Map allDescriptors = new HashMap();
 
-	/**
-	 * A cache for evaluated ContentDescriptors.
-	 * Not part of the public API.
-	 * @since 3.2
-	 * @version 4.4
-	 */
-	// @VisibleForTesting
-	public static class EvaluationCache implements VisibilityListener {
+	private class EvaluationCache implements VisibilityListener {
 
-		private final Map evaluations/* <EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>> */ = new HashMap();
-		private final Map evaluationsWithOverrides/* <EvaluationReference<Object>, EvaluationValueReference<NavigatorContentDescriptor[]>>*/ = new HashMap();
+		private final Map evaluations/* <Object, NavigatorContentDescriptor[]> */= new HashMap();
+		private final Map evaluationsWithOverrides/*<Object, NavigatorContentDescriptor[]>*/ = new HashMap();
 
-		private final ReferenceQueue evaluationsQueue = new ReferenceQueue();
-		private final ReferenceQueue evaluationsWithOverridesQueue = new ReferenceQueue();
-
-		/**
-		 * Not part of the public API.
-		 * @param anAssistant the VisisbilityAssistant to register with, must be non-null
-		 */
-		// @VisibleForTesting
-		protected EvaluationCache(VisibilityAssistant anAssistant) {
+		EvaluationCache(VisibilityAssistant anAssistant) {
 			anAssistant.addListener(this);
-		}
-
-		private void cleanUpStaleEntries() {
-			// TODO Only clean up to a certain number of entries per call?
-			// Not thread safe, but this whole class isn't, so that is fine.
-			Reference r;
-			// Reference#poll thankfully does not block if there is nothing available.
-			while ((r = evaluationsQueue.poll()) != null) {
-				processStaleEntry(r, evaluations);
-			}
-			while ((r = evaluationsWithOverridesQueue.poll()) != null) {
-				processStaleEntry(r, evaluationsWithOverrides);
-			}
-		}
-
-		private static void processStaleEntry(Reference r, Map fromMap) {
-			if (r instanceof EvaluationReference) {
-				// Key has been collected, clear its entry.
-				fromMap.remove(r);
-			}
-			if (r instanceof EvaluationValueReference) {
-				// If the value has been collected, get its key, and then remove that entry.
-				EvaluationReference key = ((EvaluationValueReference)r).getKey();
-				if (key != null) {
-					fromMap.remove(key);
-				}
-			}
-			// All other Reference types we just leave alone.
 		}
 
 		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement) {
@@ -111,68 +66,40 @@ public class NavigatorContentDescriptorManager {
 			setDescriptors(anElement, theDescriptors, true);
 		}
 
-		private static NavigatorContentDescriptor[] getDescriptorsFromMap (Object anElement, Map map) {
-			// Need to wrap in the reference type before querying, else it won't be found by HashMap.
-			EvaluationReference key = new EvaluationReference(anElement);
-			NavigatorContentDescriptor[] cachedDescriptors = null;
-			Reference cache = (Reference) map.get(key);
-			if (cache != null && (cachedDescriptors = (NavigatorContentDescriptor[]) cache.get()) == null) {
-				// There was an entry, but it has been collected, remove stale mapping.
-				EvaluationValueReference value = (EvaluationValueReference) map.remove(key);
-				if (value != null) {
-					// Clear the key from the value we don't try to prematurely remove any potential new mapping upon cleanUpStaleEntries()
-					value.clear();
-				}
-			}
-			return cachedDescriptors;
-		}
-
 		protected final NavigatorContentDescriptor[] getDescriptors(Object anElement, boolean toComputeOverrides) {
 
-			cleanUpStaleEntries();
 			if (anElement == null)
 				return null;
 
+			NavigatorContentDescriptor[] cachedDescriptors = null;
 			if (toComputeOverrides) {
-				return getDescriptorsFromMap(anElement, evaluations);
+				SoftReference cache = (SoftReference) evaluations.get(anElement);
+				if (cache != null && (cachedDescriptors = (NavigatorContentDescriptor[]) cache.get()) == null)
+					evaluations.remove(anElement);
+				return cachedDescriptors;
 			}
-			return getDescriptorsFromMap(anElement, evaluationsWithOverrides);
-		}
+			SoftReference cache = (SoftReference) evaluationsWithOverrides.get(anElement);
+			if (cache != null && (cachedDescriptors = (NavigatorContentDescriptor[]) cache.get()) == null)
+				evaluationsWithOverrides.remove(anElement);
+			return cachedDescriptors;
 
-		private static void setDescriptorsInMap(Object anElement, NavigatorContentDescriptor[] theDescriptors, Map map, ReferenceQueue queue) {
-			EvaluationReference key = new EvaluationReference(anElement, queue);
-			EvaluationValueReference newValue = new EvaluationValueReference(theDescriptors, key, queue);
-			EvaluationValueReference oldValue = (EvaluationValueReference) map.put(key, newValue);
-			if (oldValue != null) {
-				// "Swap" the correct key instance when swapping the value, or else the above, temporary
-				// lookup key will be collected too early (not the actual anElement, but the Reference object).
-				// Not truly needed, but it will help the point of this field not go to waste.
-				newValue.swapKey(oldValue);
-				// Clear the key we don't try to prematurely remove the new mapping upon cleanUpStaleEntries()
-				oldValue.clear();
-			}
 		}
 
 		protected final void setDescriptors(Object anElement, NavigatorContentDescriptor[] theDescriptors, boolean toComputeOverrides) {
-			cleanUpStaleEntries();
 			if (anElement != null) {
 				if (toComputeOverrides)
-					setDescriptorsInMap(anElement, theDescriptors, evaluations, evaluationsQueue);
+					evaluations.put(new EvalutationReference(anElement), new SoftReference(theDescriptors));
 				else
-					setDescriptorsInMap(anElement, theDescriptors, evaluationsWithOverrides, evaluationsWithOverridesQueue);
+					evaluationsWithOverrides.put(new EvalutationReference(anElement), new SoftReference(theDescriptors));
 			}
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener#onVisibilityOrActivationChange()
 		 */
 		public void onVisibilityOrActivationChange() {
-			// Make sure to flush our ReferenceQueues.
-			// If cleanUpStaleEntries every becomes bounded in number of entries to change
-			// per call, then this should call a variant that is unbounded.
-			cleanUpStaleEntries();
 			evaluations.clear();
 			evaluationsWithOverrides.clear();
 		}
@@ -206,7 +133,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return Returns all content descriptor(s).
 	 */
 	public NavigatorContentDescriptor[] getAllContentDescriptors() {
@@ -218,7 +145,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return Returns all content descriptors that provide saveables.
 	 */
 	public NavigatorContentDescriptor[] getContentDescriptorsWithSaveables() {
@@ -230,7 +157,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return Returns all content descriptors that are sort only
 	 */
 	public NavigatorContentDescriptor[] getSortOnlyContentDescriptors() {
@@ -243,16 +170,16 @@ public class NavigatorContentDescriptorManager {
 
 
 	/**
-	 *
+	 * 
 	 * Returns all content descriptor(s) which enable for the given element.
-	 *
+	 * 
 	 * @param anElement
 	 *            the element to return the best content descriptor for
-	 *
+	 * 
 	 * @param aVisibilityAssistant
 	 *            The relevant viewer assistant; used to filter out unbound
 	 *            content descriptors.
-	 * @param considerOverrides
+	 * @param considerOverrides 
 	 * @return the best content descriptor for the given element.
 	 */
 	public Set findDescriptorsForTriggerPoint(Object anElement,
@@ -262,12 +189,12 @@ public class NavigatorContentDescriptorManager {
 
 
 	/**
-	 *
+	 * 
 	 * Returns all content descriptor(s) which enable for the given element.
-	 *
+	 * 
 	 * @param anElement
 	 *            the element to return the best content descriptor for
-	 *
+	 * 
 	 * @param aVisibilityAssistant
 	 *            The relevant viewer assistant; used to filter out unbound
 	 *            content descriptors.
@@ -280,7 +207,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	private static final boolean POSSIBLE_CHILD = true;
-
+	
 
 	private Set findDescriptors(Object anElement,
 			Map cachedEvaluations, VisibilityAssistant aVisibilityAssistant, boolean considerOverrides, boolean possibleChild) {
@@ -289,9 +216,8 @@ public class NavigatorContentDescriptorManager {
 
 		Set descriptors = new TreeSet(ExtensionSequenceNumberComparator.INSTANCE);
 		NavigatorContentDescriptor[] cachedDescriptors = null;
-		if ((cachedDescriptors = cache.getDescriptors(anElement, considerOverrides)) != null) {
+		if ((cachedDescriptors = cache.getDescriptors(anElement)) != null) {
 			descriptors.addAll(Arrays.asList(cachedDescriptors));
-			return descriptors;
 		}
 
 		if (considerOverrides) {
@@ -312,7 +238,7 @@ public class NavigatorContentDescriptorManager {
 				}
 			}
 		}
-		cache.setDescriptors(anElement, (NavigatorContentDescriptor[]) descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]), considerOverrides);
+		cache.setDescriptors(anElement, (NavigatorContentDescriptor[]) descriptors.toArray(new NavigatorContentDescriptor[descriptors.size()]));
 
 		return descriptors;
 	}
@@ -370,7 +296,7 @@ public class NavigatorContentDescriptorManager {
 
 	/**
 	 * Returns the navigator content descriptor with the given id.
-	 *
+	 * 
 	 * @param id
 	 *            The id of the content descriptor that should be returned
 	 * @return The content descriptor of the given id
@@ -380,7 +306,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param descriptorId
 	 *            The unique id of a particular descriptor
 	 * @return The name (value of the 'name' attribute) of the given descriptor
@@ -394,7 +320,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param descriptorId
 	 *            The unique id of a particular descriptor
 	 * @return The image (corresponding to the value of the 'icon' attribute) of
@@ -472,7 +398,7 @@ public class NavigatorContentDescriptorManager {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void computeOverrides() {
 		if (overridingDescriptors.size() > 0) {
@@ -510,7 +436,7 @@ public class NavigatorContentDescriptorManager {
 					}
 
 				} else {
-					String message =
+					String message = 
 							"Invalid suppressedExtensionId \"" //$NON-NLS-1$
 									+ descriptor.getSuppressedExtensionId()
 									+ "\" specified from \"" //$NON-NLS-1$
@@ -525,7 +451,7 @@ public class NavigatorContentDescriptorManager {
 			}
 		}
 	}
-
+	
 	private int findId(List list, String id) {
 		for (int i = 0, len = list.size(); i < len; i++) {
 			NavigatorContentDescriptor desc = (NavigatorContentDescriptor) list.get(i);
@@ -545,7 +471,7 @@ public class NavigatorContentDescriptorManager {
 		for (int i = 0; i < descs.length; i++) {
 			list.add(descs[i]);
 		}
-
+		
 		boolean changed = true;
 		while (changed) {
 			changed = false;
@@ -561,7 +487,7 @@ public class NavigatorContentDescriptorManager {
 				}
 			}
 		}
-
+		
 		for (int i = 0, len = list.size(); i < len; i++) {
 			NavigatorContentDescriptor desc = (NavigatorContentDescriptor) list.get(i);
 			desc.setSequenceNumber(i);
@@ -583,7 +509,7 @@ public class NavigatorContentDescriptorManager {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.internal.navigator.extensions.RegistryReader#readRegistry()
 		 */
 		public void readRegistry() {
