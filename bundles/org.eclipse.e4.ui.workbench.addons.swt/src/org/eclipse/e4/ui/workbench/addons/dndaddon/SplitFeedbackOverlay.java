@@ -70,7 +70,6 @@ public class SplitFeedbackOverlay {
 		rects.clear();
 
 		if (enclosed) {
-			System.out.println("enclosed=" + enclosed);
 			addRect(ca);
 			ca.x += 4;
 			ca.y += 4;
