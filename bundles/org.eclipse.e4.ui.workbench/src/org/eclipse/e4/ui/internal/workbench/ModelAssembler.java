@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -26,6 +25,7 @@ import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.RegistryFactory;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -63,15 +63,13 @@ public class ModelAssembler {
 	@Inject
 	private IEclipseContext context;
 
-	@Inject
-	private IExtensionRegistry registry;
-
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	/**
 	 * Process the model
 	 */
 	public void processModel() {
+		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
 
@@ -288,7 +286,6 @@ public class ModelAssembler {
 						public void run() {
 							if (internalFeature.isMany()) {
 								System.err.println("Replacing"); //$NON-NLS-1$
-								@SuppressWarnings("unchecked")
 								List<Object> l = (List<Object>) interalTarget.eGet(internalFeature);
 								int index = l.indexOf(internalImportObject);
 								if (index >= 0) {
