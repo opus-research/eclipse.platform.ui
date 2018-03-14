@@ -20,9 +20,7 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
 
 /**
  * A set whose changes can be tracked by set change listeners.
- * 
- * @param <E>
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
  *              implement this interface. Note that direct implementers of this
@@ -35,17 +33,17 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
  * @since 1.0
  *
  */
-public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
+public interface IObservableSet extends Set, IObservableCollection {
 
 	/**
 	 * @param listener
 	 */
-	public void addSetChangeListener(ISetChangeListener<? super E> listener);
+	public void addSetChangeListener(ISetChangeListener listener);
 
 	/**
 	 * @param listener
 	 */
-	public void removeSetChangeListener(ISetChangeListener<? super E> listener);
+	public void removeSetChangeListener(ISetChangeListener listener);
 
 	/**
 	 * @return the element type or <code>null</code> if untyped
@@ -75,7 +73,7 @@ public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
 	 * @TrackedGetter
 	 */
 	@Override
-	Iterator<E> iterator();
+	Iterator iterator();
 
 	/**
 	 * @TrackedGetter
@@ -87,7 +85,7 @@ public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
 	 * @TrackedGetter
 	 */
 	@Override
-	<T> T[] toArray(T a[]);
+	Object[] toArray(Object a[]);
 
 	// Modification Operations
 
@@ -95,7 +93,7 @@ public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
 	 * @TrackedGetter
 	 */
 	@Override
-	boolean add(E o);
+	boolean add(Object o);
 
 	/**
 	 * @TrackedGetter
@@ -109,25 +107,25 @@ public interface IObservableSet<E> extends Set<E>, IObservableCollection<E> {
 	 * @TrackedGetter
 	 */
 	@Override
-	boolean containsAll(Collection<?> c);
+	boolean containsAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
 	@Override
-	boolean addAll(Collection<? extends E> c);
+	boolean addAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
 	@Override
-	boolean retainAll(Collection<?> c);
+	boolean retainAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
 	@Override
-	boolean removeAll(Collection<?> c);
+	boolean removeAll(Collection c);
 
 	// Comparison and hashing
 

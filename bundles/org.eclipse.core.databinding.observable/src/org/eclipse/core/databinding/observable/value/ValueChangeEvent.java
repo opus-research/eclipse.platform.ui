@@ -15,15 +15,13 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 import org.eclipse.core.databinding.observable.ObservableEvent;
 
 /**
- * Value change event describing a change of an {@link IObservableValue} 
+ * Value change event describing a change of an {@link IObservableValue}
  * object's current value.
- * 
- * @param <T>
- * 
+ *
  * @since 1.0
  *
  */
-public class ValueChangeEvent<T> extends ObservableEvent<ValueChangeEvent<T>> {
+public class ValueChangeEvent extends ObservableEvent {
 
 	/**
 	 *
@@ -36,13 +34,7 @@ public class ValueChangeEvent<T> extends ObservableEvent<ValueChangeEvent<T>> {
 	 * Description of the change to the source observable value. Listeners must
 	 * not change this field.
 	 */
-	public ValueDiff<T> diff;
-
-	/**
-	 * Always identical to <code>EventObject.source</code> but the type
-	 * information is maintained.
-	 */
-	private IObservableValue<T> typedSource;
+	public ValueDiff diff;
 
 	/**
 	 * Creates a new value change event.
@@ -52,9 +44,8 @@ public class ValueChangeEvent<T> extends ObservableEvent<ValueChangeEvent<T>> {
 	 * @param diff
 	 *            the value change
 	 */
-	public ValueChangeEvent(IObservableValue<T> source, ValueDiff<T> diff) {
+	public ValueChangeEvent(IObservableValue source, ValueDiff diff) {
 		super(source);
-		this.typedSource = source;
 		this.diff = diff;
 	}
 
@@ -63,13 +54,13 @@ public class ValueChangeEvent<T> extends ObservableEvent<ValueChangeEvent<T>> {
 	 *
 	 * @return returns the observable value from which this event originated
 	 */
-	public IObservableValue<T> getObservableValue() {
-		return typedSource;
+	public IObservableValue getObservableValue() {
+		return (IObservableValue) source;
 	}
 
 	@Override
 	protected void dispatch(IObservablesListener listener) {
-		((IValueChangeListener<T>) listener).handleValueChange(this);
+		((IValueChangeListener) listener).handleValueChange(this);
 	}
 
 	@Override

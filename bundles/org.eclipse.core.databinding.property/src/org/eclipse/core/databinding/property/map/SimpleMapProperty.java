@@ -40,25 +40,19 @@ import org.eclipse.core.internal.databinding.property.map.SimplePropertyObservab
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- * 
- * @param <S>
- *            type of the source object
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
+ *
  * @since 1.2
  */
-public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
+public abstract class SimpleMapProperty extends MapProperty {
 	@Override
-	public IObservableMap<K, V> observe(Realm realm, S source) {
-		return new SimplePropertyObservableMap<S, K, V>(realm, source, this);
+	public IObservableMap observe(Realm realm, Object source) {
+		return new SimplePropertyObservableMap(realm, source, this);
 	}
 
 	// Accessors
 
 	@Override
-	protected abstract Map<K, V> doGetMap(S source);
+	protected abstract Map doGetMap(Object source);
 
 	// Mutators
 
@@ -72,9 +66,8 @@ public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.5
 	 */
-	public final void setMap(S source, Map<K, V> map, MapDiff<K, V> diff) {
+	public final void setMap(Object source, Map map, MapDiff diff) {
 		if (source != null && !diff.isEmpty())
 			doSetMap(source, map, diff);
 	}
@@ -90,17 +83,17 @@ public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected abstract void doSetMap(S source, Map<K, V> map, MapDiff<K, V> diff);
+	protected abstract void doSetMap(Object source, Map map, MapDiff diff);
 
 	@Override
-	protected void doSetMap(S source, Map<K, V> map) {
-		MapDiff<K, V> diff = Diffs.computeLazyMapDiff(doGetMap(source), map);
+	protected void doSetMap(Object source, Map map) {
+		MapDiff diff = Diffs.computeLazyMapDiff(doGetMap(source), map);
 		doSetMap(source, map, diff);
 	}
 
 	@Override
-	protected void doUpdateMap(S source, MapDiff<K, V> diff) {
-		Map<K, V> map = new HashMap<K, V>(doGetMap(source));
+	protected void doUpdateMap(Object source, MapDiff diff) {
+		Map map = new HashMap(doGetMap(source));
 		diff.applyTo(map);
 		doSetMap(source, map, diff);
 	}
@@ -122,8 +115,7 @@ public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
 	 *         specified listener, or null if the source object has no listener
 	 *         APIs for this property.
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.5
 	 */
-	public abstract INativePropertyListener<S> adaptListener(
-			ISimplePropertyListener<MapDiff<K, V>> listener);
+	public abstract INativePropertyListener adaptListener(
+			ISimplePropertyListener listener);
 }

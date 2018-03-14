@@ -17,13 +17,11 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * List change event describing an incremental change of an
  * {@link IObservableSet} object.
- * 
- * @param <E>
- * 
+ *
  * @since 1.0
  *
  */
-public class SetChangeEvent<E> extends ObservableEvent<SetChangeEvent<E>> {
+public class SetChangeEvent extends ObservableEvent {
 
 	/**
 	 *
@@ -35,13 +33,7 @@ public class SetChangeEvent<E> extends ObservableEvent<SetChangeEvent<E>> {
 	 * Description of the change to the source observable set. Listeners must
 	 * not change this field.
 	 */
-	public SetDiff<E> diff;
-
-	/**
-	 * Always identical to <code>EventObject.source</code> but the type
-	 * information is maintained.
-	 */
-	private IObservableSet<E> typedSource;
+	public SetDiff diff;
 
 	/**
 	 * Creates a new set change event.
@@ -51,9 +43,8 @@ public class SetChangeEvent<E> extends ObservableEvent<SetChangeEvent<E>> {
 	 * @param diff
 	 *            the set change
 	 */
-	public SetChangeEvent(IObservableSet<E> source, SetDiff<E> diff) {
+	public SetChangeEvent(IObservableSet source, SetDiff diff) {
 		super(source);
-		this.typedSource = source;
 		this.diff = diff;
 	}
 
@@ -62,13 +53,13 @@ public class SetChangeEvent<E> extends ObservableEvent<SetChangeEvent<E>> {
 	 *
 	 * @return the observable set from which this event originated
 	 */
-	public IObservableSet<E> getObservableSet() {
-		return typedSource;
+	public IObservableSet getObservableSet() {
+		return (IObservableSet) getSource();
 	}
 
 	@Override
 	protected void dispatch(IObservablesListener listener) {
-		((ISetChangeListener<E>) listener).handleSetChange(this);
+		((ISetChangeListener) listener).handleSetChange(this);
 	}
 
 	@Override

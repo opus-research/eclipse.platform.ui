@@ -12,9 +12,7 @@ package org.eclipse.core.databinding.observable.value;
 
 /**
  * An observable value whose changes can be vetoed by listeners.
- * 
- * @param <T>
- * 
+ *
  * @noextend This interface is not intended to be extended by clients.
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -25,16 +23,16 @@ package org.eclipse.core.databinding.observable.value;
  * @since 1.0
  *
  */
-public interface IVetoableValue<T> extends IObservableValue<T> {
+public interface IVetoableValue extends IObservableValue {
 
 	/**
 	 * @param listener
 	 */
-	public void addValueChangingListener(IValueChangingListener<T> listener);
+	public void addValueChangingListener(IValueChangingListener listener);
 
 	/**
 	 * @param listener
 	 */
-	public void removeValueChangingListener(IValueChangingListener<T> listener);
+	public void removeValueChangingListener(IValueChangingListener listener);
 
 }
