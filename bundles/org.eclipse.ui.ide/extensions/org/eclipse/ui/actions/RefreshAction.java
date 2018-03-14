@@ -132,7 +132,12 @@ public class RefreshAction extends WorkspaceAction {
 
 			// Must prompt user in UI thread (we're in the operation thread
 			// here).
-			getShell().getDisplay().syncExec(() -> dialog.open());
+			getShell().getDisplay().syncExec(new Runnable() {
+				@Override
+				public void run() {
+					dialog.open();
+				}
+			});
 
 			// Do the deletion back in the operation thread
 			if (dialog.getReturnCode() == 0) { // yes was chosen

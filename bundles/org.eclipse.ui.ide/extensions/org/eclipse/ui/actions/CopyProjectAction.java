@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -118,7 +119,11 @@ public class CopyProjectAction extends SelectionListenerAction {
 	CopyProjectAction(final Shell shell, String name) {
 		super(name);
 		Assert.isNotNull(shell);
-		shellProvider = () -> shell;
+		shellProvider = new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			} };
 			initAction();
 	}
 
@@ -222,20 +227,23 @@ public class CopyProjectAction extends SelectionListenerAction {
 	 */
 	boolean performCopy(final IProject project, final String projectName,
 			final URI newLocation) {
-		IRunnableWithProgress op = monitor -> {
-			org.eclipse.ui.ide.undo.CopyProjectOperation op1 = new org.eclipse.ui.ide.undo.CopyProjectOperation(
-					project, projectName, newLocation, getText());
-			op1.setModelProviderIds(getModelProviderIds());
-			try {
-				PlatformUI.getWorkbench().getOperationSupport()
-						.getOperationHistory().execute(op1, monitor,
-								WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
-			} catch (ExecutionException e) {
-				if (e.getCause() instanceof CoreException) {
-					recordError((CoreException)e.getCause());
-				} else {
-					IDEWorkbenchPlugin.log(e.getMessage(), e);
-					displayError(e.getMessage());
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) {
+				org.eclipse.ui.ide.undo.CopyProjectOperation op = new org.eclipse.ui.ide.undo.CopyProjectOperation(
+						project, projectName, newLocation, getText());
+				op.setModelProviderIds(getModelProviderIds());
+				try {
+					PlatformUI.getWorkbench().getOperationSupport()
+							.getOperationHistory().execute(op, monitor,
+									WorkspaceUndoUtil.getUIInfoAdapter(shellProvider.getShell()));
+				} catch (ExecutionException e) {
+					if (e.getCause() instanceof CoreException) {
+						recordError((CoreException)e.getCause());
+					} else {
+						IDEWorkbenchPlugin.log(e.getMessage(), e);
+						displayError(e.getMessage());
+					}
 				}
 			}
 		};
