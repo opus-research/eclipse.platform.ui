@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.window;
@@ -147,7 +146,7 @@ public class Snippet031TableStaticTooltip {
 	}
 
 	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<>();
+		List<MyModel> elements = new ArrayList<MyModel>();
 
 		for (int i = 0; i < 10; i++) {
 			elements.add(new MyModel(i));
