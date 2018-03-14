@@ -14,7 +14,6 @@ package org.eclipse.e4.ui.css.core.resources;
 
 import org.eclipse.e4.ui.css.core.css2.CSS2ColorHelper;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.CSS2FontProperties;
-import org.eclipse.e4.ui.css.core.utils.SharedStringBuilder;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.RGBColor;
@@ -85,11 +84,8 @@ public class CSSResourcesHelpers {
 
 	public static String getCSSFontPropertiesKey(
 			CSS2FontProperties fontProperties) {
-		StringBuilder sb = SharedStringBuilder.INSTANCE.get();
-
-		return sb.append(getCssText(fontProperties.getFamily())).append("_")
-				.append(getCssText(fontProperties.getSize())).append("_").append(getCssText(fontProperties.getStyle()))
-				.append("_").append(getCssText(fontProperties.getWeight())).toString();
+		return getCssText(fontProperties.getFamily()) + "_" + getCssText(fontProperties.getSize()) + "_"
+				+ getCssText(fontProperties.getStyle()) + "_" + getCssText(fontProperties.getWeight());
 	}
 
 	private static String getCssText(CSSPrimitiveValue cssPrimitiveValue) {

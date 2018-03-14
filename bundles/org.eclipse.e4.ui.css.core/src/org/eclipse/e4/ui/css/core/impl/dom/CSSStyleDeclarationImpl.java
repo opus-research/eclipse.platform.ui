@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.e4.ui.css.core.dom.CSSProperty;
 import org.eclipse.e4.ui.css.core.dom.CSSPropertyList;
 import org.eclipse.e4.ui.css.core.exceptions.DOMExceptionImpl;
-import org.eclipse.e4.ui.css.core.utils.SharedStringBuilder;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.css.CSSRule;
 import org.w3c.dom.css.CSSStyleDeclaration;
@@ -41,7 +40,7 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	 */
 	@Override
 	public String getCssText() {
-		StringBuilder sb = SharedStringBuilder.INSTANCE.get();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < properties.size(); i++) {
 			CSSProperty property = properties.get(i);
 			sb.append(property.getName()).append(": ");
@@ -80,8 +79,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	public CSSValue getPropertyCSSValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
-				? null
-						: property.getValue();
+			? null
+			: property.getValue();
 	}
 
 	/*
@@ -92,8 +91,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	public String getPropertyPriority(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property != null && property.isImportant())
-				? CSSPropertyImpl.IMPORTANT_IDENTIFIER
-						: "";
+			? CSSPropertyImpl.IMPORTANT_IDENTIFIER
+			: "";
 	}
 
 	/*
@@ -104,8 +103,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	public String getPropertyValue(String propertyName) {
 		CSSProperty property = findCSSProperty(propertyName);
 		return (property == null)
-				? ""
-						: property.getValue().toString();
+			? ""
+			: property.getValue().toString();
 	}
 
 	/*
@@ -123,9 +122,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	 */
 	@Override
 	public String removeProperty(String propertyName) throws DOMException {
-		if(readOnly) {
+		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
 		for (int i = 0; i < properties.size(); i++) {
 			CSSProperty property = properties.get(i);
 			if(CSSPropertyImpl.sameName(property, propertyName)) {
@@ -142,9 +140,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	 */
 	@Override
 	public void setCssText(String cssText) throws DOMException {
-		if(readOnly) {
+		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if cssText is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -156,9 +153,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 	 */
 	@Override
 	public void setProperty(String propertyName, String value, String priority) throws DOMException {
-		if(readOnly) {
+		if(readOnly)
 			throw new DOMExceptionImpl(DOMException.NO_MODIFICATION_ALLOWED_ERR, DOMExceptionImpl.NO_MODIFICATION_ALLOWED_ERROR);
-		}
 		// TODO Auto-generated method stub
 		// TODO throws SYNTAX_ERR if value is unparsable
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -186,9 +182,8 @@ public class CSSStyleDeclarationImpl extends AbstractCSSNode implements CSSStyle
 
 	private CSSProperty findCSSProperty(String propertyName) {
 		for (CSSProperty property : properties) {
-			if(CSSPropertyImpl.sameName(property, propertyName)) {
+			if(CSSPropertyImpl.sameName(property, propertyName))
 				return property;
-			}
 		}
 		return null;
 	}
