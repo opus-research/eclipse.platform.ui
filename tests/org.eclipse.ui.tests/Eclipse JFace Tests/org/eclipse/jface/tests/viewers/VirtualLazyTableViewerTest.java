@@ -40,25 +40,21 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.tests.viewers.TableViewerTest#getContentProvider()
 	 */
-	@Override
 	protected TestModelContentProvider getContentProvider() {
 		return new TestLazyModelContentProvider(this);
 	}
 	
-	@Override
 	public void setUp() {
 		updatedElements = new ArrayList();
 		super.setUp();
 		processEvents();
 	}
 	
-	@Override
 	protected void setUpModel() {
 		fRootElement = TestElement.createModel(2, 100);
         fModel = fRootElement.getModel();
 	}
 
-	@Override
 	public void tearDown() {
 		super.tearDown();
 		updatedElements = null;
@@ -135,35 +131,30 @@ public class VirtualLazyTableViewerTest extends VirtualTableViewerTest {
 	}
 	
 
-	@Override
 	public void testSorter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 	
-	@Override
 	public void testRenameWithSorter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 	
-	@Override
 	public void testSetFilters() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 	
-	@Override
 	public void testFilter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
 		// are created.
 	}
 	
-	@Override
 	public void testRenameWithFilter() {
 		// This test is no use here as it is
 		// based on the assumption that all items
