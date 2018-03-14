@@ -57,8 +57,7 @@ public abstract class ProgressContentProvider implements
      *
      * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
      */
-    @Override
-	public Object[] getElements(Object inputElement) {
+    public Object[] getElements(Object inputElement) {
 
         return progressManager.getRootElements(debug());
     }
@@ -68,8 +67,7 @@ public abstract class ProgressContentProvider implements
      *
      * @see org.eclipse.jface.viewers.IContentProvider#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         progressViewUpdater.removeCollector(this);
     }
 
@@ -79,8 +77,7 @@ public abstract class ProgressContentProvider implements
      * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
      *      java.lang.Object, java.lang.Object)
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //No change when input changes
     }
 

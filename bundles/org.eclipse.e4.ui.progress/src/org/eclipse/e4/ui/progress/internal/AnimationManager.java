@@ -71,8 +71,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
              */
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 
                 if (animated) {
 					animationProcessor.animationStarted();
@@ -144,8 +143,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addJob(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void addJob(JobInfo info) {
+            public void addJob(JobInfo info) {
                 incrementJobCount(info);
             }
 
@@ -154,8 +152,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void refreshJobInfo(JobInfo info) {
+            public void refreshJobInfo(JobInfo info) {
                 int state = info.getJob().getState();
                 if (state == Job.RUNNING) {
 					addJob(info);
@@ -169,8 +166,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
              */
-            @Override
-			public void refreshAll() {
+            public void refreshAll() {
                 jobs.clear();
                 setAnimated(false);
                 JobInfo[] currentInfos = progressManager.getJobInfos(showsDebug());
@@ -184,8 +180,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#remove(org.eclipse.ui.internal.progress.JobInfo)
              */
-            @Override
-			public void removeJob(JobInfo info) {
+            public void removeJob(JobInfo info) {
                 decrementJobCount(info.getJob());
             }
 
@@ -194,8 +189,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
              */
-            @Override
-			public boolean showsDebug() {
+            public boolean showsDebug() {
                 return false;
             }
 
@@ -235,8 +229,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void addGroup(GroupInfo info) {
+            public void addGroup(GroupInfo info) {
                 //Don't care about groups
             }
 
@@ -245,8 +238,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void removeGroup(GroupInfo group) {
+            public void removeGroup(GroupInfo group) {
                 //Don't care about groups
             }
 
@@ -255,8 +247,7 @@ public class AnimationManager {
              *
              * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
              */
-            @Override
-			public void refreshGroup(GroupInfo info) {
+            public void refreshGroup(GroupInfo info) {
                 //Don't care about groups
             }
         };

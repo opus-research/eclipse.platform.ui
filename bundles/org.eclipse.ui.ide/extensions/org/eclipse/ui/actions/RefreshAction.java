@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -121,14 +120,15 @@ public class RefreshAction extends WorkspaceAction {
 					IDEWorkbenchMessages.RefreshAction_dialogTitle, // dialog
 					// title
 					null, // use default window icon
-					message, MessageDialog.QUESTION, 0,
+					message, MessageDialog.QUESTION, new String[] {
 							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL) {
+							IDialogConstants.NO_LABEL }, 0) {
 				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
-			};
+			}; // yes is the
+			// default
 
 			// Must prompt user in UI thread (we're in the operation thread
 			// here).
