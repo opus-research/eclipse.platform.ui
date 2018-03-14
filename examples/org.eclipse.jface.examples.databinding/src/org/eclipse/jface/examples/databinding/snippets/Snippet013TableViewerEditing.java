@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -178,7 +179,7 @@ public class Snippet013TableViewerEditing {
 		@Override
 		protected IObservableValue doCreateElementObservable(Object element,
 				ViewerCell cell) {
-			return BeanProperties.value(element.getClass(), "name").observe(element);
+			return BeansObservables.observeValue(element, "name");
 		}
 	}
 
@@ -233,8 +234,8 @@ public class Snippet013TableViewerEditing {
 			IObservableValue selection = ViewersObservables
 					.observeSingleSelection(peopleViewer);
 			bindingContext.bindValue(WidgetProperties.text().observe(selectedCommitter),
-					BeanProperties.value((Class) selection.getValueType(), "name", String.class)
-					.observeDetail(selection));
+					BeansObservables
+					.observeDetailValue(selection, "name", String.class));
 		}
 	}
 
