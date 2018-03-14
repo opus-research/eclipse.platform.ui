@@ -42,7 +42,7 @@ public class ElementMatcher implements Selector {
 		this.clazz = clazz;
 
 		if (tag != null) {
-			tagsToMatch = new ArrayList<>();
+			tagsToMatch = new ArrayList<String>();
 			tagsToMatch.add(tag);
 		}
 	}
