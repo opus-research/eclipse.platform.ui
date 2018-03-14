@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ package org.eclipse.core.tests.databinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -23,10 +24,13 @@ import org.eclipse.core.databinding.UpdateListStrategy;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
+import org.eclipse.core.databinding.util.ILogger;
+import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.internal.databinding.BindingStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
+import org.junit.Assert;
 
 /**
  * @since 1.1
@@ -179,7 +183,11 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 		assertEquals(0, status.getChildren().length);
 	}
 
-	public void testConversion() {
+	/**
+	 * we test common functionality from UpdateStrategy here, because that base
+	 * class would need much more stubbing and mocking to test it.
+	 */
+	public void testErrorDuringConversionIsLogged() {
 		UpdateListStrategy modelToTarget = new UpdateListStrategy();
 		modelToTarget.setConverter(new IConverter() {
 
@@ -195,17 +203,117 @@ public class ListBindingTest extends AbstractDefaultRealmTestCase {
 
 			@Override
 			public Object convert(Object fromObject) {
-				return ((String) fromObject) + "converted";
+				throw new IllegalArgumentException();
 			}
 
 		});
 
 		dbc.bindList(target, model, new UpdateListStrategy(), modelToTarget);
+		CountDownLatch latch = new CountDownLatch(1);
 
-		model.add("1");
-		assertEquals("1converted", target.get(0));
+		Policy.setLog(new ILogger() {
 
-		model.set(0, "2");
-		assertEquals("2converted", target.get(0));
+			@Override
+			public void log(IStatus status) {
+				latch.countDown();
+				Assert.assertEquals(IStatus.ERROR, status.getSeverity());
+				Assert.assertTrue(status.getException() instanceof IllegalArgumentException);
+			}
+		});
+
+		model.add("first");
+
+		Assert.assertEquals(0, latch.getCount());
+	}
+
+	/**
+	 * we test common functionality from UpdateStrategy here, because that base
+	 * class would need much more stubbing and mocking to test it.
+	 */
+	public void testErrorDuringRemoveIsLogged() {
+		IObservableList<String> target = new WritableList<String>() {
+			@Override
+			public String remove(int index) {
+				throw new IllegalArgumentException();
+			}
+		};
+		dbc.bindList(target, model, new UpdateListStrategy(), new UpdateListStrategy());
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Policy.setLog(new ILogger() {
+
+			@Override
+			public void log(IStatus status) {
+				latch.countDown();
+				Assert.assertEquals(IStatus.ERROR, status.getSeverity());
+				Assert.assertTrue(status.getException() instanceof IllegalArgumentException);
+			}
+		});
+
+		model.add("first");
+		model.remove("first");
+
+		Assert.assertEquals(0, latch.getCount());
+	}
+
+	/**
+	 * we test common functionality from UpdateStrategy here, because that base
+	 * class would need much more stubbing and mocking to test it.
+	 */
+	public void testErrorDuringMoveIsLogged() {
+		IObservableList<String> target = new WritableList<String>() {
+			@Override
+			public String move(int index, int index2) {
+				throw new IllegalArgumentException();
+			}
+		};
+		dbc.bindList(target, model, new UpdateListStrategy(), new UpdateListStrategy());
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Policy.setLog(new ILogger() {
+
+			@Override
+			public void log(IStatus status) {
+				latch.countDown();
+				Assert.assertEquals(IStatus.ERROR, status.getSeverity());
+				Assert.assertTrue(status.getException() instanceof IllegalArgumentException);
+			}
+		});
+
+		model.add("first");
+		model.add("second");
+		model.move(0, 1);
+
+		Assert.assertEquals(0, latch.getCount());
+	}
+
+	/**
+	 * we test common functionality from UpdateStrategy here, because that base
+	 * class would need much more stubbing and mocking to test it.
+	 */
+	public void testErrorDuringReplaceIsLogged() {
+		IObservableList<String> target = new WritableList<String>() {
+			@Override
+			public String set(int index, String element) {
+				throw new IllegalArgumentException();
+			}
+		};
+		dbc.bindList(target, model, new UpdateListStrategy(), new UpdateListStrategy());
+		CountDownLatch latch = new CountDownLatch(1);
+
+		Policy.setLog(new ILogger() {
+
+			@Override
+			public void log(IStatus status) {
+				latch.countDown();
+				Assert.assertEquals(IStatus.ERROR, status.getSeverity());
+				Assert.assertTrue(status.getException() instanceof IllegalArgumentException);
+			}
+		});
+
+		model.add("first");
+		model.set(0, "second");
+
+		Assert.assertEquals(0, latch.getCount());
 	}
 }
