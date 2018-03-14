@@ -477,12 +477,18 @@ public abstract class PreferencePage extends DialogPage implements
     }
 
    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.IPreferencePage#performOk()
+     */
     @Override
 	public boolean performOk() {
         return true;
     }
 
     
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.IPreferencePage#setContainer(org.eclipse.jface.preference.IPreferencePageContainer)
+     */
     @Override
 	public void setContainer(IPreferencePageContainer container) {
         this.container = container;
@@ -503,6 +509,9 @@ public abstract class PreferencePage extends DialogPage implements
     }
 
    
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.preference.IPreferencePage#setSize(org.eclipse.swt.graphics.Point)
+     */
     @Override
 	public void setSize(Point uiSize) {
         Control control = getControl();
@@ -549,6 +558,9 @@ public abstract class PreferencePage extends DialogPage implements
     }
 
    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
 	public String toString() {
         return getTitle();
@@ -617,6 +629,9 @@ public abstract class PreferencePage extends DialogPage implements
         return defaultsButton;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.IDialogPage#performHelp()
+     */
     @Override
 	public void performHelp() {
         getControl().notifyListeners(SWT.Help, new Event());
@@ -642,6 +657,9 @@ public abstract class PreferencePage extends DialogPage implements
 		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#setErrorMessage(java.lang.String)
+	 */
 	@Override
 	public void setErrorMessage(String newMessage) {
 		super.setErrorMessage(newMessage);
@@ -650,6 +668,9 @@ public abstract class PreferencePage extends DialogPage implements
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.DialogPage#setMessage(java.lang.String, int)
+	 */
 	@Override
 	public void setMessage(String newMessage, int newType) {
 		super.setMessage(newMessage, newType);

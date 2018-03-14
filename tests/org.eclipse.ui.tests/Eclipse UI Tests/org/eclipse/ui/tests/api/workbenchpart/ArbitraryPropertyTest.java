@@ -32,12 +32,12 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class ArbitraryPropertyTest extends UITestCase {
 	/**
-	 *
+	 * 
 	 */
 	private static final String EDITOR_ID = "org.eclipse.ui.tests.TitleTestEditor";
 
 	/**
-	 *
+	 * 
 	 */
 	private static final String USER_PROP = "org.eclipse.ui.test.user";
 
@@ -54,14 +54,22 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	IWorkbenchPage page;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow();
 		page = window.getActivePage();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
 	}
@@ -73,7 +81,6 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 		String firedNV = null;
 
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			firedProp = event.getProperty();
 			firedOV = (String) event.getOldValue();
@@ -110,47 +117,39 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	public void testEditorProperties() throws Exception {
 		IFileEditorInput input = new IFileEditorInput() {
-			@Override
 			public boolean exists() {
 				return true;
 			}
 
-			@Override
 			public ImageDescriptor getImageDescriptor() {
 				return null;
 			}
 
-			@Override
 			public String getName() {
 				return "MyInputFile";
 			}
 
-			@Override
 			public IPersistableElement getPersistable() {
 				return null;
 			}
 
-			@Override
 			public String getToolTipText() {
 				return "My Input File";
 			}
 
-			@Override
 			public Object getAdapter(Class adapter) {
 				return null;
 			}
 
-			@Override
 			public IFile getFile() {
 				return null;
 			}
 
 			/**
 			 * {@inheritDoc}
-			 *
+			 * 
 			 * @throws CoreException
 			 */
-			@Override
 			public IStorage getStorage() throws CoreException {
 				return null;
 			}

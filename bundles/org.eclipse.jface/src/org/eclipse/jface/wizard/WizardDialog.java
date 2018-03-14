@@ -220,6 +220,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			minimumHeight = minH;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on Layout.
+		 */
 		@Override
 		public Point computeSize(Composite composite, int wHint, int hHint,
 				boolean force) {
@@ -269,6 +272,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			return rect;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on Layout.
+		 */
 		@Override
 		public void layout(Composite composite, boolean force) {
 			Rectangle rect = getClientArea(composite);
@@ -410,6 +416,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		showPage(page);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
@@ -457,6 +466,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				.max(0, contentSize.y - containerSize.y));
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void cancelPressed() {
 		if (activeRunningOperations <= 0) {
@@ -471,6 +483,11 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	@Override
 	public boolean close() {
 		if (okToClose()) {
@@ -479,6 +496,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Window.
+	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
@@ -526,6 +546,11 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#setButtonLayoutData(org.eclipse.swt.widgets.Button)
+	 */
 	@Override
 	protected void setButtonLayoutData(Button button) {
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
@@ -600,6 +625,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		return contents;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -642,6 +670,11 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		return new ProgressMonitorPart(composite, pmlayout, true) {
 			String currentTask = null;
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.wizard.ProgressMonitorPart#setBlocked(org.eclipse.core.runtime.IStatus)
+			 */
 			@Override
 			public void setBlocked(IStatus reason) {
 				super.setBlocked(reason);
@@ -651,6 +684,11 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.wizard.ProgressMonitorPart#clearBlocked()
+			 */
 			@Override
 			public void clearBlocked() {
 				super.clearBlocked();
@@ -659,18 +697,34 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.wizard.ProgressMonitorPart#beginTask(java.lang.String,
+			 *      int)
+			 */
 			@Override
 			public void beginTask(String name, int totalWork) {
 				super.beginTask(name, totalWork);
 				currentTask = name;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.wizard.ProgressMonitorPart#setTaskName(java.lang.String)
+			 */
 			@Override
 			public void setTaskName(String name) {
 				super.setTaskName(name);
 				currentTask = name;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.wizard.ProgressMonitorPart#subTask(java.lang.String)
+			 */
 			@Override
 			public void subTask(String name) {
 				super.subTask(name);
@@ -808,6 +862,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public IWizardPage getCurrentPage() {
 		return currentPage;
@@ -1169,6 +1226,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public void showPage(IWizardPage page) {
 		if (page == null || page == currentPage) {
@@ -1308,18 +1368,18 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		firePageChanged(new PageChangedEvent(this, getCurrentPage()));
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public void updateButtons() {
 		boolean canFlipToNextPage = false;
 		boolean canFinish = wizard.canFinish();
 		if (backButton != null) {
-			boolean backEnabled = currentPage != null
-					&& currentPage.getPreviousPage() != null;
-			backButton.setEnabled(backEnabled);
+			backButton.setEnabled(currentPage.getPreviousPage() != null);
 		}
 		if (nextButton != null) {
-			canFlipToNextPage = currentPage != null
-					&& currentPage.canFlipToNextPage();
+			canFlipToNextPage = currentPage.canFlipToNextPage();
 			nextButton.setEnabled(canFlipToNextPage);
 		}
 		finishButton.setEnabled(canFinish);
@@ -1342,6 +1402,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		setMessage(pageDescription);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public void updateMessage() {
 
@@ -1394,6 +1457,11 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		pageContainerLayout.layoutPage(page.getControl());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.wizard.IWizardContainer2#updateSize()
+	 */
 	@Override
 	public void updateSize() {
 		updateSize(currentPage);
@@ -1438,6 +1506,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public void updateTitleBar() {
 		String s = null;
@@ -1455,6 +1526,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		updateMessage();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IWizardContainer.
+	 */
 	@Override
 	public void updateWindowTitle() {
 		if (getShell() == null) {
@@ -1468,16 +1542,31 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		getShell().setText(title);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IPageChangeProvider#getSelectedPage()
+	 */
 	@Override
 	public Object getSelectedPage() {
 		return getCurrentPage();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialog.IPageChangeProvider#addPageChangedListener()
+	 */
 	@Override
 	public void addPageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.add(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialog.IPageChangeProvider#removePageChangedListener()
+	 */
 	@Override
 	public void removePageChangedListener(IPageChangedListener listener) {
 		pageChangedListeners.remove(listener);

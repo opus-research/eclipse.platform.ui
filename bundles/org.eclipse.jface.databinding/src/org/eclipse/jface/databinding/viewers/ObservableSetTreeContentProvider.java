@@ -53,7 +53,6 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 				this.parentElement = parentElement;
 			}
 
-			@Override
 			public void handleSetChange(SetChangeEvent event) {
 				if (isViewerDisposed())
 					return;
@@ -99,13 +98,11 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 			}
 		}
 
-		@Override
 		protected IObservablesListener createCollectionChangeListener(
 				Object parentElement) {
 			return new SetChangeListener(parentElement);
 		}
 
-		@Override
 		protected void addCollectionChangeListener(
 				IObservableCollection collection, IObservablesListener listener) {
 			IObservableSet set = (IObservableSet) collection;
@@ -113,7 +110,6 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 			set.addSetChangeListener(setListener);
 		}
 
-		@Override
 		protected void removeCollectionChangeListener(
 				IObservableCollection collection, IObservablesListener listener) {
 			IObservableSet set = (IObservableSet) collection;
@@ -143,27 +139,22 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 		impl = new Impl(setFactory, structureAdvisor);
 	}
 
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		impl.inputChanged(viewer, oldInput, newInput);
 	}
 
-	@Override
 	public Object[] getElements(Object inputElement) {
 		return impl.getElements(inputElement);
 	}
 
-	@Override
 	public boolean hasChildren(Object element) {
 		return impl.hasChildren(element);
 	}
 
-	@Override
 	public Object[] getChildren(Object parentElement) {
 		return impl.getChildren(parentElement);
 	}
 
-	@Override
 	public Object getParent(Object element) {
 		return impl.getParent(element);
 	}
@@ -180,7 +171,6 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 	 * disposal.
 	 * </p>
 	 */
-	@Override
 	public void dispose() {
 		impl.dispose();
 	}

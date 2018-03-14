@@ -97,11 +97,22 @@ public class ScaleFieldEditor extends FieldEditor {
         setValues(min, max, increment, pageIncrement);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+     */
     @Override
 	protected void adjustForNumColumns(int numColumns) {
         ((GridData) scale.getLayoutData()).horizontalSpan = numColumns - 1;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite,
+     *      int)
+     */
     @Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
@@ -117,6 +128,11 @@ public class ScaleFieldEditor extends FieldEditor {
         updateScale();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+     */
     @Override
 	protected void doLoad() {
         if (scale != null) {
@@ -126,6 +142,11 @@ public class ScaleFieldEditor extends FieldEditor {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+     */
     @Override
 	protected void doLoadDefault() {
         if (scale != null) {
@@ -135,6 +156,11 @@ public class ScaleFieldEditor extends FieldEditor {
         valueChanged();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doStore()
+     */
     @Override
 	protected void doStore() {
         getPreferenceStore()
@@ -171,6 +197,11 @@ public class ScaleFieldEditor extends FieldEditor {
         return minValue;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+     */
     @Override
 	public int getNumberOfControls() {
         return 2;
@@ -239,6 +270,11 @@ public class ScaleFieldEditor extends FieldEditor {
         setValues(0, 10, 1, 1);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#setFocus()
+     */
     @Override
 	public void setFocus() {
         if (scale != null && !scale.isDisposed()) {

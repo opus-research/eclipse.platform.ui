@@ -129,6 +129,9 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         reader.readPopupContributors(this);
     }
     
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension addedExtension) {
         IConfigurationElement[] addedElements = addedExtension.getConfigurationElements();
@@ -139,6 +142,9 @@ public class ObjectActionContributorManager extends ObjectContributorManager {
         }
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.ObjectContributorManager#getExtensionPointFilter()
+	 */
 	@Override
 	protected String getExtensionPointFilter() {
 		return IWorkbenchRegistryConstants.PL_POPUP_MENU;

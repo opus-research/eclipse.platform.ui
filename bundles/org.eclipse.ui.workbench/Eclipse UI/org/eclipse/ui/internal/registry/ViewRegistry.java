@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609, 441280
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -24,14 +24,15 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.IWorkbenchConstants;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.e4.compatibility.CompatibilityPart;
 import org.eclipse.ui.internal.menus.MenuHelper;
 import org.eclipse.ui.views.IStickyViewDescriptor;
@@ -53,8 +54,6 @@ public class ViewRegistry implements IViewRegistry {
 	@Inject
 	private IWorkbench workbench;
 
-	@Inject
-	Logger logger;
 
 	private Map<String, IViewDescriptor> descriptors = new HashMap<String, IViewDescriptor>();
 
@@ -80,7 +79,8 @@ public class ViewRegistry implements IViewRegistry {
 						stickyDescriptors.add(new StickyViewDescriptor(element));
 					} catch (CoreException e) {
 						// log an error since its not safe to open a dialog here
-						logger.error("Unable to create sticky view descriptor.", e.getStatus()); //$NON-NLS-1$
+						WorkbenchPlugin.log(
+								"Unable to create sticky view descriptor.", e.getStatus());//$NON-NLS-1$
 					}
 				}
 			}
@@ -95,7 +95,7 @@ public class ViewRegistry implements IViewRegistry {
 				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_VIEW)) {
 					createDescriptor(element, false);
 				}
-				if (element.getName().equals(IWorkbenchRegistryConstants.TAG_E4VIEW)) {
+				if (element.getName().equals("e4view")) { //$NON-NLS-1$
 					createDescriptor(element, true);
 				}
 			}
@@ -120,6 +120,13 @@ public class ViewRegistry implements IViewRegistry {
 		}
 		// ==> Update descriptor
 		descriptor.setLabel(element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
+		if (id.equals(IPageLayout.ID_RES_NAV) || id.equals(IPageLayout.ID_PROJECT_EXPLORER)) {
+			descriptor.setCategory("org.eclipse.e4.primaryNavigationStack"); //$NON-NLS-1$
+		} else if (id.equals(IPageLayout.ID_OUTLINE)) {
+			descriptor.setCategory("org.eclipse.e4.secondaryNavigationStack"); //$NON-NLS-1$
+		} else {
+			descriptor.setCategory("org.eclipse.e4.secondaryDataStack"); //$NON-NLS-1$
+		}
 
 		List<String> tags = descriptor.getTags();
 		tags.add("View"); //$NON-NLS-1$
@@ -128,15 +135,11 @@ public class ViewRegistry implements IViewRegistry {
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
 				.getAttribute(IWorkbenchRegistryConstants.ATT_ALLOW_MULTIPLE)));
 
-		// make view description available as tooltip
-		String viewDescription = RegistryReader.getDescription(element);
-		descriptor.setTooltip(viewDescription);
-
 		// Is this an E4 part or a legacy IViewPart ?
 		String clsSpec = element.getAttribute(IWorkbenchConstants.TAG_CLASS);
 		String implementationURI = CompatibilityPart.COMPATIBILITY_VIEW_URI;
 		if (e4View) {
-			implementationURI = "bundleclass://" + element.getContributor().getName() + "/" + clsSpec; //$NON-NLS-1$//$NON-NLS-2$
+			implementationURI = "bundleclass://" + element.getContributor().getName() + "/" + clsSpec; //$NON-NLS-1$//$NON-NLS-2$			
 		}
 		descriptor.setContributionURI(implementationURI);
 
@@ -155,7 +158,6 @@ public class ViewRegistry implements IViewRegistry {
 		}
 		if (category != null) {
 			tags.add("categoryTag:" + category.getLabel()); //$NON-NLS-1$
-			descriptor.setCategory(category.getLabel());
 		}
 		// ==> End of update descriptor
 
@@ -192,6 +194,13 @@ public class ViewRegistry implements IViewRegistry {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(stickyDescriptors,
 				new ArrayList<Object>());
 		return allowedViews.toArray(new IStickyViewDescriptor[allowedViews.size()]);
+	}
+
+	/**
+	 *
+	 */
+	public void dispose() {
+
 	}
 
 	/**
