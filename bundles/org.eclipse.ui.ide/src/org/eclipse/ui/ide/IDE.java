@@ -1528,35 +1528,38 @@ public final class IDE {
 				IDEWorkbenchMessages.IDE_areYouSure, message);
 
 		final boolean[] result = new boolean[] { false };
-		Runnable runnable = () -> {
-			ErrorDialog dialog = new ErrorDialog(shell, title,
-					dialogMessage, displayStatus, IStatus.ERROR
-							| IStatus.WARNING | IStatus.INFO) {
-				@Override
-				protected void createButtonsForButtonBar(Composite parent) {
-					createButton(parent, IDialogConstants.YES_ID,
-							IDialogConstants.YES_LABEL, false);
-					createButton(parent, IDialogConstants.NO_ID,
-							IDialogConstants.NO_LABEL, true);
-					createDetailsButton(parent);
-				}
-
-				@Override
-				protected void buttonPressed(int id) {
-					if (id == IDialogConstants.YES_ID) {
-						super.buttonPressed(IDialogConstants.OK_ID);
-					} else if (id == IDialogConstants.NO_ID) {
-						super.buttonPressed(IDialogConstants.CANCEL_ID);
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				ErrorDialog dialog = new ErrorDialog(shell, title,
+						dialogMessage, displayStatus, IStatus.ERROR
+								| IStatus.WARNING | IStatus.INFO) {
+					@Override
+					protected void createButtonsForButtonBar(Composite parent) {
+						createButton(parent, IDialogConstants.YES_ID,
+								IDialogConstants.YES_LABEL, false);
+						createButton(parent, IDialogConstants.NO_ID,
+								IDialogConstants.NO_LABEL, true);
+						createDetailsButton(parent);
 					}
-					super.buttonPressed(id);
-				}
-				@Override
-				protected int getShellStyle() {
-					return super.getShellStyle() | SWT.SHEET;
-				}
-			};
-			int code = dialog.open();
-			result[0] = code == 0;
+
+					@Override
+					protected void buttonPressed(int id) {
+						if (id == IDialogConstants.YES_ID) {
+							super.buttonPressed(IDialogConstants.OK_ID);
+						} else if (id == IDialogConstants.NO_ID) {
+							super.buttonPressed(IDialogConstants.CANCEL_ID);
+						}
+						super.buttonPressed(id);
+					}
+					@Override
+					protected int getShellStyle() {
+						return super.getShellStyle() | SWT.SHEET;
+					}
+				};
+				int code = dialog.open();
+				result[0] = code == 0;
+			}
 		};
 		if (syncExec) {
 			shell.getDisplay().syncExec(runnable);

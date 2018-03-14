@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2015 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <scela@redhat.com> - Bug 472761
+ *     Sopot Cela <scela@redhat.com> - Bug 472707
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -48,6 +48,15 @@ public class CSSRenderingUtils {
 
 	private static final String DRAG_HANDLE = "org.eclipse.e4.ui.workbench.swt.DRAG_HANDLE";
 
+	static {
+		Bundle bundle = org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator.getDefault().getBundle();
+		IPath path = new Path("$ws$/images/dragHandle.png");
+		URL url = FileLocator.find(bundle, path, null);
+		ImageDescriptor desc = ImageDescriptor.createFromURL(url);
+		if (desc != null)
+			JFaceResources.getImageRegistry().put(DRAG_HANDLE, desc);
+	}
+
 	private final static String FRAME_IMAGE_PROP = "frame-image";
 
 	private final static String HANDLE_IMAGE_PROP = "handle-image";
@@ -67,17 +76,11 @@ public class CSSRenderingUtils {
 
 		Image handleImage = createImage(toFrame, classId, HANDLE_IMAGE_PROP,
 				null);
-
-		if ((handleImage == null) && (draggable)) {
+		if (handleImage == null) {
 			// need to feed default image otherwise the toolbar DnD won't work
-			// see bug 472761
+			// see bug 472707
 			handleImage = JFaceResources.getImage(DRAG_HANDLE);
-			if (handleImage == null) {
-				handleImage = initDragHandleResource();
-			}
-
 		}
-
 		if (vertical && handleImage != null)
 			handleImage = rotateImage(toFrame.getDisplay(), handleImage, null);
 
@@ -96,16 +99,6 @@ public class CSSRenderingUtils {
 		}
 
 		return toFrame;
-	}
-
-	private Image initDragHandleResource() {
-		Bundle bundle = org.eclipse.e4.ui.internal.workbench.swt.WorkbenchSWTActivator.getDefault().getBundle();
-		IPath path = new Path("$ws$/images/dragHandle.png");
-		URL url = FileLocator.find(bundle, path, null);
-		ImageDescriptor desc = ImageDescriptor.createFromURL(url);
-		if (desc != null)
-			JFaceResources.getImageRegistry().put(DRAG_HANDLE, desc);
-		return JFaceResources.getImage(DRAG_HANDLE);
 	}
 
 	private Image rotateImage(Display display, Image image, Integer[] frameInts) {

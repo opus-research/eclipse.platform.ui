@@ -34,7 +34,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
-import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.dialogs.Dialog;
@@ -101,15 +100,11 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private Map<String, String> themeAssociations;
 	private boolean highContrastMode;
 
-	private Button themingEnabled;
-
 	@Override
 	protected Control createContents(Composite parent) {
 		initializeDialogUnits(parent);
 
 		Composite comp = new Composite(parent, SWT.NONE);
-
-		themingEnabled = createCheckButton(comp, WorkbenchMessages.ThemingEnabled, engine != null);
 
 		// if started with "-cssTheme none", CSS settings should be disabled
 		// but other appearance settings should be *not* disabled
@@ -117,6 +112,11 @@ public class ViewsPreferencePage extends PreferencePage implements
 			GridLayout layout = new GridLayout(1, false);
 			layout.horizontalSpacing = 10;
 			comp.setLayout(layout);
+			new Label(comp, SWT.NONE).setText(WorkbenchMessages.ThemingDisabled);
+			Label separator = new Label(comp, SWT.SEPARATOR | SWT.HORIZONTAL);
+			GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
+			layoutData.verticalIndent = 20;
+			separator.setLayoutData(layoutData);
 			createThemeIndependentComposits(comp);
 			return comp;
 		}
@@ -294,15 +294,14 @@ public class ViewsPreferencePage extends PreferencePage implements
 		apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS, useColoredLabels.getSelection());
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 
-		IEclipsePreferences prefs = getSwtRendererPreferences();
 		if (enableMru != null) {
+			IEclipsePreferences prefs = getSwtRendererPreferences();
 			prefs.putBoolean(StackRenderer.MRU_KEY, enableMru.getSelection());
-		}
-		prefs.putBoolean(PartRenderingEngine.ENABLED_THEME_KEY, themingEnabled.getSelection());
-		try {
-			prefs.flush();
-		} catch (BackingStoreException e) {
-			WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
+			try {
+				prefs.flush();
+			} catch (BackingStoreException e) {
+				WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
+			}
 		}
 		return super.performOk();
 	}

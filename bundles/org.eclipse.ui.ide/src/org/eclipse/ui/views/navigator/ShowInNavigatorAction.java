@@ -81,6 +81,10 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
         return v;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on IAction.
+     */
     /**
      * Shows the Navigator view and sets its selection to the resources
      * selected in this action's selection provider.
@@ -104,6 +108,10 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on SelectionProviderAction.
+     */
     @Override
 	public void selectionChanged(IStructuredSelection selection) {
         setEnabled(!getResources(selection).isEmpty());

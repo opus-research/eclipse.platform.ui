@@ -11,7 +11,6 @@
  *     Ovidio Mallo - bug 241318
  *     Matthew Hall - bugs 247875, 246782, 249526, 268022, 251424
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -44,7 +43,7 @@ public class DetailObservableValue<M, T> extends AbstractObservableValue<T>
 		@Override
 		public void handleValueChange(ValueChangeEvent<? extends T> event) {
 			if (!updating) {
-				fireValueChange(Diffs.unmodifiableDiff(event.diff));
+				fireValueChange(event.diff);
 			}
 		}
 	};
