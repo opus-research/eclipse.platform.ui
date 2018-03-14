@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * <b>Note:</b> Clients may instantiate.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public final class ContributedAction extends CommandAction {
@@ -67,7 +67,7 @@ public final class ContributedAction extends CommandAction {
 
 	/**
 	 * Create an action that can call a command.
-	 * 
+	 *
 	 * @param locator
 	 *            The appropriate service locator to use. If you use a part site
 	 *            as your locator, this action will be tied to your part.
@@ -150,7 +150,7 @@ public final class ContributedAction extends CommandAction {
 		appContext.addVariable(ISources.ACTIVE_WORKBENCH_WINDOW_SHELL_NAME,
 				window.getShell());
 
-		partHandler = lookUpHandler((IServiceLocator) site, commandId);
+		partHandler = lookUpHandler(site, commandId);
 		if (partHandler == null) {
 			localHandler = true;
 			// if we can't find the handler, then at least we can

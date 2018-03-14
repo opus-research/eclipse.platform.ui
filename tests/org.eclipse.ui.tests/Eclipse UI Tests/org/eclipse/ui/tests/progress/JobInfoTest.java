@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,23 +8,23 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Martin W. Kirst <martin.kirst@s1998.tu-chemnitz.de> - jUnit test for Bug 361121 [Progress] DetailedProgressViewer's comparator violates its general contract
+ *     Red Hat Inc. - Bug 474132
  ******************************************************************************/
 
 package org.eclipse.ui.tests.progress;
 
-import java.lang.reflect.Field;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.eclipse.core.internal.jobs.InternalJob;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.internal.progress.JobInfo;
+import org.junit.Before;
+import org.junit.Test;
 
-public class JobInfoTest extends TestCase {
+public class JobInfoTest {
 
 
 	/**
@@ -46,11 +46,8 @@ public class JobInfoTest extends TestCase {
 
 	private List jobinfos = new ArrayList();
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		int counter = 0;
 		counter = createAndAddJobInfos(false, false, ABOUT_TO_RUN, counter);
 		counter = createAndAddJobInfos(false, true,  ABOUT_TO_RUN, counter);
@@ -83,6 +80,7 @@ public class JobInfoTest extends TestCase {
 	 * Test that {@link org.eclipse.ui.internal.progress.JobInfo#compareTo(Object)}
 	 * is valid implemented and complies to the interface method contract.
 	 */
+	@Test
 	public void testCompareToContractCompliance() {
 		for(int xi = 0; xi<this.jobinfos.size(); xi++) {
 			JobInfo x = (JobInfo) jobinfos.get(xi);
@@ -185,54 +183,4 @@ public class JobInfoTest extends TestCase {
 		return counter;
 	}
 
-	/*
-	 * ========================================================================
-	 */
-
-	/**
-	 * Only provides better readable {@link #toString()} method.
-	 */
-	private static class ExtendedJobInfo extends JobInfo {
-
-		public ExtendedJobInfo(Job enclosingJob) {
-			super(enclosingJob);
-		}
-
-		@Override
-		public String toString() {
-			return "ExtendedJobInfo [getName()=" + getJob().getName() + ", getPriority()="
-						+ getJob().getPriority() + ", getState()=" + getJob().getState()
-						+ ", isSystem()=" + getJob().isSystem() + ", isUser()=" + getJob().isUser()
-						+ "]";
-		}
-
-	}
-
-	/**
-	 * Enables access to internal state, by using reflection
-	 * Provides better readable {@link #toString()} method.
-	 */
-	private static class TestJob extends Job {
-
-		public TestJob(String name) {
-			super(name);
-		}
-
-		@Override
-		protected IStatus run(IProgressMonitor monitor) {
-			throw new UnsupportedOperationException("Not implemented, because of just a unit test");
-		}
-
-		public void setInternalJobState(int state) {
-			try {
-				final Field field = InternalJob.class.getDeclaredField("flags");
-				field.setAccessible(true); // hack for testing
-				field.set(this, new Integer(state));
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException(e);
-			}
-		}
-
-	}
 }

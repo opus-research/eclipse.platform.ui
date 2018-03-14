@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,6 @@ package org.eclipse.jface.dialogs;
 
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -64,7 +62,7 @@ public class InputDialog extends Dialog {
      * Error message label widget.
      */
     private Text errorMessageText;
-    
+
     /**
      * Error message string.
      */
@@ -76,7 +74,7 @@ public class InputDialog extends Dialog {
      * <p>
      * Note that the <code>open</code> method blocks for input dialogs.
      * </p>
-     * 
+     *
      * @param parentShell
      *            the parent shell, or <code>null</code> to create a top-level
      *            shell
@@ -155,12 +153,7 @@ public class InputDialog extends Dialog {
         text = new Text(composite, getInputTextStyle());
         text.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
-        text.addModifyListener(new ModifyListener() {
-            @Override
-			public void modifyText(ModifyEvent e) {
-                validateInput();
-            }
-        });
+        text.addModifyListener(e -> validateInput());
         errorMessageText = new Text(composite, SWT.READ_ONLY | SWT.WRAP);
         errorMessageText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL
                 | GridData.HORIZONTAL_ALIGN_FILL));
@@ -176,7 +169,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the error message label.
-     * 
+     *
      * @return the error message label
      * @deprecated use setErrorMessage(String) instead
      */
@@ -187,7 +180,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the ok button.
-     * 
+     *
      * @return the ok button
      */
     protected Button getOkButton() {
@@ -196,7 +189,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the text area.
-     * 
+     *
      * @return the text area
      */
     protected Text getText() {
@@ -205,7 +198,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the validator.
-     * 
+     *
      * @return the validator
      */
     protected IInputValidator getValidator() {
@@ -214,7 +207,7 @@ public class InputDialog extends Dialog {
 
     /**
      * Returns the string typed into this input dialog.
-     * 
+     *
      * @return the input string
      */
     public String getValue() {
@@ -243,7 +236,7 @@ public class InputDialog extends Dialog {
     /**
      * Sets or clears the error message.
      * If not <code>null</code>, the OK button is disabled.
-     * 
+     *
      * @param errorMessage
      *            the error message, or <code>null</code> to clear
      * @since 3.0
@@ -268,14 +261,14 @@ public class InputDialog extends Dialog {
     		}
     	}
     }
-    
+
 	/**
 	 * Returns the style bits that should be used for the input text field.
 	 * Defaults to a single line entry. Subclasses may override.
-	 * 
+	 *
 	 * @return the integer style bits that should be used when creating the
 	 *         input text
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	protected int getInputTextStyle() {

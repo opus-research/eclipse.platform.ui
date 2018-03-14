@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,10 +22,10 @@ import org.w3c.dom.css.CSSValue;
  * used by renderers.
  */
 public class CSSEngineHelper {
-	IEclipseContext context;
-	Control control;
-	IStylingEngine engine;
-	CSSStyleDeclaration style;
+	private IEclipseContext context;
+	private Control control;
+	private IStylingEngine engine;
+	private CSSStyleDeclaration style;
 
 	/**
 	 * Create a CSSEngineHelper that can retrieve engine values for a particular

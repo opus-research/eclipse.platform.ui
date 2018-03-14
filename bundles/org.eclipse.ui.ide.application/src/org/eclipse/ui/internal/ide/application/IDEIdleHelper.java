@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784, 474273
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -25,11 +27,11 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.Policy;
 
 /**
- * The idle helper detects when the system is idle in order to perform garbage 
+ * The idle helper detects when the system is idle in order to perform garbage
  * collection in a way that minimizes impact on responsiveness of the UI.
  * The algorithm for determining when to perform a garbage collection
  * is as follows:
- * 
+ *
  *  - Never gc if there is a test harness present
  *  - Don't gc if background jobs are running
  *  - Don't gc if the keyboard or mouse have been active within IDLE_INTERVAL
@@ -58,7 +60,7 @@ class IDEIdleHelper {
 	private static final int GC_DELAY_MULTIPLIER = 60;
 
 	/**
-	 * The time interval of no keyboard or mouse events after which the system 
+	 * The time interval of no keyboard or mouse events after which the system
 	 * is considered idle.
 	 */
 	private static final int IDLE_INTERVAL = 5000;
@@ -70,14 +72,14 @@ class IDEIdleHelper {
 	private static final String PROP_GC = "ide.gc"; //$NON-NLS-1$
 
 	/**
-	 * The name of the integer system property that specifies the minimum time 
+	 * The name of the integer system property that specifies the minimum time
 	 * interval in milliseconds between garbage collections.
 	 */
 	private static final String PROP_GC_INTERVAL = "ide.gc.interval"; //$NON-NLS-1$
 
 	/**
-	 * The name of the integer system property that specifies the maximum 
-	 * duration for a garbage collection. If this duration is ever exceeded, the 
+	 * The name of the integer system property that specifies the maximum
+	 * duration for a garbage collection. If this duration is ever exceeded, the
 	 * explicit gc mechanism is disabled for the remainder of the session.
 	 */
 	private static final String PROP_GC_MAX = "ide.gc.max"; //$NON-NLS-1$
@@ -105,11 +107,11 @@ class IDEIdleHelper {
 	 * The time interval until the next garbage collection
 	 */
 	private int nextGCInterval = DEFAULT_GC_INTERVAL;
-	
+
 	private Job gcJob;
 
-	private Runnable handler;	
-	
+	private Runnable handler;
+
 	/**
 	 * Creates and initializes the idle handler
 	 * @param aConfigurer The workbench configurer.
@@ -121,8 +123,8 @@ class IDEIdleHelper {
 			return;
 		}
 		String enabled = System.getProperty(PROP_GC);
-		//gc is turned on by default if property is missing
-		if (enabled != null && enabled.equalsIgnoreCase(Boolean.FALSE.toString())) {
+		// since 4.6 gc is turned off by default if property is missing
+		if (enabled == null || enabled.equalsIgnoreCase(Boolean.FALSE.toString())) {
 			return;
 		}
 		//init gc interval
@@ -136,7 +138,7 @@ class IDEIdleHelper {
 		if (prop != null) {
 			maxGC = prop.intValue();
 		}
-		
+
 		createGarbageCollectionJob();
 
 		//hook idle handler
@@ -175,9 +177,9 @@ class IDEIdleHelper {
 	 * Creates the job that performs garbage collection
 	 */
 	private void createGarbageCollectionJob() {
-		gcJob = new Job(IDEWorkbenchMessages.IDEIdleHelper_backgroundGC) {
+		gcJob = Job.create(IDEWorkbenchMessages.IDEIdleHelper_backgroundGC, new IJobFunction() {
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+			public IStatus run(IProgressMonitor monitor) {
 				final Display display = configurer.getWorkbench().getDisplay();
 				if (display != null && !display.isDisposed()) {
 					final long start = System.currentTimeMillis();
@@ -203,7 +205,7 @@ class IDEIdleHelper {
 				}
 				return Status.OK_STATUS;
 			}
-		};
+		});
 		gcJob.setSystem(true);
 	}
 
@@ -227,7 +229,7 @@ class IDEIdleHelper {
 				});
 			} catch (SWTException ex) {
 				// ignore (display might be disposed)
-			}			
+			}
 		}
 	}
 }

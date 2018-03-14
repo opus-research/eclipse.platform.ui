@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,12 +64,7 @@ public class MonitoringPreferenceListener implements IPropertyChangeListener {
 			final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
 			// Schedule the event to restart the thread after all preferences have had enough time
 			// to propagate.
-			display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					refreshMonitoringThread();
-				}
-			});
+			display.asyncExec(() -> refreshMonitoringThread());
 		}
 	}
 

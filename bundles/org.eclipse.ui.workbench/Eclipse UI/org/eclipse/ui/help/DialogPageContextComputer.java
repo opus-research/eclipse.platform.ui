@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class DialogPageContextComputer implements IContextComputer {
      * Add the contexts to the context list.
      *
      * @param object the contexts (<code>Object[]</code> or <code>IContextComputer</code>)
-     * @param event the help event 
+     * @param event the help event
      */
     private void addContexts(Object object, HelpEvent event) {
         Assert.isTrue(object instanceof Object[]
@@ -72,7 +72,7 @@ public class DialogPageContextComputer implements IContextComputer {
 			contexts = (Object[]) object;
 		}
 
-        // copy the contexts into our list	
+        // copy the contexts into our list
         for (int i = 0; i < contexts.length; i++) {
 			contextList.add(contexts[i]);
 		}
@@ -82,7 +82,7 @@ public class DialogPageContextComputer implements IContextComputer {
      * Add the contexts for the given control to the context list.
      *
      * @param control the control from which to obtain the contexts
-     * @param event the help event 
+     * @param event the help event
      */
     private void addContextsForControl(Control control, HelpEvent event) {
         // See if there is are help contexts on the control
@@ -96,9 +96,6 @@ public class DialogPageContextComputer implements IContextComputer {
         addContexts(object, event);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContextComputer.
-     */
     @Override
 	public Object[] computeContexts(HelpEvent event) {
         contextList = new ArrayList();
@@ -109,16 +106,13 @@ public class DialogPageContextComputer implements IContextComputer {
         // Add the contexts for the page
         addContextsForControl(page.getControl(), event);
 
-        // Add the contexts for the container shell	
+        // Add the contexts for the container shell
         addContextsForControl(page.getControl().getShell(), event);
 
         // Return the contexts
         return contextList.toArray();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IContextComputer.
-     */
     @Override
 	public Object[] getLocalContexts(HelpEvent event) {
         return new Object[] { context };

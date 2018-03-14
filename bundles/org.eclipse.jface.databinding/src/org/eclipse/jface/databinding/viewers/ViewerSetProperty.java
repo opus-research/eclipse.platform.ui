@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
  * <li>All <code>observe()</code> methods should return an
  * {@link IViewerObservableSet}
  * </ul>
- * 
+ *
  * @since 1.3
  */
 public abstract class ViewerSetProperty extends SimpleSetProperty implements

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,12 @@
 package org.eclipse.ui.internal;
 
 import java.util.List;
-
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -31,7 +31,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.SelectionEnabler;
 import org.eclipse.ui.internal.misc.Policy;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -39,7 +38,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * action registry.
  */
 public class ObjectActionContributor extends PluginActionBuilder implements
-        IObjectActionContributor, IAdaptable {    
+        IObjectActionContributor, IAdaptable {
 
     private static final String P_TRUE = "true"; //$NON-NLS-1$
 
@@ -48,12 +47,12 @@ public class ObjectActionContributor extends PluginActionBuilder implements
     private boolean configRead = false;
 
     private boolean adaptable = false;
-    
+
     private String objectClass;
 
     /**
      * The constructor.
-     * 
+     *
      * @param config the element
      */
     public ObjectActionContributor(IConfigurationElement config) {
@@ -67,10 +66,10 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 	public boolean canAdapt() {
         return adaptable;
     }
-    
+
     /**
      * Return the object class for this contributor.
-     * 
+     *
      * @return the object class
      */
 	public String getObjectClass() {
@@ -112,27 +111,27 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 			return false;
 		}
 
-        // Get a structured selection.	
+        // Get a structured selection.
         ISelection sel = selProv.getSelection();
         if ((sel == null) || !(sel instanceof IStructuredSelection)) {
 			return false;
 		}
         IStructuredSelection ssel = (IStructuredSelection) sel;
-        
-        if(canAdapt()) {        	
-           IStructuredSelection newSelection = LegacyResourceSupport.adaptSelection(ssel, getObjectClass());     
+
+        if(canAdapt()) {
+           IStructuredSelection newSelection = LegacyResourceSupport.adaptSelection(ssel, getObjectClass());
            if(newSelection.size() != ssel.size()) {
         	   if (Policy.DEBUG_CONTRIBUTIONS) {
 				WorkbenchPlugin.log("Error adapting selection to " + getObjectClass() +  //$NON-NLS-1$
-            			". Contribution " + getID(config) + " is being ignored"); //$NON-NLS-1$ //$NON-NLS-2$            	
+            			". Contribution " + getID(config) + " is being ignored"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
             	return false;
            }
            ssel = newSelection;
         }
-        
+
         final IStructuredSelection selection = ssel;
-        	
+
         // Generate menu.
         for (int i = 0; i < currentContribution.actions.size(); i++) {
             ActionDescriptor ad = (ActionDescriptor) currentContribution.actions
@@ -178,7 +177,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 			return false;
 		}
 
-        // Get a structured selection.	
+        // Get a structured selection.
         ISelection sel = selProv.getSelection();
         if ((sel == null) || !(sel instanceof IStructuredSelection)) {
 			return false;
@@ -230,7 +229,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 				object = adapted;
 			}
 		}
-			
+
         if (!testName(object)) {
 			return false;
 		}
@@ -260,7 +259,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
             return true;
         }
 
-        // Found filter sub-element				
+        // Found filter sub-element
         if (tag.equals(IWorkbenchRegistryConstants.TAG_FILTER)) {
             ((ObjectContribution) currentContribution).addFilterTest(element);
             return true;
@@ -284,7 +283,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 			return true;
 		}
         String objectName = null;
-        IWorkbenchAdapter de = (IWorkbenchAdapter)Util.getAdapter(object, IWorkbenchAdapter.class);
+        IWorkbenchAdapter de = Adapters.adapt(object, IWorkbenchAdapter.class);
         if (de != null) {
 			objectName = de.getLabel(object);
 		}
@@ -307,7 +306,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 
         /**
          * Add a filter test.
-         * 
+         *
          * @param element the element
          */
         public void addFilterTest(IConfigurationElement element) {
@@ -319,7 +318,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 
         /**
          * Set the visibility test.
-         * 
+         *
          * @param element the element
          */
         public void setVisibilityTest(IConfigurationElement element) {
@@ -328,7 +327,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 
         /**
          * Set the enablement test.
-         * 
+         *
          * @param element the element
          */
         public void setEnablementTest(IConfigurationElement element) {
@@ -342,7 +341,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
         /**
          * Returns true if name filter is not specified for the contribution
          * or the current selection matches the filter.
-         * 
+         *
          * @param object the object to test
          * @return whether we're applicable
          */
@@ -378,8 +377,8 @@ public class ObjectActionContributor extends PluginActionBuilder implements
             }
             return result;
         }
-    }    
-    
+    }
+
     /**
      * Debugging helper that will print out the contribution names for this
      * contributor.
@@ -393,7 +392,7 @@ public class ObjectActionContributor extends PluginActionBuilder implements
 			String label = element.getAttribute(IWorkbenchRegistryConstants.ATT_LABEL);
 			if(label != null) {
 				buffer.append(label);
-				buffer.append('\n'); 
+				buffer.append('\n');
 			}
 		}
     	return buffer.toString();

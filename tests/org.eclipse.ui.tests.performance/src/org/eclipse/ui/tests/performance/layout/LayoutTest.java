@@ -21,7 +21,7 @@ import org.eclipse.ui.tests.performance.BasicPerformanceTest;
 /**
  * Measures the time required to layout the widget 10 times. Does not include
  * the time required for any deferred repaints.
- * 
+ *
  * @since 3.1
  */
 public class LayoutTest extends BasicPerformanceTest {
@@ -48,6 +48,7 @@ public class LayoutTest extends BasicPerformanceTest {
 	/**
 	 * Run the test
 	 */
+	@Override
 	protected void runTest() throws CoreException, WorkbenchException {
 
 		widgetFactory.init();

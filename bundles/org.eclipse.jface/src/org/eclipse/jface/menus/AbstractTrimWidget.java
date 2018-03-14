@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.ToolBar;
  * This class is intended to be the base for any trim contributions.
  * </p>
  * @since 3.2
- * 
+ *
  */
 public abstract class AbstractTrimWidget implements IWidget {
 	/**
@@ -49,10 +49,10 @@ public abstract class AbstractTrimWidget implements IWidget {
 	 * </ul>
 	 * </p>
 	 * <p>
-	 * 
+	 *
 	 * @param parent
 	 *            The parent to (re)create the widget under
-	 * 
+	 *
 	 * @param oldSide
 	 *            The previous side ({@link SWT#DEFAULT} on the initial fill)
 	 * @param newSide

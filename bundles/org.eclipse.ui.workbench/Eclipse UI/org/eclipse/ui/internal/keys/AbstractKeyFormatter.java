@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.keys.NaturalKey;
  * key formatting functionality. It is recommended that those people
  * implementing their own key formatters subclass from here, rather than
  * implementing <code>KeyFormatter</code> directly.
- * 
+ *
  * @since 3.0
  */
 public abstract class AbstractKeyFormatter implements IKeyFormatter {
@@ -105,7 +105,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
     /**
      * An accessor for the delimiter you wish to use between keys. This is used
      * by the default format implementations to determine the key delimiter.
-     * 
+     *
      * @return The delimiter to use between keys; should not be <code>null</code>.
      */
     protected abstract String getKeyDelimiter();
@@ -114,7 +114,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * An accessor for the delimiter you wish to use between key strokes. This
      * used by the default format implementations to determine the key stroke
      * delimiter.
-     * 
+     *
      * @return The delimiter to use between key strokes; should not be <code>null</code>.
      */
     protected abstract String getKeyStrokeDelimiter();
@@ -123,7 +123,7 @@ public abstract class AbstractKeyFormatter implements IKeyFormatter {
      * An accessor for the comparator to use for sorting modifier keys. This is
      * used by the default format implementations to sort the modifier keys
      * before formatting them into a string.
-     * 
+     *
      * @return The comparator to use to sort modifier keys; must not be <code>null</code>.
      */
     protected abstract Comparator getModifierKeyComparator();

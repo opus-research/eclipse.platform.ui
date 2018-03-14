@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, Google Inc and others.
+ * Copyright (C) 2014, 2015 Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,18 +55,10 @@ public class MonitoringStartup implements IStartup {
 		final EventLoopMonitorThread thread = temporaryThread;
 		final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
 		// Final setup and start asynchronously on the display thread.
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				// If we're still running when display gets disposed, shutdown the thread.
-				display.disposeExec(new Runnable() {
-					@Override
-					public void run() {
-						thread.shutdown();
-					}
-				});
-				thread.start();
-			}
+		display.asyncExec(() -> {
+			// If we're still running when display gets disposed, shutdown the thread.
+			display.disposeExec(() -> thread.shutdown());
+			thread.start();
 		});
 
 		return thread;

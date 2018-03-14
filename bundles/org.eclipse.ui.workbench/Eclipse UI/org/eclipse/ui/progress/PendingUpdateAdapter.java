@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 /**
  * The PendingUpdateAdapter is a convenience object that can be used
  * by a BaseWorkbenchContentProvider that wants to show a pending update.
- * 
+ *
  * @since 3.2
  */
 public class PendingUpdateAdapter implements IWorkbenchAdapter, IAdaptable {
@@ -75,7 +75,7 @@ public class PendingUpdateAdapter implements IWorkbenchAdapter, IAdaptable {
 	public Object getParent(Object o) {
         return null;
     }
-    
+
     /**
 	 * @since 3.4
 	 */

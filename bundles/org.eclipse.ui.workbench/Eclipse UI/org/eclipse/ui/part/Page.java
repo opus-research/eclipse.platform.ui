@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,6 @@ import org.eclipse.ui.IActionBars;
  * <ul>
  *   <li><code>dispose</code> - extend to provide additional cleanup</li>
  *   <li><code>setFocus</code> - reimplement to accept focus</li>
- *   <li><code>setActionBars</code> - reimplement to make contributions</li>
- *   <li><code>makeContributions</code> - this method exists to support previous versions</li>
- *   <li><code>setActionBars</code> - this method exists to support previous versions</li>
  *   <li><code>init</code> - extend to provide additional setup</li>
  * </ul>
  * </p>
@@ -50,7 +47,7 @@ public abstract class Page implements IPageBookViewPage {
      */
     private IPageSite site;
 
-    /* 
+    /*
      * Creates a new page for a pagebook view.
      */
     protected Page() {
@@ -60,7 +57,7 @@ public abstract class Page implements IPageBookViewPage {
 	public abstract void createControl(Composite parent);
 
     /**
-     * The <code>Page</code> implementation of this <code>IPage</code> method 
+     * The <code>Page</code> implementation of this <code>IPage</code> method
      * disposes of this page's control (if it has one and it has not already
      * been disposed). Subclasses may extend.
      */
@@ -77,49 +74,52 @@ public abstract class Page implements IPageBookViewPage {
      * <code>null</code>. Subclasses must reimplement.
      */
     @Override
-	public abstract Control getControl();
+    public abstract Control getControl();
 
-	/**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
+    /**
+	 * Subclasses should reimplement <code>init</code>.
+	 *
+	 * @deprecated Please use the <code>init</code> method instead.
 	 */
-    public void makeContributions(IMenuManager menuManager,
-            IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
+    @Deprecated
+	public void makeContributions(IMenuManager menuManager, IToolBarManager toolBarManager,
+			IStatusLineManager statusLineManager) {
     }
 
-
-	/**
-	 * This method exists for backward compatibility. Subclasses should
-	 * reimplement <code>init</code>.
+    /**
+	 * Subclasses should reimplement <code>init</code>.
+	 *
+	 * @deprecated Please use the <code>init</code> method instead.
 	 */
+	@Deprecated
     @Override
-	public void setActionBars(IActionBars actionBars) {
+    public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
                 .getToolBarManager(), actionBars.getStatusLineManager());
     }
 
     /**
      * The <code>Page</code> implementation of this <code>IPageBookViewPage</code> method
-     * stores a reference to the supplied site (the site which contains this 
-     * page). 
+     * stores a reference to the supplied site (the site which contains this
+     * page).
      * <p>
      * Subclasses may extend.
      * </p>
-     * 
+     *
      * @since 2.0
      */
     @Override
-	public void init(IPageSite pageSite) {
+    public void init(IPageSite pageSite) {
         site = pageSite;
     }
 
     /**
      * Returns the site which contains this page.
-     * 
+     *
      * @return the site which contains this page
      */
     @Override
-	public IPageSite getSite() {
+    public IPageSite getSite() {
         return site;
     }
 

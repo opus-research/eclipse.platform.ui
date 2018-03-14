@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,24 +7,22 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - [486901] Avoid blocking URL.equals
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.eclipse.swt.widgets.Shell;
-
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
-
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -42,7 +40,7 @@ import org.eclipse.ui.internal.ide.dialogs.WelcomeEditorInput;
 
 /**
  * The quick start (Welcome...) action.
- * 
+ *
  * @deprecated the IDE now uses the new intro mechanism
  */
 @Deprecated
@@ -109,7 +107,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Prompts the user for a feature that has a welcome page.
-     * 
+     *
      * @return the chosen feature, or <code>null</code> if none was chosen
      */
     private AboutInfo promptForFeature() throws WorkbenchException {
@@ -127,7 +125,7 @@ public class QuickStartAction extends Action implements
                 .getFeatureInfos();
         for (int i = 0; i < features.length; i++) {
             URL url = features[i].getWelcomePageURL();
-            if (url != null && !url.equals(productUrl)) {
+            if (url != null && (productUrl == null || !url.toString().equals(productUrl.toString()))) {
 				welcomeFeatures.add(features[i]);
 			}
         }
@@ -155,7 +153,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Opens the welcome page for the given feature.
-     * 
+     *
      * @param featureId the about info for the feature
      * @return <code>true</code> if successful, <code>false</code> otherwise
      * @throws WorkbenchException
@@ -171,7 +169,7 @@ public class QuickStartAction extends Action implements
     /**
      * Returns the about info for the feature with the given id, or <code>null</code>
      * if there is no such feature.
-     * 
+     *
      * @return the about info for the feature with the given id, or <code>null</code>
      *   if there is no such feature.
      */
@@ -189,7 +187,7 @@ public class QuickStartAction extends Action implements
 
     /**
      * Opens the welcome page for a feature.
-     * 
+     *
      * @param feature the about info for the feature
      * @return <code>true</code> if successful, <code>false</code> otherwise
      */
@@ -224,7 +222,7 @@ public class QuickStartAction extends Action implements
         if (page == null) {
         	return false;
         }
-        
+
         page.setEditorAreaVisible(true);
 
         // create input

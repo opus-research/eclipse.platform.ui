@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.ui.internal.misc.UIStats;
  * Part listener list.
  */
 /*
- * This class should be deleted when IPartListener and IPartListener2 
+ * This class should be deleted when IPartListener and IPartListener2
  * renamed to IPartListener.
  */
 public class PartListenerList extends EventManager {
@@ -42,7 +42,7 @@ public class PartListenerList extends EventManager {
 
     /**
      * Calls a part listener with associated performance event instrumentation
-     * 
+     *
      * @param runnable
      * @param listener
      * @param part

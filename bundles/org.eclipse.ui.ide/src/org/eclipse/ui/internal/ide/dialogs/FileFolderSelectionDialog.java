@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 /**
  * Selection dialog to select files and/or folders on the file system. Use
  * setInput to set input to an IFileStore that points to a folder.
- * 
+ *
  * @since 2.1
  */
 public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
@@ -77,21 +77,17 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 
 		/**
 		 * Creates a new instance of the receiver.
-		 * 
+		 *
 		 * @param showFiles
 		 *            <code>true</code> files and folders are returned by the
 		 *            receiver. <code>false</code> only folders are returned.
 		 */
 		public FileContentProvider(final boolean showFiles) {
-			fileFilter = new IFileStoreFilter() {
-
-				@Override
-				public boolean accept(IFileStore file) {
-					if (!file.fetchInfo().isDirectory() && showFiles == false) {
-						return false;
-					}
-					return true;
+			fileFilter = file -> {
+				if (!file.fetchInfo().isDirectory() && showFiles == false) {
+					return false;
 				}
+				return true;
 			};
 		}
 
@@ -160,7 +156,7 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 
 		/**
 		 * Creates a new instance of the receiver.
-		 * 
+		 *
 		 * @param multiSelect
 		 *            <code>true</code> if multi selection is allowed.
 		 *            <code>false</code> if only single selection is allowed.
@@ -195,7 +191,7 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 
 				}
 			}
-			
+
 			// Return an ok status with no message as SelectionStatusDialog will display default ok message
 			return new Status(IStatus.OK, pluginId, IDEResourceInfoUtils.EMPTY_STRING);
 		}
@@ -203,7 +199,7 @@ public class FileFolderSelectionDialog extends ElementTreeSelectionDialog {
 
 	/**
 	 * Creates a new instance of the receiver.
-	 * 
+	 *
 	 * @param parent
 	 * @param multiSelect
 	 *            <code>true</code> if multi selection is allowed.

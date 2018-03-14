@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,7 +90,7 @@ import com.ibm.icu.text.Collator;
  * <p>
  * Note: This class replaces <code>org.eclipse.ui.internal.Workbench</code>.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
@@ -130,7 +130,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	private IDEIdleHelper idleHelper;
 
 	private Listener settingsChangeListener;
-	
+
 	/**
 	 * Support class for monitoring workspace changes and periodically
 	 * validating the undo history
@@ -156,7 +156,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			throw new IllegalStateException();
 		}
 		workbenchAdvisor = this;
-		
+
 		Listener closeListener = new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -182,7 +182,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	public void initialize(IWorkbenchConfigurer configurer) {
 
 		PluginActionBuilder.setAllowIdeLogging(true);
-		
+
 		// make sure we always save and restore workspace state
 		configurer.setSaveAndRestore(true);
 
@@ -197,7 +197,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// initialize idle handler
 		idleHelper = new IDEIdleHelper(configurer);
-		
+
 		// initialize the workspace undo monitor
 		workspaceUndoMonitor = WorkspaceUndoMonitor.getInstance();
 
@@ -254,7 +254,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		}
 		if (proxyService == null) {
 			IDEWorkbenchPlugin.log("Proxy service could not be found."); //$NON-NLS-1$
-		}	
+		}
 	}
 
 	/**
@@ -322,7 +322,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Return true if the intro plugin is present and false otherwise.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public boolean hasIntro() {
@@ -502,7 +502,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * Returns the map of versioned feature ids -> info object for all installed
 	 * features. The format of the versioned feature id (the key of the map) is
 	 * featureId + ":" + versionId.
-	 * 
+	 *
 	 * @return map of versioned feature ids -> info object (key type:
 	 *         <code>String</code>, value type: <code>AboutInfo</code>)
 	 * @since 3.0
@@ -533,7 +533,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Returns the ordered map of versioned feature ids -> AboutInfo that are
 	 * new for this session.
-	 * 
+	 *
 	 * @return ordered map of versioned feature ids (key type:
 	 *         <code>String</code>) -> infos (value type:
 	 *         <code>AboutInfo</code>).
@@ -575,7 +575,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * Declares all IDE-specific workbench images. This includes both "shared"
 	 * images (named in {@link org.eclipse.ui.ide.IDE.SharedImages}) and internal images (named in
 	 * {@link org.eclipse.ui.internal.ide.IDEInternalWorkbenchImages}).
-	 * 
+	 *
 	 * @see IWorkbenchConfigurer#declareImage
 	 */
 	private void declareWorkbenchImages() {
@@ -696,6 +696,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_OBJS_FIXABLE_ERROR,
 				PATH_OBJECT + "quickfix_error_obj.png", true); //$NON-NLS-1$
+		declareWorkbenchImage(ideBundle,
+				IDEInternalWorkbenchImages.IMG_OBJS_FIXABLE_INFO,
+				PATH_OBJECT + "quickfix_info_obj.png", true); //$NON-NLS-1$
 
 
 		// task objects
@@ -752,6 +755,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		declareWorkbenchImage(ideBundle,
 				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_WARNING,
 				PATH_EVIEW + "problems_view_warning.png", true); //$NON-NLS-1$
+		declareWorkbenchImage(ideBundle,
+				IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_INFO,
+				PATH_EVIEW + "problems_view_info.png", true); //$NON-NLS-1$
 
 		// synchronization indicator objects
 		// declareRegistryImage(IDEInternalWorkbenchImages.IMG_OBJS_WBET_STAT,
@@ -772,7 +778,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	/**
 	 * Declares an IDE-specific workbench image.
-	 * 
+	 *
 	 * @param symbolicName
 	 *            the symbolic name of the image
 	 * @param path
@@ -807,7 +813,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	public String getWorkspaceLocation() {
 		// read command line, which has priority
 		IEclipseContext context = getWorkbenchConfigurer().getWorkbench().getService(IEclipseContext.class);
-		String location = (String) context.get(E4Workbench.FORCED_SHOW_LOCATION);
+		String location = context != null ? (String) context.get(E4Workbench.FORCED_SHOW_LOCATION) : null;
 		if (location != null) {
 			return location;
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,13 +17,9 @@ import java.util.Comparator;
 import java.util.Locale;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -70,7 +66,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
      * <p>
      * There must be at least one feature.
      * </p>
-     * 
+     *
      * @param shell  the parent shell
      * @param features  the features to display
      * @param primaryFeatureId  the id of the primary feature or null if none
@@ -121,7 +117,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
             }
         }
 
-        // set a safe default		
+        // set a safe default
         setInitialSelections(new Object[0]);
     }
 
@@ -138,7 +134,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
 
         // Create label
         createMessageArea(composite);
-        // Create list viewer	
+        // Create list viewer
         listViewer = new ListViewer(composite, SWT.SINGLE | SWT.H_SCROLL
                 | SWT.V_SCROLL | SWT.BORDER);
         GridData data = new GridData(GridData.FILL_BOTH);
@@ -146,7 +142,7 @@ public class FeatureSelectionDialog extends SelectionDialog {
         data.widthHint = convertWidthInCharsToPixels(LIST_WIDTH);
         listViewer.getList().setLayoutData(data);
         listViewer.getList().setFont(parent.getFont());
-        // Set the label provider		
+        // Set the label provider
         listViewer.setLabelProvider(new LabelProvider() {
             @Override
 			public String getText(Object element) {
@@ -164,21 +160,10 @@ public class FeatureSelectionDialog extends SelectionDialog {
                 getInitialElementSelections()), true);
 
         // Add a selection change listener
-        listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
-                // Update OK button enablement
-                getOkButton().setEnabled(!event.getSelection().isEmpty());
-            }
-        });
+        listViewer.addSelectionChangedListener(event -> getOkButton().setEnabled(!event.getSelection().isEmpty()));
 
         // Add double-click listener
-        listViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
-                okPressed();
-            }
-        });
+        listViewer.addDoubleClickListener(event -> okPressed());
         return composite;
     }
 

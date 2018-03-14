@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -51,8 +50,8 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.util.PrefUtil;
 
-/**	
- * Page used to determine what order projects will be built in 
+/**
+ * Page used to determine what order projects will be built in
  * by the workspace.
  */
 public class BuildOrderPreferencePage extends PreferencePage implements
@@ -99,14 +98,11 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     // (or when the preference page was opened). This represents the most recent applied state.
     private boolean defaultOrderInitiallySelected;
 
-    private IPropertyChangeListener validityChangeListener = new IPropertyChangeListener() {
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
-            if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-				updateValidState();
-			}
-        }
-    };
+    private IPropertyChangeListener validityChangeListener = event -> {
+	    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+			updateValidState();
+		}
+	};
 
     /**
      * Add another project to the list at the end.
@@ -180,7 +176,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
                 | SWT.H_SCROLL | SWT.V_SCROLL);
         this.buildList.setEnabled(enabled);
         GridData data = new GridData();
-        //Set heightHint with a small value so the list size will be defined by 
+        //Set heightHint with a small value so the list size will be defined by
         //the space available in the dialog instead of resizing the dialog to
         //fit all the items in the list.
         data.heightHint = buildList.getItemHeight();
@@ -252,7 +248,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
 
     /**
      * Adds in a spacer.
-     * 
+     *
      * @param composite the parent composite
      */
     private void createSpacer(Composite composite) {
@@ -373,7 +369,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
 
     /**
      * Create the field for the maximum number of iterations in the presence
-     * of cycles. 
+     * of cycles.
      */
     private void createMaxIterationsField(Composite composite) {
         Composite maxItersComposite = new Composite(composite, SWT.NONE);
@@ -443,7 +439,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     /**
      * Get the project names for the current custom build
      * order stored in the workspace description.
-     * 
+     *
      * @return java.lang.String[] or null if there is no setting
      */
     private String[] getCurrentBuildOrder() {
@@ -458,7 +454,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     /**
      * Get the project names in the default build order
      * based on the current Workspace settings.
-     * 
+     *
      * @return java.lang.String[]
      */
     private String[] getDefaultProjectOrder() {
@@ -553,7 +549,7 @@ public class BuildOrderPreferencePage extends PreferencePage implements
         super.performDefaults();
     }
 
-    /** 
+    /**
      * OK has been pressed. If the defualt button is pressed then reset the build order to false;
      * otherwise set it to the contents of the list.
      */
@@ -624,10 +620,10 @@ public class BuildOrderPreferencePage extends PreferencePage implements
     }
 
     /**
-     * Return a sorted array of the names of the projects that are already in the currently 
+     * Return a sorted array of the names of the projects that are already in the currently
      * displayed names.
      * @return String[]
-     * @param allProjects - all of the projects in the workspace 
+     * @param allProjects - all of the projects in the workspace
      * @param currentlyDisplayed - the names of the projects already being displayed
      */
     private String[] sortedDifference(IProject[] allProjects,

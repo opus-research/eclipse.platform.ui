@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Utility class to simplify access to some SWT resources. 
+ * Utility class to simplify access to some SWT resources.
  */
 public class SWTUtil {
 
@@ -40,7 +40,7 @@ public class SWTUtil {
 	/**
 	 * Returns the shell for the given widget. If the widget doesn't represent
 	 * a SWT object that manage a shell, <code>null</code> is returned.
-	 * 
+	 *
 	 * @return the shell for the given widget
 	 */
 	public static Shell getShell(Widget widget) {

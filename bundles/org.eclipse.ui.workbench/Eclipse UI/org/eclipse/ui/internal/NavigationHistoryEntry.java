@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,8 +94,8 @@ public class NavigationHistoryEntry {
         if (location != null) {
             // location exists or has been restored, use its text.
             // Also update the historyText so that this value will
-            // be saved.  Doing so handles cases where getText() value 
-            // may be dynamic. 
+            // be saved.  Doing so handles cases where getText() value
+            // may be dynamic.
             String text = location.getText();
             if ((text == null) || text.equals("")) { //$NON-NLS-1$
                 text = historyText;
@@ -108,7 +108,7 @@ public class NavigationHistoryEntry {
         }
     }
 
-    /** 
+    /**
      * Saves the state of this entry and its location.
      * Returns true if possible otherwise returns false.
      */

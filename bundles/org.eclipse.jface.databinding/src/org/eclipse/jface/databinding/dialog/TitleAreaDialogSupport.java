@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,9 +45,9 @@ import org.eclipse.swt.events.DisposeListener;
 /**
  * Connects the validation result from the given data binding context to the
  * given TitleAreaDialog, updating the dialog's error message accordingly.
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
- * 
+ *
  * @since 1.3
  */
 public class TitleAreaDialogSupport {
@@ -57,7 +57,7 @@ public class TitleAreaDialogSupport {
 	 * of creation, ensuring that the dialog does not show an error right away.
 	 * Upon any validation result change, the dialog's error message will be
 	 * updated according to the current validation result.
-	 * 
+	 *
 	 * @param dialog
 	 * @param dbc
 	 * @return an instance of TitleAreaDialogSupport
@@ -135,12 +135,12 @@ public class TitleAreaDialogSupport {
 	/**
 	 * Sets the {@link IValidationMessageProvider} to use for providing the
 	 * message text and message type to display on the title area dialog.
-	 * 
+	 *
 	 * @param messageProvider
 	 *            The {@link IValidationMessageProvider} to use for providing
 	 *            the message text and message type to display on the title area
 	 *            dialog.
-	 * 
+	 *
 	 * @since 1.4
 	 */
 	public void setValidationMessageProvider(

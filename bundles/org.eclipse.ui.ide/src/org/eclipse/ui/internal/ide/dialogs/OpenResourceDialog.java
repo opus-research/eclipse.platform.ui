@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.ide.dialogs;
 import java.util.Collections;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -63,7 +64,7 @@ import org.eclipse.ui.views.IViewDescriptor;
 /**
  * Shows a list of resources to the user with a text entry field for a string
  * pattern used to filter the list of resources.
- * 
+ *
  * @since 2.1
  */
 public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
@@ -112,7 +113,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					computeResult();
 					setResult(Collections.EMPTY_LIST);
 					close();
-					
+
 					IWorkbenchPage page = getActivePage();
 					IViewPart view;
 					try {
@@ -127,7 +128,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				}
 				private IShowInTarget getShowInTarget(IWorkbenchPart targetPart) {
-					return (IShowInTarget) org.eclipse.ui.internal.util.Util.getAdapter(targetPart, IShowInTarget.class);
+					return Adapters.adapt(targetPart, IShowInTarget.class);
 				}
 			};
 			action.setId(targetId);
@@ -137,13 +138,13 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 
 	private static final int OPEN_WITH_ID = IDialogConstants.CLIENT_ID + 1;
 	private static final int SHOW_IN_ID = IDialogConstants.CLIENT_ID + 2;
-	
+
 	private Button showInButton;
 	private Button openWithButton;
 
 	/**
 	 * Creates a new instance of the class.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 * @param container
@@ -165,14 +166,14 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-		
+
 		IWorkbenchPage activePage = getActivePage();
 		if (activePage == null) {
 			return;
 		}
 
 		menuManager.add(new Separator());
-		
+
 		// Add 'Open' menu item
 		OpenFileAction openFileAction = new OpenFileAction(activePage) {
 			@Override
@@ -183,10 +184,10 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		openFileAction.selectionChanged(selectedItems);
 		if (openFileAction.isEnabled()) {
 			menuManager.add(openFileAction);
-			
+
 			IAdaptable selectedAdaptable = getSelectedAdaptable();
 			if (selectedAdaptable != null) {
-				
+
 				// Add 'Open With' sub-menu
 				MenuManager subMenu = new MenuManager(IDEWorkbenchMessages.OpenResourceDialog_openWithMenu_label);
 				OpenWithMenu openWithMenu = new ResourceOpenWithMenu(activePage, selectedAdaptable);
@@ -194,8 +195,8 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 				menuManager.add(subMenu);
 			}
 		}
-		
-		
+
+
 		// Add 'Show In' sub-menu
 		MenuManager showInMenuManager = new MenuManager(IDEWorkbenchMessages.OpenResourceDialog_showInMenu_label);
 		ShowInMenu showInMenu = new ResourceShowInMenu(selectedItems, activePage.getWorkbenchWindow());
@@ -216,7 +217,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				});
 		setButtonLayoutData(showInButton);
-		
+
 		openWithButton = createDropdownButton(parent, OPEN_WITH_ID, IDEWorkbenchMessages.OpenResourceDialog_openWithButton_text,
 				new MouseAdapter() {
 					@Override
@@ -225,16 +226,16 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				});
 		setButtonLayoutData(openWithButton);
-		
+
 		GridData showInLayoutData = (GridData) showInButton.getLayoutData();
 		GridData openWithLayoutData = (GridData) openWithButton.getLayoutData();
 		int buttonWidth = Math.max(showInLayoutData.widthHint, openWithLayoutData.widthHint);
 		showInLayoutData.widthHint = buttonWidth;
 		openWithLayoutData.widthHint = buttonWidth;
-		
+
 		new Label(parent, SWT.NONE).setLayoutData(new GridData(5, 0));
 		parentLayout.numColumns++;
-		
+
 		Button okButton = createButton(parent, IDialogConstants.OK_ID, IDEWorkbenchMessages.OpenResourceDialog_openButton_text, true);
 		Button cancelButton = createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 
@@ -327,7 +328,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-		
+
 		ShowInMenu showInMenu = new ResourceShowInMenu(selectedItems, activePage.getWorkbenchWindow());
 		showMenu(showInButton, showInMenu);
 	}

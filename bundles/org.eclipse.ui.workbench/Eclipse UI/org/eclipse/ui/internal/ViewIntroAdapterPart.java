@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463043
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -38,7 +40,7 @@ import org.osgi.service.event.EventHandler;
 
 /**
  * Simple view that will wrap an <code>IIntroPart</code>.
- * 
+ *
  * @since 3.0
  */
 public final class ViewIntroAdapterPart extends ViewPart {
@@ -78,7 +80,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 
 
     /**
-     * Adds a listener that toggles standby state if the view pane is zoomed. 
+     * Adds a listener that toggles standby state if the view pane is zoomed.
      */
     private void addZoomListener() {
 		ViewSite site = (ViewSite) getViewSite();
@@ -94,16 +96,19 @@ public final class ViewIntroAdapterPart extends ViewPart {
 		ViewSite site = (ViewSite) getViewSite();
 
 		MPart introModelPart = site.getModel();
-		MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
-		if (introPartParent instanceof MPartStack)
-			return (MPartStack) introPartParent;
+		if (introModelPart.getCurSharedRef() != null) {
+			MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
+			if (introPartParent instanceof MPartStack) {
+				return (MPartStack) introPartParent;
+			}
+		}
 
 		return null;
 	}
 
     /**
      * Forces the standby state of the intro part.
-     * 
+     *
      * @param standby update the standby state
      */
     public void setStandby(final boolean standby) {
@@ -125,7 +130,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 
     /**
      * Toggles handling of zoom events.
-     * 
+     *
      * @param handle whether to handle zoom events
      */
     public void setHandleZoomEvents(boolean handle) {
@@ -159,19 +164,19 @@ public final class ViewIntroAdapterPart extends ViewPart {
     }
 
     @Override
-	public Object getAdapter(Class adapter) {
-        return introPart.getAdapter(adapter);
+	public <T> T getAdapter(Class<T> adapter) {
+		return Adapters.adapt(introPart, adapter);
     }
 
     @Override
 	public Image getTitleImage() {
         return introPart.getTitleImage();
     }
-    
+
     @Override
 	public String getTitle() {
     	// this method is called eagerly before our init method is called (and
-    	// therefore before our intropart is created).  By default return 
+    	// therefore before our intropart is created).  By default return
     	// the view title from the view declaration.  We will fire a property
     	// change to set the title to the proper value in the init method.
     	return introPart == null ? super.getTitle() : introPart.getTitle();
@@ -196,11 +201,11 @@ public final class ViewIntroAdapterPart extends ViewPart {
             introSite = new ViewIntroAdapterSite(site, workbench
                     .getIntroDescriptor());
             introPart.init(introSite, memento);
-            
+
         } catch (CoreException e) {
             WorkbenchPlugin
                     .log(
-                            IntroMessages.Intro_could_not_create_proxy, new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, IntroMessages.Intro_could_not_create_proxy, e)); 
+                            IntroMessages.Intro_could_not_create_proxy, new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, IntroMessages.Intro_could_not_create_proxy, e));
         }
     }
 
@@ -216,14 +221,14 @@ public final class ViewIntroAdapterPart extends ViewPart {
 
 	/**
 	 * Sets whether the CoolBar/PerspectiveBar should be visible.
-	 * 
+	 *
 	 * @param visible whether the CoolBar/PerspectiveBar should be visible
 	 * @since 3.1
 	 */
 	private void setBarVisibility(final boolean visible) {
 		WorkbenchWindow window = (WorkbenchWindow) getSite()
 				.getWorkbenchWindow();
-		
+
 		boolean layout = false; // don't layout unless things have actually changed
 		if (visible) {
 			// Restore the last 'saved' state

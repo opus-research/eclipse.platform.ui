@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.jface.preference.PreferencePage;
  * Connects the validation result from the given data binding context to the
  * given preference page, updating the preference page's valid state and its
  * error message accordingly.
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  * @since 1.3
  */
@@ -38,7 +38,7 @@ public class PreferencePageSupport extends DialogPageSupport {
 	 * validation result change, {@link PreferencePage#setValid(boolean)} will
 	 * be called reflecting the new validation result, and the preference page's
 	 * error message will be updated according to the current validation result.
-	 * 
+	 *
 	 * @param preferencePage
 	 * @param dbc
 	 * @return an instance of PreferencePageSupport

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,8 +13,6 @@ package org.eclipse.jface.preference;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -43,7 +41,7 @@ public class ColorSelector extends EventManager {
     /**
      * Property name that signifies the selected color of this
      * <code>ColorSelector</code> has changed.
-     * 
+     *
      * @since 3.0
      */
     public static final String PROP_COLORCHANGE = "colorValue"; //$NON-NLS-1$
@@ -61,7 +59,7 @@ public class ColorSelector extends EventManager {
     /**
      * Create a new instance of the reciever and the button that it wrappers in
      * the supplied parent <code>Composite</code>.
-     * 
+     *
      * @param parent
      *            The parent of the button.
      */
@@ -80,19 +78,16 @@ public class ColorSelector extends EventManager {
                 open();
             }
         });
-        fButton.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent event) {
-                if (fImage != null) {
-                    fImage.dispose();
-                    fImage = null;
-                }
-                if (fColor != null) {
-                    fColor.dispose();
-                    fColor = null;
-                }
-            }
-        });
+        fButton.addDisposeListener(event -> {
+		    if (fImage != null) {
+		        fImage.dispose();
+		        fImage = null;
+		    }
+		    if (fColor != null) {
+		        fColor.dispose();
+		        fColor = null;
+		    }
+		});
         fButton.getAccessible().addAccessibleListener(new AccessibleAdapter() {
             @Override
 			public void getName(AccessibleEvent e) {
@@ -106,7 +101,7 @@ public class ColorSelector extends EventManager {
      * Events are fired when the color in the control changes via the user
      * clicking an selecting a new one in the color dialog. No event is fired in
      * the case where <code>setColorValue(RGB)</code> is invoked.
-     * 
+     *
      * @param listener
      *            a property change listener
      * @since 3.0
@@ -117,7 +112,7 @@ public class ColorSelector extends EventManager {
 
     /**
      * Compute the size of the image to be displayed.
-     * 
+     *
      * @param window -
      *            the window used to calculate
      * @return <code>Point</code>
@@ -135,7 +130,7 @@ public class ColorSelector extends EventManager {
 
     /**
      * Get the button control being wrappered by the selector.
-     * 
+     *
      * @return <code>Button</code>
      */
     public Button getButton() {
@@ -144,7 +139,7 @@ public class ColorSelector extends EventManager {
 
     /**
      * Return the currently displayed color.
-     * 
+     *
      * @return <code>RGB</code>
      */
     public RGB getColorValue() {
@@ -154,7 +149,7 @@ public class ColorSelector extends EventManager {
     /**
      * Removes the given listener from this <code>ColorSelector</code>. Has
      * no effect if the listener is not registered.
-     * 
+     *
      * @param listener
      *            a property change listener
      * @since 3.0
@@ -165,7 +160,7 @@ public class ColorSelector extends EventManager {
 
     /**
      * Set the current color value and update the control.
-     * 
+     *
      * @param rgb
      *            The new color.
      */
@@ -176,7 +171,7 @@ public class ColorSelector extends EventManager {
 
     /**
      * Set whether or not the button is enabled.
-     * 
+     *
      * @param state
      *            the enabled state.
      */
@@ -206,7 +201,7 @@ public class ColorSelector extends EventManager {
     /**
 	 * Activate the editor for this selector. This causes the color selection
 	 * dialog to appear and wait for user input.
-	 * 
+	 *
 	 * @since 3.2
 	 */
 	public void open() {

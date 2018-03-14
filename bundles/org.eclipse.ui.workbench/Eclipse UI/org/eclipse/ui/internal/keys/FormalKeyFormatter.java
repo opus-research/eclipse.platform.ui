@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.keys.KeyStroke;
 /**
  * Formats the keys in the internal key sequence grammar. This is used for
  * persistence, and is not really intended for display to the user.
- * 
+ *
  * @since 3.0
  */
 public class FormalKeyFormatter extends AbstractKeyFormatter {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.services.IEvaluationService;
 /**
  * This internal class serves as a foundation for any handler that would like
  * its enabled state controlled by core expressions and the IEvaluationService.
- * 
+ *
  * @since 3.3
  */
 public abstract class AbstractEvaluationHandler extends AbstractEnabledHandler {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
 	public void perspectiveActivated(IWorkbenchPage page,
             IPerspectiveDescriptor perspective) {
         if (page.isEditorAreaVisible()) {
-            setText(WorkbenchMessages.ToggleEditor_hideEditors); 
+            setText(WorkbenchMessages.ToggleEditor_hideEditors);
         } else {
             setText(WorkbenchMessages.ToggleEditor_showEditors);
         }
@@ -39,16 +39,16 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_HIDE
                 || changeId == IWorkbenchPage.CHANGE_EDITOR_AREA_SHOW) {
             if (page.isEditorAreaVisible()) {
-                setText(WorkbenchMessages.ToggleEditor_hideEditors); 
+                setText(WorkbenchMessages.ToggleEditor_hideEditors);
             } else {
-                setText(WorkbenchMessages.ToggleEditor_showEditors); 
+                setText(WorkbenchMessages.ToggleEditor_showEditors);
             }
         }
     }
 
     /**
      * Creates a new <code>ToggleEditorsVisibilityAction</code>
-     * 
+     *
      * @param window the window
      */
     public ToggleEditorsVisibilityAction(IWorkbenchWindow window) {
@@ -67,7 +67,7 @@ public class ToggleEditorsVisibilityAction extends PerspectiveAction implements
         boolean visible = page.isEditorAreaVisible();
         if (visible) {
             page.setEditorAreaVisible(false);
-            setText(WorkbenchMessages.ToggleEditor_showEditors); 
+            setText(WorkbenchMessages.ToggleEditor_showEditors);
         } else {
             page.setEditorAreaVisible(true);
             setText(WorkbenchMessages.ToggleEditor_hideEditors);

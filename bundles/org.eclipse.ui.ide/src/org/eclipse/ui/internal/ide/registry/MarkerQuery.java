@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,14 +15,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.internal.ide.Policy;
 
 /**
- * Instances of this class hold a marker type id and/or 
- * a series of marker attributes. This information may be used 
+ * Instances of this class hold a marker type id and/or
+ * a series of marker attributes. This information may be used
  * to determine if a given marker is of the same marker
  * type and determine its values for the attributes.
  */
 public class MarkerQuery {
     /**
-     * The marker type targetted by this query. 
+     * The marker type targetted by this query.
      * May be <code>null</code>.
      */
     private String type;
@@ -43,10 +43,10 @@ public class MarkerQuery {
      * Creates a new marker query with the given type
      * and attributes.
      * <p>
-     * The type may be <code>null</code>. The attributes may 
+     * The type may be <code>null</code>. The attributes may
      * be empty, but not <code>null</code>.
      * </p>
-     * 
+     *
      * @param markerType the targetted marker type
      * @param markerAttributes the targetted marker attributes
      */
@@ -67,7 +67,7 @@ public class MarkerQuery {
      * is appropriate for this query (correct type and has
      * all of the query attributes), otherwise <code>null</code>
      * is returned.
-     * 
+     *
      * @param marker the marker to perform the query against
      * @return a marker query result or <code>null</code>
      */
@@ -101,9 +101,6 @@ public class MarkerQuery {
         return new MarkerQueryResult(values);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Object.
-     */
     @Override
 	public boolean equals(Object o) {
         if (!(o instanceof MarkerQuery)) {
@@ -132,9 +129,6 @@ public class MarkerQuery {
         return true;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Object.
-     */
     @Override
 	public int hashCode() {
         return hashCode;
@@ -156,9 +150,9 @@ public class MarkerQuery {
     }
 
     /**
-     * Returns the targetted marker type. May be 
+     * Returns the targetted marker type. May be
      * <code>null</code>
-     * 
+     *
      * @return the targetted marker type
      */
     public String getType() {
@@ -168,7 +162,7 @@ public class MarkerQuery {
     /**
      * Returns the targetted attributes.
      * The array may be empty.
-     * 
+     *
      * @return the targetted attributes
      */
     public String[] getAttributes() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 package org.eclipse.jface.preference;
 
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -40,7 +38,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Creates a color field editor.
-	 * 
+	 *
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -62,11 +60,11 @@ public class ColorFieldEditor extends FieldEditor {
 	 * <p>
 	 * This is an internal method and should not be called by clients.
 	 * </p>
-	 * 
+	 *
 	 * @param window
 	 *            the window to create a GC on for calculation.
 	 * @return Point The image size
-	 *  
+	 *
 	 */
 	protected Point computeImageSize(Control window) {
 		// Make the image height as high as a corresponding character. This
@@ -92,10 +90,10 @@ public class ColorFieldEditor extends FieldEditor {
 
 		Button colorButton = getChangeControl(parent);
 		colorButton.setLayoutData(new GridData());
-		
+
 	}
 
-	
+
 	@Override
 	protected void doLoad() {
 		if (colorSelector == null) {
@@ -122,7 +120,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Get the color selector used by the receiver.
-	 * 
+	 *
 	 * @return ColorSelector/
 	 */
 	public ColorSelector getColorSelector() {
@@ -131,7 +129,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the change button for this field editor.
-	 * 
+	 *
 	 * @param parent
 	 *            The control to create the button in if required.
 	 * @return the change button
@@ -139,14 +137,10 @@ public class ColorFieldEditor extends FieldEditor {
 	protected Button getChangeControl(Composite parent) {
 		if (colorSelector == null) {
 			colorSelector = new ColorSelector(parent);
-			colorSelector.addListener(new IPropertyChangeListener() {
-				// forward the property change of the color selector
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					ColorFieldEditor.this.fireValueChanged(event.getProperty(),
-							event.getOldValue(), event.getNewValue());
-					setPresentsDefaultValue(false);
-				}
+			colorSelector.addListener(event -> {
+				ColorFieldEditor.this.fireValueChanged(event.getProperty(),
+						event.getOldValue(), event.getNewValue());
+				setPresentsDefaultValue(false);
 			});
 
 		} else {

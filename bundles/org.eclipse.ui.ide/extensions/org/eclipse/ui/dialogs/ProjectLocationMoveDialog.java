@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    IBM Corporation - initial API and implementation 
+ *    IBM Corporation - initial API and implementation
  *    Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *        font should be activated and used by other components.
  *    Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
@@ -48,7 +48,7 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/**
 	 * Create a ProjectLocationMoveDialog on the supplied project parented by
 	 * the parentShell.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -121,13 +121,7 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return new IErrorMessageReporter(){
-			@Override
-			public void reportError(String errorMessage, boolean notError) {
-				setMessage(errorMessage);
-				
-			}
-		};
+		return (errorMessage, notError) -> setMessage(errorMessage);
 	}
 
 	/**

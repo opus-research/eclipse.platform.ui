@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public class WWinActionBars implements IActionBars2 {
 
     /**
      * Returns the cool bar manager.
-     * 
+     *
      */
     @Override
 	public ICoolBarManager getCoolBarManager() {
@@ -87,7 +87,7 @@ public class WWinActionBars implements IActionBars2 {
 
     /**
      * Returns the tool bar manager.
-     * 
+     *
      */
     @Override
 	public IToolBarManager getToolBarManager() {
@@ -105,7 +105,7 @@ public class WWinActionBars implements IActionBars2 {
      * @see IWorkbenchActions
      *
      * @param actionID an action ID declared in the registry
-     * @param handler an action which implements the action ID.  
+     * @param handler an action which implements the action ID.
      *		<code>null</code> may be passed to deregister a handler.
      */
     @Override
@@ -114,7 +114,7 @@ public class WWinActionBars implements IActionBars2 {
 
 	/**
      * Commits all UI changes.  This should be called
-     * after additions or subtractions have been made to a 
+     * after additions or subtractions have been made to a
      * menu, status line, or toolbar.
      */
     @Override

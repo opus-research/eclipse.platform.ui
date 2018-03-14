@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -26,9 +28,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -70,7 +71,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @deprecated See {@link #RefreshAction(IShellProvider)}
@@ -83,7 +84,7 @@ public class RefreshAction extends WorkspaceAction {
 
 	/**
 	 * Creates a new action.
-	 * 
+	 *
 	 * @param provider
 	 *            the IShellProvider for any dialogs.
 	 * @since 3.4
@@ -92,15 +93,14 @@ public class RefreshAction extends WorkspaceAction {
 		super(provider, IDEWorkbenchMessages.RefreshAction_text);
 		initAction();
 	}
-	
+
 	/**
 	 * Initializes for the constructor.
 	 */
 	private void initAction(){
 		setToolTipText(IDEWorkbenchMessages.RefreshAction_toolTip);
 		setId(ID);
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
-				IIDEHelpContextIds.REFRESH_ACTION);
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IIDEHelpContextIds.REFRESH_ACTION);
 	}
 	/**
 	 * Checks whether the given project's location has been deleted. If so,
@@ -110,8 +110,7 @@ public class RefreshAction extends WorkspaceAction {
 		if (!project.exists()) {
 			return;
 		}
-		IFileInfo location = IDEResourceInfoUtils.getFileInfo(project
-				.getLocationURI());
+		IFileInfo location = IDEResourceInfoUtils.getFileInfo(project.getLocationURI());
 		if (!location.exists()) {
 			String message = NLS.bind(
 					IDEWorkbenchMessages.RefreshAction_locationDeletedMessage,
@@ -121,24 +120,18 @@ public class RefreshAction extends WorkspaceAction {
 					IDEWorkbenchMessages.RefreshAction_dialogTitle, // dialog
 					// title
 					null, // use default window icon
-					message, MessageDialog.QUESTION, new String[] {
+					message, MessageDialog.QUESTION, 0,
 							IDialogConstants.YES_LABEL,
-							IDialogConstants.NO_LABEL }, 0) {
+							IDialogConstants.NO_LABEL) {
 				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
-			}; // yes is the
-			// default
+			};
 
 			// Must prompt user in UI thread (we're in the operation thread
 			// here).
-			getShell().getDisplay().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					dialog.open();
-				}
-			});
+			getShell().getDisplay().syncExec(() -> dialog.open());
 
 			// Do the deletion back in the operation thread
 			if (dialog.getReturnCode() == 0) { // yes was chosen
@@ -167,11 +160,12 @@ public class RefreshAction extends WorkspaceAction {
 	 * otherwise be empty.
 	 */
 	@Override
-	protected List getSelectedResources() {
-		List resources = super.getSelectedResources();
+	protected List<? extends IResource> getSelectedResources() {
+		List<? extends IResource> resources = super.getSelectedResources();
 		if (resources.isEmpty()) {
-			resources = new ArrayList();
-			resources.add(ResourcesPlugin.getWorkspace().getRoot());
+			List<IResource> list = new ArrayList<>();
+			list.add(ResourcesPlugin.getWorkspace().getRoot());
+			return list;
 		}
 		return resources;
 	}
@@ -184,18 +178,16 @@ public class RefreshAction extends WorkspaceAction {
 	 */
 	@Override
 	protected boolean updateSelection(IStructuredSelection s) {
-		return (super.updateSelection(s) || s.isEmpty())
-				&& getSelectedNonResources().size() == 0;
+		return (super.updateSelection(s) || s.isEmpty()) && getSelectedNonResources().size() == 0;
 	}
 
 	/**
 	 * Handle the key release.
-	 * 
+	 *
 	 * @param event
 	 *            the event
 	 */
 	public void handleKeyReleased(KeyEvent event) {
-
 		if (event.keyCode == SWT.F5 && event.stateMask == 0) {
 			refreshAll();
 		}
@@ -212,49 +204,37 @@ public class RefreshAction extends WorkspaceAction {
 	}
 
 	@Override
-	final protected IRunnableWithProgress createOperation(
-			final IStatus[] errorStatus) {
+	final protected IRunnableWithProgress createOperation(final IStatus[] errorStatus) {
 		ISchedulingRule rule = null;
-		IResourceRuleFactory factory = ResourcesPlugin.getWorkspace()
-				.getRuleFactory();
+		IResourceRuleFactory factory = ResourcesPlugin.getWorkspace().getRuleFactory();
 
-		List actionResources = new ArrayList(getActionResources());
+		List<? extends IResource> actionResources = new ArrayList<>(getActionResources());
 		if (shouldPerformResourcePruning()) {
 			actionResources = pruneResources(actionResources);
 		}
-		final List resources = actionResources;
+		final List<? extends IResource> resources = actionResources;
 
-		Iterator res = resources.iterator();
+		Iterator<? extends IResource> res = resources.iterator();
 		while (res.hasNext()) {
-			rule = MultiRule.combine(rule, factory.refreshRule((IResource) res
-					.next()));
+			rule = MultiRule.combine(rule, factory.refreshRule(res.next()));
 		}
 		return new WorkspaceModifyOperation(rule) {
 			@Override
-			public void execute(IProgressMonitor monitor) {
+			public void execute(IProgressMonitor mon) {
+				SubMonitor subMonitor = SubMonitor.convert(mon, resources.size());
 				MultiStatus errors = null;
-				monitor.beginTask("", resources.size() * 1000); //$NON-NLS-1$
-				monitor.setTaskName(getOperationMessage());
-				Iterator resourcesEnum = resources.iterator();
-				try {
-					while (resourcesEnum.hasNext()) {
-						try {
-							IResource resource = (IResource) resourcesEnum
-									.next();
-							refreshResource(resource, new SubProgressMonitor(
-									monitor, 1000));
-						} catch (CoreException e) {
-							errors = recordError(errors, e);
-						}
-						if (monitor.isCanceled()) {
-							throw new OperationCanceledException();
-						}
+				subMonitor.setTaskName(getOperationMessage());
+				Iterator<? extends IResource> resourcesEnum = resources.iterator();
+				while (resourcesEnum.hasNext()) {
+					try {
+						IResource resource = resourcesEnum.next();
+						refreshResource(resource, subMonitor.split(1));
+					} catch (CoreException e) {
+						errors = recordError(errors, e);
 					}
-					if (errors != null) {
-						errorStatus[0] = errors;
-					}
-				} finally {
-					monitor.done();
+				}
+				if (errors != null) {
+					errorStatus[0] = errors;
 				}
 			}
 		};
@@ -266,7 +246,7 @@ public class RefreshAction extends WorkspaceAction {
 	 * This method may be extended to refresh model objects related to the
 	 * resource.
 	 * </p>
-	 * 
+	 *
 	 * @param resource
 	 *            the resource to refresh. Must not be <code>null</code>.
 	 * @param monitor
@@ -275,8 +255,7 @@ public class RefreshAction extends WorkspaceAction {
 	 *             if things go wrong
 	 * @since 3.4
 	 */
-	protected void refreshResource(IResource resource, IProgressMonitor monitor)
-			throws CoreException {
+	protected void refreshResource(IResource resource, IProgressMonitor monitor) throws CoreException {
 		// Check if project's location has been deleted,
 		// as per 1G83UCE: ITPUI:WINNT - Refresh from local doesn't detect new
 		// or deleted projects
@@ -291,7 +270,7 @@ public class RefreshAction extends WorkspaceAction {
 		}
 		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	}
-	
+
 	@Override
 	public void run() {
 		final IStatus[] errorStatus = new IStatus[1];
@@ -300,22 +279,20 @@ public class RefreshAction extends WorkspaceAction {
 		WorkspaceJob job = new WorkspaceJob("refresh") { //$NON-NLS-1$
 
 			@Override
-			public IStatus runInWorkspace(IProgressMonitor monitor)
-					throws CoreException {
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				try {
 					op.run(monitor);
 				} catch (InvocationTargetException e) {
 					String msg = NLS.bind(
 							IDEWorkbenchMessages.WorkspaceAction_logTitle, getClass()
 									.getName(), e.getTargetException());
-					throw new CoreException(StatusUtil.newStatus(IStatus.ERROR,
-							msg, e.getTargetException()));
+					throw new CoreException(StatusUtil.newStatus(IStatus.ERROR, msg, e.getTargetException()));
 				} catch (InterruptedException e) {
 					return Status.CANCEL_STATUS;
 				}
 				return errorStatus[0];
 			}
-			
+
 		};
 		ISchedulingRule rule = op.getRule();
 		if (rule != null) {

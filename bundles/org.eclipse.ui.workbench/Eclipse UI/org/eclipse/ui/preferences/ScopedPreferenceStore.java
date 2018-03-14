@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Yves YANG <yves.yang@soyatec.com> - 
+ *     Yves YANG <yves.yang@soyatec.com> -
  *     		Initial Fix for Bug 138078 [Preferences] Preferences Store for i18n support
  *******************************************************************************/
 package org.eclipse.ui.preferences;
 
 import java.io.IOException;
-
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
@@ -21,10 +20,10 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.INodeChangeListener;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.NodeChangeEvent;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
@@ -45,7 +44,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * The default scope is always included in the search scopes when searching for
  * preference values.
  * </p>
- * 
+ *
  * @see org.eclipse.core.runtime.preferences
  * @since 3.1
  */
@@ -102,7 +101,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	 * Create a new instance of the receiver. Store the values in context in the
 	 * node looked up by qualifier. <strong>NOTE:</strong> Any instance of
 	 * ScopedPreferenceStore should call
-	 * 
+	 *
 	 * @param context
 	 *            the scope to store to
 	 * @param qualifier
@@ -119,7 +118,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	/**
 	 * Create a new instance of the receiver. Store the values in context in the
 	 * node looked up by qualifier.
-	 * 
+	 *
 	 * @param context
 	 *            the scope to store to
 	 * @param qualifier
@@ -137,7 +136,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	/**
 	 * Return a node change listener that adds a removes the receiver when nodes
 	 * change.
-	 * 
+	 *
 	 * @return INodeChangeListener
 	 */
 	private INodeChangeListener getNodeChangeListener() {
@@ -193,7 +192,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	 * the given object's type and then looks in the list of defaults to see if
 	 * a value exists. If not or if there is a problem converting the value, the
 	 * default default value for that type is returned.
-	 * 
+	 *
 	 * @param key
 	 *            the key to search
 	 * @param obj
@@ -205,7 +204,7 @@ public class ScopedPreferenceStore extends EventManager implements
 		if (obj instanceof String) {
 			return defaults.get(key, STRING_DEFAULT_DEFAULT);
 		} else if (obj instanceof Integer) {
-			return new Integer(defaults.getInt(key, INT_DEFAULT_DEFAULT));
+			return Integer.valueOf(defaults.getInt(key, INT_DEFAULT_DEFAULT));
 		} else if (obj instanceof Double) {
 			return new Double(defaults.getDouble(key, DOUBLE_DEFAULT_DEFAULT));
 		} else if (obj instanceof Float) {
@@ -222,7 +221,7 @@ public class ScopedPreferenceStore extends EventManager implements
 
 	/**
 	 * Return the IEclipsePreferences node associated with this store.
-	 * 
+	 *
 	 * @return the preference node for this store
 	 */
 	IEclipsePreferences getStorePreferences() {
@@ -231,7 +230,7 @@ public class ScopedPreferenceStore extends EventManager implements
 
 	/**
 	 * Return the default IEclipsePreferences for this store.
-	 * 
+	 *
 	 * @return this store's default preference node
 	 */
 	private IEclipsePreferences getDefaultPreferences() {
@@ -253,7 +252,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	 * Whether or not the default context should be included in the resulting
 	 * list is specified by the <code>includeDefault</code> parameter.
 	 * </p>
-	 * 
+	 *
 	 * @param includeDefault
 	 *            <code>true</code> if the default context should be included
 	 *            and <code>false</code> otherwise
@@ -299,7 +298,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	 * The defaultContext will be added to the end of this list automatically
 	 * and <em>MUST NOT</em> be included by the user.
 	 * </p>
-	 * 
+	 *
 	 * @param scopes
 	 *            a list of scope contexts to use when searching, or
 	 *            <code>null</code>
@@ -409,7 +408,7 @@ public class ScopedPreferenceStore extends EventManager implements
 	 * Return the string value for the specified key. Look in the nodes which
 	 * are specified by this object's list of search scopes. If the value does
 	 * not exist then return <code>null</code>.
-	 * 
+	 *
 	 * @param key
 	 *            the key to search with
 	 * @return String or <code>null</code> if the value does not exist.
@@ -543,7 +542,7 @@ public class ScopedPreferenceStore extends EventManager implements
 				dirty = true;
 				firePropertyChangeEvent(name, oldValue, defaultValue);
 			}
-				
+
 		} finally {
 			silentRunning = false;// Restart listening to preferences
 		}
@@ -605,8 +604,7 @@ public class ScopedPreferenceStore extends EventManager implements
 				getStorePreferences().putInt(name, value);
 			}
 			dirty = true;
-			firePropertyChangeEvent(name, new Integer(oldValue), new Integer(
-					value));
+			firePropertyChangeEvent(name, Integer.valueOf(oldValue), Integer.valueOf(value));
 		} finally {
 			silentRunning = false;// Restart listening to preferences
 		}

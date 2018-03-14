@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.ui.internal.ide.registry;
 
 /**
  * Instances of this class represent the result of a specific marker
- * query. Specifically they contain an ordered collection of marker 
+ * query. Specifically they contain an ordered collection of marker
  * attribute values.
  */
 
@@ -32,7 +32,7 @@ public class MarkerQueryResult {
      * <p>
      * The values may not be empty.
      * </p>
-     * 
+     *
      * @param markerAttributeValues the target marker's attribute values
      */
     public MarkerQueryResult(String[] markerAttributeValues) {
@@ -43,9 +43,6 @@ public class MarkerQueryResult {
         computeHashCode();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Object.
-     */
     @Override
 	public boolean equals(Object o) {
         if (!(o instanceof MarkerQueryResult)) {
@@ -70,9 +67,6 @@ public class MarkerQueryResult {
         return true;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Object.
-     */
     @Override
 	public int hashCode() {
         return hashCode;

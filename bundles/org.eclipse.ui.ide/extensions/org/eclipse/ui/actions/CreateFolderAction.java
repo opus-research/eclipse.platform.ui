@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @deprecated should use NewWizardMenu to populate a New submenu instead (see Navigator view)
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -48,32 +48,27 @@ public class CreateFolderAction extends SelectionListenerAction {
      * The shell in which to show any dialogs.
      */
     protected IShellProvider shellProvider;
-    
+
     /**
      * Creates a new action for creating a folder resource.
      *
      * @param shell the shell for any dialogs
-     * 
+     *
      * @deprecated {@link #CreateFolderAction(IShellProvider)}
      */
     @Deprecated
 	public CreateFolderAction(final Shell shell) {
         super(IDEWorkbenchMessages.CreateFolderAction_text);
         Assert.isNotNull(shell);
-        shellProvider = new IShellProvider(){
-        	@Override
-			public Shell getShell(){
-        		return shell;
-        	}
-        };
+        shellProvider = () -> shell;
         initAction();
     }
 
     /**
      * Creates a new action for creating a folder resource.
-     * 
+     *
      * @param provider the shell for any dialogs
-     * 
+     *
      * @deprecated see deprecated tag on class
      * @since 3.4
      */
@@ -84,7 +79,7 @@ public class CreateFolderAction extends SelectionListenerAction {
     	shellProvider = provider;
     	initAction();
     }
-    
+
     /**
      * Initializes for the constructor.
      */
@@ -96,7 +91,7 @@ public class CreateFolderAction extends SelectionListenerAction {
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.CREATE_FOLDER_ACTION);
     }
-    
+
     /**
      * The <code>CreateFolderAction</code> implementation of this
      * <code>IAction</code> method opens a <code>BasicNewFolderResourceWizard</code>

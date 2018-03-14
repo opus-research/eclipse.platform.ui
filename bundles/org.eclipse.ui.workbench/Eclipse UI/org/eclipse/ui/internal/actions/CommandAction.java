@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * <p>
  * <b>Note:</b> Clients my instantiate, but they must not subclass.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public class CommandAction extends Action {
@@ -55,7 +55,7 @@ public class CommandAction extends Action {
 	/**
 	 * Creates the action backed by a command. For commands that don't take
 	 * parameters.
-	 * 
+	 *
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -70,7 +70,7 @@ public class CommandAction extends Action {
 	 * Creates the action backed by a parameterized command. The parameterMap
 	 * must contain only all required parameters, and may contain the optional
 	 * parameters.
-	 * 
+	 *
 	 * @param serviceLocator
 	 *            The service locator that is closest in lifecycle to this
 	 *            action.
@@ -106,7 +106,7 @@ public class CommandAction extends Action {
 
 	/**
 	 * Build a command from the executable extension information.
-	 * 
+	 *
 	 * @param commandService
 	 *            to get the Command object
 	 * @param commandId
@@ -141,11 +141,6 @@ public class CommandAction extends Action {
 		parameterizedCommand = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#runWithEvent(org.eclipse.swt.widgets.Event)
-	 */
 	@Override
 	public void runWithEvent(Event event) {
 		if (handlerService == null) {
@@ -164,11 +159,6 @@ public class CommandAction extends Action {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.Action#run()
-	 */
 	@Override
 	public void run() {
 		// hopefully this is never called

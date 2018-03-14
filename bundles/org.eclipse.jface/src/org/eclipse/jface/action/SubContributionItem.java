@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * A <code>SubContributionItem</code> is a wrapper for an <code>IContributionItem</code>.  
+ * A <code>SubContributionItem</code> is a wrapper for an <code>IContributionItem</code>.
  * It is used within a <code>SubContributionManager</code> to control the visibility
  * of items.
  * <p>
@@ -31,7 +31,7 @@ public class SubContributionItem implements IContributionItem {
     private boolean visible;
 
     /**
-     * The inner item for this contribution.  
+     * The inner item for this contribution.
      */
     private IContributionItem innerItem;
 

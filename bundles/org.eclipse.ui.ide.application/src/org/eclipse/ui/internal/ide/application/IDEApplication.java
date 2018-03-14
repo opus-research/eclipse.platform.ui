@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
  *     Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 427393, 455162
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -55,7 +56,7 @@ import org.osgi.framework.Version;
 
 /**
  * The "main program" for the Eclipse IDE.
- * 
+ *
  * @since 3.0
  */
 public class IDEApplication implements IApplication, IExecutableExtension {
@@ -85,14 +86,14 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * A special return code that will be recognized by the launcher and used to
      * restart the workbench.
      */
-    private static final Integer EXIT_RELAUNCH = new Integer(24);
+	private static final Integer EXIT_RELAUNCH = Integer.valueOf(24);
 
     /**
      * A special return code that will be recognized by the PDE launcher and used to
      * show an error dialog if the workspace is locked.
      */
-    private static final Integer EXIT_WORKSPACE_LOCKED = new Integer(15);
-    
+	private static final Integer EXIT_WORKSPACE_LOCKED = Integer.valueOf(15);
+
     /**
      * The ID of the application plug-in
      */
@@ -116,18 +117,17 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         	// look and see if there's a splash shell we can parent off of
         	Shell shell = WorkbenchPlugin.getSplashShell(display);
         	if (shell != null) {
-        		// should should set the icon and message for this shell to be the 
+        		// should should set the icon and message for this shell to be the
         		// same as the chooser dialog - this will be the guy that lives in
-        		// the task bar and without these calls you'd have the default icon 
+        		// the task bar and without these calls you'd have the default icon
         		// with no message.
         		shell.setText(ChooseWorkspaceDialog.getWindowTitle());
         		shell.setImages(Window.getDefaultImages());
         	}
-           
+
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
-                appContext.applicationRunning();
                 return instanceLocationCheck;
             }
 
@@ -161,7 +161,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     /**
      * Creates the display used by the application.
-     * 
+     *
      * @return the display used by the application
      */
     protected Display createDisplay() {
@@ -177,7 +177,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     /**
      * Return <code>null</code> if a valid workspace path has been set and an exit code otherwise.
      * Prompt for and set the path if possible and required.
-     * 
+     *
      * @param applicationArguments the command line arguments
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
@@ -210,8 +210,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                     writeWorkspaceVersion();
                     return null;
                 }
-                
-                // we failed to create the directory.  
+
+                // we failed to create the directory.
                 // Two possibilities:
                 // 1. directory is already in use
                 // 2. directory could not be created
@@ -226,19 +226,19 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 	                        NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceCannotLockMessage, workspaceDirectory.getAbsolutePath()));
                 } else {
                 	MessageDialog.openError(
-                			shell, 
+                			shell,
                 			IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
                 			IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
                 }
             } catch (IOException e) {
                 IDEWorkbenchPlugin.log("Could not obtain lock for workspace location", //$NON-NLS-1$
-                        e);            	
+                        e);
                 MessageDialog
                 .openError(
                         shell,
                         IDEWorkbenchMessages.InternalError,
-                        e.getMessage());                
-            }            
+                        e.getMessage());
+            }
             return EXIT_OK;
         }
 
@@ -247,6 +247,16 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 .getDefault());
 
         boolean force = false;
+
+		boolean parentShellVisible = false;
+		if (isValidShell(shell)) {
+			parentShellVisible = shell.getVisible();
+			// bug 455162, bug 427393: hide the splash if the workspace
+			// prompt dialog should be opened
+			if (parentShellVisible && launchData.getShowDialog()) {
+				shell.setVisible(false);
+			}
+		}
         while (true) {
             URL workspaceUrl = promptForWorkspace(shell, launchData, force);
             if (workspaceUrl == null) {
@@ -263,6 +273,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 if (instanceLoc.set(workspaceUrl, true)) {
                     launchData.writePersistedData();
                     writeWorkspaceVersion();
+
+					// bug 455162, bug 427393: unhide the splash after the
+					// workspace was selected to show the progress bar
+					if (parentShellVisible && isValidShell(shell)) {
+						shell.setVisible(true);
+						shell.forceActive();
+					}
                     return null;
                 }
             } catch (IllegalStateException e) {
@@ -282,7 +299,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
             // by this point it has been determined that the workspace is
             // already in use -- force the user to choose again
-            MessageDialog.openError(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle, 
+            MessageDialog.openError(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle,
                     NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage, workspaceUrl.getFile()));
         }
     }
@@ -294,13 +311,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return true;
 		return args.containsKey("-pdelaunch"); //$NON-NLS-1$
 	}
-	
+
     /**
      * Open a workspace selection dialog on the argument shell, populating the
      * argument data with the user's selection. Perform first level validation
      * on the selection by comparing the version information. This method does
      * not examine the runtime state (e.g., is the workspace already locked?).
-     * 
+     *
      * @param shell
      * @param launchData
      * @param force
@@ -309,17 +326,21 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return An URL storing the selected workspace or null if the user has
      *         canceled the launch operation.
      */
-    private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
+	private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
 			boolean force) {
         URL url = null;
+
         do {
-        	// okay to use the shell now - this is the splash shell
 			new ChooseWorkspaceDialog(shell, launchData, false, true) {
 				@Override
 				protected Shell getParentShell() {
+					// Bug 429308: Make workspace selection dialog visible
+					// in the task manager of the OS
 					return null;
 				}
+
 			}.prompt(force);
+
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -348,7 +369,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
             try {
                 // Don't use File.toURL() since it adds a leading slash that Platform does not
-                // handle properly.  See bug 54081 for more details.  
+                // handle properly.  See bug 54081 for more details.
                 String path = workspace.getAbsolutePath().replace(
                         File.separatorChar, '/');
                 url = new URL("file", null, path); //$NON-NLS-1$
@@ -365,12 +386,19 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return url;
     }
 
+	/**
+	 * @return true if the shell is not <code>null</code> and not disposed
+	 */
+	static boolean isValidShell(Shell shell) {
+		return shell != null && !shell.isDisposed();
+	}
+
     /**
      * Return true if the argument directory is ok to use as a workspace and
      * false otherwise. A version check will be performed, and a confirmation
      * box may be displayed on the argument shell if an older version is
      * detected.
-     * 
+     *
      * @return true if the argument URL is ok to use as a workspace and false
      *         otherwise.
      */
@@ -544,7 +572,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * The version file is stored in the metadata area of the workspace. This
      * method returns an URL to the file or null if the directory or file does
      * not exist (and the create parameter is false).
-     * 
+     *
      * @param create
      *            If the directory and file does not exist this parameter
      *            controls whether it will be created.

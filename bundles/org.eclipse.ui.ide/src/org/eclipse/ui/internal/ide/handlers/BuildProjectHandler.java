@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 IBM Corporation and others.
+ * Copyright (c) 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,9 +30,9 @@ import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * Default Handler for 'Build Project' command
- * 
+ *
  * @since 4.3
- * 
+ *
  */
 public class BuildProjectHandler extends AbstractHandler {
 
@@ -80,7 +80,7 @@ public class BuildProjectHandler extends AbstractHandler {
 		return new BuildAction(window,
 				IncrementalProjectBuilder.INCREMENTAL_BUILD);
 	}
-	
+
 	@Override
 	public void setEnabled(Object evaluationContext) {
 		boolean enabled = false;
@@ -94,5 +94,5 @@ public class BuildProjectHandler extends AbstractHandler {
 		}
 		setBaseEnabled(enabled);
 	}
-	
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,8 +29,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -46,7 +44,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * Shows the properties of a new or existing marker
- * 
+ *
  * In 3.3, this class was refactored to allow pre-existing public dialog classes
  * to share the implementation.  Note that certain methods are exposed as API
  * in public subclasses, so changes to the methods in this class should be
@@ -56,16 +54,16 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 public class DialogMarkerProperties extends TrayDialog {
 
 	private static final String DIALOG_SETTINGS_SECTION = "DialogMarkerPropertiesDialogSettings"; //$NON-NLS-1$
-	
+
 	/**
 	 * The marker being shown, or <code>null</code> for a new marker
 	 */
-	private IMarker marker = null;
+	private IMarker marker;
 
 	/**
 	 * The resource on which to create a new marker
 	 */
-	private IResource resource = null;
+	private IResource resource;
 
 	/**
 	 * The type of marker to be created
@@ -75,7 +73,7 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * The initial attributes to use when creating a new marker
 	 */
-	private Map initialAttributes = null;
+	private Map<String, Object> initialAttributes;
 
 	/**
 	 * The text control for the Description field.
@@ -108,7 +106,7 @@ public class DialogMarkerProperties extends TrayDialog {
 	private boolean dirty;
 
 	private String title;
-	
+
 	/**
 	 * The name used to describe the specific kind of marker.  Used when
 	 * creating an undo command for the dialog, so that a specific name such
@@ -121,7 +119,7 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * the resource and initial attributes for the new marker, use
 	 * <code>setResource</code> and <code>setInitialAttributes</code>. To
 	 * show or modify an existing marker, use <code>setMarker</code>.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 */
@@ -134,7 +132,7 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * the resource and initial attributes for the new marker, use
 	 * <code>setResource</code> and <code>setInitialAttributes</code>. To
 	 * show or modify an existing marker, use <code>setMarker</code>.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 * @param title
@@ -144,20 +142,20 @@ public class DialogMarkerProperties extends TrayDialog {
 		super(parentShell);
 		this.title = title;
 	}
-	
+
 	/**
 	 * Creates the dialog. By default this dialog creates a new marker. To set
 	 * the resource and initial attributes for the new marker, use
 	 * <code>setResource</code> and <code>setInitialAttributes</code>. To
 	 * show or modify an existing marker, use <code>setMarker</code>.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 * @param title
 	 *            the title of the dialog
 	 * @param markerName
 	 *            the name used to describe the specific kind of marker shown
-	 *            
+	 *
 	 * @since 3.3
 	 */
 	public DialogMarkerProperties(Shell parentShell, String title, String markerName) {
@@ -168,12 +166,12 @@ public class DialogMarkerProperties extends TrayDialog {
 
 	/**
      * Sets the marker to show or modify.
-     * <p>IMPORTANT:  Although this class is internal, there are public 
-     * subclasses that expose this method as API.  Changes in 
+     * <p>IMPORTANT:  Although this class is internal, there are public
+     * subclasses that expose this method as API.  Changes in
      * this implementation should be treated as API changes.
-     * 
+     *
      * @param marker the marker, or <code>null</code> to create a new marker
-     * 
+     *
      * @since 3.3
 	 */
 	public void setMarker(IMarker marker) {
@@ -190,12 +188,12 @@ public class DialogMarkerProperties extends TrayDialog {
      * Returns the marker being created or modified.
      * For a new marker, this returns <code>null</code> until
      * the dialog returns, but is non-null after.
-     * <p>IMPORTANT:  Although this method is protected and the class is 
+     * <p>IMPORTANT:  Although this method is protected and the class is
      * internal, there are public subclasses that expose this method as API.
      * Changes in this implementation should be treated as API changes.
-     * 
+     *
      * @return the marker
-     * 
+     *
      * @since 3.3
 	 */
 	protected IMarker getMarker() {
@@ -205,10 +203,10 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
      * Sets the resource to use when creating a new task.
      * If not set, the new task is created on the workspace root.
-     * <p>IMPORTANT:  Although this class is internal, there are public 
-     * subclasses that expose this method as API.  Changes in 
+     * <p>IMPORTANT:  Although this class is internal, there are public
+     * subclasses that expose this method as API.  Changes in
      * this implementation should be treated as API changes.
-     * 
+     *
      * @param resource the resource
 	 */
 	public void setResource(IResource resource) {
@@ -219,12 +217,12 @@ public class DialogMarkerProperties extends TrayDialog {
      * Returns the resource to use when creating a new task,
      * or <code>null</code> if none has been set.
      * If not set, the new task is created on the workspace root.
-     * <p>IMPORTANT:  Although this method is protected and the class is 
+     * <p>IMPORTANT:  Although this method is protected and the class is
      * internal, there are public subclasses that expose this method as API.
      * Changes in this implementation should be treated as API changes.
-     * 
+     *
      * @return the resource
-     * 
+     *
      * @since 3.3
 	 */
 	protected IResource getResource() {
@@ -234,15 +232,15 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
      * Sets initial attributes to use when creating a new task.
      * If not set, the new task is created with default attributes.
-     * <p>IMPORTANT:  Although this method is protected and the class is 
+     * <p>IMPORTANT:  Although this method is protected and the class is
      * internal, there are public subclasses that expose this method as API.
      * Changes in this implementation should be treated as API changes.
-     * 
+     *
      * @param initialAttributes the initial attributes
-     * 
+     *
      * @since 3.3
 	 */
-	protected void setInitialAttributes(Map initialAttributes) {
+	protected void setInitialAttributes(Map<String, Object> initialAttributes) {
 		this.initialAttributes = initialAttributes;
 	}
 
@@ -250,17 +248,17 @@ public class DialogMarkerProperties extends TrayDialog {
      * Returns the initial attributes to use when creating a new task,
      * or <code>null</code> if not set.
      * If not set, the new task is created with default attributes.
-     * <p>IMPORTANT:  Although this method is protected and the class is 
+     * <p>IMPORTANT:  Although this method is protected and the class is
      * internal, there are public subclasses that expose this method as API.
      * Changes in this implementation should be treated as API changes.
-     * 
+     *
      * @return the initial attributes
-     * 
+     *
      * @since 3.3
 	 */
-	protected Map getInitialAttributes() {
+	protected Map<String, Object> getInitialAttributes() {
 		if (initialAttributes == null) {
-			initialAttributes = new HashMap();
+			initialAttributes = new HashMap<>();
 		}
 		return initialAttributes;
 	}
@@ -302,7 +300,7 @@ public class DialogMarkerProperties extends TrayDialog {
 		composite.setLayout(layout);
         GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
         composite.setLayoutData(gridData);
-    
+
 		initializeDialogUnits(composite);
 		createDescriptionArea(composite);
 		if (marker != null) {
@@ -316,9 +314,9 @@ public class DialogMarkerProperties extends TrayDialog {
 		}
 		updateDialogFromMarker();
 		updateEnablement();
-        
+
         Dialog.applyDialogFont(composite);
-        
+
 		return composite;
 	}
 
@@ -331,15 +329,14 @@ public class DialogMarkerProperties extends TrayDialog {
 		gridData.horizontalSpan = 2;
 		seperator.setLayoutData(gridData);
 	}
-    
+
     /**
 	 * Method createCreationTimeArea.
 	 * @param parent
 	 */
 	private void createCreationTimeArea(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(MarkerMessages
-                .propertiesDialog_creationTime_text);
+        label.setText(MarkerMessages.propertiesDialog_creationTime_text);
 
         creationTime = new Text(parent, SWT.SINGLE | SWT.READ_ONLY);
 	}
@@ -349,10 +346,8 @@ public class DialogMarkerProperties extends TrayDialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
-				true);
-		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,	true);
+		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	/**
@@ -366,18 +361,13 @@ public class DialogMarkerProperties extends TrayDialog {
 		gridData.widthHint = convertHorizontalDLUsToPixels(400);
 		descriptionText.setLayoutData(gridData);
 
-		descriptionText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				markDirty();
-			}
-		});
+		descriptionText.addModifyListener(e -> markDirty());
 	}
 
 	/**
 	 * This method is intended to be overridden by subclasses. The attributes
 	 * area is created between the creation time area and the resource area.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -390,22 +380,19 @@ public class DialogMarkerProperties extends TrayDialog {
 	private void createResourceArea(Composite parent) {
         Label resourceLabel = new Label(parent, SWT.NONE);
 		resourceLabel.setText(MarkerMessages.propertiesDialog_resource_text);
-        resourceText = new Text(parent, SWT.SINGLE | SWT.WRAP
-				| SWT.READ_ONLY | SWT.BORDER);
+        resourceText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY | SWT.BORDER);
         GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		resourceText.setLayoutData(gridData);
 
         Label folderLabel = new Label(parent, SWT.NONE);
 		folderLabel.setText(MarkerMessages.propertiesDialog_folder_text);
-        folderText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY
-				| SWT.BORDER);
+        folderText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY	| SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		folderText.setLayoutData(gridData);
 
         Label locationLabel = new Label(parent, SWT.NONE);
 		locationLabel.setText(MarkerMessages.propertiesDialog_location_text);
-        locationText = new Text(parent, SWT.SINGLE | SWT.WRAP
-				| SWT.READ_ONLY | SWT.BORDER);
+        locationText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY | SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		locationText.setLayoutData(gridData);
 	}
@@ -439,7 +426,7 @@ public class DialogMarkerProperties extends TrayDialog {
 
         descriptionText.selectAll();
     }
-    
+
     /**
      * Updates the dialog from the predefined attributes.
      */
@@ -478,12 +465,11 @@ public class DialogMarkerProperties extends TrayDialog {
 
             Object line = initialAttributes.get(IMarker.LINE_NUMBER);
             if (line != null && line instanceof Integer && locationText != null) {
-				locationText.setText(
-                    NLS.bind(MarkerMessages.label_lineNumber, line));
+				locationText.setText(NLS.bind(MarkerMessages.label_lineNumber, line));
 			}
         }
     }
-    
+
 	/**
 	 * Method declared on Dialog
 	 */
@@ -518,17 +504,16 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * needed. Updates the existing marker only if there have been changes.
 	 */
 	private void saveChanges() {
-		Map attrs = getMarkerAttributes();
+		Map<String, Object> attrs = getMarkerAttributes();
 		IUndoableOperation op = null;
 		if (marker == null) {
-			if (resource == null)
+			if (resource == null) {
 				return;
-			op = new CreateMarkersOperation(type, attrs,
-					resource, getCreateOperationTitle()); 
+			}
+			op = new CreateMarkersOperation(type, attrs, resource, getCreateOperationTitle());
 		} else {
 			if (isDirty()) {
-				op = new UpdateMarkersOperation(marker, attrs,
-						getModifyOperationTitle(), true);
+				op = new UpdateMarkersOperation(marker, attrs, getModifyOperationTitle(), true);
 			}
 		}
 		if (op != null) {
@@ -542,8 +527,9 @@ public class DialogMarkerProperties extends TrayDialog {
 					ErrorDialog.openError(
 	                        getShell(),
 	                        MarkerMessages.Error, null, ((CoreException)e.getCause()).getStatus());
-				} else
+				} else {
 					IDEWorkbenchPlugin.log(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -552,12 +538,12 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * Returns the marker attributes to save back to the marker, based on the
 	 * current dialog fields.
 	 */
-	protected Map getMarkerAttributes() {
-		Map attrs = getInitialAttributes();
+	protected Map<String, Object> getMarkerAttributes() {
+		Map<String, Object> attrs = getInitialAttributes();
 		attrs.put(IMarker.MESSAGE, descriptionText.getText());
 		return attrs;
 	}
-	
+
 	/**
 	 * Updates widget enablement for the dialog. Should be overridden by
 	 * subclasses.
@@ -583,21 +569,16 @@ public class DialogMarkerProperties extends TrayDialog {
 
 	/**
 	 * Sets the marker type when creating a new marker.
-	 * 
+	 *
 	 * @param type
 	 *            the marker type
-	 *            
+	 *
 	 * @since 3.3 this method is protected.
 	 */
 	protected void setType(String type) {
 		this.type = type;
 	}
-    
-	/* (non-Javadoc)
-     * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
-     * 
-     * @since 3.2
-     */
+
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
@@ -607,26 +588,26 @@ public class DialogMarkerProperties extends TrayDialog {
         }
         return section;
 	}
-	
+
 	/**
 	 * Return the string that describes a modify marker operation.
 	 * Subclasses may override to more specifically describe the marker.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected String getModifyOperationTitle() {
 		if (markerName == null) {
 			// we don't know what kind of marker is being modified
 			return MarkerMessages.DialogMarkerProperties_ModifyMarker;
-		} 
-		return NLS.bind(MarkerMessages.qualifiedMarkerCommand_title, 
+		}
+		return NLS.bind(MarkerMessages.qualifiedMarkerCommand_title,
 				MarkerMessages.DialogMarkerProperties_Modify, markerName);
 	}
-	
+
 	/**
 	 * Return the string that describes a create marker operation.
 	 * Subclasses may override to more specifically describe the marker.
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected String getCreateOperationTitle() {
@@ -634,15 +615,11 @@ public class DialogMarkerProperties extends TrayDialog {
 			// we don't know what kind of marker is being created
 			return MarkerMessages.DialogMarkerProperties_CreateMarker;
 		}
-		return NLS.bind(MarkerMessages.qualifiedMarkerCommand_title, 
+		return NLS.bind(MarkerMessages.qualifiedMarkerCommand_title,
 				MarkerMessages.DialogMarkerProperties_Create, markerName);
-		
+
 	}
-	
-    /*
-     * (non-Javadoc)
-     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
-     */
+
     @Override
 	protected boolean isResizable() {
     	return true;

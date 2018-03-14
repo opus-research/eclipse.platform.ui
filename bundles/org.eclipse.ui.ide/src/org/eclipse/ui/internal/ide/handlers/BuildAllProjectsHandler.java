@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 Wind River Systems, Inc. and others.
+ * Copyright (c) 2010, 2015 Wind River Systems, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,13 +24,13 @@ import org.eclipse.ui.internal.ide.actions.BuildUtilities;
 
 /**
  * Default handler for 'Build All' command.
- * 
+ *
  * @since 3.6
  */
 public class BuildAllProjectsHandler extends AbstractHandler {
-	
+
 	/**
-	 * @throws ExecutionException  
+	 * @throws ExecutionException
 	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -47,7 +47,7 @@ public class BuildAllProjectsHandler extends AbstractHandler {
     	}
 		return null;
 	}
-	
+
 	/*
 	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
 	 */

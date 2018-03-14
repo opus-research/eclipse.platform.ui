@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,18 +23,18 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  * A CreateResourcesOperation represents an undoable operation for creating
  * resources in the workspace. Clients may call the public API from a background
  * thread.
- * 
+ *
  * This class is not intended to be subclassed by clients.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 abstract class AbstractCreateResourcesOperation extends
 		AbstractResourcesOperation {
 
 	/**
 	 * Create an AbstractCreateResourcesOperation.
-	 * 
+	 *
 	 * @param resourceDescriptions
 	 *            the resourceDescriptions describing resources to be created
 	 * @param label

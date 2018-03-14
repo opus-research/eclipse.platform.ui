@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public class StructuredSelection implements IStructuredSelection {
     public static final StructuredSelection EMPTY = new StructuredSelection();
 
     /**
-     * Creates a new empty selection.  
+     * Creates a new empty selection.
      * See also the static field <code>EMPTY</code> which contains an empty selection singleton.
      *
      * @see #EMPTY
@@ -76,7 +76,7 @@ public class StructuredSelection implements IStructuredSelection {
     }
 
     /**
-     * Creates a structured selection from the given <code>List</code>. 
+     * Creates a structured selection from the given <code>List</code>.
      * @param elements list of selected elements
      */
     public StructuredSelection(List elements) {
@@ -87,8 +87,8 @@ public class StructuredSelection implements IStructuredSelection {
 	 * Creates a structured selection from the given <code>List</code> and
 	 * element comparer. If an element comparer is provided, it will be used to
 	 * determine equality between structured selection objects provided that
-	 * they both are based on the same (identical) comparer. See bug 
-	 * 
+	 * they both are based on the same (identical) comparer. See bug
+	 *
 	 * @param elements
 	 *            list of selected elements
 	 * @param comparer
@@ -129,7 +129,7 @@ public class StructuredSelection implements IStructuredSelection {
         }
 
         boolean useComparer = comparer != null && comparer == s2.comparer;
-        
+
         //size
         int myLen = elements.length;
         if (myLen != s2.elements.length) {

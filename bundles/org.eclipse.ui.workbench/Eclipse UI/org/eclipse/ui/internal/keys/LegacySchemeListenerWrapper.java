@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2005 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.ui.commands.KeyConfigurationEvent;
 
 /**
  * A wrapper for old-style listeners to be hooked on to new style schemes.
- * 
+ *
  * @since 3.1
  */
 final class LegacySchemeListenerWrapper implements ISchemeListener {
@@ -37,7 +37,7 @@ final class LegacySchemeListenerWrapper implements ISchemeListener {
 	/**
 	 * Constructs a new instance of <code>SchemeListenerWrapper</code> with
 	 * the given listener.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to be wrapped; must mot be <code>null</code>.
 	 */

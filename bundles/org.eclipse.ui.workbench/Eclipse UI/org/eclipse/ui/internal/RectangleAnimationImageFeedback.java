@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.AnimationEngine;
  * Creates an animation effect where the interpolated rectangles are displayed using Canvas
  * controls that show an image of the bits that were originally occupied by the various
  * 'start' rectangles.
- * 
+ *
  * @since 3.3
  *
  */
@@ -103,7 +103,7 @@ public class RectangleAnimationImageFeedback extends
 		theShell = new Shell(getAnimationShell(), SWT.NO_TRIM | SWT.ON_TOP);
 		theShell.setBounds(getAnimationShell().getBounds());
 
-		// Capture the background image		
+		// Capture the background image
 		backingStore = new Image(theShell.getDisplay(), psRect);
 		GC gc = new GC(display);
 		gc.copyArea(backingStore, psRect.x, psRect.y);
@@ -115,14 +115,14 @@ public class RectangleAnimationImageFeedback extends
 		display.update();
 
 	}
-		
+
 	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		changeCoordinates();
 		captureImages();
 		return super.jobInit(engine);
 	}
-	
+
 	@Override
 	public void addStartRect(Rectangle rect) {
 		if (rect == null)

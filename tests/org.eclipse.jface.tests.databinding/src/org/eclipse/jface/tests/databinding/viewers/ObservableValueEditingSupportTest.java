@@ -46,11 +46,6 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 
 	private Bean bean;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.tests.databinding.AbstractSWTTestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -100,7 +95,7 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	protected void closeCellEditor() {
 		editingSupport.text.notifyListeners(SWT.DefaultSelection, new Event());

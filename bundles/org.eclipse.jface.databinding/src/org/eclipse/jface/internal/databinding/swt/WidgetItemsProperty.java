@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Matthew Hall and others.
+ * Copyright (c) 2009, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.List;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class WidgetItemsProperty extends WidgetDelegatingListProperty {
 	private IListProperty cCombo;
@@ -26,7 +26,7 @@ public class WidgetItemsProperty extends WidgetDelegatingListProperty {
 	private IListProperty list;
 
 	/**
-	 * 
+	 *
 	 */
 	public WidgetItemsProperty() {
 		super(String.class);

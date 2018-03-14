@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 BestSolution.at and others.
+ * Copyright (c) 2012, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * method that performs the "visual state persit" operation
  * <p>
  * This annotation must not be applied to more than one method on a class. If multiple methods of
- * the class are tagged with this this annotation, only one of them will be called to persist visual 
+ * the class are tagged with this this annotation, only one of them will be called to persist visual
  * state.
  * </p>
  * @since 1.0

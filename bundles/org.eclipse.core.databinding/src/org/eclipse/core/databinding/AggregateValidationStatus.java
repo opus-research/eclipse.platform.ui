@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Matt Carter - bug 182822
  *     Boris Bokowski - bug 218269
  *     Matthew Hall - bugs 218269, 146397, 249526, 267451
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 489098
  *******************************************************************************/
 package org.eclipse.core.databinding;
 
@@ -32,17 +33,17 @@ import org.eclipse.core.runtime.Status;
  * into a single status value. Instances of this class can be used as an
  * observable value with a value type of {@link IStatus}, or the static methods
  * can be called directly if an aggregated status result is only needed once.
- * 
+ *
  * @since 1.0
- * 
+ *
  */
-public final class AggregateValidationStatus extends ComputedValue {
+public final class AggregateValidationStatus extends ComputedValue<IStatus> {
 	/**
 	 * Constant denoting an aggregation strategy that merges multiple non-OK
 	 * status objects in a {@link MultiStatus}. Returns an OK status result if
 	 * all statuses from the given validation status providers are the an OK
 	 * status. Returns a single status if there is only one non-OK status.
-	 * 
+	 *
 	 * @see #getStatusMerged(Collection)
 	 */
 	public static final int MERGED = 1;
@@ -52,7 +53,7 @@ public final class AggregateValidationStatus extends ComputedValue {
 	 * severe status from the given validation status providers. If there is
 	 * more than one status at the same severity level, it picks the first one
 	 * it encounters.
-	 * 
+	 *
 	 * @see #getStatusMaxSeverity(Collection)
 	 */
 	public static final int MAX_SEVERITY = 2;
@@ -63,7 +64,7 @@ public final class AggregateValidationStatus extends ComputedValue {
 	/**
 	 * Creates a new aggregate validation status observable for the given data
 	 * binding context.
-	 * 
+	 *
 	 * @param dbc
 	 *            a data binding context
 	 * @param strategy
@@ -110,7 +111,7 @@ public final class AggregateValidationStatus extends ComputedValue {
 	}
 
 	@Override
-	protected Object calculate() {
+	protected IStatus calculate() {
 		IStatus result;
 		if (strategy == MERGED) {
 			result = getStatusMerged(validationStatusProviders);
@@ -125,7 +126,7 @@ public final class AggregateValidationStatus extends ComputedValue {
 	 * {@link MultiStatus}. Returns an OK status result if all statuses from the
 	 * given validation status providers are the an OK status. Returns a single
 	 * status if there is only one non-OK status.
-	 * 
+	 *
 	 * @param validationStatusProviders
 	 *            a collection of validation status providers
 	 * @return a merged status
@@ -161,7 +162,7 @@ public final class AggregateValidationStatus extends ComputedValue {
 	 * Returns a status that always returns the most severe status from the
 	 * given validation status providers. If there is more than one status at
 	 * the same severity level, it picks the first one it encounters.
-	 * 
+	 *
 	 * @param validationStatusProviders
 	 *            a collection of validation status providers
 	 * @return a single status reflecting the most severe status from the given

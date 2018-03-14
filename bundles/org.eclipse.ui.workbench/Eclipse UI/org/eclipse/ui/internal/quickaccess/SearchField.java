@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
+ *     Tom Hochstein (Freescale) - Bug 393703: NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 428050, 472654
  *     Brian de Alwis - Fix size computation to account for trim
+ *     Markus Kuppe <bugs.eclipse.org@lemmster.de> - Bug 449485: [QuickAccess] "Widget is disposed" exception in errorlog during shutdown due to quickaccess.SearchField.storeDialog
+ *     Elena Laskavaia <elaskavaia.cdt@gmail.com> - Bug 433746: [QuickAccess] SWTException on closing quick access shell
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 488926
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
@@ -51,8 +54,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -90,13 +91,13 @@ public class SearchField {
 
 	private MWindow window;
 
-	private Map<String, QuickAccessProvider> providerMap = new HashMap<String, QuickAccessProvider>();
+	private Map<String, QuickAccessProvider> providerMap = new HashMap<>();
 
-	private Map<String, QuickAccessElement> elementMap = new HashMap<String, QuickAccessElement>();
+	private Map<String, QuickAccessElement> elementMap = new HashMap<>();
 
-	private Map<QuickAccessElement, ArrayList<String>> textMap = new HashMap<QuickAccessElement, ArrayList<String>>();
+	private Map<QuickAccessElement, ArrayList<String>> textMap = new HashMap<>();
 
-	private LinkedList<QuickAccessElement> previousPicksList = new LinkedList<QuickAccessElement>();
+	private LinkedList<QuickAccessElement> previousPicksList = new LinkedList<>();
 	private int dialogHeight = -1;
 	private int dialogWidth = -1;
 	private Control previousFocusControl;
@@ -108,13 +109,9 @@ public class SearchField {
 	private String selectedString = ""; //$NON-NLS-1$
 	private AccessibleAdapter accessibleListener;
 
-	// private Object invokingCommandKeySequences;
-	// private Object invokingCommand;
-
 	@PostConstruct
 	void createWidget(final Composite parent, MApplication application, MWindow window) {
 		this.window = window;
-		// borderColor = new Color(parent.getDisplay(), 170, 176, 191);
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
 		text = createText(comp);
@@ -201,13 +198,6 @@ public class SearchField {
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
-		shell.addShellListener(new ShellAdapter() {
-			@Override
-			public void shellClosed(ShellEvent e) {
-				quickAccessContents.doClose();
-				e.doit = false;
-			}
-		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
@@ -232,7 +222,7 @@ public class SearchField {
 
 				previousFocusControl = (Control) e.getSource();
 			}
-			
+
 		});
 		table.addFocusListener(new FocusAdapter() {
 			@Override
@@ -291,6 +281,7 @@ public class SearchField {
 
 	private Text createText(Composite parent) {
 		Text text = new Text(parent, SWT.SEARCH);
+		text.setToolTipText(QuickAccessMessages.QuickAccess_TooltipDescription);
 		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
 		GC gc = new GC(text);
@@ -413,14 +404,14 @@ public class SearchField {
 		int preferredWidth = dialogWidth == -1 ? 350 : dialogWidth;
 		int width = Math.max(preferredWidth, compBounds.width);
 		int height = dialogHeight == -1 ? 250 : dialogHeight;
-		
+
 		// If size would extend past the right edge of the shell, try to move it
 		// to the left of the text
 		Rectangle shellBounds = text.getShell().getBounds();
 		if (compBounds.x + width > shellBounds.x + shellBounds.width){
 			compBounds.x = Math.max(shellBounds.x, (compBounds.x + compBounds.width - width));
 		}
-		
+
 		shell.setBounds(getConstrainedShellBounds(display, new Rectangle(compBounds.x, compBounds.y
 				+ compBounds.height, width, height)));
 		shell.layout();
@@ -441,7 +432,7 @@ public class SearchField {
 
 	/**
 	 * Checks if the text or shell has focus. If not, closes the shell.
-	 * 
+	 *
 	 * @param table
 	 *            the shell's table
 	 * @param text
@@ -532,7 +523,7 @@ public class SearchField {
 						QuickAccessElement quickAccessElement = quickAccessProvider
 								.getElementForId(orderedElements[i]);
 						if (quickAccessElement != null) {
-							ArrayList<String> arrayList = new ArrayList<String>();
+							ArrayList<String> arrayList = new ArrayList<>();
 							for (int j = arrayIndex; j < arrayIndex + numTexts; j++) {
 								String text = textArray[j];
 								// text length can be zero for old workspaces,
@@ -561,7 +552,7 @@ public class SearchField {
 		String[] orderedElements = new String[previousPicksList.size()];
 		String[] orderedProviders = new String[previousPicksList.size()];
 		String[] textEntries = new String[previousPicksList.size()];
-		ArrayList<String> arrayList = new ArrayList<String>();
+		ArrayList<String> arrayList = new ArrayList<>();
 		for (int i = 0; i < orderedElements.length; i++) {
 			QuickAccessElement quickAccessElement = previousPicksList.get(i);
 			ArrayList<String> elementText = textMap.get(quickAccessElement);
@@ -577,8 +568,8 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		dialogSettings.put(DIALOG_HEIGHT, dialogHeight);
+		dialogSettings.put(DIALOG_WIDTH, dialogWidth);
 	}
 
 	private IDialogSettings getDialogSettings() {
@@ -624,7 +615,7 @@ public class SearchField {
 		// Add rememberedText to list of strings for element in textMap
 		ArrayList<String> textList = textMap.get(element);
 		if (textList == null) {
-			textList = new ArrayList<String>();
+			textList = new ArrayList<>();
 			textMap.put(element, textList);
 		}
 
@@ -658,7 +649,7 @@ public class SearchField {
 	/**
 	 * Returns the quick access shell for testing. Should not be referenced
 	 * outside of the tests.
-	 * 
+	 *
 	 * @return the current quick access shell or <code>null</code>
 	 */
 	public Shell getQuickAccessShell() {
@@ -668,7 +659,7 @@ public class SearchField {
 	/**
 	 * Returns the quick access search text for testing. Should not be
 	 * referenced outside of the tests.
-	 * 
+	 *
 	 * @return the search text in the workbench window or <code>null</code>
 	 */
 	public Text getQuickAccessSearchText() {
@@ -678,7 +669,7 @@ public class SearchField {
 	/**
 	 * Returns the table in the shell for testing. Should not be referenced
 	 * outside of the tests.
-	 * 
+	 *
 	 * @return the table created in the shell or <code>null</code>
 	 */
 	public Table getQuickAccessTable(){

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
@@ -27,27 +27,19 @@ import org.eclipse.ui.tests.views.properties.tabbed.override.items.WarningItem;
  * properties view before the migration to the tabbed properties view and the
  * override tabs support. When elements are selected in the OverrideTestsView,
  * TabFolder/TabItem are displayed for the elements.
- * 
+ *
  * @author Anthony Hunter
  * @since 3.4
  */
 public class BasicTabFolder extends AbstractTabFolder {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see asd.views.folders.AbstractSampleViewFolder#appliesTo(asd.views.elements.ISampleViewElement)
-	 */
+	@Override
 	public boolean appliesTo(Element element) {
 		return ((element instanceof Information) ||
 				(element instanceof Warning) || (element instanceof Error));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see asd.views.folders.IAaaFolder#getAaaItem()
-	 */
+	@Override
 	public IOverrideTestsItem[] getItem() {
 		return new IOverrideTestsItem[] { new InformationItem(),
 				new WarningItem(), new ErrorItem() };

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,37 +19,37 @@ package org.eclipse.core.databinding.observable;
 public abstract class ChangeSupport extends ChangeManager {
 
 	/**
-	 * @param realm 
+	 * @param realm
 	 */
 	public ChangeSupport(Realm realm) {
 		super(realm);
 	}
-	
+
 	@Override
 	public void addListener(Object listenerType,
 			IObservablesListener listener) {
 		super.addListener(listenerType, listener);
 	}
-	
+
 	@Override
 	public void removeListener(Object listenerType,
 			IObservablesListener listener) {
 		super.removeListener(listenerType, listener);
 	}
-	
+
 	@Override
 	public void fireEvent(ObservableEvent event) {
 		super.fireEvent(event);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	protected abstract void firstListenerAdded();
-	
+
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	protected abstract void lastListenerRemoved();
@@ -60,7 +60,7 @@ public abstract class ChangeSupport extends ChangeManager {
 	public void addChangeListener(IChangeListener listener) {
 		addListener(ChangeEvent.TYPE, listener);
 	}
-	
+
 	/**
 	 * @param listener
 	 */
@@ -74,7 +74,7 @@ public abstract class ChangeSupport extends ChangeManager {
 	public void addStaleListener(IStaleListener listener) {
 		addListener(StaleEvent.TYPE, listener);
 	}
-	
+
 	/**
 	 * @param listener
 	 */
@@ -83,7 +83,7 @@ public abstract class ChangeSupport extends ChangeManager {
 	}
 
 	/**
-	 * @param listener 
+	 * @param listener
 	 * @since 1.2
 	 */
 	public void addDisposeListener(IDisposeListener listener) {

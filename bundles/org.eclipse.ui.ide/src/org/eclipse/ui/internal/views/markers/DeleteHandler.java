@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2011 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,17 +28,12 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * DeleteHandler is the handler for the deletion of a marker.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class DeleteHandler extends MarkerViewHandler {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 
@@ -47,7 +42,7 @@ public class DeleteHandler extends MarkerViewHandler {
 			return this;
 
 		final IMarker[] selected = getSelectedMarkers(event);
-		
+
 		// Verify.
 		MessageDialog dialog = new MessageDialog(
 				view.getSite().getShell(),
@@ -55,13 +50,13 @@ public class DeleteHandler extends MarkerViewHandler {
 				null, // icon
 				MarkerMessages.deleteActionConfirmMessage,
 				MessageDialog.WARNING,
-				new String[] { IDialogConstants.YES_LABEL,
-						IDialogConstants.NO_LABEL }, 0);
+				0,
+				IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL);
 
 		if (dialog.open() != 0) {
 			return view;
 		}
-		
+
 		WorkspaceJob deleteJob= new WorkspaceJob(IDEWorkbenchMessages.MarkerDeleteHandler_JobTitle) { //See Bug#250807
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,7 @@ public class MoveResourceAction extends CopyResourceAction {
      * Creates a new action.
      *
      * @param shell the shell for any dialogs
-     * 
+     *
      * @deprecated {@link #MoveResourceAction(IShellProvider)}
      */
     @Deprecated
@@ -59,7 +59,7 @@ public class MoveResourceAction extends CopyResourceAction {
 
     /**
      * Creates a new action.
-     * 
+     *
      * @param provider the shell for any dialogs.
      * @since 3.4
      */
@@ -67,7 +67,7 @@ public class MoveResourceAction extends CopyResourceAction {
     	super(provider, IDEWorkbenchMessages.MoveResourceAction_text);
     	initAction();
     }
-    
+
     /**
      * Initializes the workbench
      */
@@ -77,7 +77,7 @@ public class MoveResourceAction extends CopyResourceAction {
         PlatformUI.getWorkbench().getHelpSystem().setHelp(this,
 				IIDEHelpContextIds.MOVE_RESOURCE_ACTION);
     }
-    
+
     @Override
 	protected CopyFilesAndFoldersOperation createOperation() {
         return new MoveFilesAndFoldersOperation(getShell());
@@ -112,7 +112,7 @@ public class MoveResourceAction extends CopyResourceAction {
                     copiedResources[i].getName()));
         }
     }
-    
+
     @Override
 	public void run() {
 		if (LTKLauncher.openMoveWizard(getStructuredSelection())) {

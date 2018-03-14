@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
 
 /**
- * A WorkingSetFactory is used to recreate a persisted WorkingSet 
+ * A WorkingSetFactory is used to recreate a persisted WorkingSet
  * object.
  */
 public class WorkingSetFactory implements IElementFactory {
@@ -39,13 +39,13 @@ public class WorkingSetFactory implements IElementFactory {
 		}
 
         AbstractWorkingSet workingSet = null;
-        
+
         if (isAggregate) {
 			workingSet = new AggregateWorkingSet(workingSetName, label, memento);
 		} else {
 			workingSet = new WorkingSet(workingSetName, label, memento);
 		}
-        
+
         if (workingSetEditPageId != null) {
             workingSet.setId(workingSetEditPageId);
         } else if (!isAggregate) {

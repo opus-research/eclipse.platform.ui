@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.commands.operations.IOperationHistoryListener;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,7 +39,6 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.operations.TimeTriggeredProgressMonitorDialog;
-import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.part.MultiPageEditorSite;
 import org.eclipse.ui.statushandlers.StatusManager;
 
@@ -68,7 +68,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * default, pruning does not occur and it is assumed that clients of the
  * particular undo context are pruning the history when necessary.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public abstract class OperationHistoryActionHandler extends Action implements
@@ -129,11 +129,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 			IWorkbenchWindow workbenchWindow = getWorkbenchWindow();
 			if (workbenchWindow == null)
 				return;
-			
+
 			Display display = workbenchWindow.getWorkbench().getDisplay();
 			if (display == null)
 				return;
-			
+
 			switch (event.getEventType()) {
 			case OperationHistoryEvent.OPERATION_ADDED:
 			case OperationHistoryEvent.OPERATION_REMOVED:
@@ -203,7 +203,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	/**
 	 * Construct an operation history action for the specified workbench window
 	 * with the specified undo context.
-	 * 
+	 *
 	 * @param site -
 	 *            the workbench part site for the action.
 	 * @param context -
@@ -341,31 +341,32 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	abstract IStatus runCommand(IProgressMonitor pm) throws ExecutionException;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (adapter.equals(IUndoContext.class)) {
-			return undoContext;
+			return (T) undoContext;
 		}
 		if (adapter.equals(IProgressMonitor.class)) {
 			if (progressDialog != null) {
-				return progressDialog.getProgressMonitor();
+				return (T) progressDialog.getProgressMonitor();
 			}
 		}
 		if (site != null) {
 			if (adapter.equals(Shell.class)) {
-				return getWorkbenchWindow().getShell();
+				return (T) getWorkbenchWindow().getShell();
 			}
 			if (adapter.equals(IWorkbenchWindow.class)) {
-				return getWorkbenchWindow();
+				return (T) getWorkbenchWindow();
 			}
 			if (adapter.equals(IWorkbenchPart.class)) {
-				return site.getPart();
+				return (T) site.getPart();
 			}
 			// Refer all other requests to the part itself.
 			// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=108144
 			IWorkbenchPart part = site.getPart();
 			if (part != null) {
-				return Util.getAdapter(part, adapter);
+				return Adapters.adapt(part, adapter);
 			}
 		}
 		return null;
@@ -383,7 +384,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	/**
 	 * The undo and redo subclasses should implement this.
-	 * 
+	 *
 	 * @return - a boolean indicating enablement state
 	 */
 	abstract boolean shouldBeEnabled();
@@ -392,7 +393,7 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * Set the context shown by the handler. Normally the context is set up when
 	 * the action handler is created, but the context can also be changed
 	 * dynamically.
-	 * 
+	 *
 	 * @param context
 	 *            the context to be used for the undo history
 	 */
@@ -409,11 +410,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 * Specify whether the action handler should actively prune the operation
 	 * history when invalid operations are encountered. The default value is
 	 * <code>false</code>.
-	 * 
+	 *
 	 * @param prune
 	 *            <code>true</code> if the history should be pruned by the
 	 *            handler, and <code>false</code> if it should not.
-	 * 
+	 *
 	 */
 	public void setPruneHistory(boolean prune) {
 		pruning = prune;

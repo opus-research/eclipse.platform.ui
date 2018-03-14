@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,12 +15,12 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
- * 
+ *
  * A no-op viewer filter used to prevent null return values from
  * {@link CommonFilterDescriptor#createFilter()}.
- * 
+ *
  * @since 3.2
- * 
+ *
  */
 public class SkeletonViewerFilter extends ViewerFilter {
 

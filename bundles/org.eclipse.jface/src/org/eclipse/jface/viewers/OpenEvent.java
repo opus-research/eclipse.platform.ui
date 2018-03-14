@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import java.util.EventObject;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * Event object describing an open which may be generated from a 
+ * Event object describing an open which may be generated from a
  * selection or default selection event. The source of these
  * events is a viewer.
  *
@@ -28,7 +28,7 @@ public class OpenEvent extends EventObject {
      * @since 3.1
      */
     private static final long serialVersionUID = 3761972652973176117L;
-    
+
     /**
      * The selection.
      */

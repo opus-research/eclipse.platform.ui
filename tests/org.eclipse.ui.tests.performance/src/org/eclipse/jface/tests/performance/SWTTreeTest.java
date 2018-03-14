@@ -59,13 +59,14 @@ public class SWTTreeTest extends BasicPerformanceTest {
 
 	/**
 	 * Test the getItems API.
-	 * 
+	 *
 	 */
 	public void testGetItems() throws CoreException {
 		openBrowser();
 
         exercise(new TestRunnable() {
-            public void run() throws Exception {
+            @Override
+			public void run() throws Exception {
                 processEvents();
                 startMeasuring();
                 for (int j = 0; j < TreeAddTest.TEST_COUNT; j++) {
@@ -73,24 +74,25 @@ public class SWTTreeTest extends BasicPerformanceTest {
                     processEvents();
                 }
                 stopMeasuring();
-            } 
+            }
         });
-        
+
 		commitMeasurements();
 		assertPerformance();
 		browserShell.close();
 	}
 
 	/**
-	 * @throws CoreException 
+	 * @throws CoreException
 	 * Test the getItem API.
-	 * 
+	 *
 	 */
 	public void testGetItemAt() throws CoreException {
 		openBrowser();
 
         exercise(new TestRunnable() {
-            public void run() throws Exception {
+            @Override
+			public void run() throws Exception {
                 processEvents();
                 startMeasuring();
                 for (int j = 0; j < TreeAddTest.TEST_COUNT; j++) {
@@ -98,7 +100,7 @@ public class SWTTreeTest extends BasicPerformanceTest {
                     processEvents();
                 }
                 stopMeasuring();
-            } 
+            }
         });
 
 		commitMeasurements();

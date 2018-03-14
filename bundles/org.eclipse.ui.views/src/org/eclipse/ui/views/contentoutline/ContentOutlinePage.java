@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,23 +34,22 @@ import org.eclipse.ui.part.Page;
  * This class should be subclassed.
  * </p>
  * <p>
- * Internally, each content outline page consists of a standard tree viewer; 
- * selections made in the tree viewer are reported as selection change events 
- * by the page (which is a selection provider). The tree viewer is not created 
+ * Internally, each content outline page consists of a standard tree viewer;
+ * selections made in the tree viewer are reported as selection change events
+ * by the page (which is a selection provider). The tree viewer is not created
  * until <code>createPage</code> is called; consequently, subclasses must extend
- * <code>createControl</code> to configure the tree viewer with a proper content 
+ * <code>createControl</code> to configure the tree viewer with a proper content
  * provider, label provider, and input element.
  * </p>
  * <p>Subclasses may provide a hint for constructing the tree viewer
  * using {@link #getTreeStyle()}.</p>
  * <p>
  * Note that those wanting to use a control other than internally created
- * <code>TreeViewer</code> will need to implement 
+ * <code>TreeViewer</code> will need to implement
  * <code>IContentOutlinePage</code> directly rather than subclassing this class.
- * </p> 
+ * </p>
  */
-public abstract class ContentOutlinePage extends Page implements
-        IContentOutlinePage, ISelectionChangedListener {
+public abstract class ContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener {
     private ListenerList selectionChangedListeners = new ListenerList();
 
     private TreeViewer treeViewer;
@@ -68,9 +67,9 @@ public abstract class ContentOutlinePage extends Page implements
     }
 
     /**
-     * The <code>ContentOutlinePage</code> implementation of this 
+     * The <code>ContentOutlinePage</code> implementation of this
      * <code>IContentOutlinePage</code> method creates a tree viewer. Subclasses
-     * must extend this method configure the tree viewer with a proper content 
+     * must extend this method configure the tree viewer with a proper content
      * provider, label provider, and input element.
      * @param parent
      */
@@ -79,11 +78,11 @@ public abstract class ContentOutlinePage extends Page implements
         treeViewer = new TreeViewer(parent, getTreeStyle());
         treeViewer.addSelectionChangedListener(this);
     }
-    
+
 	/**
 	 * A hint for the styles to use while constructing the TreeViewer.
 	 * <p>Subclasses may override.</p>
-	 * 
+	 *
 	 * @return the tree styles to use. By default, SWT.MULTI | SWT.H_SCROLL |
 	 *         SWT.V_SCROLL
 	 * @since 3.6
@@ -104,8 +103,8 @@ public abstract class ContentOutlinePage extends Page implements
 
         // fire the event
         Object[] listeners = selectionChangedListeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+        for (Object listener : listeners) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listener;
             SafeRunner.run(new SafeRunnable() {
                 @Override
 				public void run() {
@@ -134,7 +133,7 @@ public abstract class ContentOutlinePage extends Page implements
     /**
      * Returns this page's tree viewer.
      *
-     * @return this page's tree viewer, or <code>null</code> if 
+     * @return this page's tree viewer, or <code>null</code> if
      *   <code>createControl</code> has not been called yet
      */
     protected TreeViewer getTreeViewer() {
@@ -148,8 +147,7 @@ public abstract class ContentOutlinePage extends Page implements
     }
 
     @Override
-	public void removeSelectionChangedListener(
-            ISelectionChangedListener listener) {
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
 

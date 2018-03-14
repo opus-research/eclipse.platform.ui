@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,11 +30,11 @@ import org.eclipse.ui.internal.ide.Policy;
 /**
  * WorkspaceUndoMonitor monitors the workspace for resource changes and
  * periodically checks the undo history to make sure it is valid.
- * 
+ *
  * This class is not intended to be instantiated or used by clients.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class WorkspaceUndoMonitor {
 
@@ -55,7 +55,7 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get the singleton instance of this class.
-	 * 
+	 *
 	 * @return the singleton instance of this class.
 	 */
 	public static WorkspaceUndoMonitor getInstance() {
@@ -107,31 +107,23 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get a change listener for listening to resource changes.
-	 * 
+	 *
 	 * @return the resource change listeners
 	 */
 	private IResourceChangeListener getResourceChangeListener() {
-		return new IResourceChangeListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
-			 */
-			@Override
-			public void resourceChanged(IResourceChangeEvent event) {
-				// If there is an operation in progress, this event is to be
-				// ignored.
-				if (operationInProgress != null) {
-					return;
-				}
-				if (event.getType() == IResourceChangeEvent.POST_CHANGE
-						|| event.getType() == IResourceChangeEvent.POST_BUILD) {
-					// For now, we consider any change a change worth tracking.
-					// We can be more specific later if warranted.
-					incrementChangeCount();
-					if (numChanges >= CHANGE_THRESHHOLD) {
-						checkOperationHistory();
-					}
+		return event -> {
+			// If there is an operation in progress, this event is to be
+			// ignored.
+			if (operationInProgress != null) {
+				return;
+			}
+			if (event.getType() == IResourceChangeEvent.POST_CHANGE
+					|| event.getType() == IResourceChangeEvent.POST_BUILD) {
+				// For now, we consider any change a change worth tracking.
+				// We can be more specific later if warranted.
+				incrementChangeCount();
+				if (numChanges >= CHANGE_THRESHHOLD) {
+					checkOperationHistory();
 				}
 			}
 		};
@@ -139,43 +131,33 @@ public class WorkspaceUndoMonitor {
 
 	/**
 	 * Get a change listener for listening to operation history changes.
-	 * 
+	 *
 	 * @return the resource change listeners
 	 */
 	private IOperationHistoryListener getOperationHistoryListener() {
-		return new IOperationHistoryListener() {
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.core.commands.operations.IOperationHistoryListener#historyNotification(org.eclipse.core.commands.operations.OperationHistoryEvent)
-			 */
-			@Override
-			public void historyNotification(OperationHistoryEvent event) {
-				// We only care about events that have the workspace undo
-				// context.
-				if (!event.getOperation().hasContext(
-						WorkspaceUndoUtil.getWorkspaceUndoContext())) {
-					return;
-				}
-				switch (event.getEventType()) {
-				case OperationHistoryEvent.ABOUT_TO_EXECUTE:
-				case OperationHistoryEvent.ABOUT_TO_UNDO:
-				case OperationHistoryEvent.ABOUT_TO_REDO:
-					operationInProgress = event.getOperation();
-					break;
-				case OperationHistoryEvent.DONE:
-				case OperationHistoryEvent.UNDONE:
-				case OperationHistoryEvent.REDONE:
-					resetChangeCount();
-					operationInProgress = null;
-					break;
-				case OperationHistoryEvent.OPERATION_NOT_OK:
-					operationInProgress = null;
-					break;
-				}
+		return event -> {
+			// We only care about events that have the workspace undo
+			// context.
+			if (!event.getOperation().hasContext(
+					WorkspaceUndoUtil.getWorkspaceUndoContext())) {
+				return;
 			}
-
+			switch (event.getEventType()) {
+			case OperationHistoryEvent.ABOUT_TO_EXECUTE:
+			case OperationHistoryEvent.ABOUT_TO_UNDO:
+			case OperationHistoryEvent.ABOUT_TO_REDO:
+				operationInProgress = event.getOperation();
+				break;
+			case OperationHistoryEvent.DONE:
+			case OperationHistoryEvent.UNDONE:
+			case OperationHistoryEvent.REDONE:
+				resetChangeCount();
+				operationInProgress = null;
+				break;
+			case OperationHistoryEvent.OPERATION_NOT_OK:
+				operationInProgress = null;
+				break;
+			}
 		};
 	}
 

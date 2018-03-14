@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,21 +27,21 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 /**
  * This is the contribution item that is used to add a help search field to
  * the cool bar.
- * 
+ *
  * @since 3.1
  */
 public class HelpSearchContributionItem extends ControlContribution {
 	private static final String ID = "org.eclipse.ui.helpSearch"; //$NON-NLS-1$
-	
+
 	private IWorkbenchWindow window;
 
 	private Combo combo;
 
 	private int MAX_ITEM_COUNT = 10;
-	
+
 	/**
 	 * Creates the contribution item.
-	 * 
+	 *
 	 * @param window the window
 	 */
 	public HelpSearchContributionItem(IWorkbenchWindow window) {
@@ -50,7 +50,7 @@ public class HelpSearchContributionItem extends ControlContribution {
 
 	/**
 	 * Creates the contribution item.
-	 * 
+	 *
 	 * @param window the window
 	 * @param id the contribution item id
 	 */
@@ -60,19 +60,16 @@ public class HelpSearchContributionItem extends ControlContribution {
 		this.window = window;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.ControlContribution#createControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected Control createControl(Composite parent) {
 		combo = new Combo(parent, SWT.NONE);
-		combo.setToolTipText(WorkbenchMessages.WorkbenchWindow_searchCombo_toolTip); 
+		combo.setToolTipText(WorkbenchMessages.WorkbenchWindow_searchCombo_toolTip);
 		String[] items = WorkbenchPlugin.getDefault().getDialogSettings()
 				.getArray(ID);
 		if (items != null) {
 			combo.setItems(items);
 		}
-		combo.setText(WorkbenchMessages.WorkbenchWindow_searchCombo_text); 
+		combo.setText(WorkbenchMessages.WorkbenchWindow_searchCombo_text);
 		combo.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
@@ -93,9 +90,6 @@ public class HelpSearchContributionItem extends ControlContribution {
 		return combo;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.ControlContribution#computeWidth(org.eclipse.swt.widgets.Control)
-	 */
 	@Override
 	protected int computeWidth(Control control) {
 		return control.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;

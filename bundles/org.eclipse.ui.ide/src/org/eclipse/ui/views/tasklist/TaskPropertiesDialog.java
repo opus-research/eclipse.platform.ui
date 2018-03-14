@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 	 * resource and initial attributes for the new task, use
 	 * <code>setResource</code> and <code>setInitialAttributes</code>. To
 	 * show or modify an existing task, use <code>setMarker</code>.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 */
@@ -43,13 +43,6 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 		super(parentShell);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
-	 * 
-	 * @since 3.2
-	 */
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
@@ -60,10 +53,10 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
 		}
 		return section;
 	}
-	
+
     /**
      * Sets the marker to show or modify.
-     * 
+     *
      * @param marker the marker, or <code>null</code> to create a new marker
      */
     @Override
@@ -76,7 +69,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the marker being created or modified.
      * For a new marker, this returns <code>null</code> until
      * the dialog returns, but is non-null after.
-     * 
+     *
      * @return the marker
      */
     @Override
@@ -88,7 +81,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
     /**
      * Sets the resource to use when creating a new task.
      * If not set, the new task is created on the workspace root.
-     * 
+     *
      * @param resource the resource
      */
     @Override
@@ -101,7 +94,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the resource to use when creating a new task,
      * or <code>null</code> if none has been set.
      * If not set, the new task is created on the workspace root.
-     * 
+     *
      * @return the resource
      */
     @Override
@@ -113,7 +106,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
     /**
      * Sets initial attributes to use when creating a new task.
      * If not set, the new task is created with default attributes.
-     * 
+     *
      * @param initialAttributes the initial attributes
      */
     @Override
@@ -126,7 +119,7 @@ public class TaskPropertiesDialog extends DialogTaskProperties {
      * Returns the initial attributes to use when creating a new task,
      * or <code>null</code> if not set.
      * If not set, the new task is created with default attributes.
-     * 
+     *
      * @return the initial attributes
      */
     @Override

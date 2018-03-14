@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class DetailsAreaManager {
 	/**
 	 * This method is responsible for creating details area on the specified
 	 * Composite and displaying specified StatusAdapter
-	 * 
+	 *
 	 * @param parent
 	 *            A composite on which should be the details area created.
 	 * @param statusAdapter
@@ -65,7 +65,7 @@ public class DetailsAreaManager {
 
 	/**
 	 * Returns current detail area provider.
-	 * 
+	 *
 	 * @return current detail area provider.
 	 */
 	public AbstractStatusAreaProvider getProvider() {
@@ -80,7 +80,7 @@ public class DetailsAreaManager {
 	/**
 	 * This method allows to check if the details area is open (physically
 	 * constructed).
-	 * 
+	 *
 	 * @return true if the area is open, false otherwise
 	 */
 	public boolean isOpen() {

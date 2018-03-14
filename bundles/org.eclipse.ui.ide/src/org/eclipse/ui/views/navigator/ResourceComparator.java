@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- * 
+ *
  * @since 3.3
  */
 public class ResourceComparator extends ViewerComparator {
@@ -51,7 +51,7 @@ public class ResourceComparator extends ViewerComparator {
     /**
      * Creates a resource sorter that will use the given sort criteria.
      *
-     * @param criteria the sort criterion to use: one of <code>NAME</code> or 
+     * @param criteria the sort criterion to use: one of <code>NAME</code> or
      *   <code>TYPE</code>
      */
     public ResourceComparator(int criteria) {
@@ -60,7 +60,7 @@ public class ResourceComparator extends ViewerComparator {
     }
 
     /**
-     * Returns an integer value representing the relative sort priority of the 
+     * Returns an integer value representing the relative sort priority of the
      * given element based on its class.
      * <p>
      * <ul>
@@ -80,13 +80,10 @@ public class ResourceComparator extends ViewerComparator {
         return 0;
     }
 
-    /* (non-Javadoc)
-     * Method declared on ViewerComparator.
-     */
     @Override
 	public int compare(Viewer viewer, Object o1, Object o2) {
         //have to deal with non-resources in navigator
-        //if one or both objects are not resources, returned a comparison 
+        //if one or both objects are not resources, returned a comparison
         //based on class.
         if (!(o1 instanceof IResource && o2 instanceof IResource)) {
             return compareClass(o1, o2);
@@ -115,7 +112,7 @@ public class ResourceComparator extends ViewerComparator {
      *
      * @param element1 the first element to be ordered
      * @param element2 the second element to be ordered
-     * @return a negative number if the first element is less  than the 
+     * @return a negative number if the first element is less  than the
      *  second element; the value <code>0</code> if the first element is
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
@@ -130,7 +127,7 @@ public class ResourceComparator extends ViewerComparator {
      *
      * @param resource1 the first resource element to be ordered
      * @param resource2 the second resource element to be ordered
-     * @return a negative number if the first element is less  than the 
+     * @return a negative number if the first element is less  than the
      *  second element; the value <code>0</code> if the first element is
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
@@ -146,7 +143,7 @@ public class ResourceComparator extends ViewerComparator {
      *
      * @param resource1 the first resource element to be ordered
      * @param resource2 the second resource element to be ordered
-     * @return a negative number if the first element is less  than the 
+     * @return a negative number if the first element is less  than the
      *  second element; the value <code>0</code> if the first element is
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
@@ -189,9 +186,9 @@ public class ResourceComparator extends ViewerComparator {
 
     /**
      * Sets the sort criteria of this sorter.
-     * 
-     * @param criteria the sort criterion: 
-     *	one of <code>ResourceSorter.NAME</code> or 
+     *
+     * @param criteria the sort criterion:
+     *	one of <code>ResourceSorter.NAME</code> or
      *	<code>ResourceSorter.TYPE</code>
      */
     public void setCriteria(int criteria) {

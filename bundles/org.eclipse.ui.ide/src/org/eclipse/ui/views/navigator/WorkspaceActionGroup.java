@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -59,7 +59,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
     private OpenResourceAction openProjectAction;
 
     private CloseResourceAction closeProjectAction;
-    
+
     private CloseUnrelatedProjectsAction closeUnrelatedProjectsAction;
 
     private RefreshAction refreshAction;
@@ -86,8 +86,8 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
      * Adds the build, open project, close project and refresh resource
      * actions to the context menu.
      * <p>
-     * The following conditions apply: 
-     * 	build-only projects selected, auto build disabled, at least one 
+     * The following conditions apply:
+     * 	build-only projects selected, auto build disabled, at least one
      * 		builder present
      * 	open project-only projects selected, at least one closed project
      * 	close project-only projects selected, at least one open project
@@ -100,7 +100,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
      * <p>
      * No disabled action should be on the context menu.
      * </p>
-     * 
+     *
      * @param menu context menu to add actions to
      */
     @Override
@@ -110,20 +110,13 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         boolean isProjectSelection = true;
         boolean hasOpenProjects = false;
         boolean hasClosedProjects = false;
-        boolean hasBuilder = true; // false if any project is closed or does not have builder 
-        Iterator resources = selection.iterator();
+        boolean hasBuilder = true; // false if any project is closed or does not have builder
+		Iterator<?> resources = selection.iterator();
 
         while (resources.hasNext()
                 && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
             Object next = resources.next();
-            IProject project = null;
-
-            if (next instanceof IProject) {
-				project = (IProject) next;
-			} else if (next instanceof IAdaptable) {
-				project = (IProject) ((IAdaptable) next)
-                        .getAdapter(IProject.class);
-			}
+			IProject project = Adapters.adapt(next, IProject.class);
 
             if (project == null) {
                 isProjectSelection = false;
@@ -192,7 +185,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
 				return true;
 			}
         } catch (CoreException e) {
-            // Cannot determine if project has builders. Project is closed 
+            // Cannot determine if project has builders. Project is closed
             // or does not exist. Fall through to return false.
         }
         return false;
@@ -219,17 +212,14 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         					op.run(monitor);
         					Shell shell = provider.getShell();
 							if (shell != null && !shell.isDisposed()) {
-								shell.getDisplay().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										TreeViewer viewer = navigator
-												.getViewer();
-										if (viewer != null
-												&& viewer.getControl() != null
-												&& !viewer.getControl()
-														.isDisposed()) {
-											viewer.refresh();
-										}
+								shell.getDisplay().asyncExec(() -> {
+									TreeViewer viewer = navigator
+											.getViewer();
+									if (viewer != null
+											&& viewer.getControl() != null
+											&& !viewer.getControl()
+													.isDisposed()) {
+										viewer.refresh();
 									}
 								});
 							}
@@ -244,7 +234,7 @@ public class WorkspaceActionGroup extends ResourceNavigatorActionGroup {
         				}
         				return errorStatus[0];
         			}
-        			
+
         		};
         		ISchedulingRule rule = op.getRule();
         		if (rule != null) {

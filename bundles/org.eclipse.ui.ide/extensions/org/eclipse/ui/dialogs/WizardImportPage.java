@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * selection facilities.
  * </p>
  * <p>
- * Subclasses must implement 
+ * Subclasses must implement
  * <ul>
  *   <li><code>createSourceGroup</code></li>
  * </ul>
@@ -68,7 +68,7 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
     private Button containerBrowseButton;
 
     /**
-     * Creates an import wizard page. If the initial resource selection 
+     * Creates an import wizard page. If the initial resource selection
      * contains exactly one container resource then it will be used as the default
      * import destination.
      *
@@ -97,8 +97,8 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * The <code>WizardImportPage</code> implementation of this 
-     * <code>WizardDataTransferPage</code> method returns <code>true</code>. 
+     * The <code>WizardImportPage</code> implementation of this
+     * <code>WizardDataTransferPage</code> method returns <code>true</code>.
      * Subclasses may override this method.
      */
     @Override
@@ -106,9 +106,6 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
         return true;
     }
 
-    /** (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
     @Override
 	public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
@@ -259,7 +256,7 @@ public abstract class WizardImportPage extends WizardDataTransferPage {
     }
 
     /**
-     * The <code>WizardImportPage</code> implementation of this 
+     * The <code>WizardImportPage</code> implementation of this
      * <code>Listener</code> method handles all events and enablements for controls
      * on this page. Subclasses may extend.
      */

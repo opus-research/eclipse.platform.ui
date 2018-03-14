@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,16 +17,16 @@ import org.eclipse.core.commands.common.NotDefinedException;
 /**
  * A label provider for instances of <code>NamedHandlerObject</code>, which
  * exposes the name as the label.
- * 
+ *
  * @since 3.2
  */
 public final class NamedHandleObjectLabelProvider extends LabelProvider {
-	
+
 	/**
 	 * The text of the element is simply the name of the element if its a
 	 * defined instance of <code>NamedHandleObject</code>. Otherwise, this
 	 * method just returns <code>null</code>.
-	 * 
+	 *
 	 * @param element
 	 *            The element for which the text should be retrieved; may be
 	 *            <code>null</code>.

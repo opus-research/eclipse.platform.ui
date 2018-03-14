@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,7 +50,7 @@ import org.eclipse.core.runtime.IStatus;
  * <li>This class will not forward {@link ValueChangingEvent} events from a
  * wrapped {@link IVetoableValue}.
  * </ul>
- * 
+ *
  * @since 1.2
  */
 public class ValidatedObservableValue extends AbstractObservableValue {
@@ -98,7 +98,7 @@ public class ValidatedObservableValue extends AbstractObservableValue {
 
 	/**
 	 * Constructs an observable value
-	 * 
+	 *
 	 * @param target
 	 *            the observable value to be wrapped
 	 * @param validationStatus

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 
 /**
  * An unchecked exception indicating a binding problem.
- * 
+ *
  * @since 1.0
  */
 public class BindingException extends RuntimeException {
@@ -28,7 +28,7 @@ public class BindingException extends RuntimeException {
 
 	/**
 	 * Creates a new BindingException with the given message.
-	 * 
+	 *
 	 * @param message
 	 */
 	public BindingException(String message) {
@@ -37,7 +37,7 @@ public class BindingException extends RuntimeException {
 
 	/**
 	 * Creates a new BindingException with the given message and cause.
-	 * 
+	 *
 	 * @param message
 	 * @param cause
 	 */

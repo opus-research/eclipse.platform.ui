@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Chris Gross (schtoo@schtoo.com) - patch for bug 16179
  *     Eugene Ostroukhov <eugeneo@symbian.org> - Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Paul Adams <padams@ittvis.com> - Bug 202534 - [Dialogs] SWT error in Wizard dialog when help is displayed and "Finish" is pressed
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -43,12 +44,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -93,10 +90,10 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	private IWizard wizard;
 
 	// Wizards to dispose
-	private ArrayList<IWizard> createdWizards = new ArrayList<IWizard>();
+	private ArrayList<IWizard> createdWizards = new ArrayList<>();
 
 	// Current nested wizards
-	private ArrayList<IWizard> nestedWizards = new ArrayList<IWizard>();
+	private ArrayList<IWizard> nestedWizards = new ArrayList<>();
 
 	// The currently displayed page.
 	private IWizardPage currentPage = null;
@@ -110,7 +107,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * <p>
 	 * The value <code>-1</code> indicates that the traverse listener needs to be installed.
 	 * </p>
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	private long timeWhenLastJobFinished= -1;
@@ -163,7 +160,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * A delay in milliseconds that reduces the risk that the user accidentally triggers a
 	 * button by pressing the 'Enter' key immediately after a job has finished.
-	 * 
+	 *
 	 * @since 3.6
 	 */
 	private static final int RESTORE_ENTER_DELAY= 500;
@@ -203,7 +200,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 		/**
 		 * Creates new layout object.
-		 * 
+		 *
 		 * @param mw
 		 *            the margin width
 		 * @param mh
@@ -255,7 +252,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		/**
 		 * Returns the client area for the given composite according to this
 		 * layout.
-		 * 
+		 *
 		 * @param c
 		 *            the composite
 		 * @return the client area rectangle
@@ -280,7 +277,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 		/**
 		 * Lays outs the page according to this layout.
-		 * 
+		 *
 		 * @param w
 		 *            the control
 		 */
@@ -291,7 +288,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		/**
 		 * Sets the location of the page so that its origin is in the upper left
 		 * corner.
-		 * 
+		 *
 		 * @param w
 		 *            the control
 		 */
@@ -302,7 +299,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Creates a new wizard dialog for the given wizard.
-	 * 
+	 *
 	 * @param parentShell
 	 *            the parent shell
 	 * @param newWizard
@@ -327,7 +324,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * About to start a long running operation triggered through the wizard.
 	 * Shows the progress monitor and disables the wizard's buttons and
 	 * controls.
-	 * 
+	 *
 	 * @param enableCancelButton
 	 *            <code>true</code> if the Cancel button should be enabled,
 	 *            and <code>false</code> if it should be disabled
@@ -342,19 +339,19 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				focusControl = null;
 			}
 			boolean needsProgressMonitor = wizard.needsProgressMonitor();
-			
+
 			// Set the busy cursor to all shells.
 			Display d = getShell().getDisplay();
 			waitCursor = new Cursor(d, SWT.CURSOR_WAIT);
 			setDisplayCursor(waitCursor);
-			
+
 			if (useCustomProgressMonitorPart) {
 				cancelButton.removeSelectionListener(cancelListener);
 				// Set the arrow cursor to the cancel component.
 				arrowCursor = new Cursor(d, SWT.CURSOR_ARROW);
 				cancelButton.setCursor(arrowCursor);
 			}
-			
+
 			// Deactivate shell
 			savedState = saveUIState(useCustomProgressMonitorPart && needsProgressMonitor && enableCancelButton);
 			if (focusControl != null) {
@@ -367,28 +364,25 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				}
 				progressMonitorPart.setVisible(true);
 			}
-			
+
 			// Install traverse listener once in order to implement 'Enter' and 'Space' key blocking
 			if (timeWhenLastJobFinished == -1) {
 				timeWhenLastJobFinished= 0;
-				getShell().addTraverseListener(new TraverseListener() {
-					@Override
-					public void keyTraversed(TraverseEvent e) {
-						if (e.detail == SWT.TRAVERSE_RETURN || (e.detail == SWT.TRAVERSE_MNEMONIC && e.keyCode == 32)) {
-							// We want to ignore the keystroke when we detect that it has been received within the
-							// delay period after the last operation has finished.  This prevents the user from accidentally
-							// hitting "Enter" or "Space", intending to cancel an operation, but having it processed exactly
-							// when the operation finished, thus traversing the wizard.  If there is another operation still
-							// running, the UI is locked anyway so we are not in this code.  This listener should fire only
-							// after the UI state is restored (which by definition means all jobs are done.
-							// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=287887
-							if (timeWhenLastJobFinished != 0 && System.currentTimeMillis() - timeWhenLastJobFinished < RESTORE_ENTER_DELAY) {
-								e.doit= false;
-								return;
-							}
-							timeWhenLastJobFinished= 0;
-						}}
-				});
+				getShell().addTraverseListener(e -> {
+					if (e.detail == SWT.TRAVERSE_RETURN || (e.detail == SWT.TRAVERSE_MNEMONIC && e.keyCode == 32)) {
+						// We want to ignore the keystroke when we detect that it has been received within the
+						// delay period after the last operation has finished.  This prevents the user from accidentally
+						// hitting "Enter" or "Space", intending to cancel an operation, but having it processed exactly
+						// when the operation finished, thus traversing the wizard.  If there is another operation still
+						// running, the UI is locked anyway so we are not in this code.  This listener should fire only
+						// after the UI state is restored (which by definition means all jobs are done.
+						// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=287887
+						if (timeWhenLastJobFinished != 0 && System.currentTimeMillis() - timeWhenLastJobFinished < RESTORE_ENTER_DELAY) {
+							e.doit= false;
+							return;
+						}
+						timeWhenLastJobFinished= 0;
+					}});
 			}
 		}
 		return savedState;
@@ -437,7 +431,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Calculates the difference in size between the given page and the page
 	 * container. A larger page results in a positive delta.
-	 * 
+	 *
 	 * @param page
 	 *            the page
 	 * @return the size difference encoded as a
@@ -483,13 +477,10 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		// Register help listener on the shell
-		newShell.addHelpListener(new HelpListener() {
-			@Override
-			public void helpRequested(HelpEvent event) {
-				// call perform help on the current page
-				if (currentPage != null) {
-					currentPage.performHelp();
-				}
+		newShell.addHelpListener(event -> {
+			// call perform help on the current page
+			if (currentPage != null) {
+				currentPage.performHelp();
 			}
 		});
 	}
@@ -501,7 +492,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * prevents the parent composite's columns from being made equal width in
 	 * order to remove the margin between the Back and Next buttons.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite to contain the buttons
 	 */
@@ -518,7 +509,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		finishButton = createButton(parent, IDialogConstants.FINISH_ID,
 				IDialogConstants.FINISH_LABEL, true);
 		cancelButton = createCancelButton(parent);
-		
+
 		if (parent.getDisplay().getDismissalAlignment() == SWT.RIGHT) {
             // Make the default button the right-most button.
             // See also special code in org.eclipse.jface.dialogs.Dialog#initializeBounds()
@@ -545,7 +536,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * button and registers for its selection events. Note that the number of
 	 * columns in the button bar composite is incremented. The Cancel button is
 	 * created specially to give it a removeable listener.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent button bar
 	 * @return the new Cancel button
@@ -557,14 +548,14 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		button.setText(IDialogConstants.CANCEL_LABEL);
 		setButtonLayoutData(button);
 		button.setFont(parent.getFont());
-		button.setData(new Integer(IDialogConstants.CANCEL_ID));
+		button.setData(Integer.valueOf(IDialogConstants.CANCEL_ID));
 		button.addSelectionListener(cancelListener);
 		return button;
 	}
 
 	/**
 	 * Return the cancel button if the id is a the cancel id.
-	 * 
+	 *
 	 * @param id
 	 *            the button id
 	 * @return the button corresponding to the button id
@@ -631,7 +622,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * <p>
 	 * The default implementation creates a progress monitor with a stop button will be created.
 	 * </p>
-	 * 
+	 *
 	 * @param composite the parent composite
 	 * @param pmlayout the layout
 	 * @return ProgressMonitorPart the progress monitor part
@@ -685,7 +676,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Creates the container that holds all pages.
-	 * 
+	 *
 	 * @param parent
 	 * @return Composite
 	 */
@@ -719,7 +710,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * selection events. Note that the number of columns in the button bar
 	 * composite is incremented. These buttons are created specially to prevent
 	 * any space between them.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent button bar
 	 * @return a composite containing the new buttons
@@ -745,7 +736,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				IDialogConstants.BACK_LABEL, false);
 		nextButton = createButton(composite, IDialogConstants.NEXT_ID,
 				IDialogConstants.NEXT_LABEL, false);
-		
+
 		// make sure screen readers skip visual '<', '>' chars on buttons:
 		final String backReaderText = IDialogConstants.BACK_LABEL.replace('<', ' ');
 		backButton.getAccessible().addAccessibleListener(new AccessibleAdapter() {
@@ -766,7 +757,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Creates and return a new wizard closing dialog without opening it.
-	 * 
+	 *
 	 * @return MessageDalog
 	 */
 	private MessageDialog createWizardClosingDialog() {
@@ -775,7 +766,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				null,
 				JFaceResources.getString("WizardClosingDialog.message"), //$NON-NLS-1$
 				MessageDialog.QUESTION,
-				new String[] { IDialogConstants.OK_LABEL }, 0) {
+				0, IDialogConstants.OK_LABEL) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
@@ -815,7 +806,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Returns the progress monitor for this wizard dialog (if it has one).
-	 * 
+	 *
 	 * @return the progress monitor, or <code>null</code> if this wizard
 	 *         dialog does not have one
 	 */
@@ -825,7 +816,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Returns the wizard this dialog is currently displaying.
-	 * 
+	 *
 	 * @return the current wizard
 	 */
 	protected IWizard getWizard() {
@@ -834,7 +825,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Closes this window.
-	 * 
+	 *
 	 * @return <code>true</code> if the window is (or was already) closed, and
 	 *         <code>false</code> if it is still open
 	 */
@@ -888,7 +879,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Notifies page changing listeners and returns result of page changing
 	 * processing to the sender.
-	 * 
+	 *
 	 * @param eventType
 	 * @return <code>true</code> if page changing listener completes
 	 *         successfully, <code>false</code> otherwise
@@ -906,7 +897,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * standard cancel processing. If there is a long running operation in
 	 * progress, this method posts an alert message saying that the wizard
 	 * cannot be closed.
-	 * 
+	 *
 	 * @return <code>true</code> if it is alright to close this dialog, and
 	 *         <code>false</code> if it is not
 	 */
@@ -926,7 +917,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Restores the enabled/disabled state of the given control.
-	 * 
+	 *
 	 * @param control
 	 *            the control
 	 * @param saveState
@@ -947,7 +938,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Restores the enabled/disabled state of the wizard dialog's buttons and
 	 * the tree of controls for the currently showing page.
-	 * 
+	 *
 	 * @param saveState
 	 *            a map containing the saved state as returned by
 	 *            <code>saveUIState</code>
@@ -973,12 +964,12 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * is set to <code>false</code>, the runnable will run in the UI thread
 	 * and it is the runnable's responsibility to call
 	 * <code>Display.readAndDispatch()</code> to ensure UI responsiveness.
-	 * 
+	 *
 	 * UI state is saved prior to executing the long-running operation and is
 	 * restored after the long-running operation completes executing. Any
 	 * attempt to change the UI state of the wizard in the long-running
 	 * operation will be nullified when original UI state is restored.
-	 * 
+	 *
 	 */
 	@Override
 	public void run(boolean fork, boolean cancelable,
@@ -1018,7 +1009,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Saves the enabled/disabled state of the given control in the given map,
 	 * which must be modifiable.
-	 * 
+	 *
 	 * @param control
 	 *            the control, or <code>null</code> if none
 	 * @param saveState
@@ -1043,7 +1034,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * buttons and the tree of controls for the currently showing page. All
 	 * these controls are disabled in the process, with the possible exception
 	 * of the Cancel button.
-	 * 
+	 *
 	 * @param keepCancelEnabled
 	 *            <code>true</code> if the Cancel button should remain
 	 *            enabled, and <code>false</code> if it should be disabled
@@ -1052,7 +1043,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * @see #restoreUIState
 	 */
 	private Map<String, Object> saveUIState(boolean keepCancelEnabled) {
-		Map<String, Object> savedState = new HashMap<String, Object>(10);
+		Map<String, Object> savedState = new HashMap<>(10);
 		saveEnableStateAndSet(backButton, savedState, "back", false); //$NON-NLS-1$
 		saveEnableStateAndSet(nextButton, savedState, "next", false); //$NON-NLS-1$
 		saveEnableStateAndSet(finishButton, savedState, "finish", false); //$NON-NLS-1$
@@ -1069,7 +1060,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Sets the given cursor for all shells currently active for this window's
 	 * display.
-	 * 
+	 *
 	 * @param c
 	 *            the cursor
 	 */
@@ -1082,7 +1073,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Sets the minimum page size used for the pages.
-	 * 
+	 *
 	 * @param minWidth
 	 *            the minimum page width
 	 * @param minHeight
@@ -1097,7 +1088,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Sets the minimum page size used for the pages.
-	 * 
+	 *
 	 * @param size
 	 *            the page size encoded as <code>new Point(width,height)</code>
 	 * @see #setMinimumPageSize(int,int)
@@ -1109,7 +1100,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Sets the size of all pages. The given size takes precedence over computed
 	 * sizes.
-	 * 
+	 *
 	 * @param width
 	 *            the page width
 	 * @param height
@@ -1124,7 +1115,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Sets the size of all pages. The given size takes precedence over computed
 	 * sizes.
-	 * 
+	 *
 	 * @param size
 	 *            the page size encoded as <code>new Point(width,height)</code>
 	 * @see #setPageSize(int,int)
@@ -1135,7 +1126,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Sets the wizard this dialog is currently displaying.
-	 * 
+	 *
 	 * @param newWizard
 	 *            the wizard
 	 */
@@ -1191,18 +1182,13 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			updateForPage(page);
 		} else {
 			final IWizardPage finalPage = page;
-			BusyIndicator.showWhile(getContents().getDisplay(), new Runnable() {
-				@Override
-				public void run() {
-					updateForPage(finalPage);
-				}
-			});
+			BusyIndicator.showWhile(getContents().getDisplay(), () -> updateForPage(finalPage));
 		}
 	}
 
 	/**
 	 * Update the receiver for the new page.
-	 * 
+	 *
 	 * @param page
 	 */
 	private void updateForPage(IWizardPage page) {
@@ -1216,9 +1202,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 			page.createControl(pageContainer);
 			// the page is responsible for ensuring the created control is
 			// accessible via getControl.
-			Assert.isNotNull(page.getControl(), JFaceResources.format(
-					JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
-					new Object[] { page.getName() }));
+			Assert.isNotNull(page.getControl(),
+					JFaceResources.format(JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
+							page.getName()));
 			// ensure the dialog is large enough for this page
 			updateSize(page);
 		}
@@ -1262,7 +1248,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * A long running operation triggered through the wizard was stopped either
 	 * by user input or by normal end. Hides the progress monitor and restores
 	 * the enable state wizard's buttons and controls.
-	 * 
+	 *
 	 * @param savedState
 	 *            the saved UI state as returned by <code>aboutToStart</code>
 	 * @see #aboutToStart
@@ -1273,7 +1259,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 				progressMonitorPart.setVisible(false);
 				progressMonitorPart.removeFromCancelComponent(cancelButton);
 			}
-			
+
 			@SuppressWarnings("unchecked")
 			Map<String,Object> state = (Map<String,Object>) savedState;
 			restoreUIState(state);
@@ -1366,7 +1352,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Changes the shell size to the given size, ensuring that it is no larger
 	 * than the display bounds.
-	 * 
+	 *
 	 * @param width
 	 *            the shell width
 	 * @param height
@@ -1382,7 +1368,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Computes the correct dialog size for the current page and resizes its shell if necessary.
 	 * Also causes the container to refresh its layout.
-	 * 
+	 *
 	 * @param page the wizard page to use to resize the dialog
 	 * @since 2.0
 	 */
@@ -1401,7 +1387,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Computes the correct dialog size for the given page and resizes its shell if necessary.
-	 * 
+	 *
 	 * @param page the wizard page
 	 */
 	private void updateSizeForPage(IWizardPage page) {
@@ -1418,7 +1404,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 
 	/**
 	 * Computes the correct dialog size for the given wizard and resizes its shell if necessary.
-	 * 
+	 *
 	 * @param sizingWizard the wizard
 	 */
 	private void updateSizeForWizard(IWizard sizingWizard) {
@@ -1487,12 +1473,12 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * Notifies any selection changed listeners that the selected page has
 	 * changed. Only listeners registered at the time this method is called are
 	 * notified.
-	 * 
+	 *
 	 * @param event
 	 *            a selection changed event
-	 * 
+	 *
 	 * @see IPageChangedListener#pageChanged
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	protected void firePageChanged(final PageChangedEvent event) {
@@ -1512,7 +1498,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * Adds a listener for page changes to the list of page changing listeners
 	 * registered for this dialog. Has no effect if an identical listener is
 	 * already registered.
-	 * 
+	 *
 	 * @param listener
 	 *            a page changing listener
 	 * @since 3.3
@@ -1524,7 +1510,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	/**
 	 * Removes the provided page changing listener from the list of page
 	 * changing listeners registered for the dialog.
-	 * 
+	 *
 	 * @param listener
 	 *            a page changing listener
 	 * @since 3.3
@@ -1537,10 +1523,10 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 	 * Notifies any page changing listeners that the currently selected dialog
 	 * page is changing. Only listeners registered at the time this method is
 	 * called are notified.
-	 * 
+	 *
 	 * @param event
 	 *            a selection changing event
-	 * 
+	 *
 	 * @see IPageChangingListener#handlePageChanging(PageChangingEvent)
 	 * @since 3.3
 	 */

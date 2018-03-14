@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 Tom Schindl and others.
+ * Copyright (c) 2010, 2015 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -334,7 +334,7 @@ public class ThemeEngine implements IThemeEngine {
 		Bundle bundle = FrameworkUtil.getBundle(ThemeEngine.class);
 		String osname = bundle.getBundleContext().getProperty("osgi.os");
 		// TODO: Need to differentiate win32 versions
-		String wsname = bundle.getBundleContext().getProperty("ogsi.ws");
+		String wsname = bundle.getBundleContext().getProperty("osgi.ws");
 		ArrayList<IConfigurationElement> matchingElements = new ArrayList<IConfigurationElement>();
 		for (IConfigurationElement element : elements) {
 			String elementOs = element.getAttribute("os");
@@ -523,7 +523,8 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return new InstanceScope().getNode(FrameworkUtil.getBundle(
+		return InstanceScope.INSTANCE.getNode(
+				FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 

@@ -967,7 +967,13 @@
             defaultHandler="org.eclipse.ui.internal.handlers.QuitHandler"
             description="%command.exit.description"
             id="org.eclipse.ui.file.exit"
-            name="%command.exit.name"/>
+            name="%command.exit.name">
+         <commandParameter
+               id="mayPrompt"
+               name="%command.exit.mayPrompt.name"
+               optional="true">
+         </commandParameter>
+      </command>
       <command
             name="%command.undo.name"
             description="%command.undo.description"
@@ -1156,6 +1162,12 @@
             description="%command.maximizePart.description"
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.maximizePart" />
+      <command
+            categoryId="org.eclipse.ui.category.window"
+            defaultHandler="org.eclipse.ui.internal.handlers.HideTrimBarsHandler"
+            description="%command.windowsHideTrimbars.description"
+            id="org.eclipse.ui.window.hidetrimbars"
+            name="%command.windowsHideTrimbars.name"/>
       <command
             categoryId="org.eclipse.ui.category.window"
             defaultHandler="org.eclipse.ui.internal.handlers.MinimizePartHandler"
@@ -2250,7 +2262,7 @@
             </with>
          </enabledWhen>
       </handler>
-      <handler
+       <handler
             class="org.eclipse.ui.internal.handlers.MaximizePartHandler"
             commandId="org.eclipse.ui.window.maximizePart">
          <enabledWhen>
@@ -2540,14 +2552,5 @@
             class="org.eclipse.ui.internal.about.AboutSystemPage"
             id="31.SystemPage">
           </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.themes">
-      <theme
-            id="org.eclipse.ui.theme1">
-      </theme>
-      <themeElementCategory
-            id="org.eclipse.ui.themeElementCategory1">
-      </themeElementCategory>
    </extension>
 </plugin>

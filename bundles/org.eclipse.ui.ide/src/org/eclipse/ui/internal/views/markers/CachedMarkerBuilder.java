@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IMemento;
@@ -33,9 +31,9 @@ import org.eclipse.ui.views.markers.internal.MarkerGroup;
 /**
  * The CachedMarkerBuilder is the object that generates the list of markers from
  * a generator.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class CachedMarkerBuilder {
 
@@ -43,38 +41,38 @@ public class CachedMarkerBuilder {
 	private static final String VALUE_NONE = "none"; //$NON-NLS-1$
 
 	// The MarkerContentGenerator we are using for building
-	private MarkerContentGenerator generator; 
+	private MarkerContentGenerator generator;
 	private MarkerUpdateJob updateJob;
 	private MarkersChangeListener markerListener;
 	private MarkerUpdateScheduler scheduler;
-	
+
 	private Markers markers;
 	private Markers markersClone;
-	
-	final Object MARKER_INCREMENTAL_UPDATE_FAMILY =new Object();
+
+	final Object MARKER_INCREMENTAL_UPDATE_FAMILY = new Object();
 	final Object CACHE_UPDATE_FAMILY = new Object();
 	final Object MARKERSVIEW_UPDATE_JOB_FAMILY;
-	
+
 	private IWorkbenchSiteProgressService progressService;
 
 	private MarkerGroup categoryGroup;
-	
+
 	private MarkerComparator comparator;
-	
+
 	private boolean[] changeFlags;
 
 	private IPropertyChangeListener workingSetListener;
 
 	private boolean active;
-	
+
 	private boolean building;
-	
+
 	private IMemento memento;
-	
+
 
 	/**
 	 * Create a new instance of the receiver. Update using the updateJob.
-	 * @param view 
+	 * @param view
 	 */
 	public CachedMarkerBuilder(ExtendedMarkersView view) {
 		active = false;
@@ -84,39 +82,36 @@ public class CachedMarkerBuilder {
 		markerListener = new MarkersChangeListener(view, this);
 		scheduler = new MarkerUpdateScheduler(view, this);
 	}
-	
-	void restoreState(IMemento memento) {
-		if (memento == null)
+
+	void restoreState(IMemento m) {
+		if (m == null) {
 			setDefaultCategoryGroup(getGenerator());
-		else {
+		} else {
 			// Set up the category group if it has been set or set a default.
-			String categoryGroupID = memento.getString(TAG_CATEGORY_GROUP);
-			if (categoryGroupID == null)
+			String categoryGroupID = m.getString(TAG_CATEGORY_GROUP);
+			if (categoryGroupID == null) {
 				setDefaultCategoryGroup(getGenerator());
-			else {
-				if (categoryGroupID.equals(VALUE_NONE))
+			} else {
+				if (categoryGroupID.equals(VALUE_NONE)) {
 					this.categoryGroup = null;
-				else {
-					MarkerGroup newGroup = getGenerator().getMarkerGroup(
-							categoryGroupID);
-					if (newGroup == null)
+				} else {
+					MarkerGroup newGroup = getGenerator().getMarkerGroup(categoryGroupID);
+					if (newGroup == null) {
 						setDefaultCategoryGroup(getGenerator());
-					else
+					} else {
 						this.categoryGroup = newGroup;
+					}
 				}
 			}
 		}
-		this.memento=memento;
+		this.memento = m;
 	}
-	/**
-	 * 
-	 */
+
 	void start() {
 		active = true;
 		registerTypesToListener();
-		PlatformUI.getWorkbench().getWorkingSetManager()
-				.addPropertyChangeListener(getWorkingSetListener());
-		
+		PlatformUI.getWorkbench().getWorkingSetManager().addPropertyChangeListener(getWorkingSetListener());
+
 		markerListener.start();
 		scheduleUpdate();
 	}
@@ -126,16 +121,15 @@ public class CachedMarkerBuilder {
 	 */
 	void dispose() {
 		markerListener.stop();
-		active=false;
+		active = false;
 		Job.getJobManager().cancel(MARKERSVIEW_UPDATE_JOB_FAMILY);
-		
-		if(workingSetListener!=null){
-			PlatformUI.getWorkbench().getWorkingSetManager()
-			.removePropertyChangeListener(getWorkingSetListener());
+
+		if (workingSetListener != null) {
+			PlatformUI.getWorkbench().getWorkingSetManager().removePropertyChangeListener(getWorkingSetListener());
 		}
-		
+
 		if (isIncremental()) {
-			if(incrementJob!=null){
+			if (incrementJob != null) {
 				incrementJob.clearEntries();
 			}
 		}
@@ -143,7 +137,7 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return the group used to generate categories.
-	 * 
+	 *
 	 * @return MarkerGroup or <code>null</code>.
 	 */
 	MarkerGroup getCategoryGroup() {
@@ -152,14 +146,15 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return a new instance of the receiver with the field
-	 * 
+	 *
 	 * @return MarkerComparator
 	 */
 	MarkerComparator getComparator() {
-		if(comparator==null){
+		if (comparator == null) {
 			MarkerField field = null;
-			if (getCategoryGroup() != null)
+			if (getCategoryGroup() != null) {
 				field = getCategoryGroup().getMarkerField();
+			}
 			comparator = new MarkerComparator(field, generator.getAllFields());
 			if (memento != null) {
 				comparator.restore(memento);
@@ -170,7 +165,7 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return the generator for the receiver.
-	 * 
+	 *
 	 * @return MarkerContentGenerator
 	 */
 	MarkerContentGenerator getGenerator() {
@@ -179,7 +174,7 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return the primary sort field
-	 * 
+	 *
 	 * @return MarkerField
 	 */
 	MarkerField getPrimarySortField() {
@@ -188,20 +183,21 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Get the sort direction of field
-	 * 
+	 *
 	 * @param field
 	 * @return int one of {@link MarkerComparator#ASCENDING} or
 	 *         {@link MarkerComparator#DESCENDING}
 	 */
 	int getSortDirection(MarkerField field) {
-		if (getComparator().descendingFields.contains(field))
+		if (getComparator().descendingFields.contains(field)) {
 			return MarkerComparator.DESCENDING;
+		}
 		return MarkerComparator.ASCENDING;
 	}
 
 	/**
 	 * Return the total number of markers.
-	 * 
+	 *
 	 * @return int
 	 */
 	int getTotalMarkerCount() {
@@ -210,13 +206,14 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return the total number of markers.
-	 * 
+	 *
 	 * @return int
 	 */
-	int getTotalMarkerCount(Markers markers) {
+	static int getTotalMarkerCount(Markers markers) {
 		MarkerSupportItem[] elements = markers.getElements();
-		if (elements.length == 0 || elements[0].isConcrete())
+		if (elements.length == 0 || elements[0].isConcrete()) {
 			return elements.length;
+		}
 		int length = 0;
 		for (int i = 0; i < elements.length; i++) {
 			length += elements[i].getChildren().length;
@@ -227,23 +224,23 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Return whether or not the receiver is building.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	boolean isBuilding() {
-		return building|| markerListener.isReceivingChange();
+		return building || markerListener.isReceivingChange();
 	}
 
 	/**
 	 * Update the flag that indicates if the markers are building/changing
 	 */
 	void setBuilding(boolean building) {
-		this.building =building;
+		this.building = building;
 	}
-	
+
 	/**
 	 * Return whether or not we are showing a hierarchy.
-	 * 
+	 *
 	 * @return <code>true</code> if a hierarchy is being shown.
 	 */
 	boolean isShowingHierarchy() {
@@ -252,30 +249,22 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Refresh the sort order and categories of the receiver.
-	 * 
 	 */
 	void refreshContents(IWorkbenchSiteProgressService service) {
 		try {
-			service.busyCursorWhile(new IRunnableWithProgress() {
-				@Override
-				public void run(IProgressMonitor monitor) {
-					SortingJob job=new SortingJob(CachedMarkerBuilder.this);
-					job.run(monitor);
-				}
+			service.busyCursorWhile(monitor -> {
+				SortingJob job = new SortingJob(CachedMarkerBuilder.this);
+				job.run(monitor);
 			});
 		} catch (InvocationTargetException e) {
-			StatusManager.getManager().handle(
-					StatusUtil.newStatus(IStatus.ERROR,
-							e.getLocalizedMessage(), e));
+			StatusManager.getManager().handle(StatusUtil.newStatus(IStatus.ERROR, e.getLocalizedMessage(), e));
 		} catch (InterruptedException e) {
-			StatusManager.getManager().handle(
-					StatusUtil.newStatus(IStatus.ERROR,
-							e.getLocalizedMessage(), e));
+			StatusManager.getManager().handle(StatusUtil.newStatus(IStatus.ERROR, e.getLocalizedMessage(), e));
 		}
 	}
+
 	/**
 	 * Refresh the sort order and categories of the receiver.
-	 * 
 	 */
 	void refreshContents() {
 		SortingJob job=new SortingJob(CachedMarkerBuilder.this);
@@ -287,34 +276,35 @@ public class CachedMarkerBuilder {
 			job.schedule(MarkerUpdateScheduler.SHORT_DELAY);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Save the state of the receiver to memento
-	 * 
-	 * @param memento
+	 *
+	 * @param m
 	 */
-	void saveState(IMemento memento) {
-		getComparator().saveState(memento);
-		if (categoryGroup == null)
-			memento.putString(TAG_CATEGORY_GROUP, VALUE_NONE);
-		else
-			memento.putString(TAG_CATEGORY_GROUP, getCategoryGroup().getId());
+	void saveState(IMemento m) {
+		getComparator().saveState(m);
+		if (categoryGroup == null) {
+			m.putString(TAG_CATEGORY_GROUP, VALUE_NONE);
+		} else {
+			m.putString(TAG_CATEGORY_GROUP, getCategoryGroup().getId());
+		}
 	}
 
 	/**
 	 * Schedule an update of the markers with a delay.
-	 * 
+	 *
 	 */
 	void scheduleUpdate() {
 		if (active) {
 			scheduler.scheduleUpdate(MarkerUpdateScheduler.SHORT_DELAY,true);
 		}
 	}
-	
+
 	/**
 	 * Schedule an update of the markers with a delay.
-	 * 
+	 *
 	 */
 	void scheduleUpdate(long delay) {
 		if (active) {
@@ -334,48 +324,48 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Schedule pending updates to happen quickly.
-	 * 
+	 *
 	 */
 	void speedUpPendingUpdates() {
 		if (active) {
 			scheduler.speedUpPendingUpdates();
 		}
 	}
-	
+
 	/**
 	 * Set the category group.
-	 * 
+	 *
 	 * @param group
 	 *            {@link MarkerGroup} or <code>null</code>.
 	 */
 	void setCategoryGroup(MarkerGroup group) {
 		this.categoryGroup = group;
-		if (group == null)
+		if (group == null) {
 			getComparator().setCategory(null);
-		else
+		} else {
 			getComparator().setCategory(group.getMarkerField());
+		}
 		scheduleUpdate();
-
 	}
 
 	/**
 	 * Categorise by the default setting for contentGenerator.
-	 * 
+	 *
 	 * @param contentGenerator
 	 */
 	private void setDefaultCategoryGroup(MarkerContentGenerator contentGenerator) {
 		String categoryName = contentGenerator.getCategoryName();
 		if (categoryName != null) {
 			MarkerGroup group = contentGenerator.getMarkerGroup(categoryName);
-			if (group != null)
+			if (group != null) {
 				categoryGroup = group;
+			}
 		}
-
 	}
 
 	/**
 	 * Set the generator and update the contents.
-	 * 
+	 *
 	 * @param newGenerator
 	 */
 	void setGenerator(MarkerContentGenerator newGenerator) {
@@ -389,76 +379,70 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * Set the primary sort field for the receiver.
-	 * 
+	 *
 	 * @param field
 	 */
 	void setPrimarySortField(MarkerField field) {
-
 		getComparator().setPrimarySortField(field);
-
 	}
 
 	MarkerUpdateScheduler getUpdateScheduler(){
 		return scheduler;
 	}
+
 	/**
 	 * Set the progress service for the receiver.
-	 * 
+	 *
 	 * @param service
 	 */
 	void setProgressService(IWorkbenchSiteProgressService service) {
 		progressService = service;
 		if (service != null) {
-			service
-					.showBusyForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
-			service
-					.showBusyForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
-			service
-					.showBusyForFamily(CACHE_UPDATE_FAMILY);
-			service
-					.showBusyForFamily(MARKERSVIEW_UPDATE_JOB_FAMILY);
+			service.showBusyForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
+			service.showBusyForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+			service.showBusyForFamily(CACHE_UPDATE_FAMILY);
+			service.showBusyForFamily(MARKERSVIEW_UPDATE_JOB_FAMILY);
 		}
 	}
+
 	/**
 	 * @return Returns the progressService.
 	 */
 	IWorkbenchSiteProgressService getProgressService() {
 		return progressService;
 	}
-	
+
 	/**
 	 * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
-	 * 
+	 *
 	 * schedules marker update job
 	 */
 	MarkerUpdateJob scheduleUpdateJob(long delay) {
-		return scheduleUpdateJob(delay, false, new boolean[] { true, false,
-				false });
+		return scheduleUpdateJob(delay, false, new boolean[] { true, false, false });
 	}
+
 	/**
 	 * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
-	 * 
+	 *
 	 * schedules marker update job
 	 */
 	 MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean) {
-		return scheduleUpdateJob(delay, clean,new boolean[] { true, false,
-				false });
+		return scheduleUpdateJob(delay, clean, new boolean[] { true, false, false });
 	}
 
-	 /**
-	  * The method should not be called directly, see
+	/**
+	 * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
-	 * 
+	 *
 	 * schedules marker update job
 	 */
-	MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean,
-			boolean[] changeFlags) {
-		
+	MarkerUpdateJob scheduleUpdateJob(long delay, boolean clean, boolean[] newChangeFlags) {
+
 		setBuilding(true);
-		updateChangeFlags(changeFlags);
-		
+		updateChangeFlags(newChangeFlags);
+
 		synchronized (getUpdateScheduler().getSchedulingLock()) {
 			if (generator == null || !active) {
 				return null;
@@ -486,11 +470,11 @@ public class CachedMarkerBuilder {
 			return updateJob;
 		}
 	}
-	
+
 	/**
 	 * The method should not be called directly, see
 	 * {@link MarkerUpdateScheduler}
-	 * 
+	 *
 	 * Cancel a scheduled update
 	 */
 	void cancelUpdate() {
@@ -506,7 +490,7 @@ public class CachedMarkerBuilder {
 	MarkersChangeListener getMarkerListener() {
 		return markerListener;
 	}
-	
+
 	/**
 	 * @param markerListener The {@link MarkersChangeListener} to set.
 	 */
@@ -519,26 +503,25 @@ public class CachedMarkerBuilder {
 	 */
 	boolean includeMarkerSubTypes(){
 		/*
-		 * TODO: sub-types included (hard-code?): generator(actually 
-		 * {@link ContentGeneratorDescriptor#getMarkerTypes()}) would 
+		 * TODO: sub-types included (hard-code?): generator(actually
+		 * {@link ContentGeneratorDescriptor#getMarkerTypes()}) would
 		 * need changes if this is to become a variable.
 		 */
 		return true;
 	}
-	
+
 	/**
 	 * Lets reset the types for listen at every update, fetching them during
 	 * every delta is wasteful.
 	 */
 	void registerTypesToListener() {
-		MarkerContentGenerator generator =getGenerator();
-		if (generator == null) {
+		MarkerContentGenerator gen = getGenerator();
+		if (gen == null) {
 			return;
 		}
-		getMarkerListener().listenToTypes(generator.getTypes(),
-				includeMarkerSubTypes());
+		getMarkerListener().listenToTypes(gen.getTypes(), includeMarkerSubTypes());
 	}
-	
+
 	/**
 	 * @return Returns the markers.
 	 */
@@ -547,7 +530,7 @@ public class CachedMarkerBuilder {
 	}
 	/**
 	 * Create a listener for working set changes.
-	 * 
+	 *
 	 * @return IPropertyChangeListener
 	 */
 	private IPropertyChangeListener getWorkingSetListener() {
@@ -556,12 +539,12 @@ public class CachedMarkerBuilder {
 		}
 		return workingSetListener;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Get the name for the preferences for the receiver.
-	 * 
+	 *
 	 * @return String
 	 */
 	static String getMementoPreferenceName(String viewId) {
@@ -577,7 +560,7 @@ public class CachedMarkerBuilder {
 
 	/**
 	 * @return lastUpdateTime
-	 * 
+	 *
 	 */
 	long getLastUpdateTime() {
 		if (updateJob != null) {
@@ -612,24 +595,24 @@ public class CachedMarkerBuilder {
 		markersClone =markers.getClone();
 		return markersClone;
 	}
-	 
+
 ///////	<Incremental update code>///////
 		private IncrementUpdateJob incrementJob;
 	/**
 	 * Checks whether the builder should perform incrementally Note : Incremental
 	 * updating method is NOT used and tested yet but left out for further
 	 * investigation(*).
-	 * 
+	 *
 	 * @return Returns true if we should collect markers incrementally.
 	 */
 	boolean isIncremental() {
 		/*
-		 * We do not update incrementally. We have 
+		 * We do not update incrementally. We have
 		 * code for further investigation(*) for this anyway.
 		 */
 		return false;
 	}
-	
+
 	/**
 	 * @return Returns the changeFlags {added,removed,changed}.
 	 */
@@ -643,12 +626,11 @@ public class CachedMarkerBuilder {
 	}
 
 	/**
-	 * @param changeFlags
-	 * 
+	 * @param newChangeFlags
 	 */
-	void updateChangeFlags(boolean[] changeFlags) {
-		for (int i = 0; i < changeFlags.length; i++) {
-			this.changeFlags[i]=this.changeFlags[i]|changeFlags[i];
+	void updateChangeFlags(boolean[] newChangeFlags) {
+		for (int i = 0; i < newChangeFlags.length; i++) {
+			this.changeFlags[i] = this.changeFlags[i] | newChangeFlags[i];
 		}
 	}
 
@@ -662,25 +644,20 @@ public class CachedMarkerBuilder {
 				scheduleUpdateJob(MarkerUpdateScheduler.SHORT_DELAY, true);
 			}
 		}
-		incrementJob.addUpdate(update);
+		if (incrementJob != null) {
+			incrementJob.addUpdate(update);
+		}
 	}
 ///////	</Incremental update code>///////
-	
+
 ///helpers//
-	
+
 	/**
 	 * The WorkingSet listener, since marker filters can be scoped to
 	 * workingsets; listen for changes to them.
 	 *
 	 */
 	private class WorkingSetListener implements IPropertyChangeListener{
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.util.IPropertyChangeListener#propertyChange
-		 * (org.eclipse.jface.util.PropertyChangeEvent)
-		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			boolean needsUpdate=false;
@@ -688,11 +665,9 @@ public class CachedMarkerBuilder {
 					.getProperty()
 					.equals(
 							IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE)) {
-				Iterator iterator = generator.getEnabledFilters()
-						.iterator();
+				Iterator<MarkerFieldFilterGroup> iterator = generator.getEnabledFilters().iterator();
 				while (iterator.hasNext()) {
-					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) iterator
-							.next();
+					MarkerFieldFilterGroup group = iterator.next();
 					if (group.getScope() == MarkerFieldFilterGroup.ON_WORKING_SET) {
 						IWorkingSet wSet = group.getWorkingSet();
 						if (wSet!=null&&wSet.equals(event.getNewValue())) {
@@ -702,12 +677,10 @@ public class CachedMarkerBuilder {
 					}
 				}
 			}
-			if (event.getProperty().equals(
-					IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
-				Iterator iterator = generator.getAllFilters().iterator();
+			if (event.getProperty().equals(IWorkingSetManager.CHANGE_WORKING_SET_REMOVE)) {
+				Iterator<MarkerFieldFilterGroup> iterator = generator.getAllFilters().iterator();
 				while (iterator.hasNext()) {
-					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) iterator
-							.next();
+					MarkerFieldFilterGroup group = iterator.next();
 					if (group.getScope() == MarkerFieldFilterGroup.ON_WORKING_SET) {
 						IWorkingSet wSet = group.getWorkingSet();
 						if (wSet!=null && wSet.equals(event.getOldValue())) {

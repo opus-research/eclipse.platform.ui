@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2014 IBM Corporation and others.
+ * Copyright (c) 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Marc-Andre Laperle (Ericsson) - Bug 463245
  ******************************************************************************/
 package org.eclipse.e4.ui.widgets;
 
@@ -33,7 +34,7 @@ public class ImageBasedFrame extends Canvas {
 	private static final String HANDLE_IMAGE= "handleImage"; //$NON-NLS-1$
 
 	private static final String FRAME_IMAGE= "frameImage"; //$NON-NLS-1$
-	
+
 	private Control framedControl;
 
 	private boolean draggable = true;
@@ -62,12 +63,14 @@ public class ImageBasedFrame extends Canvas {
 		this.draggable = draggable;
 
 		addPaintListener(new PaintListener() {
+			@Override
 			public void paintControl(PaintEvent e) {
 				drawFrame(e);
 			}
 		});
 
 		addListener(SWT.MouseExit, new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				ImageBasedFrame frame = (ImageBasedFrame) event.widget;
 				frame.setCursor(null);
@@ -75,6 +78,7 @@ public class ImageBasedFrame extends Canvas {
 		});
 
 		addMouseMoveListener(new MouseMoveListener() {
+			@Override
 			public void mouseMove(MouseEvent e) {
 				// Compute the display location for the handle
 				// Note that this is an empty rect if !draggable
@@ -94,22 +98,30 @@ public class ImageBasedFrame extends Canvas {
 		toWrap.pack(true);
 
 		toWrap.addControlListener(new ControlListener() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				pack(true);
 			}
 
+			@Override
 			public void controlMoved(ControlEvent e) {
+				// Bug 463245 - The framed control should always stay at the same location
+				setFramedControlLocation();
 			}
 		});
-		if (vertical) {
-			toWrap.setLocation(w1, h1 + handleHeight);
-		} else {
-			toWrap.setLocation(w1 + handleWidth, h1);
-		}
+		setFramedControlLocation();
 		setSize(computeSize(-1, -1));
 
 		if (toWrap instanceof ToolBar) {
 			id = "TB";// ((ToolBar) toWrap).getItem(0).getToolTipText(); //$NON-NLS-1$
+		}
+	}
+
+	private void setFramedControlLocation() {
+		if (vertical) {
+			framedControl.setLocation(w1, h1 + handleHeight);
+		} else {
+			framedControl.setLocation(w1 + handleWidth, h1);
 		}
 	}
 
@@ -136,7 +148,7 @@ public class ImageBasedFrame extends Canvas {
 	public Point computeSize(int wHint, int hHint) {
 		if (framedControl == null || framedControl.isDisposed())
 			return new Point(0, 0);
-		
+
 		if (vertical) {
 			int width = w1 + framedControl.getSize().x + w3;
 			int height = h1 + handleHeight + framedControl.getSize().y + h3;
@@ -153,10 +165,10 @@ public class ImageBasedFrame extends Canvas {
 			reskin(SWT.NONE);
 			return;
 		}
-		
+
 		if (framedControl == null || framedControl.isDisposed())
 			return;
-		
+
 		Point inner = framedControl.getSize();
 		int handleWidth = (handle != null && !vertical) ? handle.getBounds().width
 				: 0;
@@ -206,7 +218,7 @@ public class ImageBasedFrame extends Canvas {
 					srcRect.height, dstRect.x, dstRect.y, dstRect.width,
 					dstRect.height);
 		}
-		
+
 		// Top Right
 		srcRect.x = w1 + w2;
 		srcRect.y = 0;

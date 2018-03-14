@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.ui.internal.WorkbenchImages;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class CommandProvider extends QuickAccessProvider {
 
@@ -46,7 +46,7 @@ public class CommandProvider extends QuickAccessProvider {
 	private IHandlerService handlerService;
 	private ICommandService commandService;
 	private EHandlerService ehandlerService;
-	
+
 	public CommandProvider() {
 	}
 
@@ -105,7 +105,7 @@ public class CommandProvider extends QuickAccessProvider {
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Commands;
 	}
-	
+
 	EHandlerService getEHandlerService() {
 		if (ehandlerService == null) {
 			if (currentSnapshot instanceof ExpressionContext) {
@@ -144,7 +144,7 @@ public class CommandProvider extends QuickAccessProvider {
 		}
 		return handlerService;
 	}
-	
+
 	IEvaluationContext getContextSnapshot() {
 		return currentSnapshot;
 	}

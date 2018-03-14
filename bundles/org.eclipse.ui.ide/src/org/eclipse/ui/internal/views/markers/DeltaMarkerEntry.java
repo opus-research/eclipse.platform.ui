@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import com.ibm.icu.text.CollationKey;
 /**
  * The DeltaMarkerEntry is the class that wraps an {@link IMarkerDelta} for testing.
 
- * 
+ *
  * @since 3.6
- * 
+ *
  */
 class DeltaMarkerEntry extends MarkerEntry {
 
@@ -31,8 +31,8 @@ class DeltaMarkerEntry extends MarkerEntry {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * @param markerDelta 
-	 * 
+	 * @param markerDelta
+	 *
 	 */
 	public DeltaMarkerEntry(IMarkerDelta markerDelta) {
 		super(markerDelta.getMarker());
@@ -53,43 +53,23 @@ class DeltaMarkerEntry extends MarkerEntry {
 		return value;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getCreationTime()
-	 */
 	@Override
 	long getCreationTime() {
 			//return markerDelta.getCreationTime();
 			return super.getCreationTime();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getID()
-	 */
 	@Override
 	long getID() {
 		return markerDelta.getId();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getMarkerTypeName()
-	 */
 	@Override
 	String getMarkerTypeName() {
 		return MarkerTypesModel.getInstance().getType(markerDelta.getType())
 				.getLabel();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.markers.MarkerItem#getPath()
-	 */
 	@Override
 	public String getPath() {
 		String folder = getAttributeValue(MarkerViewUtil.PATH_ATTRIBUTE, null);

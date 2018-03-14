@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,9 @@ import org.eclipse.core.expressions.PropertyTester;
 /**
  * ContentGeneratorPropertyTester is the property tester for what content
  * generator is being shown.
- * 
+ *
  * @since 3.4
- * 
+ *
  */
 public class MarkersViewPropertyTester extends PropertyTester {
 
@@ -37,12 +37,6 @@ public class MarkersViewPropertyTester extends PropertyTester {
 	public MarkersViewPropertyTester() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object,
-	 *      java.lang.String, java.lang.Object[], java.lang.Object)
-	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
@@ -64,7 +58,7 @@ public class MarkersViewPropertyTester extends PropertyTester {
 
 	/**
 	 * Test if the content generator in the args match the receiver.
-	 * 
+	 *
 	 * @param view
 	 * @param args
 	 * @return boolean

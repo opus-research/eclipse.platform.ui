@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2006 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,10 @@ package org.eclipse.jface.action;
 import org.eclipse.core.runtime.Assert;
 
 /**
- * A <code>SubCoolBarManager</code> monitors the additional and removal of 
+ * A <code>SubCoolBarManager</code> monitors the additional and removal of
  * items from a parent manager so that visibility of the entire set can be changed as a
  * unit.
- * 
+ *
  * @since 3.0
  */
 public class SubCoolBarManager extends SubContributionManager implements
@@ -25,7 +25,7 @@ public class SubCoolBarManager extends SubContributionManager implements
     /**
      * Constructs a new manager.
      *
-     * @param mgr the parent manager.  All contributions made to the 
+     * @param mgr the parent manager.  All contributions made to the
      *      <code>SubCoolBarManager</code> are forwarded and appear in the
      *      parent manager.
      */
@@ -49,8 +49,8 @@ public class SubCoolBarManager extends SubContributionManager implements
 
     /**
      * Returns the parent cool bar manager that this sub-manager contributes to.
-     * 
-     * @return the parent cool bar manager 
+     *
+     * @return the parent cool bar manager
      */
     protected final ICoolBarManager getParentCoolBarManager() {
         // Cast is ok because that's the only

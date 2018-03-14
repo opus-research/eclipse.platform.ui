@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -19,17 +20,17 @@ import org.eclipse.ui.views.markers.FiltersContributionParameters;
 
 /**
  * ErrorsWarningsParameters is the parameters for errors and warnings.
- * 
+ *
  * @since 3.5
- * 
+ *
  */
 public class ErrorsWarningsParameters extends FiltersContributionParameters {
 
-	private static Map parametersMap;
+	private static Map<String, Integer> parametersMap;
 	static {
-		parametersMap = new HashMap();
-		parametersMap.put(IMarker.SEVERITY, new Integer(
-				SeverityAndDescriptionFieldFilter.SEVERITY_WARNING|SeverityAndDescriptionFieldFilter.SEVERITY_ERROR));
+		parametersMap = new HashMap<>();
+		parametersMap.put(IMarker.SEVERITY,
+				SeverityAndDescriptionFieldFilter.SEVERITY_WARNING | SeverityAndDescriptionFieldFilter.SEVERITY_ERROR);
 	}
 
 	/**
@@ -39,13 +40,8 @@ public class ErrorsWarningsParameters extends FiltersContributionParameters {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.provisional.views.markers.FiltersContributionParameters#getParameterValues()
-	 */
 	@Override
-	public Map getParameterValues() {
+	public Map<String, Integer> getParameterValues() {
 		return parametersMap;
 	}
 
