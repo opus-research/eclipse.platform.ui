@@ -722,27 +722,6 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M2+M3+F7">
       </key>
-      <key
-            commandId="org.eclipse.ui.window.splitEditor"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+_"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-         <parameter
-               id="Splitter.isHorizontal"
-               value="true">
-         </parameter>
-      </key>
-      <key
-            commandId="org.eclipse.ui.window.splitEditor"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+{"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-         <parameter
-               id="Splitter.isHorizontal"
-               value="false">
-         </parameter>
-      </key>
-
    </extension>
    
    <extension
@@ -1044,16 +1023,14 @@
             categoryId="org.eclipse.ui.category.window"
             id="org.eclipse.ui.window.newEditor" />
       <command
-            categoryId="org.eclipse.ui.category.window"
-            defaultHandler="org.eclipse.ui.internal.SplitHandler"
+            name="%command.splitEditor.name"
             description="%command.splitEditor.description"
-            id="org.eclipse.ui.window.splitEditor"
-            name="%command.splitEditor.name">
+            categoryId="org.eclipse.ui.category.window"
+            id="org.eclipse.ui.window.splitEditor">
             <commandParameter
-                  id="Splitter.isHorizontal"
-                  name="%command.splitEditor.orientation.name"
-                  optional="true"
-                  values="org.eclipse.ui.internal.SplitValues">
+               id="Splitter.isHorizontal"
+               name="%command.splitEditor.orientation.name"
+               optional="true">
             </commandParameter>
       </command>
       <command
