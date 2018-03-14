@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -89,7 +90,7 @@ public class QuickFixHandler extends MarkerViewHandler {
 					if (markerResolution instanceof WorkbenchMarkerResolution) {
 						IMarker[] other = ((WorkbenchMarkerResolution)markerResolution).findOtherMarkers(allMarkers);
 						if (containsAllButFirst(other, selectedMarkers)) {
-							Collection<IMarker> markers = new ArrayList<>(other.length + 1);
+							Collection<IMarker> markers = new LinkedHashSet<IMarker>(other.length + 1);
 							markers.add(firstSelectedMarker);
 							markers.addAll(Arrays.asList(other));
 							resolutionsMap.put(markerResolution, markers);
