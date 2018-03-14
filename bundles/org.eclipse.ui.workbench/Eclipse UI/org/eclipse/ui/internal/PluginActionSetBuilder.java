@@ -12,13 +12,9 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer;
-import org.eclipse.e4.ui.workbench.swt.factories.IRendererFactory;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -27,9 +23,7 @@ import org.eclipse.jface.action.IContributionManager;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.SubContributionManager;
 import org.eclipse.jface.internal.provisional.action.IToolBarContributionItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -291,42 +285,6 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
                 }
             }
             
-			// synchronize with the e4 model
-			/*
-			 * TODO: find a better solution
-			 * 
-			 * This is a hack implementation to synchronize the e4-model with
-			 * the current state of the MenuManager. It still has a problem if
-			 * you try to rearrange some menu elements with the Live-Editor. For
-			 * example the Search-Menu is contributed by the perspective via an
-			 * ActionSetMenuManager and this results in an invisible
-			 * DirectMenuItem which disappears if you start to move it with the
-			 * Live-Editor. Additionally you can arrange or add Sub-Menu entries
-			 * to it.
-			 */
-			IContributionManager parentManager = actionSet.getBars().getMenuManager();
-			// TODO: find better solution to find the real MenuManager from an
-			// ActionSetMenuManager
-			while (parentManager instanceof SubContributionManager) {
-				parentManager = ((SubContributionManager) parentManager).getParent();
-
-				if (parentManager instanceof MenuManager) {
-					// TODO: remove this hack to retrieve the
-					// MenuManagerRenderer, but how?
-					IEclipseContext context = (IEclipseContext) window
-							.getService(IEclipseContext.class);
-					EModelService modelService = context.get(EModelService.class);
-					IRendererFactory rendererFactory = context.get(IRendererFactory.class);
-					MenuManagerRenderer mr = (MenuManagerRenderer) rendererFactory.getRenderer(
-							modelService.createModelElement(MMenu.class), null);
-					MMenu parent = mr.getMenuModel((MenuManager) parentManager);
-					if (parent != null) {
-						mr.reconcileManagerToModel((MenuManager) parentManager, parent);
-						break;
-					}
-				}
-			}
-
             registerBinding(set);
             
         } else {
@@ -407,7 +365,7 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
                 for (int i = 0; i < menus.size(); i++) {
                     IConfigurationElement menuElement = (IConfigurationElement) menus
                             .get(i);
-					contributeMenu(menuElement, menuMgr, menuAppendIfMissing);
+                    contributeMenu(menuElement, menuMgr, menuAppendIfMissing);
                 }
             }
 

@@ -9,15 +9,17 @@
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
- *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 391430 - Dynamically creating / deleting menu items in Menu and MPopupMenu doesn't work
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -26,6 +28,8 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
@@ -72,16 +76,28 @@ import org.osgi.service.event.EventHandler;
 /**
  * Create a contribute part.
  */
-public class MenuManagerRenderer
-		extends
-		ContributionManagerRenderer<MMenu, MMenuElement, MenuManager, ContributionRecord> {
+public class MenuManagerRenderer extends SWTPartRenderer {
 	public static final String VISIBILITY_IDENTIFIER = "IIdentifier"; //$NON-NLS-1$
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
 
+	private Map<MMenu, MenuManager> modelToManager = new HashMap<MMenu, MenuManager>();
+	private Map<MenuManager, MMenu> managerToModel = new HashMap<MenuManager, MMenu>();
+
+	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<MMenuElement, IContributionItem>();
+	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<IContributionItem, MMenuElement>();
+
+	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
+	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
+
+	@Inject
+	private Logger logger;
+
 	@Inject
 	private MApplication application;
 
+	@Inject
+	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
@@ -238,68 +254,16 @@ public class MenuManagerRenderer
 		}
 	};
 
-	/**
-	 * Flag for skipping the {@link #childrenUpdater}, which indicates a call
-	 * from the {@link #reconcileManagerToModel(MenuManager, MMenu)} method.
-	 */
-	private boolean isReconcileManagerToModel = false;
-	/**
-	 * Flag for skipping the {@link #childrenUpdater}, which indicates a call
-	 * from the {@link #processContributions(MMenu, String, boolean, boolean)}
-	 * method.
-	 */
-	private boolean isProcessContributions = false;
-
-	/**
-	 * EventHanlder which handles the adding and disappearing of menu entries.
-	 */
-	private EventHandler childrenUpdater = new EventHandler() {
-		public void handleEvent(Event event) {
-			// skip the event handling, because it is called from methods of
-			// this class which try to synchronize a MenuManager with the model
-			if (isReconcileManagerToModel || isProcessContributions)
-				return;
-
-			Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-			if (changedObj instanceof MMenu) {
-				MMenu menuModel = (MMenu) changedObj;
-				MenuManager manager = getManager(menuModel);
-				if (manager == null)
-					return;
-				if (UIEvents.isREMOVE(event)) {
-					// remove can be one or many --> always use a list of
-					// entries
-					@SuppressWarnings("unchecked")
-					Iterable<MMenuElement> toRemove = (Iterable<MMenuElement>) UIEvents
-							.asIterable(event, UIEvents.EventTags.OLD_VALUE);
-
-					handleMenuElementRemove(manager, toRemove);
-				} else if (UIEvents.isADD(event)) {
-					// add can also be one or many --> always use a list of
-					// entries
-					@SuppressWarnings("unchecked")
-					Iterable<MMenuElement> toAdd = (Iterable<MMenuElement>) UIEvents
-							.asIterable(event, UIEvents.EventTags.NEW_VALUE);
-					handleMenuElementAdd(manager, toAdd);
-				}
-			}
-		}
-	};
-
 	private MenuManagerRendererFilter rendererFilter;
 
-	@Override
 	@PostConstruct
 	public void init() {
-		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, labelUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
 				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
-		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
-				childrenUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -318,7 +282,6 @@ public class MenuManagerRenderer
 
 	}
 
-	@Override
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -326,7 +289,6 @@ public class MenuManagerRenderer
 		eventBroker.unsubscribe(selectionUpdater);
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
-		eventBroker.unsubscribe(childrenUpdater);
 
 		ContextInjectionFactory.uninject(MenuManagerEventHelper.getInstance()
 				.getShowHelper(),
@@ -350,7 +312,6 @@ MenuManagerEventHelper.getInstance()
 			rendererFilter = null;
 		}
 		context.remove(MenuManagerRenderer.class);
-		super.contextDisposed();
 	}
 
 	/*
@@ -433,7 +394,8 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
-		Collection<ContributionRecord> vals = getList(menuModel);
+		Collection<ContributionRecord> vals = modelContributionToRecord
+				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
 		for (ContributionRecord record : vals
 				.toArray(new ContributionRecord[vals.size()])) {
@@ -451,17 +413,18 @@ MenuManagerEventHelper.getInstance()
 			}
 		}
 
-		Iterator<ContributionRecord> iterator = vals.iterator();
+		Iterator<Entry<MMenuElement, ContributionRecord>> iterator = modelContributionToRecord
+				.entrySet().iterator();
 		for (; iterator.hasNext();) {
-			ContributionRecord record = iterator.next();
-			if (disposedRecords.contains(record)) {
+			Entry<MMenuElement, ContributionRecord> entry = iterator.next();
+			ContributionRecord record = entry.getValue();
+			if (disposedRecords.contains(record))
 				iterator.remove();
-			}
 		}
 	}
 
 	public void cleanUpCopy(ContributionRecord record, MMenuElement copy) {
-		removeContributionRecord(copy);
+		modelContributionToRecord.remove(copy);
 		if (copy instanceof MMenu) {
 			MMenu menuCopy = (MMenu) copy;
 			cleanUp(menuCopy);
@@ -490,23 +453,16 @@ MenuManagerEventHelper.getInstance()
 		if (elementId == null) {
 			return;
 		}
-
-		boolean prevProcessContributions = isProcessContributions;
-		isProcessContributions = true;
-		try {
-			final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
-			ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
-					application.getMenuContributions(), elementId,
-					toContribute, null, isPopup);
-			generateContributions(menuModel, toContribute, isMenuBar);
-			for (MMenuElement element : menuModel.getChildren()) {
-				if (element instanceof MMenu) {
-					processContributions((MMenu) element,
-							element.getElementId(), false, isPopup);
-				}
+		final ArrayList<MMenuContribution> toContribute = new ArrayList<MMenuContribution>();
+		ContributionsAnalyzer.XXXgatherMenuContributions(menuModel,
+				application.getMenuContributions(), elementId, toContribute,
+				null, isPopup);
+		generateContributions(menuModel, toContribute, isMenuBar);
+		for (MMenuElement element : menuModel.getChildren()) {
+			if (element instanceof MMenu) {
+				processContributions((MMenu) element, element.getElementId(),
+						false, isPopup);
 			}
-		} finally {
-			isProcessContributions = prevProcessContributions;
 		}
 	}
 
@@ -583,6 +539,35 @@ MenuManagerEventHelper.getInstance()
 		// tracked by a separate RunAndTrack
 		return !(menuModel instanceof MPopupMenu)
 				&& ((EObject) menuModel).eContainer() instanceof MPart;
+	}
+
+	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<ContributionRecord>();
+
+	public ArrayList<ContributionRecord> getList(MMenuElement item) {
+		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		if (tmp == null) {
+			tmp = DEFAULT;
+		}
+		return tmp;
+	}
+
+	public void addRecord(MMenuElement item, ContributionRecord rec) {
+		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		if (tmp == null) {
+			tmp = new ArrayList<ContributionRecord>();
+			sharedElementToRecord.put(item, tmp);
+		}
+		tmp.add(rec);
+	}
+
+	public void removeRecord(MMenuElement item, ContributionRecord rec) {
+		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		if (tmp != null) {
+			tmp.remove(rec);
+			if (tmp.isEmpty()) {
+				sharedElementToRecord.remove(item);
+			}
+		}
 	}
 
 	void removeMenuContributions(final MMenu menuModel,
@@ -855,17 +840,67 @@ MenuManagerEventHelper.getInstance()
 		return null;
 	}
 
-	@Override
-	public IEclipseContext getContext(MUIElement el) {
-		return super.getContext(el);
+	public MenuManager getManager(MMenu model) {
+		return modelToManager.get(model);
 	}
 
 	public MMenu getMenuModel(MenuManager manager) {
-		return getModel(manager);
+		return managerToModel.get(manager);
+	}
+
+	public void linkModelToManager(MMenu model, MenuManager manager) {
+		modelToManager.put(model, manager);
+		managerToModel.put(manager, model);
+	}
+
+	public void clearModelToManager(MMenu model, MenuManager manager) {
+		modelToManager.remove(model);
+		managerToModel.remove(manager);
+	}
+
+	public IContributionItem getContribution(MMenuElement model) {
+		return modelToContribution.get(model);
 	}
 
 	public MMenuElement getMenuElement(IContributionItem item) {
-		return getModelElement(item);
+		return contributionToModel.get(item);
+	}
+
+	public void linkModelToContribution(MMenuElement model,
+			IContributionItem item) {
+		modelToContribution.put(model, item);
+		contributionToModel.put(item, model);
+	}
+
+	public void clearModelToContribution(MMenuElement model,
+			IContributionItem item) {
+		modelToContribution.remove(model);
+		contributionToModel.remove(item);
+	}
+
+	public ContributionRecord getContributionRecord(MMenuElement element) {
+		return modelContributionToRecord.get(element);
+	}
+
+	public void linkElementToContributionRecord(MMenuElement element,
+			ContributionRecord record) {
+		modelContributionToRecord.put(element, record);
+	}
+
+	/**
+	 * Search the records for testing. Look, but don't touch!
+	 * 
+	 * @return the array of active ContributionRecords.
+	 */
+	public ContributionRecord[] getContributionRecords() {
+		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>(
+				modelContributionToRecord.values());
+		return records.toArray(new ContributionRecord[records.size()]);
+	}
+
+	@Override
+	public IEclipseContext getContext(MUIElement el) {
+		return super.getContext(el);
 	}
 
 	/**
@@ -873,148 +908,139 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void reconcileManagerToModel(MenuManager menuManager, MMenu menuModel) {
-		boolean prevReconcileManagerToModel = isReconcileManagerToModel;
-		isReconcileManagerToModel = true;
-		try {
-			List<MMenuElement> modelChildren = menuModel.getChildren();
+		List<MMenuElement> modelChildren = menuModel.getChildren();
 
-			HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
-			HashSet<MMenu> oldMenus = new HashSet<MMenu>();
-			HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
-			for (MMenuElement itemModel : modelChildren) {
-				if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
-					oldSeps.add((MMenuSeparator) itemModel);
-				} else if (OpaqueElementUtil.isOpaqueMenuItem(itemModel)) {
-					oldModelItems.add((MMenuItem) itemModel);
-				} else if (OpaqueElementUtil.isOpaqueMenu(itemModel)) {
-					oldMenus.add((MMenu) itemModel);
-				}
+		HashSet<MMenuItem> oldModelItems = new HashSet<MMenuItem>();
+		HashSet<MMenu> oldMenus = new HashSet<MMenu>();
+		HashSet<MMenuSeparator> oldSeps = new HashSet<MMenuSeparator>();
+		for (MMenuElement itemModel : modelChildren) {
+			if (OpaqueElementUtil.isOpaqueMenuSeparator(itemModel)) {
+				oldSeps.add((MMenuSeparator) itemModel);
+			} else if (OpaqueElementUtil.isOpaqueMenuItem(itemModel)) {
+				oldModelItems.add((MMenuItem) itemModel);
+			} else if (OpaqueElementUtil.isOpaqueMenu(itemModel)) {
+				oldMenus.add((MMenu) itemModel);
 			}
+		}
 
-			IContributionItem[] items = menuManager.getItems();
-			for (int src = 0, dest = 0; src < items.length; src++, dest++) {
-				IContributionItem item = items[src];
-				if (item instanceof MenuManager) {
-					MenuManager childManager = (MenuManager) item;
-					MMenu childModel = getMenuModel(childManager);
-					if (childModel == null) {
-						MMenu legacyModel = OpaqueElementUtil
-								.createOpaqueMenu();
-						legacyModel.setElementId(childManager.getId());
-						legacyModel.setVisible(childManager.isVisible());
-						linkModelToManager(legacyModel, childManager);
-						OpaqueElementUtil.setOpaqueItem(legacyModel,
-								childManager);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacyModel);
-						} else {
-							modelChildren.add(legacyModel);
-						}
-						reconcileManagerToModel(childManager, legacyModel);
+		IContributionItem[] items = menuManager.getItems();
+		for (int src = 0, dest = 0; src < items.length; src++, dest++) {
+			IContributionItem item = items[src];
+			if (item instanceof MenuManager) {
+				MenuManager childManager = (MenuManager) item;
+				MMenu childModel = getMenuModel(childManager);
+				if (childModel == null) {
+					MMenu legacyModel = OpaqueElementUtil.createOpaqueMenu();
+					legacyModel.setElementId(childManager.getId());
+					legacyModel.setVisible(childManager.isVisible());
+					linkModelToManager(legacyModel, childManager);
+					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyModel);
 					} else {
-						if (OpaqueElementUtil.isOpaqueMenu(childModel)) {
-							oldMenus.remove(childModel);
-						}
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != childModel) {
-								modelChildren.remove(childModel);
-								modelChildren.add(dest, childModel);
-							}
-						} else {
-							modelChildren.add(childModel);
-						}
-						if (childModel instanceof MPopupMenu) {
-							if (((MPopupMenu) childModel).getContext() == null) {
-								IEclipseContext lclContext = getContext(menuModel);
-								if (lclContext != null) {
-									((MPopupMenu) childModel)
-											.setContext(lclContext
-													.createChild(childModel
-															.getElementId()));
-								}
-							}
-						}
+						modelChildren.add(legacyModel);
 					}
-				} else if (item.isSeparator() || item.isGroupMarker()) {
-					MMenuElement menuElement = getMenuElement(item);
-					if (menuElement == null) {
-						MMenuSeparator legacySep = OpaqueElementUtil
-								.createOpaqueMenuSeparator();
-						legacySep.setElementId(item.getId());
-						legacySep.setVisible(item.isVisible());
-						OpaqueElementUtil.setOpaqueItem(legacySep, item);
-						linkModelToContribution(legacySep, item);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacySep);
-						} else {
-							modelChildren.add(legacySep);
-						}
-					} else if (OpaqueElementUtil
-							.isOpaqueMenuSeparator(menuElement)) {
-						MMenuSeparator legacySep = (MMenuSeparator) menuElement;
-						oldSeps.remove(legacySep);
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != legacySep) {
-								modelChildren.remove(legacySep);
-								modelChildren.add(dest, legacySep);
-							}
-						} else {
-							modelChildren.add(legacySep);
-						}
-					}
+					reconcileManagerToModel(childManager, legacyModel);
 				} else {
-					MMenuElement menuElement = getMenuElement(item);
-					if (menuElement == null) {
-						MMenuItem legacyItem = OpaqueElementUtil
-								.createOpaqueMenuItem();
-						legacyItem.setElementId(item.getId());
-						legacyItem.setVisible(item.isVisible());
-						OpaqueElementUtil.setOpaqueItem(legacyItem, item);
-						linkModelToContribution(legacyItem, item);
-						if (modelChildren.size() > dest) {
-							modelChildren.add(dest, legacyItem);
-						} else {
-							modelChildren.add(legacyItem);
+					if (OpaqueElementUtil.isOpaqueMenu(childModel)) {
+						oldMenus.remove(childModel);
+					}
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != childModel) {
+							modelChildren.remove(childModel);
+							modelChildren.add(dest, childModel);
 						}
-					} else if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)) {
-						MMenuItem legacyItem = (MMenuItem) menuElement;
-						oldModelItems.remove(legacyItem);
-						if (modelChildren.size() > dest) {
-							if (modelChildren.get(dest) != legacyItem) {
-								modelChildren.remove(legacyItem);
-								modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(childModel);
+					}
+					if (childModel instanceof MPopupMenu) {
+						if (((MPopupMenu) childModel).getContext() == null) {
+							IEclipseContext lclContext = getContext(menuModel);
+							if (lclContext != null) {
+								((MPopupMenu) childModel)
+										.setContext(lclContext
+												.createChild(childModel
+														.getElementId()));
 							}
-						} else {
-							modelChildren.add(legacyItem);
 						}
 					}
 				}
-			}
-			if (!oldModelItems.isEmpty()) {
-				modelChildren.removeAll(oldModelItems);
-				for (MMenuItem model : oldModelItems) {
-					IContributionItem ici = (IContributionItem) OpaqueElementUtil
-							.getOpaqueItem(model);
-					clearModelToContribution(model, ici);
+			} else if (item.isSeparator() || item.isGroupMarker()) {
+				MMenuElement menuElement = getMenuElement(item);
+				if (menuElement == null) {
+					MMenuSeparator legacySep = OpaqueElementUtil
+							.createOpaqueMenuSeparator();
+					legacySep.setElementId(item.getId());
+					legacySep.setVisible(item.isVisible());
+					OpaqueElementUtil.setOpaqueItem(legacySep, item);
+					linkModelToContribution(legacySep, item);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacySep);
+					} else {
+						modelChildren.add(legacySep);
+					}
+				} else if (OpaqueElementUtil.isOpaqueMenuSeparator(menuElement)) {
+					MMenuSeparator legacySep = (MMenuSeparator) menuElement;
+					oldSeps.remove(legacySep);
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != legacySep) {
+							modelChildren.remove(legacySep);
+							modelChildren.add(dest, legacySep);
+						}
+					} else {
+						modelChildren.add(legacySep);
+					}
+				}
+			} else {
+				MMenuElement menuElement = getMenuElement(item);
+				if (menuElement == null) {
+					MMenuItem legacyItem = OpaqueElementUtil
+							.createOpaqueMenuItem();
+					legacyItem.setElementId(item.getId());
+					legacyItem.setVisible(item.isVisible());
+					OpaqueElementUtil.setOpaqueItem(legacyItem, item);
+					linkModelToContribution(legacyItem, item);
+					if (modelChildren.size() > dest) {
+						modelChildren.add(dest, legacyItem);
+					} else {
+						modelChildren.add(legacyItem);
+					}
+				} else if (OpaqueElementUtil.isOpaqueMenuItem(menuElement)) {
+					MMenuItem legacyItem = (MMenuItem) menuElement;
+					oldModelItems.remove(legacyItem);
+					if (modelChildren.size() > dest) {
+						if (modelChildren.get(dest) != legacyItem) {
+							modelChildren.remove(legacyItem);
+							modelChildren.add(dest, legacyItem);
+						}
+					} else {
+						modelChildren.add(legacyItem);
+					}
 				}
 			}
-			if (!oldMenus.isEmpty()) {
-				modelChildren.removeAll(oldMenus);
-				for (MMenu oldMenu : oldMenus) {
-					MenuManager oldManager = getManager(oldMenu);
-					clearModelToManager(oldMenu, oldManager);
-				}
+		}
+		if (!oldModelItems.isEmpty()) {
+			modelChildren.removeAll(oldModelItems);
+			for (MMenuItem model : oldModelItems) {
+				IContributionItem ici = (IContributionItem) OpaqueElementUtil
+						.getOpaqueItem(model);
+				clearModelToContribution(model, ici);
 			}
-			if (!oldSeps.isEmpty()) {
-				modelChildren.removeAll(oldSeps);
-				for (MMenuSeparator model : oldSeps) {
-					IContributionItem item = (IContributionItem) OpaqueElementUtil
-							.getOpaqueItem(model);
-					clearModelToContribution(model, item);
-				}
+		}
+		if (!oldMenus.isEmpty()) {
+			modelChildren.removeAll(oldMenus);
+			for (MMenu oldMenu : oldMenus) {
+				MenuManager oldManager = getManager(oldMenu);
+				clearModelToManager(oldMenu, oldManager);
 			}
-		} finally {
-			isReconcileManagerToModel = prevReconcileManagerToModel;
+		}
+		if (!oldSeps.isEmpty()) {
+			modelChildren.removeAll(oldSeps);
+			for (MMenuSeparator model : oldSeps) {
+				IContributionItem item = (IContributionItem) OpaqueElementUtil
+						.getOpaqueItem(model);
+				clearModelToContribution(model, item);
+			}
 		}
 	}
 
@@ -1085,67 +1111,5 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
-	}
-
-	/**
-	 * Handles the create of menu entries.
-	 *
-	 * @param manager
-	 *            the {@link MenuManager} to add the new entries too
-	 * @param menuElements
-	 *            the new entries to add
-	 */
-	private void handleMenuElementAdd(MenuManager manager,
-			Iterable<MMenuElement> menuElements) {
-		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
-
-		if (!iterMenuElements.hasNext())
-			return;
-
-		while (iterMenuElements.hasNext()) {
-			modelProcessSwitch(manager, iterMenuElements.next());
-		}
-
-		manager.updateAll(false);
-	}
-
-	/**
-	 * Handles the remove of menu entries.
-	 *
-	 * @param manager
-	 *            the {@link MenuManager} to remove the entries from
-	 * @param menuElements
-	 *            the elements to remove
-	 */
-	private void handleMenuElementRemove(MenuManager manager,
-			Iterable<MMenuElement> menuElements) {
-		Iterator<MMenuElement> iterMenuElements = menuElements.iterator();
-
-		if (!iterMenuElements.hasNext())
-			return;
-
-		while (iterMenuElements.hasNext()) {
-			MMenuElement menuElement = iterMenuElements.next();
-			if (menuElement instanceof MMenu) {
-				MMenu menuModel = (MMenu) menuElement;
-				MenuManager mi = getManager(menuModel);
-				manager.remove(mi);
-
-				// clean up (children also)
-				clearModelToManager(menuModel, mi);
-				handleMenuElementRemove(mi, menuModel.getChildren());
-				mi.dispose();
-			} else {
-				IContributionItem ci = getContribution(menuElement);
-				manager.remove(ci);
-
-				// clean up
-				clearModelToContribution(menuElement, ci);
-				ci.dispose();
-			}
-
-		}
-
-		manager.updateAll(false);
 	}
 }
