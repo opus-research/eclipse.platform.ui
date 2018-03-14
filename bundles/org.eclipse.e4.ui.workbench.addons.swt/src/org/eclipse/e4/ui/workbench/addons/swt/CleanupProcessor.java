@@ -11,19 +11,32 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.swt;
 
+import java.util.List;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 
 /**
  * Model processors which adds the cleanup add-on to the application model
  */
-public class CleanupProcessor extends AbstractProcessor {
+public class CleanupProcessor {
 	@Execute
 	void addCleanupAddon(MApplication app, EModelService modelService) {
-		final String contributionURI = "bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon"; //$NON-NLS-1$
-		final String id = "CleanupAddon"; //$NON-NLS-1$
+		List<MAddon> addons = app.getAddons();
 
-		addAddon(app, modelService, contributionURI, id);
+		// prevent multiple copies
+		for (MAddon addon : addons) {
+			if (addon.getContributionURI()
+					.contains("ui.workbench.addons.cleanupaddon.CleanupAddon")) //$NON-NLS-1$
+				return;
+		}
+
+		// adds the add-on to the application model
+		MAddon cleanupAddon = modelService.createModelElement(MAddon.class);
+		cleanupAddon.setElementId("CleanupAddon"); //$NON-NLS-1$
+		cleanupAddon
+				.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon"); //$NON-NLS-1$
+		app.getAddons().add(cleanupAddon);
 	}
 }
