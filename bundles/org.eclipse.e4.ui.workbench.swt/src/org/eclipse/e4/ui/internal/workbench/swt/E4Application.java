@@ -155,14 +155,13 @@ public class E4Application implements IApplication {
 					workbench.getContext()))
 				return EXIT_OK;
 
-			IEclipseContext workbenchContext = workbench.getContext();
 
 			// Create and run the UI (if any)
 			workbench.createAndRunUI(workbench.getApplication());
 
 			// Save the model into the targetURI
 			if (lcManager != null) {
-				ContextInjectionFactory.invoke(lcManager, PreSave.class, workbenchContext, null);
+				ContextInjectionFactory.invoke(lcManager, PreSave.class, workbench.getContext(), null);
 			}
 			saveModel();
 			workbench.close();
