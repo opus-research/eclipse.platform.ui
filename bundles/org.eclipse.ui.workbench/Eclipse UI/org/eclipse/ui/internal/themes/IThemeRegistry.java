@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,9 +42,6 @@ public interface IThemeRegistry {
             this.definitions = definitions;
         }
 
-        /* (non-Javadoc)
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-         */
         @Override
 		public int compare(Object arg0, Object arg1) {
             String def0 = arg0 == null ? null
@@ -93,9 +90,6 @@ public interface IThemeRegistry {
      */
     public static final Comparator ID_COMPARATOR = new Comparator() {
 
-        /* (non-Javadoc)
-         * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-         */
         @Override
 		public int compare(Object arg0, Object arg1) {
             String str0 = getCompareString(arg0);
