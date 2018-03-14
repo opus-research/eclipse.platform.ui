@@ -415,6 +415,8 @@ public class BindingModel extends CommonModel {
 			cmd = (ParameterizedCommand) obj;
 		} else if (obj instanceof KeyBinding) {
 			cmd = ((KeyBinding) obj).getParameterizedCommand();
+		} else {
+			return;
 		}
 
 		boolean done = false;

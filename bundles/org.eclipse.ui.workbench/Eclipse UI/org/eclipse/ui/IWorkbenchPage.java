@@ -12,6 +12,7 @@ package org.eclipse.ui;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
@@ -340,6 +341,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *            the id of the view extension to use
 	 * @return the view, or <code>null</code> if none is found
 	 */
+	@Nullable
 	public IViewPart findView(String viewId);
 
 	/**
@@ -350,6 +352,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return the view reference, or <code>null</code> if none is found
 	 * @since 3.0
 	 */
+	@Nullable
 	public IViewReference findViewReference(String viewId);
 
 	/**
@@ -363,7 +366,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return the view reference, or <code>null</code> if none is found
 	 * @since 3.0
 	 */
-	public IViewReference findViewReference(String viewId, String secondaryId);
+	public IViewReference findViewReference(String viewId, @Nullable String secondaryId);
 
 	/**
 	 * Returns the active editor open in this page.
@@ -374,6 +377,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *
 	 * @return the active editor, or <code>null</code> if no editor is active
 	 */
+	@Nullable
 	public IEditorPart getActiveEditor();
 
 	/**
@@ -384,6 +388,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *            the editor input
 	 * @return an editor with input equals to <code>input</code>
 	 */
+	@Nullable
 	public IEditorPart findEditor(IEditorInput input);
 
 	/**
@@ -407,7 +412,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #MATCH_ID
 	 * @since 3.2
 	 */
-	public IEditorReference[] findEditors(IEditorInput input, String editorId,
+	public IEditorReference[] findEditors(@Nullable IEditorInput input, @Nullable String editorId,
 			int matchFlags);
 
 	/**
@@ -450,6 +455,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *
 	 * @return the input for this page, or <code>null</code> if none
 	 */
+	@Nullable
 	public IAdaptable getInput();
 
 	/**
@@ -468,6 +474,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #setPerspective
 	 * @see #savePerspective
 	 */
+	@Nullable
 	public IPerspectiveDescriptor getPerspective();
 
 	/**
@@ -603,6 +610,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @exception PartInitException
 	 *                if the editor could not be created or initialized
 	 */
+	@Nullable
 	public IEditorPart openEditor(IEditorInput input, String editorId)
 			throws PartInitException;
 
@@ -630,6 +638,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @return an open editor, or <code>null</code> if an external editor was opened
 	 * @exception PartInitException if the editor could not be created or initialized
 	 */
+	@Nullable
 	public IEditorPart openEditor(IEditorInput input, String editorId,
 			boolean activate) throws PartInitException;
 
@@ -664,6 +673,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 * @see #MATCH_ID
 	 * @since 3.2
 	 */
+	@Nullable
 	public IEditorPart openEditor(final IEditorInput input,
 			final String editorId, final boolean activate, final int matchFlags)
 			throws PartInitException;
@@ -852,7 +862,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *                if the supplied mode is not valid
 	 * @since 3.0
 	 */
-	public IViewPart showView(String viewId, String secondaryId, int mode)
+	public IViewPart showView(String viewId, @Nullable String secondaryId, int mode)
 			throws PartInitException;
 
 	/**
@@ -910,6 +920,7 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *         perspective. The parts are in LRU order.
 	 * @since 3.0
 	 */
+	@Nullable
 	IViewPart[] getViewStack(IViewPart part);
 
 	/**
@@ -1150,7 +1161,8 @@ public interface IWorkbenchPage extends IPartService, ISelectionService {
 	 *         reference can be found.
 	 * @since 3.2
 	 */
-	public IWorkbenchPartReference getReference(IWorkbenchPart part);
+	@Nullable
+	public IWorkbenchPartReference getReference(@Nullable IWorkbenchPart part);
 
 	/**
 	 * Add back an open but non-participating editor
