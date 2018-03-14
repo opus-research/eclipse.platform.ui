@@ -19,12 +19,11 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
@@ -230,11 +229,11 @@ public class CompatibilityView extends CompatibilityPart {
 				renderer.clearModelToContribution(child, contribution);
 			}
 
-			if (child instanceof MOpaqueMenuSeparator) {
-				((MOpaqueMenuSeparator) child).setOpaqueItem(null);
+			if (child instanceof MMenuSeparator && child.getTags().contains("Opaque")) { //$NON-NLS-1$
+				child.getTransientData().remove("OpaqueItem"); //$NON-NLS-1$
 				it.remove();
-			} else if (child instanceof MOpaqueMenuItem) {
-				((MOpaqueMenuItem) child).setOpaqueItem(null);
+			} else if (child instanceof MMenuItem && child.getTags().contains("Opaque")) { //$NON-NLS-1$
+				child.getTransientData().remove("OpaqueItem"); //$NON-NLS-1$
 				it.remove();
 			} else if (child instanceof MMenu) {
 				MMenu submenu = (MMenu) child;
@@ -243,7 +242,7 @@ public class CompatibilityView extends CompatibilityPart {
 					renderer.clearModelToManager(submenu, manager);
 				}
 
-				if (child instanceof MOpaqueMenu) {
+				if (child instanceof MMenu && child.getTags().contains("Opaque")) { //$NON-NLS-1$
 					it.remove();
 				}
 				clearOpaqueMenuItems(renderer, submenu);
@@ -280,13 +279,13 @@ public class CompatibilityView extends CompatibilityPart {
 				// remove opaque mappings
 				for (Iterator<MToolBarElement> it = toolbar.getChildren().iterator(); it.hasNext();) {
 					MToolBarElement element = it.next();
-					if (element instanceof MOpaqueToolItem) {
+					if (element instanceof MDirectToolItem && element.getTags().contains("Opaque")) { //$NON-NLS-1$
 						IContributionItem item = tbmr.getContribution(element);
 						if (item != null) {
 							tbmr.clearModelToContribution(element, item);
 						}
 						// clear the reference
-						((MOpaqueToolItem) element).setOpaqueItem(null);
+						element.getTransientData().remove("OpaqueItem"); //$NON-NLS-1$
 						// remove the opaque item
 						it.remove();
 					}
