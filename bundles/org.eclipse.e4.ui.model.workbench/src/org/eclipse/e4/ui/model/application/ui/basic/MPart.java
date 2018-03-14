@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -37,15 +37,14 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getMenus <em>Menus</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getToolbar <em>Toolbar</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#isCloseable <em>Closeable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getLocalizedDescription <em>Localized Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.MPart#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated
@@ -164,22 +163,5 @@ public interface MPart extends MUIElement, MPartSashContainerElement, MStackElem
 	 * @generated
 	 */
 	String getLocalizedDescription();
-
-	/**
-	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * The collection of TrimBars associated with this part.
-	 * @since 1.3
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Trim Bars</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MTrimBar> getTrimBars();
 
 } // MPart

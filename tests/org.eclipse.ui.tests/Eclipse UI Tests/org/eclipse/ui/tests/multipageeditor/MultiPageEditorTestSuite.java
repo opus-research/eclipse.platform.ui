@@ -10,17 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.multipageeditor;
 
-import org.junit.runner.RunWith;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
  * The suite of tests for multi-page editors.
- *
+ * 
  * @since 3.0
  */
-@RunWith(org.junit.runners.AllTests.class)
 public class MultiPageEditorTestSuite extends TestSuite {
 
     /**

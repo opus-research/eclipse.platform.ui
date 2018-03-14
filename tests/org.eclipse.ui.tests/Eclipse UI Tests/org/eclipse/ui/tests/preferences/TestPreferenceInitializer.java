@@ -19,7 +19,7 @@ import org.eclipse.ui.tests.TestPlugin;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class TestPreferenceInitializer extends AbstractPreferenceInitializer {
 
@@ -32,7 +32,7 @@ public class TestPreferenceInitializer extends AbstractPreferenceInitializer {
 	@Override
 	public void initializeDefaultPreferences() {
 
-		IScopeContext context = DefaultScope.INSTANCE;
+		IScopeContext context = new DefaultScope();
 		IEclipsePreferences node = context.getNode(TestPlugin.getDefault()
 				.getBundle().getSymbolicName());
 		node.put(TEST_LISTENER_KEY, TEST_DEFAULT_VALUE);

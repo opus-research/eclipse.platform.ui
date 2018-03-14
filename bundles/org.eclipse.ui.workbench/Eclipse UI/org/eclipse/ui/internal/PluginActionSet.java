@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * PluginActionSet constructor comment.
-     *
+     * 
      * @param desc the descriptor
      */
     public PluginActionSet(ActionSetDescriptor desc) {
@@ -47,7 +47,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Adds one plugin action ref to the list.
-     *
+     * 
      * @param action the action
      */
     public void addPluginAction(WWinPluginAction action) {
@@ -56,7 +56,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the list of plugin actions for the set.
-     *
+     * 
      * @return the actions for the set
      */
     public IAction[] getPluginActions() {
@@ -91,7 +91,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the configuration element.
-     *
+     * 
      * @return the configuration element
      */
     public IConfigurationElement getConfigElement() {
@@ -100,7 +100,7 @@ public class PluginActionSet implements IActionSet {
 
     /**
      * Returns the underlying descriptor.
-     *
+     * 
      * @return the descriptor
      */
     public ActionSetDescriptor getDesc() {
@@ -125,11 +125,4 @@ public class PluginActionSet implements IActionSet {
 		}
 		disposableBuilder = builder;
 	}
-
-	@Override
-	public String toString() {
-		return "PluginActionSet [desc=" + desc + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ (pluginActions != null ? "actions=" + pluginActions : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

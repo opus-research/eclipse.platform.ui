@@ -16,12 +16,10 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 /**
  * Supplies an arrangement of views to test various forms of view activation.
- *
+ * 
  * @since 3.0
  */
 public class ViewPerspective implements IPerspectiveFactory {
-
-	public static final String ID = "org.eclipse.ui.tests.api.ViewPerspective";
 
     @Override
 	public void createInitialLayout(IPageLayout layout) {

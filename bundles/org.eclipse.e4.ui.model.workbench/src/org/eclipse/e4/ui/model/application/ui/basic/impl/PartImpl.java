@@ -1,10 +1,10 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -29,7 +29,6 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
 import org.eclipse.e4.ui.model.application.ui.impl.UIElementImpl;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
@@ -55,7 +54,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getContributionURI <em>Contribution URI</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getObject <em>Object</em>}</li>
@@ -75,8 +73,8 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#isCloseable <em>Closeable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getDescription <em>Description</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getLocalizedDescription <em>Localized Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.basic.impl.PartImpl#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
+ * </p>
  *
  * @generated
  */
@@ -350,16 +348,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 	 * @ordered
 	 */
 	protected static final String LOCALIZED_DESCRIPTION_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getTrimBars() <em>Trim Bars</em>}' containment reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTrimBars()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<MTrimBar> trimBars;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -683,20 +671,7 @@ public class PartImpl extends UIElementImpl implements MPart {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
 	 */
-	public List<MTrimBar> getTrimBars() {
-		if (trimBars == null) {
-			trimBars = new EObjectContainmentEList<MTrimBar>(MTrimBar.class, this, BasicPackageImpl.PART__TRIM_BARS);
-		}
-		return trimBars;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 */
-	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(
@@ -713,7 +688,7 @@ public class PartImpl extends UIElementImpl implements MPart {
 	 * <!-- end-user-doc -->
 	 */
 	public String getLocalizedLabel() {
-		return LocalizationHelper.getLocalizedLabel(this);
+		return LocalizationHelper.getLocalizedLabel(this);		
 	}
 
 	/**
@@ -740,8 +715,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return ((InternalEList<?>)getMenus()).basicRemove(otherEnd, msgs);
 			case BasicPackageImpl.PART__TOOLBAR:
 				return basicSetToolbar(null, msgs);
-			case BasicPackageImpl.PART__TRIM_BARS:
-				return ((InternalEList<?>)getTrimBars()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -791,8 +764,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return getDescription();
 			case BasicPackageImpl.PART__LOCALIZED_DESCRIPTION:
 				return getLocalizedDescription();
-			case BasicPackageImpl.PART__TRIM_BARS:
-				return getTrimBars();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -855,10 +826,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 			case BasicPackageImpl.PART__DESCRIPTION:
 				setDescription((String)newValue);
 				return;
-			case BasicPackageImpl.PART__TRIM_BARS:
-				getTrimBars().clear();
-				getTrimBars().addAll((Collection<? extends MTrimBar>)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -916,9 +883,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 			case BasicPackageImpl.PART__DESCRIPTION:
 				setDescription(DESCRIPTION_EDEFAULT);
 				return;
-			case BasicPackageImpl.PART__TRIM_BARS:
-				getTrimBars().clear();
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -967,8 +931,6 @@ public class PartImpl extends UIElementImpl implements MPart {
 				return DESCRIPTION_EDEFAULT == null ? description != null : !DESCRIPTION_EDEFAULT.equals(description);
 			case BasicPackageImpl.PART__LOCALIZED_DESCRIPTION:
 				return LOCALIZED_DESCRIPTION_EDEFAULT == null ? getLocalizedDescription() != null : !LOCALIZED_DESCRIPTION_EDEFAULT.equals(getLocalizedDescription());
-			case BasicPackageImpl.PART__TRIM_BARS:
-				return trimBars != null && !trimBars.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.internal.ide.dialogs.CleanDialog;
  * state for all projects in the workspace, and deletes all problem markers.
  * The next time a build is run, projects will have to be built from scratch.
  * Technically this is only necessary if an incremental builder misbehaves.
- *
+ * 
  * @since 3.0
  */
 public class BuildCleanAction extends Action implements ActionFactory.IWorkbenchAction {
@@ -30,7 +30,7 @@ public class BuildCleanAction extends Action implements ActionFactory.IWorkbench
 
 	/**
 	 * Creates a new BuildCleanAction
-	 *
+	 * 
 	 * @param window The window for parenting this action
 	 */
 	public BuildCleanAction(IWorkbenchWindow window) {

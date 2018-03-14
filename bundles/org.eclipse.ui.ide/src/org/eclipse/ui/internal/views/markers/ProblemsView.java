@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.views.markers.internal.MarkerSupportRegistry;
 
 /**
  * The Problems view is supplied by the IDE to show problems.
- *
+ * 
  * @since 3.4
  */
 public class ProblemsView extends MarkerSupportView {
@@ -34,7 +34,7 @@ public class ProblemsView extends MarkerSupportView {
 	 */
 	public ProblemsView() {
 		super(MarkerSupportRegistry.PROBLEMS_GENERATOR);
-
+		
 	}
 
 	@Override
@@ -44,8 +44,6 @@ public class ProblemsView extends MarkerSupportView {
 			image= WorkbenchPlugin.getDefault().getSharedImages().getImage(IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_ERROR);
 		} else if (counts[1].intValue() > 0) {
 			image= WorkbenchPlugin.getDefault().getSharedImages().getImage(IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_WARNING);
-		} else if (counts[2].intValue() > 0) {
-			image= WorkbenchPlugin.getDefault().getSharedImages().getImage(IDEInternalWorkbenchImages.IMG_ETOOL_PROBLEMS_VIEW_INFO);
 		}
 		setTitleImage(image);
 	}
@@ -54,7 +52,7 @@ public class ProblemsView extends MarkerSupportView {
 	protected IUndoContext getUndoContext() {
 		return WorkspaceUndoUtil.getProblemsUndoContext();
 	}
-
+	
 	@Override
 	protected String getDeleteOperationName(IMarker[] markers) {
 		Assert.isLegal(markers.length > 0);

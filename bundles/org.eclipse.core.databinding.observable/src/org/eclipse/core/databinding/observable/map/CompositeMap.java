@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 233306, 226289, 190881
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.map;
 
@@ -32,52 +31,45 @@ import org.eclipse.core.runtime.Assert;
  * Customer objects to their "last name" property of type String. The composite
  * map of map1 and map2 would then map Order objects to their customers' last
  * names.
- *
+ * 
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
- * @param <K>
- *            the type of the keys in this map
- * @param <I>
- *            the type of the intermediate values
- * @param <V>
- *            the type of the values in this map
- *
+ * 
  * @since 1.1
- *
+ * 
  */
-public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
+public class CompositeMap extends ObservableMap {
 	// adds that need to go through the second map and thus will be picked up by
 	// secondMapListener.
-	private Set<I> pendingAdds = new HashSet<>();
+	private Set pendingAdds = new HashSet();
 
 	// Removes that need to go through the second map and thus will be picked up
 	// by secondMapListener. Maps from value being removed to key being removed.
-	private Map<I, K> pendingRemoves = new HashMap<>();
+	private Map pendingRemoves = new HashMap();
 
 	// Changes that need to go through the second map and thus will be picked up
-	// by secondMapListener. Maps from old value to new value and new value to
-	// old
+	// by secondMapListener. Maps from old value to new value and new value to old
 	// value.
-	private Map<I, I> pendingChanges = new HashMap<>();
+	private Map pendingChanges = new HashMap();
 
-	private IMapChangeListener<K, I> firstMapListener = new IMapChangeListener<K, I>() {
+	private IMapChangeListener firstMapListener = new IMapChangeListener() {
 
 		@Override
-		public void handleMapChange(MapChangeEvent<? extends K, ? extends I> event) {
-			MapDiff<? extends K, ? extends I> diff = event.diff;
-			Set<I> rangeSetAdditions = new HashSet<>();
-			Set<I> rangeSetRemovals = new HashSet<>();
-			final Set<K> adds = new HashSet<>();
-			final Set<K> changes = new HashSet<>();
-			final Set<K> removes = new HashSet<>();
-			final Map<K, V> oldValues = new HashMap<>();
+		public void handleMapChange(MapChangeEvent event) {
+			MapDiff diff = event.diff;
+			Set rangeSetAdditions = new HashSet();
+			Set rangeSetRemovals = new HashSet();
+			final Set adds = new HashSet();
+			final Set changes = new HashSet();
+			final Set removes = new HashSet();
+			final Map oldValues = new HashMap();
 
-			for (K addedKey : diff.getAddedKeys()) {
-				I newValue = diff.getNewValue(addedKey);
+			for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
+				Object addedKey = it.next();
+				Object newValue = diff.getNewValue(addedKey);
 				if (!rangeSet.contains(newValue)) {
 					pendingAdds.add(newValue);
 					rangeSetAdditions.add(newValue);
@@ -86,9 +78,10 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 					wrappedMap.put(addedKey, secondMap.get(newValue));
 				}
 			}
-			for (K changedKey : diff.getChangedKeys()) {
-				I oldValue = diff.getOldValue(changedKey);
-				I newValue = diff.getNewValue(changedKey);
+			for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+				Object changedKey = it.next();
+				Object oldValue = diff.getOldValue(changedKey);
+				Object newValue = diff.getNewValue(changedKey);
 				boolean removed = firstMap.getKeys(oldValue).isEmpty();
 				boolean added = !rangeSet.contains(newValue);
 				if (removed) {
@@ -104,12 +97,13 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 					pendingChanges.put(newValue, oldValue);
 				} else {
 					changes.add(changedKey);
-					oldValues.put(changedKey, secondMap.get(oldValue));
+					oldValues.put(changedKey, oldValue);
 					wrappedMap.put(changedKey, secondMap.get(newValue));
 				}
 			}
-			for (K removedKey : diff.getRemovedKeys()) {
-				I oldValue = diff.getOldValue(removedKey);
+			for (Iterator it = diff.getRemovedKeys().iterator(); it.hasNext();) {
+				Object removedKey = it.next();
+				Object oldValue = diff.getOldValue(removedKey);
 				if (firstMap.getKeys(oldValue).isEmpty()) {
 					pendingRemoves.put(oldValue, removedKey);
 					rangeSetRemovals.add(oldValue);
@@ -121,30 +115,30 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 			}
 
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
-				fireMapChange(new MapDiff<K, V>() {
+				fireMapChange(new MapDiff() {
 
 					@Override
-					public Set<K> getAddedKeys() {
+					public Set getAddedKeys() {
 						return adds;
 					}
 
 					@Override
-					public Set<K> getChangedKeys() {
+					public Set getChangedKeys() {
 						return changes;
 					}
 
 					@Override
-					public V getNewValue(Object key) {
+					public Object getNewValue(Object key) {
 						return wrappedMap.get(key);
 					}
 
 					@Override
-					public V getOldValue(Object key) {
+					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
 					@Override
-					public Set<K> getRemovedKeys() {
+					public Set getRemovedKeys() {
 						return removes;
 					}
 				});
@@ -156,25 +150,26 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 		}
 	};
 
-	private IMapChangeListener<I, V> secondMapListener = new IMapChangeListener<I, V>() {
+	private IMapChangeListener secondMapListener = new IMapChangeListener() {
 
 		@Override
-		public void handleMapChange(MapChangeEvent<? extends I, ? extends V> event) {
-			MapDiff<? extends I, ? extends V> diff = event.diff;
-			final Set<K> adds = new HashSet<>();
-			final Set<K> changes = new HashSet<>();
-			final Set<K> removes = new HashSet<>();
-			final Map<K, V> oldValues = new HashMap<>();
-			final Map<K, V> newValues = new HashMap<>();
-			Set<I> addedKeys = new HashSet<I>(diff.getAddedKeys());
-			Set<I> removedKeys = new HashSet<I>(diff.getRemovedKeys());
+		public void handleMapChange(MapChangeEvent event) {
+			MapDiff diff = event.diff;
+			final Set adds = new HashSet();
+			final Set changes = new HashSet();
+			final Set removes = new HashSet();
+			final Map oldValues = new HashMap();
+			final Map newValues = new HashMap();
+			Set addedKeys = new HashSet(diff.getAddedKeys());
+			Set removedKeys = new HashSet(diff.getRemovedKeys());
 
-			for (I addedKey : addedKeys) {
-				Set<K> elements = firstMap.getKeys(addedKey);
-				V newValue = diff.getNewValue(addedKey);
+			for (Iterator it = addedKeys.iterator(); it.hasNext();) {
+				Object addedKey = it.next();
+				Set elements = firstMap.getKeys(addedKey);
+				Object newValue = diff.getNewValue(addedKey);
 				if (pendingChanges.containsKey(addedKey)) {
-					I oldKey = pendingChanges.remove(addedKey);
-					V oldValue;
+					Object oldKey = pendingChanges.remove(addedKey);
+					Object oldValue;
 					if (removedKeys.remove(oldKey)) {
 						oldValue = diff.getOldValue(oldKey);
 					} else {
@@ -183,16 +178,16 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 					pendingChanges.remove(oldKey);
 					pendingAdds.remove(addedKey);
 					pendingRemoves.remove(oldKey);
-					for (Iterator<K> it2 = elements.iterator(); it2.hasNext();) {
-						K element = it2.next();
+					for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+						Object element = it2.next();
 						changes.add(element);
 						oldValues.put(element, oldValue);
 						newValues.put(element, newValue);
 						wrappedMap.put(element, newValue);
 					}
 				} else if (pendingAdds.remove(addedKey)) {
-					for (Iterator<K> it2 = elements.iterator(); it2.hasNext();) {
-						K element = it2.next();
+					for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+						Object element = it2.next();
 						adds.add(element);
 						newValues.put(element, newValue);
 						wrappedMap.put(element, newValue);
@@ -201,19 +196,21 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 					Assert.isTrue(false, "unexpected case"); //$NON-NLS-1$
 				}
 			}
-			for (I changedKey : diff.getChangedKeys()) {
-				Set<K> elements = firstMap.getKeys(changedKey);
-				for (Iterator<K> it2 = elements.iterator(); it2.hasNext();) {
-					K element = it2.next();
+			for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+				Object changedKey = it.next();
+				Set elements = firstMap.getKeys(changedKey);
+				for (Iterator it2 = elements.iterator(); it2.hasNext();) {
+					Object element = it2.next();
 					changes.add(element);
 					oldValues.put(element, diff.getOldValue(changedKey));
-					V newValue = diff.getNewValue(changedKey);
+					Object newValue = diff.getNewValue(changedKey);
 					newValues.put(element, newValue);
 					wrappedMap.put(element, newValue);
 				}
 			}
-			for (I removedKey : removedKeys) {
-				K element = pendingRemoves.remove(removedKey);
+			for (Iterator it = removedKeys.iterator(); it.hasNext();) {
+				Object removedKey = it.next();
+				Object element = pendingRemoves.remove(removedKey);
 				if (element != null) {
 					if (pendingChanges.containsKey(removedKey)) {
 						Object newKey = pendingChanges.remove(removedKey);
@@ -222,12 +219,12 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 						pendingRemoves.remove(removedKey);
 						changes.add(element);
 						oldValues.put(element, diff.getOldValue(removedKey));
-						V newValue = secondMap.get(newKey);
+						Object newValue = secondMap.get(newKey);
 						newValues.put(element, newValue);
 						wrappedMap.put(element, newValue);
 					} else {
 						removes.add(element);
-						V oldValue = diff.getOldValue(removedKey);
+						Object oldValue = diff.getOldValue(removedKey);
 						oldValues.put(element, oldValue);
 						wrappedMap.remove(element);
 					}
@@ -237,30 +234,30 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 			}
 
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
-				fireMapChange(new MapDiff<K, V>() {
+				fireMapChange(new MapDiff() {
 
 					@Override
-					public Set<K> getAddedKeys() {
+					public Set getAddedKeys() {
 						return adds;
 					}
 
 					@Override
-					public Set<K> getChangedKeys() {
+					public Set getChangedKeys() {
 						return changes;
 					}
 
 					@Override
-					public V getNewValue(Object key) {
+					public Object getNewValue(Object key) {
 						return newValues.get(key);
 					}
 
 					@Override
-					public V getOldValue(Object key) {
+					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
 					@Override
-					public Set<K> getRemovedKeys() {
+					public Set getRemovedKeys() {
 						return removes;
 					}
 				});
@@ -268,18 +265,18 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 		}
 	};
 
-	private BidiObservableMap<K, I> firstMap;
-	private IObservableMap<I, V> secondMap;
+	private BidiObservableMap firstMap;
+	private IObservableMap secondMap;
 
-	private static class WritableSetPlus<E> extends WritableSet<E> {
-		void addAndRemove(Set<E> additions, Set<E> removals) {
+	private static class WritableSetPlus extends WritableSet {
+		void addAndRemove(Set additions, Set removals) {
 			wrappedSet.removeAll(removals);
 			wrappedSet.addAll(additions);
 			fireSetChange(Diffs.createSetDiff(additions, removals));
 		}
 	}
 
-	private WritableSetPlus<I> rangeSet = new WritableSetPlus<>();
+	private WritableSetPlus rangeSet = new WritableSetPlus();
 
 	/**
 	 * Creates a new composite map. Because the key set of the second map is
@@ -287,23 +284,24 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 	 * <code>firstMap</code>, it cannot be passed in as an argument. Instead,
 	 * the second map will be created by calling
 	 * <code>secondMapFactory.createObservable(valueSet())</code>.
-	 *
+	 * 
 	 * @param firstMap
 	 *            the first map
 	 * @param secondMapFactory
 	 *            a factory that creates the second map when given an observable
 	 *            set representing the value set of <code>firstMap</code>.
 	 */
-	public CompositeMap(IObservableMap<K, I> firstMap,
-			IObservableFactory<Set<I>, IObservableMap<I, V>> secondMapFactory) {
-		super(firstMap.getRealm(), new HashMap<K, V>());
-		this.firstMap = new BidiObservableMap<>(firstMap);
+	public CompositeMap(IObservableMap firstMap,
+			IObservableFactory secondMapFactory) {
+		super(firstMap.getRealm(), new HashMap());
+		this.firstMap = new BidiObservableMap(firstMap);
 		this.firstMap.addMapChangeListener(firstMapListener);
 		rangeSet.addAll(this.firstMap.values());
-		this.secondMap = secondMapFactory.createObservable(rangeSet);
+		this.secondMap = (IObservableMap) secondMapFactory
+				.createObservable(rangeSet);
 		secondMap.addMapChangeListener(secondMapListener);
-		for (Iterator<Map.Entry<K, I>> it = this.firstMap.entrySet().iterator(); it.hasNext();) {
-			Map.Entry<K, I> entry = it.next();
+		for (Iterator it = this.firstMap.entrySet().iterator(); it.hasNext();) {
+			Map.Entry entry = (Entry) it.next();
 			wrappedMap.put(entry.getKey(), secondMap.get(entry.getValue()));
 		}
 	}

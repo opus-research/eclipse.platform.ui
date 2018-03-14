@@ -25,10 +25,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- *
+ * 
  * @since 3.5
  * @author Prakash G.R.
- *
+ * 
  */
 public class MarkerTesterTest extends UITestCase {
 
@@ -43,44 +43,41 @@ public class MarkerTesterTest extends UITestCase {
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		project = ResourcesPlugin.getWorkspace().getRoot().getProject("tests");
-		if (!project.exists()) {
+		if (!project.exists())
 			project.create(null);
-		}
 
-		if (!project.isOpen()) {
+		if (!project.isOpen())
 			project.open(null);
-		}
 	}
 
 	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();
-		if (project.exists()) {
+		if (project.exists())
 			project.delete(true, null);
-		}
 	}
 
 	public void testSeverity() throws Exception {
 
 		IMarker errorMarker = project.createMarker(IMarker.PROBLEM);
 		Map attributes = new HashMap();
-		attributes.put(IMarker.SEVERITY, Integer.valueOf(IMarker.SEVERITY_ERROR));
+		attributes.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
 		errorMarker.setAttributes(attributes);
 
 		EvaluationContext context = new EvaluationContext(null, errorMarker);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"severity", null, Integer.valueOf(IMarker.SEVERITY_ERROR));
+				"severity", null, new Integer(IMarker.SEVERITY_ERROR));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
 		IMarker warningMarker = project.createMarker(IMarker.PROBLEM);
 		attributes = new HashMap();
-		attributes.put(IMarker.SEVERITY, Integer.valueOf(IMarker.SEVERITY_WARNING));
+		attributes.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_WARNING));
 		warningMarker.setAttributes(attributes);
 
 		context = new EvaluationContext(null, warningMarker);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "severity", null,
-				Integer.valueOf(IMarker.SEVERITY_WARNING));
+				new Integer(IMarker.SEVERITY_WARNING));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
@@ -125,23 +122,23 @@ public class MarkerTesterTest extends UITestCase {
 
 		IMarker highPriority = project.createMarker(IMarker.PROBLEM);
 		Map attributes = new HashMap();
-		attributes.put(IMarker.PRIORITY, Integer.valueOf(IMarker.PRIORITY_HIGH));
+		attributes.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_HIGH));
 		highPriority.setAttributes(attributes);
 
 		EvaluationContext context = new EvaluationContext(null, highPriority);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"priority", null, Integer.valueOf(IMarker.PRIORITY_HIGH));
+				"priority", null, new Integer(IMarker.PRIORITY_HIGH));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
 		IMarker lowPriority = project.createMarker(IMarker.PROBLEM);
 		attributes = new HashMap();
-		attributes.put(IMarker.PRIORITY, Integer.valueOf(IMarker.PRIORITY_LOW));
+		attributes.put(IMarker.PRIORITY, new Integer(IMarker.PRIORITY_LOW));
 		lowPriority.setAttributes(attributes);
 
 		context = new EvaluationContext(null, lowPriority);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "priority", null,
-				Integer.valueOf(IMarker.PRIORITY_LOW));
+				new Integer(IMarker.PRIORITY_LOW));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 	}
@@ -223,7 +220,7 @@ public class MarkerTesterTest extends UITestCase {
 
 		EvaluationContext context = new EvaluationContext(null, someTaskMarker);
 		TestExpression testExpression = new TestExpression(MARKER_NAMESPACE,
-				"resourceType", null, Integer.valueOf(IResource.PROJECT));
+				"resourceType", null, new Integer(IResource.PROJECT));
 		EvaluationResult result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 
@@ -237,7 +234,7 @@ public class MarkerTesterTest extends UITestCase {
 
 		context = new EvaluationContext(null, someOtherMarker);
 		testExpression = new TestExpression(MARKER_NAMESPACE, "resourceType",
-				null, Integer.valueOf(IResource.FOLDER));
+				null, new Integer(IResource.FOLDER));
 		result = testExpression.evaluate(context);
 		assertEquals(EvaluationResult.TRUE, result);
 

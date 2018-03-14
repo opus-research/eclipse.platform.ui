@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -54,9 +53,10 @@ import org.eclipse.ui.progress.IJobRunnable;
 
 /**
  * @since 3.3
- *
+ * 
  */
-public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSource {
+public class TestBackgroundSaveEditor extends EditorPart implements
+		ISaveablesSource {
 
 	public class MySaveable extends Saveable {
 
@@ -67,10 +67,11 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 		@Override
 		public void doSave(IProgressMonitor monitor) throws CoreException {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, 2);
-			IJobRunnable runnable = doSave(subMonitor.split(1), getSite());
-			if (runnable != null) {
-				runnable.run(subMonitor.split(1));
+			IJobRunnable runnable = doSave(subMonitor.newChild(1), getSite());
+			if (runnable!=null) {
+				runnable.run(subMonitor.newChild(1));
 			}
+			monitor.done();
 		}
 
 		@Override
@@ -168,7 +169,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 		}
 
 		public void setDirty(boolean dirty) {
-			firePropertyChange("dirty", Boolean.valueOf(this.dirty), Boolean.valueOf(
+			firePropertyChange("dirty", new Boolean(this.dirty), new Boolean(
 					this.dirty = dirty));
 			getSite().getShell().getDisplay().syncExec(new Runnable(){
 				@Override
@@ -204,7 +205,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 
 	@Override
 	public void createPartControl(Composite parent) {
-		Realm realm = DisplayRealm.getRealm(parent.getDisplay());
+		Realm realm = SWTObservables.getRealm(parent.getDisplay());
 		final DataBindingContext dbc = new DataBindingContext(realm);
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
@@ -252,7 +253,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 				dirtyObservable, null, null);
 		// IObservableValue inputAndOutputDiffer = new ComputedValue(realm) {
 		// protected Object calculate() {
-		// return Boolean.valueOf(!Util.equals(inputObservable.getValue(),
+		// return new Boolean(!Util.equals(inputObservable.getValue(),
 		// outputObservable.getValue()));
 		// }
 		// };
@@ -328,10 +329,9 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		if (!(input instanceof IFileEditorInput)) {
+		if (!(input instanceof IFileEditorInput))
 			throw new PartInitException(
 					"Invalid Input: Must be IFileEditorInput");
-		}
 		setSite(site);
 		setInput(input);
 		this.input = input;
@@ -505,5 +505,5 @@ public class TestBackgroundSaveEditor extends EditorPart implements ISaveablesSo
 	public Saveable[] getSaveables() {
 		return new Saveable[] { mySaveable };
 	}
-
+	
 }

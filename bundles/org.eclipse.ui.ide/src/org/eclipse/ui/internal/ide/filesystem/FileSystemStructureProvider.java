@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.ui.wizards.datatransfer.IImportStructureProvider;
 /**
  * This class provides information regarding the structure and
  * content of specified file system File objects.
- *
+ * 
  * class copied from org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider as its singleton
  */
 public class FileSystemStructureProvider implements IImportStructureProvider {
@@ -46,7 +46,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
         		continue;
         	result.add(file);
 		}
-
+        
         return result;
     }
 
@@ -55,7 +55,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
     		visitedDirs = new HashSet();
     	}
     }
-
+    
 	private boolean isRecursiveLink(File childFile) {
 
 		if (childFile.isDirectory()) {
@@ -101,7 +101,7 @@ public class FileSystemStructureProvider implements IImportStructureProvider {
 	public boolean isFolder(Object element) {
         return ((File) element).isDirectory();
     }
-
+    
     /**
      * Clears the visited dir information
      */

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 223808
+ *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 223808 
  *     James Blackburn (Broadcom Corp.) - Bug 294628 multiple selection
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
@@ -20,12 +20,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.eclipse.core.expressions.EvaluationContext;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -46,6 +44,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.registry.CategorizedPageRegistryReader;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PropertyPagesRegistryReader;
+import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
@@ -78,13 +77,13 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	private IConfigurationElement pageElement;
 
-	private SoftReference<Map<String, String>> filterProperties;
+	private SoftReference filterProperties;
 
 	private Expression enablementExpression;
 
 	/**
 	 * PropertyPageContributor constructor.
-	 *
+	 * 
 	 * @param pageId
 	 *            the id
 	 * @param element
@@ -103,6 +102,12 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 		initializeEnablement(element);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.dialogs.IPropertyPageContributor#contributePropertyPage(org.eclipse.ui.internal.dialogs.PropertyPageManager,
+	 *      java.lang.Object)
+	 */
 	@Override
 	public PreferenceNode contributePropertyPage(PropertyPageManager mng,
 			Object element) {
@@ -111,10 +116,10 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 			node.setPriority(-1);
 		return node;
 	}
-
+	
 	/**
 	 * Creates the page based on the information in the configuration element.
-	 *
+	 * 
 	 * @param element
 	 *            the adaptable element
 	 * @return the property page
@@ -137,7 +142,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 			if (adaptable) {
 				adapted = getAdaptedElement(adapted);
 				if (adapted == null) {
-					String message = "Error adapting selection to Property page " + pageId + " is being ignored"; //$NON-NLS-1$ //$NON-NLS-2$
+					String message = "Error adapting selection to Property page " + pageId + " is being ignored"; //$NON-NLS-1$ //$NON-NLS-2$            	
 					throw new CoreException(new Status(IStatus.ERROR,
 							WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR,
 							message, null));
@@ -166,7 +171,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Find an adapted element from the receiver.
-	 *
+	 * 
 	 * @param element
 	 * @return the adapted element or <code>null</code> if it could not be
 	 *         found.
@@ -182,7 +187,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Return the object class name
-	 *
+	 * 
 	 * @return the object class name
 	 */
 	public String getObjectClass() {
@@ -192,7 +197,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Returns page icon as defined in the registry.
-	 *
+	 * 
 	 * @return the page icon
 	 */
 	public ImageDescriptor getPageIcon() {
@@ -206,7 +211,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Returns page ID as defined in the registry.
-	 *
+	 * 
 	 * @return the page id
 	 */
 
@@ -216,7 +221,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Returns page name as defined in the registry.
-	 *
+	 * 
 	 * @return the page name
 	 */
 	public String getPageName() {
@@ -257,7 +262,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 			// Name filter
 			if (nameFilter != null) {
 				String objectName = object.toString();
-				IWorkbenchAdapter adapter = Adapters.adapt(object, IWorkbenchAdapter.class);
+				IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util
+						.getAdapter(object, IWorkbenchAdapter.class);
 				if (adapter != null) {
 					String elementName = adapter.getLabel(object);
 					if (elementName != null) {
@@ -280,7 +286,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 				object = adaptedObject;
 			}
 
-			filter = Adapters.adapt(object, IActionFilter.class);
+			filter = (IActionFilter) Util.getAdapter(object,
+					IActionFilter.class);
 
 			if (filter != null && !testCustom(object, filter))
 				return false;
@@ -316,7 +323,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	 * Returns an object array for the passed in object. If the object is an
 	 * IStructuredSelection, then return its array otherwise return a 1 element
 	 * Object[] containing the passed in object
-	 *
+	 * 
 	 * @param obj
 	 * @return an object array representing the passed in object
 	 */
@@ -353,13 +360,14 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 	 * by a matcher.
 	 */
 	private boolean testCustom(Object object, IActionFilter filter) {
-		Map<String, String> filterProperties = getFilterProperties();
+		Map filterProperties = getFilterProperties();
 
 		if (filterProperties == null)
 			return false;
-		for (Entry<String, String> entry : filterProperties.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
+		Iterator iter = filterProperties.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = (String) iter.next();
+			String value = (String) filterProperties.get(key);
 			if (!filter.testAttribute(object, key, value))
 				return false;
 		}
@@ -376,7 +384,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Get the id of the category.
-	 *
+	 * 
 	 * @return String
 	 * @since 3.1
 	 */
@@ -387,7 +395,7 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Return the children of the receiver.
-	 *
+	 * 
 	 * @return Collection
 	 */
 	public Collection getSubPages() {
@@ -396,28 +404,28 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Add child to the list of children.
-	 *
+	 * 
 	 * @param child
 	 */
 	public void addSubPage(RegistryPageContributor child) {
 		subPages.add(child);
 	}
 
-	private Map<String, String> getFilterProperties() {
+	private Map getFilterProperties() {
 		if (filterProperties == null || filterProperties.get() == null) {
-			Map<String, String> map = new HashMap<>();
-			filterProperties = new SoftReference<>(map);
+			Map map = new HashMap();
+			filterProperties = new SoftReference(map);
 			IConfigurationElement[] children = pageElement.getChildren();
 			for (int i = 0; i < children.length; i++) {
 				processChildElement(map, children[i]);
 			}
 		}
-		return filterProperties.get();
+		return (Map) filterProperties.get();
 	}
 
 	/**
 	 * Get the child with the given id.
-	 *
+	 * 
 	 * @param id
 	 * @return RegistryPageContributor
 	 */
@@ -434,10 +442,10 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 
 	/**
 	 * Parses child element and processes it.
-	 *
+	 * 
 	 * @since 3.1
 	 */
-	private void processChildElement(Map<String, String> map, IConfigurationElement element) {
+	private void processChildElement(Map map, IConfigurationElement element) {
 		String tag = element.getName();
 		if (tag.equals(PropertyPagesRegistryReader.TAG_FILTER)) {
 			String key = element
@@ -450,10 +458,16 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 * @since 3.1
+	 */
 	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IConfigurationElement.class)) {
-			return adapter.cast(getConfigurationElement());
+			return getConfigurationElement();
 		}
 		return null;
 	}

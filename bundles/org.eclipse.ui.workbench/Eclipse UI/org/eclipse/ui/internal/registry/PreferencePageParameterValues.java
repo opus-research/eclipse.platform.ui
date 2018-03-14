@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * This is only intended for use within the
  * <code>org.eclipse.ui.workbench</code> plug-in.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class PreferencePageParameterValues implements IParameterValues {
@@ -47,6 +47,11 @@ public final class PreferencePageParameterValues implements IParameterValues {
 		Platform.getExtensionRegistry().addRegistryChangeListener(
 				new IRegistryChangeListener() {
 
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
+					 */
 					@Override
 					public void registryChanged(IRegistryChangeEvent event) {
 						if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
@@ -62,7 +67,7 @@ public final class PreferencePageParameterValues implements IParameterValues {
 	/**
 	 * Iterate through the preference page and build the map of preference page
 	 * names to ids.
-	 *
+	 * 
 	 * @param values
 	 *            The Map being populated with parameter values.
 	 * @param preferenceNodes

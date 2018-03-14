@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,10 @@ import org.w3c.dom.css.CSSValue;
 /**
  * SWT Helper to transform CSS w3c object (org.w3c.dom.css.RGBColor....) into
  * SWT object (org.eclipse.swt.graphics.Color...).
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSSSWTHelpers {
 
@@ -44,11 +44,11 @@ public class CSSSWTHelpers {
 	public static PaintListener createBorderPaintListener(final CSSEngine engine,
 			final Control control) {
 		return new PaintListener() {
-
+			
 			/**
 			 * Converts the specified CSS value into an SWT Color instance. If
 			 * the conversion process fails, <code>null</code> will be returned.
-			 *
+			 * 
 			 * @param value the CSS value to convert
 			 * @return the Color corresponding to the provided RGB values, or <code>null</code> if the conversion process failed
 			 */
@@ -60,24 +60,21 @@ public class CSSSWTHelpers {
 					return null;
 				}
 			}
-
+			
 			@Override
 			public void paintControl(PaintEvent e) {
 				CSSBorderProperties border = (CSSBorderProperties) control
 						.getData(CSSSWTConstants.CONTROL_CSS2BORDER_KEY);
-				if (border == null) {
+				if (border == null)
 					return;
-				}
 				int width = border.getWidth();
 				GC gc = e.gc;
 				CSSPrimitiveValue value = border.getColor();
-				if (value == null) {
+				if (value == null)
 					return;
-				}
 				Color color = convert(value);
-				if (color != null) {
+				if (color != null)
 					gc.setForeground(color);
-				}
 				Rectangle rect = control.getBounds();
 				if (width == 0) {
 					Rectangle rect1 = new Rectangle(rect.x - width, rect.y
@@ -112,9 +109,8 @@ public class CSSSWTHelpers {
 	}
 
 	public static int getLineStyle(String borderStyle) {
-		if (borderStyle == null) {
+		if (borderStyle == null)
 			return SWT.LINE_SOLID;
-		}
 		// one hidden dotted dashed solid double groove ridge inset outset
 		if ("dashed".equals(borderStyle)) {
 			return SWT.LINE_DASH;

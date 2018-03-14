@@ -10,17 +10,14 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.concurrency;
 
-import org.junit.runner.RunWith;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
  * The suite of tests related to concurrency and deadlock.
- *
+ * 
  * @since 3.1
  */
-@RunWith(org.junit.runners.AllTests.class)
 public final class ConcurrencyTestSuite extends TestSuite {
 
     /**

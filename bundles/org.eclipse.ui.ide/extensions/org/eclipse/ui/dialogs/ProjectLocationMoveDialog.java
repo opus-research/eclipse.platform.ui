@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *    IBM Corporation - initial API and implementation
+ *    IBM Corporation - initial API and implementation 
  *    Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  *        font should be activated and used by other components.
  *    Oakland Software Incorporated (Francis Upton) <francisu@ieee.org>
@@ -48,7 +48,7 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	/**
 	 * Create a ProjectLocationMoveDialog on the supplied project parented by
 	 * the parentShell.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param existingProject
 	 */
@@ -58,6 +58,11 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 		this.project = existingProject;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.SelectionDialog#setMessage(java.lang.String)
+	 */
 	@Override
 	public void setMessage(String message) {
 		super.setMessage(message);
@@ -76,6 +81,9 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -83,6 +91,9 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 				IIDEHelpContextIds.PROJECT_LOCATION_SELECTION_DIALOG);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		Control content = super.createContents(parent);
@@ -90,6 +101,9 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 		return content;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		// page group
@@ -121,7 +135,16 @@ public class ProjectLocationMoveDialog extends SelectionDialog {
 	 * @return IErrorMessageReporter
 	 */
 	private IErrorMessageReporter getErrorReporter() {
-		return (errorMessage, notError) -> setMessage(errorMessage);
+		return new IErrorMessageReporter(){
+			/* (non-Javadoc)
+			 * @see org.eclipse.ui.internal.ide.dialogs.ProjectContentsLocationArea.IErrorMessageReporter#reportError(java.lang.String)
+			 */
+			@Override
+			public void reportError(String errorMessage, boolean notError) {
+				setMessage(errorMessage);
+				
+			}
+		};
 	}
 
 	/**

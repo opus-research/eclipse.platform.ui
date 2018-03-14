@@ -6,37 +6,28 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.preference;
 
 import static org.eclipse.e4.ui.css.swt.helpers.EclipsePreferencesHelper.PROPS_OVERRIDDEN_BY_CSS_PROP;
 import static org.eclipse.e4.ui.css.swt.properties.preference.EclipsePreferencesHandler.PREFERENCES_PROP;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import junit.framework.TestCase;
 
 import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.preference.EclipsePreferencesElement;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.w3c.dom.css.CSSValue;
 import org.w3c.dom.css.CSSValueList;
 
-public class EclipsePreferencesHandlerTest {
-
-	@Test
-	public void testApplyCSSProperty() {
+public class EclipsePreferencesHandlerTest extends TestCase {
+	public void testApplyCSSProperty() throws Exception {
 		// given
 		CSSEngine engine = mock(CSSEngine.class);
 
@@ -51,19 +42,13 @@ public class EclipsePreferencesHandlerTest {
 		EclipsePreferencesHandlerTestable handler = spy(new EclipsePreferencesHandlerTestable());
 
 		// when
-		try {
-			handler.applyCSSProperty(element, PREFERENCES_PROP, value, null, engine);
-		} catch (Exception e) {
-			fail("Apply CSSProperty should not throw exception");
-		}
+		handler.applyCSSProperty(element, PREFERENCES_PROP, value, null, engine);
 
 		// then
 		verify(handler, times(1)).overrideProperty(preferences, value);
-		engine.dispose();
 	}
 
-	@Test
-	public void testApplyCSSPropertyWhenCssValueList() {
+	public void testApplyCSSPropertyWhenCssValueList() throws Exception {
 		// given
 		CSSEngine engine = mock(CSSEngine.class);
 
@@ -84,23 +69,17 @@ public class EclipsePreferencesHandlerTest {
 		EclipsePreferencesHandlerTestable handler = spy(new EclipsePreferencesHandlerTestable());
 
 		// when
-		try {
-			handler.applyCSSProperty(element, PREFERENCES_PROP, listValue, null, engine);
-		} catch (Exception e) {
-			fail("Apply CSSProperty should not throw exception");
-
-		}
+		handler.applyCSSProperty(element, PREFERENCES_PROP, listValue, null,
+				engine);
 
 		// then
 		verify(handler, times(2)).overrideProperty(
 				any(IEclipsePreferences.class), any(CSSValue.class));
 		verify(handler, times(1)).overrideProperty(preferences, values[0]);
 		verify(handler, times(1)).overrideProperty(preferences, values[1]);
-		engine.dispose();
 	}
 
-	@Test
-	public void testOverridePropertyWithCSSValue() {
+	public void testOverridePropertyWithCSSValue() throws Exception {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences();
 
@@ -123,8 +102,7 @@ public class EclipsePreferencesHandlerTest {
 				"value2");
 	}
 
-	@Test
-	public void testOverridePropertyWithNameAndValueSplit() {
+	public void testOverridePropertyWithNameAndValueSplit() throws Exception {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences();
 
@@ -139,9 +117,8 @@ public class EclipsePreferencesHandlerTest {
 				"name"));
 	}
 
-	@Test
-	@Ignore("Failing on Hudson, see Bug 501875")
-	public void testOverridePropertyWithNameAndValueSplitAndNameAlreadyAddedByUser() {
+	public void testOverridePropertyWithNameAndValueSplitAndNameAlreadyAddedByUser()
+			throws Exception {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences();
 		// pref is already set that means that user has overridden it with the
@@ -158,8 +135,7 @@ public class EclipsePreferencesHandlerTest {
 		assertNull(preferences.get(PROPS_OVERRIDDEN_BY_CSS_PROP, null));
 	}
 
-	@Test
-	public void testCustomizePreferenceOverriddenByCSS() {
+	public void testCustomizePreferenceOverriddenByCSS() throws Exception {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences();
 

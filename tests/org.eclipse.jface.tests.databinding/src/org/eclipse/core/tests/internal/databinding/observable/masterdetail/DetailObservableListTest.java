@@ -45,7 +45,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts the use case of specifying null on construction for the detail
 	 * type of the detail list.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNull() throws Exception {
@@ -66,7 +66,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Asserts that you can't change the type across multiple inner observables.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNotNull() throws Exception {
@@ -173,7 +173,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 		public IObservableCollection createObservableCollection(
 				final Realm realm, final int elementCount) {
 
-			IObservableValue master = new WritableValue(realm, Integer.valueOf(
+			IObservableValue master = new WritableValue(realm, new Integer(
 					elementCount), Integer.class);
 			IObservableFactory factory = new FactoryStub(realm, elementType);
 			return new DetailObservableListStub(factory, master, elementType);
@@ -192,7 +192,7 @@ public class DetailObservableListTest extends AbstractDefaultRealmTestCase {
 		@Override
 		public void change(IObservable observable) {
 			final IObservableValue master = ((DetailObservableListStub) observable).master;
-			master.setValue(Integer.valueOf(((Integer) master.getValue())
+			master.setValue(new Integer(((Integer) master.getValue())
 					.intValue() + 1));
 		}
 	}

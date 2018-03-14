@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.ui.tests.activities;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,7 +44,7 @@ import org.eclipse.ui.tests.TestPlugin;
 import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
- *
+ * 
  * The dynamic test manipualtes the categories, activities and their definitions
  * and ensures that their content and their listeners are behaving properly.
  */
@@ -76,12 +76,12 @@ public class DynamicTest extends UITestCase {
     static final int ACTIVITY_ACTIVITY_BINDINGS_CHANGED = 9;
 
     static final int DESCRIPTION_CHANGED = 10;
-
+    
     static final int DEFAULT_ENABLED_CHANGED = 11;
 
     /**
      * Constructor.
-     *
+     * 
      * @param testName
      *            Test's name.
      */
@@ -94,7 +94,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test sizes of what has been read.
-     *
+     *  
      */
     public void testSizes() {
         assertTrue(activityManager.getDefinedCategoryIds().size() == 6);
@@ -104,7 +104,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test activity bindings.
-     *
+     *  
      */
     public void testActivityPatternBindings() {
         IActivity first_activity = activityManager
@@ -126,7 +126,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the enabled activities.
-     *
+     *  
      */
     public void testEnabledActivities() {
         // Add an enabled activity
@@ -145,7 +145,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the identifier listener.
-     *
+     *  
      */
     public void testIdentifiersListener() {
         final IIdentifier enabledIdentifier = activityManager
@@ -204,7 +204,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity manager listener.
-     *
+     *  
      */
     public void testActivityManagerListener() {
         activityManager
@@ -224,7 +224,7 @@ public class DynamicTest extends UITestCase {
                         case DEFINED_ACTIVITYIDS_CHANGED:
                             assertTrue(activityManagerEvent
                                     .haveDefinedActivityIdsChanged());
-                            break;
+                            break; 
                         }
                         listenerType = -1;
                     }
@@ -262,7 +262,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the activity listener.
-     *
+     *  
      */
     public void testActivityListener() {
         final String activity_to_listen_name = "Activity 18"; //$NON-NLS-1$
@@ -359,7 +359,7 @@ public class DynamicTest extends UITestCase {
         } catch (NotDefinedException e1) {
             fail(e1.getMessage());
         }
-
+        
         listenerType = DEFAULT_ENABLED_CHANGED;
         fixedModelRegistry.removeDefaultEnabledActivity(activity_to_listen.getId());
         assertTrue(listenerType == -1);
@@ -372,7 +372,7 @@ public class DynamicTest extends UITestCase {
 
     /**
      * Test the category listener.
-     *
+     *  
      */
     public void testCategoryListener() {
         final ICategory category_to_listen = activityManager
@@ -445,7 +445,7 @@ public class DynamicTest extends UITestCase {
         }
         assertTrue(listenerType == -1);
     }
-
+    
 	/**
 	 * Tests to ensure dynamism with regard to the extension registry.
 	 */
@@ -479,20 +479,27 @@ public class DynamicTest extends UITestCase {
 			}
 		});
 
-		String ACTIVITY = "<plugin><extension point=\"org.eclipse.ui.activities\">"
-				+ "<category id=\"dynamic.category\" name=\"Dynamic Activity Category\"/>"
-				+ "<activity id=\"dynamic.activity\" name=\"Dynamic Activity\"/>"
-				+ "<activity id=\"dynamic.parent\" name=\"Dynamic Parent Activity\"/>"
-				+ "<activityRequirementBinding requiredActivityId = \"dynamic.parent\" activityId = \"dynamic.activity\" />"
-				+ "<categoryActivityBinding categoryId = \"dynamic.category\" activityId = \"dynamic.activity\" />"
-				+ "<activityPatternBinding activityId=\"dynamic.activity\"  pattern=\"dynamic.activity/.*\"/>"
-				+ "<defaultEnablement id=\"dynamic.activity\"/>" + "</extension></plugin>";
-		byte[] bytes = ACTIVITY.toString().getBytes(StandardCharsets.UTF_8);
-		InputStream is = new ByteArrayInputStream(bytes);
-		IContributor contrib = ContributorFactoryOSGi.createContributor(TestPlugin.getDefault().getBundle());
-		ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory.getRegistry();
-		if (!registry.addContribution(is, contrib, false, null, null, registry.getTemporaryUserToken())) {
-			throw new RuntimeException();
+		try {
+			String ACTIVITY = "<plugin><extension point=\"org.eclipse.ui.activities\">"
+					+ "<category id=\"dynamic.category\" name=\"Dynamic Activity Category\"/>"
+					+ "<activity id=\"dynamic.activity\" name=\"Dynamic Activity\"/>"
+					+ "<activity id=\"dynamic.parent\" name=\"Dynamic Parent Activity\"/>"
+					+ "<activityRequirementBinding requiredActivityId = \"dynamic.parent\" activityId = \"dynamic.activity\" />"
+					+ "<categoryActivityBinding categoryId = \"dynamic.category\" activityId = \"dynamic.activity\" />"
+					+ "<activityPatternBinding activityId=\"dynamic.activity\"  pattern=\"dynamic.activity/.*\"/>"
+					+ "<defaultEnablement id=\"dynamic.activity\"/>"
+					+ "</extension></plugin>";
+			byte[] bytes = ACTIVITY.toString().getBytes("UTF-8");
+			InputStream is = new ByteArrayInputStream(bytes);
+			IContributor contrib = ContributorFactoryOSGi
+					.createContributor(TestPlugin.getDefault().getBundle());
+			ExtensionRegistry registry = (ExtensionRegistry) RegistryFactory
+					.getRegistry();
+			if (!registry.addContribution(is, contrib, false, null, null,
+					registry.getTemporaryUserToken()))
+				throw new RuntimeException();
+		} catch (UnsupportedEncodingException e) {
+			fail(e.getMessage(), e);
 		}
 
 		// spin the event loop and ensure that the changes come down the pipe.
@@ -502,11 +509,9 @@ public class DynamicTest extends UITestCase {
 				&& System.currentTimeMillis() < endTime) {
 
 			Display display = PlatformUI.getWorkbench().getDisplay();
-			if (display != null && !display.isDisposed()) {
-				while (display.readAndDispatch()) {
+			if (display != null && !display.isDisposed())
+				while (display.readAndDispatch())
 					;
-				}
-			}
 			display.sleep();
 
 		}

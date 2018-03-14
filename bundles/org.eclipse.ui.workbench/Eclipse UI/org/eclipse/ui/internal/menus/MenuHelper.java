@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 180308, 472654
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 180308
  *******************************************************************************/
 package org.eclipse.ui.internal.menus;
 
@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -64,7 +63,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.renderers.swt.AbstractContributionItem;
+import org.eclipse.e4.ui.workbench.renderers.swt.DirectContributionItem;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
@@ -104,20 +103,19 @@ public class MenuHelper {
 		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
-	private static final Pattern SCHEME_PATTERN = Pattern.compile("\\p{Alpha}[\\p{Alnum}+.-]*:.*"); //$NON-NLS-1$
-	public static final String MAIN_MENU_ID = ActionSet.MAIN_MENU;
+	public static final String MAIN_MENU_ID = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
 	private static Field urlField;
 
 	/**
 	 * The private 'location' field that is defined in the FileImageDescriptor.
-	 *
+	 * 
 	 * @see #getLocation(ImageDescriptor)
 	 */
 	private static Field locationField;
 
 	/**
 	 * The private 'name' field that is defined in the FileImageDescriptor.
-	 *
+	 * 
 	 * @see #getName(ImageDescriptor)
 	 */
 	private static Field nameField;
@@ -154,7 +152,17 @@ public class MenuHelper {
 				urlField.setAccessible(true);
 			}
 			return (URL) urlField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -167,7 +175,11 @@ public class MenuHelper {
 				locationField.setAccessible(true);
 			}
 			return (Class<?>) locationField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -180,7 +192,11 @@ public class MenuHelper {
 				nameField.setAccessible(true);
 			}
 			return (String) nameField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -252,8 +268,13 @@ public class MenuHelper {
 					// visWhenMap.put(configElement, visWhen);
 				}
 			}
-		} catch (InvalidRegistryObjectException | CoreException e) {
+		} catch (InvalidRegistryObjectException e) {
 			// visWhenMap.put(configElement, null);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
+			// visWhenMap.put(configElement, null);
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -261,7 +282,7 @@ public class MenuHelper {
 
 	/**
 	 * Do a type-safe extraction of an object from the evalation context
-	 *
+	 * 
 	 * @param context
 	 *            the evaluation context
 	 * @param expectedType
@@ -341,7 +362,7 @@ public class MenuHelper {
 		// If iconPath doesn't specify a scheme, then try to transform to a URL
 		// RFC 3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 		// This allows using data:, http:, or other custom URL schemes
-		if (!SCHEME_PATTERN.matcher(iconPath).matches()) {
+		if (!iconPath.matches("\\p{Alpha}[\\p{Alnum}+.-]*:.*")) { //$NON-NLS-1$
 			// First attempt to resolve in ISharedImages (e.g. "IMG_OBJ_FOLDER")
 			// as per bug 391232 & AbstractUIPlugin.imageDescriptorFromPlugin().
 			ImageDescriptor d = WorkbenchPlugin.getDefault().getSharedImages()
@@ -411,7 +432,7 @@ public class MenuHelper {
 	}
 
 	public static Map<String, String> getParameters(IConfigurationElement element) {
-		HashMap<String, String> map = new HashMap<>();
+		HashMap<String, String> map = new HashMap<String, String>();
 		IConfigurationElement[] parameters = element
 				.getChildren(IWorkbenchRegistryConstants.TAG_PARAMETER);
 		for (int i = 0; i < parameters.length; i++) {
@@ -638,7 +659,7 @@ public class MenuHelper {
 			RenderedElementUtil.setContributionManager(menu, generator);
 			item.setMenu(menu);
 		}
-
+		
 		item.setElementId(id);
 		item.setCommand(cmd);
 		if (iconUri == null) {
@@ -746,99 +767,94 @@ public class MenuHelper {
 	}
 
 	public static MMenuItem createItem(MApplication application, CommandContributionItem cci) {
-		MCommand command = getMCommand(application, cci);
-		if (command != null) {
-			CommandContributionItemParameter data = cci.getData();
-			MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createHandledMenuItem();
-			menuItem.setCommand(command);
-			menuItem.setContributorURI(command.getContributorURI());
-			if (data.label != null) {
-				menuItem.setLabel(data.label);
-			} else {
-				menuItem.setLabel(command.getCommandName());
-			}
-			if (data.mnemonic != null) {
-				menuItem.setMnemonics(data.mnemonic);
-			}
-			if (data.icon != null) {
-				menuItem.setIconURI(getIconURI(data.icon, application.getContext()));
-			} else {
-				menuItem.setIconURI(getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DEFAULT));
-			}
-			String itemId = cci.getId();
-			menuItem.setElementId(itemId == null ? command.getElementId() : itemId);
-			return menuItem;
+		if (cci.getCommand() == null) {
+			return null;
 		}
-		return null;
-	}
-
-	public static MHandledToolItem createToolItem(MApplication application, CommandContributionItem cci) {
-		MCommand command = getMCommand(application, cci);
-		if (command != null) {
-			CommandContributionItemParameter data = cci.getData();
-			MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
-			toolItem.setCommand(command);
-			toolItem.setContributorURI(command.getContributorURI());
-			toolItem.setVisible(cci.isVisible());
-
-			String iconURI = null;
-			String disabledIconURI = null;
-
-			toolItem.setType(ItemType.PUSH);
-			if (data.style == CommandContributionItem.STYLE_CHECK)
-				toolItem.setType(ItemType.CHECK);
-			else if (data.style == CommandContributionItem.STYLE_RADIO)
-				toolItem.setType(ItemType.RADIO);
-
-			if (data.icon != null) {
-				iconURI = getIconURI(data.icon, application.getContext());
-			}
-			if (iconURI == null) {
-				iconURI = getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DEFAULT);
-			}
-			if (iconURI == null) {
-				toolItem.setLabel(command.getCommandName());
-			} else {
-				toolItem.setIconURI(iconURI);
-			}
-
-			if (data.disabledIcon != null) {
-				disabledIconURI = getIconURI(data.disabledIcon, application.getContext());
-			}
-
-			if (disabledIconURI == null) {
-				disabledIconURI = getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DISABLED);
-			}
-
-			if (disabledIconURI != null) {
-				setDisabledIconURI(toolItem, disabledIconURI);
-			}
-
-			if (data.tooltip != null) {
-				toolItem.setTooltip(data.tooltip);
-			} else if (data.label != null) {
-				toolItem.setTooltip(data.label);
-			} else {
-				toolItem.setTooltip(command.getDescription());
-			}
-
-			String itemId = cci.getId();
-			toolItem.setElementId(itemId == null ? command.getElementId() : itemId);
-			return toolItem;
-		}
-		return null;
-	}
-
-	public static MCommand getMCommand(MApplication application, CommandContributionItem contribution) {
-		ParameterizedCommand command = contribution.getCommand();
-		if (command != null) {
-			for (MCommand mcommand : application.getCommands()) {
-				if (mcommand.getElementId().equals(command.getId())) {
-					return mcommand;
+		String id = cci.getCommand().getId();
+		for (MCommand command : application.getCommands()) {
+			if (id.equals(command.getElementId())) {
+				CommandContributionItemParameter data = cci.getData();
+				MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createHandledMenuItem();
+				menuItem.setCommand(command);
+				menuItem.setContributorURI(command.getContributorURI());
+				if (data.label != null) {
+					menuItem.setLabel(data.label);
+				} else {
+					menuItem.setLabel(command.getCommandName());
 				}
+				if (data.mnemonic != null) {
+					menuItem.setMnemonics(data.mnemonic);
+				}
+				if (data.icon != null) {
+					menuItem.setIconURI(getIconURI(data.icon, application.getContext()));
+				} else {
+					menuItem.setIconURI(getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DEFAULT));
+				}
+				String itemId = cci.getId();
+				menuItem.setElementId(itemId == null ? id : itemId);
+				return menuItem;
+			}
+		}
+		return null;
+	}
+
+	public static MToolItem createToolItem(MApplication application, CommandContributionItem cci) {
+		String id = cci.getCommand().getId();
+		for (MCommand command : application.getCommands()) {
+			if (id.equals(command.getElementId())) {
+				CommandContributionItemParameter data = cci.getData();
+				MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
+				toolItem.setCommand(command);
+				toolItem.setContributorURI(command.getContributorURI());
+				toolItem.setVisible(cci.isVisible());
+
+				String iconURI = null;
+				String disabledIconURI = null;
+
+				toolItem.setType(ItemType.PUSH);
+				if (data.style == CommandContributionItem.STYLE_CHECK)
+					toolItem.setType(ItemType.CHECK);
+				else if (data.style == CommandContributionItem.STYLE_RADIO)
+					toolItem.setType(ItemType.RADIO);
+
+				if (data.icon != null) {
+					iconURI = getIconURI(data.icon, application.getContext());
+				}
+				if (iconURI == null) {
+					iconURI = getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DEFAULT);
+				}
+				if (iconURI == null) {
+					toolItem.setLabel(command.getCommandName());
+				} else {
+					toolItem.setIconURI(iconURI);
+				}
+
+				if (data.disabledIcon != null) {
+					disabledIconURI = getIconURI(data.disabledIcon, application.getContext());
+				}
+
+				if (disabledIconURI == null) {
+					disabledIconURI = getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DISABLED);
+				}
+
+				if (disabledIconURI != null) {
+					setDisabledIconURI(toolItem, disabledIconURI);
+				}
+
+				if (data.tooltip != null) {
+					toolItem.setTooltip(data.tooltip);
+				} else if (data.label != null) {
+					toolItem.setTooltip(data.label);
+				} else {
+					toolItem.setTooltip(command.getDescription());
+				}
+
+				String itemId = cci.getId();
+				toolItem.setElementId(itemId == null ? id : itemId);
+				return toolItem;
 			}
 		}
 		return null;
@@ -962,7 +978,7 @@ public class MenuHelper {
 			// property listener is removed in
 			// DirectContributionItem#handleWidgetDispose()
 			action.addPropertyChangeListener(propertyListener);
-			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, new Runnable() {
+			toolItem.getTransientData().put(DirectContributionItem.DISPOSABLE, new Runnable() {
 						@Override
 						public void run() {
 							action.removePropertyChangeListener(propertyListener);
@@ -1152,7 +1168,7 @@ public class MenuHelper {
 	/**
 	 * Rewrite certain types of URLs to more durable forms, as these URLs may
 	 * may be persisted in the model.
-	 *
+	 * 
 	 * @param url
 	 *            the url
 	 * @return the rewritten URL

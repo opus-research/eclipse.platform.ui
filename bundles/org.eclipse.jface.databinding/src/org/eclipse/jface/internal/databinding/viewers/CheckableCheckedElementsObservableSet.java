@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.IElementComparer;
 
 /**
- *
+ * 
  * @since 1.2
  */
 public class CheckableCheckedElementsObservableSet extends
@@ -40,7 +40,7 @@ public class CheckableCheckedElementsObservableSet extends
 
 	/**
 	 * Constructs a new instance of the given realm, and checkable,
-	 *
+	 * 
 	 * @param realm
 	 *            the observable's realm
 	 * @param wrappedSet

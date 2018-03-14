@@ -32,13 +32,13 @@ import org.osgi.framework.Bundle;
 
 /**
  * Base class for mock intro and workbench parts.
- *
+ * 
  * @since 3.0
  */
 public class MockPart extends EventManager implements IExecutableExtension {
 
     /**
-     *
+     * 
      */
     public MockPart() {
         callTrace = new CallHistory(this);
@@ -61,7 +61,7 @@ public class MockPart extends EventManager implements IExecutableExtension {
     		MockPart.this.widgetDisposed();
     	}
     };
-
+    
     public CallHistory getCallHistory() {
         return callTrace;
     }
@@ -73,9 +73,9 @@ public class MockPart extends EventManager implements IExecutableExtension {
     @Override
 	public void setInitializationData(IConfigurationElement config,
  String propertyName, Object data) {
-
+    	
     	callTrace.add("setInitializationData");
-
+    	
         this.config = config;
         this.data = data;
 
@@ -108,7 +108,7 @@ public class MockPart extends EventManager implements IExecutableExtension {
     public void widgetDisposed() {
     	callTrace.add("widgetDisposed");
     }
-
+    
     /**
      * @see IWorkbenchPart#addPropertyListener(IPropertyListener)
      */
@@ -121,7 +121,7 @@ public class MockPart extends EventManager implements IExecutableExtension {
      */
     public void createPartControl(Composite parent) {
         callTrace.add("createPartControl");
-
+        
         parent.addDisposeListener(disposeListener);
     }
 
@@ -153,11 +153,10 @@ public class MockPart extends EventManager implements IExecutableExtension {
         callTrace.add("setFocus");
     }
 
-	/**
-	 * @param adapter
-	 * @see IAdaptable#getAdapter(Class)
-	 */
-	public <T> T getAdapter(Class<T> adapter) {
+    /**
+     * @see IAdaptable#getAdapter(Class)
+     */
+    public Object getAdapter(Class arg0) {
         return null;
     }
 
@@ -173,14 +172,14 @@ public class MockPart extends EventManager implements IExecutableExtension {
      */
     protected void firePropertyChange(int propertyId) {
         Object[] listeners = getListeners();
-        for (Object listener : listeners) {
-            IPropertyListener l = (IPropertyListener) listener;
+        for (int i = 0; i < listeners.length; i++) {
+            IPropertyListener l = (IPropertyListener) listeners[i];
             l.propertyChanged(this, propertyId);
         }
     }
 
     /**
-     * boolean to declare whether the site was properly initialized in the init method.
+     * boolean to declare whether the site was properly initialized in the init method. 
      */
     private boolean siteState = false;
 

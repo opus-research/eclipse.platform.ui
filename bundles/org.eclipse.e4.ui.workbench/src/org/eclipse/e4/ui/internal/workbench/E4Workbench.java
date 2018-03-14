@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 BestSolution.at and others.
+ * Copyright (c) 2008, 2013 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Christian Georgi (SAP) - Bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 393171
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -18,7 +16,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 import org.eclipse.e4.core.commands.ExpressionContext;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
@@ -28,7 +25,6 @@ import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IWorkbench;
-import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.osgi.framework.ServiceRegistration;
@@ -61,7 +57,15 @@ public class E4Workbench implements IWorkbench {
 	 * Value is: <code>rendererFactoryUri</code>
 	 */
 	public static final String RENDERER_FACTORY_URI = "rendererFactoryUri"; //$NON-NLS-1$
-
+	/**
+	 * The argument for setting the delta store location <br>
+	 * <br>
+	 * Value is: <code>deltaRestore</code>
+	 *
+	 * @deprecated
+	 */
+	@Deprecated
+	public static final String DELTA_RESTORE = "deltaRestore"; //$NON-NLS-1$
 	/**
 	 * The argument for setting RTL mode <br>
 	 * <br>
@@ -76,13 +80,6 @@ public class E4Workbench implements IWorkbench {
 	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	public static final String NO_SAVED_MODEL_FOUND = "NO_SAVED_MODEL_FOUND"; //$NON-NLS-1$
-	/**
-	 * The argument for the whether to forcefully show the location in the window title (set on the
-	 * command line)<br>
-	 * <br>
-	 * Value is: <code>forcedShowLocation</code>
-	 */
-	public static final String FORCED_SHOW_LOCATION = "forcedShowLocation"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;
@@ -124,13 +121,11 @@ public class E4Workbench implements IWorkbench {
 		uiEventPublisher = new UIEventPublisher(appContext);
 		appContext.set(UIEventPublisher.class, uiEventPublisher);
 		((Notifier) uiRoot).eAdapters().add(uiEventPublisher);
-		Hashtable<String, Object> properties = new Hashtable<>();
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", getId()); //$NON-NLS-1$
 
 		osgiRegistration = Activator.getDefault().getContext()
 				.registerService(IWorkbench.class.getName(), this, properties);
-
-		ContextInjectionFactory.make(PartOnTopManager.class, appContext);
 	}
 
 	@Override
@@ -185,9 +180,6 @@ public class E4Workbench implements IWorkbench {
 
 	@Override
 	public boolean close() {
-		// Fire an E4 lifecycle notification
-		UIEvents.publishEvent(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, appModel);
-
 		if (renderer != null) {
 			renderer.stop();
 		}

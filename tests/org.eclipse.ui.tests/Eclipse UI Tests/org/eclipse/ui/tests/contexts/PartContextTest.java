@@ -28,17 +28,17 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 /**
  * Test that the contexts activated through their local services are only in
  * play when their local service is active.
- *
+ * 
  * @since 3.2
  */
 public class PartContextTest extends UITestCase {
 	/**
-	 *
+	 * 
 	 */
 	public static final String PAGE_VIEW_ID = "org.eclipse.ui.tests.contexts.MockPageView";
 
 	/**
-	 *
+	 * 
 	 */
 	private static final String TEXT_EDITOR_ID = "org.eclipse.ui.DefaultTextEditor";
 
@@ -102,8 +102,6 @@ public class PartContextTest extends UITestCase {
 		checkActiveContext(globalService, WINDOW_CONTEXT_ID, false);
 
 		IWorkbenchWindow window = openTestWindow();
-		assertTrue(forceActive(window.getShell()));
-
 		IContextService localService = window
 				.getService(IContextService.class);
 		localService.activateContext(WINDOW_CONTEXT_ID);
@@ -116,7 +114,7 @@ public class PartContextTest extends UITestCase {
 	/**
 	 * Test context activation while switching through the pages of a pagebook.
 	 * Exercises the NestableContextService.
-	 *
+	 * 
 	 * @throws Exception
 	 *             on error
 	 */
@@ -174,7 +172,7 @@ public class PartContextTest extends UITestCase {
 
 	/**
 	 * Assert if the contextId is active in the contextService.
-	 *
+	 * 
 	 * @param contextService
 	 * @param contextId
 	 * @param isActive

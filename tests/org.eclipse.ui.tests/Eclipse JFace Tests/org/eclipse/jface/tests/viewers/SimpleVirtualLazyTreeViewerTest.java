@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * Tests TreeViewer's VIRTUAL support with a lazy content provider.
- *
+ * 
  * @since 3.2
  */
 public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
@@ -43,7 +43,7 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 
 	private class LazyTreeContentProvider implements ILazyTreeContentProvider {
 		/**
-		 *
+		 * 
 		 */
 		private Object input;
 
@@ -52,10 +52,9 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 			updateElementCallCount++;
 			String parentString = (String) parent;
 			Object childElement = parentString + "-" + (index + offset);
-			if (printCallbacks) {
+			if (printCallbacks)
 				System.out.println("updateElement called for " + parent
 						+ " at " + index);
-			}
 			if (callbacksEnabled) {
 				getTreeViewer().replace(parent, index, childElement);
 				getTreeViewer().setChildCount(childElement, NUM_CHILDREN);
@@ -79,10 +78,9 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 
 		@Override
 		public void updateChildCount(Object element, int currentChildCount) {
-			if (printCallbacks) {
+			if (printCallbacks)
 				System.out.println("updateChildCount called for " + element
 						+ " with " + currentChildCount);
-			}
 			if (callbacksEnabled) {
 				getTreeViewer().setChildCount(element,
 						element == input ? NUM_ROOTS : NUM_CHILDREN);
@@ -197,10 +195,6 @@ public class SimpleVirtualLazyTreeViewerTest extends ViewerTestCase {
 	public void testRemoveAt() {
 		if (disableTestsBug347491) {
 			System.out.println(getName() + " disabled due to Bug 347491");
-			return;
-		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
 			return;
 		}
 		assertTrue("SWT.SetData not received", setDataCalled);

@@ -38,8 +38,8 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
     // This boolean should only be true if the earlyStartup() method
     // has been called.
     private static boolean earlyStartupCalled = false;
-
-    public static final String PLUGIN_ID = "org.eclipse.ui.tests";
+    
+    public static final String PLUGIN_ID = "org.eclipse.ui.tests"; 
 
     /**
      * The constructor.
@@ -94,7 +94,7 @@ public class TestPlugin extends AbstractUIPlugin implements IStartup {
     public ImageDescriptor getImageDescriptor(String relativePath) {
         String iconPath = "icons/";
         try {
-			URL installURL = getBundle().getEntry("/");
+            URL installURL = getDescriptor().getInstallURL();
             URL url = new URL(installURL, iconPath + relativePath);
             return ImageDescriptor.createFromURL(url);
         } catch (MalformedURLException e) {

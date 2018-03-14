@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
     /**
      * Creates a <code>ZipFileStructureProvider</code>, which will operate
      * on the passed zip file.
-     *
+     * 
      * @param sourceFile the zip file used to create this structure provider
      */
     public ZipFileStructureProvider(ZipFile sourceFile) {
@@ -99,6 +99,9 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
         addToChildren(parent, entry);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IImportStructureProvider
+     */
     @Override
 	public List getChildren(Object element) {
         if (children == null) {
@@ -108,6 +111,9 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
         return ((List) children.get(element));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IImportStructureProvider
+     */
     @Override
 	public InputStream getContents(Object element) {
         try {
@@ -118,11 +124,17 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IImportStructureProvider
+     */
     @Override
 	public String getFullPath(Object element) {
         return ((ZipEntry) element).getName();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IImportStructureProvider
+     */
     @Override
 	public String getLabel(Object element) {
         if (element.equals(root)) {
@@ -143,7 +155,7 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
 
     /**
      * Returns the zip file that this provider provides structure for.
-     *
+     * 
      * @return the zip file this provider provides structure for
      */
     public ZipFile getZipFile() {
@@ -172,6 +184,9 @@ public class ZipFileStructureProvider implements IImportStructureProvider {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IImportStructureProvider
+     */
     @Override
 	public boolean isFolder(Object element) {
         return ((ZipEntry) element).isDirectory();

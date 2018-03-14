@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -35,8 +36,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ILayoutExtension;
@@ -75,21 +78,17 @@ public class TitleRegion extends Canvas {
 	private class HoverListener implements MouseTrackListener,
 			MouseMoveListener {
 
-		@Override
 		public void mouseEnter(MouseEvent e) {
 			setHoverState(STATE_HOVER_FULL);
 		}
 
-		@Override
 		public void mouseExit(MouseEvent e) {
 			setHoverState(STATE_NORMAL);
 		}
 
-		@Override
 		public void mouseHover(MouseEvent e) {
 		}
 
-		@Override
 		public void mouseMove(MouseEvent e) {
 			if (e.button > 0)
 				setHoverState(STATE_NORMAL);
@@ -106,7 +105,6 @@ public class TitleRegion extends Canvas {
 			setExpanded(true);
 		}
 
-		@Override
 		public void setExpanded(boolean expanded) {
 			if (firstTime) {
 				super.setExpanded(expanded);
@@ -120,13 +118,11 @@ public class TitleRegion extends Canvas {
 
 	private class TitleRegionLayout extends Layout implements ILayoutExtension {
 
-		@Override
 		protected Point computeSize(Composite composite, int wHint, int hHint,
 				boolean flushCache) {
 			return layout(composite, false, 0, 0, wHint, hHint, flushCache);
 		}
 
-		@Override
 		protected void layout(Composite composite, boolean flushCache) {
 			Rectangle carea = composite.getClientArea();
 			layout(composite, true, carea.x, carea.y, carea.width,
@@ -225,12 +221,10 @@ public class TitleRegion extends Canvas {
 			return size;
 		}
 
-		@Override
 		public int computeMaximumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, SWT.DEFAULT, SWT.DEFAULT, changed).x;
 		}
 
-		@Override
 		public int computeMinimumWidth(Composite parent, boolean changed) {
 			return computeSize(parent, 0, SWT.DEFAULT, changed).x;
 		}
@@ -243,21 +237,25 @@ public class TitleRegion extends Canvas {
 		titleCache = new SizeCache();
 		super.setLayout(new TitleRegionLayout());
 		hookHoverListeners();
-		addListener(SWT.Dispose, e -> {
-			if (dragImage != null) {
-				dragImage.dispose();
-				dragImage = null;
+		addListener(SWT.Dispose, new Listener() {
+			public void handleEvent(Event e) {
+				if (dragImage != null) {
+					dragImage.dispose();
+					dragImage = null;
+				}
 			}
 		});
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Control#forceFocus()
+	 */
 	public boolean forceFocus() {
 		return false;
 	}
 
 	private Color getColor(String key) {
-		return ((FormHeading) getParent()).colors.get(key);
+		return (Color) ((FormHeading) getParent()).colors.get(key);
 	}
 
 	private void hookHoverListeners() {
@@ -266,7 +264,11 @@ public class TitleRegion extends Canvas {
 		addMouseMoveListener(listener);
 		titleLabel.addMouseTrackListener(listener);
 		titleLabel.addMouseMoveListener(listener);
-		addPaintListener(e -> onPaint(e));
+		addPaintListener(new PaintListener() {
+			public void paintControl(PaintEvent e) {
+				onPaint(e);
+			}
+		});
 	}
 
 	private void onPaint(PaintEvent e) {
@@ -314,13 +316,11 @@ public class TitleRegion extends Canvas {
 	/**
 	 * Fully delegates the size computation to the internal layout manager.
 	 */
-	@Override
 	public final Point computeSize(int wHint, int hHint, boolean changed) {
 		return ((TitleRegionLayout) getLayout()).computeSize(this, wHint,
 				hHint, changed);
 	}
 
-	@Override
 	public final void setLayout(Layout layout) {
 		// do nothing
 	}
@@ -356,7 +356,6 @@ public class TitleRegion extends Canvas {
 			busyLabel.setToolTipText(toolTip);
 	}
 
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		titleLabel.setBackground(bg);
@@ -366,7 +365,6 @@ public class TitleRegion extends Canvas {
 			menuHyperlink.setBackground(bg);
 	}
 
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		titleLabel.setForeground(fg);
@@ -386,7 +384,6 @@ public class TitleRegion extends Canvas {
 		return titleLabel.getText();
 	}
 
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		titleLabel.setFont(font);
@@ -428,10 +425,11 @@ public class TitleRegion extends Canvas {
 	/**
 	 * Sets the form's busy state. Busy form will display 'busy' animation in
 	 * the area of the title image.
-	 *
+	 * 
 	 * @param busy
 	 *            the form's busy state
 	 */
+
 	public boolean setBusy(boolean busy) {
 		if (busy)
 			ensureBusyLabelExists();
@@ -516,7 +514,6 @@ public class TitleRegion extends Canvas {
 		source.setTransfer(transferTypes);
 		source.addDragListener(listener);
 		source.setDragSourceEffect(new DragSourceEffect(control) {
-			@Override
 			public void dragStart(DragSourceEvent event) {
 				event.image = createDragEffectImage();
 			}

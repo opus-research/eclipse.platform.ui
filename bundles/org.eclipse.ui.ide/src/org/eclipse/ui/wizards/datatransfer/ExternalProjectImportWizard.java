@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class ExternalProjectImportWizard extends Wizard implements
 	private WizardProjectsImportPage mainPage;
 	private IStructuredSelection currentSelection = null;
 	private String initialPath = null;
-
+	
     /**
      * Constructor for ExternalProjectImportWizard.
      */
@@ -57,7 +57,7 @@ public class ExternalProjectImportWizard extends Wizard implements
 
     /**
      * Constructor for ExternalProjectImportWizard.
-     *
+     * 
      * @param initialPath Default path for wizard to import
      * @since 3.5
      */
@@ -68,16 +68,19 @@ public class ExternalProjectImportWizard extends Wizard implements
         setNeedsProgressMonitor(true);
         IDialogSettings workbenchSettings = IDEWorkbenchPlugin.getDefault()
         		.getDialogSettings();
-
+        
 		IDialogSettings wizardSettings = workbenchSettings
 		        .getSection(EXTERNAL_PROJECT_SECTION);
 		if (wizardSettings == null) {
 			wizardSettings = workbenchSettings
 		            .addNewSection(EXTERNAL_PROJECT_SECTION);
 		}
-		setDialogSettings(wizardSettings);
+		setDialogSettings(wizardSettings);        
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public void addPages() {
         super.addPages();
@@ -86,6 +89,9 @@ public class ExternalProjectImportWizard extends Wizard implements
         addPage(mainPage);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
     @Override
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(DataTransferMessages.DataTransfer_importTitle);
@@ -94,12 +100,18 @@ public class ExternalProjectImportWizard extends Wizard implements
         this.currentSelection = currentSelection;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performCancel() {
     	mainPage.performCancel();
         return true;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
     @Override
 	public boolean performFinish() {
         return mainPage.createProjects();

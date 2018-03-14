@@ -50,7 +50,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
     public void testTypePage() throws Throwable {
         IWizardPage page = fWizardDialog.getCurrentPage();
         WorkingSetDescriptor[] descriptors = getEditableWorkingSetDescriptors();
-
+        
         // the first page must be the type selection page iff there is more than one working set type
         assertEquals(descriptors.length > 1, (page instanceof WorkingSetTypePage));
 
@@ -78,7 +78,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
             assertTrue(fWizard.canFinish() == false);
 
             /*
-             * Check page texts
+             * Check page texts 
              */
             DialogCheck.assertDialogTexts(fWizardDialog, this);
         }
@@ -91,7 +91,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         IWizardPage defaultEditPage = registry.getDefaultWorkingSetPage();
         String defaultEditPageClassName = defaultEditPage.getClass().getName();
         WorkingSetDescriptor[] descriptors = getEditableWorkingSetDescriptors();
-
+        
         // the first page must be the type selection page iff there is more than one working set type
         assertEquals(descriptors.length > 1, (page instanceof WorkingSetTypePage));
 
@@ -105,7 +105,8 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
             Table table = (Table) widgets.get(0);
             TableItem[] items = table.getItems();
             String workingSetName = null;
-            for (WorkingSetDescriptor descriptor : descriptors) {
+            for (int descriptorIndex = 0; descriptorIndex < descriptors.length; descriptorIndex++) {
+                WorkingSetDescriptor descriptor = descriptors[descriptorIndex];
                 if (defaultEditPageClassName.equals(descriptor
                         .getPageClassName())) {
                     workingSetName = descriptor.getName();
@@ -138,7 +139,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         assertFalse(fWizard.canFinish());
         assertNull(page.getErrorMessage());
         assertNull(page.getMessage());
-
+        
         /*
          * Test page state with partial page input
          */
@@ -169,7 +170,7 @@ public class UINewWorkingSetWizardAuto extends UIWorkingSetWizardsAuto {
         assertTrue(ArrayUtil.contains(workingSetItems, p2));
 
         /*
-         * Check page texts
+         * Check page texts 
          */
         DialogCheck.assertDialogTexts(fWizardDialog, this);
     }

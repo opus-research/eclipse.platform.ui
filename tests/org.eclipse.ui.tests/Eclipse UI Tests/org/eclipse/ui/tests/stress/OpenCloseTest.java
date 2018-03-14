@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
  */
 public class OpenCloseTest extends UITestCase {
     /**
-	 *
+	 * 
 	 */
 	private static final String ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE = "org.eclipse.jdt.ui.JavaPerspective";
 
@@ -53,32 +53,36 @@ public class OpenCloseTest extends UITestCase {
 
     /**
      * Constructor.
-     *
+     * 
      * @param testName
      *            Test's name.
      */
     public OpenCloseTest(String testName) {
         super(testName);
-		workbenchWindow = (WorkbenchWindow) PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        workbenchWindow = (WorkbenchWindow) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow();
     }
 
     /**
      * Test the opening and closing of a file.
-     *
+     *  
      */
     public void testOpenCloseFile() {
         IWorkbenchPage page = workbenchWindow.getActivePage();
         try {
-			FileUtil.createProject("TestProject");
-			IProject testProject = ResourcesPlugin.getWorkspace().getRoot().getProject("TestProject"); //$NON-NLS-1$
-			FileUtil.createFile("tempFile.txt", testProject);
-			testProject.open(null);
-			IEditorInput editorInput = new FileEditorInput(testProject.getFile("tempFile.txt"));
-			IEditorPart editorPart = null;
-			for (index = 0; index < numIterations; index++) {
-				editorPart = page.openEditor(editorInput, "org.eclipse.ui.DefaultTextEditor"); //$NON-NLS-1$
-				page.closeEditor(editorPart, false);
-			}
+            FileUtil.createProject("TestProject");
+            IProject testProject = ResourcesPlugin.getWorkspace().getRoot()
+                    .getProject("TestProject"); //$NON-NLS-1$
+            FileUtil.createFile("tempFile.txt", testProject);
+            testProject.open(null);
+            IEditorInput editorInput = new FileEditorInput(testProject
+                    .getFile("tempFile.txt"));
+            IEditorPart editorPart = null;
+            for (index = 0; index < numIterations; index++) {
+                editorPart = page.openEditor(editorInput,
+                        "org.eclipse.ui.DefaultTextEditor"); //$NON-NLS-1$
+                page.closeEditor(editorPart, false);
+            }
             FileUtil.deleteProject(testProject);
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -87,15 +91,16 @@ public class OpenCloseTest extends UITestCase {
 
     /**
      * Test opening and closing of workbench window.
-     *
+     *  
      */
     public void testOpenCloseWorkbenchWindow() {
         IWorkbenchWindow secondWorkbenchWindow = null;
         try {
-			for (index = 0; index < numIterations; index++) {
-				secondWorkbenchWindow = PlatformUI.getWorkbench().openWorkbenchWindow(getPageInput());
-				secondWorkbenchWindow.close();
-			}
+            for (index = 0; index < numIterations; index++) {
+                secondWorkbenchWindow = PlatformUI.getWorkbench()
+                        .openWorkbenchWindow(getPageInput());
+                secondWorkbenchWindow.close();
+            }
         } catch (WorkbenchException e) {
             e.printStackTrace(System.err);
         }
@@ -103,49 +108,52 @@ public class OpenCloseTest extends UITestCase {
 
     /**
      * Test open and close of perspective.
-     *
+     *  
      */
     public void testOpenClosePerspective() {
 		ICommandService commandService = fWorkbench.getService(ICommandService.class);
 		Command command = commandService.getCommand("org.eclipse.ui.window.closePerspective");
-
+		
 		HashMap parameters = new HashMap();
 		parameters.put(IWorkbenchCommandConstants.WINDOW_CLOSE_PERSPECTIVE_PARM_ID,
 				ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE);
-
+		
 		ParameterizedCommand pCommand = ParameterizedCommand.generateCommand(command, parameters);
-
-		IHandlerService handlerService = workbenchWindow.getService(IHandlerService.class);
-
-		for (index = 0; index < numIterations; index++) {
-			try {
-				PlatformUI.getWorkbench().showPerspective(ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE, workbenchWindow);
-				try {
-					handlerService.executeCommand(pCommand, null);
-				} catch (ExecutionException e1) {
-				} catch (NotDefinedException e1) {
-				} catch (NotEnabledException e1) {
-				} catch (NotHandledException e1) {
-				}
-			} catch (WorkbenchException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+		
+		IHandlerService handlerService = (IHandlerService) workbenchWindow
+				.getService(IHandlerService.class);
+                
+        for (index = 0; index < numIterations; index++) {
+            try {
+                PlatformUI.getWorkbench().showPerspective(
+                        ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE, workbenchWindow);
+        		try {
+        			handlerService.executeCommand(pCommand, null);
+        		} catch (ExecutionException e1) {
+        		} catch (NotDefinedException e1) {
+        		} catch (NotEnabledException e1) {
+        		} catch (NotHandledException e1) {
+        		}
+            } catch (WorkbenchException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * Test open and close of view.
-     *
+     *  
      */
     public void testOpenCloseView() {
         IViewPart consoleView = null;
         try {
-			IWorkbenchPage page = PlatformUI.getWorkbench().showPerspective(ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE,
-					workbenchWindow);
-			for (index = 0; index < numIterations; index++) {
-				consoleView = page.showView("org.eclipse.ui.views.ResourceNavigator");
-				page.hideView(consoleView);
-			}
+            IWorkbenchPage page = PlatformUI.getWorkbench().showPerspective(
+                    ORG_ECLIPSE_JDT_UI_JAVA_PERSPECTIVE, workbenchWindow);
+            for (index = 0; index < numIterations; index++) {
+                consoleView = page
+                        .showView("org.eclipse.ui.views.ResourceNavigator");
+                page.hideView(consoleView);
+            }
         } catch (WorkbenchException e) {
             e.printStackTrace();
         }
@@ -153,13 +161,14 @@ public class OpenCloseTest extends UITestCase {
 
     /**
      * Test open and close intro.
-     *
+     *  
      */
     public void testOpenCloseIntro() {
         IIntroPart introPart = null;
         for (index = 0; index < numIterations; index++) {
-			introPart = PlatformUI.getWorkbench().getIntroManager().showIntro(workbenchWindow, false);
-			PlatformUI.getWorkbench().getIntroManager().closeIntro(introPart);
+            introPart = PlatformUI.getWorkbench().getIntroManager().showIntro(
+                    workbenchWindow, false);
+            PlatformUI.getWorkbench().getIntroManager().closeIntro(introPart);
         }
     }
 }

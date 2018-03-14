@@ -11,8 +11,8 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -58,19 +58,21 @@ public class BindingCreateTest {
 	}
 
 	public void setupTestVars() {
-		ECommandService cs = workbenchContext.get(ECommandService.class);
-		bs = workbenchContext.get(EBindingService.class);
+		ECommandService cs = (ECommandService) workbenchContext
+				.get(ECommandService.class.getName());
+		bs = (EBindingService) workbenchContext
+				.get(EBindingService.class.getName());
 
 		cmd = cs.createCommand(TEST_ID1, null);
 		emptySeq = bs.createSequence("");
 		seq = bs.createSequence("CTRL+5 T");
 
-		emptyAttrs = new HashMap<>();
+		emptyAttrs = new HashMap<String,String>();
 
-		schemeOnly = new HashMap<>();
+		schemeOnly = new HashMap<String,String>();
 		schemeOnly.put(EBindingService.SCHEME_ID_ATTR_TAG, DEFAULT_SCHEME_ID);
 
-		schemeAndTypeAttrs = new HashMap<>();;
+		schemeAndTypeAttrs = new HashMap<String,String>();;
 		schemeAndTypeAttrs.put(EBindingService.SCHEME_ID_ATTR_TAG, DEFAULT_SCHEME_ID);
 		schemeAndTypeAttrs.put(EBindingService.TYPE_ATTR_TAG, "user");
 	}
@@ -163,5 +165,5 @@ public class BindingCreateTest {
 		assertNull(b.getPlatform());
 		assertTrue(b.getType() == Binding.USER);
 	}
-
+	
 }

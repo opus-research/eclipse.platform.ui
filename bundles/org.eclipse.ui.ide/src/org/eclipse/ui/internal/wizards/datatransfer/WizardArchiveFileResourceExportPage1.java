@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class WizardArchiveFileResourceExportPage1 extends
 
     // widgets
     protected Button compressContentsCheckbox;
-
+    
     private Button zipFormatButton;
     private Button targzFormatButton;
 
@@ -50,7 +50,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     private final static String STORE_COMPRESS_CONTENTS_ID = "WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID"; //$NON-NLS-1$
 
     /**
-     *	Create an instance of this class.
+     *	Create an instance of this class. 
      *
      *	@param name java.lang.String
      */
@@ -69,6 +69,9 @@ public class WizardArchiveFileResourceExportPage1 extends
         setDescription(DataTransferMessages.ArchiveExport_description);
     }
 
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
     @Override
 	public void createControl(Composite parent) {
         super.createControl(parent);
@@ -84,20 +87,18 @@ public class WizardArchiveFileResourceExportPage1 extends
 	protected void createOptionsGroupButtons(Group optionsGroup) {
     	Font font = optionsGroup.getFont();
     	optionsGroup.setLayout(new GridLayout(2, true));
-
+    	
     	Composite left = new Composite(optionsGroup, SWT.NONE);
     	left.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
     	left.setLayout(new GridLayout(1, true));
 
         createFileFormatOptions(left, font);
-
+        
         // compress... checkbox
         compressContentsCheckbox = new Button(left, SWT.CHECK
                 | SWT.LEFT);
         compressContentsCheckbox.setText(DataTransferMessages.ZipExport_compressContents);
         compressContentsCheckbox.setFont(font);
-
-		createResolveLinkedResources(left, font);
 
         Composite right = new Composite(optionsGroup, SWT.NONE);
         right.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
@@ -129,8 +130,8 @@ public class WizardArchiveFileResourceExportPage1 extends
         targzFormatButton.setText(DataTransferMessages.ArchiveExport_saveInTarFormat);
         targzFormatButton.setSelection(false);
         targzFormatButton.setFont(font);
-    }
-
+    }    
+    
     /**
      * Returns a boolean indicating whether the directory portion of the
      * passed pathname is valid and available for use.
@@ -198,7 +199,6 @@ public class WizardArchiveFileResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setUseCompression(compressContentsCheckbox.getSelection());
-        op.setIncludeLinkedResources(resolveLinkedResourcesCheckbox.getSelection());
         op.setUseTarFormat(targzFormatButton.getSelection());
 
         try {
@@ -231,7 +231,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     @Override
 	public boolean finish() {
     	List resourcesToExport = getWhiteCheckedResources();
-
+    	
         if (!ensureTargetIsValid()) {
 			return false;
 		}
@@ -262,9 +262,9 @@ public class WizardArchiveFileResourceExportPage1 extends
         String idealSuffix = getOutputSuffix();
         String destinationText = super.getDestinationValue();
 
-        // only append a suffix if the destination doesn't already have a . in
-        // its last path segment.
-        // Also prevent the user from selecting a directory.  Allowing this will
+        // only append a suffix if the destination doesn't already have a . in 
+        // its last path segment.  
+        // Also prevent the user from selecting a directory.  Allowing this will 
         // create a ".zip" file in the directory
         if (destinationText.length() != 0
                 && !destinationText.endsWith(File.separator)) {
@@ -380,11 +380,14 @@ public class WizardArchiveFileResourceExportPage1 extends
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.wizards.datatransfer.WizardFileSystemResourceExportPage1#destinationEmptyMessage()
+     */
     @Override
 	protected String destinationEmptyMessage() {
         return DataTransferMessages.ArchiveExport_destinationEmpty;
     }
-
+    
     /**
      *	Answer a boolean indicating whether the receivers destination specification
      *	widgets currently all contain valid values.
@@ -405,7 +408,7 @@ public class WizardArchiveFileResourceExportPage1 extends
     		zipFormatButton.setSelection(true);
     		targzFormatButton.setSelection(false);
     	}
-
+    	
     	return super.validateDestinationGroup();
     }
 }

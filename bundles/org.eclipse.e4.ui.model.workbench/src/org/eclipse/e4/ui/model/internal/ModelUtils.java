@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,14 +78,14 @@ public class ModelUtils {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<MApplicationElement> merge(MApplicationElement container, EStructuralFeature feature, List<MApplicationElement> elements, String positionInList) {
 		EObject eContainer = (EObject) container;
 
 		if( feature.isMany() ) {
 			List<MApplicationElement> copy = new ArrayList<MApplicationElement>(elements);
 
-			@SuppressWarnings("unchecked")
-			List<MApplicationElement> list= (List<MApplicationElement>)eContainer.eGet(feature);
+			List list = (List)eContainer.eGet(feature);
 			boolean flag = true;
 			if( positionInList != null && positionInList.trim().length() != 0 ) {
 				int index = -1;
@@ -93,42 +93,42 @@ public class ModelUtils {
 				PositionInfo posInfo = PositionInfo.parse(positionInList);
 
 				if( posInfo != null ){
-					switch (posInfo.getPosition()){
-					case FIRST:
-						index = 0;
-						break;
+				  switch (posInfo.getPosition()){
+				    case FIRST:
+				      index = 0;
+				      break;
 
-					case INDEX:
-						index = posInfo.getPositionReferenceAsInteger();
-						break;
+				    case INDEX:
+				      index = posInfo.getPositionReferenceAsInteger();
+				      break;
 
-					case BEFORE:
-					case AFTER:
-						int tmpIndex = -1;
-						String elementId = posInfo.getPositionReference();
+				    case BEFORE:
+				    case AFTER:
+				      int tmpIndex = -1;
+				      String elementId = posInfo.getPositionReference();
 
-						for( int i = 0; i < list.size(); i++ ) {
-							if( elementId.equals((list.get(i)).getElementId()) ) {
-								tmpIndex = i;
-								break;
-							}
-						}
+				      for( int i = 0; i < list.size(); i++ ) {
+		            if( elementId.equals(((MApplicationElement)list.get(i)).getElementId()) ) {
+		              tmpIndex = i;
+		              break;
+		            }
+		          }
 
-						if( tmpIndex != -1 ) {
-							if( posInfo.getPosition() == Position.BEFORE ) {
-								index = tmpIndex;
-							} else {
-								index = tmpIndex + 1;
-							}
-						} else {
-							System.err.println("Could not find element with Id '"+elementId+"'");
-						}
+				      if( tmpIndex != -1 ) {
+		            if( posInfo.getPosition() == Position.BEFORE ) {
+		              index = tmpIndex;
+		            } else {
+		              index = tmpIndex + 1;
+		            }
+		          } else {
+		            System.err.println("Could not find element with Id '"+elementId+"'");
+		          }
 
-					case LAST:
-					default:
-						// both no special operation, because the default is adding it at the last position
-						break;
-					}
+				    case LAST:
+				      default:
+				        // both no special operation, because the default is adding it at the last position
+				        break;
+				  }
 				} else {
 					System.err.println("Not a valid list position.");
 				}
@@ -161,7 +161,7 @@ public class ModelUtils {
 		return Collections.emptyList();
 	}
 
-	private static void mergeList(List<MApplicationElement> list, List<MApplicationElement> elements, int index) {
+	private static void mergeList(List list,  List<MApplicationElement> elements, int index) {
 		MApplicationElement[] tmp = new MApplicationElement[elements.size()];
 		elements.toArray(tmp);
 		for(MApplicationElement element : tmp) {
@@ -208,10 +208,7 @@ public class ModelUtils {
 		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
 		} else if (element instanceof EObject) {
-			EObject eContainer = ((EObject) element).eContainer();
-			if (eContainer instanceof MApplicationElement) {
-				return (MApplicationElement) eContainer;
-			}
+			return (MApplicationElement) ((EObject) element).eContainer();
 		}
 		return null;
 	}

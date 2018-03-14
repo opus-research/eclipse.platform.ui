@@ -25,7 +25,7 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.MultiValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.wizard.WizardPageSupport;
@@ -230,9 +230,9 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		};
 		dbc.addValidationStatusProvider(validator);
 
-		IObservableValue modelField1 = new WritableValue(Integer.valueOf(1),
+		IObservableValue modelField1 = new WritableValue(new Integer(1),
 				Integer.TYPE);
-		IObservableValue modelField2 = new WritableValue(Integer.valueOf(4),
+		IObservableValue modelField2 = new WritableValue(new Integer(4),
 				Integer.TYPE);
 		dbc.bindValue(validator.observeValidatedValue(middleField1),
 				modelField1);
@@ -288,7 +288,7 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 			}
 		});
 
-		IObservableValue modelSum = new WritableValue(Integer.valueOf(5),
+		IObservableValue modelSum = new WritableValue(new Integer(5),
 				Integer.TYPE);
 		dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(sumModelValue),
 				modelSum);
@@ -342,7 +342,7 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 	public static void main(String[] args) {
 		Display display = new Display();
 
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				IWizard wizard = new MultiFieldValidationWizard();

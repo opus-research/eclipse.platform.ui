@@ -17,25 +17,29 @@ import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 
 public class TestActionProviderBasic extends CommonActionProvider {
-
+	
 	private IAction action;
 
-	public TestActionProviderBasic() {
-
+	public TestActionProviderBasic() { 
+		
 	}
-
-	@Override
-	public void init(ICommonActionExtensionSite site) {
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonActionProvider#init(org.eclipse.ui.navigator.ICommonActionExtensionSite)
+	 */
+	public void init(ICommonActionExtensionSite site) { 
 		super.init(site);
 
 		action = new Action() {
-
-		};
+			
+		}; 
 		action.setId(site.getExtensionId());
 		action.setText(site.getExtensionId());
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.ActionGroup#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+	 */
 	public void fillContextMenu(IMenuManager menu) {
 		menu.add(action);
 	}

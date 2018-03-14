@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2015 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 443391
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -44,7 +43,7 @@ public class DefaultLoggerTests {
 
 	@Before
 	public void setUp() {
-		logger = new DefaultUiFreezeEventLogger(DURATION * 10);
+		logger = new DefaultUiFreezeEventLogger();
 		createLogListener();
 	}
 
@@ -64,7 +63,7 @@ public class DefaultLoggerTests {
 		thread = jvmThreadManager.getThreadInfo(Thread.currentThread().getId(), Integer.MAX_VALUE);
 
 		StackSample[] samples = { new StackSample(TIME, new ThreadInfo[] { thread }) };
-		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, false, false, false);
+		UiFreezeEvent event = new UiFreezeEvent(TIME, DURATION, samples, false);
 		return event;
 	}
 
@@ -73,7 +72,7 @@ public class DefaultLoggerTests {
 		UiFreezeEvent event = createFreezeEvent();
 		String expectedTime = dateFormat.format(new Date(TIME));
 		String expectedHeader =
-				String.format("UI freeze of %.2gs at %s", DURATION / 1000.0, expectedTime);
+				String.format("UI Delay of %.2fs at %s", DURATION / 1000.0, expectedTime);
 		String expectedEventMessage = String.format("Sample at %s (+%.3fs)", expectedTime, 0.000);
 
 		logger.log(event);

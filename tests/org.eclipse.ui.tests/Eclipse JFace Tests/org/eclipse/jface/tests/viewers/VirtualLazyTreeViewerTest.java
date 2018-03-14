@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,25 +40,25 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
         fTreeViewer.setContentProvider(new TestModelLazyTreeContentProvider((TreeViewer) fTreeViewer));
         return fTreeViewer;
     }
-
+    
     @Override
 	public void setUp() {
     	super.setUp();
     	// process events because the content provider uses an asyncExec to set the item count of the tree
     	processEvents();
     }
-
+    
     @Override
 	protected void setInput() {
 		super.setInput();
 	}
-
+    
     @Override
 	public void tearDown() {
     	super.tearDown();
 //    	System.out.println("calls: " + setDataCalls);
     }
-
+    
     public void testLeafIsExpandable() {
     	TestElement leafElement = fRootElement.getChildAt(2).getChildAt(3).getChildAt(2);
     	assertEquals(0, leafElement.getChildCount());
@@ -70,75 +70,74 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
     	assertTrue(rootElement.getChildCount() > 0);
     	assertTrue(fTreeViewer.isExpandable(rootElement));
     }
-
+    
     public void testNodeIsExpandable() {
     	TestElement nodeElement = fRootElement.getChildAt(2).getChildAt(3);
     	assertTrue(nodeElement.getChildCount() > 0);
     	assertTrue(fTreeViewer.isExpandable(nodeElement));
     }
-
+    
 
     @Override
 	public void testRefreshWithDuplicateChild() {
     	// Test leads to infinite loop. Duplicate children are a bad idea in virtual trees.
     }
-
+    
     @Override
 	public void testSetExpandedWithCycle() {
     	// Test leads to infinite loop. Cycles are a bad idea in virtual trees.
     }
-
+    
     @Override
 	public void testFilterExpanded() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testFilter() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testSetFilters() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testInsertSiblingWithFilterFiltered() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testInsertSiblingWithFilterNotFiltered() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testInsertSiblingWithSorter() {
     	// no need to test since virtual trees do not support sorting
     }
-
+        
     @Override
 	public void testRenameWithFilter() {
     	// no need to test since virtual trees do not support filtering
     }
-
+    
     @Override
 	public void testRenameWithSorter() {
     	// no need to test since virtual trees do not support sorting
     }
-
+    
     @Override
 	public void testSorter() {
     	// no need to test since virtual trees do not support sorting
     }
-
+    
     // Temporary overrides for bug 347491:
     @Override
 	public void testRefreshWithAddedChildren() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
@@ -148,16 +147,15 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 
     @Override
 	public void testDeleteSibling() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
 		super.testDeleteSibling();
     }
-
+    
     @Override
 	public void testExpandToLevel() {
 		if (setDataCalls == 0) {
@@ -166,60 +164,44 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 		}
     	super.testExpandToLevel();
     }
-
+    
     @Override
 	public void testInsertSibling() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
     	super.testInsertSibling();
     }
-
+    
     @Override
 	public void testInsertSiblings() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
    	super.testInsertSiblings();
     }
-
+    
     @Override
 	public void testSetInput() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
 		}
     	super.testSetInput();
     }
-
+    
     @Override
 	public void testSomeChildrenChanged() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
@@ -229,13 +211,8 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 
 	@Override
 	public void testWorldChanged() {
-		if (disableTestsBug347491) {
+		if (disableTestsBug347491)
 			return;
-		}
-		if (disableTestsBug493357) {
-			System.out.println(getName() + " disabled due to Bug 493357");
-			return;
-		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;

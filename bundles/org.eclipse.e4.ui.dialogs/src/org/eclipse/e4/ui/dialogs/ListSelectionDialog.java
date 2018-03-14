@@ -12,20 +12,17 @@ package org.eclipse.e4.ui.dialogs;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.e4.ui.dialogs.textbundles.DialogMessages;
 import org.eclipse.jface.databinding.viewers.IViewerObservableSet;
 import org.eclipse.jface.databinding.viewers.IViewerObservableValue;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
-import org.eclipse.jface.dialogs.AbstractSelectionDialog;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.SelectionDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -51,14 +48,10 @@ import org.eclipse.swt.widgets.Shell;
  * Example:
  *
  * <pre>
- * ListSelectionDialog&lt;MPart&gt; dlg =
- *  new ListSelectionDialog&lt;MPart&gt;(
- *  	getShell(),
- *  	input,
- *  	ArrayContentProvider.getInstance(),
- *  	new LabelProvider(),
- *  	&quot;Select the resources to save:&quot;,
- *  	MPart.class);
+ * ListSelectionDialog&lt;MPart&gt; dlg = new ListSelectionDialog&lt;MPart&gt;(getShell(),
+ * 		input, new BaseWorkbenchContentProvider(),
+ * 		new WorkbenchLabelProvider(), &quot;Select the resources to save:&quot;,
+ * 		MPart.class);
  * dlg.setInitialSelections(dirtyEditors);
  * dlg.setTitle(&quot;Save Resources&quot;);
  * dlg.open();
@@ -67,10 +60,8 @@ import org.eclipse.swt.widgets.Shell;
  * </p>
  *
  * @param <T>
- *            which declares the type of the elements in the
- *            {@link AbstractSelectionDialog}.
  */
-public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
+public class ListSelectionDialog<T> extends SelectionDialog<T> {
 
 	// sizing constants
 	private final static int SIZING_SELECTION_WIDGET_HEIGHT = 250;
@@ -91,40 +82,44 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 
 	private DataBindingContext dbc;
 
-	/**
-	 * Creates a list selection dialog with default title and message.<br/>
-	 * It uses the ArrayContentProvider and LabelProvider internally.
-	 *
-	 * @param parentShell
-	 *            the parent shell
-	 * @param input
-	 *            the root element to populate this dialog with
-	 * @param elementType
-	 *            type of the elements, which are shown in this dialog
-	 */
-	public ListSelectionDialog(Shell parentShell, Collection<String> input, Class<T> elementType) {
-		this(parentShell, input, elementType, ArrayContentProvider.getInstance(), new LabelProvider(),
-				DialogMessages.ListSelection_title, DialogMessages.ListSelection_message);
+	public static <T> SelectionDialog<T> create(Shell parentShell,
+			Collection<String> input, Class<T> elementType) {
+
+		return new ListSelectionDialog<T>(parentShell, input, elementType,
+				ArrayContentProvider.getInstance(), new LabelProvider(),
+				DialogMessages.ListSelection_title,
+				DialogMessages.ListSelection_message);
 	}
 
-	/**
-	 * Creates a list selection dialog with default title and message.
-	 *
-	 * @param parentShell
-	 *            the parent shell
-	 * @param input
-	 *            the root element to populate this dialog with
-	 * @param elementType
-	 *            type of the elements, which are shown in this dialog
-	 * @param contentProvider
-	 *            the content provider for navigating the model
-	 * @param labelProvider
-	 *            the label provider for displaying model elements
-	 */
-	public ListSelectionDialog(Shell parentShell, Object input, Class<T> elementType,
-			IStructuredContentProvider contentProvider, ILabelProvider labelProvider) {
-		this(parentShell, input, elementType, contentProvider, labelProvider, DialogMessages.ListSelection_title,
+	public static <T> SelectionDialog<T> create(Shell parentShell,
+			Object input, Class<T> elementType,
+			IStructuredContentProvider contentProvider,
+			ILabelProvider labelProvider) {
+
+		return new ListSelectionDialog<T>(parentShell, input, elementType,
+				contentProvider, labelProvider,
+				DialogMessages.ListSelection_title,
 				DialogMessages.ListSelection_message);
+	}
+
+	public static <T> SelectionDialog<T> create(Shell parentShell,
+			Object input, Class<T> elementType,
+			IStructuredContentProvider contentProvider,
+			ILabelProvider labelProvider, String title, String message) {
+
+		return new ListSelectionDialog<T>(parentShell, input, elementType,
+				contentProvider, labelProvider, title != null ? title
+						: DialogMessages.ListSelection_title,
+				message != null ? message
+						: DialogMessages.ListSelection_message);
+	}
+
+	@Override
+	public boolean close() {
+		if (dbc != null) {
+			dbc.dispose();
+		}
+		return super.close();
 	}
 
 	/**
@@ -140,13 +135,11 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 	 *            the content provider for navigating the model
 	 * @param labelProvider
 	 *            the label provider for displaying model elements
-	 * @param title
-	 *            for the new dialog window
 	 * @param message
 	 *            the message to be displayed at the top of this dialog, or
 	 *            <code>null</code> to display a default message
 	 */
-	public ListSelectionDialog(Shell parentShell, Object input,
+	protected ListSelectionDialog(Shell parentShell, Object input,
 			Class<T> elementType, IStructuredContentProvider contentProvider,
 			ILabelProvider labelProvider, String title, String message) {
 		super(parentShell);
@@ -156,14 +149,6 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 		this.labelProvider = labelProvider;
 		setTitle(title);
 		setMessage(message);
-	}
-
-	@Override
-	public boolean close() {
-		if (dbc != null) {
-			dbc.dispose();
-		}
-		return super.close();
 	}
 
 	@Override
@@ -178,10 +163,10 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 
 		viewer = CheckboxTableViewer.newCheckList(composite, SWT.BORDER);
 		GridDataFactory
-		.swtDefaults()
-		.hint(SIZING_SELECTION_WIDGET_WIDTH,
-				SIZING_SELECTION_WIDGET_HEIGHT)
-		.applyTo(viewer.getControl());
+				.swtDefaults()
+				.hint(SIZING_SELECTION_WIDGET_WIDTH,
+						SIZING_SELECTION_WIDGET_HEIGHT)
+				.applyTo(viewer.getControl());
 
 		viewer.setLabelProvider(labelProvider);
 		viewer.setContentProvider(contentProvider);
@@ -189,12 +174,13 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 		// bind input to the viewer
 		IViewerObservableValue viewerInputObservable = ViewerProperties.input()
 				.observe(viewer);
-		dbc.bindValue(viewerInputObservable, new WritableValue<>(inputElement,
+		dbc.bindValue(viewerInputObservable, new WritableValue(inputElement,
 				null));
 
 		// bind result to selected items in the viewer
-		Set<T> initialElementSelections = new HashSet<>(getInitialSelection());
-		IObservableSet<T> resultSet = Properties.<T> selfSet(elementType).observe(initialElementSelections);
+		Collection<T> initialElementSelections = getInitialElementSelections();
+		WritableSet resultSet = new WritableSet(initialElementSelections,
+				elementType);
 		setResult(resultSet);
 
 		IViewerObservableSet viewerCheckedElementsObservable = ViewerProperties
@@ -208,6 +194,12 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 		return composite;
 	}
 
+	/**
+	 * Add the selection and deselection buttons to the dialog.
+	 *
+	 * @param composite
+	 *            {@link Composite}
+	 */
 	private void addSelectionButtons(Composite parent) {
 		Composite buttonComposite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
@@ -227,10 +219,8 @@ public class ListSelectionDialog<T> extends AbstractSelectionDialog<T> {
 			public void widgetSelected(SelectionEvent e) {
 				// select all elements with databinding
 				Object[] elements = contentProvider.getElements(inputElement);
-
-				@SuppressWarnings("unchecked")
-				Collection<? extends T> result = (Collection<? extends T>) Arrays.asList(elements);
-				getResult().addAll(result);
+				getResult().addAll(
+						(Collection<? extends T>) Arrays.asList(elements));
 			}
 		});
 

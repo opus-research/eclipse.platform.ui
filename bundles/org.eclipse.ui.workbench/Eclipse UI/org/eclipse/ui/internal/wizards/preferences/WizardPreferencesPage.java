@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
 
@@ -28,6 +27,7 @@ import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -63,7 +63,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * Base class for preference export/import pages.
- *
+ * 
  * @since 3.1
  */
 public abstract class WizardPreferencesPage extends WizardPage implements
@@ -77,7 +77,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	private Button overwriteExistingFilesCheckbox;
 
 	protected FilteredTree transfersTree;
-
+	
 	protected Text descText;
 
 	private Composite buttonComposite;
@@ -109,7 +109,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	protected static final int COMBO_HISTORY_LENGTH = 5;
 
-
+    
 	/**
 	 * @param pageName
 	 */
@@ -127,7 +127,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * assumed to be a GridLayout and the number of columns in this layout is
 	 * incremented. Subclasses may override.
 	 * </p>
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param id
@@ -149,7 +149,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		setButtonLayoutData(button);
 
-		button.setData(Integer.valueOf(id));
+		button.setData(new Integer(id));
 		button.setText(label);
 
 		if (defaultButton) {
@@ -164,7 +164,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	/**
 	 * Add the passed value to self's destination widget's history
-	 *
+	 * 
 	 * @param value
 	 *            java.lang.String
 	 */
@@ -172,6 +172,9 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.add(value);
 	}
 
+	/**
+	 * (non-Javadoc) Method declared on IDialogPage.
+	 */
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
@@ -179,7 +182,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		composite.setLayout(new GridLayout());
 		composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL
 				| GridData.HORIZONTAL_ALIGN_FILL));
-
+		
 
 		createTransferArea(composite);
 		setPreferenceTransfers();
@@ -227,7 +230,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	private String getNoOptionsMessage() {
 		return PreferencesMessages.WizardPreferencesPage_noOptionsSelected;
 	}
-
+	
 	protected boolean validDestination() {
 		File file = new File(getDestinationValue());
 		return !(file.getPath().length() <= 0 || file.isDirectory());
@@ -255,7 +258,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		transferAllButton = new Button(composite, SWT.CHECK);
 		transferAllButton.setText(getAllButtonText());
-
+		
 		group = new Group(composite, SWT.NONE);
 		GridData groupData = new GridData(GridData.FILL_BOTH);
 		groupData.horizontalSpan = 2;
@@ -269,7 +272,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		GridLayout layout = new GridLayout();
 		group.setLayout(layout);
-
+		
 		transfersTree = createFilteredTree(group);
 
 		transfersTree.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -281,13 +284,13 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		Label description = new Label(group, SWT.NONE);
 		description.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		description.setText(PreferencesMessages.WizardPreferences_description);
-
+		
 		descText = new Text(group, SWT.V_SCROLL | SWT.READ_ONLY
 				| SWT.BORDER | SWT.WRAP);
 		GridData descriptionData = new GridData(GridData.FILL_BOTH);
 		descriptionData.heightHint = convertHeightInCharsToPixels(3);
 		descText.setLayoutData(descriptionData);
-
+		
 		transferAllButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -321,10 +324,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	}
 
 	protected void updateDescription() {
-		IStructuredSelection selection = viewer.getStructuredSelection();
+		ISelection selection = viewer.getSelection();
 		String desc = ""; //$NON-NLS-1$
 		if (!selection.isEmpty()) {
-			Object element = selection.getFirstElement();
+			Object element = ((IStructuredSelection) selection)
+					.getFirstElement();
 			if ((element instanceof PreferenceTransferElement)) {
 				desc = ((PreferenceTransferElement) element).getDescription();
 			}
@@ -350,7 +354,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	/**
 	 * Add the selection and deselection buttons to the composite.
-	 *
+	 * 
 	 * @param composite
 	 *            org.eclipse.swt.widgets.Composite
 	 */
@@ -364,10 +368,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		data.grabExcessHorizontalSpace = true;
 		buttonComposite.setLayoutData(data);
 		buttonComposite.setFont(parentFont);
-
+		
 		selectAllButton = new Button(buttonComposite, SWT.PUSH);
 		selectAllButton.setText(PreferencesMessages.SelectionDialog_selectLabel);
-		selectAllButton.setData(Integer.valueOf(IDialogConstants.SELECT_ALL_ID));
+		selectAllButton.setData(new Integer(IDialogConstants.SELECT_ALL_ID));
 		setButtonLayoutData(selectAllButton);
 
 		SelectionListener listener = new SelectionAdapter() {
@@ -379,10 +383,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		};
 		selectAllButton.addSelectionListener(listener);
 		selectAllButton.setFont(parentFont);
-
+		
 		deselectAllButton = new Button(buttonComposite, SWT.PUSH);
 		deselectAllButton.setText(PreferencesMessages.SelectionDialog_deselectLabel);
-		deselectAllButton.setData(Integer.valueOf(IDialogConstants.DESELECT_ALL_ID));
+		deselectAllButton.setData(new Integer(IDialogConstants.DESELECT_ALL_ID));
 		setButtonLayoutData(deselectAllButton);
 
 		listener = new SelectionAdapter() {
@@ -405,7 +409,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	/**
 	 * Create the export destination specification widgets
-	 *
+	 * 
 	 * @param parent
 	 *            org.eclipse.swt.widgets.Composite
 	 */
@@ -417,10 +421,10 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationSelectionGroup.setLayout(layout);
 		destinationSelectionGroup.setLayoutData(new GridData(
 				GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL));
-
+		
 		Label dest = new Label(destinationSelectionGroup, SWT.NONE);
 		dest.setText(getDestinationLabel());
-
+		
 		// destination name entry field
 		destinationNameField = new Combo(destinationSelectionGroup, SWT.SINGLE
 				| SWT.BORDER);
@@ -429,7 +433,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL
 				| GridData.GRAB_HORIZONTAL);
 		destinationNameField.setLayoutData(data);
-
+		
 		// destination browse button
 		destinationBrowseButton = new Button(destinationSelectionGroup,
 				SWT.PUSH);
@@ -437,38 +441,38 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 				.setText(PreferencesMessages.PreferencesExport_browse);
 		setButtonLayoutData(destinationBrowseButton);
 		destinationBrowseButton.addListener(SWT.Selection, this);
-
+		
 		new Label(parent, SWT.NONE); // vertical spacer
 	}
 
 	/**
 	 * Create the export options specification widgets.
-	 *
+	 * 
 	 * @param parent
 	 *            org.eclipse.swt.widgets.Composite
 	 */
 	protected void createOptionsGroup(Composite parent) {
 		// options group
-
+	
 		Composite optionsGroup = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
 		optionsGroup.setLayout(layout);
 		optionsGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL
 				| GridData.GRAB_HORIZONTAL));
-
+	
 		// overwrite... checkbox
 		overwriteExistingFilesCheckbox = new Button(optionsGroup, SWT.CHECK
 				| SWT.LEFT);
 		overwriteExistingFilesCheckbox
 				.setText(PreferencesMessages.ExportFile_overwriteExisting);
-
+		
 	}
 
 	/**
 	 * Attempts to ensure that the specified directory exists on the local file
 	 * system. Answers a boolean indicating success.
-	 *
+	 * 
 	 * @return boolean
 	 * @param directory
 	 *            java.io.File
@@ -496,7 +500,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	/**
 	 * Displays a Yes/No question to the user with the specified message and
 	 * returns the user's response.
-	 *
+	 * 
 	 * @param message
 	 *            the question to ask
 	 * @return <code>true</code> for Yes, and <code>false</code> for No
@@ -504,7 +508,8 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	protected boolean queryYesNoQuestion(String message) {
 		MessageDialog dialog = new MessageDialog(getContainer().getShell(),
 				PreferencesMessages.Question, (Image) null, message,
-				MessageDialog.NONE, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL) {
+				MessageDialog.NONE, new String[] { IDialogConstants.YES_LABEL,
+						IDialogConstants.NO_LABEL }, 0) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
@@ -519,7 +524,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * If the target for export does not exist then attempt to create it. Answer
 	 * a boolean indicating whether the target exists (ie.- if it either
 	 * pre-existed or this method was able to create it)
-	 *
+	 * 
 	 * @return boolean
 	 */
 	protected boolean ensureTargetIsValid(File file) {
@@ -543,6 +548,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#saveWidgetValues()
+	 */
 	protected void saveWidgetValues() {
 
 		IDialogSettings settings = getDialogSettings();
@@ -552,7 +562,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 			if (directoryNames == null) {
 				directoryNames = new String[0];
 			}
-
+		
 			directoryNames = addToHistory(directoryNames, getDestinationValue());
 			settings.put(STORE_DESTINATION_NAMES_ID, directoryNames);
 			String current = getDestinationValue();
@@ -579,7 +589,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 					settings.put(TRANSFER_PREFERENCES_NAMES_ID, preferenceIds);
 				}
 			}
-
+		
 		}
 	}
 
@@ -587,7 +597,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * The Finish button was pressed. Try to do the required work now and answer
 	 * a boolean indicating success. If false is returned then the wizard will
 	 * not close.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean finish() {
@@ -689,14 +699,14 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * include their controls in this determination should override the hook
 	 * methods <code>validateSourceGroup</code> and/or
 	 * <code>validateOptionsGroup</code>.
-	 *
+	 * 
 	 * @return <code>true</code> if this page is complete, and
 	 *         <code>false</code> if incomplete
 	 * @see #validateSourceGroup
 	 * @see #validateOptionsGroup
 	 */
 	protected boolean determinePageCompletion() {
-
+		
 		// validate groups in order of priority so error message is the most important one
 		boolean complete = validateSourceGroup() && validateDestinationGroup()
 				&& validateOptionsGroup();
@@ -717,11 +727,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * contain valid values.
 	 * <p>
 	 * The <code>WizardPreferencesPage</code> implementation of this method
-	 * returns <code>true</code> if the button to transfer all preferences is
-	 * selected OR at least one of the individual items are checked. Subclasses
+	 * returns <code>true</code> if the button to transfer all preferences is 
+	 * selected OR at least one of the individual items are checked. Subclasses 
 	 * may reimplement this method.
 	 * </p>
-	 *
+	 * 
 	 * @return <code>true</code> indicating validity of all controls in the
 	 *         options group
 	 */
@@ -745,7 +755,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * returns <code>true</code>. Subclasses may reimplement this hook
 	 * method.
 	 * </p>
-	 *
+	 * 
 	 * @return <code>true</code> indicating validity of all controls in the
 	 *         source specification group
 	 */
@@ -755,14 +765,14 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	/**
 	 * Answer the string to display in self as the destination type
-	 *
+	 * 
 	 * @return java.lang.String
 	 */
 	protected abstract String getDestinationLabel();
 
 	/**
 	 * Answer the contents of self's destination specification widget
-	 *
+	 * 
 	 * @return java.lang.String
 	 */
 	protected String getDestinationValue() {
@@ -799,7 +809,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 	/**
 	 * Handle all events and enablements for widgets in this page
-	 *
+	 * 
 	 * @param e
 	 *            Event
 	 */
@@ -932,7 +942,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	/**
 	 * Set the contents of self's destination specification widget to the passed
 	 * value
-	 *
+	 * 
 	 * @param value
 	 *            java.lang.String
 	 */
@@ -940,12 +950,22 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.setText(value);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
 		transfers = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#allowNewContainerName()
+	 */
 	protected boolean allowNewContainerName() {
 		return true;
 	}
@@ -954,7 +974,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	 * The <code>WizardDataTransfer</code> implementation of this
 	 * <code>IOverwriteQuery</code> method asks the user whether the existing
 	 * resource at the given path should be overwritten.
-	 *
+	 * 
 	 * @param pathString
 	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>,
 	 *         <code>"ALL"</code>, or <code>"CANCEL"</code>
@@ -979,9 +999,14 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 									.toOSString());
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), PreferencesMessages.Question, null,
-				messageString, MessageDialog.QUESTION, 0, IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL,
-				IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL) {
+		final MessageDialog dialog = new MessageDialog(getContainer()
+				.getShell(), PreferencesMessages.Question, null, messageString,
+				MessageDialog.QUESTION, new String[] {
+						IDialogConstants.YES_LABEL,
+						IDialogConstants.YES_TO_ALL_LABEL,
+						IDialogConstants.NO_LABEL,
+						IDialogConstants.NO_TO_ALL_LABEL,
+						IDialogConstants.CANCEL_LABEL }, 0) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;

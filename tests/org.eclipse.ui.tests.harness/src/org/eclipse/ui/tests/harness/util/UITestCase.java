@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474957
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -16,16 +14,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import junit.framework.TestCase;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWindowListener;
@@ -34,8 +31,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
-
-import junit.framework.TestCase;
 
 /**
  * <code>UITestCase</code> is a useful super class for most
@@ -62,24 +57,20 @@ public abstract class UITestCase extends TestCase {
             this.enabled = enabled;
         }
 
-        @Override
-		public void windowActivated(IWorkbenchWindow window) {
+        public void windowActivated(IWorkbenchWindow window) {
             // do nothing
         }
 
-        @Override
-		public void windowDeactivated(IWorkbenchWindow window) {
+        public void windowDeactivated(IWorkbenchWindow window) {
             // do nothing
         }
 
-        @Override
-		public void windowClosed(IWorkbenchWindow window) {
+        public void windowClosed(IWorkbenchWindow window) {
             if (enabled)
                 testWindows.remove(window);
         }
 
-        @Override
-		public void windowOpened(IWorkbenchWindow window) {
+        public void windowOpened(IWorkbenchWindow window) {
             if (enabled)
                 testWindows.add(window);
         }
@@ -87,14 +78,14 @@ public abstract class UITestCase extends TestCase {
 
     protected IWorkbench fWorkbench;
 
-    private List<IWorkbenchWindow> testWindows;
+    private List testWindows;
 
     private TestWindowListener windowListener;
 
     public UITestCase(String testName) {
         super(testName);
         //		ErrorDialog.NO_UI = true;
-        testWindows = new ArrayList<IWorkbenchWindow>(3);
+        testWindows = new ArrayList(3);
     }
 
 	/**
@@ -180,8 +171,7 @@ public abstract class UITestCase extends TestCase {
      * from overriding this method to maintain logging consistency.
      * doSetUp() should be overriden instead.
      */
-    @Override
-	protected final void setUp() throws Exception {
+    protected final void setUp() throws Exception {
     	super.setUp();
 		fWorkbench = PlatformUI.getWorkbench();
     	trace("----- " + this.getName()); //$NON-NLS-1$
@@ -206,8 +196,8 @@ public abstract class UITestCase extends TestCase {
      * from overriding this method to maintain logging consistency.
      * doTearDown() should be overriden instead.
      */
-    @Override
-	protected final void tearDown() throws Exception {
+    protected final void tearDown() throws Exception {
+        super.tearDown();
         trace(this.getName() + ": tearDown...\n"); //$NON-NLS-1$
         removeWindowListener();
         doTearDown();
@@ -227,126 +217,12 @@ public abstract class UITestCase extends TestCase {
         processEvents();
     }
 
-	public static void processEvents() {
+    protected static void processEvents() {
         Display display = PlatformUI.getWorkbench().getDisplay();
         if (display != null)
             while (display.readAndDispatch())
                 ;
     }
-
-	/**
-	 * Utility for waiting until the execution of jobs of any family has
-	 * finished or timeout is reached. If no jobs are running, the method waits
-	 * given minimum wait time. While this method is waiting for jobs, UI events
-	 * are processed.
-	 *
-	 * @param minTimeMs
-	 *            minimum wait time in milliseconds
-	 * @param maxTimeMs
-	 *            maximum wait time in milliseconds
-	 */
-	public static void waitForJobs(long minTimeMs, long maxTimeMs) {
-		if (maxTimeMs < minTimeMs) {
-			throw new IllegalArgumentException("Max time is smaller as min time!");
-		}
-		final long start = System.currentTimeMillis();
-		while (System.currentTimeMillis() - start < minTimeMs) {
-			processEvents();
-			sleep(10);
-		}
-		while (!Job.getJobManager().isIdle() && System.currentTimeMillis() - start < maxTimeMs) {
-			processEvents();
-			sleep(10);
-		}
-	}
-
-	/**
-	 * Pauses execution of the current thread
-	 *
-	 * @param millis
-	 */
-	protected static void sleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			return;
-		}
-	}
-
-	/**
-	 * Tries to make given shell active.
-	 *
-	 * <p>
-	 * Note: the method runs at least 1000 milliseconds to make sure the active
-	 * window is really active, see
-	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=417258#c27
-	 *
-	 * @param shell
-	 *            non null
-	 * @return true if the given shell is active for the current display
-	 */
-	protected boolean forceActive(Shell shell) {
-		Display display = PlatformUI.getWorkbench().getDisplay();
-		Shell[] shells = display.getShells();
-		for (Shell s : shells) {
-			s.setMinimized(true);
-			processEvents();
-		}
-		waitForJobs(200, 3000);
-		for (Shell s : shells) {
-			s.setMinimized(false);
-			processEvents();
-		}
-		waitForJobs(200, 3000);
-		shell.setVisible(false);
-		processEvents();
-		shell.setMinimized(true);
-		processEvents();
-		waitForJobs(200, 3000);
-		shell.setVisible(true);
-		processEvents();
-		shell.setMinimized(false);
-		processEvents();
-		shell.forceActive();
-		processEvents();
-		shell.forceFocus();
-		processEvents();
-		waitForJobs(400, 3000);
-		return display.getActiveShell() == shell;
-	}
-
-	public static class ShellStateListener implements ShellListener {
-		private AtomicBoolean shellIsActive;
-
-		public ShellStateListener(AtomicBoolean shellIsActive) {
-			this.shellIsActive = shellIsActive;
-		}
-
-		@Override
-		public void shellIconified(ShellEvent e) {
-			shellIsActive.set(false);
-		}
-
-		@Override
-		public void shellDeiconified(ShellEvent e) {
-			shellIsActive.set(true);
-		}
-
-		@Override
-		public void shellDeactivated(ShellEvent e) {
-			shellIsActive.set(false);
-		}
-
-		@Override
-		public void shellClosed(ShellEvent e) {
-			shellIsActive.set(false);
-		}
-
-		@Override
-		public void shellActivated(ShellEvent e) {
-			shellIsActive.set(true);
-		}
-	}
 
     protected static interface Condition {
     	public boolean compute();
@@ -411,19 +287,26 @@ public abstract class UITestCase extends TestCase {
 	 * @since 3.2
 	 */
 	private void waitOnShell(Shell shell) {
+
 		processEvents();
-		waitForJobs(100, 5000);
+//		long endTime = System.currentTimeMillis() + 5000;
+//
+//		while (shell.getDisplay().getActiveShell() != shell
+//				&& System.currentTimeMillis() < endTime) {
+//			processEvents();
+//		}
 	}
 
 	/**
 	 * Close all test windows.
 	 */
     public void closeAllTestWindows() {
-		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<IWorkbenchWindow>(testWindows);
-		for (IWorkbenchWindow testWindow : testWindowsCopy) {
-			testWindow.close();
+        Iterator iter = new ArrayList(testWindows).iterator();
+        while (iter.hasNext()) {
+            IWorkbenchWindow win = (IWorkbenchWindow) iter.next();
+            win.close();
         }
-		testWindows.clear();
+        testWindows.clear();
     }
 
     /**

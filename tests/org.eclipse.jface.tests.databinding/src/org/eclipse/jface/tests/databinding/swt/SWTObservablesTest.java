@@ -17,7 +17,6 @@ import org.eclipse.core.databinding.observable.IDecoratingObservable;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.jface.databinding.conformance.util.ChangeEventTracker;
 import org.eclipse.jface.databinding.conformance.util.RealmTester;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.ISWTObservable;
 import org.eclipse.jface.databinding.swt.ISWTObservableList;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
@@ -103,7 +102,7 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		super.setUp();
 
 		shell = getShell();
-		RealmTester.setDefault(DisplayRealm.getRealm(shell.getDisplay()));
+		RealmTester.setDefault(SWTObservables.getRealm(shell.getDisplay()));
 	}
 
 	@Override
@@ -114,8 +113,11 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 	}
 
 	@Override
-	protected Shell createShell() {
-		return new Shell(SWT.V_SCROLL);
+	protected Shell getShell() {
+		if (shell == null) {
+			shell = new Shell(SWT.V_SCROLL);
+		}
+		return shell;
 	}
 
 	public void testObserveForeground() throws Exception {
@@ -395,7 +397,7 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		ISWTObservableValue value = WidgetProperties.singleSelectionIndex()
 				.observe(cCombo);
 		assertEquals(0, cCombo.getSelectionIndex());
-		value.setValue(Integer.valueOf(-1));
+		value.setValue(new Integer(-1));
 		assertEquals(-1, cCombo.getSelectionIndex());
 	}
 
@@ -421,7 +423,7 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		ISWTObservableValue value = WidgetProperties.singleSelectionIndex()
 				.observe(combo);
 		assertEquals(0, combo.getSelectionIndex());
-		value.setValue(Integer.valueOf(-1));
+		value.setValue(new Integer(-1));
 		assertEquals(-1, combo.getSelectionIndex());
 	}
 
@@ -447,7 +449,7 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		ISWTObservableValue value = WidgetProperties.singleSelectionIndex()
 				.observe(list);
 		assertEquals(0, list.getSelectionIndex());
-		value.setValue(Integer.valueOf(-1));
+		value.setValue(new Integer(-1));
 		assertEquals(-1, list.getSelectionIndex());
 	}
 
@@ -473,7 +475,7 @@ public class SWTObservablesTest extends AbstractSWTTestCase {
 		ISWTObservableValue value = WidgetProperties.singleSelectionIndex()
 				.observe(table);
 		assertEquals(0, table.getSelectionIndex());
-		value.setValue(Integer.valueOf(-1));
+		value.setValue(new Integer(-1));
 		assertEquals(-1, table.getSelectionIndex());
 	}
 

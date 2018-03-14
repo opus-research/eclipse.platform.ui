@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -59,7 +59,7 @@ public class TableSingleSelectionObservableValueTest extends
 	@Override
 	protected IObservable doCreateObservable() {
 		Delegate delegate = (Delegate) getObservableContractDelegate();
-		return delegate.createObservableValue(DisplayRealm.getRealm(Display
+		return delegate.createObservableValue(SWTObservables.getRealm(Display
 				.getDefault()));
 	}
 
@@ -68,7 +68,7 @@ public class TableSingleSelectionObservableValueTest extends
 		assertEquals(-1, table.getSelectionIndex());
 		assertEquals(-1, ((Integer) observable.getValue()).intValue());
 
-		Integer value = Integer.valueOf(0);
+		Integer value = new Integer(0);
 		observable.setValue(value);
 		assertEquals("table selection index", value.intValue(), table
 				.getSelectionIndex());
@@ -80,7 +80,7 @@ public class TableSingleSelectionObservableValueTest extends
 		table.setSelection(value);
 
 		assertEquals("table selection index", value, table.getSelectionIndex());
-		assertEquals("observable value", Integer.valueOf(value), observable
+		assertEquals("observable value", new Integer(value), observable
 				.getValue());
 	}
 
@@ -142,9 +142,9 @@ public class TableSingleSelectionObservableValueTest extends
 			switch (value) {
 			case -1:
 			case 1:
-				return Integer.valueOf(0);
+				return new Integer(0);
 			case 0:
-				return Integer.valueOf(1);
+				return new Integer(1);
 			}
 
 			Assert.isTrue(false);

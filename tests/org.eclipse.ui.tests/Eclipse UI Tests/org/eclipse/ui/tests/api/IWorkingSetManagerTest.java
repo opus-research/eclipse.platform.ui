@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tomasz Zarna <tomasz.zarna@tasktop.com> - Bug 37183
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -31,7 +30,7 @@ public class IWorkingSetManagerTest extends UITestCase {
     final static String WORKING_SET_NAME_1 = "ws1";
 
     final static String WORKING_SET_NAME_2 = "ws2";
-
+    
     final static String WORKING_SET_NAME_3 = "ws3";
 
     IWorkingSetManager fWorkingSetManager;
@@ -42,16 +41,16 @@ public class IWorkingSetManagerTest extends UITestCase {
 
     String fChangeProperty;
 
-	IWorkingSet fChangeNewValue;
+    Object fChangeNewValue;
 
-	IWorkingSet fChangeOldValue;
+    Object fChangeOldValue;
 
     class TestPropertyChangeListener implements IPropertyChangeListener {
         @Override
 		public void propertyChange(PropertyChangeEvent event) {
             fChangeProperty = event.getProperty();
-			fChangeNewValue = (IWorkingSet) event.getNewValue();
-			fChangeOldValue = (IWorkingSet) event.getOldValue();
+            fChangeNewValue = event.getNewValue();
+            fChangeOldValue = event.getOldValue();
         }
     }
 
@@ -68,8 +67,8 @@ public class IWorkingSetManagerTest extends UITestCase {
                 new IAdaptable[] { fWorkspace.getRoot() });
 
         IWorkingSet[] workingSets = fWorkingSetManager.getWorkingSets();
-        for (IWorkingSet workingSet : workingSets) {
-            fWorkingSetManager.removeWorkingSet(workingSet);
+        for (int i = 0; i < workingSets.length; i++) {
+            fWorkingSetManager.removeWorkingSet(workingSets[i]);
         }
     }
 
@@ -78,13 +77,13 @@ public class IWorkingSetManagerTest extends UITestCase {
         fChangeNewValue = null;
         fChangeOldValue = null;
     }
-
+    
     /**
      * Tests the utility method found on the WorkingSetConfigurationBlock.
      */
     public void testConfigBlockFilter() {
-    	final String [] setIds = new String[] {"5", "2", "4", "1", "3" };
-
+    	final String [] setIds = new String[] {"5", "2", "4", "1", "3" }; 
+    	
     	IWorkingSet [] sets = new IWorkingSet[setIds.length * 3];
     	for (int i = 0; i < setIds.length; i++) {
 			sets[i * 3] = createSet(setIds, i);
@@ -93,15 +92,15 @@ public class IWorkingSetManagerTest extends UITestCase {
 		}
     	IWorkingSet [] newSets = WorkingSetConfigurationBlock.filter(sets, setIds);
     	assertEquals(sets.length, newSets.length);
-
-    	for (String setId : setIds) {
-    		newSets = WorkingSetConfigurationBlock.filter(sets, new String [] {setId});
+    	
+    	for (int j = 0; j < setIds.length; j++) {
+    		newSets = WorkingSetConfigurationBlock.filter(sets, new String [] {setIds[j]});	
     		assertEquals(3, newSets.length);
-    		assertEquals(setId, newSets[0].getId());
-    		assertEquals(setId, newSets[1].getId());
-    		assertEquals(setId, newSets[2].getId());
+    		assertEquals(setIds[j], newSets[0].getId());
+    		assertEquals(setIds[j], newSets[1].getId());
+    		assertEquals(setIds[j], newSets[2].getId());
 		}
-
+    	
     }
 
     public void testAddPropertyChangeListener() throws Throwable {
@@ -126,25 +125,27 @@ public class IWorkingSetManagerTest extends UITestCase {
         assertEquals(null, fChangeNewValue);
 
         resetChangeData();
-		// Set the label first to something other than the new name.
-		// This will allow us to test for the name property apart from the label
-		// property
-		fWorkingSet.setLabel(WORKING_SET_NAME_3);
+		fWorkingSet.setLabel(WORKING_SET_NAME_3); // set the label first to
+													// something other than the
+													// new name. This will allow
+													// us to test for the name
+													// property apart from the
+													// label property
 		assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE,
 				fChangeProperty);
-		assertEquals(WORKING_SET_NAME_1, fChangeOldValue.getLabel());
+		assertEquals(null, fChangeOldValue);
 		assertEquals(fWorkingSet, fChangeNewValue);
 		fWorkingSet.setName(WORKING_SET_NAME_2);
 		assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE,
 				fChangeProperty);
-		assertEquals(WORKING_SET_NAME_1, fChangeOldValue.getName());
+		assertEquals(null, fChangeOldValue);
 		assertEquals(fWorkingSet, fChangeNewValue);
 
         resetChangeData();
         fWorkingSet.setElements(new IAdaptable[] {});
         assertEquals(IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE,
                 fChangeProperty);
-		assertEquals(1, fChangeOldValue.getElements().length);
+        assertEquals(null, fChangeOldValue);
         assertEquals(fWorkingSet, fChangeNewValue);
     }
 
@@ -231,12 +232,12 @@ public class IWorkingSetManagerTest extends UITestCase {
         assertTrue(ArrayUtil.equals(new IWorkingSet[] { fWorkingSet },
                 fWorkingSetManager.getRecentWorkingSets()));
     }
-
+    
     public void testRecentWorkingSetsLength() throws Throwable {
         int oldMRULength =  fWorkingSetManager.getRecentWorkingSetsLength();
         try {
 	        fWorkingSetManager.setRecentWorkingSetsLength(10);
-
+	        
 	        IWorkingSet[] workingSets = new IWorkingSet[10];
 	        for (int i = 0 ; i < 10; i++) {
 	            IWorkingSet workingSet = fWorkingSetManager.createWorkingSet(
@@ -246,16 +247,16 @@ public class IWorkingSetManagerTest extends UITestCase {
 	            workingSets[9 - i] = workingSet;
 	        }
 	        assertTrue(ArrayUtil.equals(workingSets, fWorkingSetManager.getRecentWorkingSets()));
-
+	        
 	        fWorkingSetManager.setRecentWorkingSetsLength(7);
 	        IWorkingSet[] workingSets7 = new IWorkingSet[7];
 	        System.arraycopy(workingSets, 0, workingSets7, 0, 7);
 	        assertTrue(ArrayUtil.equals(workingSets7, fWorkingSetManager.getRecentWorkingSets()));
-
+	        
 	        fWorkingSetManager.setRecentWorkingSetsLength(9);
 	        IWorkingSet[] workingSets9 = new IWorkingSet[9];
 	        System.arraycopy(workingSets, 0, workingSets9, 2, 7);
-
+	        
 	        for (int i = 7 ; i < 9; i++) {
 	            IWorkingSet workingSet = fWorkingSetManager.createWorkingSet(
 	                    "ws_addded_" + Integer.toString(i + 1), new IAdaptable[] { fWorkspace.getRoot() });
@@ -263,12 +264,11 @@ public class IWorkingSetManagerTest extends UITestCase {
 	            fWorkingSetManager.addWorkingSet(workingSet);
 	            workingSets9[8 - i] = workingSet;
 	        }
-
+	        
 	        assertTrue(ArrayUtil.equals(workingSets9, fWorkingSetManager.getRecentWorkingSets()));
         } finally {
-        	if (oldMRULength > 0) {
-				fWorkingSetManager.setRecentWorkingSetsLength(oldMRULength);
-			}
+        	if (oldMRULength > 0)
+        		fWorkingSetManager.setRecentWorkingSetsLength(oldMRULength);
         }
     }
 
@@ -321,17 +321,17 @@ public class IWorkingSetManagerTest extends UITestCase {
 		assertEquals(fWorkingSet, sets[0]);
 		assertEquals(workingSet2, sets[2]);
 		assertEquals(workingSet3, sets[1]);
-
+		
 		IWorkingSet workingSet3a = fWorkingSetManager.createWorkingSet(
 				WORKING_SET_NAME_2 + "\u200b", new IAdaptable[] { fWorkspace.getRoot() });
 		workingSet3.setLabel(WORKING_SET_NAME_2); // reset the label - it
 
 		fWorkingSetManager.addWorkingSet(workingSet3a);
 		assertFalse(workingSet3a.equals(workingSet3));
-
+		
 		sets = fWorkingSetManager.getWorkingSets();
 		assertEquals(4, sets.length);
-
+		
     }
 
     public void testRemovePropertyChangeListener() throws Throwable {
@@ -360,10 +360,10 @@ public class IWorkingSetManagerTest extends UITestCase {
         assertTrue(ArrayUtil.equals(new IWorkingSet[] { workingSet2 },
                 fWorkingSetManager.getWorkingSets()));
     }
-
+    
     public void testRemoveWorkingSetAfterRename() throws Throwable {
     	/* get workingSetManager */
-    	IWorkingSetManager workingSetManager =
+    	IWorkingSetManager workingSetManager = 
     		fWorkbench.getWorkingSetManager();
 
     	workingSetManager.addWorkingSet(fWorkingSet);
@@ -392,7 +392,7 @@ public class IWorkingSetManagerTest extends UITestCase {
     }
     /**
      * Tests to ensure that a misbehaving listener does not bring down the manager.
-     *
+     * 
      * @throws Throwable
      */
     public void testListenerSafety() throws Throwable {
@@ -525,12 +525,12 @@ public class IWorkingSetManagerTest extends UITestCase {
 			public Object getAdapter(Class adapter) {
 				return null;
 			}
-
+			
 			@Override
 			public String toString() {
 				return getId();
 			}
 		};
-
+			
 	}
 }

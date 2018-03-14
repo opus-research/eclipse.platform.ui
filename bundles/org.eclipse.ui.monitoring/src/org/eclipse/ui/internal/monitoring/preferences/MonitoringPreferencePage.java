@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014, 2015 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,12 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring.preferences;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -25,9 +21,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.internal.monitoring.MonitoringPlugin;
@@ -42,8 +38,9 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 	private static final IPreferenceStore preferences =
 			MonitoringPlugin.getDefault().getPreferenceStore();
 	private BooleanFieldEditor monitoringEnabled;
-	private IntegerEditor longEventWarningThreshold;
-	private IntegerEditor longEventErrorThreshold;
+	private IntegerEditor longEventThreshold;
+	private IntegerEditor sampleInterval;
+	private IntegerEditor initialSampleDelay;
 	private IntegerEditor deadlockThreshold;
 	private Map<FieldEditor, Composite> editors;
 
@@ -56,7 +53,8 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 		@Override
 		protected void valueChanged() {
 			super.valueChanged();
-			if (longEventWarningThreshold.isValid() && longEventErrorThreshold.checkValue()) {
+			if (longEventThreshold.isValid() &&
+					sampleInterval.checkValue() && initialSampleDelay.checkValue()) {
 				deadlockThreshold.checkValue();
 			}
 		}
@@ -68,15 +66,21 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 			}
 
 			String preferenceName = getPreferenceName();
-			if (preferenceName.equals(PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS)) {
-				if (longEventWarningThreshold.isValid() &&
-						getIntValue() < longEventWarningThreshold.getIntValue()) {
-					showMessage(Messages.MonitoringPreferencePage_error_threshold_too_low_error);
+			if (preferenceName.equals(PreferenceConstants.SAMPLE_INTERVAL_MILLIS)) {
+				if (longEventThreshold.isValid() &&
+						getIntValue() >= longEventThreshold.getIntValue()) {
+					showMessage(Messages.MonitoringPreferencePage_sample_interval_too_high_error);
+					return false;
+				}
+			} else if (preferenceName.equals(PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS)) {
+				if (longEventThreshold.isValid() &&
+						getIntValue() >= longEventThreshold.getIntValue()) {
+					showMessage(Messages.MonitoringPreferencePage_initial_sample_delay_too_high_error);
 					return false;
 				}
 			} else if (preferenceName.equals(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS)) {
-				if (longEventWarningThreshold.isValid() &&
-						getIntValue() <= longEventErrorThreshold.getIntValue()) {
+				if (longEventThreshold.isValid() &&
+						getIntValue() <= longEventThreshold.getIntValue()) {
 					showMessage(Messages.MonitoringPreferencePage_deadlock_threshold_too_low_error);
 					return false;
 				}
@@ -105,85 +109,63 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 	public void createFieldEditors() {
 		Composite parent = getFieldEditorParent();
     	PixelConverter pixelConverter = new PixelConverter(parent);
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginWidth = 0;
+		parent.setLayout(layout);
 
 		Composite container = new Composite(parent, SWT.NONE);
+		layout = new GridLayout(1, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		layout.verticalSpacing = pixelConverter.convertHeightInCharsToPixels(1);
+		container.setLayout(layout);
+		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-		createTopBlock(container);
-		createBottomBlock(container, pixelConverter);
-
-		GridLayoutFactory.fillDefaults()
-				.numColumns(1)
-				.spacing(LayoutConstants.getSpacing())
-				.generateLayout(container);
-
-		GridLayoutFactory.fillDefaults()
-				.numColumns(1)
-				.spacing(LayoutConstants.getSpacing())
-				.generateLayout(parent);
-	}
-
-	private Composite createTopBlock(Composite container) {
-		Composite block = new Composite(container, SWT.NONE);
+		Composite topGroup = new Composite(container, SWT.NONE);
+		layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		topGroup.setLayout(layout);
+		topGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		monitoringEnabled = createBooleanEditor(PreferenceConstants.MONITORING_ENABLED,
-				Messages.MonitoringPreferencePage_enable_monitoring_label, block);
-		createBooleanEditor(PreferenceConstants.LOG_TO_ERROR_LOG,
-				Messages.MonitoringPreferencePage_log_freeze_events_label, block);
+				Messages.MonitoringPreferencePage_enable_thread_label, topGroup);
 
-		longEventWarningThreshold = createIntegerEditor(
-				PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS,
-				Messages.MonitoringPreferencePage_warning_threshold_label, block,
-				3, HOUR_IN_MS);
-		longEventErrorThreshold = createIntegerEditor(
-				PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS,
-				Messages.MonitoringPreferencePage_error_threshold_label, block,
-				3, HOUR_IN_MS);
-		deadlockThreshold = createIntegerEditor(
-				PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS,
-				Messages.MonitoringPreferencePage_deadlock_threshold_label, block,
-				1000, 24 * HOUR_IN_MS);
+		longEventThreshold = createIntegerEditor(
+				PreferenceConstants.LONG_EVENT_THRESHOLD_MILLIS,
+				Messages.MonitoringPreferencePage_long_event_threshold, topGroup, 3, HOUR_IN_MS);
 		createIntegerEditor(
 				PreferenceConstants.MAX_STACK_SAMPLES,
-				Messages.MonitoringPreferencePage_max_stack_samples_label, block, 0, 100);
-		GridLayoutFactory.fillDefaults()
-				.numColumns(2)
-				.spacing(LayoutConstants.getSpacing())
-				.applyTo(block);
-		return block;
-	}
+				Messages.MonitoringPreferencePage_max_stack_samples_label, topGroup, 1, 100);
+		sampleInterval = createIntegerEditor(
+				PreferenceConstants.SAMPLE_INTERVAL_MILLIS,
+				Messages.MonitoringPreferencePage_sample_interval_label, topGroup, 2, HOUR_IN_MS);
+		initialSampleDelay = createIntegerEditor(
+				PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS,
+				Messages.MonitoringPreferencePage_initial_sample_delay_label, topGroup,
+				2, HOUR_IN_MS);
+		deadlockThreshold = createIntegerEditor(
+				PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS,
+				Messages.MonitoringPreferencePage_deadlock_threshold_label, topGroup,
+				1000, 24 * HOUR_IN_MS);
 
-	private Composite createBottomBlock(Composite container, PixelConverter pixelConverter) {
-		Composite block = new Composite(container, SWT.NONE);
+		createBooleanEditor(PreferenceConstants.DUMP_ALL_THREADS,
+				Messages.MonitoringPreferencePage_dump_all_threads_label, topGroup);
+		topGroup.setLayout(layout);
 
-		createEmptySpace(block, pixelConverter.convertVerticalDLUsToPixels(3), 2);
-		FilterListEditor uiThreadFilter = new FilterListEditor(PreferenceConstants.UI_THREAD_FILTER,
-				Messages.MonitoringPreferencePage_ui_thread_filter_label,
-				Messages.MonitoringPreferencePage_add_ui_thread_filter_button_label,
-				Messages.MonitoringPreferencePage_remove_ui_thread_filter_button_label,
-				Messages.FilterInputDialog_ui_thread_filter_message,
-				block);
-		addField(uiThreadFilter, block);
+		createBooleanEditor(PreferenceConstants.LOG_TO_ERROR_LOG,
+				Messages.MonitoringPreferencePage_log_freeze_events_label, topGroup);
+		topGroup.setLayout(layout);
 
-		createEmptySpace(block, pixelConverter.convertVerticalDLUsToPixels(3), 2);
-		FilterListEditor noninterestingThreadFilter = new FilterListEditor(
-				PreferenceConstants.NONINTERESTING_THREAD_FILTER,
-				Messages.MonitoringPreferencePage_noninteresting_thread_filter_label,
-				Messages.MonitoringPreferencePage_add_noninteresting_thread_filter_button_label,
-				Messages.MonitoringPreferencePage_remove_noninteresting_thread_filter_button_label,
-				Messages.FilterInputDialog_noninteresting_thread_filter_message,
-				block);
-		addField(noninterestingThreadFilter, block);
-		GridLayoutFactory.fillDefaults()
-				.numColumns(2)
-				.spacing(LayoutConstants.getSpacing())
-				.applyTo(block);
-		return block;
-	}
+		final Composite bottomGroup = new Composite(container, SWT.NONE);
+		layout = new GridLayout(2, false);
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
+		bottomGroup.setLayout(layout);
+		bottomGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-	private static Control createEmptySpace(Composite parent, int height, int span) {
-		Label label= new Label(parent, SWT.LEFT);
-		GridDataFactory.fillDefaults().span(span, 1).hint(0, height).applyTo(label);
-		return label;
+		addField(new FilterListEditor(PreferenceConstants.FILTER_TRACES,
+				Messages.MonitoringPreferencePage_filter_label, bottomGroup), bottomGroup);
 	}
 
 	@Override

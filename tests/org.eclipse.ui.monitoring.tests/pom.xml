@@ -8,22 +8,23 @@
 
   Contributors:
       Marcus Eng (Google) - initial API and implementation
-      Lars Vogel <Lars.Vogel@vogella.com> - Bug 443678, 457719
+      Lars Vogel <Lars.Vogel@vogella.com> - Bug 443678
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>eclipse.platform.ui.tests</artifactId>
     <groupId>eclipse.platform.ui</groupId>
-    <version>4.7.0-SNAPSHOT</version>
+    <version>4.5.0-SNAPSHOT</version>
   </parent>
   <groupId>org.eclipse.ui</groupId>
   <artifactId>org.eclipse.ui.monitoring.tests</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-	<unitTestSuite>org.eclipse.ui.internal.monitoring.MonitoringTestSuite</unitTestSuite>
+	<testSuiteMonitoring>**/org/eclipse/ui/internal/monitoring/MonitoringTestSuite.java</testSuiteMonitoring>
+ 	<skipTests>false</skipTests>
   </properties>
 
   <build>
@@ -33,8 +34,9 @@
   			<artifactId>tycho-surefire-plugin</artifactId>
   			<version>${tycho.version}</version>
 			<configuration>
-				<testSuite>org.eclipse.ui.monitoring.tests</testSuite>
-				<testClass>${unitTestSuite}</testClass>
+				<includes>
+				 	<include>${testSuiteMonitoring}</include>
+				</includes>
 				<useUIHarness>true</useUIHarness>
 				<useUIThread>true</useUIThread>
 	  			<dependencies>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,8 @@
 package org.eclipse.ui.forms.widgets;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -29,14 +31,14 @@ import org.eclipse.swt.widgets.Event;
  * control vertical alignment (supported values are SWT.TOP, SWT.BOTTOM and
  * SWT.CENTER).
  * <p>
- * The class does not need to be subclassed but it is allowed to do so if some
+ * The class does not need to be sublassed but it is allowed to do so if some
  * aspect of the image hyperlink needs to be modified.
  * <p>
  * <dl>
  * <dt><b>Styles:</b></dt>
  * <dd>SWT.WRAP, SWT.BOTTOM, SWT.TOP, SWT.MIDDLE, SWT.LEFT, SWT.RIGHT</dd>
  * </dl>
- *
+ * 
  * @since 3.0
  */
 public class ImageHyperlink extends Hyperlink {
@@ -50,7 +52,7 @@ public class ImageHyperlink extends Hyperlink {
 	private Image hoverImage;
 
 	private Image activeImage;
-
+	
 	private Image disabledImage;
 
 	private int state;
@@ -65,7 +67,7 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Creates the image hyperlink instance.
-	 *
+	 * 
 	 * @param parent
 	 *            the control parent
 	 * @param style
@@ -74,23 +76,27 @@ public class ImageHyperlink extends Hyperlink {
 	public ImageHyperlink(Composite parent, int style) {
 		super(parent, removeAlignment(style));
 		extractAlignment(style);
-		addDisposeListener(e -> {
-			if (disabledImage != null)
-				disabledImage.dispose();
+		addDisposeListener(new DisposeListener() {
+			public void widgetDisposed(DisposeEvent e) {
+				if (disabledImage != null)
+					disabledImage.dispose();
+			}
 		});
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.forms.widgets.AbstractHyperlink#paintHyperlink(org.eclipse.swt.events.PaintEvent)
+	 */
 	protected void paintHyperlink(GC gc) {
 		paintHyperlink(gc, getClientArea());
 	}
-
+	
 	protected void paintHyperlink(GC gc, Rectangle bounds) {
 		Image image = null;
-		if (!isEnabled()) {
-			createDisabledImage();
+		if (!isEnabled())
 			image = disabledImage;
-		}
 		else {
 			if ((state & ACTIVE) != 0)
 				image = activeImage;
@@ -101,7 +107,7 @@ public class ImageHyperlink extends Hyperlink {
 		}
 		Rectangle ibounds = image != null ? image.getBounds() : new Rectangle(0, 0, 0, 0);
 		Point maxsize = computeMaxImageSize();
-		int spacing = image!=null?textSpacing:0;
+		int spacing = image!=null?textSpacing:0;		
 		int textWidth = bounds.width - maxsize.x - spacing
 				- marginWidth - marginWidth;
 		int y = bounds.y+marginHeight + maxsize.y / 2 - ibounds.height / 2;
@@ -144,7 +150,7 @@ public class ImageHyperlink extends Hyperlink {
 	/**
 	 * Computes the control size by reserving space for images in addition to
 	 * text.
-	 *
+	 * 
 	 * @param wHint
 	 *            width hint
 	 * @param hHint
@@ -153,7 +159,6 @@ public class ImageHyperlink extends Hyperlink {
 	 *            if <code>true</code>, any cached layout data should be
 	 *            computed anew
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		Point isize = computeMaxImageSize();
@@ -178,19 +183,16 @@ public class ImageHyperlink extends Hyperlink {
 		return new Point(width, height);
 	}
 
-	@Override
 	protected void handleEnter(Event e) {
 		state = HOVER;
 		super.handleEnter(e);
 	}
 
-	@Override
 	protected void handleExit(Event e) {
 		state = 0;
 		super.handleExit(e);
 	}
 
-	@Override
 	protected void handleActivate(Event e) {
 		state &= ACTIVE;
 		redraw();
@@ -202,7 +204,7 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Returns active image.
-	 *
+	 * 
 	 * @return active image or <code>null</code> if not set.
 	 */
 	public Image getActiveImage() {
@@ -211,9 +213,9 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Sets the image to show when link is activated.
-	 *
+	 * 
 	 * @param activeImage
-	 *
+	 * 
 	 */
 	public void setActiveImage(Image activeImage) {
 		this.activeImage = activeImage;
@@ -221,7 +223,7 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Returns the hover image.
-	 *
+	 * 
 	 * @return hover image or <code>null</code> if not set.
 	 */
 	public Image getHoverImage() {
@@ -230,7 +232,7 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Sets the image to show when link is hover state (on mouse over).
-	 *
+	 * 
 	 * @param hoverImage
 	 */
 	public void setHoverImage(Image hoverImage) {
@@ -239,7 +241,7 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Returns the image to show in the normal state.
-	 *
+	 * 
 	 * @return normal image or <code>null</code> if not set.
 	 */
 	public Image getImage() {
@@ -248,21 +250,18 @@ public class ImageHyperlink extends Hyperlink {
 
 	/**
 	 * Sets the image to show when link is in the normal state.
-	 *
+	 * 
 	 * @param image
 	 */
 	public void setImage(Image image) {
 		this.image = image;
 		if (disabledImage != null)
 			disabledImage.dispose();
+		if (image != null && !image.isDisposed())
+			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);
 		if (image == null) {
 			disabledImage = null;
 		}
-	}
-
-	private void createDisabledImage() {
-		if (this.image != null && !this.image.isDisposed())
-			disabledImage = new Image(this.image.getDevice(), this.image, SWT.IMAGE_DISABLE);
 	}
 
 	private Point computeMaxImageSize() {
@@ -317,8 +316,7 @@ public class ImageHyperlink extends Hyperlink {
 			horizontalAlignment = SWT.RIGHT;
 		}
 	}
-
-	@Override
+	
 	public void setEnabled(boolean enabled) {
 		if (!enabled && (disabledImage == null || disabledImage.isDisposed()) && image != null && !image.isDisposed()) {
 			disabledImage = new Image(image.getDevice(), image, SWT.IMAGE_DISABLE);

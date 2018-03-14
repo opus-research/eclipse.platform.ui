@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 	 * Child cache. Map from Object->Object[]. Our hasChildren() method is
 	 * expensive so it's better to cache the results of getChildren().
 	 */
-	private Map<Object, Object[]> childMap = new HashMap<>();
+	private Map<Object, Object[]> childMap = new HashMap<Object, Object[]>();
 
 	private MApplication application;
 
@@ -73,7 +73,7 @@ public class ViewContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object element) {
-		Object[] children = childMap.get(element);
+		Object[] children = (Object[]) childMap.get(element);
 		if (children == null) {
 			children = createChildren(element);
 			childMap.put(element, children);
@@ -85,8 +85,8 @@ public class ViewContentProvider implements ITreeContentProvider {
 		if (element instanceof MApplication) {
 			List<MPartDescriptor> descriptors = ((MApplication) element)
 					.getDescriptors();
-			Set<String> categoryTags = new HashSet<>();
-			Set<MPartDescriptor> noCategoryDescriptors = new HashSet<>();
+			Set<String> categoryTags = new HashSet<String>();
+			Set<MPartDescriptor> noCategoryDescriptors = new HashSet<MPartDescriptor>();
 			for (MPartDescriptor descriptor : descriptors) {
 				List<String> tags = descriptor.getTags();
 				String category = null;
@@ -106,13 +106,13 @@ public class ViewContentProvider implements ITreeContentProvider {
 				}
 			}
 
-			Set<Object> combinedTopElements = new HashSet<>();
+			Set<Object> combinedTopElements = new HashSet<Object>();
 			combinedTopElements.addAll(categoryTags);
 			combinedTopElements.addAll(noCategoryDescriptors);
 			return combinedTopElements.toArray();
 		} else if (element instanceof String) {
 			List<MPartDescriptor> descriptors = application.getDescriptors();
-			Set<MPartDescriptor> categoryDescriptors = new HashSet<>();
+			Set<MPartDescriptor> categoryDescriptors = new HashSet<MPartDescriptor>();
 			for (MPartDescriptor descriptor : descriptors) {
 				List<String> tags = descriptor.getTags();
 				for (String tag : tags) {

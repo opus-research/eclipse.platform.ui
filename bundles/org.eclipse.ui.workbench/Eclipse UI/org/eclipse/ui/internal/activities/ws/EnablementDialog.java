@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.activities.ws;
 
@@ -17,6 +16,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -45,7 +45,7 @@ import org.eclipse.ui.activities.WorkbenchTriggerPointAdvisor;
 /**
  * Dialog that will prompt the user and confirm that they wish to activate a set
  * of activities.
- *
+ * 
  * @since 3.0
  */
 public class EnablementDialog extends Dialog {
@@ -80,7 +80,7 @@ public class EnablementDialog extends Dialog {
 
     /**
      * Create a new instance of the reciever.
-     *
+     * 
      * @param parentShell the parent shell
      * @param activityIds the candidate activities
      * @param strings string overrides
@@ -91,6 +91,9 @@ public class EnablementDialog extends Dialog {
 		this.strings = strings;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -116,7 +119,7 @@ public class EnablementDialog extends Dialog {
             }
             text.setText(MessageFormat.format(RESOURCE_BUNDLE
                     .getString("requiresSingle"), //$NON-NLS-1$
-					activityText));
+                    new Object[] { activityText }));
 
             text = new Label(composite, SWT.NONE);
 			text
@@ -138,6 +141,9 @@ public class EnablementDialog extends Dialog {
             viewer.setCheckedElements(activityIdsCopy.toArray());
             viewer.addCheckStateListener(new ICheckStateListener() {
 
+                /* (non-Javadoc)
+                 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
+                 */
                 @Override
 				public void checkStateChanged(CheckStateChangedEvent event) {
                     if (event.getChecked()) {
@@ -151,6 +157,9 @@ public class EnablementDialog extends Dialog {
                 }
             });
             viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+                /* (non-Javadoc)
+                 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+                 */
                 @Override
 				public void selectionChanged(SelectionChangedEvent event) {
                     selectedActivity = (String) ((IStructuredSelection) event
@@ -166,7 +175,7 @@ public class EnablementDialog extends Dialog {
 
             text = new Label(composite, SWT.NONE);
             text.setText(strings.getProperty(WorkbenchTriggerPointAdvisor.PROCEED_MULTI, RESOURCE_BUNDLE
-					.getString(WorkbenchTriggerPointAdvisor.PROCEED_MULTI)));
+					.getString(WorkbenchTriggerPointAdvisor.PROCEED_MULTI))); 
             text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
             text.setFont(dialogFont);
         }
@@ -232,13 +241,13 @@ public class EnablementDialog extends Dialog {
                 desc = RESOURCE_BUNDLE.getString("noDescAvailable"); //$NON-NLS-1$
             }
             detailsLabel.setText(MessageFormat.format(RESOURCE_BUNDLE
-					.getString("detailsLabel"), name)); //$NON-NLS-1$
+                    .getString("detailsLabel"), new Object[] { name })); //$NON-NLS-1$
             detailsText.setText(desc);
         }
     }
 
     /**
-     *
+     * 
      */
     protected void setDetailHints() {
         GridData data = (GridData) detailsComposite.getLayoutData();
@@ -259,18 +268,21 @@ public class EnablementDialog extends Dialog {
         if (!showDetails) {
 			detailsButton.setText(RESOURCE_BUNDLE.getString("showDetails")); //$NON-NLS-1$
 		} else {
-			detailsButton.setText(RESOURCE_BUNDLE.getString("hideDetails")); //$NON-NLS-1$
+			detailsButton.setText(RESOURCE_BUNDLE.getString("hideDetails")); //$NON-NLS-1$        
 		}
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText(RESOURCE_BUNDLE.getString("title")); //$NON-NLS-1$
     }
 
-    /**
-     * @return Returns whether the user has declared that there is to be no further
+    /** 
+     * @return Returns whether the user has declared that there is to be no further 
      * prompting for the supplied activities
      */
     public boolean getDontAsk() {
@@ -284,12 +296,18 @@ public class EnablementDialog extends Dialog {
         return activitiesToEnable;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+     */
     @Override
 	protected void okPressed() {
         dontAsk = dontAskButton.getSelection();
         super.okPressed();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         super.createButtonsForButtonBar(parent);
@@ -298,6 +316,9 @@ public class EnablementDialog extends Dialog {
         setDetailButtonLabel();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         if (buttonId == IDialogConstants.DETAILS_ID) {

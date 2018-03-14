@@ -1,33 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2013 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.resources;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import org.eclipse.e4.ui.css.core.dom.properties.css2.CSS2FontProperties;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTHelperTestCase;
 import org.eclipse.e4.ui.css.swt.resources.ResourceByDefinitionKey;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
-import org.junit.Test;
+import org.eclipse.swt.SWT;
 import org.w3c.dom.css.CSSPrimitiveValue;
 
+@SuppressWarnings("restriction")
 public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 	private SWTResourceRegistryKeyFactory factory = new SWTResourceRegistryKeyFactory();
 
-	@Test
-	public void testCreateKeyWhenFontProperty() {
-		CSS2FontProperties fontProperties = null;
-		fontProperties = fontProperties("Arial", 12, CSS_ITALIC, CSS_BOLD);
-
+	public void testCreateKeyWhenFontProperty() throws Exception {
+		CSS2FontProperties fontProperties = fontProperties("Arial", 12,
+				SWT.ITALIC);
 
 		Object result = factory.createKey(fontProperties);
 
@@ -35,8 +30,7 @@ public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 		assertEquals(CSSResourcesHelpers.getCSSValueKey(fontProperties), result);
 	}
 
-	@Test
-	public void testCreateKeyWhenColorValue() {
+	public void testCreateKeyWhenColorValue() throws Exception {
 		CSSPrimitiveValue colorValue = colorValue("red");
 
 		Object result = factory.createKey(colorValue);
@@ -45,14 +39,10 @@ public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 		assertEquals(CSSResourcesHelpers.getCSSValueKey(colorValue), result);
 	}
 
-	@Test
-	public void testCreateKeyWhenFontByDefinition() {
-		CSS2FontProperties fontProperties = null;
-		try {
-			fontProperties = fontProperties("#font-by-definition", 12, CSS_ITALIC, CSS_BOLD);
-		} catch (Exception e) {
-			fail("FontProperties should not throw exception");
-		}
+	public void testCreateKeyWhenFontByDefinition() throws Exception {
+		CSS2FontProperties fontProperties = fontProperties(
+				"#font-by-definition", 12,
+				SWT.ITALIC);
 
 		Object result = factory.createKey(fontProperties);
 
@@ -60,8 +50,7 @@ public class SWTResourceRegistryKeyFactoryTest extends CSSSWTHelperTestCase {
 		assertEquals(CSSResourcesHelpers.getCSSValueKey(fontProperties).toString(), result.toString());
 	}
 
-	@Test
-	public void testCreateKeyWhenColorByDefinition() {
+	public void testCreateKeyWhenColorByDefinition() throws Exception {
 		CSSPrimitiveValue colorValue = colorValue("#color-by-definition");
 
 		Object result = factory.createKey(colorValue);

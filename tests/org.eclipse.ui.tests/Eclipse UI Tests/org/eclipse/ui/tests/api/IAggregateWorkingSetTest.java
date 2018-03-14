@@ -10,19 +10,11 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
-import static org.junit.Assert.assertArrayEquals;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IAggregateWorkingSet;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IWorkingSet;
@@ -43,7 +35,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 	IWorkspace fWorkspace;
 
 	IWorkingSet[] components;
-	List<IWorkingSet> backup;
 	IAggregateWorkingSet fWorkingSet;
 
 	public IAggregateWorkingSetTest(String testName) {
@@ -55,7 +46,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 		super.doSetUp();
 		IWorkingSetManager workingSetManager = fWorkbench
 		.getWorkingSetManager();
-		backup = Arrays.asList(workingSetManager.getAllWorkingSets());
 
 		fWorkspace = ResourcesPlugin.getWorkspace();
 		components = new IWorkingSet[4];
@@ -74,15 +64,9 @@ public class IAggregateWorkingSetTest extends UITestCase {
 	protected void doTearDown() throws Exception {
 		IWorkingSetManager workingSetManager = fWorkbench.getWorkingSetManager();
 		workingSetManager.removeWorkingSet(fWorkingSet);
-		for (IWorkingSet component : components) {
-			workingSetManager.removeWorkingSet(component);
-		}
-		IWorkingSet[] sets = workingSetManager.getAllWorkingSets();
-		for (IWorkingSet wset : sets) {
-			if (!backup.contains(wset)) {
-				workingSetManager.removeWorkingSet(wset);
-			}
-		}
+		for (int i = 0; i < components.length; i++) {
+			workingSetManager.removeWorkingSet(components[i]);
+		}    	
 		super.doTearDown();
 	}
 
@@ -97,8 +81,8 @@ public class IAggregateWorkingSetTest extends UITestCase {
 				sets[0]=null; //client fails to pay enough attention to specs or unknowingly does this
 			}
 		}
-		//</possible client code>
-		//error makes it look like it comes from workingsets api, with no clue about the actual culprit
+		//</possible client code>    	
+		//error makes it look like it comes from workingsets api, with no clue about the actual culprit 
 		IMemento memento=XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET);
 		set.saveState(memento);
 	}
@@ -111,14 +95,14 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			IWorkingSet[] sets=((IAggregateWorkingSet)set).getComponents();
 			if(sets.length>1){
 				//code 2 fails to pay enough attention to specs or unknowingly does this
-				sets[0]=workingSetManager.createWorkingSet(WORKING_SET_NAME, new IAdaptable[] { fWorkspace.getRoot() });
+				sets[0]=workingSetManager.createWorkingSet(WORKING_SET_NAME, new IAdaptable[] { fWorkspace.getRoot() }); 
 				//code 1 part  removes a workingset
 				workingSetManager.removeWorkingSet(sets[1]);
 			}
 		}
-		//</possible client code>
-
-		//unexpected
+		//</possible client code>    	
+		
+		//unexpected 
 		assertTrue(ArrayUtil.equals(
 				new IAdaptable[] {},
 				fWorkingSet.getElements()));
@@ -128,38 +112,38 @@ public class IAggregateWorkingSetTest extends UITestCase {
 	 * Core of the problem: while Eclipse is running, name collisions among working sets
 	 * don't matter. However, on save and restart names will be used to identify working
 	 * sets, which could possibly lead to cycles in aggregate working sets.
-	 *
+	 * 
 	 * Bottom line: if there are multiple aggregate working sets with the same name, expect
 	 * trouble on restart.
-	 *
+	 * 
 	 * To create a cycle we have to be creative:
 	 * - create an aggregate1 with an ID = "testCycle"
 	 * - create an aggregate2 with an ID = "testCycle" containing aggregate1
 	 * - save it into IMemento
-	 *
+	 * 
 	 * Now the IMememnto creates a self reference:
-	 *
+	 * 
 	 * <workingSet name="testCycle" label="testCycle" aggregate="true">
 	 * 	<workingSet IMemento.internal.id="testCycle" />
 	 * </workingSet>
-	 *
+	 * 
 	 * All we have to do to emulate stack overflow is to create a working set based on this IMemento.
-	 *
+	 * 
 	 * @throws Throwable
 	 */
 	public void testWorkingSetCycle() throws Throwable {
 		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-
+		
 		// create an IMemento with a cycle in it
 		IAggregateWorkingSet aggregate = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle","testCycle", new IWorkingSet[0]);
-
+		
 		IAggregateWorkingSet aggregate2 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle","testCycle", new IWorkingSet[] {aggregate});
-
+		
 		IMemento memento=XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET);
 		aggregate2.saveState(memento);
-
+		
 		// load the IMemento
 		IAggregateWorkingSet aggregateReloaded = null;
 		try {
@@ -170,48 +154,47 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			e.printStackTrace();
 			fail("Stack overflow for self-referenced aggregate working set", e);
 		} finally {
-			if (aggregateReloaded != null) {
+			if (aggregateReloaded != null)
 				manager.removeWorkingSet(aggregateReloaded);
-			}
 		}
 	}
-
+	
 	/**
 	 * Tests cleanup of the cycle from an aggregate working set.
 	 * @throws Throwable
 	 */
 	public void testCycleCleanup() throws Throwable {
 		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-
+		
 		// create an IMemento with a cycle in it: { good, good, cycle, good, good }
 		IAggregateWorkingSet aggregateSub0 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle0","testCycle0", new IWorkingSet[0]);
-
+		
 		IAggregateWorkingSet aggregateSub1 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle1","testCycle1", new IWorkingSet[0]);
 
 		IAggregateWorkingSet aggregateSub2 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle","testCycle", new IWorkingSet[0]); // cycle
-
+		
 		IAggregateWorkingSet aggregateSub3 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle3","testCycle3", new IWorkingSet[0]);
-
+		
 		IAggregateWorkingSet aggregateSub4 = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet("testCycle4","testCycle4", new IWorkingSet[0]);
-
-
+		
+		
 		IAggregateWorkingSet aggregate = (IAggregateWorkingSet) manager
-		.createAggregateWorkingSet("testCycle","testCycle", new IWorkingSet[] {aggregateSub0,
+		.createAggregateWorkingSet("testCycle","testCycle", new IWorkingSet[] {aggregateSub0, 
 				aggregateSub1, aggregateSub2, aggregateSub3, aggregateSub4});
 
 		manager.addWorkingSet(aggregateSub0);
 		manager.addWorkingSet(aggregateSub1);
 		manager.addWorkingSet(aggregateSub3);
 		manager.addWorkingSet(aggregateSub4);
-
+		
 		IMemento memento=XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET);
 		aggregate.saveState(memento);
-
+		
 		// load the IMemento
 		IAggregateWorkingSet aggregateReloaded = null;
 		try {
@@ -220,26 +203,23 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			IWorkingSet[] aggregates = aggregateReloaded.getComponents();
 			assertNotNull(aggregates);
 			assertEquals(4, aggregates.length);
-			for (IWorkingSet aggregate2 : aggregates) {
-				assertFalse("testCycle".equals(aggregate2.getName()));
-			}
+			for(int i = 0; i < aggregates.length; i++)
+				assertFalse("testCycle".equals(aggregates[i].getName()));
 		} catch (StackOverflowError e) {
 			e.printStackTrace();
 			fail("Stack overflow for self-referenced aggregate working set", e);
 		} finally {
-			if (aggregateReloaded != null) {
+			if (aggregateReloaded != null)
 				manager.removeWorkingSet(aggregateReloaded);
-			}
 		}
 	}
-
+	
 	/*
 	 * Test related to Bug 217955.The initial fix made changes that caused
 	 * save/restore to fail due to early restore and forward reference in
 	 * memento of aggregates
 	 */
-	/* TODO test must be enabled after bug 479217 is fixed */
-	public void XXXtestWorkingSetSaveRestoreAggregates() throws Throwable {
+	public void testWorkingSetSaveRestoreAggregates() throws Throwable {
 		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
 		String nameA = "A";
 		String nameB = "B";
@@ -248,15 +228,15 @@ public class IAggregateWorkingSetTest extends UITestCase {
 		IWorkingSet wSetA = manager
 				.createWorkingSet(nameA, new IAdaptable[] {});
 		manager.addWorkingSet(wSetA);
-
+		
 		IAggregateWorkingSet wSetB = (IAggregateWorkingSet) manager
 		.createAggregateWorkingSet(nameB, nameB, new IWorkingSet[] {});
 		manager.addWorkingSet(wSetB);
-
+		
 		IAggregateWorkingSet wSetC = (IAggregateWorkingSet) manager
 				.createAggregateWorkingSet(nameC, nameC, new IWorkingSet[0]);
 		manager.addWorkingSet(wSetC);
-
+		
 		try {
 			assertEquals("Failed to add workingset" + nameA, wSetA, manager
 					.getWorkingSet(nameA));
@@ -267,54 +247,33 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			assertEquals("Failed to add workingset" + nameB, wSetB, manager
 					.getWorkingSet(nameB));
 
-			assertEquals(0, wSetB.getComponents().length);
-
 			invokeMethod(AggregateWorkingSet.class, "setComponents", wSetB,
 					new Object[] { new IWorkingSet[] {
 							wSetA, wSetC } },
 					new Class[] { new IWorkingSet[] {}.getClass() });
 
-			assertArrayEquals(new IWorkingSet[] { wSetA, wSetC }, wSetB.getComponents());
+			saveRestoreWorkingSetManager();
 
-			IMemento workingSets = saveAndRemoveWorkingSets(wSetA, wSetB, wSetC);
-			processEvents();
-			waitForJobs(500, 3000);
-
-			assertNull(manager.getWorkingSet(nameA));
-			assertNull(manager.getWorkingSet(nameB));
-			assertNull(manager.getWorkingSet(nameC));
-
-			restoreWorkingSetManager(workingSets);
-			processEvents();
-			waitForJobs(500, 3000);
-
-			IWorkingSet restoredA = manager.getWorkingSet(nameA);
-			assertNotNull("Unable to save/restore correctly", restoredA);
-
-			IAggregateWorkingSet restoredB = (IAggregateWorkingSet) manager.getWorkingSet(nameB);
-
-			IAggregateWorkingSet restoredC = (IAggregateWorkingSet) manager.getWorkingSet(nameC);
-
-			assertNotNull("Unable to save/restore correctly", restoredC);
-			assertNotNull("Unable to save/restore correctly", restoredB);
-
-			IWorkingSet[] componenents1 = wSetB.getComponents();
-			IWorkingSet[] componenents2 = restoredB.getComponents();
-
-			if (componenents1.length != componenents2.length) {
-				assertArrayEquals(nameB + " has lost data in the process of save/restore: " + restoredB,
-						wSetB.getComponents(), restoredB.getComponents());
-			} else {
-				for (int i = 0; i < componenents1.length; i++) {
-					if (!componenents1[i].equals(componenents2[i])) {
-						assertEquals(nameB + " has lost data in the process of save/restore: " + restoredB,
-								componenents1[i].toString(), componenents2[i].toString());
-						fail("equals() and toString() do not match for: " + componenents1[i] + " and "
-								+ componenents2[i]);
-					}
-				}
+			IAggregateWorkingSet restoredB = (IAggregateWorkingSet) manager
+					.getWorkingSet(nameB);
+			assertTrue("Unable to save/restore correctly", restoredB!=null);
+			
+			IAggregateWorkingSet restoredC = (IAggregateWorkingSet) manager
+			.getWorkingSet(nameC);
+			assertTrue("Unable to save/restore correctly", restoredC!=null);
+			
+			IWorkingSet[] componenets1=wSetB.getComponents();
+			IWorkingSet[] componenets2=((IAggregateWorkingSet) manager
+					.getWorkingSet(nameB)).getComponents();
+	
+			if (componenets1.length != componenets2.length)
+				fail(nameB + " has lost data in the process of save/restore");
+	        else {
+	            for (int i = 0; i < componenets1.length; i++)
+	                if (!componenets1[i].equals(componenets2[i]))
+	                	fail(nameB + " has lost data in the process of save/restore");
 	        }
-
+			
 		} finally {
 			// restore
 			IWorkingSet set = manager.getWorkingSet(nameA);
@@ -332,136 +291,15 @@ public class IAggregateWorkingSetTest extends UITestCase {
 		}
 	}
 
-	/* test which passes as long as bug 479217 is not fixed */
-	public void testWorkingSetSaveNeverRestoresAggregate() throws Throwable {
-		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-		String nameA = "A";
-		String nameB = "B";
-		String nameC = "C";
-
-		IWorkingSet wSetA = manager.createWorkingSet(nameA, new IAdaptable[] {});
-		manager.addWorkingSet(wSetA);
-
-		IAggregateWorkingSet wSetB = (IAggregateWorkingSet) manager.createAggregateWorkingSet(nameB, nameB,
-				new IWorkingSet[] {});
-		manager.addWorkingSet(wSetB);
-
-		IAggregateWorkingSet wSetC = (IAggregateWorkingSet) manager.createAggregateWorkingSet(nameC, nameC,
-				new IWorkingSet[0]);
-		manager.addWorkingSet(wSetC);
-
-		try {
-			assertEquals("Failed to add workingset" + nameA, wSetA, manager.getWorkingSet(nameA));
-
-			assertEquals("Failed to add workingset" + nameC, wSetC, manager.getWorkingSet(nameC));
-
-			assertEquals("Failed to add workingset" + nameB, wSetB, manager.getWorkingSet(nameB));
-
-			assertEquals(0, wSetB.getComponents().length);
-
-			invokeMethod(AggregateWorkingSet.class, "setComponents", wSetB,
-					new Object[] { new IWorkingSet[] { wSetA, wSetC } },
-					new Class[] { new IWorkingSet[] {}.getClass() });
-
-			assertArrayEquals(new IWorkingSet[] { wSetA, wSetC }, wSetB.getComponents());
-
-			IMemento workingSets = saveAndRemoveWorkingSets(wSetA, wSetB, wSetC);
-			processEvents();
-			waitForJobs(500, 3000);
-
-			assertNull(manager.getWorkingSet(nameA));
-			assertNull(manager.getWorkingSet(nameB));
-			assertNull(manager.getWorkingSet(nameC));
-
-			final AtomicReference<String> error = new AtomicReference<>();
-
-			// Exploit the bug 479217 in
-			// AbstractWorkingSetManager.restoreWorkingSetState():
-			// every client which wants to see components of the working set
-			// *before* the restoreWorkingSetState() is done, can silently (!!!)
-			// damage the AggregateWorkingSet being restored
-			IPropertyChangeListener badListener = new IPropertyChangeListener() {
-
-				@Override
-				public void propertyChange(PropertyChangeEvent event) {
-					if (event.getProperty() != IWorkingSetManager.CHANGE_WORKING_SET_ADD) {
-						return;
-					}
-					// simply resolve the working set before the manager creates
-					// another one
-					Object ws = event.getNewValue();
-					if (!(ws instanceof AggregateWorkingSet)) {
-						return;
-					}
-					AggregateWorkingSet aws = (AggregateWorkingSet) ws;
-					IMemento m = readField(AbstractWorkingSet.class, "workingSetMemento", IMemento.class, aws);
-					IWorkingSet[] sets = aws.getComponents();
-					if (m != null) {
-						IMemento[] msets = m.getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-						if (msets.length != sets.length) {
-							// KABOOM!
-							error.set("Working set lost due the bad listener! " + "restored: " + Arrays.toString(sets)
-									+ ", expected: " + Arrays.toString(msets));
-						}
-					} else {
-						if (nameB.equals(aws.getName()) && sets.length != 2) {
-							// someone was faster
-							error.set("Working set lost due the bad listener! " + "restored: " + Arrays.toString(sets));
-						}
-					}
-				}
-			};
-			try {
-				manager.addPropertyChangeListener(badListener);
-
-				restoreWorkingSetManager(workingSets);
-				processEvents();
-
-				IWorkingSet restoredA = manager.getWorkingSet(nameA);
-				assertNotNull("Unable to save/restore correctly", restoredA);
-
-				IAggregateWorkingSet restoredB = (IAggregateWorkingSet) manager.getWorkingSet(nameB);
-				assertNotNull("Unable to save/restore correctly", restoredB);
-
-				IAggregateWorkingSet restoredC = (IAggregateWorkingSet) manager.getWorkingSet(nameC);
-				assertNotNull("Unable to save/restore correctly", restoredC);
-
-				IWorkingSet[] componenents1 = wSetB.getComponents();
-				IWorkingSet[] componenents2 = restoredB.getComponents();
-				assertEquals(2, componenents1.length);
-				// this is the bug 479217: we should see 2 elements, and not 1!
-				assertEquals(1, componenents2.length);
-				// if the bug is fixed, the error must be null
-				assertNotNull(error.get());
-			} finally {
-				manager.removePropertyChangeListener(badListener);
-			}
-
-		} finally {
-			// restore
-			IWorkingSet set = manager.getWorkingSet(nameA);
-			if (set != null) {
-				manager.removeWorkingSet(set);
-			}
-			set = manager.getWorkingSet(nameB);
-			if (set != null) {
-				manager.removeWorkingSet(set);
-			}
-			set = manager.getWorkingSet(nameC);
-			if (set != null) {
-				manager.removeWorkingSet(set);
-			}
-		}
-	}
-
-	private IMemento saveAndRemoveWorkingSets(IWorkingSet... sets) {
+	private void saveRestoreWorkingSetManager() {
 		IMemento managerMemento = XMLMemento
 				.createWriteRoot(IWorkbenchConstants.TAG_WORKING_SET_MANAGER);
 		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-		for (IWorkingSet set : sets) {
-			if(set.getId()==null){
+		IWorkingSet[] sets = manager.getAllWorkingSets();
+		for (int i = 0; i < sets.length; i++) {
+			if(sets[i].getId()==null){
 				//set default id as set by factory
-				set.setId(WSET_PAGE_ID);
+				sets[i].setId(WSET_PAGE_ID);
 			}
 		}
 		invokeMethod(AbstractWorkingSetManager.class, "saveWorkingSetState",
@@ -469,19 +307,13 @@ public class IAggregateWorkingSetTest extends UITestCase {
 				new Class[] { IMemento.class });
 		invokeMethod(AbstractWorkingSetManager.class, "saveMruList", manager,
 				new Object[] { managerMemento }, new Class[] { IMemento.class });
-		for (IWorkingSet set : sets) {
-			((AbstractWorkingSet) set).disconnect();
+		for (int i = 0; i < sets.length; i++) {
+			((AbstractWorkingSet) sets[i]).disconnect();
 		}
-		for (IWorkingSet set : sets) {
-			manager.removeWorkingSet(set);
+		for (int i = 0; i < sets.length; i++) {
+			manager.removeWorkingSet(sets[i]);
 		}
 		//manager.dispose(); //not needed, also cause problems
-		return managerMemento;
-	}
-
-	private void restoreWorkingSetManager(IMemento managerMemento) {
-		IWorkingSetManager manager = fWorkbench.getWorkingSetManager();
-
 		invokeMethod(AbstractWorkingSetManager.class, "restoreWorkingSetState",
 				manager, new Object[] { managerMemento },
 				new Class[] { IMemento.class });
@@ -498,17 +330,6 @@ public class IAggregateWorkingSetTest extends UITestCase {
 			return method.invoke(instance, args);
 		} catch (Exception e) {
 			fail("Failure in invoking " + clazz.getName() + methodName, e);
-		}
-		return null;
-	}
-
-	private <T> T readField(Class clazz, String filedName, Class<T> type, Object instance) {
-		try {
-			Field field = clazz.getDeclaredField(filedName);
-			field.setAccessible(true);
-			return type.cast(field.get(instance));
-		} catch (Exception e) {
-			fail("Failure in reading " + clazz.getName() + filedName, e);
 		}
 		return null;
 	}

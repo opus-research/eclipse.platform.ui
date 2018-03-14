@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 The Pampered Chef, Inc. and others.
+ * Copyright (c) 2006, 2014 The Pampered Chef, Inc. and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  *     Tom Schindl - cell editing
  *     Matthew Hall - bugs 260329, 260337
  *     Heiko Ahlig - bug 267712
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283, 297495
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  *******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -29,7 +29,7 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.property.Properties;
 import org.eclipse.core.databinding.property.value.IValueProperty;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.CellEditorProperties;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
@@ -51,10 +51,9 @@ import org.eclipse.swt.widgets.Table;
  * Demonstrates binding a TableViewer with multiple columns to a collection.
  */
 public class Snippet032TableViewerColumnEditing {
-
 	public static void main(String[] args) {
 		final Display display = new Display();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				ViewModel viewModel = new ViewModel();
@@ -72,26 +71,33 @@ public class Snippet032TableViewerColumnEditing {
 
 	// Minimal JavaBeans support
 	public static abstract class AbstractModelObject {
-		private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+		private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+				this);
 
 		public void addPropertyChangeListener(PropertyChangeListener listener) {
 			propertyChangeSupport.addPropertyChangeListener(listener);
 		}
 
-		public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-			propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+		public void addPropertyChangeListener(String propertyName,
+				PropertyChangeListener listener) {
+			propertyChangeSupport.addPropertyChangeListener(propertyName,
+					listener);
 		}
 
 		public void removePropertyChangeListener(PropertyChangeListener listener) {
 			propertyChangeSupport.removePropertyChangeListener(listener);
 		}
 
-		public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-			propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+		public void removePropertyChangeListener(String propertyName,
+				PropertyChangeListener listener) {
+			propertyChangeSupport.removePropertyChangeListener(propertyName,
+					listener);
 		}
 
-		protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
-			propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+		protected void firePropertyChange(String propertyName, Object oldValue,
+				Object newValue) {
+			propertyChangeSupport.firePropertyChange(propertyName, oldValue,
+					newValue);
 		}
 	}
 
@@ -119,7 +125,8 @@ public class Snippet032TableViewerColumnEditing {
 		}
 
 		public void setFirstName(String firstName) {
-			firePropertyChange("firstName", this.firstName, this.firstName = firstName);
+			firePropertyChange("firstName", this.firstName,
+					this.firstName = firstName);
 		}
 	}
 
@@ -138,10 +145,7 @@ public class Snippet032TableViewerColumnEditing {
 			people.add(new Person("Joe", "Winchester"));
 			people.add(new Person("Boris", "Bokowski"));
 			people.add(new Person("Brad", "Reynolds"));
-			people.add(new Person("Thomas", "Schindl"));
-			people.add(new Person("Lars", "Vogel"));
-			people.add(new Person("Simon", "Scholz"));
-			people.add(new Person("Stefan", "Xenos"));
+			people.add(new Person("Matthew", "Hall"));
 		}
 
 		public List getPeople() {
@@ -193,20 +197,24 @@ public class Snippet032TableViewerColumnEditing {
 			// Since we're using a JFace Viewer, we do first wrap our Table...
 			TableViewer peopleViewer = new TableViewer(committers);
 
-			TableViewerColumn columnName = new TableViewerColumn(peopleViewer, SWT.NONE);
+			TableViewerColumn columnName = new TableViewerColumn(peopleViewer,
+					SWT.NONE);
 			columnName.getColumn().setText("Name");
 			columnName.getColumn().setWidth(100);
 
-			TableViewerColumn columnFirstName = new TableViewerColumn(peopleViewer, SWT.NONE);
+			TableViewerColumn columnFirstName = new TableViewerColumn(
+					peopleViewer, SWT.NONE);
 			columnFirstName.getColumn().setText("FirstName");
 			columnFirstName.getColumn().setWidth(100);
 
 			// Bind viewer to model
-			IBeanValueProperty propName = BeanProperties.value(Person.class, "name");
-			IBeanValueProperty propFirstname = BeanProperties.value(Person.class, "firstName");
+			IBeanValueProperty propName = BeanProperties.value(Person.class,
+					"name");
+			IBeanValueProperty propFirstname = BeanProperties.value(
+					Person.class, "firstName");
 
-			IValueProperty cellEditorControlText = CellEditorProperties.control()
-					.value(WidgetProperties.text(SWT.Modify));
+			IValueProperty cellEditorControlText = CellEditorProperties
+					.control().value(WidgetProperties.text());
 
 			columnName.setEditingSupport(ObservableValueEditingSupport.create(
 					peopleViewer, bindingContext,
@@ -220,18 +228,23 @@ public class Snippet032TableViewerColumnEditing {
 			peopleViewer.setContentProvider(contentProvider);
 
 			// Bind the LabelProviders to the model and columns
-			IObservableMap[] result = Properties.observeEach(contentProvider.getKnownElements(),
-					new IBeanValueProperty[] { propName,
+			IObservableMap[] result = Properties.observeEach(contentProvider
+					.getKnownElements(), new IBeanValueProperty[] { propName,
 					propFirstname });
 
-			columnName.setLabelProvider(new ObservableMapCellLabelProvider(result[0]));
-			columnFirstName.setLabelProvider(new ObservableMapCellLabelProvider(result[1]));
+			columnName.setLabelProvider(new ObservableMapCellLabelProvider(
+					result[0]));
+			columnFirstName
+					.setLabelProvider(new ObservableMapCellLabelProvider(
+							result[1]));
 
-			peopleViewer.setInput(new WritableList(viewModel.getPeople(), Person.class));
+			peopleViewer.setInput(new WritableList(viewModel.getPeople(),
+					Person.class));
 
-			// bind selectedCommitter labels to the name and firstname of the
+			// bind selectedCommitter labels to the name and forname of the
 			// current selection
-			IObservableValue selection = ViewersObservables.observeSingleSelection(peopleViewer);
+			IObservableValue selection = ViewersObservables
+					.observeSingleSelection(peopleViewer);
 			bindingContext.bindValue(
 					WidgetProperties.text().observe(selectedCommitterName),
 					BeanProperties.value((Class) selection.getValueType(), "name", String.class)

@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -58,18 +58,18 @@ public class ScaleObservableValueMinTest extends ObservableDelegateTest {
 	@Override
 	protected IObservable doCreateObservable() {
 		return getObservableContractDelegate().createObservable(
-				DisplayRealm.getRealm(Display.getDefault()));
+				SWTObservables.getRealm(Display.getDefault()));
 	}
 
 	public void testGetValue() throws Exception {
 		int min = 100;
 		scale.setMinimum(min);
-		assertEquals(Integer.valueOf(min), observable.getValue());
+		assertEquals(new Integer(min), observable.getValue());
 	}
 
 	public void testSetValue() throws Exception {
 		int min = 100;
-		observable.setValue(Integer.valueOf(min));
+		observable.setValue(new Integer(min));
 		assertEquals(min, scale.getMinimum());
 	}
 
@@ -122,7 +122,7 @@ public class ScaleObservableValueMinTest extends ObservableDelegateTest {
 		}
 
 		private Integer createIntegerValue(IObservableValue observable) {
-			return Integer.valueOf(((Integer) observable.getValue()).intValue() + 1);
+			return new Integer(((Integer) observable.getValue()).intValue() + 1);
 		}
 	}
 }

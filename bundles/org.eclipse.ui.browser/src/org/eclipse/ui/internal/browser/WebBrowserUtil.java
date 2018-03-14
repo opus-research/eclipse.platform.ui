@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - Initial API and implementation
- *     Martin Oberhuber (Wind River) - [292882] Default Browser on Solaris
- *     Tomasz Zarna (Tasktop Technologies) - [429546] External Browser with parameters
+ * Martin Oberhuber (Wind River) - [292882] Default Browser on Solaris
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
@@ -16,7 +15,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -29,6 +27,8 @@ import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 /**
  * Utility class for the Web browser tools.
  */
@@ -51,7 +51,7 @@ public class WebBrowserUtil {
 
 	/**
 	 * Returns true if we're running on Windows.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public static boolean isWindows() {
@@ -63,7 +63,7 @@ public class WebBrowserUtil {
 
 	/**
 	 * Returns true if we're running on linux.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public static boolean isLinux() {
@@ -75,29 +75,33 @@ public class WebBrowserUtil {
 
 	/**
 	 * Open a dialog window.
-	 *
+	 * 
 	 * @param message
 	 *            java.lang.String
 	 */
-	public static void openError(final String message) {
+	public static void openError(String message) {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
-		d.asyncExec(() -> MessageDialog.openError(null, Messages.errorDialogTitle, message));
+
+		Shell shell = d.getActiveShell();
+		MessageDialog.openError(shell, Messages.errorDialogTitle, message);
 	}
 
 	/**
 	 * Open a dialog window.
-	 *
+	 * 
 	 * @param message
 	 *            java.lang.String
 	 */
-	public static void openMessage(final String message) {
+	public static void openMessage(String message) {
 		Display d = Display.getCurrent();
 		if (d == null)
 			d = Display.getDefault();
 
-		d.asyncExec(() -> MessageDialog.openInformation(null, Messages.searchingTaskName, message));
+		Shell shell = d.getActiveShell();
+		MessageDialog.openInformation(shell, Messages.searchingTaskName,
+				message);
 	}
 
 	/**
@@ -113,7 +117,7 @@ public class WebBrowserUtil {
 	 * bother adding the Internal Web ExternalBrowserInstance that uses this
 	 * widget. Designed to be attemped only once and the flag set used
 	 * throughout.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public static boolean canUseInternalWebBrowser() {
@@ -125,7 +129,7 @@ public class WebBrowserUtil {
 		try {
 			Class.forName(BROWSER_PACKAGE_NAME);
 		} catch (ClassNotFoundException e) {
-			isInternalBrowserOperational = Boolean.FALSE;
+			isInternalBrowserOperational = new Boolean(false);
 			return false;
 		}
 
@@ -134,7 +138,7 @@ public class WebBrowserUtil {
 		try {
 			shell = new Shell(PlatformUI.getWorkbench().getDisplay());
 			new Browser(shell, SWT.NONE);
-			isInternalBrowserOperational = Boolean.TRUE;
+			isInternalBrowserOperational = new Boolean(true);
 			return true;
 		} catch (Throwable t) {
 			StringBuffer message = new StringBuffer("Internal browser is not available"); //$NON-NLS-1$
@@ -142,7 +146,7 @@ public class WebBrowserUtil {
 			WebBrowserUIPlugin.getInstance().getLog().log(
 					new Status(IStatus.WARNING, WebBrowserUIPlugin.PLUGIN_ID,
 							0, message.toString() , null));
-			isInternalBrowserOperational = Boolean.FALSE;
+			isInternalBrowserOperational = new Boolean(false);
 			return false;
 		} finally {
 			if (shell != null)
@@ -151,11 +155,28 @@ public class WebBrowserUtil {
 	}
 
 	public static boolean canUseSystemBrowser() {
+		// Disabling system browser on Solaris < Solaris10 due to bug 94497
+		// The problem is that the SWT Program fails with the Tooltalk / DT integration on Solaris 9 or older
+		// The GTK / Gnome integration on Solaris 10 or newer does work though.
+		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=94497#c56
+		if (Platform.OS_SOLARIS.equals(Platform.getOS())) {
+			//No system browser on Solaris Motif
+			if (!Platform.WS_GTK.equals(Platform.getWS())) {
+				return false;
+			}
+			//No system browser on Solaris 9 or older
+			String osVersion = WebBrowserUIPlugin.getInstance().getBundle().getBundleContext().getProperty(Constants.FRAMEWORK_OS_VERSION);
+			int compareVal = new Version(osVersion).compareTo(new Version(5,10,0));
+			if (compareVal < 0) {
+				//older than Solaris 10
+				return false;
+			}
+		}
 		return Program.findProgram("html") != null; //$NON-NLS-1$
 	}
 
 	public static List<String> getExternalBrowserPaths() {
-		List<String> paths = new ArrayList<>();
+		List<String> paths = new ArrayList<String>();
 		Iterator<IBrowserDescriptor> iterator = BrowserManager.getInstance()
 				.getWebBrowsers().iterator();
 		while (iterator.hasNext()) {
@@ -253,7 +274,7 @@ public class WebBrowserUtil {
 	private static File[] getUsableDrives(File[] roots) {
 		if (!Platform.getOS().equals(Platform.OS_WIN32))
 			return roots;
-		ArrayList<File> list = new ArrayList<>();
+		ArrayList<File> list = new ArrayList<File>();
 		for (int i = 0; i < roots.length; i++) {
 			String path = roots[i].getAbsolutePath();
 			if (path != null
@@ -267,7 +288,7 @@ public class WebBrowserUtil {
 	/**
 	 * Create an external Web browser if the file matches the default (known)
 	 * browsers.
-	 *
+	 * 
 	 * @param file
 	 * @return an external browser working copy
 	 */
@@ -294,7 +315,7 @@ public class WebBrowserUtil {
 
 	/**
 	 * Encodes browser style in the secondary id as id-style
-	 *
+	 * 
 	 * @param browserId
 	 * @param style
 	 * @return secondaryId
@@ -305,7 +326,7 @@ public class WebBrowserUtil {
 
 	/**
 	 * Decodes secondary id into a browser style.
-	 *
+	 * 
 	 * @param secondaryId
 	 * @return style
 	 */
@@ -331,12 +352,7 @@ public class WebBrowserUtil {
 		}
 		return encodedId;
 	}
-
-	/**
-	 * @deprecated Please use {@link #createParameterArray(String, String)}
-	 *             instead.
-	 */
-	@Deprecated
+	
 	public static String createParameterString(String parameters, String urlText) {
 		String params = parameters;
 		String url = urlText;
@@ -347,26 +363,17 @@ public class WebBrowserUtil {
 			params = ""; //$NON-NLS-1$
 
 		int urlIndex = params.indexOf(IBrowserDescriptor.URL_PARAMETER);
-		if (urlIndex >= 0) {
-			params = params.substring(0, urlIndex) + url
-					+ params.substring(urlIndex + IBrowserDescriptor.URL_PARAMETER.length());
-		} else {
+		if (urlIndex >= 0)
+			params = params.substring(0, urlIndex)
+					+ url
+					+ params.substring(urlIndex
+							+ IBrowserDescriptor.URL_PARAMETER.length());
+		else {
 			if (params.length() != 0 && !params.endsWith(" ")) //$NON-NLS-1$
-				params += " "; //$NON-NLS-1$
+				params += " "; //$NON-NLS-1$ 
 			params += url;
 		}
 		return params;
-	}
 
-	public static String[] createParameterArray(String parameters, String urlText) {
-		return tokenize(createParameterString(parameters, urlText));
-	}
-
-	private static String[] tokenize(String string) {
-		StringTokenizer tokenizer = new StringTokenizer(string);
-		String[] tokens = new String[tokenizer.countTokens()];
-		for (int i = 0; tokenizer.hasMoreTokens(); i++)
-			tokens[i] = tokenizer.nextToken();
-		return tokens;
 	}
 }

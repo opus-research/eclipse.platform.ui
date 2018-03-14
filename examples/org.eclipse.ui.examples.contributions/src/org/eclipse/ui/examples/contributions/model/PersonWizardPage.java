@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,11 @@ public class PersonWizardPage extends WizardPage implements Listener {
 		setDescription(ContributionMessages.PersonWizardPage_descriptoin);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 		// top level group
@@ -91,10 +95,12 @@ public class PersonWizardPage extends WizardPage implements Listener {
 		if (getId() == 0) {
 			return false;
 		}
-		IPersonService service = locator.getService(IPersonService.class);
+		IPersonService service = (IPersonService) locator
+				.getService(IPersonService.class);
 		if (service.getPerson(getId()) != null) {
 			setErrorMessage(NLS.bind(
-					ContributionMessages.PersonWizardPage_error_alreadyExists, getId()));
+					ContributionMessages.PersonWizardPage_error_alreadyExists,
+					new Integer(getId())));
 			return false;
 		}
 		if (getSurname() == null || getSurname().length() == 0) {
@@ -126,7 +132,8 @@ public class PersonWizardPage extends WizardPage implements Listener {
 	}
 
 	boolean finish() {
-		IPersonService service = locator.getService(IPersonService.class);
+		IPersonService service = (IPersonService) locator
+				.getService(IPersonService.class);
 		Person person = service.createPerson(getId());
 		if (person == null) {
 			return false;
@@ -136,7 +143,11 @@ public class PersonWizardPage extends WizardPage implements Listener {
 		return true;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+	 */
 	public void handleEvent(Event event) {
 		// this plus validatePage() are blunt force validation.
 		setPageComplete(validatePage());

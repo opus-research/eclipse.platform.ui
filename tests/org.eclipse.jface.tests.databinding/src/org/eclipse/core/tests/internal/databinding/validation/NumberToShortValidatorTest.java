@@ -21,11 +21,17 @@ import com.ibm.icu.text.NumberFormat;
  * @since 1.1
  */
 public class NumberToShortValidatorTest extends NumberToNumberValidatorTestHarness {
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetOutOfRangeNumber()
+	 */
 	@Override
 	protected Number doGetOutOfRangeNumber() {
-		return Integer.valueOf(Short.MAX_VALUE + 1);
+		return new Integer(Short.MAX_VALUE + 1);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
+	 */
 	@Override
 	protected NumberToNumberValidator doGetToBoxedTypeValidator(Class fromType) {
 		NumberToShortConverter converter = new NumberToShortConverter(NumberFormat.getInstance(),
@@ -33,6 +39,9 @@ public class NumberToShortValidatorTest extends NumberToNumberValidatorTestHarne
 		return new NumberToShortValidator(converter);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.validation.NumberToNumberValidatorTestHarness#doGetToPrimitiveValidator(java.lang.Class)
+	 */
 	@Override
 	protected NumberToNumberValidator doGetToPrimitiveValidator(Class fromType) {
 		NumberToShortConverter converter = new NumberToShortConverter(NumberFormat.getInstance(),

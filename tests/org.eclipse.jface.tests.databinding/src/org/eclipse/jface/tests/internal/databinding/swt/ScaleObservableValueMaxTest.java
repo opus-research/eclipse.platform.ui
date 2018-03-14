@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -58,18 +58,18 @@ public class ScaleObservableValueMaxTest extends ObservableDelegateTest {
 	@Override
 	protected IObservable doCreateObservable() {
 		return getObservableContractDelegate().createObservable(
-				DisplayRealm.getRealm(Display.getDefault()));
+				SWTObservables.getRealm(Display.getDefault()));
 	}
 
 	public void testGetValue() throws Exception {
 		int max = 100;
 		scale.setMaximum(max);
-		assertEquals(Integer.valueOf(max), observable.getValue());
+		assertEquals(new Integer(max), observable.getValue());
 	}
 
 	public void testSetValue() throws Exception {
 		int max = 100;
-		observable.setValue(Integer.valueOf(max));
+		observable.setValue(new Integer(max));
 		assertEquals(max, scale.getMaximum());
 	}
 
@@ -122,7 +122,7 @@ public class ScaleObservableValueMaxTest extends ObservableDelegateTest {
 		}
 
 		private Integer createIntegerValue(IObservableValue observable) {
-			return Integer.valueOf(((Integer) observable.getValue()).intValue() + 1);
+			return new Integer(((Integer) observable.getValue()).intValue() + 1);
 		}
 	}
 }

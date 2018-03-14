@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.tests.commands;
 
@@ -25,7 +24,7 @@ import org.eclipse.ui.tests.statushandlers.TestStatusHandler;
 /**
  * A tests whether is active will log an exception if the command is not
  * defined.
- *
+ * 
  * @since 3.1
  */
 public final class Bug73756Test extends UITestCase {
@@ -39,13 +38,13 @@ public final class Bug73756Test extends UITestCase {
 
 	private static String MESSAGE = MessageFormat.format(Util.translateString(
 			RESOURCE_BUNDLE, "undefinedCommand.WarningMessage", null), //$NON-NLS-1$
-			CMD_ID);
+			(Object[]) new String[] { CMD_ID });
 
 	private static String PLUGIN_ID = "org.eclipse.jface";
 
 	/**
 	 * Constructs a new instance of <code>Bug73756Test</code>.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the test
 	 */

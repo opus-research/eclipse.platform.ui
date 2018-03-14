@@ -41,13 +41,13 @@ import org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 	/**
 	 * Asserts the use case of specifying null on construction for the detail
 	 * type of the detail set.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNull() throws Exception {
@@ -74,7 +74,7 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Asserts that you can't change the type across multiple inner observables.
-	 *
+	 * 
 	 * @throws Exception
 	 */
 	public void testElementTypeNotNull() throws Exception {
@@ -180,7 +180,7 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 		public IObservableCollection createObservableCollection(
 				final Realm realm, final int elementCount) {
 
-			IObservableValue master = new WritableValue(realm, Integer.valueOf(
+			IObservableValue master = new WritableValue(realm, new Integer(
 					elementCount), Integer.class);
 			IObservableFactory factory = new FactoryStub(realm, elementType);
 			return new DetailObservableSetStub(factory, master, elementType);
@@ -199,7 +199,7 @@ public class DetailObservableSetTest extends AbstractDefaultRealmTestCase {
 		@Override
 		public void change(IObservable observable) {
 			final IObservableValue master = ((DetailObservableSetStub) observable).master;
-			master.setValue(Integer.valueOf(((Integer) master.getValue())
+			master.setValue(new Integer(((Integer) master.getValue())
 					.intValue() + 1));
 		}
 	}

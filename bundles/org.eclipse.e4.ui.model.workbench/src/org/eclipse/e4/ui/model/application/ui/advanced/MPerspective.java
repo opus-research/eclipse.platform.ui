@@ -1,23 +1,20 @@
 /**
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
 package org.eclipse.e4.ui.model.application.ui.advanced;
 
 import java.util.List;
-import org.eclipse.e4.ui.model.application.commands.MBindings;
-import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
-import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 
 /**
@@ -37,16 +34,15 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
  *
  * <p>
  * The following features are supported:
- * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getWindows <em>Windows</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.ui.advanced.MPerspective#getTrimBars <em>Trim Bars</em>}</li>
  * </ul>
+ * </p>
  *
  * @model
  * @generated
  */
-public interface MPerspective extends MElementContainer<MPartSashContainerElement>, MUILabel, MContext, MHandlerContainer, MBindings {
+public interface MPerspective extends MElementContainer<MPartSashContainerElement>, MUILabel, MContext {
 	/**
 	 * Returns the value of the '<em><b>Windows</b></em>' containment reference list.
 	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MWindow}.
@@ -65,22 +61,5 @@ public interface MPerspective extends MElementContainer<MPartSashContainerElemen
 	 * @generated
 	 */
 	List<MWindow> getWindows();
-
-	/**
-	 * Returns the value of the '<em><b>Trim Bars</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MTrimBar}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * The collection of TrimBars associated with this perspective.
-	 * @since 1.3
-	 * </p>
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Trim Bars</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MTrimBar> getTrimBars();
 
 } // MPerspective

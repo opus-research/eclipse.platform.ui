@@ -18,19 +18,28 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
  */
 public class StringToNumberParserIntegerTest extends
 		StringToNumberParserTestHarness {
-
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#assertValid(java.lang.Number)
+	 */
 	@Override
 	protected boolean assertValid(Number number) {
 		return StringToNumberParser.inIntegerRange(number);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMax()
+	 */
 	@Override
 	protected Number getValidMax() {
-		return Integer.valueOf(Integer.MAX_VALUE);
+		return new Integer(Integer.MAX_VALUE);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMin()
+	 */
 	@Override
 	protected Number getValidMin() {
-		return Integer.valueOf(Integer.MIN_VALUE);
+		return new Integer(Integer.MIN_VALUE);
 	}
 }

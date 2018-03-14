@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2016 IBM Corporation and others.
+ * Copyright (c) 2001, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
 
@@ -32,7 +31,7 @@ import com.ibm.icu.text.MessageFormat;
  * Represents the default implementation of a section descriptor on the tabbed
  * property sections extensions. This implementation assumes that we are
  * interested in selected objects in an IStructuredSelection.
- *
+ * 
  * @author Anthony Hunter
  */
 public class SectionDescriptor extends AbstractSectionDescriptor {
@@ -45,9 +44,9 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 
-	private static final String ATT_SECTION_FILTER = "filter"; //$NON-NLS-1$
+	private static final String ATT_SECTION_FILTER = "filter"; //$NON-NLS-1$	
 
-	private static final String ATT_SECTION_ENABLES_FOR = "enablesFor"; //$NON-NLS-1$
+	private static final String ATT_SECTION_ENABLES_FOR = "enablesFor"; //$NON-NLS-1$	
 
 	private static final String ATT_INPUT_TYPE = "type"; //$NON-NLS-1$
 
@@ -69,7 +68,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 
 	/**
 	 * Constructor for the section descriptor.
-	 *
+	 * 
 	 * @param configurationElement
 	 *            the configuration element for the section descriptor.
 	 * @param typeMapper
@@ -102,7 +101,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	/**
 	 * Handle the section error when an issue is found loading from the
 	 * configuration element.
-	 *
+	 * 
 	 * @param exception
 	 *            an optional CoreException
 	 */
@@ -111,9 +110,14 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 				.getNamespaceIdentifier();
 		String message = TabbedPropertyMessages.SectionDescriptor_Section_error;
 		if (exception == null) {
-			message = MessageFormat.format(TabbedPropertyMessages.SectionDescriptor_Section_error, pluginId);
+			message = MessageFormat.format(
+					TabbedPropertyMessages.SectionDescriptor_Section_error,
+					new Object[] { pluginId });
 		} else {
-			message = MessageFormat.format(TabbedPropertyMessages.SectionDescriptor_class_not_found_error, pluginId);
+			message = MessageFormat
+					.format(
+							TabbedPropertyMessages.SectionDescriptor_class_not_found_error,
+							new Object[] { pluginId });
 		}
 		IStatus status = new Status(IStatus.ERROR, pluginId,
 				TabbedPropertyViewStatusCodes.SECTION_ERROR, message, exception);
@@ -148,7 +152,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 	 * Retrieves the value for section enablement which is a precise number of
 	 * items selected. For example: enablesFor=" 4" enables the action only when
 	 * 4 items are selected. If not specified, enable for all selections.
-	 *
+	 * 
 	 * @return the value for section enablement.
 	 */
 	public int getEnablesFor() {
@@ -174,7 +178,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 
 	/**
 	 * Creates an instance of a section described by this descriptor
-	 *
+	 * 
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getSectionClass()
 	 */
 	public ISection getSectionClass() {
@@ -191,7 +195,7 @@ public class SectionDescriptor extends AbstractSectionDescriptor {
 
 	/**
 	 * Gets the input types that are valid for this section.
-	 *
+	 * 
 	 * @see org.eclipse.ui.views.properties.tabbed.ISectionDescriptor#getInputTypes()
 	 */
 	public List getInputTypes() {

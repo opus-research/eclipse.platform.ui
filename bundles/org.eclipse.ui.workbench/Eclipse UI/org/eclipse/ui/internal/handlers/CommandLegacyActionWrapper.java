@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ import org.eclipse.ui.services.IServiceLocator;
  * This class is eventually intended to exist in
  * <code>org.eclipse.ui.handlers</code>.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public final class CommandLegacyActionWrapper extends AbstractAction {
@@ -151,7 +151,7 @@ public final class CommandLegacyActionWrapper extends AbstractAction {
 
 	/**
 	 * Constructs a new instance of <code>ActionProxy</code>.
-	 *
+	 * 
 	 * @param id
 	 *            The initial action identifier; may be <code>null</code>.
 	 * @param command
@@ -312,7 +312,7 @@ public final class CommandLegacyActionWrapper extends AbstractAction {
 	 * legacy action proxies who are trying to avoid a <a
 	 * href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=117496">stack
 	 * overflow</a>.
-	 *
+	 * 
 	 * @return <code>false</code> if someone has called
 	 *         {@link #setEnabled(boolean)} with <code>false</code>;
 	 *         <code>true</code> otherwise.

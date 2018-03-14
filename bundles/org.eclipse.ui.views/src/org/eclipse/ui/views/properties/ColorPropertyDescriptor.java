@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ColorPropertyDescriptor extends PropertyDescriptor {
     /**
      * Creates an property descriptor with the given id and display name.
-     *
+     * 
      * @param id the id of the property
      * @param displayName the name to display for the property
      */
@@ -40,7 +40,7 @@ public class ColorPropertyDescriptor extends PropertyDescriptor {
     }
 
     /**
-     * The <code>ColorPropertyDescriptor</code> implementation of this
+     * The <code>ColorPropertyDescriptor</code> implementation of this 
      * <code>IPropertyDescriptor</code> method creates and returns a new
      * <code>ColorCellEditor</code>.
      * <p>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import org.eclipse.ui.internal.e4.compatibility.ActionBars;
  * A view container manages the services for a view.
  */
 public class ViewSite extends PartSite implements IViewSite {
-
+    
 	public ViewSite(MPart model, IWorkbenchPart part, IWorkbenchPartReference ref,
 			IConfigurationElement element) {
 		super(model, part, ref, element);
@@ -34,7 +34,7 @@ public class ViewSite extends PartSite implements IViewSite {
 	private void initializeDefaultServices() {
 		setActionBars(new ActionBars(((WorkbenchPage) getPage()).getActionBars(), serviceLocator,
 				model));
-		serviceLocator.registerService(IViewPart.class, getPart());
+		serviceLocator.registerService(IViewPart.class, (IViewPart) getPart());
 	}
 
 	@Override

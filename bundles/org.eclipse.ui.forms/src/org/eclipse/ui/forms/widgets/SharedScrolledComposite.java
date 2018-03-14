@@ -1,13 +1,13 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2016 IBM Corporation and others.
+ *  Copyright (c) 2000, 2011 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     Wojciech Galanciak - fix for Bug 294868 [Forms] Problem with text
+ *     Wojciech Galanciak - fix for Bug 294868 [Forms] Problem with text 
  *     wrapping in SharedScrolledComposite:
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
@@ -20,6 +20,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.ui.internal.forms.widgets.FormUtil;
 
@@ -27,14 +29,14 @@ import org.eclipse.ui.internal.forms.widgets.FormUtil;
  * This class is used to provide common scrolling services to a number of
  * controls in the toolkit. Classes that extend it are not required to implement
  * any method.
- *
+ * 
  * @since 3.0
  */
 public abstract class SharedScrolledComposite extends ScrolledComposite {
 	private static final int H_SCROLL_INCREMENT = 5;
 
 	private static final int V_SCROLL_INCREMENT = 64;
-
+	
 	private boolean ignoreLayouts = true;
 
 	private boolean ignoreResizes = false;
@@ -48,10 +50,10 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	private boolean reflowPending = false;
 
 	private boolean delayedReflow = false;
-
+	
 	/**
 	 * Creates the new instance.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param style
@@ -59,9 +61,11 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 */
 	public SharedScrolledComposite(Composite parent, int style) {
 		super(parent, style);
-		addListener(SWT.Resize, e -> {
-			if (!ignoreResizes) {
-				scheduleReflow(false);
+		addListener(SWT.Resize, new Listener() {
+			public void handleEvent(Event e) {
+				if (!ignoreResizes) {
+					scheduleReflow(false);
+				}
 			}
 		});
 		initializeScrollBars();
@@ -69,11 +73,10 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 
 	/**
 	 * Sets the foreground of the control and its content.
-	 *
+	 * 
 	 * @param fg
 	 *            the new foreground color
 	 */
-	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (getContent() != null)
@@ -82,11 +85,10 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 
 	/**
 	 * Sets the background of the control and its content.
-	 *
+	 * 
 	 * @param bg
 	 *            the new background color
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (getContent() != null)
@@ -97,7 +99,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * Sets the font of the form. This font will be used to render the title
 	 * text. It will not affect the body.
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (getContent() != null)
@@ -107,7 +108,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	/**
 	 * Overrides 'super' to pass the proper colors and font
 	 */
-	@Override
 	public void setContent(Control content) {
 		super.setContent(content);
 		if (content != null) {
@@ -120,7 +120,6 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	/**
 	 * If content is set, transfers focus to the content.
 	 */
-	@Override
 	public boolean setFocus() {
 		boolean result;
 		FormUtil.setFocusScrollingEnabled(this, false);
@@ -132,7 +131,11 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Composite#layout(boolean)
+	 */
 	public void layout(boolean changed) {
 		if (ignoreLayouts) {
 			return;
@@ -144,13 +147,21 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 		ignoreResizes = false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandHorizontal(boolean)
+	 */
 	public void setExpandHorizontal(boolean expand) {
 		expandHorizontal = expand;
 		super.setExpandHorizontal(expand);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.custom.ScrolledComposite#setExpandVertical(boolean)
+	 */
 	public void setExpandVertical(boolean expand) {
 		expandVertical = expand;
 		super.setExpandVertical(expand);
@@ -160,7 +171,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * Recomputes the body layout and the scroll bars. The method should be used
 	 * when changes somewhere in the form body invalidate the current layout
 	 * and/or scroll bars.
-	 *
+	 * 
 	 * @param flushCache
 	 *            if <code>true</code>, drop the cached data
 	 */
@@ -175,7 +186,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 			    clientArea.width -= bar.getSize().x;
 			}
 		}
-
+			
 		contentCache.setControl(c);
 		if (flushCache) {
 			contentCache.flush();
@@ -190,20 +201,20 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 
 		setMinSize(newSize);
 		FormUtil.updatePageIncrement(this);
-
+		
 		// reduce vertical scroll increment if necessary
 		ScrollBar vbar = getVerticalBar();
 		if (vbar != null) {
 			if (getClientArea().height - 5 < V_SCROLL_INCREMENT)
 				getVerticalBar().setIncrement(getClientArea().height - 5);
-			else
+			else 
 				getVerticalBar().setIncrement(V_SCROLL_INCREMENT);
 		}
 
 		ignoreLayouts = false;
 		layout(flushCache);
 		ignoreLayouts = true;
-
+		
 		contentCache.layoutIfNecessary();
 	}
 
@@ -220,10 +231,12 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 				return;
 			}
 			reflowPending = true;
-			getDisplay().asyncExec(() -> {
-				reflowPending = false;
-				if (!isDisposed())
-					reflow(flushCache);
+			getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					reflowPending = false;
+					if (!isDisposed())
+						reflow(flushCache);
+				}
 			});
 		} else
 			reflow(flushCache);
@@ -244,7 +257,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	/**
 	 * Tests if the control uses delayed reflow.
 	 * @return <code>true</code> if reflow requests will
-	 * be delayed, <code>false</code> otherwise.
+	 * be delayed, <code>false</code> otherwise. 
 	 */
 	public boolean isDelayedReflow() {
 		return delayedReflow;
@@ -255,7 +268,7 @@ public abstract class SharedScrolledComposite extends ScrolledComposite {
 	 * it will schedule a reflow on resize requests
 	 * and reject subsequent reflows until the
 	 * scheduled one is performed.
-	 *
+	 * 
 	 * @param delayedReflow
 	 *            The delayedReflow to set.
 	 */

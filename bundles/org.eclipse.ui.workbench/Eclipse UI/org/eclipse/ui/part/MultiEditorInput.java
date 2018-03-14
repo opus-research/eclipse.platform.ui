@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.part;
 
 import java.util.Arrays;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
@@ -18,8 +19,8 @@ import org.eclipse.ui.IPersistableElement;
 
 /**
  * Implements an input for a <code>AbstractMultiEditor</code>.
- *
- * This class is intended to be instantiated by clients but is
+ * 
+ * This class is intended to be instantiated by clients but is 
  * not intended to be subclassed.
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -102,11 +103,14 @@ public class MultiEditorInput implements IEditorInput {
      * @see IAdaptable#getAdapter(Class)
      */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
         return null;
     }
-
-
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     @Override
 	public boolean equals(Object obj) {
         if (this == obj) {
@@ -118,8 +122,11 @@ public class MultiEditorInput implements IEditorInput {
         MultiEditorInput other = (MultiEditorInput) obj;
         return Arrays.equals(this.editors, other.editors) && Arrays.equals(this.input, other.input);
     }
-
-
+    
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
     @Override
 	public int hashCode() {
         int hash = 0;

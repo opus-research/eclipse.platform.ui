@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  * IBM - Initial API and implementation
  * Markus Schorn (Wind River Systems)
- * Patrik Suzzi <psuzzi@gmail.com> - Bug 460683
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
@@ -21,13 +20,10 @@ import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.operation.ProgressMonitorUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -39,7 +35,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.internal.progress.ProgressManager.JobMonitor;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.WorkbenchJob;
 
@@ -48,13 +43,13 @@ import org.eclipse.ui.progress.WorkbenchJob;
  * particular job in a modal dialog so as to give a user accustomed to a modal
  * UI a more familiar feel.
  */
-public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
+class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 	Job job;
 	private boolean showDialog;
 
 	/**
 	 * Create a new instance of the receiver with progress reported on the job.
-	 *
+	 * 
 	 * @param parentShell
 	 *            The shell this is parented from.
 	 */
@@ -67,28 +62,34 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		enableDetailsButton = true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#cancelPressed()
+	 */
 	@Override
 	protected void cancelPressed() {
 		job.cancel();
 		super.cancelPressed();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		shell.setText(job.getName());
-		shell.addTraverseListener(new TraverseListener() {
-			@Override
-			public void keyTraversed(TraverseEvent e) {
-				if (e.detail == SWT.TRAVERSE_ESCAPE) {
-					cancelPressed();
-					e.detail = SWT.TRAVERSE_NONE;
-					e.doit = true;
-				}
-			}
-		});
+
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		Button runInWorkspace = createButton(
@@ -97,6 +98,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 				ProgressMessages.ProgressMonitorFocusJobDialog_RunInBackgroundButton,
 				true);
 		runInWorkspace.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Rectangle shellPosition = getShell().getBounds();
@@ -117,11 +123,16 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 
 	/**
 	 * Returns a listener that will close the dialog when the job completes.
-	 *
+	 * 
 	 * @return IJobChangeListener
 	 */
 	private IJobChangeListener createCloseListener() {
 		return new JobChangeAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.jobs.IJobChangeListener#done(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void done(IJobChangeEvent event) {
 				// first of all, make sure this listener is removed
@@ -135,6 +146,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 				}
 				WorkbenchJob closeJob = new WorkbenchJob(
 						ProgressMessages.ProgressMonitorFocusJobDialog_CLoseDialogJob) {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+					 */
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						Shell currentShell = getShell();
@@ -151,6 +167,242 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		};
 	}
 
+	/**
+	 * Return the ProgressMonitorWithBlocking for the receiver.
+	 * 
+	 * @return IProgressMonitorWithBlocking
+	 */
+	private IProgressMonitorWithBlocking getBlockingProgressMonitor() {
+		return new IProgressMonitorWithBlocking() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
+			 *      int)
+			 */
+			@Override
+			public void beginTask(String name, int totalWork) {
+				final String finalName = name;
+				final int finalWork = totalWork;
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						getProgressMonitor().beginTask(finalName, finalWork);
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+			 */
+			@Override
+			public void clearBlocked() {
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						((IProgressMonitorWithBlocking) getProgressMonitor())
+								.clearBlocked();
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#done()
+			 */
+			@Override
+			public void done() {
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						getProgressMonitor().done();
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
+			 */
+			@Override
+			public void internalWorked(double work) {
+				final double finalWork = work;
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						getProgressMonitor().internalWorked(finalWork);
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
+			 */
+			@Override
+			public boolean isCanceled() {
+				return getProgressMonitor().isCanceled();
+			}
+
+			/**
+			 * Run the runnable as an asyncExec if we are already open.
+			 * 
+			 * @param runnable
+			 */
+			private void runAsync(final Runnable runnable) {
+
+				if (alreadyClosed) {
+					return;
+				}
+				Shell currentShell = getShell();
+
+				Display display;
+				if (currentShell == null) {
+					display = Display.getDefault();
+				} else {
+					if (currentShell.isDisposed())// Don't bother if it has
+						// been closed
+						return;
+					display = currentShell.getDisplay();
+				}
+
+				display.asyncExec(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						if (alreadyClosed) {
+							return;// Check again as the async may come too
+							// late
+						}
+						Shell shell = getShell();
+						if (shell != null && shell.isDisposed())
+							return;
+
+						runnable.run();
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+			 */
+			@Override
+			public void setBlocked(IStatus reason) {
+				final IStatus finalReason = reason;
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						((IProgressMonitorWithBlocking) getProgressMonitor())
+								.setBlocked(finalReason);
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
+			 */
+			@Override
+			public void setCanceled(boolean value) {
+				// Just a listener - doesn't matter.
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+			 */
+			@Override
+			public void setTaskName(String name) {
+				final String finalName = name;
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						getProgressMonitor().setTaskName(finalName);
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+			 */
+			@Override
+			public void subTask(String name) {
+				final String finalName = name;
+				runAsync(new Runnable() {
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@Override
+					public void run() {
+						getProgressMonitor().subTask(finalName);
+					}
+				});
+			}
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
+			 */
+			@Override
+			public void worked(int work) {
+				internalWorked(work);
+			}
+		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.window.Window#open()
+	 */
 	@Override
 	public int open() {
 		int result = super.open();
@@ -171,7 +423,7 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 
 	/**
 	 * Opens this dialog for the duration that the given job is running.
-	 *
+	 * 
 	 * @param jobToWatch
 	 * @param originatingShell
 	 *            The shell this request was created from. Do not block on this
@@ -181,6 +433,9 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		job = jobToWatch;
 		// after the dialog is opened we can get access to its monitor
 		job.setProperty(IProgressConstants.PROPERTY_IN_DIALOG, Boolean.TRUE);
+
+		ProgressManager.getInstance().progressFor(job).addProgressListener(
+				getBlockingProgressMonitor());
 
 		setOpenOnRun(false);
 		aboutToRun();
@@ -218,6 +473,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 
 		WorkbenchJob openJob = new WorkbenchJob(
 				ProgressMessages.ProgressMonitorFocusJobDialog_UserDialogJob) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 
@@ -239,11 +499,6 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 					return Status.CANCEL_STATUS;
 				}
 
-				JobMonitor jobMonitor = ProgressManager.getInstance().progressFor(job);
-				Display d = Display.getCurrent();
-				IProgressMonitorWithBlocking wrapper = ProgressMonitorUtil
-						.createAccumulatingProgressMonitor(getProgressMonitor(), d);
-				jobMonitor.addProgressListener(wrapper);
 				open();
 
 				return Status.OK_STATUS;
@@ -262,6 +517,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		ProgressManager.getInstance().checkForStaleness(job);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control area = super.createDialogArea(parent);
@@ -272,6 +532,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		return area;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createExtendedDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected void createExtendedDialogArea(Composite parent) {
 
@@ -288,6 +553,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		showUserDialogButton.setLayoutData(gd);
 
 		showUserDialogButton.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				showDialog = showUserDialogButton.getSelection();
@@ -297,6 +567,11 @@ public class ProgressMonitorFocusJobDialog extends ProgressMonitorJobsDialog {
 		super.createExtendedDialogArea(parent);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#close()
+	 */
 	@Override
 	public boolean close() {
 		if (getReturnCode() != CANCEL)

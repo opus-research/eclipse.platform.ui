@@ -23,7 +23,12 @@ import com.ibm.icu.text.NumberFormat;
 public class StringToByteConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private StringToByteConverter converter;
-
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -34,7 +39,7 @@ public class StringToByteConverterTest extends TestCase {
 	public void testConvertsToByte() throws Exception {
 		Byte value = new Byte((byte) 1);
 		Byte result = (Byte) converter.convert(numberFormat.format(value));
-
+		
 		assertEquals(value, result);
 	}
 
@@ -52,12 +57,12 @@ public class StringToByteConverterTest extends TestCase {
 	public void testToTypeIsShort() throws Exception {
 		assertEquals(Byte.class, converter.getToType());
 	}
-
+	
 	public void testToTypeIsBytePrimitive() throws Exception {
 		converter = StringToByteConverter.toByte(true);
 		assertEquals(Byte.TYPE, converter.getToType());
 	}
-
+	
 	public void testReturnsNullBoxedTypeForEmptyString() throws Exception {
 		assertNull(converter.convert(""));
 	}
@@ -65,7 +70,7 @@ public class StringToByteConverterTest extends TestCase {
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		try {
-			converter.convert(Integer.valueOf(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

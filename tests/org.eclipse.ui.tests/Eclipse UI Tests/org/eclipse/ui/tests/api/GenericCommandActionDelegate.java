@@ -11,8 +11,8 @@
 package org.eclipse.ui.tests.api;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
@@ -55,7 +55,7 @@ public class GenericCommandActionDelegate implements
 
 	private String commandId = null;
 
-	private Map<String, String> parameterMap = null;
+	private Map parameterMap = null;
 
 	private ParameterizedCommand parameterizedCommand = null;
 
@@ -122,12 +122,12 @@ public class GenericCommandActionDelegate implements
 
 	/**
 	 * Build a command from the executable extension information.
-	 *
+	 * 
 	 * @param commandService
 	 *            to get the Command object
 	 */
 	private void createCommand(ICommandService commandService) {
-		String id = parameterMap.get(PARM_COMMAND_ID);
+		String id = (String) parameterMap.get(PARM_COMMAND_ID);
 		if (id == null) {
 			return;
 		}
@@ -142,8 +142,9 @@ public class GenericCommandActionDelegate implements
 				return;
 			}
 			ArrayList parameters = new ArrayList();
-			for (Entry<String, String> entry : parameterMap.entrySet()) {
-				String parmName = entry.getKey();
+			Iterator i = parameterMap.keySet().iterator();
+			while (i.hasNext()) {
+				String parmName = (String) i.next();
 				if (PARM_COMMAND_ID.equals(parmName)) {
 					continue;
 				}
@@ -152,7 +153,8 @@ public class GenericCommandActionDelegate implements
 					// asking for a bogus parameter? No problem
 					return;
 				}
-				parameters.add(new Parameterization(parm, entry.getValue()));
+				parameters.add(new Parameterization(parm, (String) parameterMap
+						.get(parmName)));
 			}
 			parameterizedCommand = new ParameterizedCommand(cmd,
 					(Parameterization[]) parameters
