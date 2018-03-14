@@ -81,6 +81,11 @@ public class MarkerSupportTests extends DynamicTestCase {
 		assertFalse(hasHierarchy());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	@Override
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.markerSupport.DynamicTestsSubCategoryProvider";
@@ -138,21 +143,41 @@ public class MarkerSupportTests extends DynamicTestCase {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	@Override
 	protected String getExtensionId() {
 		return "newProblemFilter.testDynamicFilterAddition";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	@Override
 	protected String getExtensionPoint() {
 		return MarkerSupportRegistry.MARKER_SUPPORT;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	@Override
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newMarkerSupport";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getDeclaringNamespace()
+	 */
 	@Override
 	protected String getDeclaringNamespace() {
 		return IDEWorkbenchPlugin.IDE_WORKBENCH;

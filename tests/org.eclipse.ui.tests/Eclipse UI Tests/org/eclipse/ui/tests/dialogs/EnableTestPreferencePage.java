@@ -110,6 +110,9 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
 
     }
 
+    /* (non-Javadoc)
+     * Method declared on PreferencePage.
+     */
     @Override
 	protected Control createContents(Composite parent) {
         Composite composite = (Composite) super.createContents(parent);

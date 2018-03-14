@@ -73,6 +73,9 @@ public class IntroTest2 extends UITestCase {
         
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doSetUp()
+     */
     @Override
 	protected void doSetUp() throws Exception {
         super.doSetUp();
@@ -89,6 +92,9 @@ public class IntroTest2 extends UITestCase {
         window = openTestWindow();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+     */
     @Override
 	protected void doTearDown() throws Exception {
         super.doTearDown();

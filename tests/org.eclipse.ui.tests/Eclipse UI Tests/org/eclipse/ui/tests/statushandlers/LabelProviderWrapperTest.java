@@ -39,6 +39,9 @@ public class LabelProviderWrapperTest extends TestCase {
 	private LabelProviderWrapper wrapper;
 	private Map dialogState = new HashMap();
 	
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -48,6 +51,9 @@ public class LabelProviderWrapperTest extends TestCase {
 		wrapper = new LabelProviderWrapper(dialogState);
 	}
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
