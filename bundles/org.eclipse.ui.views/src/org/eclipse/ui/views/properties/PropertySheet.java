@@ -33,9 +33,11 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -218,12 +220,44 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IWorkbenchPart getBootstrapPart() {
-        IWorkbenchPage page = getSite().getPage();
-        if (page != null) {
-            bootstrapSelection = page.getSelection();
-            return page.getActivePart();
-        }
-        return null;
+		IWorkbenchPage page = getSite().getPage();
+		if (page == null) {
+			return null;
+		}
+		ISelection originalSel = page.getSelection();
+		IWorkbenchPart activePart = page.getActivePart();
+		if (activePart != null && activePart != this) {
+			bootstrapSelection = originalSel;
+			return activePart;
+		}
+		if (originalSel == null || originalSel.isEmpty()) {
+			return null;
+		}
+
+		IEditorPart activeEditor = page.getActiveEditor();
+		if (activeEditor != null && isImportant(activeEditor)) {
+			ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
+			if (originalSel.equals(selection)) {
+				bootstrapSelection = originalSel;
+				return activeEditor;
+			}
+		}
+		IViewReference[] viewrefs = page.getViewReferences();
+		for (IViewReference ref : viewrefs) {
+			IWorkbenchPart part = ref.getPart(false);
+			if (part == null || part == this || !page.isPartVisible(part)) {
+				continue;
+			}
+			if (!isImportant(part)) {
+				continue;
+			}
+			ISelection selection = part.getSite().getSelectionProvider().getSelection();
+			if (originalSel.equals(selection)) {
+				bootstrapSelection = originalSel;
+				return part;
+			}
+		}
+		return null;
     }
 
     @Override
@@ -427,11 +461,11 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {
 				IExtension[] extensions = ep.getExtensions();
-				for (int i = 0; i < extensions.length; i++) {
-					IConfigurationElement[] elements = extensions[i].getConfigurationElements();
-					for (int j = 0; j < elements.length; j++) {
-						if ("excludeSources".equalsIgnoreCase(elements[j].getName())) { //$NON-NLS-1$
-							String id = elements[j].getAttribute("id"); //$NON-NLS-1$
+				for (IExtension extension : extensions) {
+					IConfigurationElement[] elements = extension.getConfigurationElements();
+					for (IConfigurationElement element : elements) {
+						if ("excludeSources".equalsIgnoreCase(element.getName())) { //$NON-NLS-1$
+							String id = element.getAttribute("id"); //$NON-NLS-1$
 							if (id != null)
 								ignoredViews.add(id);
 						}

@@ -1622,10 +1622,10 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * refiltering and resorting of the elements.
 	 *
 	 * @param filters
-	 *            an array of viewer filters
+	 *            an varargs of viewer filters
 	 * @since 3.3
 	 */
-	public void setFilters(ViewerFilter[] filters) {
+	public void setFilters(ViewerFilter... filters) {
 		if (filters.length == 0) {
 			resetFilters();
 		} else {
@@ -1654,6 +1654,11 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public abstract void reveal(Object element);
 
+	/**
+	 * {@inheritDoc}
+	 * The implementation of this method calls {@link #assertContentProviderType(IContentProvider)}
+	 * to validate the content provider.
+	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
