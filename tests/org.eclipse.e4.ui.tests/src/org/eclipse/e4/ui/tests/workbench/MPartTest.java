@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -26,8 +31,11 @@ import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class MPartTest extends TestCase {
+public class MPartTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
@@ -36,8 +44,8 @@ public class MPartTest extends TestCase {
 	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
@@ -48,14 +56,15 @@ public class MPartTest extends TestCase {
 	 *
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
+	@Test
 	public void testSetName() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -81,6 +90,7 @@ public class MPartTest extends TestCase {
 		assertEquals("Another Name", item.getText());
 	}
 
+	@Test
 	public void testCTabItem_GetImage() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -122,14 +132,17 @@ public class MPartTest extends TestCase {
 		assertEquals(expected, item.getText());
 	}
 
+	@Test
 	public void testDeclaredNameNull() {
 		testDeclaredName(null, "");
 	}
 
+	@Test
 	public void testDeclaredNameEmpty() {
 		testDeclaredName("", "");
 	}
 
+	@Test
 	public void testDeclaredNameDefined() {
 		testDeclaredName("partName", "partName");
 	}
@@ -155,14 +168,17 @@ public class MPartTest extends TestCase {
 		assertEquals(expectedToolTip, item.getToolTipText());
 	}
 
+	@Test
 	public void testDeclaredTooltipNull() {
 		testDeclaredTooltip(null, null);
 	}
 
+	@Test
 	public void testDeclaredTooltipEmptyString() {
 		testDeclaredTooltip("", null);
 	}
 
+	@Test
 	public void testDeclaredTooltipDefined() {
 		testDeclaredTooltip("partToolTip", "partToolTip");
 	}
@@ -192,18 +208,22 @@ public class MPartTest extends TestCase {
 		assertEquals(expectedToolTip, item.getToolTipText());
 	}
 
+	@Test
 	public void testMPart_setTooltipNull() {
 		testMPart_setTooltip(null, null);
 	}
 
+	@Test
 	public void testMPart_setTooltipEmptyString() {
 		testMPart_setTooltip("", null);
 	}
 
+	@Test
 	public void testMPart_setTooltipDefined() {
 		testMPart_setTooltip("partToolTip", "partToolTip");
 	}
 
+	@Test
 	public void testMPart_getContext() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
@@ -227,6 +247,7 @@ public class MPartTest extends TestCase {
 		assertNull(part.getContext());
 	}
 
+	@Test
 	public void testMPartBug369866() {
 		final MWindow window = createWindowWithOneView("Part");
 

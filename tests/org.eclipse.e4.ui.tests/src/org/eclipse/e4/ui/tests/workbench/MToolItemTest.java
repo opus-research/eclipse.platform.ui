@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -28,20 +33,23 @@ import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ToolItem;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class MToolItemTest extends TestCase {
+public class MToolItemTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		if (wb != null) {
 			wb.close();
 		}
@@ -84,42 +92,52 @@ public class MToolItemTest extends TestCase {
 		assertEquals(afterExpected, toolItemWidget.getText());
 	}
 
+	@Test
 	public void testMToolItem_Text_NullNull() {
 		testMToolItem_Text(null, "", null, "");
 	}
 
+	@Test
 	public void testMToolItem_Text_NullEmpty() {
 		testMToolItem_Text(null, "", "", "");
 	}
 
+	@Test
 	public void testMToolItem_Text_NullString() {
 		testMToolItem_Text(null, "", "label", "label");
 	}
 
+	@Test
 	public void testMToolItem_Text_EmptyNull() {
 		testMToolItem_Text("", "", null, "");
 	}
 
+	@Test
 	public void testMToolItem_Text_EmptyEmpty() {
 		testMToolItem_Text("", "", "", "");
 	}
 
+	@Test
 	public void testMToolItem_Text_EmptyString() {
 		testMToolItem_Text("", "", "label", "label");
 	}
 
+	@Test
 	public void testMToolItem_Text_StringNull() {
 		testMToolItem_Text("label", "label", null, "");
 	}
 
+	@Test
 	public void testMToolItem_Text_StringEmpty() {
 		testMToolItem_Text("label", "label", "", "");
 	}
 
+	@Test
 	public void testMToolItem_Text_StringStringUnchanged() {
 		testMToolItem_Text("label", "label", "label", "label");
 	}
 
+	@Test
 	public void testMToolItem_Text_StringStringChanged() {
 		testMToolItem_Text("label", "label", "label2", "label2");
 	}
@@ -160,46 +178,57 @@ public class MToolItemTest extends TestCase {
 		assertEquals(afterExpected, toolItemWidget.getToolTipText());
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_NullNull() {
 		testMToolItem_Tooltip(null, null, null, null);
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_NullEmpty() {
 		testMToolItem_Tooltip(null, null, "", "");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_NullString() {
 		testMToolItem_Tooltip(null, null, "toolTip", "toolTip");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_EmptyNull() {
 		testMToolItem_Tooltip("", "", null, null);
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_EmptyEmpty() {
 		testMToolItem_Tooltip("", "", "", "");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_EmptyString() {
 		testMToolItem_Tooltip("", "", "toolTip", "toolTip");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_StringNull() {
 		testMToolItem_Tooltip("toolTip", "toolTip", null, null);
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_StringEmpty() {
 		testMToolItem_Tooltip("toolTip", "toolTip", "", "");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_StringStringUnchanged() {
 		testMToolItem_Tooltip("toolTip", "toolTip", "toolTip", "toolTip");
 	}
 
+	@Test
 	public void testMToolItem_Tooltip_StringStringChanged() {
 		testMToolItem_Tooltip("toolTip", "toolTip", "toolTip2", "toolTip2");
 	}
 
+	@Test
 	public void testMToolItem_RadioItems() {
 		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
 				.createTrimmedWindow();

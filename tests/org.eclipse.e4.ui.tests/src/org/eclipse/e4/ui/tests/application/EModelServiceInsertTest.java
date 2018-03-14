@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -23,22 +26,21 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class EModelServiceInsertTest extends TestCase {
+public class EModelServiceInsertTest {
 
 	private IEclipseContext applicationContext;
 
-	MApplication app = null;
-
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		applicationContext = E4Application.createDefaultContext();
-		super.setUp();
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() {
 		applicationContext.dispose();
 	}
 
@@ -128,41 +130,49 @@ public class EModelServiceInsertTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testSimpleInsertAbove() {
 		MApplication application = createSimpleApplication();
 		testInsert(application, "theStack", EModelService.ABOVE, 25);
 	}
 
+	@Test
 	public void testSimpleInsertBelow() {
 		MApplication application = createSimpleApplication();
 		testInsert(application, "theStack", EModelService.BELOW, 25);
 	}
 
+	@Test
 	public void testSimpleInsertLeftOf() {
 		MApplication application = createSimpleApplication();
 		testInsert(application, "theStack", EModelService.LEFT_OF, 25);
 	}
 
+	@Test
 	public void testSimpleInsertRightOf() {
 		MApplication application = createSimpleApplication();
 		testInsert(application, "theStack", EModelService.RIGHT_OF, 25);
 	}
 
+	@Test
 	public void testInsertAbove() {
 		MApplication application = createApplication();
 		testInsert(application, "theStack", EModelService.ABOVE, 35);
 	}
 
+	@Test
 	public void testInsertBelow() {
 		MApplication application = createApplication();
 		testInsert(application, "theStack", EModelService.BELOW, 35);
 	}
 
+	@Test
 	public void testInsertLeftOf() {
 		MApplication application = createApplication();
 		testInsert(application, "theStack", EModelService.LEFT_OF, 35);
 	}
 
+	@Test
 	public void testInsertRightOf() {
 		MApplication application = createApplication();
 		testInsert(application, "theStack", EModelService.RIGHT_OF, 35);
