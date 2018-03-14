@@ -7,7 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+<<<<<<< Upstream, based on master
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
+=======
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430988
+>>>>>>> dfc8e9d Bug 430988 - Show View should work on application model instead of ViewRegistry 
  *******************************************************************************/
 package org.eclipse.ui.tests.dialogs;
 
@@ -15,6 +19,10 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -181,8 +189,16 @@ public class UIDialogs extends TestCase {
     }
 
     public void testShowView() {
-        Dialog dialog = new ShowViewDialog(getWorkbench().getActiveWorkbenchWindow(), WorkbenchPlugin
-                .getDefault().getViewRegistry());
+
+    	IWorkbench workbench = getWorkbench();
+
+    	Shell shell = workbench.getActiveWorkbenchWindow().getShell();
+		// Get the view identifier, if any.
+		IEclipseContext ctx = workbench.getService(IEclipseContext.class);
+		EModelService modelService = workbench.getService(EModelService.class);
+		MApplication app = workbench.getService(MApplication.class);
+		MWindow window = workbench.getService(MWindow.class);
+        Dialog dialog = new ShowViewDialog(shell, app,window, modelService, ctx);
         DialogCheck.assertDialog(dialog, this);
     }
     /**
