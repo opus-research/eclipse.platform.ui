@@ -289,7 +289,6 @@ public class TreeViewer extends AbstractTreeViewer {
 
 		if ((treeControl.getStyle() & SWT.VIRTUAL) != 0) {
 			treeControl.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					treeIsDisposed = true;
 					unmapAllElements();
@@ -297,7 +296,6 @@ public class TreeViewer extends AbstractTreeViewer {
 			});
 			treeControl.addListener(SWT.SetData, new Listener() {
 
-				@Override
 				public void handleEvent(Event event) {
 					if (contentProviderIsLazy) {
 						TreeItem item = (TreeItem) event.item;
@@ -447,7 +445,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		if (checkBusy())
 			return;
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 				if (internalIsInputOrEmptyPath(elementOrTreePath)) {
 					getTree().setItemCount(count);
@@ -797,7 +794,6 @@ public class TreeViewer extends AbstractTreeViewer {
 			if (item.getData(VIRTUAL_DISPOSE_KEY) == null) {
 				item.setData(VIRTUAL_DISPOSE_KEY, Boolean.TRUE);
 				item.addDisposeListener(new DisposeListener() {
-					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						if (!treeIsDisposed) {
 							Object data = item.getData();
@@ -902,7 +898,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		final List oldSelection = new LinkedList(Arrays
 				.asList(((TreeSelection) getSelection()).getPaths()));
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 				TreePath removedPath = null;
 				if (internalIsInputOrEmptyPath(parentOrTreePath)) {
@@ -1027,7 +1022,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		if (checkBusy())
 			return;
 		preservingSelection(new Runnable() {
-			@Override
 			public void run() {
 				if (internalIsInputOrEmptyPath(elementOrTreePath)) {
 					if (hasChildren) {

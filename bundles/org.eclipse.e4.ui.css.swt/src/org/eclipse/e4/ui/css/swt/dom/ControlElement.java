@@ -145,13 +145,12 @@ public class ControlElement extends WidgetElement {
 
 	@Override
 	public void reset() {
+		super.reset();
 		Control control = getControl();
 		CSSSWTFontHelper.restoreDefaultFont(control);
 		CSSSWTCursorHelper.restoreDefaultCursor(control);
+		control.setBackgroundImage(null);
 		GradientBackgroundListener.remove(control);
-		if (control.getBackgroundImage() != null) {
-			control.setBackgroundImage(null);
-		}
 
 		if (WEBSITE_CLASS.equals(control.getClass().getName())) {
 			control.setBackground(control.getDisplay().getSystemColor(
@@ -162,7 +161,6 @@ public class ControlElement extends WidgetElement {
 			control.setBackground(null);
 			control.setForeground(null);
 		}
-		super.reset();
 	}
 
 }

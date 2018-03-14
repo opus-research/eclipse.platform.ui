@@ -115,8 +115,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public IDialogSettings addNewSection(String sectionName) {
+    public IDialogSettings addNewSection(String sectionName) {
         DialogSettings section = new DialogSettings(sectionName);
         addSection(section);
         return section;
@@ -125,8 +124,7 @@ public class DialogSettings implements IDialogSettings {
 	/* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void addSection(IDialogSettings section) {
+    public void addSection(IDialogSettings section) {
         sections.put(section.getName(), section);
     }
 
@@ -160,32 +158,28 @@ public class DialogSettings implements IDialogSettings {
 	/* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public String get(String key) {
+    public String get(String key) {
         return items.get(key);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public String[] getArray(String key) {
+    public String[] getArray(String key) {
         return arrayItems.get(key);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public boolean getBoolean(String key) {
+    public boolean getBoolean(String key) {
         return Boolean.valueOf(items.get(key)).booleanValue();
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public double getDouble(String key) throws NumberFormatException {
+    public double getDouble(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
@@ -198,8 +192,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public float getFloat(String key) throws NumberFormatException {
+    public float getFloat(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
 			throw new NumberFormatException(
@@ -212,8 +205,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public int getInt(String key) throws NumberFormatException {
+    public int getInt(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
             //new Integer(null) will throw a NumberFormatException and meet our spec, but this message
@@ -228,8 +220,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public long getLong(String key) throws NumberFormatException {
+    public long getLong(String key) throws NumberFormatException {
         String setting = items.get(key);
         if (setting == null) {
             //new Long(null) will throw a NumberFormatException and meet our spec, but this message
@@ -244,8 +235,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public String getName() {
+    public String getName() {
         return name;
     }
     
@@ -273,16 +263,14 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public IDialogSettings getSection(String sectionName) {
+    public IDialogSettings getSection(String sectionName) {
         return sections.get(sectionName);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public IDialogSettings[] getSections() {
+    public IDialogSettings[] getSections() {
         Collection<IDialogSettings> values = sections.values();
         DialogSettings[] result = new DialogSettings[values.size()];
         values.toArray(result);
@@ -292,8 +280,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void load(Reader r) {
+    public void load(Reader r) {
         Document document = null;
         try {
             DocumentBuilder parser = DocumentBuilderFactory.newInstance()
@@ -320,8 +307,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void load(String fileName) throws IOException {
+    public void load(String fileName) throws IOException {
         FileInputStream stream = new FileInputStream(fileName);
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 stream, "utf-8"));//$NON-NLS-1$
@@ -376,63 +362,55 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, String[] value) {
+    public void put(String key, String[] value) {
         arrayItems.put(key, value);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, double value) {
+    public void put(String key, double value) {
         put(key, String.valueOf(value));
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, float value) {
+    public void put(String key, float value) {
         put(key, String.valueOf(value));
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, int value) {
+    public void put(String key, int value) {
         put(key, String.valueOf(value));
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, long value) {
+    public void put(String key, long value) {
         put(key, String.valueOf(value));
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, String value) {
+    public void put(String key, String value) {
         items.put(key, value);
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void put(String key, boolean value) {
+    public void put(String key, boolean value) {
         put(key, String.valueOf(value));
     }
 
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-	@Override
 	public void save(Writer writer) throws IOException {
     	final XMLWriter xmlWriter = new XMLWriter(writer);
     	save(xmlWriter);
@@ -442,8 +420,7 @@ public class DialogSettings implements IDialogSettings {
     /* (non-Javadoc)
      * Method declared on IDialogSettings.
      */
-    @Override
-	public void save(String fileName) throws IOException {
+    public void save(String fileName) throws IOException {
         FileOutputStream stream = new FileOutputStream(fileName);
         XMLWriter writer = new XMLWriter(stream);
         save(writer);

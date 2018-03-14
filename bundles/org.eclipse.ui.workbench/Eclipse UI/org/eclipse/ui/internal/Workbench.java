@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.ExecutionException;
@@ -123,7 +122,6 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -223,7 +221,6 @@ import org.eclipse.ui.internal.services.SourceProviderService;
 import org.eclipse.ui.internal.services.WorkbenchLocationService;
 import org.eclipse.ui.internal.splash.EclipseSplashHandler;
 import org.eclipse.ui.internal.splash.SplashHandlerFactory;
-import org.eclipse.ui.internal.testing.ContributionInfoMessages;
 import org.eclipse.ui.internal.testing.WorkbenchTestable;
 import org.eclipse.ui.internal.themes.ColorDefinition;
 import org.eclipse.ui.internal.themes.FontDefinition;
@@ -247,7 +244,6 @@ import org.eclipse.ui.services.ISourceProviderService;
 import org.eclipse.ui.splash.AbstractSplashHandler;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.swt.IFocusService;
-import org.eclipse.ui.testing.ContributionInfo;
 import org.eclipse.ui.themes.IThemeManager;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
@@ -274,8 +270,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * rewritten to use the new workbench advisor API.
  * </p>
  */
-public final class Workbench extends EventManager implements IWorkbench,
-		org.eclipse.e4.ui.workbench.IWorkbench {
+public final class Workbench extends EventManager implements IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
@@ -457,9 +452,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	private Job autoSaveJob;
 
-	private String id;
-	private ServiceRegistration<?> e4WorkbenchService;
-
 	/**
 	 * Creates a new workbench.
 	 * 
@@ -474,7 +466,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
 			IEclipseContext appContext) {
 		super();
-		this.id = createId();
 		StartupThreading.setWorkbench(this);
 		if (instance != null && instance.isRunning()) {
 			throw new IllegalStateException(WorkbenchMessages.Workbench_CreatingWorkbenchTwice);
@@ -532,6 +523,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		serviceLocator.registerService(IWorkbenchLocationService.class,
 				new WorkbenchLocationService(IServiceScopes.WORKBENCH_SCOPE, this, null, null,
 						null, null, 0));
+
 	}
 
 	/**
@@ -583,13 +575,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 				System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
 						"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
 				Object obj = getApplication(Platform.getCommandLineArgs());
-
-				IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-				if (!store.isDefault(IPreferenceConstants.LAYOUT_DIRECTION)) {
-					int orientation = store.getInt(IPreferenceConstants.LAYOUT_DIRECTION);
-					Window.setDefaultOrientation(orientation);
-				}
-
 				if (obj instanceof E4Application) {
 					E4Application e4app = (E4Application) obj;
 					E4Workbench e4Workbench = e4app.createE4Workbench(getApplicationContext(),
@@ -1585,6 +1570,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		});
 		initializeE4Services();
+		initializeDefaultServices();
+		initializeFonts();
+		initializeColors();
+		initializeApplicationColors();
+
 		IIntroRegistry introRegistry = WorkbenchPlugin.getDefault().getIntroRegistry();
 		if (introRegistry.getIntroCount() > 0) {
 			IProduct product = Platform.getProduct();
@@ -1593,10 +1583,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 						.getId());
 			}
 		}
-		initializeDefaultServices();
-		initializeFonts();
-		initializeColors();
-		initializeApplicationColors();
 
 		// now that the workbench is sufficiently initialized, let the advisor
 		// have a turn.
@@ -1614,9 +1600,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 		// initialize workbench single-click vs double-click behavior
 		initializeSingleClickOption();
-
-		initializeGlobalization();
-		initializeNLExtensions();
 
 		initializeWorkbenchImages();
 
@@ -1707,7 +1690,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		});
 	}
 
-	void initializeSingleClickOption() {
+	private void initializeSingleClickOption() {
 		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
 		boolean openOnSingleClick = store.getBoolean(IPreferenceConstants.OPEN_ON_SINGLE_CLICK);
 		boolean selectOnHover = store.getBoolean(IPreferenceConstants.SELECT_ON_HOVER);
@@ -1723,26 +1706,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		}
 		OpenStrategy.setOpenMethod(singleClickMethod);
-	}
-
-	private void initializeGlobalization() {
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-
-		if (!store.isDefault(IPreferenceConstants.BIDI_SUPPORT)) {
-			BidiUtils.setBidiSupport(store.getBoolean(IPreferenceConstants.BIDI_SUPPORT));
-		}
-		if (!store.isDefault(IPreferenceConstants.TEXT_DIRECTION)) {
-			BidiUtils.setTextDirection(store.getString(IPreferenceConstants.TEXT_DIRECTION));
-		}
-	}
-
-	private void initializeNLExtensions() {
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-		if (!store.isDefault(IPreferenceConstants.NL_EXTENSIONS)) {
-			String nlExtensions = store.getString(IPreferenceConstants.NL_EXTENSIONS);
-			ULocale.setDefault(Category.FORMAT, new ULocale(ULocale.getDefault(Category.FORMAT)
-					.getBaseName() + nlExtensions));
-		}
 	}
 
 	/*
@@ -2571,7 +2534,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * 
 	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
-	public ContributionInfo[] getEarlyActivatedPlugins() {
+	public String[] getEarlyActivatedPlugins() {
 		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
@@ -2582,13 +2545,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 				pluginIds.add(id);
 			}
 		}
-		ContributionInfo[] result = new ContributionInfo[pluginIds.size()];
-		for (int i = 0; i < result.length; i++) {
-			result[i] = new ContributionInfo((String) pluginIds.get(i),
-					ContributionInfoMessages.ContributionInfo_EarlyStartupPlugin, null);
-
-		}
-		return result;
+		return (String[]) pluginIds.toArray(new String[pluginIds.size()]);
 	}
 
 	/**
@@ -2797,17 +2754,8 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 
 			if (initOK[0] && runEventLoop) {
-				// Same registration as in E4Workbench
-				Hashtable<String, Object> properties = new Hashtable<String, Object>();
-				properties.put("id", getId()); //$NON-NLS-1$
-
-				workbenchService = WorkbenchPlugin.getDefault().getBundleContext()
-						.registerService(IWorkbench.class.getName(), this, properties);
-
-				e4WorkbenchService = WorkbenchPlugin.getDefault().getBundleContext()
-						.registerService(org.eclipse.e4.ui.workbench.IWorkbench.class.getName(),
-								this, properties);
-
+				workbenchService = WorkbenchPlugin.getDefault().getBundleContext().registerService(
+						IWorkbench.class.getName(), this, null);
 				Runnable earlyStartup = new Runnable() {
 					public void run() {
 						// start eager plug-ins
@@ -2994,10 +2942,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (workbenchService != null)
 			workbenchService.unregister();
 		workbenchService = null;
-
-		if (e4WorkbenchService != null)
-			e4WorkbenchService.unregister();
-		e4WorkbenchService = null;
 
 		// for dynamic UI
 		Platform.getExtensionRegistry().removeRegistryChangeListener(extensionEventHandler);
@@ -3730,13 +3674,5 @@ UIEvents.Context.TOPIC_CONTEXT,
 			UIStats.end(UIStats.RESTORE_WORKBENCH, this, "MRUList"); //$NON-NLS-1$
 		}
 		return result;
-	}
-
-	public final String getId() {
-		return id;
-	}
-
-	protected String createId() {
-		return UUID.randomUUID().toString();
 	}
 }

@@ -80,8 +80,7 @@ public class ColorRegistry extends ResourceRegistry {
      * Runnable that cleans up the manager on disposal of the display.
      */
     protected Runnable displayRunnable = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             clearCaches();
         }
     };
