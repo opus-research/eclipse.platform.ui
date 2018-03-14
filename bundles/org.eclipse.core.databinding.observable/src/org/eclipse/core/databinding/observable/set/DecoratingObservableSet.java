@@ -16,17 +16,15 @@ import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
 
 /**
  * An observable set which decorates another observable set.
- * 
- * @param <E>
- * 
+ *
  * @since 1.2
  */
-public class DecoratingObservableSet<E> extends
-		DecoratingObservableCollection<E> implements IObservableSet<E> {
+public class DecoratingObservableSet extends DecoratingObservableCollection
+		implements IObservableSet {
 
-	private IObservableSet<E> decorated;
+	private IObservableSet decorated;
 
-	private ISetChangeListener<E> setChangeListener;
+	private ISetChangeListener setChangeListener;
 
 	/**
 	 * Constructs a DecoratingObservableSet which decorates the given
@@ -36,7 +34,7 @@ public class DecoratingObservableSet<E> extends
 	 *            the observable set being decorated
 	 * @param disposeDecoratedOnDispose
 	 */
-	public DecoratingObservableSet(IObservableSet<E> decorated,
+	public DecoratingObservableSet(IObservableSet decorated,
 			boolean disposeDecoratedOnDispose) {
 		super(decorated, disposeDecoratedOnDispose);
 		this.decorated = decorated;
@@ -49,21 +47,19 @@ public class DecoratingObservableSet<E> extends
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(
-			ISetChangeListener<? super E> listener) {
+	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeSetChangeListener(
-			ISetChangeListener<? super E> listener) {
+	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected void fireSetChange(SetDiff<E> diff) {
+	protected void fireSetChange(SetDiff diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new SetChangeEvent<E>(this, diff));
+		fireEvent(new SetChangeEvent(this, diff));
 	}
 
 	@Override
@@ -75,9 +71,9 @@ public class DecoratingObservableSet<E> extends
 	@Override
 	protected void firstListenerAdded() {
 		if (setChangeListener == null) {
-			setChangeListener = new ISetChangeListener<E>() {
+			setChangeListener = new ISetChangeListener() {
 				@Override
-				public void handleSetChange(SetChangeEvent<E> event) {
+				public void handleSetChange(SetChangeEvent event) {
 					DecoratingObservableSet.this.handleSetChange(event);
 				}
 			};
@@ -104,7 +100,7 @@ public class DecoratingObservableSet<E> extends
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleSetChange(final SetChangeEvent<E> event) {
+	protected void handleSetChange(final SetChangeEvent event) {
 		fireSetChange(event.diff);
 	}
 

@@ -30,12 +30,10 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
- * @param <E>
- * 
+ *
  * @since 1.0
  */
-public class WritableSet<E> extends ObservableSet<E> {
+public class WritableSet extends ObservableSet {
 
 	/**
 	 * Constructs a new empty instance in the default realm with a
@@ -47,16 +45,16 @@ public class WritableSet<E> extends ObservableSet<E> {
 	}
 
 	/**
-	 * Constructs a new instance in the default realm containing the elements of
-	 * the given collection. Changes to the given collection after calling this
-	 * method do not affect the contents of the created WritableSet.
+	 * Constructs a new instance in the default realm containing the
+	 * elements of the given collection. Changes to the given collection after
+	 * calling this method do not affect the contents of the created WritableSet.
 	 *
 	 * @param c
 	 * @param elementType
 	 *            can be <code>null</code>
 	 */
-	public WritableSet(Collection<? extends E> c, Object elementType) {
-		this(Realm.getDefault(), new HashSet<E>(c), elementType);
+	public WritableSet(Collection c, Object elementType) {
+		this(Realm.getDefault(), new HashSet(c), elementType);
 	}
 
 	/**
@@ -66,7 +64,7 @@ public class WritableSet<E> extends ObservableSet<E> {
 	 * @param realm
 	 */
 	public WritableSet(Realm realm) {
-		this(realm, new HashSet<E>(), null);
+		this(realm, new HashSet(), null);
 	}
 
 	/**
@@ -80,38 +78,34 @@ public class WritableSet<E> extends ObservableSet<E> {
 	 * @param elementType
 	 *            can be <code>null</code>
 	 */
-	public WritableSet(Realm realm, Collection<? extends E> c,
-			Object elementType) {
-		super(realm, new HashSet<E>(c), elementType);
+	public WritableSet(Realm realm, Collection c, Object elementType) {
+		super(realm, new HashSet(c), elementType);
 		this.elementType = elementType;
 	}
 
 	@Override
-	public boolean add(E o) {
+	public boolean add(Object o) {
 		getterCalled();
 		boolean added = wrappedSet.add(o);
 		if (added) {
-			Set<E> removals = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(Collections.singleton(o),
-					removals));
+			fireSetChange(Diffs.createSetDiff(Collections.singleton(o), Collections.EMPTY_SET));
 		}
 		return added;
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends E> c) {
+	public boolean addAll(Collection c) {
 		getterCalled();
-		Set<E> additions = new HashSet<E>();
-		Iterator<? extends E> it = c.iterator();
+		Set additions = new HashSet();
+		Iterator it = c.iterator();
 		while (it.hasNext()) {
-			E element = it.next();
+			Object element = it.next();
 			if (wrappedSet.add(element)) {
 				additions.add(element);
 			}
 		}
 		if (additions.size() > 0) {
-			Set<E> removals = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(additions, removals));
+			fireSetChange(Diffs.createSetDiff(additions, Collections.EMPTY_SET));
 			return true;
 		}
 		return false;
@@ -122,47 +116,44 @@ public class WritableSet<E> extends ObservableSet<E> {
 		getterCalled();
 		boolean removed = wrappedSet.remove(o);
 		if (removed) {
-			Set<E> additions = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(additions,
-					Collections.singleton((E) o)));
+			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, Collections
+					.singleton(o)));
 		}
 		return removed;
 	}
 
 	@Override
-	public boolean removeAll(Collection<?> c) {
+	public boolean removeAll(Collection c) {
 		getterCalled();
-		Set<E> removes = new HashSet<E>();
-		Iterator<?> it = c.iterator();
+		Set removes = new HashSet();
+		Iterator it = c.iterator();
 		while (it.hasNext()) {
 			Object element = it.next();
 			if (wrappedSet.remove(element)) {
-				removes.add((E) element);
+				removes.add(element);
 			}
 		}
 		if (removes.size() > 0) {
-			Set<E> additions = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(additions, removes));
+			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removes));
 			return true;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
+	public boolean retainAll(Collection c) {
 		getterCalled();
-		Set<E> removes = new HashSet<E>();
-		Iterator<E> it = wrappedSet.iterator();
+		Set removes = new HashSet();
+		Iterator it = wrappedSet.iterator();
 		while (it.hasNext()) {
-			E element = it.next();
+			Object element = it.next();
 			if (!c.contains(element)) {
 				it.remove();
 				removes.add(element);
 			}
 		}
 		if (removes.size() > 0) {
-			Set<E> additions = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(additions, removes));
+			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removes));
 			return true;
 		}
 		return false;
@@ -171,19 +162,16 @@ public class WritableSet<E> extends ObservableSet<E> {
 	@Override
 	public void clear() {
 		getterCalled();
-		Set<E> removes = new HashSet<E>(wrappedSet);
-		Set<E> additions = Collections.emptySet();
+		Set removes = new HashSet(wrappedSet);
 		wrappedSet.clear();
-		fireSetChange(Diffs.createSetDiff(additions, removes));
+		fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removes));
 	}
 
 	/**
-	 * @param elementType
-	 *            can be <code>null</code>
+	 * @param elementType can be <code>null</code>
 	 * @return new instance with the default realm
 	 */
-	public static WritableSet<?> withElementType(Object elementType) {
-		return new WritableSet<Object>(Realm.getDefault(),
-				new HashSet<Object>(), elementType);
+	public static WritableSet withElementType(Object elementType) {
+		return new WritableSet(Realm.getDefault(), new HashSet(), elementType);
 	}
 }

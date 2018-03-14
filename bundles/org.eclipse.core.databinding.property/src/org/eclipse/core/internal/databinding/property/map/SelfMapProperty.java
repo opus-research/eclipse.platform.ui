@@ -20,15 +20,10 @@ import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.map.SimpleMapProperty;
 
 /**
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
  * @since 3.3
  *
  */
-public final class SelfMapProperty<K, V> extends
-		SimpleMapProperty<Map<K, V>, K, V> {
+public final class SelfMapProperty extends SimpleMapProperty {
 	private final Object keyType;
 	private final Object valueType;
 
@@ -52,31 +47,30 @@ public final class SelfMapProperty<K, V> extends
 	}
 
 	@Override
-	protected Map<K, V> doGetMap(Map<K, V> source) {
-		return source;
+	protected Map doGetMap(Object source) {
+		return (Map) source;
 	}
 
 	@Override
-	protected void doSetMap(Map<K, V> source, Map<K, V> map, MapDiff<K, V> diff) {
+	protected void doSetMap(Object source, Map map, MapDiff diff) {
 		doUpdateMap(source, diff);
 	}
 
 	@Override
-	protected void doUpdateMap(Map<K, V> source, MapDiff<K, V> diff) {
-		diff.applyTo(source);
+	protected void doUpdateMap(Object source, MapDiff diff) {
+		diff.applyTo((Map) source);
 	}
 
 	@Override
-	public INativePropertyListener<Map<K, V>> adaptListener(
-			ISimplePropertyListener<MapDiff<K, V>> listener) {
+	public INativePropertyListener adaptListener(
+			ISimplePropertyListener listener) {
 		return null; // no listener API
 	}
 
-	protected void doAddListener(Object source,
-			INativePropertyListener<Map<K, V>> listener) {
+	protected void doAddListener(Object source, INativePropertyListener listener) {
 	}
 
 	protected void doRemoveListener(Object source,
-			INativePropertyListener<Map<K, V>> listener) {
+			INativePropertyListener listener) {
 	}
 }

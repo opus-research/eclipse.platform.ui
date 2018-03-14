@@ -21,9 +21,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * added to an observable collection. Listeners interested in incremental
  * changes have to be added using more concrete subtypes such as
  * {@link IObservableList} or {@link IObservableSet}.
- * 
- * @param <T>
- * 
+ *
  * @noextend This interface is not intended to be extended by clients.
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -33,7 +31,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  *
  * @since 1.0
  */
-public interface IObservableCollection<T> extends IObservable, Collection<T> {
+public interface IObservableCollection extends IObservable, Collection {
 
 	/**
 	 * Returns the element type of this observable collection, or

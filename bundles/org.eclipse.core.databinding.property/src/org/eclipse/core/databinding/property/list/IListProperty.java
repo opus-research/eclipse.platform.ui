@@ -24,11 +24,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
  * Interface for list-typed properties.
- * 
- * @param <S>
- *            type of the source object
- * @param <E>
- *            type of the elements in the list
+ *
  * @since 1.2
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
@@ -38,7 +34,7 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
  * @see ListProperty
  * @see SimpleListProperty
  */
-public interface IListProperty<S, E> extends IProperty {
+public interface IListProperty extends IProperty {
 	/**
 	 * Returns the type of the elements in the collection or <code>null</code>
 	 * if untyped
@@ -58,7 +54,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 *         list property
 	 * @since 1.3
 	 */
-	public List<E> getList(S source);
+	public List getList(Object source);
 
 	/**
 	 * Updates the property on the source with the specified change
@@ -76,7 +72,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 *            the new list
 	 * @since 1.3
 	 */
-	public void setList(S source, List<E> list);
+	public void setList(Object source, List list);
 
 	/**
 	 * Updates the property on the source with the specified change
@@ -93,7 +89,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 *            a diff describing the change
 	 * @since 1.3
 	 */
-	public void updateList(S source, ListDiff<E> diff);
+	public void updateList(Object source, ListDiff diff);
 
 	/**
 	 * Returns an observable list observing this list property on the given
@@ -104,7 +100,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return an observable list observing this list property on the given
 	 *         property source
 	 */
-	public IObservableList<E> observe(S source);
+	public IObservableList observe(Object source);
 
 	/**
 	 * Returns an observable list observing this list property on the given
@@ -117,7 +113,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return an observable list observing this list property on the given
 	 *         property source
 	 */
-	public IObservableList<E> observe(Realm realm, S source);
+	public IObservableList observe(Realm realm, Object source);
 
 	/**
 	 * Returns a factory for creating observable lists tracking this property of
@@ -126,7 +122,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return a factory for creating observable lists tracking this property of
 	 *         a particular property source.
 	 */
-	public IObservableFactory<S, IObservableList<E>> listFactory();
+	public IObservableFactory listFactory();
 
 	/**
 	 * Returns a factory for creating observable lists in the given realm,
@@ -138,7 +134,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return a factory for creating observable lists in the given realm,
 	 *         tracking this property of a particular property source.
 	 */
-	public IObservableFactory<S, IObservableList<E>> listFactory(Realm realm);
+	public IObservableFactory listFactory(Realm realm);
 
 	/**
 	 * Returns an observable list on the master observable's realm which tracks
@@ -149,8 +145,7 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return an observable list on the given realm which tracks this property
 	 *         of the current value of <code>master</code>.
 	 */
-	public <U extends S> IObservableList<E> observeDetail(
-			IObservableValue<U> master);
+	public IObservableList observeDetail(IObservableValue master);
 
 	/**
 	 * Returns the nested combination of this property and the specified detail
@@ -165,6 +160,5 @@ public interface IListProperty<S, E> extends IProperty {
 	 * @return the nested combination of the master list and detail value
 	 *         properties
 	 */
-	public <T> IListProperty<S, T> values(
-			IValueProperty<? super E, T> detailValue);
+	public IListProperty values(IValueProperty detailValue);
 }
