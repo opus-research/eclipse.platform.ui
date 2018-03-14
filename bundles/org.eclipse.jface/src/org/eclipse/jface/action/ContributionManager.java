@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/**
 	 * The list of contribution items.
 	 */
-	private List contributions = new ArrayList();
+	private List<IContributionItem> contributions = new ArrayList<IContributionItem>();
 
 	/**
 	 * Indicates whether the widgets are in sync with the contributions.
@@ -71,6 +71,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void add(IAction action) {
 		Assert.isNotNull(action, "Action must not be null"); //$NON-NLS-1$
 		add(new ActionContributionItem(action));
@@ -79,6 +80,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void add(IContributionItem item) {
 		Assert.isNotNull(item, "Item must not be null"); //$NON-NLS-1$
 		if (allowItem(item)) {
@@ -104,16 +106,16 @@ public abstract class ContributionManager implements IContributionManager {
 	private void addToGroup(String groupName, IContributionItem item,
 			boolean append) {
 		int i;
-		Iterator items = contributions.iterator();
+		Iterator<IContributionItem> items = contributions.iterator();
 		for (i = 0; items.hasNext(); i++) {
-			IContributionItem o = (IContributionItem) items.next();
+			IContributionItem o = items.next();
 			if (o.isGroupMarker()) {
 				String id = o.getId();
 				if (id != null && id.equalsIgnoreCase(groupName)) {
 					i++;
 					if (append) {
 						for (; items.hasNext(); i++) {
-							IContributionItem ci = (IContributionItem) items
+							IContributionItem ci = items
 									.next();
 							if (ci.isGroupMarker()) {
 								break;
@@ -134,6 +136,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void appendToGroup(String groupName, IAction action) {
 		addToGroup(groupName, new ActionContributionItem(action), true);
 	}
@@ -141,6 +144,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void appendToGroup(String groupName, IContributionItem item) {
 		addToGroup(groupName, item, true);
 	}
@@ -177,7 +181,7 @@ public abstract class ContributionManager implements IContributionManager {
 		System.out.println("   Number of elements: " + size);//$NON-NLS-1$
 		int sum = 0;
 		for (int i = 0; i < size; i++) {
-			if (((IContributionItem) contributions.get(i)).isVisible()) {
+			if (contributions.get(i).isVisible()) {
 				sum++;
 			}
 		}
@@ -188,10 +192,11 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public IContributionItem find(String id) {
-		Iterator e = contributions.iterator();
+		Iterator<IContributionItem> e = contributions.iterator();
 		while (e.hasNext()) {
-			IContributionItem item = (IContributionItem) e.next();
+			IContributionItem item = e.next();
 			String itemId = item.getId();
 			if (itemId != null && itemId.equalsIgnoreCase(id)) {
 				return item;
@@ -203,6 +208,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public IContributionItem[] getItems() {
 		IContributionItem[] items = new IContributionItem[contributions.size()];
 		contributions.toArray(items);
@@ -227,25 +233,31 @@ public abstract class ContributionManager implements IContributionManager {
 	 * 
 	 * @since 2.0
 	 */
+	@Override
 	public IContributionManagerOverrides getOverrides() {
 		if (overrides == null) {
 			overrides = new IContributionManagerOverrides() {
+				@Override
 				public Boolean getEnabled(IContributionItem item) {
 					return null;
 				}
 
+				@Override
 				public Integer getAccelerator(IContributionItem item) {
 					return null;
 				}
 
+				@Override
 				public String getAcceleratorText(IContributionItem item) {
 					return null;
 				}
 
+				@Override
 				public String getText(IContributionItem item) {
 					return null;
 				}
 
+				@Override
 				public Boolean getVisible(IContributionItem item) {
 					return null;
 				}
@@ -276,7 +288,7 @@ public abstract class ContributionManager implements IContributionManager {
 	 */
 	public int indexOf(String id) {
 		for (int i = 0; i < contributions.size(); i++) {
-			IContributionItem item = (IContributionItem) contributions.get(i);
+			IContributionItem item = contributions.get(i);
 			String itemId = item.getId();
 			if (itemId != null && itemId.equalsIgnoreCase(id)) {
 				return i;
@@ -321,6 +333,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void insertAfter(String ID, IAction action) {
 		insertAfter(ID, new ActionContributionItem(action));
 	}
@@ -328,6 +341,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void insertAfter(String ID, IContributionItem item) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -346,6 +360,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void insertBefore(String ID, IAction action) {
 		insertBefore(ID, new ActionContributionItem(action));
 	}
@@ -353,6 +368,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void insertBefore(String ID, IContributionItem item) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -371,13 +387,14 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public boolean isDirty() {
 		if (isDirty) {
 			return true;
 		}
 		if (hasDynamicItems()) {
-			for (Iterator iter = contributions.iterator(); iter.hasNext();) {
-				IContributionItem item = (IContributionItem) iter.next();
+			for (Iterator<IContributionItem> iter = contributions.iterator(); iter.hasNext();) {
+				IContributionItem item = iter.next();
 				if (item.isDirty()) {
 					return true;
 				}
@@ -389,6 +406,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public boolean isEmpty() {
 		return contributions.isEmpty();
 	}
@@ -427,6 +445,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void markDirty() {
 		setDirty(true);
 	}
@@ -434,6 +453,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void prependToGroup(String groupName, IAction action) {
 		addToGroup(groupName, new ActionContributionItem(action), false);
 	}
@@ -441,6 +461,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void prependToGroup(String groupName, IContributionItem item) {
 		addToGroup(groupName, item, false);
 	}
@@ -448,6 +469,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public IContributionItem remove(String ID) {
 		IContributionItem ci = find(ID);
 		if (ci == null) {
@@ -459,6 +481,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public IContributionItem remove(IContributionItem item) {
 		if (contributions.remove(item)) {
 			itemRemoved(item);
@@ -470,6 +493,7 @@ public abstract class ContributionManager implements IContributionManager {
 	/*
 	 * (non-Javadoc) Method declared on IContributionManager.
 	 */
+	@Override
 	public void removeAll() {
 		IContributionItem[] items = getItems();
 		contributions.clear();
@@ -512,7 +536,7 @@ public abstract class ContributionManager implements IContributionManager {
 		}
 
 		// Remove the old item.
-		final IContributionItem oldItem = (IContributionItem) contributions
+		final IContributionItem oldItem = contributions
 				.get(index);
 		itemRemoved(oldItem);
 
@@ -522,7 +546,7 @@ public abstract class ContributionManager implements IContributionManager {
 
 		// Go through and remove duplicates.
 		for (int i = contributions.size() - 1; i > index; i--) {
-			IContributionItem item = (IContributionItem) contributions.get(i);
+			IContributionItem item = contributions.get(i);
 			if ((item != null) && (identifier.equals(item.getId()))) {
 				if (Policy.TRACE_TOOLBAR) {
 					System.out

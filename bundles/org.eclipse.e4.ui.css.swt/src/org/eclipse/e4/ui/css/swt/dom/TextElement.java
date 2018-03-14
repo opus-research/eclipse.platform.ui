@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Angelo Zerr and others.
+ * Copyright (c) 2009, 2012 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Text;
 public class TextElement extends ControlElement {
 	
 	ModifyListener modifyListener = new ModifyListener() {
+		@Override
 		public void modifyText(ModifyEvent e) {
 			doApplyStyles();
 		}
@@ -33,6 +34,7 @@ public class TextElement extends ControlElement {
 		super(text, engine);
 	}
 
+	@Override
 	public void initialize() {
 		super.initialize();
 
@@ -42,6 +44,7 @@ public class TextElement extends ControlElement {
 		text.addModifyListener(modifyListener);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 

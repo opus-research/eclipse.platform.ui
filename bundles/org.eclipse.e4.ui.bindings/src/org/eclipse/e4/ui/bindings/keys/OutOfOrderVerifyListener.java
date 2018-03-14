@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2013 IBM Corporation and others.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *******************************************************************************/
 package org.eclipse.e4.ui.bindings.keys;
 
 import org.eclipse.swt.SWT;
@@ -73,6 +83,7 @@ final class OutOfOrderVerifyListener implements VerifyKeyListener {
 	 *            The verify event after it has been processed by all other verify listeners; must
 	 *            not be <code>null</code>.
 	 */
+	@Override
 	public void verifyKey(VerifyEvent event) {
 		// Always remove the listener.
 		final Widget widget = event.widget;

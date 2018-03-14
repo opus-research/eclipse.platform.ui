@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,8 @@ public interface IWorkbenchSiteProgressService extends IProgressService {
      * The property that is sent with busy notifications.
      * @deprecated this property is no longer in use in the Eclipse SDK
      */
-    public static final String BUSY_PROPERTY = "SITE_BUSY"; //$NON-NLS-1$
+    @Deprecated
+	public static final String BUSY_PROPERTY = "SITE_BUSY"; //$NON-NLS-1$
 
 	/**
 	 * Jobs scheduled with this method will cause the part's presentation to be

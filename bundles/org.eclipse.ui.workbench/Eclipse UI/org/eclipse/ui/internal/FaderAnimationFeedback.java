@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 		super(parentShell);
 	}
 
+	@Override
 	public void dispose() {
 		super.dispose();
 
@@ -42,6 +43,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 			backingStore.dispose();
 	}
 
+	@Override
 	public void initialize(AnimationEngine engine) {
 		Rectangle psRect = getBaseShell().getBounds();
 		getAnimationShell().setBounds(psRect);
@@ -59,6 +61,7 @@ public class FaderAnimationFeedback extends	AnimationFeedbackBase {
 		getAnimationShell().setVisible(true);
 	}
 
+	@Override
 	public void renderStep(AnimationEngine engine) {
 		getAnimationShell().setAlpha((int) (255 - (engine.amount()*255)));
 	}
