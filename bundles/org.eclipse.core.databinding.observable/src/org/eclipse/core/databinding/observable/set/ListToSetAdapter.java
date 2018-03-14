@@ -12,6 +12,7 @@
 package org.eclipse.core.databinding.observable.set;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
@@ -30,24 +31,25 @@ import org.eclipse.core.databinding.observable.list.ListDiffEntry;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
+ * @param <E>
  * @since 1.0
  *
  */
-public class ListToSetAdapter extends ObservableSet {
+public class ListToSetAdapter<E> extends ObservableSet<E> {
 
-	private final IObservableList list;
+	private final IObservableList<E> list;
 
-	private IListChangeListener listener = new IListChangeListener() {
+	private IListChangeListener<E> listener = new IListChangeListener<E>() {
 
 		@Override
-		public void handleListChange(ListChangeEvent event) {
-			Set added = new HashSet();
-			Set removed = new HashSet();
-			ListDiffEntry[] differences = event.diff.getDifferences();
-			for (int i = 0; i < differences.length; i++) {
-				ListDiffEntry entry = differences[i];
-				Object element = entry.getElement();
+		public void handleListChange(ListChangeEvent<E> event) {
+			Set<E> added = new HashSet<E>();
+			Set<E> removed = new HashSet<E>();
+			List<ListDiffEntry<E>> differences = event.diff
+					.getDifferencesAsList();
+			for (ListDiffEntry<E> entry : differences) {
+				E element = entry.getElement();
 				if (entry.isAddition()) {
 					if (wrappedSet.add(element)) {
 						if (!removed.remove(element))
@@ -67,8 +69,8 @@ public class ListToSetAdapter extends ObservableSet {
 	/**
 	 * @param list
 	 */
-	public ListToSetAdapter(IObservableList list) {
-		super(list.getRealm(), new HashSet(), list.getElementType());
+	public ListToSetAdapter(IObservableList<E> list) {
+		super(list.getRealm(), new HashSet<E>(), list.getElementType());
 		this.list = list;
 		wrappedSet.addAll(list);
 		this.list.addListChangeListener(listener);

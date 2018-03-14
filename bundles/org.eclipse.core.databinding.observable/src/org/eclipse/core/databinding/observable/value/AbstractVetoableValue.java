@@ -23,11 +23,13 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
+ * 
+ * @param <T>
  * @since 1.0
  *
  */
-public abstract class AbstractVetoableValue extends AbstractObservableValue
-		implements IVetoableValue {
+public abstract class AbstractVetoableValue<T> extends
+		AbstractObservableValue<T> implements IVetoableValue<T> {
 
 	/**
 	 * Creates a new vetoable value.
@@ -44,9 +46,9 @@ public abstract class AbstractVetoableValue extends AbstractObservableValue
 	}
 
 	@Override
-	final protected void doSetValue(Object value) {
-		Object currentValue = doGetValue();
-		ValueDiff diff = Diffs.createValueDiff(currentValue, value);
+	final protected void doSetValue(T value) {
+		T currentValue = doGetValue();
+		ValueDiff<T> diff = Diffs.createValueDiff(currentValue, value);
 		boolean okToProceed = fireValueChanging(diff);
 		if (!okToProceed) {
 			throw new ChangeVetoException("Change not permitted"); //$NON-NLS-1$
@@ -59,21 +61,22 @@ public abstract class AbstractVetoableValue extends AbstractObservableValue
 	}
 
 	/**
-	 * Sets the value. Invoked after performing veto checks.  Should not fire change events.
+	 * Sets the value. Invoked after performing veto checks. Should not fire
+	 * change events.
 	 *
 	 * @param value
 	 */
-	protected abstract void doSetApprovedValue(Object value);
+	protected abstract void doSetApprovedValue(T value);
 
 	@Override
 	public synchronized void addValueChangingListener(
-			IValueChangingListener listener) {
+			IValueChangingListener<T> listener) {
 		addListener(ValueChangingEvent.TYPE, listener);
 	}
 
 	@Override
 	public synchronized void removeValueChangingListener(
-			IValueChangingListener listener) {
+			IValueChangingListener<T> listener) {
 		removeListener(ValueChangingEvent.TYPE, listener);
 	}
 
@@ -84,10 +87,10 @@ public abstract class AbstractVetoableValue extends AbstractObservableValue
 	 * @param diff
 	 * @return false if the change was vetoed, true otherwise
 	 */
-	protected boolean fireValueChanging(ValueDiff diff) {
+	protected boolean fireValueChanging(ValueDiff<T> diff) {
 		checkRealm();
 
-		ValueChangingEvent event = new ValueChangingEvent(this, diff);
+		ValueChangingEvent<T> event = new ValueChangingEvent<T>(this, diff);
 		fireEvent(event);
 		return !event.veto;
 	}
