@@ -1,7 +1,7 @@
 package org.eclipse.ui.internal.views.markers;
 
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -37,6 +38,7 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 
 	private Combo descriptionCombo;
 	private Text descriptionText;
+	private Button regexCheckbox;
 
 	/**
 	 * Create new instance of the receiver.
@@ -58,7 +60,7 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 			desc
 					.setContainsModifier(MarkerSupportConstants.DOES_NOT_CONTAIN_KEY);
 		desc.setContainsText(descriptionText.getText());
-
+		desc.setUseRegex(regexCheckbox.getSelection());
 	}
 
 	/*
@@ -84,7 +86,7 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 			descriptionCombo.select(1);
 
 		descriptionText.setText(desc.getContainsText());
-
+		regexCheckbox.setSelection(desc.isUseRegex());
 	}
 
 	/**
@@ -98,6 +100,12 @@ public class DescriptionConfigurationArea extends FilterConfigurationArea {
 		descriptionComposite.setLayout(new GridLayout(3, false));
 		descriptionComposite.setLayoutData(new GridData(
 				GridData.FILL_HORIZONTAL));
+		
+		GridData regexGridData = new GridData();
+		regexGridData.horizontalSpan = 3;
+		regexCheckbox = new Button(descriptionComposite, SWT.CHECK);
+		regexCheckbox.setText(MarkerMessages.filtersDialog_regexLabel);
+		regexCheckbox.setLayoutData(regexGridData);
 
 		Label descriptionLabel = new Label(descriptionComposite, SWT.NONE);
 		descriptionLabel.setText(MarkerMessages.filtersDialog_descriptionLabel);
