@@ -17,7 +17,6 @@
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *     Snjezana Peco <snjeza.peco@gmail.com> - Bug 405542
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  *******************************************************************************/
 
 package org.eclipse.ui.internal;

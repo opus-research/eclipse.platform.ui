@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Christian Georgi (SAP)            - Bug 432480
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -23,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -31,10 +29,8 @@ import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProduct;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.RegistryFactory;
-import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -72,7 +68,6 @@ import org.eclipse.e4.ui.workbench.IExceptionHandler;
 import org.eclipse.e4.ui.workbench.IModelResourceHandler;
 import org.eclipse.e4.ui.workbench.IWorkbench;
 import org.eclipse.e4.ui.workbench.lifecycle.PostContextCreate;
-import org.eclipse.e4.ui.workbench.lifecycle.PostSave;
 import org.eclipse.e4.ui.workbench.lifecycle.PreSave;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessAdditions;
 import org.eclipse.e4.ui.workbench.lifecycle.ProcessRemovals;
@@ -179,48 +174,25 @@ public class E4Application implements IApplication {
 		}
 	}
 
-	// TODO should be moved to E4Workbench
 	public void saveModel() {
+		// Save the model into the targetURI
+		if (lcManager != null && workbench != null) {
+			ContextInjectionFactory.invoke(lcManager, PreSave.class, workbench.getContext(), null);
+		}
+
 		try {
-			firePreSave();
-			handler.save();
-			firePostSave();
+			if (!(handler instanceof ResourceHandler) || ((ResourceHandler) handler).hasTopLevelWindows()) {
+				handler.save();
+			} else {
+				Logger logger = new WorkbenchLogger(PLUGIN_ID);
+				logger.error(
+						new Exception(), // log a stack trace for debugging
+						"Attempted to save a workbench model that had no top-level windows! " //$NON-NLS-1$
+								+ "Skipped saving the model to avoid corruption."); //$NON-NLS-1$
+			}
 		} catch (IOException e) {
 			Logger logger = new WorkbenchLogger(PLUGIN_ID);
 			logger.error(e, "Error saving the workbench model"); //$NON-NLS-1$
-		}
-	}
-
-	private void firePreSave() {
-		SafeRunner.run(new ISafeRunnable() {
-			@Override
-			public void run() throws Exception {
-				notifyWorkbenchListeners(PreSave.class);
-			}
-
-			@Override
-			public void handleException(Throwable exception) {
-			}
-		});
-	}
-
-	private void firePostSave() {
-		SafeRunner.run(new ISafeRunnable() {
-			@Override
-			public void run() throws Exception {
-				notifyWorkbenchListeners(PostSave.class);
-			}
-
-			@Override
-			public void handleException(Throwable exception) {
-			}
-		});
-	}
-
-	private void notifyWorkbenchListeners(Class<? extends Annotation> qualifier) {
-		IEclipseContext workbenchContext = workbench.getContext();
-		for (Object listener : workbench.getWorkbenchListeners()) {
-			ContextInjectionFactory.invoke(listener, qualifier, workbenchContext, null);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 BestSolution.at and others.
+ * Copyright (c) 2008, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
  *     Christian Georgi (SAP)                   - Bug 432480
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -17,7 +16,6 @@ import java.net.URI;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -98,7 +96,6 @@ public class E4Workbench implements IWorkbench {
 	IPresentationEngine renderer;
 	MApplication appModel = null;
 	private UIEventPublisher uiEventPublisher;
-	private ListenerList workbenchListeners = new ListenerList();
 
 	private boolean restart;
 
@@ -266,15 +263,4 @@ public class E4Workbench implements IWorkbench {
 		return context;
 	}
 
-	public void addWorkbenchListener(Object listener) {
-		workbenchListeners.add(listener);
-	}
-
-	public void removeWorkbenchListener(Object listener) {
-		workbenchListeners.remove(listener);
-	}
-
-	public Object[] getWorkbenchListeners() {
-		return workbenchListeners.getListeners();
-	}
 }

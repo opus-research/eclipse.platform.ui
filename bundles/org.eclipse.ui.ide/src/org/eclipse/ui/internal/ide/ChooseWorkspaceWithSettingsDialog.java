@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  *******************************************************************************/
 
 package org.eclipse.ui.internal.ide;
@@ -233,44 +232,45 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	 * @return String[] or <code>null</code>
 	 */
 	private String[] getEnabledSettings(IDialogSettings section) {
+
 		if (section == null)
 			return null;
 
 		return section.getArray(ENABLED_TRANSFERS);
+
 	}
 
 	@Override
 	protected void okPressed() {
-		IStatus result = transferSelectedSettings(new Path(getWorkspaceLocation()));
-		if (result.getSeverity() != IStatus.OK) {
-			ErrorDialog.openError(getShell(),
-					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_TransferFailedMessage,
-					IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed, result);
-		} else {
-			saveSettings(getSelectedSetting());
-		}
-		super.okPressed();
-	}
+		Iterator settingsIterator = selectedSettings.iterator();
+		MultiStatus result = new MultiStatus(
+				PlatformUI.PLUGIN_ID,
+				IStatus.OK,
+				IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle,
+				null);
 
-	private IStatus transferSelectedSettings(IPath targetWorkspace) {
-		MultiStatus result = new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK,
-				IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_ProblemsTransferTitle, null);
-		Iterator<?> settingsIterator = selectedSettings.iterator();
-		while (settingsIterator.hasNext()) {
-			result.add(transferSettings((IConfigurationElement) settingsIterator.next(), targetWorkspace));
-		}
-		return result;
-	}
-
-	private String[] getSelectedSetting() {
-		Iterator<?> settingsIterator = selectedSettings.iterator();
+		IPath path = new Path(getWorkspaceLocation());
 		String[] selectionIDs = new String[selectedSettings.size()];
 		int index = 0;
+
 		while (settingsIterator.hasNext()) {
-			IConfigurationElement elem = (IConfigurationElement) settingsIterator.next();
-			selectionIDs[index++] = elem.getAttribute(ATT_ID);
+			IConfigurationElement elem = (IConfigurationElement) settingsIterator
+					.next();
+			result.add(transferSettings(elem, path));
+			selectionIDs[index] = elem.getAttribute(ATT_ID);
 		}
-		return selectionIDs;
+		if (result.getSeverity() != IStatus.OK) {
+			ErrorDialog
+					.openError(
+							getShell(),
+							IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_TransferFailedMessage,
+							IDEWorkbenchMessages.ChooseWorkspaceWithSettingsDialog_SaveSettingsFailed,
+							result);
+			return;
+		}
+
+		saveSettings(selectionIDs);
+		super.okPressed();
 	}
 
 	/**
@@ -279,12 +279,15 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 	 * @param selectionIDs
 	 */
 	private void saveSettings(String[] selectionIDs) {
-		IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings().getSection(WORKBENCH_SETTINGS);
+		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
+				.getDialogSettings().getSection(WORKBENCH_SETTINGS);
 
 		if (settings == null)
-			settings = IDEWorkbenchPlugin.getDefault().getDialogSettings().addNewSection(WORKBENCH_SETTINGS);
+			settings = IDEWorkbenchPlugin.getDefault().getDialogSettings()
+					.addNewSection(WORKBENCH_SETTINGS);
 
 		settings.put(ENABLED_TRANSFERS, selectionIDs);
+
 	}
 
 	/**
