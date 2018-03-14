@@ -35,17 +35,14 @@ public abstract class WidgetStringValueProperty extends WidgetValueProperty {
 		super(events, staleEvents);
 	}
 
-	@Override
 	public Object getValueType() {
 		return String.class;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return doGetStringValue(source);
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		doSetStringValue(source, (String) value);
 	}
