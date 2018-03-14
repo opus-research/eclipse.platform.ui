@@ -95,6 +95,14 @@ public interface IPresentationEngine {
 	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
 
 	/**
+	 * When applied to an MWindow causes the renderer to render the resulting control as a top level
+	 * window
+	 *
+	 * @since 1.3
+	 */
+	public static String WINDOW_TOP_LEVEL = "shellTopLevel"; //$NON-NLS-1$
+
+	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
 	 * the trim. In the default implementation you can only apply this tag to an MPartStack or the
 	 * MPlaceholder of the MArea.
@@ -201,10 +209,9 @@ public interface IPresentationEngine {
 	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$
 
 	/**
-	 * This is the tag name that indicates that the model element is active.
-	 * 
-	 * @since 1.3
+	 * This is the tag name indicates that model element is active
 	 *
+	 * @since 1.3
 	 */
 	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
