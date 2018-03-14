@@ -486,7 +486,8 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 *            specializes this workbench instance
 	 * @since 3.0
 	 */
-	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app, IEclipseContext appContext) {
+	private Workbench(Display display, final WorkbenchAdvisor advisor, MApplication app,
+			IEclipseContext appContext) {
 		super();
 		this.id = createId();
 		StartupThreading.setWorkbench(this);
@@ -2725,19 +2726,18 @@ UIEvents.Context.TOPIC_CONTEXT,
 	}
 
 	/**
-	 * Returns the information about contributions that extend the
+	 * Returns the ids of all plug-ins that extend the
 	 * <code>org.eclipse.ui.startup</code> extension point.
 	 * 
-	 * @return the contributions of all plug-ins containing startup extensions
+	 * @return the ids of all plug-ins containing 1 or more startup extensions
 	 */
 	public ContributionInfo[] getEarlyActivatedPlugins() {
-		IExtensionRegistry registry = e4Context.get(IExtensionRegistry.class);
-		IExtensionPoint point = registry
-				.getExtensionPoint(PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
+		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
+				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
 		ArrayList<String> pluginIds = new ArrayList<String>(extensions.length);
-		for (IExtension extension : extensions) {
-			String id = extension.getNamespaceIdentifier();
+		for (int i = 0; i < extensions.length; i++) {
+			String id = extensions[i].getNamespaceIdentifier();
 			if (!pluginIds.contains(id)) {
 				pluginIds.add(id);
 			}
@@ -2770,19 +2770,22 @@ UIEvents.Context.TOPIC_CONTEXT,
 	 * page.
 	 */
 	private void startPlugins() {
-		IExtensionRegistry registry = e4Context.get(IExtensionRegistry.class);
+		IExtensionRegistry registry = Platform.getExtensionRegistry();
+
+		// bug 55901: don't use getConfigElements directly, for pre-3.0
+		// compat, make sure to allow both missing class
+		// attribute and a missing startup element
 		IExtensionPoint point = registry.getExtensionPoint(PlatformUI.PLUGIN_ID,
 				IWorkbenchRegistryConstants.PL_STARTUP);
-		final IExtension[] extensions = point.getExtensions();
 
+		final IExtension[] extensions = point.getExtensions();
 		if (extensions.length == 0) {
 			return;
 		}
-
 		Job job = new Job("Workbench early startup") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				HashSet<String> disabledPlugins = new HashSet<String>(Arrays
+				HashSet disabledPlugins = new HashSet(Arrays
 						.asList(getDisabledEarlyActivatedPlugins()));
 				monitor.beginTask(WorkbenchMessages.Workbench_startingPlugins, extensions.length);
 				for (int i = 0; i < extensions.length; ++i) {
@@ -2791,10 +2794,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 					}
 					IExtension extension = extensions[i];
 
-					// if the plug-in is not in the set of disabled plug-ins,
-					// then execute the code to start it
-					if (!disabledPlugins.contains(extension.getNamespaceIdentifier())) {
-						monitor.subTask(extension.getNamespaceIdentifier());
+					// if the plugin is not in the set of disabled plugins, then
+					// execute the code to start it
+					if (!disabledPlugins.contains(extension.getNamespace())) {
+						monitor.subTask(extension.getNamespace());
 						SafeRunner.run(new EarlyStartupRunnable(extension));
 					}
 					monitor.worked(1);
