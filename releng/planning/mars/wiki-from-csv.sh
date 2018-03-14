@@ -3,7 +3,7 @@
 create_wiki_header() {
 echo "Overview page of the work done for the Eclipse 4.4 service and 4.5 release"
 echo ""
-echo "'''This list is genereated automatically, please do not update manually'''"
+echo "'''This list is generated automatically, please do not update manually'''"
 echo ""
 echo "Our planning bugs for the Eclipse 4.5 release can be found on [[Platform UI/Plan/4.5/Planning Bugs]]. It is the backlog of Mars that we review selecting the bugs for the particular milestone of the release. The list will be refreshed in order to better adjust the priorities of the bugs during the release."
 }
@@ -88,6 +88,7 @@ create_wiki_section "4.5 RC1" 4.5%20RC1
 create_wiki_section "4.5 RC2" 4.5%20RC2
 create_wiki_section "4.5 RC3" 4.5%20RC3
 create_wiki_section "4.5 RC4" 4.5%20RC4
+create_wiki_section "4.5" 4.5
 create_wiki_section "4.6" 4.6
 
 

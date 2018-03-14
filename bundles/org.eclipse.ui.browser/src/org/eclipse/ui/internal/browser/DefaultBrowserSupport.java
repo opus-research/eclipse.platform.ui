@@ -29,7 +29,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 	static final String DEFAULT_ID_BASE = "org.eclipse.ui.defaultBrowser"; //$NON-NLS-1$
 	private static final String HELP_BROWSER_ID = "org.eclipse.help.ui"; //$NON-NLS-1$
 
-	protected HashMap<String, Object> browserIdMap = new HashMap<String, Object>();
+	protected HashMap<String, Object> browserIdMap = new HashMap<>();
 
 	protected static DefaultBrowserSupport instance;
 
@@ -37,6 +37,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		// do nothing
 		instance = this;
 		BrowserManager.getInstance().addObserver(new Observer() {
+			@Override
 			public void update(Observable o, Object arg) {
 				// TODO I am not sure what we should do here
 				// The preferences have changed so maybe we should
@@ -78,12 +79,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return new Integer(window.hashCode());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
-	 *      java.lang.String, java.lang.String, java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(int style, String browserId, String name,
 			String tooltip) throws PartInitException {
 		if (browserId == null)
@@ -104,14 +100,14 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		// preference
 		// The help editor will open in an editor regardless of the user preferences
 		boolean isHelpEditor = ((style & AS_EDITOR) != 0) && HELP_BROWSER_ID.equals(browserId);
-		if ((style & AS_EXTERNAL) != 0 || 
+		if ((style & AS_EXTERNAL) != 0 ||
 		    (WebBrowserPreference.getBrowserChoice() != WebBrowserPreference.INTERNAL && !isHelpEditor)
 		    || !WebBrowserUtil.canUseInternalWebBrowser()) {
 			IBrowserDescriptor ewb = BrowserManager.getInstance()
 					.getCurrentWebBrowser();
 			if (ewb == null)
 				throw new PartInitException(Messages.errorNoBrowser);
-			
+
 			if (ewb instanceof SystemBrowserDescriptor)
 				webBrowser = new SystemBrowserInstance(browserId);
 			else {
@@ -141,7 +137,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 			@SuppressWarnings("unchecked")
 			HashMap<Integer, IWebBrowser> wmap = (HashMap<Integer, IWebBrowser>) browserIdMap.get(browserId);
 			if (wmap == null) {
-				wmap = new HashMap<Integer, IWebBrowser>();
+				wmap = new HashMap<>();
 				browserIdMap.put(browserId, wmap);
 			}
 			wmap.put(key, webBrowser);
@@ -153,20 +149,12 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		return webBrowser;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
-	 */
+	@Override
 	public IWebBrowser createBrowser(String browserId) throws PartInitException {
 		return createBrowser(0, browserId, null, null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
-	 */
+	@Override
 	public boolean isInternalWebBrowserAvailable() {
 		return WebBrowserUtil.canUseInternalWebBrowser();
 	}
@@ -188,7 +176,7 @@ public class DefaultBrowserSupport extends AbstractWorkbenchBrowserSupport {
 		} else
 			browserIdMap.remove(baseId);
 	}
-	
+
 	private String getDefaultId() {
 		String id = null;
 		for (int i = 0; i < Integer.MAX_VALUE; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *      Wojciech Galanciak <wojciech.galanciak@pl.ibm.com> - Bug 236104 [EditorMgmt] File association default needs to be set twice to take effect
+ *      Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -39,9 +40,9 @@ import org.eclipse.ui.internal.util.PrefUtil;
  */
 public class PlatformUIPreferenceListener implements
 		IEclipsePreferences.IPreferenceChangeListener {
-	
+
 	private static PlatformUIPreferenceListener singleton;
-	
+
 	public static IEclipsePreferences.IPreferenceChangeListener getSingleton(){
 		if(singleton == null) {
 			singleton = new PlatformUIPreferenceListener();
@@ -68,7 +69,7 @@ public class PlatformUIPreferenceListener implements
 
 			ProgressManager.getInstance().setShowSystemJobs(setting);
 		}
-		
+
 		if (IWorkbenchPreferenceConstants.DEFAULT_PERSPECTIVE_ID.equals(propertyName)) {
 			IWorkbench workbench = PlatformUI.getWorkbench();
 
@@ -128,7 +129,7 @@ public class PlatformUIPreferenceListener implements
 					if (xmlString != null && xmlString.length() > 0) {
 						reader = new StringReader(xmlString);
 						// Build the editor map.
-						HashMap<String, IEditorDescriptor> editorMap = new HashMap<String, IEditorDescriptor>();
+						HashMap<String, IEditorDescriptor> editorMap = new HashMap<>();
 						int i = 0;
 						IEditorDescriptor[] descriptors = editorRegistry
 								.getSortedEditorsFromPlugins();

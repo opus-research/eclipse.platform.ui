@@ -43,22 +43,16 @@ public class WebBrowserView extends ViewPart implements
 
 	protected ISelectionListener listener;
 
+	@Override
 	public void createPartControl(Composite parent) {
 		int style = WebBrowserUtil.decodeStyle(getViewSite().getSecondaryId());
 		viewer = new BrowserViewer(parent, style);
 		viewer.setContainer(this);
 
-		/*
-		 * PropertyChangeListener propertyChangeListener = new
-		 * PropertyChangeListener() { public void
-		 * propertyChange(PropertyChangeEvent event) { if
-		 * (BrowserViewer.PROPERTY_TITLE.equals(event.getPropertyName())) {
-		 * setPartName((String) event.getNewValue()); } } };
-		 * viewer.addPropertyChangeListener(propertyChangeListener);
-		 */
 		initDragAndDrop();
 	}
 
+	@Override
 	public void dispose() {
 		if (viewer!=null)
 			viewer.setContainer(null);
@@ -71,10 +65,12 @@ public class WebBrowserView extends ViewPart implements
 			viewer.setURL(url);
 	}
 
+	@Override
 	public void setFocus() {
 		viewer.setFocus();
 	}
 
+	@Override
 	public boolean close() {
 		try {
 			getSite().getPage().hideView(this);
@@ -84,10 +80,12 @@ public class WebBrowserView extends ViewPart implements
 		}
 	}
 
+	@Override
 	public IActionBars getActionBars() {
 		return getViewSite().getActionBars();
 	}
 
+	@Override
 	public void openInExternalBrowser(String url) {
 		try {
 			URL theURL = new URL(url);
@@ -106,6 +104,7 @@ public class WebBrowserView extends ViewPart implements
 			return;
 
 		listener = new ISelectionListener() {
+			@Override
 			public void selectionChanged(IWorkbenchPart part,
 					ISelection selection) {
 				onSelectionChange(selection);
@@ -114,7 +113,7 @@ public class WebBrowserView extends ViewPart implements
 		getSite().getWorkbenchWindow().getSelectionService()
 				.addPostSelectionListener(listener);
 	}
-	
+
 	private void onSelectionChange(ISelection selection) {
 		if (!(selection instanceof IStructuredSelection))
 			return;
@@ -127,7 +126,7 @@ public class WebBrowserView extends ViewPart implements
 				setURL(url.toExternalForm());
 		}
 	}
-	
+
 	private URL getURLFromAdaptable(IAdaptable adapt) {
 		// test for path
 		IPath path= adapt.getAdapter(IPath.class);
@@ -153,7 +152,7 @@ public class WebBrowserView extends ViewPart implements
 
 	/**
 	 * Return true if the filename has a "web" extension.
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -166,17 +165,14 @@ public class WebBrowserView extends ViewPart implements
 	 * Adds drag and drop support to the view.
 	 */
 	protected void initDragAndDrop() {
-		Transfer[] transfers = new Transfer[] {
-		// LocalSelectionTransfer.getInstance(),
-		// ResourceTransfer.getInstance(),
-		FileTransfer.getInstance() };
+		Transfer[] transfers = new Transfer[] { FileTransfer.getInstance() };
 
-		DropTarget dropTarget = new DropTarget(viewer, DND.DROP_COPY
-				| DND.DROP_DEFAULT);
+		DropTarget dropTarget = new DropTarget(viewer, DND.DROP_COPY | DND.DROP_DEFAULT);
 		dropTarget.setTransfer(transfers);
 		dropTarget.addDropListener(new WebBrowserViewDropAdapter(viewer));
 	}
 
+	@Override
 	public void selectReveal(ISelection selection) {
 		onSelectionChange(selection);
 	}
@@ -184,7 +180,7 @@ public class WebBrowserView extends ViewPart implements
 	public void setBrowserViewName(String name) {
 		setPartName(name);
 	}
-	
+
 	public void setBrowserViewTooltip(String tip) {
 		setTitleToolTip(tip);
 	}

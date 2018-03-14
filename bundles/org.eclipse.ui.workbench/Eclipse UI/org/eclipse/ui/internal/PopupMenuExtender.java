@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dan Rubel (dan_rubel@instantiations.com) - accessor to get menu id
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -61,7 +62,7 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  */
 public class PopupMenuExtender implements IMenuListener2,
 		IRegistryChangeListener {
-    
+
     /**
      * The bit in <code>bitSet</code> that stores whether the static actions
      * have been read from the registry.
@@ -89,8 +90,8 @@ public class PopupMenuExtender implements IMenuListener2,
      * save memory.
      */
 	private int bitSet = 0;
-	
-	private ArrayList<PluginActionContributionItem> actionContributionCache = new ArrayList<PluginActionContributionItem>();
+
+	private ArrayList<PluginActionContributionItem> actionContributionCache = new ArrayList<>();
 	private boolean cleanupNeeded = false;
 
 	private MPart modelPart;
@@ -102,7 +103,7 @@ public class PopupMenuExtender implements IMenuListener2,
 
     /**
      * Construct a new menu extender.
-     * 
+     *
      * @param id
      *            the menu id
      * @param menu
@@ -121,7 +122,7 @@ public class PopupMenuExtender implements IMenuListener2,
 
     /**
      * Construct a new menu extender.
-     * 
+     *
      * @param id
      *            the menu id
      * @param menu
@@ -144,7 +145,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		this.selProvider = prov;
 		this.part = part;
 		this.context = context;
-		this.modelPart = (MPart) part.getSite().getService(MPart.class);
+		this.modelPart = part.getSite().getService(MPart.class);
 		if (includeEditorInput) {
 			bitSet |= INCLUDE_EDITOR_INPUT;
 		}
@@ -155,7 +156,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		}
 		createModelFor(id);
 		addMenuId(id);
-				
+
 		Platform.getExtensionRegistry().addRegistryChangeListener(this);
 	}
 
@@ -194,14 +195,14 @@ public class PopupMenuExtender implements IMenuListener2,
 	// getMenuId() added by Dan Rubel (dan_rubel@instantiations.com)
     /**
      * Return the menu identifiers for this extender.
-     * 
+     *
      * @return The set of all identifiers that represent this extender.
      */
 	public Set<String> getMenuIds() {
     	if (staticActionBuilders == null) {
 			return Collections.emptySet();
     	}
-    	
+
         return staticActionBuilders.keySet();
     }
 
@@ -220,7 +221,7 @@ public class PopupMenuExtender implements IMenuListener2,
      * as menu identifier for the same pop-up menu. We don't want to contribute
      * duplicate items in this case.
      * </p>
-     * 
+     *
      * @param menuId
      *            The menu identifier to add to this extender; should not be
      *            <code>null</code>.
@@ -243,7 +244,7 @@ public class PopupMenuExtender implements IMenuListener2,
      * the same menu manager, selection provider and part (i.e., if the menu
      * they represent is about to show, they would populate it with duplicate
      * values).
-     * 
+     *
      * @param menuManager
      *            The menu manager with which to compare; may be
      *            <code>null</code>.
@@ -300,7 +301,7 @@ public class PopupMenuExtender implements IMenuListener2,
                         "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
             }
         };
-        
+
 		if (ObjectActionContributorManager.getManager().contributeObjectActions(part, mgr,
 				activeEditor, alreadyContributed)) {
 			mgr.add(new Separator());
@@ -319,7 +320,7 @@ public class PopupMenuExtender implements IMenuListener2,
             }
         }
     }
-    
+
     /**
      * Disposes all of the static actions.
      */
@@ -355,7 +356,7 @@ public class PopupMenuExtender implements IMenuListener2,
     @Override
 	public void menuAboutToShow(IMenuManager mgr) {
 		registerE4Support();
-    	
+
     	// Add this menu as a visible menu.
     	final IWorkbenchPartSite site = part.getSite();
     	if (site != null) {
@@ -377,7 +378,7 @@ public class PopupMenuExtender implements IMenuListener2,
 				realWorkbench.addShowingMenus(getMenuIds(), s, input);
 			}
 		}
-    	
+
 		addMenuContributions(mgr);
 
     	readStaticActions();
@@ -386,18 +387,18 @@ public class PopupMenuExtender implements IMenuListener2,
             mgr = menuWrapper;
             menuWrapper.removeAll();
         }
-		Set<IObjectActionContributor> contributedItems = new HashSet<IObjectActionContributor>();
+		Set<IObjectActionContributor> contributedItems = new HashSet<>();
         if ((bitSet & INCLUDE_EDITOR_INPUT) != 0) {
 			addEditorActions(mgr, contributedItems);
         }
 		addObjectActions(mgr, contributedItems);
         addStaticActions(mgr);
     }
-    
+
 
 	/**
 	 * well, this goes to the renderer.
-	 * 
+	 *
 	 * @param mgr
 	 */
 	private void addMenuContributions(IMenuManager mgr) {
@@ -413,7 +414,7 @@ public class PopupMenuExtender implements IMenuListener2,
 	}
 
 	private MPopupMenu menuModel;
-    
+
     /**
 	 * Notifies the listener that the menu is about to be hidden.
 	 */
@@ -460,7 +461,7 @@ public class PopupMenuExtender implements IMenuListener2,
 			}
 		}
 	}
-	
+
 	private void cleanUpContributionCache() {
 		if (!actionContributionCache.isEmpty()) {
 			PluginActionContributionItem[] items = actionContributionCache
@@ -517,7 +518,7 @@ public class PopupMenuExtender implements IMenuListener2,
 		}
 
 		if (staticActionBuilders == null) {
-			staticActionBuilders = new HashMap<String, ViewerActionBuilder>();
+			staticActionBuilders = new HashMap<>();
 		}
 
 		Object object = staticActionBuilders.get(menuId);
@@ -554,7 +555,7 @@ public class PopupMenuExtender implements IMenuListener2,
 
 	/**
 	 * Unlink all contribution items from the given model menu.
-	 * 
+	 *
 	 * @param renderer
 	 *            the renderer that is holding the links
 	 * @param menu
@@ -608,9 +609,9 @@ public class PopupMenuExtender implements IMenuListener2,
 					if (element.getName().equals(IWorkbenchRegistryConstants.TAG_VIEWER_CONTRIBUTION)) {
 						clearPopups = true;
 						break;
-					}					
+					}
 				}
-										
+
 				if (clearPopups) {
 					display.syncExec(new Runnable() {
 						@Override
@@ -622,7 +623,7 @@ public class PopupMenuExtender implements IMenuListener2,
 			}
 		}
 	}
-	
+
 	public MenuManager getManager() {
 		return menu;
 	}

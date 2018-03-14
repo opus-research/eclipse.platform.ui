@@ -164,19 +164,13 @@ public abstract class BasicNewResourceWizard extends Wizard implements
             if (part instanceof ISetSelectionTarget) {
 				target = (ISetSelectionTarget) part;
 			} else {
-				target = (ISetSelectionTarget) part
-                        .getAdapter(ISetSelectionTarget.class);
+				target = part.getAdapter(ISetSelectionTarget.class);
 			}
 
             if (target != null) {
                 // select and reveal resource
                 final ISetSelectionTarget finalTarget = target;
-                window.getShell().getDisplay().asyncExec(new Runnable() {
-                    @Override
-					public void run() {
-                        finalTarget.selectReveal(selection);
-                    }
-                });
+                window.getShell().getDisplay().asyncExec(() -> finalTarget.selectReveal(selection));
             }
         }
     }

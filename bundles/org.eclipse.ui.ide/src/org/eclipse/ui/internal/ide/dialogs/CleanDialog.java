@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - [IDE] Project>Clean dialog should not use a question-mark icon - http://bugs.eclipse.org/155436
  *     Mark Melvin <mark_melvin@amis.com>
  *     Christian Georgi <christian.georgi@sap.com> -  [IDE] Clean dialog should scroll to reveal selected projects - http://bugs.eclipse.org/415522
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -17,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -24,13 +27,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
@@ -63,15 +64,18 @@ import org.eclipse.ui.progress.IProgressConstants2;
  * @since 3.0
  */
 public class CleanDialog extends MessageDialog {
+
     private class ProjectSubsetBuildAction extends BuildAction {
+
         private IProject[] projectsToBuild = new IProject[0];
+
         public ProjectSubsetBuildAction(IShellProvider shellProvider, int type, IProject[] projects) {
             super(shellProvider, type);
             this.projectsToBuild = projects;
         }
 
         @Override
-		protected List getSelectedResources() {
+		protected List<? extends IResource> getSelectedResources() {
             return Arrays.asList(this.projectsToBuild);
         }
 	}
@@ -115,8 +119,8 @@ public class CleanDialog extends MessageDialog {
     public CleanDialog(IWorkbenchWindow window, IProject[] selection) {
         super(
                 window.getShell(),
-                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, new String[] {
-                IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, 0,
+                	IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
         this.window = window;
         this.selection = selection;
         if (this.selection == null) {
@@ -127,10 +131,8 @@ public class CleanDialog extends MessageDialog {
     @Override
 	protected void buttonPressed(int buttonId) {
         final boolean cleanAll = allButton.getSelection();
-        final boolean buildAll = buildNowButton != null
-                && buildNowButton.getSelection();
-        final boolean globalBuild = globalBuildButton != null
-                && globalBuildButton.getSelection();
+		final boolean buildAll = buildNowButton != null && buildNowButton.getSelection();
+		final boolean globalBuild = globalBuildButton != null && globalBuildButton.getSelection();
         super.buttonPressed(buttonId);
         if (buttonId != IDialogConstants.OK_ID) {
             return;
@@ -153,8 +155,8 @@ public class CleanDialog extends MessageDialog {
                     // Only build what was requested
                     if (globalBuild) {
                         //start an immediate workspace build
-                        GlobalBuildAction build = new GlobalBuildAction(window,
-                                IncrementalProjectBuilder.INCREMENTAL_BUILD);
+						GlobalBuildAction build = new GlobalBuildAction(window,
+								IncrementalProjectBuilder.INCREMENTAL_BUILD);
                         build.doBuild();
                     } else {
                         // Only build what was cleaned
@@ -174,8 +176,7 @@ public class CleanDialog extends MessageDialog {
                 return Status.OK_STATUS;
             }
         };
-        cleanJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory()
-                .buildRule());
+		cleanJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
         cleanJob.setUser(true);
         cleanJob.setProperty(IProgressConstants2.SHOW_IN_TASKBAR_ICON_PROPERTY, Boolean.TRUE);
         cleanJob.schedule();
@@ -219,8 +220,7 @@ public class CleanDialog extends MessageDialog {
             buildNowButton.setText(IDEWorkbenchMessages.CleanDialog_buildNowButton);
             String buildNow = settings.get(BUILD_NOW);
             buildNowButton.setSelection(buildNow == null || Boolean.valueOf(buildNow).booleanValue());
-            buildNowButton.setLayoutData(new GridData(
-                    GridData.HORIZONTAL_ALIGN_BEGINNING));
+			buildNowButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
             buildNowButton.addSelectionListener(updateEnablement);
 
             globalBuildButton = new Button(parent, SWT.RADIO);
@@ -295,13 +295,10 @@ public class CleanDialog extends MessageDialog {
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
-        projectNames.addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-                selection = projectNames.getCheckedElements();
-                updateEnablement();
-            }
-        });
+        projectNames.addCheckStateListener(event -> {
+		    selection = projectNames.getCheckedElements();
+		    updateEnablement();
+		});
     }
 
     /**
@@ -314,18 +311,12 @@ public class CleanDialog extends MessageDialog {
     protected void doClean(boolean cleanAll, IProgressMonitor monitor)
             throws CoreException {
         if (cleanAll) {
-            ResourcesPlugin.getWorkspace().build(
-                    IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+			ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
         } else {
-            try {
-                monitor.beginTask(IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName, selection.length);
-                for (int i = 0; i < selection.length; i++) {
-                    ((IProject) selection[i]).build(
-                            IncrementalProjectBuilder.CLEAN_BUILD,
-                            new SubProgressMonitor(monitor, 1));
-                }
-            } finally {
-                monitor.done();
+			SubMonitor subMonitor = SubMonitor.convert(monitor, IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName,
+					selection.length);
+			for (int i = 0; i < selection.length; i++) {
+				((IProject) selection[i]).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.newChild(1));
             }
         }
     }

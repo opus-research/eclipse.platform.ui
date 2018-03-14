@@ -22,21 +22,11 @@ import org.eclipse.swt.widgets.Shell;
 public abstract class AbstractSWTTestCase extends AbstractDefaultRealmTestCase {
 	private Shell shell;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#setUp()
-	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.tests.databinding.AbstractDefaultRealmTestCase#tearDown()
-	 */
 	@Override
 	protected void tearDown() throws Exception {
 		if (shell != null && !shell.isDisposed()) {
@@ -61,8 +51,8 @@ public abstract class AbstractSWTTestCase extends AbstractDefaultRealmTestCase {
 
 	/**
 	 * Returns a new shell to be used in a test. This method is called by {@link #getShell()}.
-	 * It should not be called by test code, but it can be overridden to configure the created shell. 
-	 * 
+	 * It should not be called by test code, but it can be overridden to configure the created shell.
+	 *
 	 * @return shell
 	 */
 	protected Shell createShell() {

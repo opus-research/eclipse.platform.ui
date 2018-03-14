@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150, 472654
  *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 457939
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -229,7 +230,15 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 
 			Composite phComp = (Composite) ph.getWidget();
 			Control refCtrl = (Control) ph.getRef().getWidget();
-			refCtrl.setParent(phComp);
+
+			// If the parent changes we need to adjust the bounds of the child
+			// we do not call layout() because this could lead to
+			// a big amount of layout calls in unrelated places e.g. none
+			// visible children of a CTabFolder (see 460745)
+			if (refCtrl.getParent() != phComp) {
+				refCtrl.setParent(phComp);
+				refCtrl.setSize(phComp.getSize());
+			}
 
 			element = ref;
 		}
@@ -275,7 +284,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				showElementRecursive(curSel);
 		} else if (element instanceof MElementContainer<?>) {
 			MElementContainer<?> container = (MElementContainer<?>) element;
-			List<MUIElement> kids = new ArrayList<MUIElement>(
+			List<MUIElement> kids = new ArrayList<>(
 					container.getChildren());
 			for (MUIElement childElement : kids) {
 				showElementRecursive(childElement);

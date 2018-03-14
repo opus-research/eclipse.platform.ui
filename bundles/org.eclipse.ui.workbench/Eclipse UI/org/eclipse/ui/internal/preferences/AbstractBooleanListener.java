@@ -18,27 +18,24 @@ public abstract class AbstractBooleanListener extends AbstractPropertyListener {
     private IDynamicPropertyMap map;
     private boolean defaultValue;
     private String propertyId;
-    
+
     public AbstractBooleanListener() {
     }
-    
+
     public void attach(IDynamicPropertyMap map, String propertyId, boolean defaultValue) {
         this.defaultValue = defaultValue;
         this.propertyId = propertyId;
         if (this.map != null) {
             this.map.removeListener(this);
         }
-        
+
         this.map = map;
-        
+
         if (this.map != null) {
             this.map.addListener(new String[]{propertyId}, this);
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.AbstractPropertyListener#update()
-     */
     @Override
 	protected void update() {
         handleValue(PropertyUtil.get(map, propertyId, defaultValue));
@@ -49,6 +46,6 @@ public abstract class AbstractBooleanListener extends AbstractPropertyListener {
      * @since 3.1
      */
     protected abstract void handleValue(boolean b);
-   
-    
+
+
 }

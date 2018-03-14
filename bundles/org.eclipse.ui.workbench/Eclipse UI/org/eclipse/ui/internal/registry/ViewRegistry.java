@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609, 441280
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430616, 441267, 441282, 445609, 441280, 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -41,8 +41,6 @@ import org.eclipse.ui.views.IViewRegistry;
 
 public class ViewRegistry implements IViewRegistry {
 
-	public static final String VIEW_TAG = "View"; //$NON-NLS-1$
-
 	@Inject
 	private MApplication application;
 
@@ -58,11 +56,11 @@ public class ViewRegistry implements IViewRegistry {
 	@Inject
 	Logger logger;
 
-	private Map<String, IViewDescriptor> descriptors = new HashMap<String, IViewDescriptor>();
+	private Map<String, IViewDescriptor> descriptors = new HashMap<>();
 
-	private List<IStickyViewDescriptor> stickyDescriptors = new ArrayList<IStickyViewDescriptor>();
+	private List<IStickyViewDescriptor> stickyDescriptors = new ArrayList<>();
 
-	private HashMap<String, ViewCategory> categories = new HashMap<String, ViewCategory>();
+	private HashMap<String, ViewCategory> categories = new HashMap<>();
 
 	private Category miscCategory = new Category();
 
@@ -124,7 +122,7 @@ public class ViewRegistry implements IViewRegistry {
 		descriptor.setLabel(element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
 
 		List<String> tags = descriptor.getTags();
-		tags.add(VIEW_TAG);
+		tags.add("View"); //$NON-NLS-1$
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
@@ -185,14 +183,14 @@ public class ViewRegistry implements IViewRegistry {
 	@Override
 	public IViewDescriptor[] getViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(
-				descriptors.values(), new ArrayList<Object>());
+				descriptors.values(), new ArrayList<>());
 		return allowedViews.toArray(new IViewDescriptor[allowedViews.size()]);
 	}
 
 	@Override
 	public IStickyViewDescriptor[] getStickyViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(stickyDescriptors,
-				new ArrayList<Object>());
+				new ArrayList<>());
 		return allowedViews.toArray(new IStickyViewDescriptor[allowedViews.size()]);
 	}
 

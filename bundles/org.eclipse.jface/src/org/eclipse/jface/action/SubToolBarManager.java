@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.jface.action;
 
 /**
- * A <code>SubToolBarManager</code> monitors the additional and removal of 
+ * A <code>SubToolBarManager</code> monitors the additional and removal of
  * items from a parent manager so that visibility of the entire set can be changed as a
  * unit.
  */
@@ -21,7 +21,7 @@ public class SubToolBarManager extends SubContributionManager implements
     /**
      * Constructs a new manager.
      *
-     * @param mgr the parent manager.  All contributions made to the 
+     * @param mgr the parent manager.  All contributions made to the
      *      <code>SubToolBarManager</code> are forwarded and appear in the
      *      parent manager.
      */

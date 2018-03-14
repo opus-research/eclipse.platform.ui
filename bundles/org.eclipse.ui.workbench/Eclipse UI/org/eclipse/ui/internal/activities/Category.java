@@ -106,15 +106,15 @@ final class Category implements ICategory {
                 castedObject.categoryActivityBindings)) {
             return false;
         }
-        
+
         if (!Util.equals(defined, castedObject.defined)) {
             return false;
         }
-        
+
         if (!Util.equals(id, castedObject.id)) {
             return false;
         }
-        
+
         return Util.equals(name, castedObject.name);
     }
 
@@ -245,9 +245,6 @@ final class Category implements ICategory {
         return string;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.ICategory#getDescription()
-     */
     @Override
 	public String getDescription() throws NotDefinedException {
         if (!defined) {

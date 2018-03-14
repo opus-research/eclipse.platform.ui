@@ -53,9 +53,9 @@ import org.eclipse.ui.keys.IBindingService;
 /**
  * This is the quick access popup dialog used in 3.x. The new quick access is
  * done through a shell in {@link SearchField}.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class QuickAccessDialog extends PopupDialog {
 	private TriggerSequence[] invokingCommandKeySequences;
@@ -266,13 +266,6 @@ public class QuickAccessDialog extends PopupDialog {
 		return filterText;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
-	 * .widgets.Composite)
-	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -289,8 +282,7 @@ public class QuickAccessDialog extends PopupDialog {
 	final protected TriggerSequence[] getInvokingCommandKeySequences() {
 		if (invokingCommandKeySequences == null) {
 			if (invokingCommand != null) {
-				IBindingService bindingService = (IBindingService) window.getWorkbench()
-						.getAdapter(IBindingService.class);
+				IBindingService bindingService = window.getWorkbench().getAdapter(IBindingService.class);
 				invokingCommandKeySequences = bindingService.getActiveBindingsFor(invokingCommand
 						.getId());
 			}

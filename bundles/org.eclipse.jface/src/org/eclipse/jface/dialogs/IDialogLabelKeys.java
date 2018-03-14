@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011 IBM Corporation and others.
+ * Copyright (c) 2011, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,17 +11,17 @@
 package org.eclipse.jface.dialogs;
 
 /**
- * IDialogLabelKeys contains publicly accessible keys to the common dialog 
+ * IDialogLabelKeys contains publicly accessible keys to the common dialog
  * labels used throughout JFace.  <code>IDialogConstants</code> provides
  * access to these labels using static constants.  This is the preferred
- * method when the client is optimizing for performance and is known to be 
+ * method when the client is optimizing for performance and is known to be
  * used in a single-locale system.  Using the keys and accessing the
  * common dialog labels dynamically is the preferred method when the client
  * may be running in a multi-locale system.
- * 
+ *
  * @see IDialogConstants
  * @since 3.7
- * 
+ *
  * @noimplement This interface is not intended to be implemented by clients.
 
  */
@@ -31,7 +31,7 @@ public interface IDialogLabelKeys {
      * The key used to retrieve the label for OK buttons. Clients should use the pattern
      * <code>JFaceResources.getString(IDialogLabelKeys.OK_LABEL_KEY)</code> to retrieve the label
      * dynamically when using multiple locales.
-     * 
+     *
      * @since 3.7
      */
     public String OK_LABEL_KEY = "ok"; //$NON-NLS-1$

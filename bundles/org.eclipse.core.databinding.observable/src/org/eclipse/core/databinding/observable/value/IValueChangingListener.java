@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
 
@@ -14,11 +15,14 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for pre-change events for observable values.
- * 
+ *
+ * @param <T>
+ *            the type of value being observed
+ *
  * @since 1.0
- * 
+ *
  */
-public interface IValueChangingListener extends IObservablesListener {
+public interface IValueChangingListener<T> extends IObservablesListener {
 
 	/**
 	 * This method is called when the value is about to change and provides an
@@ -26,9 +30,9 @@ public interface IValueChangingListener extends IObservablesListener {
 	 * locally in this method because it may be reused for other change
 	 * notifications. The diff object referenced by the event is immutable and
 	 * may be used non-locally.
-	 * 
+	 *
 	 * @param event
 	 */
-	public void handleValueChanging(ValueChangingEvent event);
+	public void handleValueChanging(ValueChangingEvent<T> event);
 
 }

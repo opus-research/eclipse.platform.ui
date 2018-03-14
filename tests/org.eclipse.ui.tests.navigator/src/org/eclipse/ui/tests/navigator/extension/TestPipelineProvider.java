@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Fair Isaac Corporation.
+ * Copyright (c) 2009, 2015 Fair Isaac Corporation.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Fair Isaac Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  ******************************************************************************/
 
 package org.eclipse.ui.tests.navigator.extension;
@@ -51,9 +52,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		_track(CHILDREN, aParent, _id);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#getPipelinedElements(java.lang.Object, java.util.Set)
-	 */
 	@Override
 	public void getPipelinedElements(Object anInput, Set currentElements) {
 		List newElements = new ArrayList();
@@ -81,7 +79,7 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 			return (IProject) element;
 		}
 		if (element instanceof IAdaptable) {
-			return (IProject) ((IAdaptable)element).getAdapter(IProject.class);
+			return ((IAdaptable) element).getAdapter(IProject.class);
 		}
 		return null;
 	}
@@ -104,9 +102,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		map.put(key, buf.toString());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptAdd(org.eclipse.ui.navigator.PipelinedShapeModification)
-	 */
 	@Override
 	public PipelinedShapeModification interceptAdd(PipelinedShapeModification anAddModification) {
 		Set children = anAddModification.getChildren();
@@ -116,9 +111,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		return super.interceptAdd(anAddModification);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRefresh(org.eclipse.ui.navigator.PipelinedViewerUpdate)
-	 */
 	@Override
 	public boolean interceptRefresh(PipelinedViewerUpdate update) {
 		Set targets = update.getRefreshTargets();
@@ -128,9 +120,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		return super.interceptRefresh(update);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptRemove(org.eclipse.ui.navigator.PipelinedShapeModification)
-	 */
 	@Override
 	public PipelinedShapeModification interceptRemove(PipelinedShapeModification aRemoveModification) {
 		Set children = aRemoveModification.getChildren();
@@ -140,9 +129,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		return super.interceptRemove(aRemoveModification);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IPipelinedTreeContentProvider#interceptUpdate(org.eclipse.ui.navigator.PipelinedViewerUpdate)
-	 */
 	@Override
 	public boolean interceptUpdate(PipelinedViewerUpdate update) {
 		Set targets = update.getRefreshTargets();
@@ -152,9 +138,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		return super.interceptUpdate(update);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
-	 */
 	@Override
 	public void init(ICommonContentExtensionSite config) {
 		_id = config.getExtension().getId();
@@ -165,9 +148,6 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
-	 */
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		try {
@@ -179,58 +159,37 @@ public class TestPipelineProvider extends ResourceWrapperContentProvider {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
-	 */
 	@Override
 	public Object getParent(Object element) {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
-	 */
 	@Override
 	public boolean hasChildren(Object element) {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-	 */
 	@Override
 	public Object[] getElements(Object inputElement) {
 		_track(ELEMENTS, inputElement, _id + "1");
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-	 */
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
-	 */
 	@Override
 	public void restoreState(IMemento aMemento) {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
-	 */
 	@Override
 	public void saveState(IMemento aMemento) {
 

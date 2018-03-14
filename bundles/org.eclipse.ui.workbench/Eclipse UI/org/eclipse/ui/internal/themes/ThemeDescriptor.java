@@ -29,7 +29,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
     /* Theme */
     public static final String ATT_ID = "id";//$NON-NLS-1$
 
-    private static final String ATT_NAME = "name";//$NON-NLS-1$	
+    private static final String ATT_NAME = "name";//$NON-NLS-1$
 
     private Collection colors = new HashSet();
 
@@ -53,7 +53,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
 
     /**
      * Add a color override to this descriptor.
-     * 
+     *
      * @param definition the definition to add
      */
     void add(ColorDefinition definition) {
@@ -65,7 +65,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
 
     /**
      * Add a font override to this descriptor.
-     * 
+     *
      * @param definition the definition to add
      */
     void add(FontDefinition definition) {
@@ -77,7 +77,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
 
     /**
      * Add a data object to this descriptor.
-     * 
+     *
      * @param key the key
      * @param data the data
      */
@@ -85,13 +85,10 @@ public class ThemeDescriptor implements IThemeDescriptor {
         if (dataMap.containsKey(key)) {
 			return;
 		}
-            
+
         dataMap.put(key, data);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getColorOverrides()
-     */
     @Override
 	public ColorDefinition[] getColors() {
         ColorDefinition[] defs = (ColorDefinition[]) colors
@@ -100,17 +97,11 @@ public class ThemeDescriptor implements IThemeDescriptor {
         return defs;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getDescription()
-     */
     @Override
 	public String getDescription() {
         return description;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getFontOverrides()
-     */
     @Override
 	public FontDefinition[] getFonts() {
         FontDefinition[] defs = (FontDefinition[]) fonts
@@ -119,17 +110,11 @@ public class ThemeDescriptor implements IThemeDescriptor {
         return defs;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getID()
-     */
     @Override
 	public String getId() {
         return id;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getName()
-     */
     @Override
 	public String getName() {
     	if (name == null)
@@ -148,7 +133,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
 
     /**
      * Set the description.
-     * 
+     *
      * @param description the description
      */
     void setDescription(String description) {
@@ -157,9 +142,6 @@ public class ThemeDescriptor implements IThemeDescriptor {
 		}
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getData()
-     */
     @Override
 	public Map getData() {
         return Collections.unmodifiableMap(dataMap);

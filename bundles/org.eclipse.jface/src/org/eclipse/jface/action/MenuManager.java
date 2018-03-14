@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 12116 [Contributions] widgets: MenuManager.setImageDescriptor() method needed
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440252
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 436225
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -70,12 +71,12 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * The text for a sub-menu.
      */
     private String menuText;
-    
+
     /**
      * The image for a sub-menu.
      */
     private ImageDescriptor image;
-    
+
     /**
      * A resource manager to remember all of the images that have been used by this menu.
      */
@@ -98,7 +99,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     private boolean removeAllWhenShown = false;
 
     /**
-     * Indicates this item is visible in its manager; <code>true</code> 
+     * Indicates this item is visible in its manager; <code>true</code>
      * by default.
      * @since 3.3
      */
@@ -143,7 +144,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /**
      * Creates a menu manager with the given text, image, and id.
      * Typically used for creating a sub-menu, where it needs to be referred to by id.
-     * 
+     *
      * @param text the text for the menu, or <code>null</code> if none
      * @param image the image for the menu, or <code>null</code> if none
      * @param id the menu id, or <code>null</code> if it is to have no id
@@ -232,13 +233,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         }
 
         disposeOldImages();
-
+		// remember items for disposal before removing them all
         IContributionItem[] items = getItems();
+		removeAll();
         for (IContributionItem item : items) {
             item.dispose();
         }
-
         markDirty();
+		parent = null;
     }
 
     @Override
@@ -390,10 +392,10 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 		}
 		return menuText;
 	}
-    
+
     /**
 	 * Returns the image for this menu as an image descriptor.
-	 * 
+	 *
 	 * @return the image, or <code>null</code> if this menu has no image
 	 * @since 3.4
 	 */
@@ -440,7 +442,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
      * Returns the parent contribution manager of this manger.
-     * 
+     *
      * @return the parent contribution manager
      * @since 2.0
      */
@@ -528,10 +530,10 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
      * Check if the contribution is item is a subsitute for ourselves
-     * 
+     *
      * @param item the contribution item
-     * @return <code>true</code> if give item is a substitution for ourselves 
-     * @deprecated this method is no longer a part of the 
+     * @return <code>true</code> if give item is a substitution for ourselves
+     * @deprecated this method is no longer a part of the
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
     @Deprecated
@@ -549,7 +551,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         	// we have no way of knowing if the menu has children
         	return true;
         }
-        
+
         // menus aren't visible if all of its children are invisible (or only contains visible separators).
         IContributionItem[] childItems = getItems();
         boolean visibleChildren = false;
@@ -563,11 +565,11 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         return visibleChildren;
     }
 
-    
+
     /**
      * The <code>MenuManager</code> implementation of this <code>ContributionManager</code> method
      * also propagates the dirty flag up the parent chain.
-     * 
+     *
      * @since 3.1
      */
     @Override
@@ -576,7 +578,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         // Can't optimize by short-circuiting when the first dirty manager is encountered,
         // since non-visible children are not even processed.
         // That is, it's possible to have a dirty sub-menu under a non-dirty parent menu
-        // even after the parent menu has been updated. 
+        // even after the parent menu has been updated.
         // If items are added/removed in the sub-menu, we still need to propagate the dirty flag up,
         // even if the sub-menu is already dirty, since the result of isVisible() may change
         // due to the added/removed items.
@@ -585,11 +587,11 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             parent.markDirty();
         }
     }
-    
+
     /**
      * Returns whether the menu control is created
      * and not disposed.
-     * 
+     *
      * @return <code>true</code> if the control is created
      *	and not disposed, <code>false</code> otherwise
 	 * @since 3.4 protected, was added in 3.1 as private method
@@ -609,7 +611,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
      * Sets the overrides for this contribution manager
-     * 
+     *
      * @param newOverrides the overrides for the items of this manager
      * @since 2.0
      */
@@ -633,18 +635,18 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 	public void setVisible(boolean visible) {
         this.visible = visible;
     }
-    
+
     /**
 	 * Sets the action definition id of this action. This simply allows the menu
 	 * item text to include a short cut if available.  It can be used to
 	 * notify a user of a key combination that will open a quick menu.
-	 * 
+	 *
 	 * @param definitionId
 	 *            the command definition id
 	 * @since 3.4
 	 */
     public void setActionDefinitionId(String definitionId) {
-    	this.definitionId = definitionId; 
+    	this.definitionId = definitionId;
     }
 
     @Override
@@ -665,7 +667,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
 	 * Get all the items from the implementation's widget.
-	 * 
+	 *
 	 * @return the menu items
 	 * @since 3.4
 	 */
@@ -678,7 +680,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
 	 * Get an item from the implementation's widget.
-	 * 
+	 *
 	 * @param index
 	 *            of the item
 	 * @return the menu item
@@ -693,7 +695,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
     /**
      * Get the menu item count for the implementation's widget.
-     * 
+     *
      * @return the number of items
      * @since 3.4
      */
@@ -709,7 +711,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 	 * implementation's widget. The default is to use the <code>Menu</code>
 	 * widget.<br>
 	 * <code>fill(Menu menu, int index)</code>
-	 * 
+	 *
 	 * @param ci
 	 *            An <code>IContributionItem</code> whose <code>fill()</code>
 	 *            method should be called.
@@ -739,7 +741,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
+                List<IContributionItem> clean = new ArrayList<>(items.length);
                 IContributionItem separator = null;
                 for (IContributionItem item : items) {
                     IContributionItem ci = item;
@@ -811,7 +813,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 
                     // May be we can optimize this call. If the menu has just
                     // been created via the call src.fill(fMenuBar, destIx) then
-                    // the menu has already been updated with update(true) 
+                    // the menu has already been updated with update(true)
                     // (see MenuManager). So if force is true we do it again. But
                     // we can't set force to false since then information for the
                     // sub sub menus is lost.
@@ -936,7 +938,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
          * Commented out until proper solution to enablement of
          * menu item for a sub-menu is found. See bug 30833 for
          * more details.
-         *  
+         *
          if (menuItem != null && !menuItem.isDisposed() && menuExist()) {
          IContributionItem items[] = getItems();
          boolean enabled = false;
@@ -967,7 +969,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             }
         }
     }
-    
+
 	private boolean isChildVisible(IContributionItem item) {
 		Boolean v = getOverrides().getVisible(item);
 		if (v != null) {

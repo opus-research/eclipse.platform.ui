@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.views.framelist;
 
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,12 +39,7 @@ public class TreeViewerFrameSource implements IFrameSource {
      * so that when the current frame changes, the viewer is updated.
      */
     public void connectTo(FrameList frameList) {
-        frameList.addPropertyChangeListener(new IPropertyChangeListener() {
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
-                TreeViewerFrameSource.this.handlePropertyChange(event);
-            }
-        });
+        frameList.addPropertyChangeListener(event -> TreeViewerFrameSource.this.handlePropertyChange(event));
     }
 
     /**
@@ -87,9 +81,6 @@ public class TreeViewerFrameSource implements IFrameSource {
         return frame;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IFrameSource.
-     */
     @Override
 	public Frame getFrame(int whichFrame, int flags) {
         switch (whichFrame) {
@@ -117,19 +108,18 @@ public class TreeViewerFrameSource implements IFrameSource {
         Object parent = provider.getParent(input);
         if (parent == null) {
             return null;
-        } else {
-            TreeFrame frame = createFrame(parent);
-            if ((flags & IFrameSource.FULL_CONTEXT) != 0) {
-                frame.setSelection(viewer.getSelection());
-                // include current input in expanded set
-                Object[] expanded = viewer.getExpandedElements();
-                Object[] newExpanded = new Object[expanded.length + 1];
-                System.arraycopy(expanded, 0, newExpanded, 0, expanded.length);
-                newExpanded[newExpanded.length - 1] = input;
-                frame.setExpandedElements(newExpanded);
-            }
-            return frame;
         }
+		TreeFrame frame = createFrame(parent);
+		if ((flags & IFrameSource.FULL_CONTEXT) != 0) {
+			frame.setSelection(viewer.getSelection());
+			// include current input in expanded set
+			Object[] expanded = viewer.getExpandedElements();
+			Object[] newExpanded = new Object[expanded.length + 1];
+			System.arraycopy(expanded, 0, newExpanded, 0, expanded.length);
+			newExpanded[newExpanded.length - 1] = input;
+			frame.setExpandedElements(newExpanded);
+		}
+		return frame;
     }
 
     /**

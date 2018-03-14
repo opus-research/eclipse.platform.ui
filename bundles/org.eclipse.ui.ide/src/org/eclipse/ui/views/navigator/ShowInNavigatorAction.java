@@ -72,8 +72,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
                 IResource resource = ((IMarker) o).getResource();
                 v.add(resource);
             } else if (o instanceof IAdaptable) {
-                IResource resource = (IResource) ((IAdaptable) o)
-                        .getAdapter(IResource.class);
+                IResource resource = ((IAdaptable) o).getAdapter(IResource.class);
                 if (resource != null) {
                     v.add(resource);
                 }
@@ -82,10 +81,6 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
         return v;
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on IAction.
-     */
     /**
      * Shows the Navigator view and sets its selection to the resources
      * selected in this action's selection provider.
@@ -109,10 +104,6 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * Method declared on SelectionProviderAction.
-     */
     @Override
 	public void selectionChanged(IStructuredSelection selection) {
         setEnabled(!getResources(selection).isEmpty());

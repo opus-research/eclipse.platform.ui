@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Display;
 
 		/**
 		 * Create a new collector.
-		 * 
+		 *
 		 * @param taskName
 		 * @param subTask
 		 * @param work
@@ -80,7 +80,7 @@ import org.eclipse.swt.widgets.Display;
 
 		/**
 		 * Set the task name
-		 * 
+		 *
 		 * @param name
 		 */
 		public void setTaskName(String name) {
@@ -124,9 +124,9 @@ import org.eclipse.swt.widgets.Display;
     /**
      * Creates an accumulating progress monitor wrapping the given one
      * that uses the given display.
-     * 
+     *
      * @param monitor the actual progress monitor to be wrapped
-     * @param display the SWT display used to forward the calls 
+     * @param display the SWT display used to forward the calls
      *  to the wrapped progress monitor
      */
     public AccumulatingProgressMonitor(IProgressMonitor monitor, Display display) {
@@ -140,19 +140,16 @@ import org.eclipse.swt.widgets.Display;
         synchronized (this) {
             collector = null;
         }
-        display.asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                currentTask = name;
-                getWrappedProgressMonitor().beginTask(name, totalWork);
-            }
-        });
+        display.asyncExec(() -> {
+		    currentTask = name;
+		    getWrappedProgressMonitor().beginTask(name, totalWork);
+		});
     }
 
 	/**
 	 * Clears the collector object used to accumulate work and subtask calls if
 	 * it matches the given one.
-	 * 
+	 *
 	 * @param collectorToClear
 	 */
 	private synchronized void clearCollector(Collector collectorToClear) {
@@ -165,7 +162,7 @@ import org.eclipse.swt.widgets.Display;
 
 	/**
 	 * Creates a collector object to accumulate work and subtask calls.
-	 * 
+	 *
 	 * @param subTask
 	 * @param work
 	 */
@@ -180,12 +177,7 @@ import org.eclipse.swt.widgets.Display;
         synchronized (this) {
             collector = null;
         }
-        display.asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                getWrappedProgressMonitor().done();
-            }
-        });
+        display.asyncExec(() -> getWrappedProgressMonitor().done());
     }
 
 	@Override
@@ -232,13 +224,10 @@ import org.eclipse.swt.widgets.Display;
 			return;
 		}
 
-        display.asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                ((IProgressMonitorWithBlocking) pm).clearBlocked();
-                Dialog.getBlockedHandler().clearBlocked();
-            }
-        });
+        display.asyncExec(() -> {
+		    ((IProgressMonitorWithBlocking) pm).clearBlocked();
+		    Dialog.getBlockedHandler().clearBlocked();
+		});
     }
 
     @Override
@@ -251,13 +240,10 @@ import org.eclipse.swt.widgets.Display;
 			return;
 		}
 
-        display.asyncExec(new Runnable() {
-            @Override
-			public void run() {
-                ((IProgressMonitorWithBlocking) pm).setBlocked(reason);
-                //Do not give a shell as we want it to block until it opens.
-                Dialog.getBlockedHandler().showBlocked(pm, reason, currentTask);
-            }
-        });
+        display.asyncExec(() -> {
+		    ((IProgressMonitorWithBlocking) pm).setBlocked(reason);
+		    //Do not give a shell as we want it to block until it opens.
+		    Dialog.getBlockedHandler().showBlocked(pm, reason, currentTask);
+		});
     }
 }

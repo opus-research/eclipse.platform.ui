@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 433450
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -68,7 +69,7 @@ public class ModeledPageLayout implements IPageLayout {
 		if (model == null) {
 			return Collections.emptyList();
 		}
-		ArrayList<String> result = new ArrayList<String>();
+		ArrayList<String> result = new ArrayList<>();
 		for (String tag : model.getTags()) {
 			if (tag.startsWith(tagPrefix)) {
 				result.add(tag.substring(tagPrefix.length()));
@@ -459,7 +460,7 @@ public class ModeledPageLayout implements IPageLayout {
 	 * containers underneath the current perspective. If this element's parent
 	 * is the perspective itself, the element will be returned. The perspective
 	 * will only be returned if the perspective itself has no children.
-	 * 
+	 *
 	 * @return the parent of the final element in the recursion chain of
 	 *         children, or the element itself if its parent is the perspective,
 	 *         or the perspective if the perspective itself has no children

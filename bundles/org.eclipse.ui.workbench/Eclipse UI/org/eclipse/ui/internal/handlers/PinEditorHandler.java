@@ -27,18 +27,11 @@ import org.eclipse.ui.menus.UIElement;
 
 /**
  * Replacement for the PinEditorAction.
- * 
+ *
  */
 public class PinEditorHandler extends AbstractHandler implements
 		IElementUpdater {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.
-	 * ExecutionEvent)
-	 */
 	@Override
 	public Object execute(ExecutionEvent event) {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -62,13 +55,6 @@ public class PinEditorHandler extends AbstractHandler implements
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.
-	 * menus.UIElement, java.util.Map)
-	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		IWorkbenchWindow window = element

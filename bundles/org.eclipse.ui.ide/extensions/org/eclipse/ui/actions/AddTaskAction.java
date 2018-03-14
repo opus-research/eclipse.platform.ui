@@ -52,11 +52,7 @@ public class AddTaskAction extends SelectionListenerAction {
 	public AddTaskAction(final Shell shell) {
         super(IDEWorkbenchMessages.AddTaskLabel);
         Assert.isNotNull(shell);
-        this.shellProvider = new IShellProvider() {
-			@Override
-			public Shell getShell() {
-				return shell;
-			} };
+        this.shellProvider = () -> shell;
         initAction();
     }
 
@@ -95,8 +91,7 @@ public class AddTaskAction extends SelectionListenerAction {
 			resource = (IResource) element;
 		}
         if (element instanceof IAdaptable) {
-			resource = (IResource) ((IAdaptable) element)
-                    .getAdapter(IResource.class);
+			resource = ((IAdaptable) element).getAdapter(IResource.class);
 		}
 
         if (resource != null && resource instanceof IProject) {

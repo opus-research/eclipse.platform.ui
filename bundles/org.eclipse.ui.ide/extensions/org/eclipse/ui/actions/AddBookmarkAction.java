@@ -83,11 +83,7 @@ public class AddBookmarkAction extends SelectionListenerAction {
 	public AddBookmarkAction(final Shell shell, boolean promptForName) {
 		super(IDEWorkbenchMessages.AddBookmarkLabel);
 		Assert.isNotNull(shell);
-		shellProvider = new IShellProvider() {
-			@Override
-			public Shell getShell() {
-				return shell;
-			} };
+		shellProvider = () -> shell;
 
 		initAction(promptForName);
 	}
@@ -125,7 +121,7 @@ public class AddBookmarkAction extends SelectionListenerAction {
 		if (getSelectedResources().isEmpty())
 			return;
 
-		IResource resource= (IResource)getSelectedResources().get(0);
+		IResource resource= getSelectedResources().get(0);
 		if (resource != null) {
 			if (promptForName) {
 				BookmarkPropertiesDialog dialog= new BookmarkPropertiesDialog(shellProvider.getShell());

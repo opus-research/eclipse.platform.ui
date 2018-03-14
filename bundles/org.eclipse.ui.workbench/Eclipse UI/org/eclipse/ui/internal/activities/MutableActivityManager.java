@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  *******************************************************************************/
 
 package org.eclipse.ui.internal.activities;
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobFunction;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -50,12 +52,12 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * An activity registry that may be altered.
- * 
+ *
  * @since 3.0
  */
 public final class MutableActivityManager extends AbstractActivityManager
         implements IMutableActivityManager, Cloneable {
-	
+
     private Map activitiesById = new HashMap();
 
     private Map activityRequirementBindingsByActivityId = new HashMap();
@@ -79,13 +81,13 @@ public final class MutableActivityManager extends AbstractActivityManager
     private Set enabledActivityIds = new HashSet();
 
     private Map identifiersById = new HashMap();
-    
+
     /**
      * Avoid endless circular referencing of re-adding activity to evaluation
      * listener, because of adding it the first time to evaluation listener.
      */
     private boolean addingEvaluationListener = false;
-    
+
     /**
      * A list of identifiers that need to have their activity sets reconciled in the background job.
      */
@@ -95,7 +97,7 @@ public final class MutableActivityManager extends AbstractActivityManager
      * The identifier update job.  Lazily initialized.
      */
     private Job deferredIdentifierJob = null;
-    
+
     private final IActivityRegistryListener activityRegistryListener = new IActivityRegistryListener() {
                 @Override
 				public void activityRegistryChanged(
@@ -108,7 +110,7 @@ public final class MutableActivityManager extends AbstractActivityManager
 
     /**
      * Create a new instance of this class using the platform extension registry.
-     * @param triggerPointAdvisor 
+     * @param triggerPointAdvisor
      */
     public MutableActivityManager(ITriggerPointAdvisor triggerPointAdvisor) {
         this(triggerPointAdvisor, new ExtensionActivityRegistry(Platform.getExtensionRegistry()));
@@ -116,8 +118,8 @@ public final class MutableActivityManager extends AbstractActivityManager
 
     /**
      * Create a new instance of this class using the provided registry.
-     * @param triggerPointAdvisor 
-     * 
+     * @param triggerPointAdvisor
+     *
      * @param activityRegistry the activity registry
      */
     public MutableActivityManager(ITriggerPointAdvisor triggerPointAdvisor, IActivityRegistry activityRegistry) {
@@ -501,7 +503,7 @@ public final class MutableActivityManager extends AbstractActivityManager
     }
 
 	private void clearExpressions() {
-		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
+		IEvaluationService evaluationService = PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		Iterator i = refsByActivityDefinition.values().iterator();
 		while (i.hasNext()) {
@@ -514,9 +516,9 @@ public final class MutableActivityManager extends AbstractActivityManager
 	/**
      * Returns whether the Java 1.4 regular expression support is available.
      * Regexp support will not be available when running against JCL Foundation (see bug 80053).
-     * 
+     *
 	 * @return <code>true</code> if regexps are supported, <code>false</code> otherwise.
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	private boolean isRegexpSupported() {
@@ -538,30 +540,30 @@ public final class MutableActivityManager extends AbstractActivityManager
         Set deltaActivityIds = null;
         boolean activityManagerChanged = false;
         Map activityEventsByActivityId = null;
-        
+
         Set previouslyEnabledActivityIds = null;
         // the sets are different so there may be work to do.
         if (!this.enabledActivityIds.equals(enabledActivityIds)) {
             previouslyEnabledActivityIds = this.enabledActivityIds;
             activityManagerChanged = true;
-            
+
             // break out the additions to the current set
             Set additions = new HashSet(enabledActivityIds);
             additions.removeAll(previouslyEnabledActivityIds);
-            
+
             // and the removals
             Set removals = new HashSet(previouslyEnabledActivityIds);
             removals.removeAll(enabledActivityIds);
-            
-            // remove from each set the expression-activities 
+
+            // remove from each set the expression-activities
             removeExpressionControlledActivities(additions);
             removeExpressionControlledActivities(removals);
-            
+
             // merge the two sets into one delta - these are the changes that
 			// need to be made after taking expressions into account
             deltaActivityIds = new HashSet(additions);
             deltaActivityIds.addAll(removals);
-            
+
             if (deltaActivityIds.size() > 0) {
             	// instead of blowing away the old set with the new we will
 				// instead modify it based on the deltas
@@ -583,7 +585,7 @@ public final class MutableActivityManager extends AbstractActivityManager
 
 	/**
 	 * Updates all the listeners to changes in the state.
-	 * 
+	 *
 	 * @param activityManagerChanged
 	 * @param activityEventsByActivityId
 	 * @param deltaActivityIds
@@ -616,7 +618,7 @@ public final class MutableActivityManager extends AbstractActivityManager
 
 		updateExpressionEnabledActivities(id, previouslyEnabledActivityIds);
 	}
-	
+
 	private void removeExpressionEnabledActivity(String id) {
 		Set previouslyEnabledActivityIds = new HashSet(this.enabledActivityIds);
 		this.enabledActivityIds.remove(id);
@@ -637,20 +639,20 @@ public final class MutableActivityManager extends AbstractActivityManager
 		updateListeners(true, activityEventsByActivityId, deltaActivityIds,
 				previouslyEnabledActivityIds);
 	}
-	
+
 
 	/**
 	 * Removes from a list of activity changes all those that are based on expressions
-	 * 
+	 *
 	 * @param delta the set to modify
 	 */
 	private void removeExpressionControlledActivities(Set delta) {
-		
+
 		for (Iterator i = delta.iterator(); i.hasNext();) {
 			String id = (String) i.next();
 			IActivity activity = (IActivity) activitiesById.get(id);
 			Expression expression = activity.getExpression();
-			
+
 			if (expression != null) {
 				i.remove();
 			}
@@ -682,24 +684,24 @@ public final class MutableActivityManager extends AbstractActivityManager
 			if (addingEvaluationListener) {
 				return;
 			}
-			
+
 			Object nv = event.getNewValue();
 			boolean enabledWhen = nv == null ? false : ((Boolean) nv)
 					.booleanValue();
 			String id = event.getProperty();
 			IActivity activity = (IActivity)activitiesById.get(id);
-			if (activity.isEnabled() != enabledWhen) {				
-				if (enabledWhen) {					
-					addExpressionEnabledActivity(id);					
+			if (activity.isEnabled() != enabledWhen) {
+				if (enabledWhen) {
+					addExpressionEnabledActivity(id);
 				} else {
 					removeExpressionEnabledActivity(id);
-				}				
+				}
 			}
 		}
 	};
 
 	private ITriggerPointAdvisor advisor;
-    	
+
     private ActivityEvent updateActivity(Activity activity) {
         Set activityRequirementBindings = (Set) activityRequirementBindingsByActivityId
                 .get(activity.getId());
@@ -715,11 +717,11 @@ public final class MutableActivityManager extends AbstractActivityManager
                 .get(activity.getId());
         boolean definedChanged = activity
                 .setDefined(activityDefinition != null);
-        
+
         // enabledWhen comes into play
         IEvaluationReference ref = (IEvaluationReference) refsByActivityDefinition
 				.get(activityDefinition);
-		IEvaluationService evaluationService = (IEvaluationService) PlatformUI
+		IEvaluationService evaluationService = PlatformUI
 				.getWorkbench().getService(IEvaluationService.class);
 		boolean newRef = false;
 		if (activityDefinition != null && evaluationService!=null) {
@@ -747,13 +749,13 @@ public final class MutableActivityManager extends AbstractActivityManager
 				// make sure this activity is in the enabled set for this
 				// manager - event firing will be handled by the caller to this
 				// method.
-				this.enabledActivityIds.add(activity.getId());				
+				this.enabledActivityIds.add(activity.getId());
 			}
 		} else {
 			enabledChanged = activity.setEnabled(enabledActivityIds
 					.contains(activity.getId()));
 		}
-		
+
         boolean nameChanged = activity
                 .setName(activityDefinition != null ? activityDefinition
                         .getName() : null);
@@ -764,14 +766,14 @@ public final class MutableActivityManager extends AbstractActivityManager
                 .getDefaultEnabledActivities().contains(activity.getId()));
         if (activityRequirementBindingsChanged
                 || activityPatternBindingsChanged || definedChanged
-                || enabledChanged || nameChanged || descriptionChanged 
+                || enabledChanged || nameChanged || descriptionChanged
                 || defaultEnabledChanged) {
 			return new ActivityEvent(activity,
                     activityRequirementBindingsChanged,
                     activityPatternBindingsChanged, definedChanged,
                     descriptionChanged, enabledChanged, nameChanged, defaultEnabledChanged);
 		}
-        
+
         return null;
     }
 
@@ -816,24 +818,24 @@ public final class MutableActivityManager extends AbstractActivityManager
 			return new CategoryEvent(category, categoryActivityBindingsChanged,
                     definedChanged, descriptionChanged, nameChanged);
 		}
-        
+
         return null;
     }
 
     private IdentifierEvent updateIdentifier(Identifier identifier) {
         return updateIdentifier(identifier, definedActivityIds);
     }
-    
+
     private IdentifierEvent updateIdentifier(Identifier identifier, Set changedActivityIds) {
         String id = identifier.getId();
         Set activityIds = new HashSet();
-        
+
         boolean enabled = false;
-        
+
         boolean activityIdsChanged = false;
-        
+
         boolean enabledChanged = false;
-        
+
         // short-circut logic. If all activities are enabled, then the
         // identifier must be as well. Return true and schedule the remainder of
         // the work to run in a background job.
@@ -856,19 +858,19 @@ public final class MutableActivityManager extends AbstractActivityManager
                     .hasNext();) {
                 String activityId = (String) iterator.next();
                 Activity activity = (Activity) getActivity(activityId);
-    
+
                 if (activity.isMatch(id)) {
                     activityIds.add(activityId);
                }
             }
-            
+
             activityIdsChanged = identifier.setActivityIds(activityIds);
-            
+
             if (advisor != null) {
             	enabled = advisor.computeEnablement(this, identifier);
             }
             enabledChanged = identifier.setEnabled(enabled);
-    
+
             if (activityIdsChanged || enabledChanged) {
 				return new IdentifierEvent(identifier, activityIdsChanged,
                         enabledChanged);
@@ -880,7 +882,7 @@ public final class MutableActivityManager extends AbstractActivityManager
     private Map updateIdentifiers(Collection identifierIds) {
         return updateIdentifiers(identifierIds, definedActivityIds);
     }
-    
+
     private Map updateIdentifiers(Collection identifierIds, Set changedActivityIds) {
         Map identifierEventsByIdentifierId = new TreeMap();
 
@@ -901,7 +903,7 @@ public final class MutableActivityManager extends AbstractActivityManager
 
         return identifierEventsByIdentifierId;
     }
-    
+
     /**
      * Unhook this manager from its registry.
      *
@@ -910,32 +912,25 @@ public final class MutableActivityManager extends AbstractActivityManager
     public void unhookRegistryListeners() {
         activityRegistry.removeActivityRegistryListener(activityRegistryListener);
     }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#clone()
-     */
+
 	@Override
 	synchronized public Object clone() {
         MutableActivityManager clone = new MutableActivityManager(advisor, activityRegistry);
         clone.setEnabledActivityIds(getEnabledActivityIds());
         return clone;
     }
-    
+
     /**
      * Return the identifier update job.
-     * 
+     *
      * @return the job
      * @since 3.1
      */
     private Job getUpdateJob() {
         if (deferredIdentifierJob == null) {
-            deferredIdentifierJob = new Job("Identifier Update Job") { //$NON-NLS-1$
-                
-                /* (non-Javadoc)
-                 * @see org.eclipse.core.internal.jobs.InternalJob#run(org.eclipse.core.runtime.IProgressMonitor)
-                 */
+            deferredIdentifierJob = Job.create("Identifier Update Job", new IJobFunction() { //$NON-NLS-1$
                 @Override
-				protected IStatus run(IProgressMonitor monitor) {
+				public IStatus run(IProgressMonitor monitor) {
                     while (!deferredIdentifiers.isEmpty()) {
                         Identifier identifier = (Identifier) deferredIdentifiers.remove(0);
                         Set activityIds = new HashSet();
@@ -948,7 +943,7 @@ public final class MutableActivityManager extends AbstractActivityManager
                                 activityIds.add(activityId);
                             }
                         }
-                        
+
                         boolean activityIdsChanged = identifier.setActivityIds(activityIds);
                         if (activityIdsChanged) {
                             IdentifierEvent identifierEvent = new IdentifierEvent(identifier, activityIdsChanged,
@@ -963,18 +958,18 @@ public final class MutableActivityManager extends AbstractActivityManager
 										IProgressMonitor monitor) {
 									notifyIdentifiers(identifierEventsByIdentifierId);
 									return Status.OK_STATUS;
-								} 
+								}
                             };
                             notifyJob.setSystem(true);
                             notifyJob.schedule();
-                        }                
+                        }
                     }
                     return Status.OK_STATUS;
                 }
-            };
+			});
             deferredIdentifierJob.setSystem(true);
         }
         return deferredIdentifierJob;
     }
-    
+
 }

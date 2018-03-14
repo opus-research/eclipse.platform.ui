@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
@@ -29,12 +30,14 @@ import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.internal.PerspectiveTagger;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayout;
 import org.eclipse.ui.internal.e4.compatibility.ModeledPageLayoutUtils;
 import org.eclipse.ui.internal.e4.migration.InfoReader.PageReader;
+import org.eclipse.ui.internal.e4.migration.InfoReader.PartState;
 import org.eclipse.ui.internal.e4.migration.PerspectiveReader.DetachedWindowReader;
 import org.eclipse.ui.internal.e4.migration.PerspectiveReader.ViewLayoutReader;
 import org.eclipse.ui.internal.registry.StickyViewDescriptor;
@@ -59,7 +62,7 @@ public class PerspectiveBuilder {
 
 	private List<String> renderedViews;
 
-	private Map<String, MPlaceholder> viewPlaceholders = new HashMap<String, MPlaceholder>();
+	private Map<String, MPlaceholder> viewPlaceholders = new HashMap<>();
 
 	private Map<String, ViewLayoutReader> viewLayouts;
 
@@ -72,7 +75,7 @@ public class PerspectiveBuilder {
 		layoutUtils = new ModeledPageLayoutUtils(modelService);
 	}
 
-	MPerspective createPerspective() {
+	public MPerspective createPerspective() {
 		create();
 		tags = perspective.getTags();
 		populate();
@@ -102,14 +105,19 @@ public class PerspectiveBuilder {
 			if (info.isEditorArea()) {
 				addEditorArea(info);
 			} else if (info.isFolder()) {
-				populatePartStack(addPartStack(info), info);
+				MPartStack stack = addPartStack(info);
+				populatePartStack(stack, info);
 			}
 		}
 
+		setZoomState();
 		addDetachedWindows();
 		hideEmptyStacks();
-		hideVisuallyEmptySashes();
+		hideUrenderableSashes();
+		hideInvisibleSashes();
 		processStandaloneViews();
+		correctSelectedElements();
+		addTrimBars();
 		PerspectiveTagger.tagPerspective(perspective, modelService);
 	}
 
@@ -147,39 +155,183 @@ public class PerspectiveBuilder {
 		}
 	}
 
+	private void addTrimBars() {
+		Map<String, Integer> fastViewBars = perspReader.getFastViewBars();
+		if (fastViewBars.size() == 0) {
+			return;
+		}
+
+		int topCounter = 0;
+		int bottomCounter = 0;
+		int rightCounter = 0;
+		int leftCounter = 0;
+		StringBuilder sb = new StringBuilder();
+
+		for (InfoReader folder : perspReader.getInfos()) {
+			String folderId = folder.getId();
+			if (!fastViewBars.containsKey(folderId)) {
+				continue;
+			}
+
+			sb.append(folderId).append(' ');
+
+			Integer side = fastViewBars.get(folderId);
+			if (side == null) {
+				side = SWT.LEFT;
+			}
+
+			switch (side) {
+			case SWT.TOP:
+				sb.append(SideValue.TOP_VALUE).append(' ').append(topCounter++);
+				break;
+			case SWT.BOTTOM:
+				sb.append(SideValue.BOTTOM_VALUE).append(' ').append(bottomCounter++);
+				break;
+			case SWT.RIGHT:
+				sb.append(SideValue.RIGHT_VALUE).append(' ').append(rightCounter++);
+				break;
+			default:
+				sb.append(SideValue.LEFT_VALUE).append(' ').append(leftCounter++);
+				break;
+			}
+
+			sb.append('#');
+		}
+
+		perspective.getPersistedState().put("trims", sb.toString()); //$NON-NLS-1$
+	}
+
 	private void hideEmptyStacks() {
 		for (MPartStack stack : modelService.findElements(perspective, null, MPartStack.class, null)) {
 			if (ID_EDITOR_AREA.equals(stack.getElementId()) || ID_EDITOR_AREA.equals(stack.getParent().getElementId())) {
 				continue;
 			}
-			if (!hasVisibleContent(stack)) {
+			if (!hasRenderableContent(stack)) {
 				stack.setToBeRendered(false);
 			}
 		}
 	}
 
-	private void hideVisuallyEmptySashes() {
-		for (MPartSashContainer sash : modelService.findElements(perspective, null, MPartSashContainer.class, null)) {
-			hideEmptySash(sash);
-		}
-	}
-
-	private void hideEmptySash(MElementContainer<?> container) {
-		if ((container instanceof MPartSashContainer) && container != perspective) {
-			if (modelService.countRenderableChildren(container) == 0) {
-				container.setToBeRendered(false);
-				hideEmptySash(container.getParent());
+	private void setZoomState() {
+		List<MPartStack> stacks = modelService.findElements(perspective, null, MPartStack.class, null);
+		boolean isAnythingMaximized = isMaximized(editorAreaPlaceholder) || isAnyMaximized(stacks);
+		if (isAnythingMaximized) {
+			markMinimizedByZoom(editorAreaPlaceholder);
+			for (MPartStack stack : stacks) {
+				markMinimizedByZoom(stack);
 			}
 		}
 	}
 
-	private boolean hasVisibleContent(MPartStack stack) {
+	private void markMinimizedByZoom(MUIElement element) {
+		List<String> tags = element.getTags();
+		if (tags.contains(IPresentationEngine.MINIMIZED)) {
+			tags.add(IPresentationEngine.MINIMIZED_BY_ZOOM);
+		}
+	}
+
+	private boolean isAnyMaximized(List<MPartStack> stacks) {
+		for (MPartStack stack : stacks) {
+			if (isMaximized(stack)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isMaximized(MUIElement element) {
+		return element.getTags().contains(IPresentationEngine.MAXIMIZED);
+	}
+
+	private void hideUrenderableSashes() {
+		for (MPartSashContainer sash : modelService.findElements(perspective, null, MPartSashContainer.class, null)) {
+			hideUnrenderableSash(sash);
+		}
+	}
+
+	private void hideInvisibleSashes() {
+		for (MPartSashContainer sash : modelService.findElements(perspective, null, MPartSashContainer.class, null)) {
+			hideInvisibleSash(sash);
+		}
+	}
+
+	private void hideInvisibleSash(MElementContainer<?> container) {
+		if ((container instanceof MPartSashContainer) && container != perspective) {
+			if (!hasVisibleContent((MPartSashContainer) container)) {
+				container.setVisible(false);
+				hideInvisibleSash(container.getParent());
+			}
+		}
+	}
+
+	private boolean hasVisibleContent(MPartSashContainer sash) {
+		for (MPartSashContainerElement child : sash.getChildren()) {
+			if (child.isVisible()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void hideUnrenderableSash(MElementContainer<?> container) {
+		if ((container instanceof MPartSashContainer) && container != perspective) {
+			if (modelService.countRenderableChildren(container) == 0) {
+				container.setToBeRendered(false);
+				hideUnrenderableSash(container.getParent());
+			}
+		}
+	}
+
+	private boolean hasRenderableContent(MPartStack stack) {
 		for (MStackElement child : stack.getChildren()) {
 			if (child.isVisible() && child.isToBeRendered()) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private void correctSelectedElements() {
+		List<MPartSashContainerElement> perspChildren = perspective.getChildren();
+		if (perspective.getSelectedElement() == null && !perspChildren.isEmpty()) {
+			for (MPartSashContainerElement child : perspChildren) {
+				if (child.isToBeRendered()) {
+					perspective.setSelectedElement(child);
+					break;
+				}
+			}
+		}
+
+		for (MPartSashContainerElement child : perspChildren) {
+			correctSelectedElements(child);
+		}
+	}
+
+	private void correctSelectedElements(MUIElement element) {
+		if (!(element instanceof MPartSashContainer || element instanceof MPartStack)) {
+			return;
+		}
+		@SuppressWarnings("unchecked")
+		MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) element;
+		List<MUIElement> children = container.getChildren();
+		if (container.getSelectedElement() == null && !children.isEmpty()) {
+			MUIElement firstRenderableElement = getFirstRenderableElement(children);
+			if (firstRenderableElement != null) {
+				container.setSelectedElement(firstRenderableElement);
+			}
+		}
+		for (MUIElement child : children) {
+			correctSelectedElements(child);
+		}
+	}
+
+	private MUIElement getFirstRenderableElement(List<MUIElement> elements) {
+		for (MUIElement element : elements) {
+			if (element.isToBeRendered()) {
+				return element;
+			}
+		}
+		return null;
 	}
 
 	private void addToPerspective(MPartSashContainerElement element, InfoReader info) {
@@ -194,6 +346,7 @@ public class PerspectiveBuilder {
 		editorAreaPlaceholder = modelService.createModelElement(MPlaceholder.class);
 		editorAreaPlaceholder.setElementId(ID_EDITOR_AREA);
 		editorAreaPlaceholder.setToBeRendered(perspReader.isEditorAreaVisible());
+		setPartState(editorAreaPlaceholder, perspReader.getEditorAreaState());
 		addToPerspective(editorAreaPlaceholder, info);
 	}
 
@@ -212,7 +365,23 @@ public class PerspectiveBuilder {
 		} else {
 			perspective.getChildren().add(stack);
 		}
+		setPartState(stack, info.getState());
 		return stack;
+	}
+
+	private void setPartState(MUIElement element, PartState state) {
+		List<String> tags = element.getTags();
+		switch (state) {
+		case MINIMIZED:
+			tags.add(IPresentationEngine.MINIMIZED);
+			element.setVisible(false);
+			break;
+		case MAXIMIZED:
+			tags.add(IPresentationEngine.MAXIMIZED);
+			break;
+		default:
+			break;
+		}
 	}
 
 	private void insert(MUIElement element, MUIElement refElement, InfoReader info) {
@@ -256,7 +425,7 @@ public class PerspectiveBuilder {
 		if (partOrder == null || partOrder.length != renderedViews.size()) {
 			return;
 		}
-		List<MStackElement> originalOrder = new ArrayList<MStackElement>(renderedViews);
+		List<MStackElement> originalOrder = new ArrayList<>(renderedViews);
 		stackChildren.clear();
 		for (int i = 0; i < partOrder.length; i++) {
 			stackChildren.add(originalOrder.get(partOrder[i]));
@@ -266,7 +435,7 @@ public class PerspectiveBuilder {
 	}
 
 	private List<MStackElement> getRenderedViews(MPartStack stack) {
-		List<MStackElement> renderedViews = new ArrayList<MStackElement>();
+		List<MStackElement> renderedViews = new ArrayList<>();
 		for (MStackElement element : stack.getChildren()) {
 			if (element.isToBeRendered()) {
 				renderedViews.add(element);

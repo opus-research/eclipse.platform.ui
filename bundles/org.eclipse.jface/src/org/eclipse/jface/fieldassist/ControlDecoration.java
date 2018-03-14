@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -25,7 +24,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -69,12 +67,12 @@ import org.eclipse.swt.widgets.Widget;
  * <p>
  * This class is intended to be instantiated and used by clients. It is not
  * intended to be subclassed by clients.
- * 
+ *
  * @since 3.3
- * 
+ *
  * @see FieldDecoration
  * @see FieldDecorationRegistry
- * 
+ *
  * @noextend This class is not intended to be subclassed by clients.
  */
 public class ControlDecoration {
@@ -191,12 +189,12 @@ public class ControlDecoration {
 	 * The current rectangle used for tracking mouse moves
 	 */
 	private Rectangle decorationRectangle;
-	
+
 	/**
 	 * The rectangle of the previously used image.  Used
 	 * for redrawing in the case where a smaller image replaces
 	 * a larger one.
-	 * 
+	 *
 	 * @since 3.5
 	 */
 	private Rectangle previousDecorationRectangle;
@@ -273,13 +271,10 @@ public class ControlDecoration {
 					.getSystemColor(SWT.COLOR_INFO_BACKGROUND));
 			hoverShell.setForeground(display
 					.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-			hoverShell.addPaintListener(new PaintListener() {
-				@Override
-				public void paintControl(PaintEvent pe) {
-					pe.gc.drawText(text, hm, hm);
-					if (!MAC) {
-						pe.gc.drawPolygon(getPolygon(true));
-					}
+			hoverShell.addPaintListener(pe -> {
+				pe.gc.drawText(text, hm, hm);
+				if (!MAC) {
+					pe.gc.drawPolygon(getPolygon(true));
 				}
 			});
 			hoverShell.addMouseListener(new MouseAdapter() {
@@ -421,7 +416,7 @@ public class ControlDecoration {
 	 * specified, the control decoration will be positioned to the left and
 	 * center of the control (<code>SWT.LEFT | SWT.CENTER</code>).
 	 * </p>
-	 * 
+	 *
 	 * @param control
 	 *            the control to be decorated
 	 * @param position
@@ -455,7 +450,7 @@ public class ControlDecoration {
 	 * specified, the control decoration will be positioned to the left and
 	 * center of the control (<code>SWT.LEFT | SWT.CENTER</code>).
 	 * </p>
-	 * 
+	 *
 	 * @param control
 	 *            the control to be decorated
 	 * @param position
@@ -494,10 +489,10 @@ public class ControlDecoration {
 	 * relative to the display. The <code>data</code> field will contain the
 	 * decoration that received the event.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should be notified
-	 * 
+	 *
 	 * @see org.eclipse.swt.events.MenuDetectListener
 	 * @see org.eclipse.swt.events.MenuDetectEvent
 	 * @see #removeMenuDetectListener
@@ -509,12 +504,12 @@ public class ControlDecoration {
 	/**
 	 * Removes the listener from the collection of listeners who will be
 	 * notified when the platform-specific context menu trigger has occurred.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should no longer be notified. This message
 	 *            has no effect if the listener was not previously added to the
 	 *            receiver.
-	 * 
+	 *
 	 * @see org.eclipse.swt.events.MenuDetectListener
 	 * @see #addMenuDetectListener
 	 */
@@ -538,10 +533,10 @@ public class ControlDecoration {
 	 * relative to that widget. The <code>data</code> field will contain the
 	 * decoration that received the event.
 	 * </p>
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should be notified
-	 * 
+	 *
 	 * @see org.eclipse.swt.events.SelectionListener
 	 * @see org.eclipse.swt.events.SelectionEvent
 	 * @see #removeSelectionListener
@@ -553,12 +548,12 @@ public class ControlDecoration {
 	/**
 	 * Removes the listener from the collection of listeners who will be
 	 * notified when the decoration is selected.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener which should no longer be notified. This message
 	 *            has no effect if the listener was not previously added to the
 	 *            receiver.
-	 * 
+	 *
 	 * @see org.eclipse.swt.events.SelectionListener
 	 * @see #addSelectionListener
 	 */
@@ -585,7 +580,7 @@ public class ControlDecoration {
 
 	/**
 	 * Get the control that is decorated by the receiver.
-	 * 
+	 *
 	 * @return the Control decorated by the receiver. May be <code>null</code>
 	 *         if the control has been uninstalled.
 	 */
@@ -598,12 +593,7 @@ public class ControlDecoration {
 	 * the decoration is to be rendered.
 	 */
 	private void addControlListeners() {
-		disposeListener = new DisposeListener() {
-			@Override
-			public void widgetDisposed(DisposeEvent event) {
-				dispose();
-			}
-		};
+		disposeListener = event -> dispose();
 		printAddListener(control, "DISPOSE"); //$NON-NLS-1$
 		control.addDisposeListener(disposeListener);
 
@@ -628,31 +618,25 @@ public class ControlDecoration {
 		control.addFocusListener(focusListener);
 
 		// Listener for painting the decoration
-		paintListener = new PaintListener() {
-			@Override
-			public void paintControl(PaintEvent event) {
-				Control control = (Control) event.widget;
-				Rectangle rect = getDecorationRectangle(control);
-				if (shouldShowDecoration()) {
-					event.gc.drawImage(getImage(), rect.x, rect.y);
-				}
+		paintListener = event -> {
+			Control control = (Control) event.widget;
+			Rectangle rect = getDecorationRectangle(control);
+			if (shouldShowDecoration()) {
+				event.gc.drawImage(getImage(), rect.x, rect.y);
 			}
 		};
 
 		// Listener for tracking the end of a hover. Only installed
 		// after a hover begins.
-		mouseMoveListener = new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent event) {
-				if (showHover) {
-					if (!decorationRectangle.contains(event.x, event.y)) {
-						hideHover();
-						// No need to listen any longer
-						printRemoveListener(event.widget, "MOUSEMOVE"); //$NON-NLS-1$
-						((Control) event.widget)
-								.removeMouseMoveListener(mouseMoveListener);
-						moveListeningTarget = null;
-					}
+		mouseMoveListener = event -> {
+			if (showHover) {
+				if (!decorationRectangle.contains(event.x, event.y)) {
+					hideHover();
+					// No need to listen any longer
+					printRemoveListener(event.widget, "MOUSEMOVE"); //$NON-NLS-1$
+					((Control) event.widget)
+							.removeMouseMoveListener(mouseMoveListener);
+					moveListeningTarget = null;
 				}
 			}
 		};
@@ -703,28 +687,25 @@ public class ControlDecoration {
 			}
 		};
 
-		compositeListener = new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				// Don't forward events if decoration is not showing
-				if (!visible) {
-					return;
-				}
-				// Notify listeners if any are registered.
-				switch (event.type) {
-				case SWT.MouseDown:
-					if (!selectionListeners.isEmpty())
-						notifySelectionListeners(event);
-					break;
-				case SWT.MouseDoubleClick:
-					if (!selectionListeners.isEmpty())
-						notifySelectionListeners(event);
-					break;
-				case SWT.MenuDetect:
-					if (!menuDetectListeners.isEmpty())
-						notifyMenuDetectListeners(event);
-					break;
-				}
+		compositeListener = event -> {
+			// Don't forward events if decoration is not showing
+			if (!visible) {
+				return;
+			}
+			// Notify listeners if any are registered.
+			switch (event.type) {
+			case SWT.MouseDown:
+				if (!selectionListeners.isEmpty())
+					notifySelectionListeners(event);
+				break;
+			case SWT.MouseDoubleClick:
+				if (!selectionListeners.isEmpty())
+					notifySelectionListeners(event);
+				break;
+			case SWT.MenuDetect:
+				if (!menuDetectListeners.isEmpty())
+					notifyMenuDetectListeners(event);
+				break;
 			}
 		};
 
@@ -847,7 +828,7 @@ public class ControlDecoration {
 	 * text at other times (such as when the control receives focus), or to show
 	 * other text associated with the field. The hover will not be shown if the
 	 * decoration is hidden.
-	 * 
+	 *
 	 * @param text
 	 *            the text to be shown in the info hover, or <code>null</code>
 	 *            if no text should be shown.
@@ -870,7 +851,7 @@ public class ControlDecoration {
 	 * hovering in the decoration.
 	 * <p>
 	 * This message has no effect if there is no current hover.
-	 * 
+	 *
 	 */
 	public void hideHover() {
 		if (hover != null) {
@@ -906,7 +887,7 @@ public class ControlDecoration {
 	/**
 	 * Get the description text that may be shown in a hover for this
 	 * decoration.
-	 * 
+	 *
 	 * @return the text to be shown as a description for the decoration, or
 	 *         <code>null</code> if none has been set.
 	 */
@@ -929,7 +910,7 @@ public class ControlDecoration {
 
 	/**
 	 * Get the image shown in this control decoration.
-	 * 
+	 *
 	 * @return the image to be shown adjacent to the control, or
 	 *         <code>null</code> if one has not been set.
 	 */
@@ -940,7 +921,7 @@ public class ControlDecoration {
 	/**
 	 * Set the image shown in this control decoration. Update the rendered
 	 * decoration.
-	 * 
+	 *
 	 * @param image
 	 *            the image to be shown adjacent to the control. Should never be
 	 *            <code>null</code>.
@@ -955,7 +936,7 @@ public class ControlDecoration {
 	 * Get the boolean that controls whether the decoration is shown only when
 	 * the control has focus. The default value of this setting is
 	 * <code>false</code>.
-	 * 
+	 *
 	 * @return <code>true</code> if the decoration should only be shown when
 	 *         the control has focus, and <code>false</code> if it should
 	 *         always be shown. Note that if the control is not capable of
@@ -970,7 +951,7 @@ public class ControlDecoration {
 	 * Set the boolean that controls whether the decoration is shown only when
 	 * the control has focus. The default value of this setting is
 	 * <code>false</code>.
-	 * 
+	 *
 	 * @param showOnlyOnFocus
 	 *            <code>true</code> if the decoration should only be shown
 	 *            when the control has focus, and <code>false</code> if it
@@ -988,7 +969,7 @@ public class ControlDecoration {
 	 * Get the boolean that controls whether the decoration's description text
 	 * should be shown in a hover when the user hovers over the decoration. The
 	 * default value of this setting is <code>true</code>.
-	 * 
+	 *
 	 * @return <code>true</code> if a hover popup containing the decoration's
 	 *         description text should be shown when the user hovers over the
 	 *         decoration, and <code>false</code> if a hover should not be
@@ -1002,7 +983,7 @@ public class ControlDecoration {
 	 * Set the boolean that controls whether the decoration's description text
 	 * should be shown in a hover when the user hovers over the decoration. The
 	 * default value of this setting is <code>true</code>.
-	 * 
+	 *
 	 * @param showHover
 	 *            <code>true</code> if a hover popup containing the
 	 *            decoration's description text should be shown when the user
@@ -1018,7 +999,7 @@ public class ControlDecoration {
 	 * Get the margin width in pixels that should be used between the decorator
 	 * and the horizontal edge of the control. The default value of this setting
 	 * is <code>0</code>.
-	 * 
+	 *
 	 * @return the number of pixels that should be reserved between the
 	 *         horizontal edge of the control and the adjacent edge of the
 	 *         decoration.
@@ -1031,7 +1012,7 @@ public class ControlDecoration {
 	 * Set the margin width in pixels that should be used between the decorator
 	 * and the horizontal edge of the control. The default value of this setting
 	 * is <code>0</code>.
-	 * 
+	 *
 	 * @param marginWidth
 	 *            the number of pixels that should be reserved between the
 	 *            horizontal edge of the control and the adjacent edge of the
@@ -1073,7 +1054,7 @@ public class ControlDecoration {
 	 * Show the specified text in the hover, positioning the hover near the
 	 * specified control. The hover will only be shown if the control is
 	 * visible.
-	 * 
+	 *
 	 * The caller has already established that the control is not null.
 	 */
 	private void showHoverText(String text, Control hoverNear) {
@@ -1091,19 +1072,19 @@ public class ControlDecoration {
 		if (!visible) {
 			return;
 		}
-		
+
 		// If the decoration is hidden, don't show the hover.
 		if (showOnlyOnFocus && !control.isFocusControl()) {
 			return;
 		}
-		
+
 		// If there is no text, any existing hover should be hidden, and
 		// there is nothing more to do.
 		if (text == null || text.length() == 0) {
 			hideHover();
 			return;
 		}
-		
+
 		// Now we can hover!
 		// Create the hover if it's not already showing
 		if (hover == null) {
@@ -1171,7 +1152,7 @@ public class ControlDecoration {
 	 * Return the rectangle in which the decoration should be rendered, in
 	 * coordinates relative to the specified control. If the specified control
 	 * is null, return the rectangle in display coordinates.
-	 * 
+	 *
 	 * @param targetControl
 	 *            the control whose coordinates should be used
 	 * @return the rectangle in which the decoration should be rendered
@@ -1256,23 +1237,23 @@ public class ControlDecoration {
 					.println("Removed listener>>>" + listenerType + " from>>>" + widget); //$NON-NLS-1$//$NON-NLS-2$
 		}
 	}
-	
+
 
 	/**
 	 * Return a boolean indicating whether the decoration is visible. This
 	 * method considers the visibility state of the decoration (
-	 * {@link #hide()} and {@link #show()}), the visibility state of the 
-	 * associated control ({@link Control#isVisible()}), and the focus state 
-	 * of the control if applicable ({@link #setShowOnlyOnFocus(boolean)}. 
-	 * When this method returns <code>true</code>, it means that the decoration 
-	 * should be visible. However, this method does not consider the case where 
+	 * {@link #hide()} and {@link #show()}), the visibility state of the
+	 * associated control ({@link Control#isVisible()}), and the focus state
+	 * of the control if applicable ({@link #setShowOnlyOnFocus(boolean)}.
+	 * When this method returns <code>true</code>, it means that the decoration
+	 * should be visible. However, this method does not consider the case where
 	 * the decoration should be visible, but is obscured by another window or
 	 * control, or positioned off the screen. In these cases, the decoration
 	 * will still be considered visible.
-	 * 
+	 *
 	 * @return <code>true</code> if the decoration is visible, and
 	 *         <code>false</code> if it is not.
-	 * 
+	 *
 	 * @see #setShowOnlyOnFocus(boolean)
 	 * @see #hide()
 	 * @see #show()

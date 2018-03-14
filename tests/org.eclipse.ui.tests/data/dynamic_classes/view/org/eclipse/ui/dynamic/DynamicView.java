@@ -19,22 +19,18 @@ import org.eclipse.ui.part.ViewPart;
 public class DynamicView extends ViewPart {
 
 	/**
-	 * 
+	 *
 	 */
 	public DynamicView() {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createPartControl(Composite parent) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
-	 */
-	public void setFocus() {	
+	@Override
+	public void setFocus() {
 	}
 
 }

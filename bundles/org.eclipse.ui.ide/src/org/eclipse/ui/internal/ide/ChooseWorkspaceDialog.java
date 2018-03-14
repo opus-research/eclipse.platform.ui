@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -90,7 +88,9 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         if (force || launchData.getShowDialog()) {
             open();
 
-            // 70576: make sure dialog gets dismissed on ESC too
+			// Bug 70576: Dialog gets dismissed via ESC and via the window's
+			// close box. Make sure the launch doesn't continue with the default
+			// workspace.
             if (getReturnCode() == CANCEL) {
 				launchData.workspaceSelected(null);
 			}
@@ -148,16 +148,8 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         boolean gcj = Boolean.getBoolean("eclipse.gcj"); //$NON-NLS-1$
 		String vmName = System.getProperty("java.vm.name");//$NON-NLS-1$
 		if (!gcj && vmName != null && vmName.indexOf("libgcj") != -1) { //$NON-NLS-1$
-			composite.getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					// set this via an async - if we set it directly the dialog
-					// will
-					// be huge. See bug 223532
-					setMessage(IDEWorkbenchMessages.UnsupportedVM_message,
-							IMessageProvider.WARNING);
-				}
-			});
+			composite.getDisplay().asyncExec(() -> setMessage(IDEWorkbenchMessages.UnsupportedVM_message,
+					IMessageProvider.WARNING));
 		}
 
         Dialog.applyDialogFont(composite);
@@ -182,21 +174,19 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return productName;
 	}
 
-    /**
-     * Configures the given shell in preparation for opening this window
-     * in it.
-     * <p>
-     * The default implementation of this framework method
-     * sets the shell's image and gives it a grid layout.
-     * Subclasses may extend or reimplement.
-     * </p>
-     *
-     * @param shell the shell
-     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         shell.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_dialogName);
+		shell.addTraverseListener(e -> {
+			// Bug 462707: [WorkbenchLauncher] dialog not closed on ESC.
+			// The dialog doesn't always have a parent, so
+			// Shell#traverseEscape() doesn't always close it for free.
+			if (e.detail == SWT.TRAVERSE_ESCAPE) {
+				e.detail = SWT.TRAVERSE_NONE;
+				cancelPressed();
+			}
+		});
     }
 
     /**
@@ -221,14 +211,6 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		return text.getText();
 	}
 
-    /**
-     * Notifies that the cancel button of this dialog has been pressed.
-     * <p>
-     * The <code>Dialog</code> implementation of this framework method sets
-     * this dialog's return code to <code>Window.CANCEL</code>
-     * and closes the dialog. Subclasses may override if desired.
-     * </p>
-     */
     @Override
 	protected void cancelPressed() {
         launchData.workspaceSelected(null);
@@ -257,23 +239,20 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
         text = new Combo(panel, SWT.BORDER | SWT.LEAD | SWT.DROP_DOWN);
         text.setFocus();
         text.setLayoutData(new GridData(400, SWT.DEFAULT));
-        text.addModifyListener(new ModifyListener(){
-        	@Override
-			public void modifyText(ModifyEvent e) {
-        		Button okButton = getButton(Window.OK);
-        		if(okButton != null && !okButton.isDisposed()) {
-        			boolean nonWhitespaceFound = false;
-					String characters = getWorkspaceLocation();
-					for (int i = 0; !nonWhitespaceFound
-							&& i < characters.length(); i++) {
-						if (!Character.isWhitespace(characters.charAt(i))) {
-							nonWhitespaceFound = true;
-						}
+        text.addModifyListener(e -> {
+			Button okButton = getButton(Window.OK);
+			if(okButton != null && !okButton.isDisposed()) {
+				boolean nonWhitespaceFound = false;
+				String characters = getWorkspaceLocation();
+				for (int i = 0; !nonWhitespaceFound
+						&& i < characters.length(); i++) {
+					if (!Character.isWhitespace(characters.charAt(i))) {
+						nonWhitespaceFound = true;
 					}
-        			okButton.setEnabled(nonWhitespaceFound);
-        		}
-        	}
-        });
+				}
+				okButton.setEnabled(nonWhitespaceFound);
+			}
+		});
         setInitialTextValues(text);
 
         Button browseButton = new Button(panel, SWT.PUSH);

@@ -35,13 +35,13 @@ import org.eclipse.ui.PlatformUI;
  * sides. This is a common layout for application windows, which typically have
  * a central work area and a number of small widgets (toolbars, status lines,
  * etc.) attached to the edge.
- * 
+ *
  * <p>
  * Unlike most other SWT layouts, this layout does not require layout data to be
  * attached to each child control. Instead, member functions on the Layout are
  * used to control the positioning of controls within the layout.
  * </p>
- * 
+ *
  * <p>
  * The interface to this layout is intended to easily support drag-and-drop.
  * Trim widgets can be added, removed, or inserted between other existing
@@ -49,13 +49,13 @@ import org.eclipse.ui.PlatformUI;
  * contains no trim widgets, the central area will expand to reclaim the unused
  * space.
  * </p>
- * 
+ *
  * <p>
  * This layout must be told about every widget that it is supposed to arrange.
  * If the composite contains additional widgets, they will not be moved by the
  * layout and may be arranged through other means.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
@@ -101,7 +101,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 * Map of TrimDescriptors by IDs.
 	 */
 	private Map fTrimDescriptors = new HashMap();
-	
+
 	private boolean trimLocked;
 
 	private HashMap preferredLocationMap = new HashMap();
@@ -113,7 +113,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		// Determine whether or not the trim is 'locked'
 		final IPreferenceStore store = PlatformUI.getPreferenceStore();
         trimLocked = store.getBoolean(IWorkbenchPreferenceConstants.LOCK_TRIM);
-		
+
 		createTrimArea(TOP_ID, TOP_ID.toString());
 		createTrimArea(BOTTOM_ID, BOTTOM_ID.toString());
 		createTrimArea(LEFT_ID, LEFT_ID.toString());
@@ -130,7 +130,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 * SWT.LEFT if the control is docked on the left, SWT.RIGHT if docked on the
 	 * right, etc. Returns SWT.DEFAULT if the given control is not a trim
 	 * control.
-	 * 
+	 *
 	 * @param trimControl
 	 *            control to query
 	 * @return The area ID of this control. If the control is not part of our
@@ -159,7 +159,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param trim
 	 *            new window trim to be added
 	 * @param areaId
@@ -176,12 +176,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		addTrim(areaId, trim, beforeMe);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#addTrim(int,
-	 *      org.eclipse.ui.internal.IWindowTrim)
-	 */
 	@Override
 	public void addTrim(int areaId, IWindowTrim trim) {
 		// If we're adding trim to the same side that it's
@@ -196,30 +190,23 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 				}
 			}
 		}
-		
+
 		addTrim(areaId, trim, insertBefore);
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#addTrim(int,
-	 *      org.eclipse.ui.internal.IWindowTrim,
-	 *      org.eclipse.ui.internal.IWindowTrim)
-	 */
+
 	@Override
 	public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
 		TrimArea area = (TrimArea) fTrimArea.get(new Integer(areaId));
 		if (area == null) {
 			return;
 		}
-		
+
 		// remove the trim from the current layout
 		removeTrim(trim);
 
 		// Create a new trim descriptor for the new area...
 		TrimDescriptor desc = new TrimDescriptor(trim, areaId);
-		
+
 		// If the trim can be relocated then add a docking handle
 		boolean isAlreadyAHandle = trim instanceof TrimToolBarBase;
 		if (!trimLocked && trim.getValidSides() != SWT.NONE && !isAlreadyAHandle) {
@@ -232,7 +219,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		SizeCache cache = new SizeCache(trim.getControl());
 		trim.getControl().setLayoutData(trim);
 		desc.setCache(cache);
-		
+
 		// Add a dispose listener so we can clean up if the Client disposes the trim
 		trim.getControl().addDisposeListener(new DisposeListener() {
 			@Override
@@ -282,11 +269,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#removeTrim(org.eclipse.ui.internal.IWindowTrim)
-	 */
 	@Override
 	public void removeTrim(IWindowTrim toRemove) {
 		TrimDescriptor desc = (TrimDescriptor) fTrimDescriptors.remove(toRemove
@@ -304,7 +286,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		// If we had a trim UI handle then dispose it
 		if (desc.getDockingCache() != null) {
 			Control ctrl = desc.getDockingCache().getControl();
-			
+
 			// KLUDGE!! we'll leak a handle rather than losing the
 			// mouse capture (for now...)
 			ctrl.setVisible(false);
@@ -313,11 +295,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#getTrim(java.lang.String)
-	 */
 	@Override
 	public IWindowTrim getTrim(String id) {
 		TrimDescriptor desc = (TrimDescriptor) fTrimDescriptors.get(id);
@@ -342,7 +319,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 				if (nextControl == null || nextControl.isDisposed()) {
 					// Remvoe the trim from the area's list (not the local copy)
 					area.removeTrim(desc);
-					
+
 					// Remove it from the map
 					fTrimDescriptors.remove(desc.getId());
 				}
@@ -361,7 +338,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 *
 	 * See bug 166619 for details but we'll keep returning the
 	 * current value for legacy reasons...
-	 * 
+	 *
 	 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
 	 *      int, int, boolean)
 	 */
@@ -371,12 +348,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		return new Point(0, 0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
-	 *      boolean)
-	 */
 	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		//long startTime = System.currentTimeMillis();
@@ -390,18 +361,18 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 
 		Rectangle clientArea = composite.getClientArea();
 
-		// Determine the amount of space necessary for the trim areas 
+		// Determine the amount of space necessary for the trim areas
 		int trim_top = top.computeWrappedTrim(clientArea.width);
 		int trim_bottom = bottom.computeWrappedTrim(clientArea.width);
-		
+
 		// The space left over after the top and bottom have been laid out
-		// represents the 'fixed' dimension for the vertical trim 
+		// represents the 'fixed' dimension for the vertical trim
 		int verticalMajor = clientArea.height- (trim_top+trim_bottom);
-		
+
 		// Lay out the left/right trim areas
 		int trim_left = left.computeWrappedTrim(verticalMajor);
 		int trim_right = right.computeWrappedTrim(verticalMajor);
-		
+
 		// Tile the trim into the allotted space
 		top.tileTrim(clientArea.x, clientArea.y, clientArea.width);
 		bottom.tileTrim(clientArea.x, clientArea.height-trim_bottom, clientArea.width);
@@ -422,7 +393,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 * Sets the widget that will occupy the central area of the layout.
 	 * Typically, this will be a composite that contains the main widgetry of
 	 * the application.
-	 * 
+	 *
 	 * @param center
 	 *            control that will occupy the center of the layout, or null if
 	 *            none
@@ -433,18 +404,13 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 
 	/**
 	 * Returns the control in the center of this layout
-	 * 
+	 *
 	 * @return the center area control.
 	 */
 	public Control getCenterControl() {
 		return centerArea.getControl();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ICachingLayout#flush(org.eclipse.swt.widgets.Control)
-	 */
 	@Override
 	public void flush(Control dirtyControl) {
 		if (dirtyControl == centerArea.getControl()) {
@@ -457,21 +423,11 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#getAreaIds()
-	 */
 	@Override
 	public int[] getAreaIds() {
-		return (int[]) TRIM_ID_INFO.clone();
+		return TRIM_ID_INFO.clone();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#getAreaTrim(int)
-	 */
 	@Override
 	public List getAreaTrim(int areaId) {
 		TrimArea area = (TrimArea) fTrimArea.get(new Integer(areaId));
@@ -481,12 +437,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		return area.getTrims();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#updateAreaTrim(int,
-	 *      java.util.List, boolean)
-	 */
 	@Override
 	public void updateAreaTrim(int id, List trim, boolean removeExtra) {
 		TrimArea area = (TrimArea) fTrimArea.get(new Integer(id));
@@ -518,7 +468,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 
 	/**
 	 * Return a trim area rectangle.
-	 * 
+	 *
 	 * @param window
 	 *            the window that has the trim
 	 * @param areaId
@@ -532,11 +482,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		return window.getDisplay().map(window, null, area.getCurRect());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#getAllTrim()
-	 */
 	@Override
 	public List getAllTrim() {
 		List trimList = new ArrayList(fTrimDescriptors.size());
@@ -550,12 +495,6 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		return trimList;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.layout.ITrimManager#setTrimVisible(org.eclipse.ui.internal.IWindowTrim,
-	 *      boolean)
-	 */
 	@Override
 	public void setTrimVisible(IWindowTrim trim, boolean visible) {
 		TrimDescriptor desc = findTrimDescription(trim.getControl());
@@ -567,7 +506,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 
 	/**
 	 * Find the trim descriptor for this control.
-	 * 
+	 *
 	 * @param trim
 	 *            the Control to find.
 	 * @return the trim descriptor, or <code>null</code> if not found.
@@ -590,7 +529,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 
 	/**
 	 * Return the trim area associated with the given id
-	 * 
+	 *
 	 * @param areaId
 	 *            The id of the trim area to get
 	 * @return The TrimArea or <code>null</code> if the id is not found
@@ -602,17 +541,17 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	/**
 	 * Remember the persisted locations for the trim. This allows the code
 	 * to site the trim in its preferred (i.e. cached) location on creation
-	 * 
+	 *
 	 * @param areaId The id of the trim area being defined
 	 * @param preferredLocations A list of trim ID's
 	 */
 	public void setPreferredLocations(int areaId, List preferredLocations) {
 		preferredLocationMap.put(new Integer(areaId), preferredLocations);
 	}
-	
+
 	/**
 	 * If the given id has a cached location return its preferred side
-	 * 
+	 *
 	 * @param trimId The id of the trim to be tested
 	 * @return The areaId of a cached id or -1 if no cache info exists
 	 */
@@ -624,14 +563,14 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 			if (areaList.contains(trimId))
 				return key.intValue();
 		}
-		
+
 		return -1;
 	}
-	
+
 	/**
 	 * If the given id has a cached location return an existing trim
 	 * element that it should be placed before (if any)
-	 * 
+	 *
 	 * @param trimId The id of the trim to be tested
 	 * @return The trim to be inserted before or <code>null</code>
 	 * if no cached info exists
@@ -654,7 +593,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -663,14 +602,14 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 * is only used during long-running WorkbenchWindow operations to prevent users
 	 * from changing the environment while the operation (i.e. a long-running editor
 	 * 'save') is in progress.
-	 * 
+	 *
 	 * The expected life-cycle is to first call this this method to disable any visible
 	 * trim (and caching the elements that had to be disabled) followed by a call to
 	 * 'enableTrim' passing in the list returned from this method.
-	 * 
+	 *
 	 * @param ignoreMe Since the current UI has a disable button in the StatusLine
 	 * we allow the caller to designate one piece of trim to ignore
-	 * 
+	 *
 	 * @return The list of trim controls that were disabled during this call
 	 */
 	public List disableTrim(IWindowTrim ignoreMe) {
@@ -682,18 +621,18 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 			IWindowTrim trim = (IWindowTrim) trimIter.next();
 			if (ignoreMe == trim)
 				continue;
-			
+
 			Control ctrl = trim.getControl();
 			if (ctrl == null || ctrl.isDisposed() || !ctrl.isVisible() || !ctrl.isEnabled())
 				continue;
-			
+
 			ctrl.setEnabled(false);
 			disabledControls.add(ctrl);
 		}
-		
+
 		return disabledControls;
 	}
-	
+
 	/**
 	 * Enables the controls in the list. This list is expected to be a non-modified
 	 * List as returned from a call to 'disableTrim'.
@@ -703,7 +642,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 		// Simply re-enable any controls in the list
 		for (Iterator dcIter = disabledControls.iterator(); dcIter.hasNext();) {
 			Control ctrl = (Control) dcIter.next();
-			
+
 			if (!ctrl.isDisposed() && !ctrl.isEnabled())
 				ctrl.setEnabled(true);
 		}

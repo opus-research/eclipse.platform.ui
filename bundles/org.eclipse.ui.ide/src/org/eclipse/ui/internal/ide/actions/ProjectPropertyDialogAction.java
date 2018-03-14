@@ -116,17 +116,13 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
         if (!(selection instanceof IAdaptable)) {
 			return null;
 		}
-        IResource resource = (IResource) ((IAdaptable) selection)
-                .getAdapter(IResource.class);
+        IResource resource = ((IAdaptable) selection).getAdapter(IResource.class);
         if (resource == null) {
 			return null;
 		}
         return resource.getProject();
     }
 
-    /* (non-javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction
-     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {

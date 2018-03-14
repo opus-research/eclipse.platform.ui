@@ -69,7 +69,7 @@ public class InfoReader extends MementoReader {
 		}
 		return partOrder;
 	}
-	
+
 	List<PageReader> getPages() {
 		if (pages != null) {
 			return pages;
@@ -78,7 +78,7 @@ public class InfoReader extends MementoReader {
 		IMemento folder = getFolder();
 		if (folder != null) {
 			IMemento[] pageMems = folder.getChildren(IWorkbenchConstants.TAG_PAGE);
-			pages = new ArrayList<PageReader>(pageMems.length);
+			pages = new ArrayList<>(pageMems.length);
 			for (IMemento pageMem : pageMems) {
 				pages.add(new PageReader(pageMem));
 			}
@@ -105,6 +105,25 @@ public class InfoReader extends MementoReader {
 
 	String getRelative() {
 		return getString(IWorkbenchConstants.TAG_RELATIVE);
+	}
+
+	public PartState getState() {
+		PartState state = PartState.RESTORED;
+		IMemento folder = getFolder();
+		int value = folder.getInteger(IWorkbenchConstants.TAG_EXPANDED);
+		switch (value) {
+		case 0:
+			state = PartState.MINIMIZED;
+			break;
+		case 1:
+			state = PartState.MAXIMIZED;
+			break;
+		}
+		return state;
+	}
+
+	public static enum PartState {
+		MINIMIZED, MAXIMIZED, RESTORED;
 	}
 
 	static class PageReader extends MementoReader {

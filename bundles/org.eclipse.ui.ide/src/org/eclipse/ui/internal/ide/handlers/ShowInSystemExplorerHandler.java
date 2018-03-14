@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474273
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.handlers;
@@ -18,7 +19,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -62,49 +62,45 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		final StatusReporter statusReporter = HandlerUtil.getActiveWorkbenchWindow(event).getService(
 				StatusReporter.class);
 
-		Job job = new Job(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle) {
-
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				String logMsgPrefix;
-				try {
-					logMsgPrefix = event.getCommand().getName() + ": "; //$NON-NLS-1$
-				} catch (NotDefinedException e) {
-					// will used id instead...
-					logMsgPrefix = event.getCommand().getId() + ": "; //$NON-NLS-1$
-				}
-
-				try {
-					File canonicalPath = getSystemExplorerPath(item);
-					if (canonicalPath == null) {
-						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
-								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation, null);
-					}
-					String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
-
-					if ("".equals(launchCmd)) { //$NON-NLS-1$
-						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
-								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable, null);
-					}
-
-					File dir = item.getWorkspace().getRoot().getLocation().toFile();
-					Process p;
-					if (Util.isLinux() || Util.isMac()) {
-						p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", launchCmd }, null, dir); //$NON-NLS-1$ //$NON-NLS-2$
-					} else {
-						p = Runtime.getRuntime().exec(launchCmd, null, dir);
-					}
-					int retCode = p.waitFor();
-					if (retCode != 0 && !Util.isWindows()) {
-						return statusReporter.newStatus(IStatus.ERROR, "Execution of '" + launchCmd //$NON-NLS-1$
-								+ "' failed with return code: " + retCode, null); //$NON-NLS-1$
-					}
-				} catch (Exception e) {
-					return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix + "Unhandled failure.", e); //$NON-NLS-1$
-				}
-				return Status.OK_STATUS;
+		Job job = Job.create(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle, monitor -> {
+			String logMsgPrefix;
+			try {
+				logMsgPrefix = event.getCommand().getName() + ": "; //$NON-NLS-1$
+			} catch (NotDefinedException e1) {
+				// will used id instead...
+				logMsgPrefix = event.getCommand().getId() + ": "; //$NON-NLS-1$
 			}
-		};
+
+			try {
+				File canonicalPath = getSystemExplorerPath(item);
+				if (canonicalPath == null) {
+					return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
+							+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation, null);
+				}
+				String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
+
+				if ("".equals(launchCmd)) { //$NON-NLS-1$
+					return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
+							+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable, null);
+				}
+
+				File dir = item.getWorkspace().getRoot().getLocation().toFile();
+				Process p;
+				if (Util.isLinux() || Util.isMac()) {
+					p = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", launchCmd }, null, dir); //$NON-NLS-1$ //$NON-NLS-2$
+				} else {
+					p = Runtime.getRuntime().exec(launchCmd, null, dir);
+				}
+				int retCode = p.waitFor();
+				if (retCode != 0 && !Util.isWindows()) {
+					return statusReporter.newStatus(IStatus.ERROR, "Execution of '" + launchCmd //$NON-NLS-1$
+							+ "' failed with return code: " + retCode, null); //$NON-NLS-1$
+				}
+			} catch (IOException | InterruptedException e2) {
+				return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix + "Unhandled failure.", e2); //$NON-NLS-1$
+			}
+			return Status.OK_STATUS;
+		});
 		job.schedule();
 		return null;
 	}
@@ -126,7 +122,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 
 		Object selectedObject = ((IStructuredSelection) selection)
 				.getFirstElement();
-		IResource item = (IResource) org.eclipse.ui.internal.util.Util
+		IResource item = org.eclipse.ui.internal.util.Util
 				.getAdapter(selectedObject, IResource.class);
 		return item;
 	}
@@ -140,7 +136,7 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 		if (input instanceof IFileEditorInput) {
 			return ((IFileEditorInput)input).getFile();
 		}
-		return (IResource) input.getAdapter(IResource.class);
+		return input.getAdapter(IResource.class);
 	}
 
 	/**

@@ -141,10 +141,9 @@ class TaskListContentProvider implements IStructuredContentProvider,
 
         if (filter.isShowingAll()) {
             return NLS.bind(TaskListMessages.TaskList_titleSummaryUnfiltered, new Integer(visibleMarkerCount));
-        } else {
-            return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, new Integer(visibleMarkerCount),
-			new Integer(getTotalMarkerCount()));
         }
+		return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, new Integer(visibleMarkerCount),
+				new Integer(getTotalMarkerCount()));
     }
 
     /**
@@ -408,29 +407,18 @@ class TaskListContentProvider implements IStructuredContentProvider,
                 if (!isMarkerLimitExceeded()) {
                     setMarkerLimitExceeded(true);
 
-                    viewer.getControl().getDisplay().syncExec(new Runnable() {
-                        @Override
-						public void run() {
-                            viewer.refresh();
-                        }
-                    });
+                    viewer.getControl().getDisplay().syncExec(() -> viewer.refresh());
                 }
 
                 return new IMarker[0];
-            } else {
-                if (isMarkerLimitExceeded()) {
-                    setMarkerLimitExceeded(false);
+			}
+			if (isMarkerLimitExceeded()) {
+				setMarkerLimitExceeded(false);
 
-                    viewer.getControl().getDisplay().syncExec(new Runnable() {
-                        @Override
-						public void run() {
-                            viewer.refresh();
-                        }
-                    });
-                }
+				viewer.getControl().getDisplay().syncExec(() -> viewer.refresh());
+			}
 
-                return markers;
-            }
+			return markers;
         } catch (CoreException e) {
             return new IMarker[0];
         }
@@ -545,31 +533,28 @@ class TaskListContentProvider implements IStructuredContentProvider,
          * see 1G95PU8: ITPUI:WIN2000 - Changing task description flashes old
          * description
          */
-        viewer.getControl().getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
-                if (getFilterOnMarkerLimit()
-                        && sum(visibleMarkerCounts) > getMarkerLimit()) {
-                    if (!isMarkerLimitExceeded()) {
-                        setMarkerLimitExceeded(true);
-                        viewer.refresh();
-                    }
-                } else if (taskList.isMarkerLimitExceeded()) {
-                    setMarkerLimitExceeded(false);
-                    viewer.refresh();
-                } else {
-                    updateViewer(additions, removals, changes);
-                }
+        viewer.getControl().getDisplay().syncExec(() -> {
+		    if (getFilterOnMarkerLimit()
+		            && sum(visibleMarkerCounts) > getMarkerLimit()) {
+		        if (!isMarkerLimitExceeded()) {
+		            setMarkerLimitExceeded(true);
+		            viewer.refresh();
+		        }
+		    } else if (taskList.isMarkerLimitExceeded()) {
+		        setMarkerLimitExceeded(false);
+		        viewer.refresh();
+		    } else {
+		        updateViewer(additions, removals, changes);
+		    }
 
-                /* Update the task list's status message.
-                 * XXX: Quick and dirty solution here.
-                 * Would be better to have a separate model for the tasks and
-                 * have both the content provider and the task list register for
-                 * updates. XXX: Do this inside the syncExec, since we're
-                 * talking to status line widget.
-                 */
-                taskList.markersChanged();
-            }
-        });
+		    /* Update the task list's status message.
+		     * XXX: Quick and dirty solution here.
+		     * Would be better to have a separate model for the tasks and
+		     * have both the content provider and the task list register for
+		     * updates. XXX: Do this inside the syncExec, since we're
+		     * talking to status line widget.
+		     */
+		    taskList.markersChanged();
+		});
     }
 }

@@ -122,9 +122,6 @@ public class ResourcePatternFilter extends ViewerFilter {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on ViewerFilter.
-     */
     @Override
 	public boolean select(Viewer viewer, Object parentElement, Object element) {
         IResource resource = null;
@@ -132,7 +129,7 @@ public class ResourcePatternFilter extends ViewerFilter {
             resource = (IResource) element;
         } else if (element instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) element;
-            resource = (IResource) adaptable.getAdapter(IResource.class);
+            resource = adaptable.getAdapter(IResource.class);
         }
         if (resource != null) {
             String name = resource.getName();

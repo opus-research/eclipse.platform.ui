@@ -18,7 +18,7 @@ import org.eclipse.ui.internal.commands.ILegacyAttributeNames;
 /**
  * A wrapper so that the new handler listener can work with legacy handlers.
  * This class is only intended for backward compatibility with Eclipse 3.0.
- * 
+ *
  * @since 3.1
  */
 public final class LegacyHandlerListenerWrapper implements IHandlerListener {
@@ -35,7 +35,7 @@ public final class LegacyHandlerListenerWrapper implements IHandlerListener {
 
 	/**
 	 * Constructs a new instance of <code>LegacyHandlerListenerWrapper</code>.
-	 * 
+	 *
 	 * @param listener
 	 *            The listener to wrap; must not be <code>null</code>.
 	 */
@@ -55,11 +55,6 @@ public final class LegacyHandlerListenerWrapper implements IHandlerListener {
 		this.listener = listener;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.commands.IHandlerListener#handlerChanged(org.eclipse.ui.commands.HandlerEvent)
-	 */
 	@Override
 	public void handlerChanged(HandlerEvent event) {
 		final boolean enabledChanged = ((Boolean) event

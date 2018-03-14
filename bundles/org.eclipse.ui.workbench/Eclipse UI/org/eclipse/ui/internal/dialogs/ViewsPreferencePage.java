@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278, 472654
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 388476
  *******************************************************************************/
 
@@ -34,6 +34,7 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.css.swt.theme.ITheme;
 import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
+import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.dialogs.Dialog;
@@ -100,11 +101,15 @@ public class ViewsPreferencePage extends PreferencePage implements
 	private Map<String, String> themeAssociations;
 	private boolean highContrastMode;
 
+	private Button themingEnabled;
+
 	@Override
 	protected Control createContents(Composite parent) {
 		initializeDialogUnits(parent);
 
 		Composite comp = new Composite(parent, SWT.NONE);
+
+		themingEnabled = createCheckButton(comp, WorkbenchMessages.ThemingEnabled, engine != null);
 
 		// if started with "-cssTheme none", CSS settings should be disabled
 		// but other appearance settings should be *not* disabled
@@ -112,11 +117,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 			GridLayout layout = new GridLayout(1, false);
 			layout.horizontalSpacing = 10;
 			comp.setLayout(layout);
-			new Label(comp, SWT.NONE).setText(WorkbenchMessages.ThemingDisabled);
-			Label separator = new Label(comp, SWT.SEPARATOR | SWT.HORIZONTAL);
-			GridData layoutData = new GridData(SWT.FILL, SWT.CENTER, true, false);
-			layoutData.verticalIndent = 20;
-			separator.setLayoutData(layoutData);
 			createThemeIndependentComposits(comp);
 			return comp;
 		}
@@ -198,7 +198,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private List<ITheme> getCSSThemes(boolean highContrastMode) {
-		List<ITheme> themes = new ArrayList<ITheme>();
+		List<ITheme> themes = new ArrayList<>();
 		for (ITheme theme : engine.getThemes()) {
 			/*
 			 * When we have Win32 OS - when the high contrast mode is enabled on
@@ -237,7 +237,17 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return button;
 	}
 
+	private Label createLabel(Composite composite, String text) {
+		Label label = new Label(composite, SWT.NONE);
+		GridData data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1);
+		label.setLayoutData(data);
+		label.setText(text);
+		return label;
+	}
+
 	protected void createEnableMruPref(Composite composite) {
+		createLabel(composite, ""); //$NON-NLS-1$
+		createLabel(composite, WorkbenchMessages.ViewsPreference_visibleTabs_description);
 		IEclipsePreferences prefs = getSwtRendererPreferences();
 		if (engine != null) {
 			boolean mruControlledByCSS = prefs.getBoolean(StackRenderer.MRU_CONTROLLED_BY_CSS_KEY, false);
@@ -284,14 +294,15 @@ public class ViewsPreferencePage extends PreferencePage implements
 		apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS, useColoredLabels.getSelection());
 		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 
+		IEclipsePreferences prefs = getSwtRendererPreferences();
 		if (enableMru != null) {
-			IEclipsePreferences prefs = getSwtRendererPreferences();
 			prefs.putBoolean(StackRenderer.MRU_KEY, enableMru.getSelection());
-			try {
-				prefs.flush();
-			} catch (BackingStoreException e) {
-				WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
-			}
+		}
+		prefs.putBoolean(PartRenderingEngine.ENABLED_THEME_KEY, themingEnabled.getSelection());
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			WorkbenchPlugin.log("Failed to set SWT renderer preferences", e); //$NON-NLS-1$
 		}
 		return super.performOk();
 	}
@@ -301,7 +312,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private boolean getDefaultMRUValue() {
-		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, true);
+		return getSwtRendererPreferences().getBoolean(StackRenderer.MRU_KEY_DEFAULT, StackRenderer.MRU_DEFAULT);
 	}
 
 	private void setColorsAndFontsTheme(ColorsAndFontsTheme theme) {
@@ -460,7 +471,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private Map<String, String> createThemeAssociations() {
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<>();
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(E4_THEME_EXTENSION_POINT);
 
@@ -478,7 +489,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private List<ColorsAndFontsTheme> getColorsAndFontsThemes() {
-		List<ColorsAndFontsTheme> result = new ArrayList<ColorsAndFontsTheme>();
+		List<ColorsAndFontsTheme> result = new ArrayList<>();
 		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
 				.getCurrentTheme();
 

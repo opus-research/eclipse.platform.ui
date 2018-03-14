@@ -58,16 +58,13 @@ public class PropertyPageNode extends WorkbenchPreferenceExtensionNode {
         } catch (CoreException e) {
             // Just inform the user about the error. The details are
             // written to the log by now.
-            IStatus errStatus = StatusUtil.newStatus(e.getStatus(), WorkbenchMessages.PropertyPageNode_errorMessage); 
+            IStatus errStatus = StatusUtil.newStatus(e.getStatus(), WorkbenchMessages.PropertyPageNode_errorMessage);
             StatusManager.getManager().handle(errStatus, StatusManager.SHOW);
             page = new EmptyPropertyPage();
         }
         setPage(page);
     }
 
-    /** (non-Javadoc)
-     * Method declared on IPreferenceNode.
-     */
     @Override
 	public void disposeResources() {
 

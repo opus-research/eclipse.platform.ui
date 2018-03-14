@@ -17,7 +17,7 @@ import org.eclipse.ui.IMemento;
 public class MementoReader {
 
 	protected IMemento memento;
-	
+
 	MementoReader() {
 	}
 
