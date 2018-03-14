@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring.preferences;
 
@@ -18,25 +17,19 @@ import org.eclipse.ui.internal.monitoring.MonitoringPlugin;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 
 /**
- * Initializes the default values of the monitoring plug-in preferences.
+ * Initializes the default values for monitoring plug-in preferences.
  */
 public class MonitoringPreferenceInitializer extends AbstractPreferenceInitializer {
 	/** Force a logged event for a possible deadlock when an event hangs for longer than this */
 	private static final int DEFAULT_FORCE_DEADLOCK_LOG_TIME_MILLIS = 10 * 60 * 1000; // == 10 minutes
 	private static final String DEFAULT_FILTER_TRACES;
 	static {
-		String defaultFilterTraces;
+		String defaultFilterTraces = "org.eclipse.e4.ui.workbench.addons.dndaddon.DnDManager.startDrag"; //$NON-NLS-1$
 		if (Util.isGtk()) {
-			defaultFilterTraces = "org.eclipse.swt.internal.gtk.OS._g_main_context_iteration" //$NON-NLS-1$
-					+ ",org.eclipse.swt.internal.gtk.OS._gtk_dialog_run"; //$NON-NLS-1$
+			defaultFilterTraces += ",org.eclipse.swt.internal.gtk.OS.gtk_dialog_run"; //$NON-NLS-1$
 		} else if (Util.isWin32()) {
-			defaultFilterTraces = "org.eclipse.swt.internal.win32.OS.DefWindowProcA" //$NON-NLS-1$
-					+ ",org.eclipse.swt.internal.win32.OS.DefWindowProcW" //$NON-NLS-1$
-					+ "org.eclipse.swt.internal.win32.OS.TrackPopupMenu"; //$NON-NLS-1$
-		} else if (Util.isCocoa()) {
-			defaultFilterTraces = "org.eclipse.swt.widgets.Display.applicationNextEventMatchingMask"; //$NON-NLS-1$
-		} else {
-			defaultFilterTraces = ""; //$NON-NLS-1$
+			defaultFilterTraces += ",org.eclipse.swt.internal.win32.OS.TrackPopupMenu" //$NON-NLS-1$
+								 + ",org.eclipse.swt.internal.win32.OS.DefWindowProc"; //$NON-NLS-1$
 		}
 		DEFAULT_FILTER_TRACES = defaultFilterTraces;
 	}
