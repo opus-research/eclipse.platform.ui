@@ -37,16 +37,18 @@ import org.eclipse.jface.util.Policy;
  * categorization; and they may override the <code>compare</code> methods
  * to provide a totally different way of sorting elements.
  * </p>
+ * @param <E> 
+ * @param <I> 
  * @see IStructuredContentProvider
  * @see StructuredViewer
  *
  * @since 3.2
  */
-public class ViewerComparator {
+public class ViewerComparator<E,I> {
 	/**
 	 * The comparator to use to sort a viewer's contents.
 	 */
-	private Comparator comparator;
+	private Comparator<Object> comparator;
 
 	/**
      * Creates a new {@link ViewerComparator}, which uses the default comparator
@@ -63,7 +65,7 @@ public class ViewerComparator {
      *
 	 * @param comparator
 	 */
-	public ViewerComparator(Comparator comparator){
+	public ViewerComparator(Comparator<Object> comparator) {
 		this.comparator = comparator;
 	}
 
@@ -72,7 +74,7 @@ public class ViewerComparator {
 	 *
 	 * @return the comparator used to sort strings
 	 */
-	protected Comparator getComparator() {
+	protected Comparator<Object> getComparator() {
 		if (comparator == null){
 			comparator = Policy.getComparator();
 		}
@@ -118,7 +120,7 @@ public class ViewerComparator {
      *  equal to the second element; and a positive number if the first
      *  element is greater than the second element
      */
-    public int compare(Viewer viewer, Object e1, Object e2) {
+    public int compare(Viewer<I> viewer, E e1, E e2) {
         int cat1 = category(e1);
         int cat2 = category(e2);
 
@@ -132,16 +134,17 @@ public class ViewerComparator {
         // use the comparator to compare the strings
         return getComparator().compare(name1, name2);
     }
-
-	private String getLabel(Viewer viewer, Object e1) {
+    
+	private String getLabel(Viewer<I> viewer, E e1) {
 		String name1;
 		if (viewer == null || !(viewer instanceof ContentViewer)) {
 			name1 = e1.toString();
 		} else {
-			IBaseLabelProvider prov = ((ContentViewer) viewer)
-					.getLabelProvider();
+			@SuppressWarnings("unchecked")
+			ContentViewer<E,I> contentViewer = (ContentViewer<E,I>) viewer;
+			IBaseLabelProvider<E> prov = contentViewer.getLabelProvider();
 			if (prov instanceof ILabelProvider) {
-				ILabelProvider lprov = (ILabelProvider) prov;
+				ILabelProvider<E> lprov = (ILabelProvider<E>) prov;
 				name1 = lprov.getText(e1);
 			} else {
 				name1 = e1.toString();
@@ -166,7 +169,7 @@ public class ViewerComparator {
      * @return <code>true</code> if the sorting would be affected,
      *    and <code>false</code> if it would be unaffected
      */
-    public boolean isSorterProperty(Object element, String property) {
+    public boolean isSorterProperty(E element, String property) {
         return false;
     }
 
@@ -184,11 +187,12 @@ public class ViewerComparator {
      * @param viewer the viewer
      * @param elements the elements to sort
      */
-	public void sort(final Viewer viewer, Object[] elements) {
+	public void sort(final Viewer<I> viewer, E[] elements) {
 		try {
-			Arrays.sort(elements, new Comparator() {
+			Arrays.sort(elements, new Comparator<E>() {
+				
 				@Override
-				public int compare(Object a, Object b) {
+				public int compare(E a, E b) {
 					return ViewerComparator.this.compare(viewer, a, b);
 				}
 			});
@@ -198,7 +202,7 @@ public class ViewerComparator {
 					+ "\nthis: " + getClass().getName() //$NON-NLS-1$
 					+ "\ncomparator: " + (comparator != null ? comparator.getClass().getName() : null) //$NON-NLS-1$
 					+ "\narray:"; //$NON-NLS-1$
-			for (Object element : elements) {
+			for (E element : elements) {
 				msg += "\n\t" + getLabel(viewer, element); //$NON-NLS-1$
 			}
 			Policy.getLog().log(new Status(IStatus.ERROR, "org.eclipse.jface", msg)); //$NON-NLS-1$

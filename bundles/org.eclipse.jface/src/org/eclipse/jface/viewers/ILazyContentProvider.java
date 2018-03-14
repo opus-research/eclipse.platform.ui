@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2007 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - Bug 413973
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -20,8 +21,10 @@ package org.eclipse.jface.viewers;
  * changes to the number of items for this object while
  * require a call to <code>#setItemCount</code> on the
  * viewer that uses it.
+ * @param <I> Type of the input for the view
+ *
  */
-public interface ILazyContentProvider extends IContentProvider {
+public interface ILazyContentProvider<I> extends IContentProvider<I> {
 	/**
 	 * Called when a previously-blank item becomes visible in the
 	 * TableViewer. If the content provider knows the element
