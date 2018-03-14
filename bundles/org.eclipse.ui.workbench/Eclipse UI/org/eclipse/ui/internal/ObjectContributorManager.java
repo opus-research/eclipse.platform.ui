@@ -155,7 +155,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
 		for (Iterator<Class<?>> list = classList.iterator(); list.hasNext();) {
 			Class<?>[] interfaces = list.next().getInterfaces();
-			internalComputeInterfaceOrder(interfaces, result, new HashMap(4));
+			internalComputeInterfaceOrder(interfaces, result, new HashMap<Class<?>, Class<?>>(4));
         }
         return result;
     }
@@ -176,9 +176,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Cache the real adapter class contributor search path.
      */
-	private void cacheResourceAdapterLookup(Class<?> adapterClass, List results) {
+	private void cacheResourceAdapterLookup(Class<?> adapterClass, List<IObjectContributor> results) {
         if (resourceAdapterLookup == null) {
-			resourceAdapterLookup = new HashMap();
+			resourceAdapterLookup = new HashMap<Class<?>, List<IObjectContributor>>();
 		}
         resourceAdapterLookup.put(adapterClass, results);
     }
@@ -196,9 +196,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Cache the object class contributor search path.
      */
-	private void cacheObjectLookup(Class<?> objectClass, List results) {
+	private void cacheObjectLookup(Class<?> objectClass, List<IObjectContributor> results) {
         if (objectLookup == null) {
-			objectLookup = new HashMap();
+			objectLookup = new HashMap<Class<?>, List<IObjectContributor>>();
 		}
         objectLookup.put(objectClass, results);
     }
@@ -238,7 +238,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      */
     public boolean hasContributorsFor(Object object) {
 
-		List contributors = getContributors(object);
+		List<IObjectContributor> contributors = getContributors(object);
         return contributors.size() > 0;
     }
 
@@ -275,7 +275,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	 */
     public boolean isApplicableTo(IStructuredSelection selection,
             IObjectContributor contributor) {
-        Iterator elements = selection.iterator();
+		Iterator<?> elements = selection.iterator();
         while (elements.hasNext()) {
             if (contributor.isApplicableTo(elements.next()) == false) {
 				return false;
@@ -676,18 +676,18 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         // See bug 177592 for more details.
         if (allSameClass(objects)) {
         	
-        	Class clazz = objects.get(0).getClass();
+			Class<?> clazz = objects.get(0).getClass();
         	commonAdapters.addAll(Arrays.asList(Platform.getAdapterManager().computeAdapterTypes(clazz)));
-        	List result = new ArrayList(1);
+			List<Class<?>> result = new ArrayList<Class<?>>(1);
         	result.add(clazz);
         	return result;
         }
         
         // Compute all the super classes, interfaces, and adapters 
         // for the first element.
-        List classes = computeClassOrder(objects.get(0).getClass());
-        List adapters = computeAdapterOrder(classes);
-        List interfaces = computeInterfaceOrder(classes);
+		List<Class<?>> classes = computeClassOrder(objects.get(0).getClass());
+		List<String> adapters = computeAdapterOrder(classes);
+		List<Class<?>> interfaces = computeInterfaceOrder(classes);
 
         // Cache of all types found in the selection - this is needed
         // to compute common adapters.
@@ -699,14 +699,14 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         // Traverse the selection if there is more than one element selected.
         for (int i = 1; i < objects.size(); i++) {
             // Compute all the super classes for the current element
-            List otherClasses = computeClassOrder(objects.get(i).getClass());
+			List<Class<?>> otherClasses = computeClassOrder(objects.get(i).getClass());
             if (!classesEmpty) {
                 classesEmpty = extractCommonClasses(classes, otherClasses);
             }
 
             // Compute all the interfaces for the current element
             // and all of its super classes.
-            List otherInterfaces = computeInterfaceOrder(otherClasses);
+			List<Class<?>> otherInterfaces = computeInterfaceOrder(otherClasses);
             if (!interfacesEmpty) {
                 interfacesEmpty = extractCommonClasses(interfaces,
                         otherInterfaces);
@@ -714,11 +714,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 
             // Compute all the adapters provided for the calculated
             // classes and interfaces for this element.
-            List classesAndInterfaces = new ArrayList(otherClasses);
+			List<Class<?>> classesAndInterfaces = new ArrayList<Class<?>>(otherClasses);
             if (otherInterfaces != null) {
 				classesAndInterfaces.addAll(otherInterfaces);
 			}
-            List otherAdapters = computeAdapterOrder(classesAndInterfaces);
+			List<String> otherAdapters = computeAdapterOrder(classesAndInterfaces);
 
             // Compute common adapters
             // Note here that an adapter can match a class or interface, that is
@@ -737,8 +737,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
                 } else {
                     // Remove any adapters of the first element that
                     // are not in the current element's adapter list.
-                    for (Iterator it = adapters.iterator(); it.hasNext();) {
-                        String adapter = (String) it.next();
+					for (Iterator<String> it = adapters.iterator(); it.hasNext();) {
+						String adapter = it.next();
                         if (!otherAdapters.contains(adapter)) {
                             it.remove();
                         }
@@ -824,11 +824,10 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         return classesEmpty;
     }
 
-    private void removeNonCommonAdapters(List adapters, List classes) {
+	private void removeNonCommonAdapters(List<String> adapters, List<Class<?>> classes) {
         for (int i = 0; i < classes.size(); i++) {
-            Object o = classes.get(i);
-            if (o != null) {
-                Class clazz = (Class) o;
+			Class<?> clazz = classes.get(i);
+			if (clazz != null) {
                 String name = clazz.getName();
                 if (adapters.contains(name)) {
 					return;
@@ -854,11 +853,11 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         }
     }
 
-    private List computeAdapterOrder(List classList) {
-        Set result = new HashSet(4);
+	private List<String> computeAdapterOrder(List<Class<?>> classList) {
+		Set<String> result = new HashSet<String>(4);
         IAdapterManager adapterMgr = Platform.getAdapterManager();
-        for (Iterator list = classList.iterator(); list.hasNext();) {
-            Class clazz = ((Class) list.next());
+		for (Iterator<Class<?>> list = classList.iterator(); list.hasNext();) {
+			Class<?> clazz = list.next();
             String[] adapters = adapterMgr.computeAdapterTypes(clazz);
             for (int i = 0; i < adapters.length; i++) {
                 String adapter = adapters[i];
@@ -867,7 +866,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
                 }
             }
         }
-        return new ArrayList(result);
+		return new ArrayList<String>(result);
     }
 
     /**
