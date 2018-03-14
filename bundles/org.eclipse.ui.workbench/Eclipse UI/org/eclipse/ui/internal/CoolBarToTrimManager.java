@@ -737,7 +737,6 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			} else {
 				MToolItem toolItem = OpaqueElementUtil.createOpaqueToolItem();
 				toolItem.setElementId(item.getId());
-				OpaqueElementUtil.setOpaqueItem(toolItem, item);
 				if (item instanceof AbstractGroupMarker) {
 					toolItem.setVisible(item.isVisible());
 				}
