@@ -66,8 +66,7 @@ public class ReadmeEditorActionBarContributor extends
             this.shell = shell;
         }
 
-        @Override
-		public void run() {
+        public void run() {
             String editorName = MessageUtil.getString("Empty_Editor_Name"); //$NON-NLS-1$
             if (activeEditor != null)
                 editorName = activeEditor.getTitle();
@@ -126,8 +125,10 @@ public class ReadmeEditorActionBarContributor extends
         dirtyStateContribution = new DirtyStateContribution();
     }
 
-    @Override
-	public void contributeToMenu(IMenuManager menuManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToMenu(IMenuManager menuManager) {
         // Run super.
         super.contributeToMenu(menuManager);
 
@@ -144,8 +145,10 @@ public class ReadmeEditorActionBarContributor extends
         readmeMenu.add(action3);
     }
 
-    @Override
-	public void contributeToStatusLine(IStatusLineManager statusLineManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToStatusLine(IStatusLineManager statusLineManager) {
         // Run super.
         super.contributeToStatusLine(statusLineManager);
         // Test status line.	
@@ -153,8 +156,10 @@ public class ReadmeEditorActionBarContributor extends
         statusLineManager.add(dirtyStateContribution);
     }
 
-    @Override
-	public void contributeToToolBar(IToolBarManager toolBarManager) {
+    /** (non-Javadoc)
+     * Method declared on EditorActionBarContributor
+     */
+    public void contributeToToolBar(IToolBarManager toolBarManager) {
         // Run super.
         super.contributeToToolBar(toolBarManager);
 
@@ -165,15 +170,19 @@ public class ReadmeEditorActionBarContributor extends
         toolBarManager.add(action3);
     }
 
-    @Override
-	public void dispose() {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void dispose() {
         // Remove retarget actions as page listeners
         getPage().removePartListener(action2);
         getPage().removePartListener(action3);
     }
 
-    @Override
-	public void init(IActionBars bars, IWorkbenchPage page) {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void init(IActionBars bars, IWorkbenchPage page) {
         super.init(bars, page);
         bars.setGlobalActionHandler(IReadmeConstants.RETARGET2, handler2);
         bars.setGlobalActionHandler(IReadmeConstants.LABELRETARGET3, handler3);
@@ -192,8 +201,10 @@ public class ReadmeEditorActionBarContributor extends
         }
     }
 
-    @Override
-	public void setActiveEditor(IEditorPart editor) {
+    /** (non-Javadoc)
+     * Method declared on IEditorActionBarContributor
+     */
+    public void setActiveEditor(IEditorPart editor) {
         // Run super.
         super.setActiveEditor(editor);
 

@@ -20,8 +20,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class ReadmePreferenceInitializer extends AbstractPreferenceInitializer {
 
-    @Override
-	public void initializeDefaultPreferences() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+     */
+    public void initializeDefaultPreferences() {
         // These settings will show up when the Readme preference page
         // is shown for the first time.
         IPreferenceStore store = ReadmePlugin.getDefault().getPreferenceStore();

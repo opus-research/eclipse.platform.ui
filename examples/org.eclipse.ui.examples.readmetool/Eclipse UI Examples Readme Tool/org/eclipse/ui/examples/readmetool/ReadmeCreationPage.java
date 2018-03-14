@@ -69,8 +69,10 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
         this.workbench = workbench;
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /** (non-Javadoc)
+     * Method declared on IDialogPage.
+     */
+    public void createControl(Composite parent) {
         // inherit default container and name specification widgets
         super.createControl(parent);
         Composite composite = (Composite) getControl();
@@ -150,8 +152,7 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
      * newly-created Readme file according to the selections of self's
      * checkbox widgets
      */
-    @Override
-	protected InputStream getInitialContents() {
+    protected InputStream getInitialContents() {
         if (!sectionCheckbox.getSelection())
             return null;
 
@@ -182,16 +183,14 @@ public class ReadmeCreationPage extends WizardNewFileCreationPage {
     /** (non-Javadoc)
      * Method declared on WizardNewFileCreationPage.
      */
-    @Override
-	protected String getNewFileLabel() {
+    protected String getNewFileLabel() {
         return MessageUtil.getString("Readme_file_name"); //$NON-NLS-1$
     }
 
     /** (non-Javadoc)
      * Method declared on WizardNewFileCreationPage.
      */
-    @Override
-	public void handleEvent(Event e) {
+    public void handleEvent(Event e) {
         Widget source = e.widget;
 
         if (source == sectionCheckbox) {
