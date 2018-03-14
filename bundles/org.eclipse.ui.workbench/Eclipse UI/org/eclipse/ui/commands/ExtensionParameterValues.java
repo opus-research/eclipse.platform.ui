@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.StringTokenizer;
-
 import org.eclipse.core.commands.IParameterValues;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
@@ -47,6 +46,8 @@ import org.eclipse.core.runtime.IExecutableExtension;
  * 
  * @since 3.1
  */
+@Deprecated
+@SuppressWarnings("all")
 public final class ExtensionParameterValues implements IParameterValues,
 		IExecutableExtension {
 
@@ -62,10 +63,12 @@ public final class ExtensionParameterValues implements IParameterValues,
 	 */
 	private Map parameterValues = null;
 
+	@Deprecated
 	public Map getParameterValues() {
 		return parameterValues;
 	}
 
+	@Deprecated
 	public final void setInitializationData(final IConfigurationElement config,
 			final String propertyName, final Object data) {
 		if (data == null) {
