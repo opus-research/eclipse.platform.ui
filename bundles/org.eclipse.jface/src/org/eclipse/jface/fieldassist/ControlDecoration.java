@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Rüdiger Herrmann - fix for bug 418420
  *******************************************************************************/
 package org.eclipse.jface.fieldassist;
 
@@ -273,7 +272,6 @@ public class ControlDecoration {
 			hoverShell.setForeground(display
 					.getSystemColor(SWT.COLOR_INFO_FOREGROUND));
 			hoverShell.addPaintListener(new PaintListener() {
-				@Override
 				public void paintControl(PaintEvent pe) {
 					pe.gc.drawText(text, hm, hm);
 					if (!MAC) {
@@ -282,7 +280,6 @@ public class ControlDecoration {
 				}
 			});
 			hoverShell.addMouseListener(new MouseAdapter() {
-				@Override
 				public void mouseDown(MouseEvent e) {
 					hideHover();
 				}
@@ -362,9 +359,8 @@ public class ControlDecoration {
 			int y = -extent.y - hah + 1;
 			int x = arrowOnLeft ? -hao + haw / 2 : -extent.x + hao + haw / 2;
 
-			Point hoverSize = hoverShell.getSize();
-			Rectangle hoverBounds = control.getDisplay().map(control.getParent(), null, decorationRectangle.x + x, decorationRectangle.y + y, hoverSize.x, hoverSize.y);
-			hoverShell.setLocation(hoverBounds.x, hoverBounds.y);
+			hoverShell.setLocation(control.getParent().toDisplay(
+					decorationRectangle.x + x, decorationRectangle.y + y));
 		}
 
 		/*
@@ -598,7 +594,6 @@ public class ControlDecoration {
 	 */
 	private void addControlListeners() {
 		disposeListener = new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent event) {
 				dispose();
 			}
@@ -607,7 +602,6 @@ public class ControlDecoration {
 		control.addDisposeListener(disposeListener);
 
 		focusListener = new FocusListener() {
-			@Override
 			public void focusGained(FocusEvent event) {
 				hasFocus = true;
 				if (showOnlyOnFocus) {
@@ -615,7 +609,6 @@ public class ControlDecoration {
 				}
 			}
 
-			@Override
 			public void focusLost(FocusEvent event) {
 				hasFocus = false;
 				if (showOnlyOnFocus) {
@@ -628,7 +621,6 @@ public class ControlDecoration {
 
 		// Listener for painting the decoration
 		paintListener = new PaintListener() {
-			@Override
 			public void paintControl(PaintEvent event) {
 				Control control = (Control) event.widget;
 				Rectangle rect = getDecorationRectangle(control);
@@ -641,7 +633,6 @@ public class ControlDecoration {
 		// Listener for tracking the end of a hover. Only installed
 		// after a hover begins.
 		mouseMoveListener = new MouseMoveListener() {
-			@Override
 			public void mouseMove(MouseEvent event) {
 				if (showHover) {
 					if (!decorationRectangle.contains(event.x, event.y)) {
@@ -658,7 +649,6 @@ public class ControlDecoration {
 
 		// Listener for tracking the beginning of a hover. Always installed.
 		mouseTrackListener = new MouseTrackListener() {
-			@Override
 			public void mouseExit(MouseEvent event) {
 				// Just in case we didn't catch it before.
 				Control target = (Control) event.widget;
@@ -670,7 +660,6 @@ public class ControlDecoration {
 				hideHover();
 			}
 
-			@Override
 			public void mouseHover(MouseEvent event) {
 				if (showHover) {
 					decorationRectangle = getDecorationRectangle((Control) event.widget);
@@ -696,14 +685,12 @@ public class ControlDecoration {
 				}
 			}
 
-			@Override
 			public void mouseEnter(MouseEvent event) {
 				// Nothing to do until a hover occurs.
 			}
 		};
 
 		compositeListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				// Don't forward events if decoration is not showing
 				if (!visible) {
@@ -1087,12 +1074,6 @@ public class ControlDecoration {
 		if (!visible) {
 			return;
 		}
-		
-		// If the decoration is hidden, don't show the hover.
-		if (showOnlyOnFocus && !control.isFocusControl()) {
-			return;
-		}
-		
 		// If there is no text, any existing hover should be hidden, and
 		// there is nothing more to do.
 		if (text == null || text.length() == 0) {

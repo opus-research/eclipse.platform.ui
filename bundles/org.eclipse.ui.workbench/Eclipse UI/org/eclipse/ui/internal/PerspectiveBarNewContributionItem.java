@@ -44,8 +44,7 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.ContributionItem#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (image != null && !image.isDisposed()) {
             image.dispose();
@@ -53,12 +52,10 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
         }
     }
 
-    @Override
-	public void fill(final ToolBar parent, int index) {
+    public void fill(final ToolBar parent, int index) {
         if (toolItem == null && parent != null) {
             parent.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent e) {
+                public void widgetDisposed(DisposeEvent e) {
                     //toolItem.getImage().dispose();
                     toolItem.dispose();
                     toolItem = null;
@@ -77,8 +74,7 @@ public class PerspectiveBarNewContributionItem extends ContributionItem {
             toolItem.setToolTipText(WorkbenchMessages.PerspectiveBarNewContributionItem_toolTip); 
             toolItem.addSelectionListener(new SelectionAdapter() {
 
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     menuManager.update(true);
                     Point point = new Point(event.x, event.y);
                     if (event.widget instanceof ToolItem) {

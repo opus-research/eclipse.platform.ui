@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,8 +52,7 @@ class RGBColorDescriptor extends ColorDescriptor {
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj instanceof RGBColorDescriptor) {
             RGBColorDescriptor other = (RGBColorDescriptor) obj;
             
@@ -66,16 +65,14 @@ class RGBColorDescriptor extends ColorDescriptor {
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         return color.hashCode();
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.resources.ColorDescriptor#createColor()
      */
-    @Override
-	public Color createColor(Device device) {
+    public Color createColor(Device device) {
         // If this descriptor is wrapping an existing color, then we can return the original color
         // if this is the same device.
         if (originalColor != null) {
@@ -91,8 +88,7 @@ class RGBColorDescriptor extends ColorDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.ColorDescriptor#destroyColor(org.eclipse.swt.graphics.Color)
      */
-    @Override
-	public void destroyColor(Color toDestroy) {
+    public void destroyColor(Color toDestroy) {
         if (toDestroy == originalColor) {
             return;
         }

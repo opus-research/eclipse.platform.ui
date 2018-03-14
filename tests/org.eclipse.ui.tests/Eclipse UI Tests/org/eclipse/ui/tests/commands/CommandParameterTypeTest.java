@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -103,7 +103,7 @@ public class CommandParameterTypeTest extends UITestCase {
 		// execute the command and check the result
 		ParameterizedCommand pCommand = new ParameterizedCommand(command,
 				parameterizations);
-		IHandlerService hs = getWorkbench().getService(IHandlerService.class);
+		IHandlerService hs = (IHandlerService) getWorkbench().getService(IHandlerService.class);
 		Integer result = (Integer) pCommand.executeWithChecks(null, hs.getCurrentState());
 		assertEquals(difference, result.intValue());
 	}

@@ -54,7 +54,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#createView()
 	 */
-	@Override
 	public IViewPart createView() throws CoreException {
 		if (element == null) {
 			throw new CoreException(new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH,
@@ -68,7 +67,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getCategoryPath()
 	 */
-	@Override
 	public String[] getCategoryPath() {
 		return categoryPath;
 	}
@@ -78,7 +76,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getDescription()
 	 */
-	@Override
 	public String getDescription() {
 		return element == null ? "" : RegistryReader.getDescription(element); //$NON-NLS-1$
 	}
@@ -88,7 +85,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getId()
 	 */
-	@Override
 	public String getId() {
 		return descriptor.getElementId();
 	}
@@ -98,7 +94,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getImageDescriptor()
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		if (imageDescriptor == null) {
 			String iconURI = descriptor.getIconURI();
@@ -122,7 +117,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getLabel()
 	 */
-	@Override
 	public String getLabel() {
 		return LocalizationHelper.getLocalized(descriptor.getLabel(), descriptor,
 				application.getContext());
@@ -133,7 +127,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getFastViewWidthRatio()
 	 */
-	@Override
 	public float getFastViewWidthRatio() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -144,7 +137,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#getAllowMultiple()
 	 */
-	@Override
 	public boolean getAllowMultiple() {
 		return descriptor.isAllowMultiple();
 	}
@@ -154,7 +146,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.views.IViewDescriptor#isRestorable()
 	 */
-	@Override
 	public boolean isRestorable() {
 		if (element == null) {
 			return false;
@@ -167,7 +158,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
-	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter != null && adapter.equals(IConfigurationElement.class)) {
 			return getConfigurationElement();
@@ -184,7 +174,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return getId();
 	}
@@ -194,7 +183,6 @@ public class ViewDescriptor implements IViewDescriptor, IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return getConfigurationElement().getNamespaceIdentifier();
 	}

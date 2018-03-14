@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -134,7 +134,6 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	 * @param object
 	 * @return true if this Saveable is equal to the given object
 	 */
-	@Override
 	public abstract boolean equals(Object object);
 
 	/**
@@ -159,7 +158,6 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	 * 
 	 * @return a hash code
 	 */
-	@Override
 	public abstract int hashCode();
 
 	/**
@@ -303,7 +301,6 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	 * 
 	 * @since 3.3
 	 */
-	@Override
 	public Object getAdapter(Class adapter) {
 		return null;
 	}

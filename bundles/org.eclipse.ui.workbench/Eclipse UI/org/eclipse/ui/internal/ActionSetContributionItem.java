@@ -36,16 +36,14 @@ public class ActionSetContributionItem extends SubContributionItem implements
     /**
      * Returns the action set id.
      */
-    @Override
-	public String getActionSetId() {
+    public String getActionSetId() {
         return actionSetId;
     }
 
     /**
      * Sets the action set id.
      */
-    @Override
-	public void setActionSetId(String newActionSetId) {
+    public void setActionSetId(String newActionSetId) {
         actionSetId = newActionSetId;
     }
 }

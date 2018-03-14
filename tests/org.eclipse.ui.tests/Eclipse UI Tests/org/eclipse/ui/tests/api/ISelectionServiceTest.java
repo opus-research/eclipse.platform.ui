@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,9 +127,9 @@ public class ISelectionServiceTest extends UITestCase implements
 				.showView(SelectionProviderView.ID);
 
 		ISelectionService service = fWindow.getSelectionService();
-		ISelectionService windowService = fWindow
+		ISelectionService windowService = (ISelectionService) fWindow
 				.getService(ISelectionService.class);
-		ISelectionService slaveService = view2.getSite()
+		ISelectionService slaveService = (ISelectionService) view2.getSite()
 				.getService(ISelectionService.class);
 
 		assertTrue(service != slaveService);
