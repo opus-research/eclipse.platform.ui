@@ -58,6 +58,7 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		ts.addTest(new AdaptableDecoratorTestCase("testRefreshLightContributor"));
 		return ts;
 	}
+
 	/**
 	 * Constructor for DecoratorTestCase.
 	 * 
@@ -67,9 +68,6 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		super(testName);
 	}
 
-	/**
-	 * Sets up the hierarchy.
-	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -94,9 +92,6 @@ public class AdaptableDecoratorTestCase extends UITestCase implements
 		return WorkbenchPlugin.getDefault().getDecoratorManager();
 	}
 
-	/**
-	 * Remove the listener.
-	 */
 	@Override
 	protected void doTearDown() throws Exception {
 
