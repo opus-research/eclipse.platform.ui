@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Sebastian Davids <sdavids@gmx.de> - Images for menu items (27481)
+ *     Manumitting Technologies - bug 447737
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
@@ -23,6 +24,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionGroup;
+import org.eclipse.ui.actions.MoveProjectAction;
 import org.eclipse.ui.actions.MoveResourceAction;
 import org.eclipse.ui.actions.RenameResourceAction;
 import org.eclipse.ui.ide.ResourceSelectionUtil;
@@ -38,7 +40,9 @@ public class RefactorActionGroup extends ActionGroup {
 
 	private RenameResourceAction renameAction;
 
-	private MoveResourceAction moveAction;
+	private DelegatingSelectionListenerAction moveAction;
+	private MoveResourceAction moveResourceAction;
+	private MoveProjectAction moveProjectAction;
 
 	private Shell shell;
 
@@ -106,7 +110,9 @@ public class RefactorActionGroup extends ActionGroup {
 			}
 		};
 
-		moveAction = new MoveResourceAction(sp);
+		moveResourceAction = new MoveResourceAction(sp);
+		moveProjectAction = new MoveProjectAction(sp);
+		moveAction = new DelegatingSelectionListenerAction(moveProjectAction, moveResourceAction);
 		moveAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_MOVE);
 
 		renameAction = new RenameResourceAction(sp, tree);
