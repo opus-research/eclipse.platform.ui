@@ -72,6 +72,8 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.internal.Position;
 import org.eclipse.e4.ui.model.internal.PositionInfo;
@@ -821,10 +823,26 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		 * and so on, buttons which are normally placed at the beginning of the
 		 * trimbar (left) would be moved to the end of it (right).)
 		 */
-		MToolControl spacerControl = (MToolControl) modelService.find("PerspectiveSpacer", model); //$NON-NLS-1$
+
+		if (modelService.find(IWorkbenchConstants.ADDITIONS, trimBar) == null) {
+			MToolBarSeparator additionsSeparator = modelService
+					.createModelElement(MToolBarSeparator.class);
+			additionsSeparator.setToBeRendered(false);
+			additionsSeparator.setElementId(IWorkbenchConstants.ADDITIONS);
+
+			MToolBar additionsToolBar = modelService.createModelElement(MToolBar.class);
+			additionsToolBar.getTags().add(IWorkbenchConstants.TAG_TOOLBAR_SEPARATOR);
+			additionsToolBar.setElementId(IWorkbenchConstants.ADDITIONS);
+			additionsToolBar.setToBeRendered(false);
+			additionsToolBar.getChildren().add(additionsSeparator);
+			trimBar.getChildren().add(additionsToolBar);
+		}
+
+		MToolControl spacerControl = (MToolControl) modelService.find(
+				IWorkbenchConstants.TRIM_PERSPECTIVE_SPACER, model);
 		if (spacerControl == null) {
 			spacerControl = modelService.createModelElement(MToolControl.class);
-			spacerControl.setElementId("PerspectiveSpacer"); //$NON-NLS-1$
+			spacerControl.setElementId(IWorkbenchConstants.TRIM_PERSPECTIVE_SPACER);
 			spacerControl
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
