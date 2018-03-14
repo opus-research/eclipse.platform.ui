@@ -163,6 +163,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 	}
 
+	@Override
 	public IViewDescriptor find(String id) {
 		IViewDescriptor candidate = descriptors.get(id);
 		if (WorkbenchActivityHelper.restrictUseOf(candidate)) {
@@ -171,31 +172,19 @@ public class ViewRegistry implements IViewRegistry {
 		return candidate;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.IViewRegistry#getCategories()
-	 */
+	@Override
 	public IViewCategory[] getCategories() {
 		return categories.values().toArray(new IViewCategory[categories.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.IViewRegistry#getViews()
-	 */
+	@Override
 	public IViewDescriptor[] getViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(
 				descriptors.values(), new ArrayList<Object>());
 		return allowedViews.toArray(new IViewDescriptor[allowedViews.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.views.IViewRegistry#getStickyViews()
-	 */
+	@Override
 	public IStickyViewDescriptor[] getStickyViews() {
 		Collection<?> allowedViews = WorkbenchActivityHelper.restrictCollection(stickyDescriptors,
 				new ArrayList<Object>());
