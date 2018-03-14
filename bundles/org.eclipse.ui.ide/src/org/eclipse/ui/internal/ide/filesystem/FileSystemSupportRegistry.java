@@ -69,6 +69,12 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	FileSystemConfiguration defaultConfiguration = new FileSystemConfiguration(
 			FileSystemMessages.DefaultFileSystem_name, new FileSystemContributor() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.ui.ide.fileSystem.FileSystemContributor#browseFileSystem(java.lang.String,
+				 *      org.eclipse.swt.widgets.Shell)
+				 */
 				@Override
 				public URI browseFileSystem(String initialPath, Shell shell) {
 
@@ -119,12 +125,24 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamichelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		processExtension(tracker, extension);
 		allConfigurations = null;//Clear the cache
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
+	 *      java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		for (int i = 0; i < objects.length; i++) {
@@ -179,7 +197,7 @@ public class FileSystemSupportRegistry implements IExtensionChangeHandler {
 			}
 
 			/*
-			 * Method declared on ISafeRunnable.
+			 * (non-Javadoc) Method declared on ISafeRunnable.
 			 */
 			@Override
 			public void handleException(Throwable e) {
