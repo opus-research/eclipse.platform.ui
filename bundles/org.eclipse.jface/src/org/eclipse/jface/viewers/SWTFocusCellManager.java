@@ -45,7 +45,6 @@ abstract class SWTFocusCellManager {
 
 	private DisposeListener itemDeletionListener = new DisposeListener() {
 
-		@Override
 		public void widgetDisposed(DisposeEvent e) {
 			setFocusCell(null);
 		}
@@ -140,7 +139,6 @@ abstract class SWTFocusCellManager {
 	private void hookListener(final ColumnViewer viewer) {
 		Listener listener = new Listener() {
 
-			@Override
 			public void handleEvent(Event event) {
 				switch (event.type) {
 				case SWT.MouseDown:
@@ -164,7 +162,6 @@ abstract class SWTFocusCellManager {
 		viewer.getControl().addListener(SWT.Selection, listener);
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				if( event.selection.isEmpty() ) {
 					setFocusCell(null);
