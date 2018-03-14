@@ -96,12 +96,15 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 		}
 	}
 
-	@Override
 	public boolean isHelpAvailable() {
 		return helpContext != null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createDialogArea(Composite parent) {
 		 
 		getShell()
@@ -166,14 +169,12 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 
 		customizationsTabFolder.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (descriptionText != null) {
 					descriptionText.setText(""); //$NON-NLS-1$
 				}
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -220,11 +221,15 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 		return updateDescriptionSelectionListener;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	protected void okPressed() {
 
 		if (contentExtensionsTab != null) {
-			List<String> checkedExtensions = new ArrayList<String>();
+			List checkedExtensions = new ArrayList();
 			TableItem[] tableItems = contentExtensionsTab.getTable().getItems();
 			INavigatorContentDescriptor descriptor;
 			for (int i = 0; i < tableItems.length; i++) {
@@ -235,7 +240,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 					checkedExtensions.add(descriptor.getId());
 				}
 			}
-			String[] contentExtensionIdsToActivate = checkedExtensions
+			String[] contentExtensionIdsToActivate = (String[]) checkedExtensions
 					.toArray(new String[checkedExtensions.size()]);
 			UpdateActiveExtensionsOperation updateExtensions = new UpdateActiveExtensionsOperation(
 					commonViewer, contentExtensionIdsToActivate);

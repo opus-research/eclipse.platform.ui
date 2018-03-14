@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,13 +33,11 @@ public class WizardProvider extends QuickAccessProvider {
 	private QuickAccessElement[] cachedElements;
 	private Map<String, WizardElement> idToElement = new HashMap<String, WizardElement>();
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (cachedElements == null) {
 			IWizardCategory rootCategory = WorkbenchPlugin.getDefault()
@@ -68,23 +66,19 @@ public class WizardProvider extends QuickAccessProvider {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.wizards"; //$NON-NLS-1$
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_New;
 	}
 
-	@Override
 	protected void doReset() {
 		cachedElements = null;
 		idToElement.clear();

@@ -36,7 +36,7 @@ public abstract class ViewerTestCase extends TestCase {
 	protected StructuredViewer fViewer;
 	protected TestElement fRootElement;
 	public TestModel fModel;
-
+	
 	protected boolean disableTestsBug347491 = false;
 
 	public ViewerTestCase(String name) {
@@ -59,9 +59,8 @@ public abstract class ViewerTestCase extends TestCase {
 	    if (shell != null && !shell.isDisposed()) {
 	        Display display = shell.getDisplay();
 	        if (display != null) {
-	            while (shell.isVisible()) {
-					display.readAndDispatch();
-				}
+	            while (shell.isVisible())
+	                display.readAndDispatch();
 	        }
 	    }
 	}
@@ -104,15 +103,12 @@ public abstract class ViewerTestCase extends TestCase {
 	    }
 	}
 
-	@Override
 	public void setUp() {
 		Policy.setLog(new ILogger(){
-			@Override
 			public void log(IStatus status) {
 				fail(status.getMessage());
 			}});
 		SafeRunnable.setRunner(new ISafeRunnableRunner(){
-			@Override
 			public void run(ISafeRunnable code) {
 				try {
 					code.run();
@@ -138,7 +134,6 @@ public abstract class ViewerTestCase extends TestCase {
 		}
 	}
 
-	@Override
 	public void tearDown() {
 	    processEvents();
 	    fViewer = null;

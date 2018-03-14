@@ -24,8 +24,7 @@ public class ProgressViewerLabelProvider extends LabelProvider {
      * 
      * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
      */
-    @Override
-	public String getText(Object element) {
+    public String getText(Object element) {
         JobTreeElement info = (JobTreeElement) element;
         return ProgressManagerUtil.shortenText(
                 info.getCondensedDisplayString(), control);

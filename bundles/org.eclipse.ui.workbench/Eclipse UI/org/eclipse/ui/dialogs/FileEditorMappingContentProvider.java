@@ -41,17 +41,23 @@ public class FileEditorMappingContentProvider implements
         super();
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
+    public void dispose() {
     }
 
-    @Override
-	public Object[] getElements(Object element) {
+    /* (non-Javadoc)
+     * Method declared on IStructuredContentProvider.
+     */
+    public Object[] getElements(Object element) {
         IFileEditorMapping[] array = (IFileEditorMapping[]) element;
         return array == null ? new Object[0] : array;
     }
 
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    /* (non-Javadoc)
+     * Method declared on IContentProvider.
+     */
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 }

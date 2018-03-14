@@ -16,12 +16,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- *
+ * 
  * A job that completes very quicky and returns the specified status
- *
+ * 
  * @since 3.6
  * @author Prakash G.R. (grprakash@in.ibm.com)
- *
+ * 
  */
 public class DummyJob extends Job {
 
@@ -32,7 +32,6 @@ public class DummyJob extends Job {
 		this.status = status;
 	}
 
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 
 		monitor.beginTask(getName() + " starts now", 10);
@@ -44,9 +43,8 @@ public class DummyJob extends Job {
 					// ignore
 				}
 				monitor.worked(1);
-				if (monitor.isCanceled()) {
+				if (monitor.isCanceled())
 					break;
-				}
 			}
 			return status;
 		} finally {

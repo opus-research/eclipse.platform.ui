@@ -49,7 +49,6 @@ public abstract class MapProperty implements IMapProperty {
 	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public Map getMap(Object source) {
 		if (source == null) {
 			return Collections.EMPTY_MAP;
@@ -78,7 +77,6 @@ public abstract class MapProperty implements IMapProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setMap(Object source, Map map) {
 		if (source != null) {
 			doSetMap(source, map);
@@ -103,7 +101,6 @@ public abstract class MapProperty implements IMapProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void updateMap(Object source, MapDiff diff) {
 		if (source != null) {
 			doUpdateMap(source, diff);
@@ -129,38 +126,31 @@ public abstract class MapProperty implements IMapProperty {
 		}
 	}
 
-	@Override
 	public IObservableMap observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory mapFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory mapFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableMap observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailMap(master,
 				mapFactory(master.getRealm()), getKeyType(), getValueType());
 	}
 
-	@Override
 	public final IMapProperty values(IValueProperty detailValues) {
 		return new MapPropertyDetailValuesMap(this, detailValues);
 	}

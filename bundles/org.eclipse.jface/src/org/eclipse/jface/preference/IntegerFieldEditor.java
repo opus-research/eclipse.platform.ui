@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -75,8 +75,11 @@ public class IntegerFieldEditor extends StringFieldEditor {
         		new Object[] { new Integer(min), new Integer(max) }));
     }
 
-    @Override
-	protected boolean checkState() {
+    /* (non-Javadoc)
+     * Method declared on StringFieldEditor.
+     * Checks whether the entered String is a valid integer or not.
+     */
+    protected boolean checkState() {
 
         Text text = getTextControl();
 
@@ -102,8 +105,10 @@ public class IntegerFieldEditor extends StringFieldEditor {
         return false;
     }
 
-    @Override
-	protected void doLoad() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoad() {
         Text text = getTextControl();
         if (text != null) {
             int value = getPreferenceStore().getInt(getPreferenceName());
@@ -113,8 +118,10 @@ public class IntegerFieldEditor extends StringFieldEditor {
 
     }
 
-    @Override
-	protected void doLoadDefault() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoadDefault() {
         Text text = getTextControl();
         if (text != null) {
             int value = getPreferenceStore().getDefaultInt(getPreferenceName());
@@ -123,8 +130,10 @@ public class IntegerFieldEditor extends StringFieldEditor {
         valueChanged();
     }
 
-    @Override
-	protected void doStore() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doStore() {
         Text text = getTextControl();
         if (text != null) {
             Integer i = new Integer(text.getText());

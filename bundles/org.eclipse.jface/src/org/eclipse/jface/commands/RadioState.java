@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,10 +61,10 @@ public class RadioState extends ToggleState {
 			 * The current members in this group. If there are no members, then
 			 * this value is <code>nlistenerull</code>.
 			 */
-			private Set<RadioState> members = null;
+			private Set members = null;
 
 			/**
-			 * Activates a member. This checks to see if there are any other
+			 * Activates a memeber. This checks to see if there are any other
 			 * active members. If there are, they are deactivated.
 			 * 
 			 * @param state
@@ -72,7 +72,7 @@ public class RadioState extends ToggleState {
 			 *            <code>null</code>.
 			 */
 			private final void activateMember(final RadioState state) {
-				if (active != null && active != state) {
+				if (active!=null && active != state) {
 					active.setValue(Boolean.FALSE);
 				}
 				active = state;
@@ -80,7 +80,7 @@ public class RadioState extends ToggleState {
 
 			/**
 			 * Adds a member to this radio group. If the state being added is
-			 * active, then it replaces the currently active group member as
+			 * active, then it replaces the currently active group memeber as
 			 * the active state.
 			 * 
 			 * @param state
@@ -88,7 +88,7 @@ public class RadioState extends ToggleState {
 			 */
 			private final void addMember(final RadioState state) {
 				if (members == null) {
-					members = new HashSet<RadioState>(5);
+					members = new HashSet(5);
 				}
 
 				members.add(state);
@@ -102,7 +102,6 @@ public class RadioState extends ToggleState {
 				}
 			}
 
-			@Override
 			public final void handleStateChange(final State state,
 					final Object oldValue) {
 				final Object newValue = state.getValue();
@@ -135,10 +134,11 @@ public class RadioState extends ToggleState {
 
 		/**
 		 * The map of radio states indexed by identifier (<code>String</code>).
-		 * The radio states is either a single <code>RadioState</code> instance
-		 * or a <code>Collection</code> of <code>RadioState</code> instances.
+		 * The radio states is either a single <code>RadioState</code>
+		 * instance or a <code>Collection</code> of <code>RadioState</code>
+		 * instances.
 		 */
-		private static Map<String, RadioGroup> radioStatesById = null;
+		private static Map radioStatesById = null;
 
 		/**
 		 * Activates a particular state within a given group.
@@ -174,7 +174,7 @@ public class RadioState extends ToggleState {
 		private static final void registerState(final String identifier,
 				final RadioState state) {
 			if (radioStatesById == null) {
-				radioStatesById = new HashMap<String, RadioGroup>();
+				radioStatesById = new HashMap();
 			}
 
 			final Object currentValue = radioStatesById.get(identifier);
@@ -221,7 +221,6 @@ public class RadioState extends ToggleState {
 	/**
 	 * Unregisters this state from the manager, which detaches the listeners.
 	 */
-	@Override
 	public void dispose() {
 		setRadioGroupIdentifier(null);
 	}
@@ -252,7 +251,6 @@ public class RadioState extends ToggleState {
 	 * @param value
 	 *            The new value; should be a <code>Boolean</code>.
 	 */
-	@Override
 	public void setValue(final Object value) {
 		if (!(value instanceof Boolean)) {
 			throw new IllegalArgumentException(

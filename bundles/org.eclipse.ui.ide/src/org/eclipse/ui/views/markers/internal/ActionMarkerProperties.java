@@ -18,7 +18,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 
 /**
  * ActionMarkerProperties is the action for opening a properties dialog.
- *
+ * 
  */
 public class ActionMarkerProperties extends SelectionProviderAction {
 
@@ -28,7 +28,7 @@ public class ActionMarkerProperties extends SelectionProviderAction {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param part
 	 * @param provider
 	 * @param markerName
@@ -44,10 +44,9 @@ public class ActionMarkerProperties extends SelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 		if (!isEnabled()) {
 			return;
@@ -65,10 +64,9 @@ public class ActionMarkerProperties extends SelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(selection != null && selection.size() == 1);
 	}

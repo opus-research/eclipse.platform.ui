@@ -28,12 +28,12 @@ import org.eclipse.ui.ide.undo.WorkspaceUndoUtil;
 public class ActionRemoveMarker extends MarkerSelectionProviderAction {
 
 	private IWorkbenchPart part;
-
+	
 	private String markerName;
 
 	/**
 	 * Creates the action.
-	 *
+	 * 
 	 * @param part
 	 * @param provider
 	 * @param markerName
@@ -55,7 +55,6 @@ public class ActionRemoveMarker extends MarkerSelectionProviderAction {
 	/**
 	 * Delete the marker selection.
 	 */
-	@Override
 	public void run() {
 		String operationTitle = NLS.bind(MarkerMessages.qualifiedMarkerCommand_title,
 				MarkerMessages.deleteAction_title, markerName);
@@ -65,7 +64,6 @@ public class ActionRemoveMarker extends MarkerSelectionProviderAction {
 				WorkspaceUndoUtil.getUIInfoAdapter(part.getSite().getShell()));
 	}
 
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(false);
 		if (selection == null || selection.isEmpty()) {

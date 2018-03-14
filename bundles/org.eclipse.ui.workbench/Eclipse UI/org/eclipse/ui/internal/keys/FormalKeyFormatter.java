@@ -31,23 +31,39 @@ public class FormalKeyFormatter extends AbstractKeyFormatter {
      */
     private static final Comparator FORMAL_MODIFIER_KEY_COMPARATOR = new AlphabeticModifierKeyComparator();
 
-    @Override
-	public String format(Key key) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
+     */
+    public String format(Key key) {
         return key.toString();
     }
 
-    @Override
-	protected String getKeyDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
+     */
+    protected String getKeyDelimiter() {
         return KeyStroke.KEY_DELIMITER;
     }
 
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+     */
+    protected String getKeyStrokeDelimiter() {
         return KeySequence.KEY_STROKE_DELIMITER;
     }
 
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
+     */
+    protected Comparator getModifierKeyComparator() {
         return FORMAL_MODIFIER_KEY_COMPARATOR;
     }
 

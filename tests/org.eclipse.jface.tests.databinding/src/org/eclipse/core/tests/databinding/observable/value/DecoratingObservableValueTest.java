@@ -24,7 +24,7 @@ import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValu
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class DecoratingObservableValueTest {
 	public static Test suite() {
@@ -37,19 +37,16 @@ public class DecoratingObservableValueTest {
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		private Object valueType = Object.class;
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			IObservableValue decorated = new WritableValue(realm, new Object(),
 					valueType);
 			return new DecoratingObservableValueStub(decorated);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return valueType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			((DecoratingObservableValueStub) observable).decorated
 					.setValue(new Object());

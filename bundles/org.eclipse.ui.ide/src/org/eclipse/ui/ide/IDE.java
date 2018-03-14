@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,9 @@ import org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory;
 import org.eclipse.core.resources.mapping.ModelProvider;
 import org.eclipse.core.resources.mapping.ModelStatus;
 import org.eclipse.core.resources.mapping.ResourceChangeValidator;
+import org.eclipse.core.resources.mapping.ResourceMapping;
+import org.eclipse.core.resources.mapping.ResourceMappingContext;
+import org.eclipse.core.resources.mapping.ResourceTraversal;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -61,12 +64,15 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IMarkerHelpRegistry;
+import org.eclipse.ui.ISaveableFilter;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.MultiPartInitException;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.Saveable;
 import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
@@ -81,7 +87,7 @@ import org.eclipse.ui.part.FileEditorInput;
  * Collection of IDE-specific APIs factored out of existing workbench. This
  * class cannot be instantiated; all functionality is provided by static methods
  * and fields.
- *
+ * 
  * @since 3.0
  */
 public final class IDE {
@@ -90,7 +96,7 @@ public final class IDE {
 	 * preferred editor ID to use.
 	 * <p>
 	 * Example of retrieving the persisted editor id:
-	 *
+	 * 
 	 * <pre><code>
 	 *  IFile file = ...
 	 *  IEditorDescriptor editorDesc = null;
@@ -103,11 +109,11 @@ public final class IDE {
 	 *  	// handle problem accessing persistent property here
 	 *  }
 	 * </code></pre>
-	 *
+	 * 
 	 * </p>
 	 * <p>
 	 * Example of persisting the editor id:
-	 *
+	 * 
 	 * <pre><code>
 	 *  IFile file = ...
 	 *  try {
@@ -116,7 +122,7 @@ public final class IDE {
 	 *  	// handle problem setting persistent property here
 	 *  }
 	 * </code></pre>
-	 *
+	 * 
 	 * </p>
 	 */
 	public static final QualifiedName EDITOR_KEY = new QualifiedName(
@@ -149,7 +155,7 @@ public final class IDE {
 	 * <p>
 	 * This interface is not intended to be implemented by clients.
 	 * </p>
-	 *
+	 * 
 	 * @see org.eclipse.ui.ISharedImages
 	 */
 	public interface SharedImages {
@@ -184,7 +190,6 @@ public final class IDE {
 	 * <p>
 	 * This interface is not intended to be implemented by clients.
 	 * </p>
-	 * @noimplement This interface is not intended to be implemented by clients.
 	 */
 	public interface Preferences {
 
@@ -194,10 +199,10 @@ public final class IDE {
 		 * <p>
 		 * Value is of type <code>String</code>. The possible values are
 		 * defined by the constants
-		 * <code>OPEN_PERSPECTIVE_WINDOW, OPEN_PERSPECTIVE_PAGE,
+		 * <code>OPEN_PERSPECTIVE_WINDOW, OPEN_PERSPECTIVE_PAGE, 
 		 * OPEN_PERSPECTIVE_REPLACE, and NO_NEW_PERSPECTIVE</code>.
 		 * </p>
-		 *
+		 * 
 		 * @see org.eclipse.ui.IWorkbenchPreferenceConstants#OPEN_PERSPECTIVE_WINDOW
 		 * @see org.eclipse.ui.IWorkbenchPreferenceConstants#OPEN_PERSPECTIVE_PAGE
 		 * @see org.eclipse.ui.IWorkbenchPreferenceConstants#OPEN_PERSPECTIVE_REPLACE
@@ -213,7 +218,7 @@ public final class IDE {
 		 * <p>
 		 * The default value for this preference is <code>true</code>.
 		 * </p>
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		public static final String SHOW_WORKSPACE_SELECTION_DIALOG = "SHOW_WORKSPACE_SELECTION_DIALOG"; //$NON-NLS-1$
@@ -223,7 +228,7 @@ public final class IDE {
 		 * Stores the maximum number of workspaces that should be displayed in
 		 * the ChooseWorkspaceDialog.
 		 * </p>
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		public static final String MAX_RECENT_WORKSPACES = "MAX_RECENT_WORKSPACES"; //$NON-NLS-1$
@@ -232,7 +237,7 @@ public final class IDE {
 		 * <p>
 		 * Stores a comma separated list of the recently used workspace paths.
 		 * </p>
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		public static final String RECENT_WORKSPACES = "RECENT_WORKSPACES"; //$NON-NLS-1$
@@ -242,19 +247,128 @@ public final class IDE {
 		 * Stores the version of the protocol used to decode/encode the list of
 		 * recent workspaces.
 		 * </p>
-		 *
+		 * 
 		 * @since 3.1
 		 */
 		public static final String RECENT_WORKSPACES_PROTOCOL = "RECENT_WORKSPACES_PROTOCOL"; //$NON-NLS-1$
 
-		/**
-		 * Workspace name, will be displayed in the window title. This
-		 * preference must only be changed on the UI thread.
-		 * @since 3.10
-		 */
-		public static final String WORKSPACE_NAME = "WORKSPACE_NAME"; //$NON-NLS-1$
 	}
 
+	/**
+	 * A saveable filter that selects savables that contain resources that
+	 * are descendants of the roots of the filter.
+	 * @since 3.3
+	 *
+	 */
+	private static class SaveFilter implements ISaveableFilter {
+		private final IResource[] roots;
+
+		/**
+		 * Create the filter
+		 * @param roots the save roots
+		 */
+		public SaveFilter(IResource[] roots) {
+			this.roots = roots;
+		}
+		
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.ISaveableFilter#select(org.eclipse.ui.Saveable, org.eclipse.ui.IWorkbenchPart[])
+		 */
+		public boolean select(Saveable saveable,
+				IWorkbenchPart[] containingParts) {
+			if (isDescendantOfRoots(saveable)) {
+				return true;
+			}
+			// For backwards compatibility, we need to check the parts
+			for (int i = 0; i < containingParts.length; i++) {
+				IWorkbenchPart workbenchPart = containingParts[i];
+				if (workbenchPart instanceof IEditorPart) {
+					IEditorPart editorPart = (IEditorPart) workbenchPart;
+					if (isEditingDescendantOf(editorPart)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		
+		/**
+		 * Return whether the given saveable contains any resources that
+		 * are descendants of the root resources.
+		 * @param saveable the saveable
+		 * @return whether the given saveable contains any resources that
+		 * are descendants of the root resources
+		 */
+		private boolean isDescendantOfRoots(Saveable saveable) {
+			// First, try and adapt the saveable to a resource mapping.
+			ResourceMapping mapping = ResourceUtil.getResourceMapping(saveable);
+			if (mapping != null) {
+				try {
+					ResourceTraversal[] traversals = mapping.getTraversals(
+							ResourceMappingContext.LOCAL_CONTEXT, null);
+					for (int i = 0; i < traversals.length; i++) {
+						ResourceTraversal traversal = traversals[i];
+						IResource[] resources = traversal.getResources();
+						for (int j = 0; j < resources.length; j++) {
+							IResource resource = resources[j];
+							if (isDescendantOfRoots(resource)) {
+								return true;
+							}
+						}
+					}
+				} catch (CoreException e) {
+					IDEWorkbenchPlugin
+							.log(
+									NLS
+											.bind(
+													"An internal error occurred while determining the resources for {0}", saveable.getName()), e); //$NON-NLS-1$
+				}
+			} else {
+				// If there is no mapping, try to adapt to a resource or file directly
+				IFile file = ResourceUtil.getFile(saveable);
+				if (file != null) {
+					return isDescendantOfRoots(file);
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Return whether the given resource is either equal to or a descendant of
+		 * one of the given roots.
+		 * 
+		 * @param resource the resource to be tested
+		 * @return whether the given resource is either equal to or a descendant of
+		 *         one of the given roots
+		 */
+		private boolean isDescendantOfRoots(IResource resource) {
+			for (int l = 0; l < roots.length; l++) {
+				IResource root = roots[l];
+				if (root.getFullPath().isPrefixOf(resource.getFullPath())) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		/**
+		 * Return whether the given dirty editor part is editing resources that are
+		 * descendants of the given roots.
+		 * 
+		 * @param part the dirty editor part
+		 * @return whether the given dirty editor part is editing resources that are
+		 *         descendants of the given roots
+		 */
+		private boolean isEditingDescendantOf(IEditorPart part) {
+			IFile file = ResourceUtil.getFile(part.getEditorInput());
+			if (file != null) {
+				return isDescendantOfRoots(file);
+			}
+			return false;
+		}
+		
+	}
+	
 	/**
 	 * Block instantiation.
 	 */
@@ -264,7 +378,7 @@ public final class IDE {
 
 	/**
 	 * Returns the marker help registry for the workbench.
-	 *
+	 * 
 	 * @return the marker help registry
 	 */
 	public static IMarkerHelpRegistry getMarkerHelpRegistry() {
@@ -281,7 +395,7 @@ public final class IDE {
 	 * editor does not provide an <code>IGotoMarker</code> interface (either
 	 * directly or via <code>IAdaptable.getAdapter</code>), this has no
 	 * effect.
-	 *
+	 * 
 	 * @param editor
 	 *            the editor
 	 * @param marker
@@ -305,7 +419,7 @@ public final class IDE {
 	 * If the page already has an editor open on the target object then that
 	 * editor is brought to front; otherwise, a new editor is opened.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -339,7 +453,7 @@ public final class IDE {
 	 * If the page already has an editor open on the target object then that
 	 * editor is brought to front; otherwise, a new editor is opened.
 	 * </p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param uri
@@ -351,10 +465,10 @@ public final class IDE {
 	 * @return an open editor or <code>null</code> if an external editor was
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
-	 *
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
 	 * @see EFS#getStore(URI)
-	 *
+	 * 
 	 * @since 3.3
 	 */
 	public static IEditorPart openEditor(IWorkbenchPage page, URI uri,
@@ -383,7 +497,7 @@ public final class IDE {
 	 * The result is a normal file editor input if the file exists in the
 	 * workspace and, if not, we create a wrapper capable of managing an
 	 * 'external' file using its <code>IFileStore</code>.
-	 *
+	 * 
 	 * @param fileStore
 	 *            The file store to provide the editor input for
 	 * @return The editor input associated with the given file store
@@ -399,7 +513,7 @@ public final class IDE {
 	/**
 	 * Determine whether or not the <code>IFileStore</code> represents a file
 	 * currently in the workspace.
-	 *
+	 * 
 	 * @param fileStore
 	 *            The <code>IFileStore</code> to test
 	 * @return The workspace's <code>IFile</code> if it exists or
@@ -419,7 +533,7 @@ public final class IDE {
 	/**
 	 * Filter the incoming array of <code>IFile</code> elements by removing
 	 * any that do not currently exist in the workspace.
-	 *
+	 * 
 	 * @param files
 	 *            The array of <code>IFile</code> elements
 	 * @return The filtered array
@@ -444,7 +558,7 @@ public final class IDE {
 	 * editor is brought to front; otherwise, a new editor is opened. If
 	 * <code>activate == true</code> the editor will be activated.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -481,7 +595,7 @@ public final class IDE {
 	 * editor is brought to front; otherwise, a new editor is opened. If
 	 * <code>activate == true</code> the editor will be activated.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -510,7 +624,7 @@ public final class IDE {
 	 * editor is brought to front; otherwise, a new editor is opened. If
 	 * <code>activate == true</code> the editor will be activated.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -550,7 +664,7 @@ public final class IDE {
 	 * If the page already has an editor open on the target object then that
 	 * editor is brought to front; otherwise, a new editor is opened.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -579,7 +693,7 @@ public final class IDE {
 	 * If the page already has an editor open on the target object then that
 	 * editor is brought to front; otherwise, a new editor is opened.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -610,7 +724,7 @@ public final class IDE {
 	 * editor is brought to front; otherwise, a new editor is opened. If
 	 * <code>activate == true</code> the editor will be activated.
 	 * <p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param input
@@ -661,7 +775,7 @@ public final class IDE {
 	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
-	 *
+	 * 
 	 * @param file
 	 *            the file
 	 * @return an editor descriptor, appropriate for opening the file
@@ -698,7 +812,7 @@ public final class IDE {
 	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
-	 *
+	 * 
 	 * @param file
 	 *            the file
 	 * @param determineContentType
@@ -741,8 +855,8 @@ public final class IDE {
 	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
-	 *
-	 * @param fileStore
+	 * 
+	 * @param fileStore 
 	 *            the file store
 	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
@@ -786,7 +900,7 @@ public final class IDE {
 	 * calling {@link #getDefaultEditor(IFile, boolean)}. This method here should only be used if
 	 * this is not possible for whatever reason.
 	 * </p>
-	 *
+	 * 
 	 * @param editorInput the editor input for the editor
 	 * @param contentType the content type of the input or <code>null</code> if not available
 	 * @param editorDescriptor the current association for the given input or <code>null</code> if
@@ -808,7 +922,7 @@ public final class IDE {
 	/**
 	 * Applies the <code>org.eclipse.ui.ide.editorAssociationOverride</code> extensions to the given
 	 * input.
-	 *
+	 * 
 	 * @param fileName the name of the file for which to choose the editor
 	 * @param contentType the content type of the input or <code>null</code> if not available
 	 * @param editorDescriptor the current association for the given input or <code>null</code> if
@@ -830,7 +944,7 @@ public final class IDE {
 	/**
 	 * Applies the <code>org.eclipse.ui.ide.editorAssociationOverride</code> extensions to the given
 	 * input.
-	 *
+	 * 
 	 * @param editorInput the editor input for the editor
 	 * @param contentType the content type of the input or <code>null</code> if not available
 	 * @param editorDescriptors the current association for the given input
@@ -851,7 +965,7 @@ public final class IDE {
 	/**
 	 * Applies the <code>org.eclipse.ui.ide.editorAssociationOverride</code> extensions to the given
 	 * input.
-	 *
+	 * 
 	 * @param fileName the name of the file for which to choose the editor
 	 * @param contentType the content type of the input or <code>null</code> if not available
 	 * @param editorDescriptors the current association for the given input
@@ -889,7 +1003,7 @@ public final class IDE {
 	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
-	 *
+	 * 
 	 * @param name
 	 *            the file name
 	 * @return an editor descriptor, appropriate for opening the file
@@ -923,7 +1037,7 @@ public final class IDE {
 	 * default text editor is available.</li>
 	 * </ol>
 	 * </p>
-	 *
+	 * 
 	 * @param name
 	 *            the file name
 	 * @param inferContentType
@@ -954,7 +1068,7 @@ public final class IDE {
 	/**
 	 * Get the editor descriptor for a given name using the editorDescriptor
 	 * passed in as a default as a starting point.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the element to open.
 	 * @param editorReg
@@ -964,7 +1078,7 @@ public final class IDE {
 	 * @return IEditorDescriptor
 	 * @throws PartInitException
 	 *             if no valid editor can be found
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	private static IEditorDescriptor getEditorDescriptor(String name,
@@ -1018,7 +1132,7 @@ public final class IDE {
 	 * attribute value will be used to determine the editor type to be opened.
 	 * If not, the registered editor for the marker resource file will be used.
 	 * </p>
-	 *
+	 * 
 	 * @param page
 	 *            the workbench page to open the editor in
 	 * @param marker
@@ -1048,7 +1162,7 @@ public final class IDE {
 	 * attribute value will be used to determine the editor type to be opened.
 	 * If not, the registered editor for the marker resource file will be used.
 	 * </p>
-	 *
+	 * 
 	 * @param page
 	 *            the workbench page to open the editor in
 	 * @param marker
@@ -1115,10 +1229,10 @@ public final class IDE {
      * If the page already has an editor open on the target object then that
      * editor is brought to front; otherwise, a new editor is opened.
      * </p>
-     *
+     * 
      * @param page
      *            the page in which the editor will be opened
-     * @param fileStore
+     * @param fileStore 
      *            the IFileStore representing the file to open
      * @return an open editor or <code>null</code> if an external editor was opened
      * @exception PartInitException
@@ -1134,7 +1248,7 @@ public final class IDE {
 
         IEditorInput input = getEditorInput(fileStore);
         String editorId = getEditorId(fileStore);
-
+        
         // open the editor on the file
         return page.openEditor(input, editorId);
     }
@@ -1149,7 +1263,7 @@ public final class IDE {
 	 * If the page already has an editor open on the target object then that
 	 * editor is brought to front; otherwise, a new editor is opened.
 	 * </p>
-	 *
+	 * 
 	 * @param page
 	 *            the page in which the editor will be opened
 	 * @param fileStore
@@ -1224,9 +1338,9 @@ public final class IDE {
 	 * resource of one of the <code>IResource</code>'s provided. Opens a
 	 * dialog to prompt the user if <code>confirm</code> is true. Return true
 	 * if successful. Return false if the user has canceled the command.
-	 *
+	 * 
 	 * @since 3.0
-	 *
+	 * 
 	 * @param resourceRoots the resource roots under which editor input should
 	 *            be saved, other will be left dirty
 	 * @param confirm <code>true</code> to ask the user before saving unsaved
@@ -1245,7 +1359,6 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { true };
 		SafeRunner.run(new SafeRunnable(IDEWorkbenchMessages.ErrorOnSaveAll) {
-			@Override
 			public void run() {
 				IWorkbenchWindow w = PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow();
@@ -1257,7 +1370,7 @@ public final class IDE {
 				}
 				if (w != null) {
 					result[0] = PlatformUI.getWorkbench().saveAll(w, w,
-							new ResourceSaveableFilter(resourceRoots), confirm);
+							new SaveFilter(resourceRoots), confirm);
 				}
 			}
 		});
@@ -1268,7 +1381,7 @@ public final class IDE {
 	 * Sets the default editor id for a given file. This value will be used to
 	 * determine the default editor descriptor for the file in future calls to
 	 * <code>getDefaultEditor(IFile)</code>.
-	 *
+	 * 
 	 * @param file
 	 *            the file
 	 * @param editorID
@@ -1293,7 +1406,7 @@ public final class IDE {
 	 * default editor is determined by taking the file name for the file and
 	 * obtaining the default editor for that name.
 	 * </p>
-	 *
+	 * 
 	 * @param file
 	 *            the file
 	 * @return the descriptor of the default editor, or <code>null</code> if
@@ -1315,7 +1428,7 @@ public final class IDE {
 	 * default editor is determined by taking the file name for the file and
 	 * obtaining the default editor for that name.
 	 * </p>
-	 *
+	 * 
 	 * @param file
 	 *            the file
 	 * @param determineContentType
@@ -1355,7 +1468,7 @@ public final class IDE {
 	/**
 	 * Extracts and returns the <code>IResource</code>s in the given
 	 * selection or the resource objects they adapts to.
-	 *
+	 * 
 	 * @param originalSelection
 	 *            the original selection, possibly empty
 	 * @return list of resources (element type: <code>IResource</code>),
@@ -1390,7 +1503,7 @@ public final class IDE {
 
 	/**
 	 * Return the content type for the given file.
-	 *
+	 * 
 	 * @param file
 	 *            the file to test
 	 * @return the content type, or <code>null</code> if it cannot be
@@ -1420,7 +1533,7 @@ public final class IDE {
 
 	/**
 	 * Guess at the content type of the given file based on the filename.
-	 *
+	 * 
 	 * @param file
 	 *            the file to test
 	 * @return the content type, or <code>null</code> if it cannot be
@@ -1447,7 +1560,7 @@ public final class IDE {
 	 * providers. A model provider can be ignored if it is the client calling
 	 * this API. Any message from the provided model provider id or any model
 	 * providers it extends will be ignored.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell to parent the prompt dialog
 	 * @param title
@@ -1509,12 +1622,10 @@ public final class IDE {
 
 		final boolean[] result = new boolean[] { false };
 		Runnable runnable = new Runnable() {
-			@Override
 			public void run() {
 				ErrorDialog dialog = new ErrorDialog(shell, title,
 						dialogMessage, displayStatus, IStatus.ERROR
 								| IStatus.WARNING | IStatus.INFO) {
-					@Override
 					protected void createButtonsForButtonBar(Composite parent) {
 						createButton(parent, IDialogConstants.YES_ID,
 								IDialogConstants.YES_LABEL, false);
@@ -1523,7 +1634,11 @@ public final class IDE {
 						createDetailsButton(parent);
 					}
 
-					@Override
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see org.eclipse.jface.dialogs.ErrorDialog#buttonPressed(int)
+					 */
 					protected void buttonPressed(int id) {
 						if (id == IDialogConstants.YES_ID) {
 							super.buttonPressed(IDialogConstants.OK_ID);
@@ -1532,7 +1647,6 @@ public final class IDE {
 						}
 						super.buttonPressed(id);
 					}
-					@Override
 					protected int getShellStyle() {
 						return super.getShellStyle() | SWT.SHEET;
 					}
@@ -1556,7 +1670,7 @@ public final class IDE {
 	 * <b>Note:</b> this method should only be called once, in your
 	 * application's WorkbenchAdvisor#initialize(IWorkbenchConfigurer) method.
 	 * </p>
-	 *
+	 * 
 	 * @since 3.5
 	 */
 	public static void registerAdapters() {
@@ -1601,12 +1715,12 @@ public final class IDE {
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Opens editors on given file resources.
 	 * <p>
 	 * If the page already has an editor open on the target object then that
-	 * editor is brought to front; otherwise, a new editor is opened. The editor created
+	 * editor is brought to front; otherwise, a new editor is opened. The editor created 
 	 * for the first input will be activated.
 	 * </p>
 	 * @param page the page in which the editor will be opened
@@ -1618,9 +1732,9 @@ public final class IDE {
 	public static IEditorReference[] openEditors(IWorkbenchPage page, IFile[] inputs) throws MultiPartInitException {
 		if ((page == null) || (inputs == null))
 			throw new IllegalArgumentException();
-
-		String[] editorDescriptions = new String[inputs.length];
-		IEditorInput[] editorInputs = new IEditorInput[inputs.length];
+		
+		String[] editorDescriptions = new String[inputs.length]; 
+		IEditorInput[] editorInputs = new IEditorInput[inputs.length]; 
 		for(int i = 0 ; i < inputs.length; i++) {
 			editorInputs[i] = new FileEditorInput(inputs[i]);
 			try {

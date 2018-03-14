@@ -118,7 +118,6 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return id;
 	}
@@ -128,7 +127,6 @@ public class StatusHandlerDescriptor implements IPluginContribution {
 	 * 
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return pluginId;
 	}

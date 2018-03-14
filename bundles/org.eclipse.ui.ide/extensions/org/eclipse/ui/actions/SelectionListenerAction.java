@@ -83,7 +83,7 @@ public abstract class SelectionListenerAction extends
 
 	/**
 	 * Creates a new action with the given text.
-	 *
+	 * 
 	 * @param text
 	 *            the string used as the text for the action, or
 	 *            <code>null</code> if there is no text
@@ -97,7 +97,6 @@ public abstract class SelectionListenerAction extends
 	 * <code>BaseSelectionListenerAction</code> method clears the cached
 	 * resources and non-resources.
 	 */
-	@Override
 	protected void clearCache() {
 		selectionDirty = true;
 		// clear out the lists in case computeResources does not get called
@@ -199,7 +198,7 @@ public abstract class SelectionListenerAction extends
 	/**
 	 * Returns the elements in the current selection that are not
 	 * <code>IResource</code>s.
-	 *
+	 * 
 	 * @return list of elements (element type: <code>Object</code>)
 	 */
 	protected List getSelectedNonResources() {
@@ -212,14 +211,14 @@ public abstract class SelectionListenerAction extends
 		if (nonResources == null) {
 			return EMPTY_LIST;
 		}
-
+		
 		return nonResources;
 	}
 
 	/**
 	 * Returns the elements in the current selection that are
 	 * <code>IResource</code>s.
-	 *
+	 * 
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
 	protected List getSelectedResources() {
@@ -238,7 +237,7 @@ public abstract class SelectionListenerAction extends
 	/**
 	 * Returns whether the type of the given resource is among those in the
 	 * given resource type mask.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource
 	 * @param resourceMask
@@ -256,7 +255,7 @@ public abstract class SelectionListenerAction extends
 	/**
 	 * Returns whether the current selection consists entirely of resources
 	 * whose types are among those in the given resource type mask.
-	 *
+	 * 
 	 * @param resourceMask
 	 *            a bitwise OR of resource types: <code>IResource</code>.{<code>FILE</code>,
 	 *            <code>FOLDER</code>, <code>PROJECT</code>,

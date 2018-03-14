@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -130,7 +130,6 @@ public class KeyAssistDialog extends PopupDialog {
 	 * 
 	 * @return Whether the shell was already closed.
 	 */
-	@Override
 	public boolean close() {
 		return close(false);
 	}
@@ -173,11 +172,7 @@ public class KeyAssistDialog extends PopupDialog {
 			completionsTable = null;
 		}
 		matches = null;
-		boolean popupClosed = super.close();
-		if (resetState) {
-			workbenchKeyboard.resetState();
-		}
-		return popupClosed;
+		return super.close();
 	}
 
 	/**
@@ -257,7 +252,6 @@ public class KeyAssistDialog extends PopupDialog {
 	 * @param parent
 	 *            The parent composite to contain the dialog area; must not be <code>null</code>.
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		// Create a composite for the dialog area.
@@ -356,7 +350,6 @@ public class KeyAssistDialog extends PopupDialog {
 		 * If you double-click on the table, it should execute the selected command.
 		 */
 		completionsTable.addListener(SWT.DefaultSelection, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				executeKeyBinding(event);
 			}
@@ -371,7 +364,6 @@ public class KeyAssistDialog extends PopupDialog {
 		int selectionIndex = completionsTable.getSelectionIndex();
 		// Try to execute the corresponding command.
 		if (selectionIndex >= 0) {
-			close();
 			Binding binding = bindings.get(selectionIndex);
 			try {
 				// workbenchKeyboard.updateShellKludge(null);
@@ -394,7 +386,6 @@ public class KeyAssistDialog extends PopupDialog {
 		Collection<Binding> activeBindings = bindingService.getActiveBindings();
 		Collection<Binding> conflictBindings = bindingService.getAllConflicts();
 		Collection<Binding> sortedMatches = new TreeSet<Binding>(new Comparator<Binding>() {
-			@Override
 			public int compare(Binding binding1, Binding binding2) {
 				ParameterizedCommand cmdA = binding1.getParameterizedCommand();
 				ParameterizedCommand cmdB = binding2.getParameterizedCommand();
@@ -459,7 +450,6 @@ public class KeyAssistDialog extends PopupDialog {
 	 * 
 	 * @return The return code from this dialog.
 	 */
-	@Override
 	public int open() {
 		// If the dialog is already open, dispose the shell and recreate it.
 		Shell shell = getShell();
@@ -468,8 +458,6 @@ public class KeyAssistDialog extends PopupDialog {
 			return Window.OK;
 		}
 		create();
-		// Bug 412001. Stop ShellActivationListener from creating a context for this.
-		getShell().setData("org.eclipse.e4.ui.ignoreDialog", Boolean.TRUE); //$NON-NLS-1$
 
 		// Configure the size and location.
 		Point size = configureSize();
@@ -487,7 +475,6 @@ public class KeyAssistDialog extends PopupDialog {
 	 */
 	public int open(Collection<Binding> bindings) {
 		matches = new TreeSet<Binding>(new Comparator<Binding>() {
-			@Override
 			public int compare(Binding a, Binding b) {
 				Binding bindingA = a;
 				Binding bindingB = b;
@@ -510,8 +497,7 @@ public class KeyAssistDialog extends PopupDialog {
 			return Window.OK;
 		}
 		create();
-		// Bug 369860. Stop ShellActivationListener from creating a context for this.
-		getShell().setData("org.eclipse.e4.ui.ignoreDialog", Boolean.TRUE); //$NON-NLS-1$
+
 		// Configure the size and location.
 		Point size = configureSize();
 		configureLocation(size);
@@ -527,7 +513,6 @@ public class KeyAssistDialog extends PopupDialog {
 	 *            The new parent shell; this value may be <code>null</code> if there is to be no
 	 *            parent.
 	 */
-	@Override
 	public void setParentShell(Shell newParentShell) {
 		super.setParentShell(newParentShell);
 	}

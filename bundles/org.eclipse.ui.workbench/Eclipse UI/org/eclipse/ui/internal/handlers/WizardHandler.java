@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,17 +61,14 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	    private static final int SIZING_WIZARD_WIDTH = 470;
 	    private static final int SIZING_WIZARD_HEIGHT = 550;
 
-		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_EXPORT_PARM_WIZARDID;
 		}
 
-		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getExportWizardRegistry();
 		}
 
-		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil
 					.getActiveWorkbenchWindow(event);
@@ -115,17 +112,14 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	    private static final int SIZING_WIZARD_WIDTH = 470;
 	    private static final int SIZING_WIZARD_HEIGHT = 550;
 
-		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_IMPORT_PARM_WIZARDID;
 		}
 
-		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getImportWizardRegistry();
 		}
 
-		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 	        if (activeWorkbenchWindow == null) {
@@ -181,12 +175,10 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	     */
 	    private String categoryId = null;
 
-		@Override
 		protected String getWizardIdParameterId() {
 			return IWorkbenchCommandConstants.FILE_NEW_PARM_WIZARDID;
 		}
 
-		@Override
 		protected IWizardRegistry getWizardRegistry() {
 			return PlatformUI.getWorkbench().getNewWizardRegistry();
 		}
@@ -209,8 +201,7 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	        categoryId = id;
 	    }
 	    
-	    @Override
-		protected IStructuredSelection getSelectionToUse(ExecutionEvent event) {
+	    protected IStructuredSelection getSelectionToUse(ExecutionEvent event) {
 	        ISelection selection = HandlerUtil.getCurrentSelection(event);
 	        IStructuredSelection selectionToPass = StructuredSelection.EMPTY;
 	        if (selection instanceof IStructuredSelection) {
@@ -235,7 +226,6 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	        return selectionToPass;
 	    }
 	    
-		@Override
 		protected void executeHandler(ExecutionEvent event) {
 			IWorkbenchWindow activeWorkbenchWindow = HandlerUtil.getActiveWorkbenchWindow(event);
 	        if (activeWorkbenchWindow == null) {
@@ -278,7 +268,6 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 	 */
 	protected abstract void executeHandler(ExecutionEvent event);
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 
 		String wizardId = event.getParameter(getWizardIdParameterId());
@@ -334,7 +323,6 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 		return StructuredSelection.EMPTY;
 	}
 
-	@Override
 	public void updateElement(UIElement element, Map parameters) {
 
 		String wizardId = (String) parameters.get(getWizardIdParameterId());

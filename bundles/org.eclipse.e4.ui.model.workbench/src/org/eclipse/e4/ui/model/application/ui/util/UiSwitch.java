@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,18 @@
 package org.eclipse.e4.ui.model.application.ui.util;
 
 import org.eclipse.e4.ui.model.application.MApplicationElement;
-import org.eclipse.e4.ui.model.application.ui.*;
+import org.eclipse.e4.ui.model.application.ui.MContext;
+import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
+import org.eclipse.e4.ui.model.application.ui.MDirtyable;
+import org.eclipse.e4.ui.model.application.ui.MElementContainer;
+import org.eclipse.e4.ui.model.application.ui.MExpression;
+import org.eclipse.e4.ui.model.application.ui.MGenericStack;
+import org.eclipse.e4.ui.model.application.ui.MGenericTile;
+import org.eclipse.e4.ui.model.application.ui.MGenericTrimContainer;
+import org.eclipse.e4.ui.model.application.ui.MInput;
+import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.MUILabel;
 import org.eclipse.e4.ui.model.application.ui.impl.UiPackageImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -96,7 +107,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 				MUIElement uiElement = (MUIElement)theEObject;
 				T1 result = caseUIElement(uiElement);
 				if (result == null) result = caseApplicationElement(uiElement);
-				if (result == null) result = caseLocalizable(uiElement);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -105,14 +115,12 @@ public class UiSwitch<T1> extends Switch<T1> {
 				T1 result = caseElementContainer(elementContainer);
 				if (result == null) result = caseUIElement(elementContainer);
 				if (result == null) result = caseApplicationElement(elementContainer);
-				if (result == null) result = caseLocalizable(elementContainer);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case UiPackageImpl.UI_LABEL: {
 				MUILabel uiLabel = (MUILabel)theEObject;
 				T1 result = caseUILabel(uiLabel);
-				if (result == null) result = caseLocalizable(uiLabel);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -122,7 +130,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(genericStack);
 				if (result == null) result = caseUIElement(genericStack);
 				if (result == null) result = caseApplicationElement(genericStack);
-				if (result == null) result = caseLocalizable(genericStack);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -132,7 +139,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(genericTile);
 				if (result == null) result = caseUIElement(genericTile);
 				if (result == null) result = caseApplicationElement(genericTile);
-				if (result == null) result = caseLocalizable(genericTile);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -142,7 +148,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(genericTrimContainer);
 				if (result == null) result = caseUIElement(genericTrimContainer);
 				if (result == null) result = caseApplicationElement(genericTrimContainer);
-				if (result == null) result = caseLocalizable(genericTrimContainer);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -164,12 +169,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 			case UiPackageImpl.SNIPPET_CONTAINER: {
 				MSnippetContainer snippetContainer = (MSnippetContainer)theEObject;
 				T1 result = caseSnippetContainer(snippetContainer);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case UiPackageImpl.LOCALIZABLE: {
-				MLocalizable localizable = (MLocalizable)theEObject;
-				T1 result = caseLocalizable(localizable);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -354,21 +353,6 @@ public class UiSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseSnippetContainer(MSnippetContainer object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseLocalizable(MLocalizable object) {
 		return null;
 	}
 

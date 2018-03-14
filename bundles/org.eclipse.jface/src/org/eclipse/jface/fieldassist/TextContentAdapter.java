@@ -25,19 +25,33 @@ import org.eclipse.swt.widgets.Text;
 public class TextContentAdapter implements IControlContentAdapter,
 		IControlContentAdapter2 {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter#getControlContents(org.eclipse.swt.widgets.Control)
+	 */
 	public String getControlContents(Control control) {
 		return ((Text) control).getText();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	public void setControlContents(Control control, String text,
 			int cursorPosition) {
 		((Text) control).setText(text);
 		((Text) control).setSelection(cursorPosition, cursorPosition);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#insertControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	public void insertControlContents(Control control, String text,
 			int cursorPosition) {
 		Point selection = ((Text) control).getSelection();
@@ -50,12 +64,20 @@ public class TextContentAdapter implements IControlContentAdapter,
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition(org.eclipse.swt.widgets.Control)
+	 */
 	public int getCursorPosition(Control control) {
 		return ((Text) control).getCaretPosition();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds(org.eclipse.swt.widgets.Control)
+	 */
 	public Rectangle getInsertionBounds(Control control) {
 		Text text = (Text) control;
 		Point caretOrigin = text.getCaretLocation();
@@ -65,7 +87,12 @@ public class TextContentAdapter implements IControlContentAdapter,
 				caretOrigin.y + text.getClientArea().y + 3, 1, text.getLineHeight());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition(org.eclipse.swt.widgets.Control,
+	 *      int)
+	 */
 	public void setCursorPosition(Control control, int position) {
 		((Text) control).setSelection(new Point(position, position));
 	}
@@ -75,7 +102,6 @@ public class TextContentAdapter implements IControlContentAdapter,
 	 * 
 	 * @since 3.4
 	 */
-	@Override
 	public Point getSelection(Control control) {
 		return ((Text) control).getSelection();
 	}
@@ -86,7 +112,6 @@ public class TextContentAdapter implements IControlContentAdapter,
 	 * 
 	 * @since 3.4
 	 */
-	@Override
 	public void setSelection(Control control, Point range) {
 		((Text) control).setSelection(range);
 	}

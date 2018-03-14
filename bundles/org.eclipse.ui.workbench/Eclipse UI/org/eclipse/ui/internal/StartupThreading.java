@@ -26,7 +26,6 @@ public final class StartupThreading {
 	public static abstract class StartupRunnable implements Runnable {
 		private Throwable throwable;
 
-		@Override
 		public final void run() {
 			try {
 				runWithException();

@@ -48,39 +48,48 @@ public class PendingUpdateAdapter implements IWorkbenchAdapter, IAdaptable {
         //No initial behavior
     }
 
-    @Override
-	public Object getAdapter(Class adapter) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class) {
 			return this;
 		}
         return null;
     }
 
-    @Override
-	public Object[] getChildren(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+     */
+    public Object[] getChildren(Object o) {
         return new Object[0];
     }
 
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+     */
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
-    @Override
-	public String getLabel(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
+     */
+    public String getLabel(Object o) {
         return ProgressMessages.PendingUpdateAdapter_PendingLabel;
     }
 
-    @Override
-	public Object getParent(Object o) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+     */
+    public Object getParent(Object o) {
         return null;
     }
     
     /**
 	 * @since 3.4
 	 */
-    @Override
-	public String toString() {
+    public String toString() {
     	return getLabel(null);
     }
 }

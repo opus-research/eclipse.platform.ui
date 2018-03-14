@@ -58,7 +58,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 	private boolean updating = false;
 
 	private IMapChangeListener masterListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(final MapChangeEvent event) {
 			if (!isDisposed()) {
 				updateKnownValues();
@@ -117,7 +116,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 	};
 
 	private IStaleListener staleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
 		}
@@ -136,11 +134,9 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		this.detailProperty = valueProperty;
 
 		ISimplePropertyListener listener = new ISimplePropertyListener() {
-			@Override
 			public void handleEvent(final SimplePropertyEvent event) {
 				if (!isDisposed() && !updating) {
 					getRealm().exec(new Runnable() {
-						@Override
 						public void run() {
 							if (event.type == SimplePropertyEvent.CHANGE) {
 								notifyIfChanged(event.getSource());
@@ -158,17 +154,14 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		this.detailListener = detailProperty.adaptListener(listener);
 	}
 
-	@Override
 	public Object getKeyType() {
 		return masterMap.getKeyType();
 	}
 
-	@Override
 	public Object getValueType() {
 		return detailProperty.getValueType();
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -180,7 +173,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		cachedValues = new IdentityMap();
 		staleMasterValues = new IdentitySet();
 		knownMasterValues.addSetChangeListener(new ISetChangeListener() {
-			@Override
 			public void handleSetChange(SetChangeEvent event) {
 				for (Iterator it = event.diff.getRemovals().iterator(); it
 						.hasNext();) {
@@ -201,7 +193,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		});
 
 		getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				knownMasterValues.addAll(masterMap.values());
 
@@ -211,7 +202,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		});
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		masterMap.removeMapChangeListener(masterListener);
 		masterMap.removeStaleListener(staleListener);
@@ -227,7 +217,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 
 	private Set entrySet;
 
-	@Override
 	public Set entrySet() {
 		getterCalled();
 		if (entrySet == null)
@@ -236,32 +225,27 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 	}
 
 	class EntrySet extends AbstractSet {
-		@Override
 		public Iterator iterator() {
 			return new Iterator() {
 				Iterator it = masterMap.entrySet().iterator();
 
-				@Override
 				public boolean hasNext() {
 					getterCalled();
 					return it.hasNext();
 				}
 
-				@Override
 				public Object next() {
 					getterCalled();
 					Map.Entry next = (Map.Entry) it.next();
 					return new MapEntry(next.getKey());
 				}
 
-				@Override
 				public void remove() {
 					it.remove();
 				}
 			};
 		}
 
-		@Override
 		public int size() {
 			return masterMap.size();
 		}
@@ -274,13 +258,11 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 			this.key = key;
 		}
 
-		@Override
 		public Object getKey() {
 			getterCalled();
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			getterCalled();
 			if (!masterMap.containsKey(key))
@@ -288,7 +270,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 			return detailProperty.getValue(masterMap.get(key));
 		}
 
-		@Override
 		public Object setValue(Object value) {
 			if (!masterMap.containsKey(key))
 				return null;
@@ -308,7 +289,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 			return oldValue;
 		}
 
-		@Override
 		public boolean equals(Object o) {
 			getterCalled();
 			if (o == this)
@@ -322,7 +302,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 					&& Util.equals(this.getValue(), that.getValue());
 		}
 
-		@Override
 		public int hashCode() {
 			getterCalled();
 			Object value = getValue();
@@ -331,21 +310,18 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		}
 	}
 
-	@Override
 	public boolean containsKey(Object key) {
 		getterCalled();
 
 		return masterMap.containsKey(key);
 	}
 
-	@Override
 	public Object get(Object key) {
 		getterCalled();
 
 		return detailProperty.getValue(masterMap.get(key));
 	}
 
-	@Override
 	public Object put(Object key, Object value) {
 		if (!masterMap.containsKey(key))
 			return null;
@@ -356,7 +332,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		return oldValue;
 	}
 
-	@Override
 	public Object remove(Object key) {
 		checkRealm();
 
@@ -380,27 +355,22 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 				cachedValues.put(masterValue, newValue);
 				staleMasterValues.remove(masterValue);
 				fireMapChange(new MapDiff() {
-					@Override
 					public Set getAddedKeys() {
 						return Collections.EMPTY_SET;
 					}
 
-					@Override
 					public Set getChangedKeys() {
 						return keys;
 					}
 
-					@Override
 					public Set getRemovedKeys() {
 						return Collections.EMPTY_SET;
 					}
 
-					@Override
 					public Object getNewValue(Object key) {
 						return newValue;
 					}
 
-					@Override
 					public Object getOldValue(Object key) {
 						return oldValue;
 					}
@@ -422,7 +392,6 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		return keys;
 	}
 
-	@Override
 	public boolean isStale() {
 		getterCalled();
 		return masterMap.isStale() || staleMasterValues != null
@@ -433,17 +402,14 @@ public class MapSimpleValueObservableMap extends AbstractObservableMap
 		ObservableTracker.getterCalled(this);
 	}
 
-	@Override
 	public Object getObserved() {
 		return masterMap;
 	}
 
-	@Override
 	public IProperty getProperty() {
 		return detailProperty;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (masterMap != null) {
 			masterMap.removeMapChangeListener(masterListener);

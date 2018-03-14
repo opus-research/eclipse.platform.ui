@@ -48,43 +48,36 @@ public interface IObservableSet extends Set, IObservableCollection {
 	/**
 	 * @return the element type or <code>null</code> if untyped
 	 */
-	@Override
 	public Object getElementType();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	int size();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean isEmpty();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean contains(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	Iterator iterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	Object[] toArray();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	Object[] toArray(Object a[]);
 
 	// Modification Operations
@@ -92,13 +85,11 @@ public interface IObservableSet extends Set, IObservableCollection {
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean add(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean remove(Object o);
 
 	// Bulk Operations
@@ -106,25 +97,21 @@ public interface IObservableSet extends Set, IObservableCollection {
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean containsAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean addAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean retainAll(Collection c);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean removeAll(Collection c);
 
 	// Comparison and hashing
@@ -132,13 +119,11 @@ public interface IObservableSet extends Set, IObservableCollection {
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	boolean equals(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
 	int hashCode();
 
 }

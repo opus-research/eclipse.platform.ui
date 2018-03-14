@@ -137,8 +137,7 @@ public abstract class SelectionProviderAction extends Action implements
      * not. Subclasses should override either of those methods method to react to
      * selection changes.
      */
-    @Override
-	public final void selectionChanged(SelectionChangedEvent event) {
+    public final void selectionChanged(SelectionChangedEvent event) {
         ISelection selection = event.getSelection();
         if (selection instanceof IStructuredSelection) {
 			selectionChanged((IStructuredSelection) selection);

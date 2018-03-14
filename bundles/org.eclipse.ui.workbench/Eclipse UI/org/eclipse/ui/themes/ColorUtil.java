@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.themes;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+
 import org.eclipse.jface.resource.DataFormatException;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.swt.SWT;
@@ -64,9 +65,9 @@ public final class ColorUtil {
 	 */
 	private static Field[] getFields() {
 		if (cachedFields == null) {
-			Class<SWT> clazz = SWT.class;
+			Class clazz = SWT.class;		
 			Field[] allFields = clazz.getDeclaredFields();
-			ArrayList<Field> applicableFields = new ArrayList<Field>(allFields.length);
+			ArrayList applicableFields = new ArrayList(allFields.length);
 			
 			for (int i = 0; i < allFields.length; i++) {
 				Field field = allFields[i];
@@ -79,7 +80,7 @@ public final class ColorUtil {
 					applicableFields.add(field);
 				}
 			}
-			cachedFields = applicableFields.toArray(new Field[applicableFields.size()]);
+			cachedFields = (Field []) applicableFields.toArray(new Field [applicableFields.size()]);
 		}
 		return cachedFields;
 	}

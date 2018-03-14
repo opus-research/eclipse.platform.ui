@@ -30,12 +30,14 @@ public class ActionSetMenuManager extends SubMenuManager {
         this.actionSetId = actionSetId;
     }
 
-	/**
-	 * Returns the item passed to us, not the wrapper. In the case of menu's not
-	 * added by this manager, ensure that we return a wrapper for the menu.
-	 */
-    @Override
-	public IContributionItem find(String id) {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     *
+     * Returns the item passed to us, not the wrapper.
+     * In the case of menu's not added by this manager,
+     * ensure that we return a wrapper for the menu.
+     */
+    public IContributionItem find(String id) {
         IContributionItem item = getParentMenuManager().find(id);
         if (item instanceof SubContributionItem) {
 			// Return the item passed to us, not the wrapper.
@@ -57,30 +59,24 @@ public class ActionSetMenuManager extends SubMenuManager {
         return item;
     }
 
-	/**
-	 * @return Returns the actionSetId.
-	 */
-	public String getActionSetId() {
-		return actionSetId;
-	}
-
-    @Override
-	public IContributionItem[] getItems() {
+    /* (non-Javadoc)
+     * Method declared on IContributionManager.
+     */
+    public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
     }
 
-    @Override
-	protected SubContributionItem wrap(IContributionItem item) {
+    /* (non-Javadoc)
+     * Method declared on SubContributionManager.
+     */
+    protected SubContributionItem wrap(IContributionItem item) {
         return new ActionSetContributionItem(item, actionSetId);
     }
 
-    @Override
-	protected SubMenuManager wrapMenu(IMenuManager menu) {
+    /* (non-Javadoc)
+     * Method declared on SubMenuManager.
+     */
+    protected SubMenuManager wrapMenu(IMenuManager menu) {
         return new ActionSetMenuManager(menu, actionSetId);
     }
-
-	@Override
-	public String toString() {
-		return "ActionSetMenuManager [id=" + actionSetId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-	}
 }

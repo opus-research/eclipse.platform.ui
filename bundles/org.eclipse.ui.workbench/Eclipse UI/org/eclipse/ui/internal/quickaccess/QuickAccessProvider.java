@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,10 +54,11 @@ public abstract class QuickAccessProvider {
 	public QuickAccessElement[] getElementsSorted() {
 		if (sortedElements == null) {
 			sortedElements = getElements();
-			Arrays.sort(sortedElements, new Comparator<QuickAccessElement>() {
-				@Override
-				public int compare(QuickAccessElement e1, QuickAccessElement e2) {
-					return e1.getSortLabel().compareTo(e2.getSortLabel());
+			Arrays.sort(sortedElements, new Comparator() {
+				public int compare(Object o1, Object o2) {
+					QuickAccessElement e1 = (QuickAccessElement) o1;
+					QuickAccessElement e2 = (QuickAccessElement) o2;
+					return e1.getLabel().compareTo(e2.getLabel());
 				}
 			});
 		}

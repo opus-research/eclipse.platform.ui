@@ -98,7 +98,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 
 		int sortValue;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
 		public String toString() {
 			String toString;
 			if (name != null) {
@@ -117,7 +121,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	}
 
 	private class FileSpecComparator extends ViewerComparator {
-		@Override
 		public int category(Object element) {
 			// only Spec objects in here - unchecked cast
 			return ((Spec) element).sortValue;
@@ -125,7 +128,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	}
 
 	private class FileSpecLabelProvider extends LabelProvider {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		public String getText(Object element) {
 			String label = super.getText(element);
 			return TextProcessor.process(label, "*."); //$NON-NLS-1$
@@ -134,15 +141,28 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 
 	private class FileSpecContentProvider implements IStructuredContentProvider {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		public Object[] getElements(Object inputElement) {
 			IContentType contentType = (IContentType) inputElement;
 			String[] userextfileSpecs = contentType
@@ -203,7 +223,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 	}
 
 	private class ContentTypesLabelProvider extends LabelProvider {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
+		 */
 		public String getText(Object element) {
 			IContentType contentType = (IContentType) element;
 			return contentType.getName();
@@ -214,7 +238,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 
 		private IContentTypeManager manager;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+		 */
 		public Object[] getChildren(Object parentElement) {
 			List elements = new ArrayList();
 			IContentType baseType = (IContentType) parentElement;
@@ -228,34 +256,59 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			return elements.toArray();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+		 */
 		public Object getParent(Object element) {
 			IContentType contentType = (IContentType) element;
 			return contentType.getBaseType();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+		 */
 		public boolean hasChildren(Object element) {
 			return getChildren(element).length > 0;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		public Object[] getElements(Object inputElement) {
 			return getChildren(null);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			manager = (IContentTypeManager) newInput;
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createContents(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(2, false);
@@ -308,7 +361,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		setButtonLayoutData(setButton);
 		setButton.addSelectionListener(new SelectionAdapter() {
 
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					String text = charsetField.getText().trim();
@@ -325,7 +382,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		});
 
 		charsetField.addKeyListener(new KeyAdapter() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
+			 */
 			public void keyReleased(KeyEvent e) {
 				IContentType contentType = getSelectedContentType();
 				String charset = contentType.getDefaultCharset();
@@ -338,7 +399,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		});
 
 		charsetField.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				String errorMessage = null;
 				String text = charsetField.getText();
@@ -378,7 +438,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			fileAssociationViewer
 					.addSelectionChangedListener(new ISelectionChangedListener() {
 
-						@Override
 						public void selectionChanged(SelectionChangedEvent event) {
 							IStructuredSelection selection = (IStructuredSelection) event
 									.getSelection();
@@ -415,7 +474,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			addButton.setEnabled(false);
 			setButtonLayoutData(addButton);
 			addButton.addSelectionListener(new SelectionAdapter() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				public void widgetSelected(SelectionEvent e) {
 					Shell shell = composite.getShell();
 					IContentType selectedContentType = getSelectedContentType();
@@ -459,7 +522,6 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			editButton.setEnabled(false);
 			setButtonLayoutData(editButton);
 			editButton.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					Shell shell = composite.getShell();
 					IContentType selectedContentType = getSelectedContentType();
@@ -518,7 +580,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 					.setText(WorkbenchMessages.ContentTypes_fileAssociationsRemoveLabel);
 			setButtonLayoutData(removeButton);
 			removeButton.addSelectionListener(new SelectionAdapter() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
 				public void widgetSelected(SelectionEvent event) {
 					IContentType contentType = getSelectedContentType();
 					Spec[] specs = getSelectedSpecs();
@@ -590,7 +656,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 			contentTypesViewer
 					.addSelectionChangedListener(new ISelectionChangedListener() {
 
-						@Override
+						/*
+						 * (non-Javadoc)
+						 * 
+						 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+						 */
 						public void selectionChanged(SelectionChangedEvent event) {
 							IContentType contentType = (IContentType) ((IStructuredSelection) event
 									.getSelection()).getFirstElement();
@@ -615,7 +685,11 @@ public class ContentTypesPreferencePage extends PreferencePage implements
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
+	 */
 	public void init(IWorkbench workbench) {
 		this.workbench = workbench;
 		noDefaultAndApplyButton();

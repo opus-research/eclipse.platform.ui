@@ -36,18 +36,17 @@ public class ActionRevealMarker extends MarkerSelectionProviderAction {
 	 * @param provider
 	 */
 	public ActionRevealMarker(IWorkbenchPart part, ISelectionProvider provider) {
-		super(provider, Util.EMPTY_STRING);
+		super(provider, Util.EMPTY_STRING); 
 		this.part = part;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
-
+		
 		IEditorPart editor = part.getSite().getPage().getActiveEditor();
 		if (editor == null) {
 			return;
@@ -68,7 +67,6 @@ public class ActionRevealMarker extends MarkerSelectionProviderAction {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(Util.isSingleConcreteSelection(selection));
 	}

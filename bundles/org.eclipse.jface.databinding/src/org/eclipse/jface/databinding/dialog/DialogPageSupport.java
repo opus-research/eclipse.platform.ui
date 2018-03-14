@@ -72,13 +72,11 @@ public class DialogPageSupport {
 	private IObservableValue aggregateStatusProvider;
 	private boolean uiChanged = false;
 	private IChangeListener uiChangeListener = new IChangeListener() {
-		@Override
 		public void handleChange(ChangeEvent event) {
 			handleUIChanged();
 		}
 	};
 	private IListChangeListener validationStatusProvidersListener = new IListChangeListener() {
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiff diff = event.diff;
 			ListDiffEntry[] differences = diff.getDifferences();
@@ -106,7 +104,6 @@ public class DialogPageSupport {
 		}
 	};
 	private IListChangeListener validationStatusProviderTargetsListener = new IListChangeListener() {
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			ListDiff diff = event.diff;
 			ListDiffEntry[] differences = diff.getDifferences();
@@ -176,19 +173,16 @@ public class DialogPageSupport {
 
 		aggregateStatusProvider
 				.addValueChangeListener(new IValueChangeListener() {
-					@Override
 					public void handleValueChange(ValueChangeEvent event) {
 						statusProviderChanged();
 					}
 				});
 		dialogPage.getShell().addListener(SWT.Dispose, new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				dispose();
 			}
 		});
 		aggregateStatusProvider.addStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				currentStatusStale = true;
 				handleStatusChanged();

@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.Collections;
@@ -140,7 +130,6 @@ public final class Parameter implements IParameter, ITypedParameter {
 	 *            The object with which to compare; may be <code>null</code>.
 	 * @return <code>true</code> if the objects are equal; <code>false</code> otherwise.
 	 */
-	@Override
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -164,22 +153,18 @@ public final class Parameter implements IParameter, ITypedParameter {
 		return Util.equals(optional, parameter.optional);
 	}
 
-	@Override
 	public final String getId() {
 		return id;
 	}
 
-	@Override
 	public final String getName() {
 		return name;
 	}
 
-	@Override
 	public final ParameterType getParameterType() {
 		return parameterType;
 	}
 
-	@Override
 	public final IParameterValues getValues() throws ParameterValuesException {
 		if (values == null) {
 			if (valuesConfigurationElement != null) {
@@ -194,7 +179,6 @@ public final class Parameter implements IParameter, ITypedParameter {
 				}
 			} else {
 				values = new IParameterValues() {
-					@Override
 					public Map getParameterValues() {
 						return Collections.EMPTY_MAP;
 					}
@@ -205,7 +189,6 @@ public final class Parameter implements IParameter, ITypedParameter {
 		return values;
 	}
 
-	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(id);
@@ -216,12 +199,10 @@ public final class Parameter implements IParameter, ITypedParameter {
 		return hashCode;
 	}
 
-	@Override
 	public final boolean isOptional() {
 		return optional;
 	}
 
-	@Override
 	public final String toString() {
 		if (string == null) {
 			final StringBuffer buffer = new StringBuffer();

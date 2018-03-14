@@ -45,8 +45,7 @@ class DefaultMarkerResourceAdapter implements ITaskListResourceAdapter {
     /**
      * @see IMarkerResourceAdapter#getAffectedResource(IAdaptable)
      */
-    @Override
-	public IResource getAffectedResource(IAdaptable adaptable) {
+    public IResource getAffectedResource(IAdaptable adaptable) {
         IResource resource = (IResource) adaptable.getAdapter(IResource.class);
 
         if (resource == null) {

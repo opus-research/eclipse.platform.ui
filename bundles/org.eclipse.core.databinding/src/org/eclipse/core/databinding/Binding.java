@@ -63,10 +63,8 @@ public abstract class Binding extends ValidationStatusProvider {
 		if (model.isDisposed())
 			throw new IllegalArgumentException("Model observable is disposed"); //$NON-NLS-1$
 		this.disposeListener = new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent staleEvent) {
 				Binding.this.context.getValidationRealm().exec(new Runnable() {
-					@Override
 					public void run() {
 						if (!isDisposed())
 							dispose();
@@ -129,7 +127,6 @@ public abstract class Binding extends ValidationStatusProvider {
 	/**
 	 * Disposes of this Binding. Subclasses may extend, but must call super.dispose().
 	 */
-	@Override
 	public void dispose() {
 		if (context != null) {
 			context.removeBinding(this);
@@ -165,7 +162,6 @@ public abstract class Binding extends ValidationStatusProvider {
 		return target;
 	}
 
-	@Override
 	public IObservableList getTargets() {
 		return Observables.staticObservableList(context.getValidationRealm(),
 				Collections.singletonList(target));
@@ -180,7 +176,6 @@ public abstract class Binding extends ValidationStatusProvider {
 		return model;
 	}
 
-	@Override
 	public IObservableList getModels() {
 		return Observables.staticObservableList(context.getValidationRealm(),
 				Collections.singletonList(model));

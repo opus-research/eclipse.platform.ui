@@ -1,20 +1,15 @@
-/*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
+/*
+ * Monitor example snippet: center a shell on the primary monitor
+ *
+ * For a list of all SWT example snippets see
+ * http://www.eclipse.org/swt/snippets/
+ * 
+ * @since 3.0
+ */
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
-import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
@@ -31,9 +26,6 @@ public class SplitFeedbackOverlay {
 	private List<Rectangle> rects = new ArrayList<Rectangle>();
 	private Rectangle outerRect;
 
-	Boolean isModified = null;
-	private IStylingEngine stylingEngine;
-
 	public SplitFeedbackOverlay(Shell dragShell, Rectangle rect, int side, float pct,
 			boolean enclosed, boolean modified) {
 		outerRect = rect;
@@ -43,13 +35,11 @@ public class SplitFeedbackOverlay {
 		feedbackShell = new Shell(dragShell, SWT.NO_TRIM);
 		feedbackShell.setBounds(dragShell.getBounds());
 
-		MWindow winModel = (MWindow) dragShell.getData(AbstractPartRenderer.OWNING_ME);
-		stylingEngine = winModel.getContext().get(IStylingEngine.class);
-
 		// Show the appropriate feedback rectangles
 		setFeedback(enclosed, modified);
 
 		defineRegion();
+		feedbackShell.setVisible(true);
 	}
 
 	public void dispose() {
@@ -59,7 +49,6 @@ public class SplitFeedbackOverlay {
 				region.dispose();
 			feedbackShell.dispose();
 		}
-		feedbackShell = null;
 	}
 
 	private void showRects(boolean enclosed) {
@@ -121,35 +110,13 @@ public class SplitFeedbackOverlay {
 	}
 
 	public void setFeedback(boolean enclosed, boolean modified) {
-		if (isModified == null)
-			isModified = !modified;
-
-		// Update the feedback color if the drag is 'modified'
-		if (modified != isModified) {
-			if (!modified) {
-				stylingEngine.setClassname(feedbackShell, "DragFeedback");
-			} else {
-				stylingEngine.setClassname(feedbackShell, "ModifiedDragFeedback");
-			}
-			stylingEngine.style(feedbackShell);
-			isModified = modified;
-		}
+		if (!modified)
+			feedbackShell.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
+		else
+			feedbackShell.setBackground(display.getSystemColor(SWT.COLOR_DARK_YELLOW));
 
 		showRects(enclosed);
 		defineRegion();
 		feedbackShell.update();
-	}
-
-	/**
-	 * Control this instance's visibility.
-	 * 
-	 * @param visible
-	 *            make visible if {@code true} or invisible if {@code false}
-	 * @since 0.11
-	 */
-	public void setVisible(boolean visible) {
-		if (feedbackShell != null) {
-			feedbackShell.setVisible(visible);
-		}
 	}
 }

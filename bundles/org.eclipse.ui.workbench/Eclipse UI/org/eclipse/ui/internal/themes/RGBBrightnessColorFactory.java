@@ -30,7 +30,6 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
 	 */
-	@Override
 	public RGB createColor() {
 		RGB rgb = ColorUtil.getColorValue(color);
 		float scale = Float.parseFloat(scaleFactor);
@@ -55,7 +54,6 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
 			throws CoreException {
 		if (data instanceof Hashtable) {

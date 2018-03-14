@@ -93,18 +93,15 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 
 	private class PrivateInterface implements IChangeListener, IStaleListener,
 			IDisposeListener {
-		@Override
 		public void handleDispose(DisposeEvent staleEvent) {
 			dispose();
 		}
 
-		@Override
 		public void handleChange(ChangeEvent event) {
 			if (!isDisposed() && !updating)
 				notifyIfChanged();
 		}
 
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			if (!isDisposed())
 				fireStale();
@@ -113,7 +110,6 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 
 	// One calendar per thread to preserve thread-safety
 	private static final ThreadLocal calendar = new ThreadLocal() {
-		@Override
 		protected Object initialValue() {
 			return Calendar.getInstance();
 		}
@@ -144,12 +140,10 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		timeObservable.addDisposeListener(privateInterface);
 	}
 
-	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		cachedValue = doGetValue();
 
@@ -160,7 +154,6 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		timeObservable.addStaleListener(privateInterface);
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		if (dateObservable != null && !dateObservable.isDisposed()) {
 			dateObservable.removeChangeListener(privateInterface);
@@ -184,7 +177,6 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		}
 	}
 
-	@Override
 	protected Object doGetValue() {
 		Date dateValue = (Date) dateObservable.getValue();
 		if (dateValue == null)
@@ -214,7 +206,6 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		return cal.getTime();
 	}
 
-	@Override
 	protected void doSetValue(Object value) {
 		Date date = (Date) value;
 
@@ -271,13 +262,11 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		notifyIfChanged();
 	}
 
-	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return dateObservable.isStale() || timeObservable.isStale();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		checkRealm();
 		if (!isDisposed()) {

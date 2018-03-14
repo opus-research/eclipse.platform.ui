@@ -30,14 +30,12 @@ import org.eclipse.swt.widgets.Text;
 
 public class CustomScenarios extends ScenariosTestCase {
 
-    @Override
-	protected void setUp() throws Exception {
+    protected void setUp() throws Exception {
         super.setUp();
         // do any setup work here
     }
 
-    @Override
-	protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         // do any teardown work here
         super.tearDown();
     }

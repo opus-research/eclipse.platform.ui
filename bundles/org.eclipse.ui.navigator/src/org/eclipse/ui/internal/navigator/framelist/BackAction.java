@@ -59,8 +59,7 @@ public class BackAction extends FrameAction {
     /**
      * Calls <code>back()</code> on the frame list.
      */
-    @Override
-	public void run() {
+    public void run() {
         getFrameList().back();
     }
 
@@ -69,8 +68,7 @@ public class BackAction extends FrameAction {
      * This action is enabled only when there is a previous frame in the frame list.
      * The tool tip text is "Back to " plus the tool tip text for the previous frame.
      */
-    @Override
-	public void update() {
+    public void update() {
         super.update();
         Frame previousFrame = getPreviousFrame();
         setEnabled(previousFrame != null);

@@ -213,7 +213,12 @@ public class VisibilityAssistant implements IExtensionActivationListener {
 				|| viewerDescriptor.isRootExtension(aContentExtensionId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.IExtensionActivationListener#onExtensionActivation(java.lang.String,
+	 *      java.lang.String[], boolean)
+	 */
 	public void onExtensionActivation(String aViewerId,
 			String[] theNavigatorExtensionIds, boolean isActive) {
 		if (aViewerId.equals(viewerDescriptor.getViewerId())) {

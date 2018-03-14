@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 213145
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 444829
  *******************************************************************************/
 
 package org.eclipse.jface.databinding.conformance;
@@ -36,7 +35,8 @@ import org.eclipse.jface.databinding.conformance.util.ValueChangeEventTracker;
  * 
  * @since 3.2
  */
-public class MutableObservableValueContractTest extends ObservableDelegateTest {
+public class MutableObservableValueContractTest extends
+		ObservableDelegateTest {
 	private IObservableValueContractDelegate delegate;
 
 	private IObservableValue observable;
@@ -55,7 +55,6 @@ public class MutableObservableValueContractTest extends ObservableDelegateTest {
 		this.delegate = delegate;
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -64,36 +63,30 @@ public class MutableObservableValueContractTest extends ObservableDelegateTest {
 
 	public void testSetValue_SetsValue() throws Exception {
 		Object value = delegate.createValue(observable);
-
+		
 		observable.setValue(value);
-		assertEquals(
-				formatFail("IObservableValue.setValue(Object) should set the value of the observable."),
-				value, observable.getValue());
+		assertEquals(formatFail("IObservableValue.setValue(Object) should set the value of the observable."), value, observable.getValue());
 	}
-
+	
 	public void testSetValue_ChangeEvent() throws Exception {
 		ChangeEventTracker listener = ChangeEventTracker.observe(observable);
-
+		
 		observable.setValue(delegate.createValue(observable));
-
-		assertEquals(formatFail("Change event listeners were not notified"), 1,
+		
+		assertEquals(formatFail("Change event listeners were not notified"), 1, listener.count);
+		assertEquals(formatFail("IObservableValue.setValue(Object) should fire one ChangeEvent."), 1,
 				listener.count);
-		assertEquals(
-				formatFail("IObservableValue.setValue(Object) should fire one ChangeEvent."),
-				1, listener.count);
 		assertEquals(
 				formatFail("IObservableValue.setValue(Object)'s change event observable should be the created observable."),
 				observable, listener.event.getObservable());
 	}
-
+	
 	public void testSetValue_SameValue() throws Exception {
 		// invoke change to ensure observable has a value
 		delegate.change(observable);
 
-		ValueChangeEventTracker valueChangeListener = ValueChangeEventTracker
-				.observe(observable);
-		ChangeEventTracker changeListener = ChangeEventTracker
-				.observe(observable);
+		ValueChangeEventTracker valueChangeListener = ValueChangeEventTracker.observe(observable);
+		ChangeEventTracker changeListener = ChangeEventTracker.observe(observable);
 		Object value = observable.getValue();
 		observable.setValue(value);
 
@@ -104,10 +97,9 @@ public class MutableObservableValueContractTest extends ObservableDelegateTest {
 				formatFail("IObservableValue.setValue() should not fire a change event when the value has not change."),
 				0, changeListener.count);
 	}
-
+	
 	public void testSetValue_RealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				observable.setValue(delegate.createValue(observable));
 			}
@@ -115,9 +107,8 @@ public class MutableObservableValueContractTest extends ObservableDelegateTest {
 	}
 
 	public static Test suite(IObservableValueContractDelegate delegate) {
-		return new SuiteBuilder()
-				.addObservableContractTest(
-						MutableObservableValueContractTest.class, delegate)
+		return new SuiteBuilder().addObservableContractTest(
+				MutableObservableValueContractTest.class, delegate)
 				.addObservableContractTest(ObservableValueContractTest.class,
 						delegate).build();
 	}

@@ -38,7 +38,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public boolean performFinish() {
 			return true;
 		}
@@ -46,7 +45,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public void addPages() {
 			addPage(new ReadOnlyPage());
 		}
@@ -62,7 +60,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 		/**
 		 * {@inheritDoc}
 		 */
-		@Override
 		public void createControl(Composite parent) {
 			Composite composite= new Composite(parent, SWT.NONE);
 			composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -81,7 +78,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setElement(IAdaptable element) {
 		super.setElement(element);
 		
@@ -95,7 +91,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	protected void applyChanges() {
 		//Wizard does all the work
 	}
@@ -103,7 +98,6 @@ public class WorkingSetPropertyPage extends WizardPropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	protected IWizard createWizard() {
 		if (fWorkingSet.isEditable()) {
 			return PlatformUI.getWorkbench().getWorkingSetManager().createWorkingSetEditWizard(fWorkingSet);

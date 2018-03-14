@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,15 +51,19 @@ final class ArrayFontDescriptor extends FontDescriptor {
         this.originalFont = originalFont;
     }
     
-    @Override
-	public FontData[] getFontData() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontDescriptor#getFontData()
+     */
+    public FontData[] getFontData() {
     	// Copy the original array to ensure that callers will not modify it
     	return copy(data);
     }
     
     
-    @Override
-	public Font createFont(Device device) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontDescriptor#createFont(org.eclipse.swt.graphics.Device)
+     */
+    public Font createFont(Device device) {
         
         // If this descriptor is an existing font, then we can return the original font
         // if this is the same device.
@@ -73,8 +77,10 @@ final class ArrayFontDescriptor extends FontDescriptor {
         return new Font(device, data);
     }
 
-    @Override
-	public boolean equals(Object obj) {
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
         if ((obj.getClass() == ArrayFontDescriptor.class)) {
             ArrayFontDescriptor descr = (ArrayFontDescriptor)obj;
             
@@ -105,8 +111,10 @@ final class ArrayFontDescriptor extends FontDescriptor {
         return false;
     }
     
-    @Override
-	public int hashCode() {
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
         if (originalFont != null) {
             return originalFont.hashCode();
         }
@@ -120,8 +128,10 @@ final class ArrayFontDescriptor extends FontDescriptor {
         return code;
     }
 
-    @Override
-	public void destroyFont(Font previouslyCreatedFont) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.FontDescriptor#destroyFont(org.eclipse.swt.graphics.Font)
+     */
+    public void destroyFont(Font previouslyCreatedFont) {
         if (previouslyCreatedFont == originalFont) {
             return;
         }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,32 +58,44 @@ public class DeferredContentProvider implements ILazyContentProvider {
 			this.viewer = viewer;
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#flushCache(java.lang.Object)
+		 */
 		public void clear(int index) {
 			viewer.clear(index);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#replace(java.lang.Object, int)
+		 */
 		public void replace(Object element, int itemIndex) {
 			viewer.replace(element, itemIndex);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#setItemCount(int)
+		 */
 		public void setItemCount(int total) {
 			viewer.setItemCount(total);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#getItemCount()
+		 */
 		public int getItemCount() {
 			return viewer.getTable().getItemCount();
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#getTopIndex()
+		 */
 		public int getTopIndex() {
 			return Math.max(viewer.getTable().getTopIndex() - 1, 0);
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#getVisibleItemCount()
+		 */
 		public int getVisibleItemCount() {
 			Table table = viewer.getTable();
 			Rectangle rect = table.getClientArea ();
@@ -92,7 +104,9 @@ public class DeferredContentProvider implements ILazyContentProvider {
 			return (rect.height - headerHeight + itemHeight - 1) / (itemHeight + table.getGridLineWidth());
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.deferred.AbstractVirtualTable#getControl()
+		 */
 		public Control getControl() {
 			return viewer.getControl();
 		}
@@ -107,12 +121,16 @@ public class DeferredContentProvider implements ILazyContentProvider {
 		this.sortOrder = sortOrder;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+	 */
 	public void dispose() {
 		setProvider(null);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+	 */
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		if (newInput == null) {
 			setProvider(null);
@@ -187,7 +205,9 @@ public class DeferredContentProvider implements ILazyContentProvider {
 		return limit;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILazyContentProvider#updateElement(int)
+	 */
 	public void updateElement(int element) {
 		if (provider != null) {
 			provider.checkVisibleRange(element);

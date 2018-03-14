@@ -58,12 +58,10 @@ public class ValueChangeEvent extends ObservableEvent {
 		return (IObservableValue) source;
 	}
 
-	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IValueChangeListener) listener).handleValueChange(this);
 	}
 
-	@Override
 	protected Object getListenerType() {
 		return TYPE;
 	}

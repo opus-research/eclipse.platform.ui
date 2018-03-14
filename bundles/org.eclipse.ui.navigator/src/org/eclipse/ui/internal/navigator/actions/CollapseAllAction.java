@@ -36,7 +36,6 @@ public class CollapseAllAction extends Action {
 		commonViewer = aViewer;
 	}
 
-	@Override
 	public void run() {
 		if (commonViewer != null) {
 			commonViewer.collapseAll();

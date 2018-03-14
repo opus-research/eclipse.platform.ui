@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426365
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -31,36 +29,39 @@ import org.eclipse.ui.internal.misc.ProgramImageDescriptor;
 import org.eclipse.ui.internal.util.BundleUtility;
 
 /**
- * This class provides convenience access to many of the resources required by
- * the workbench. The class stores some images as descriptors, and some are
- * stored as real Images in the registry. This is a pure speed-space tradeoff.
- * The trick for users of this class is that images obtained from the registry
- * (using getImage()), don't require disposal since they are shared, while
- * images obtained using getImageDescriptor() will require disposal. Consult the
- * declareImages method to see if a given image is declared as a registry image
- * or just as a descriptor. If you change an image from being stored as a
- * descriptor to a registry image, or vice-versa, make sure to check all users
- * of the image to ensure they are calling the correct getImage... method and
- * handling disposal correctly.
+ * This class provides convenience access to many of the resources required
+ * by the workbench. The class stores some images as descriptors, and
+ * some are stored as real Images in the registry.  This is a pure
+ * speed-space tradeoff.  The trick for users of this class is that
+ * images obtained from the registry (using getImage()), don't require
+ * disposal since they are shared, while images obtained using
+ * getImageDescriptor() will require disposal.  Consult the declareImages
+ * method to see if a given image is declared as a registry image or
+ * just as a descriptor.  If you change an image from being stored
+ * as a descriptor to a registry image, or vice-versa, make sure to
+ * check all users of the image to ensure they are calling
+ * the correct getImage... method and handling disposal correctly.
  *
- * Images: - use getImage(key) to access cached images from the registry. - Less
- * common images are found by calling getImageDescriptor(key) where key can be
- * found in IWorkbenchGraphicConstants
+ *  Images:
+ *      - use getImage(key) to access cached images from the registry.
+ *      - Less common images are found by calling getImageDescriptor(key)
+ *          where key can be found in IWorkbenchGraphicConstants
  *
- * This class initializes the image registry by declaring all of the required
- * graphics. This involves creating image descriptors describing how to
- * create/find the image should it be needed. The image is not actually
- * allocated until requested.
+ *      This class initializes the image registry by declaring all of the required
+ *      graphics. This involves creating image descriptors describing
+ *      how to create/find the image should it be needed.
+ *      The image is not actually allocated until requested.
  *
- * Some Images are also made available to other plugins by being placed in the
- * descriptor table of the SharedImages class.
+ *      Some Images are also made available to other plugins by being
+ *      placed in the descriptor table of the SharedImages class.
  *
- * Where are the images? The images (typically png file) are found the plugins
- * install directory
+ *      Where are the images?
+ *          The images (typically gifs) are found the plugins install directory
  *
- * How to add a new image Place the png file into the appropriate directories.
- * Add a constant to IWorkbenchGraphicConstants following the conventions Add
- * the declaration to this file
+ *      How to add a new image
+ *          Place the gif file into the appropriate directories.
+ *          Add a constant to IWorkbenchGraphicConstants following the conventions
+ *          Add the declaration to this file
  */
 public/*final*/class WorkbenchImages {
 
@@ -141,152 +142,152 @@ public/*final*/class WorkbenchImages {
      */
     private final static void declareImages() {
 		// Overlays
-		declareImage(ISharedImages.IMG_DEC_FIELD_ERROR, PATH_OVERLAY + "error_ovr.png", true); //$NON-NLS-1$
-		declareImage(ISharedImages.IMG_DEC_FIELD_WARNING, PATH_OVERLAY + "warning_ovr.png", true); //$NON-NLS-1$
+		declareImage(ISharedImages.IMG_DEC_FIELD_ERROR, PATH_OVERLAY + "error_ovr.gif", true); //$NON-NLS-1$
+		declareImage(ISharedImages.IMG_DEC_FIELD_WARNING, PATH_OVERLAY + "warning_ovr.gif", true); //$NON-NLS-1$
 
 		// Pinning
 	    declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_PIN_EDITOR,
-                PATH_ETOOL + "pin_editor.png", false); //$NON-NLS-1$
+                PATH_ETOOL + "pin_editor.gif", false); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_PIN_EDITOR_DISABLED,
-                PATH_DTOOL + "pin_editor.png", false); //$NON-NLS-1$
+                PATH_DTOOL + "pin_editor.gif", false); //$NON-NLS-1$
 
         // other toolbar buttons
 
         declareImage(ISharedImages.IMG_ETOOL_SAVE_EDIT, PATH_ETOOL
- + "save_edit.png", true); //$NON-NLS-1$
+				+ "save_edit.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_SAVE_EDIT_DISABLED, PATH_DTOOL
- + "save_edit.png", true); //$NON-NLS-1$
+				+ "save_edit.gif", true); //$NON-NLS-1$
         
 		declareImage(ISharedImages.IMG_ETOOL_SAVEAS_EDIT, PATH_ETOOL
- + "saveas_edit.png", true); //$NON-NLS-1$
+				+ "saveas_edit.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_SAVEAS_EDIT_DISABLED, PATH_DTOOL
- + "saveas_edit.png", true); //$NON-NLS-1$
+				+ "saveas_edit.gif", true); //$NON-NLS-1$
         
 		declareImage(ISharedImages.IMG_ETOOL_SAVEALL_EDIT, PATH_ETOOL
- + "saveall_edit.png", true); //$NON-NLS-1$
+				+ "saveall_edit.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_SAVEALL_EDIT_DISABLED, PATH_DTOOL
- + "saveall_edit.png", true); //$NON-NLS-1$
+				+ "saveall_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_UNDO,
-                PATH_ETOOL + "undo_edit.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "undo_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_UNDO_DISABLED, PATH_DTOOL
-                + "undo_edit.png", true); //$NON-NLS-1$
+                + "undo_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_REDO,
-                PATH_ETOOL + "redo_edit.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "redo_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_REDO_DISABLED, PATH_DTOOL
-                + "redo_edit.png", true); //$NON-NLS-1$
+                + "redo_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_CUT,
-                PATH_ETOOL + "cut_edit.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "cut_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_CUT_DISABLED, PATH_DTOOL
-                + "cut_edit.png", true); //$NON-NLS-1$
+                + "cut_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_COPY,
-                PATH_ETOOL + "copy_edit.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "copy_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_COPY_DISABLED, PATH_DTOOL
-                + "copy_edit.png", true); //$NON-NLS-1$
+                + "copy_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_PASTE, PATH_ETOOL
-                + "paste_edit.png", true); //$NON-NLS-1$
+                + "paste_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_PASTE_DISABLED, PATH_DTOOL
-                + "paste_edit.png", true); //$NON-NLS-1$
+                + "paste_edit.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_DELETE, PATH_ETOOL
-                + "delete_edit.png", true); //$NON-NLS-1$
+                + "delete_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_DELETE_DISABLED, PATH_DTOOL
-                + "delete_edit.png", true); //$NON-NLS-1$
+                + "delete_edit.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ETOOL_DELETE,
-				PATH_ETOOL + "delete.png", true); //$NON-NLS-1$
+				PATH_ETOOL + "delete.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_DELETE_DISABLED, PATH_DTOOL
-				+ "delete.png", true); //$NON-NLS-1$
+				+ "delete.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ETOOL_CLEAR,
-				PATH_ETOOL + "clear.png", true); //$NON-NLS-1$
+				PATH_ETOOL + "clear.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_CLEAR_DISABLED, PATH_DTOOL
-				+ "clear.png", true); //$NON-NLS-1$
+				+ "clear.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_NEW_WIZARD,
-                PATH_ETOOL + "new_wiz.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "new_wiz.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_NEW_WIZARD_DISABLED, PATH_DTOOL
-                        + "new_wiz.png", true); //$NON-NLS-1$
+                        + "new_wiz.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ETOOL_PRINT_EDIT, PATH_ETOOL
-				+ "print_edit.png", true); //$NON-NLS-1$
+				+ "print_edit.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_PRINT_EDIT_DISABLED, PATH_DTOOL
-				+ "print_edit.png", true); //$NON-NLS-1$
+				+ "print_edit.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_HELP_CONTENTS,
-                PATH_ETOOL + "help_contents.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "help_contents.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_HELP_SEARCH,
-                PATH_ETOOL + "help_search.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "help_search.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_NEW_FASTVIEW,
-                PATH_ETOOL + "new_fastview.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "new_fastview.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_DTOOL_NEW_FASTVIEW,
-                PATH_DTOOL + "new_fastview.png", true); //$NON-NLS-1$
+                PATH_DTOOL + "new_fastview.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_RESTORE_TRIMPART,
-                PATH_ETOOL + "fastview_restore.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "fastview_restore.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_EDITOR_TRIMPART,
-                PATH_ETOOL + "editor_area.png", true); //$NON-NLS-1$
+                PATH_ETOOL + "editor_area.gif", true); //$NON-NLS-1$
         
         declareImage(ISharedImages.IMG_TOOL_FORWARD, PATH_ELOCALTOOL
-                + "forward_nav.png", true); //$NON-NLS-1$
+                + "forward_nav.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_FORWARD_DISABLED, PATH_DLOCALTOOL
-                + "forward_nav.png", true); //$NON-NLS-1$
+                + "forward_nav.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_BACK, PATH_ELOCALTOOL
-                + "backward_nav.png", true); //$NON-NLS-1$
+                + "backward_nav.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_BACK_DISABLED, PATH_DLOCALTOOL
-                + "backward_nav.png", true); //$NON-NLS-1$
+                + "backward_nav.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_TOOL_UP,
-                PATH_ELOCALTOOL + "up_nav.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "up_nav.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_UP_DISABLED, PATH_DLOCALTOOL
-                + "up_nav.png", true); //$NON-NLS-1$
+                + "up_nav.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_SYNCED, PATH_ELOCALTOOL
-				+ "synced.png", true); //$NON-NLS-1$
+				+ "synced.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_SYNCED_DISABLED, PATH_DLOCALTOOL
-				+ "synced.png", true); //$NON-NLS-1$
+				+ "synced.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_COLLAPSEALL, PATH_ELOCALTOOL
-				+ "collapseall.png", true); //$NON-NLS-1$
+				+ "collapseall.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_COLLAPSEALL_DISABLED,
-				PATH_DLOCALTOOL + "collapseall.png", true); //$NON-NLS-1$
+				PATH_DLOCALTOOL + "collapseall.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_REMOVE, PATH_ELOCALTOOL
-				+ "remove.png", true); //$NON-NLS-1$
+				+ "remove.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED, PATH_DLOCALTOOL
-				+ "remove.png", true); //$NON-NLS-1$
+				+ "remove.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_REMOVEALL, PATH_ELOCALTOOL
-				+ "removeall.png", true); //$NON-NLS-1$
+				+ "removeall.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_REMOVEALL_DISABLED, PATH_DLOCALTOOL
-				+ "removeall.png", true); //$NON-NLS-1$
+				+ "removeall.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_COLLAPSEALL, PATH_ELOCALTOOL
-				+ "collapseall.png", true); //$NON-NLS-1$
+				+ "collapseall.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_COLLAPSEALL_DISABLED,
-				PATH_DLOCALTOOL + "collapseall.png", true); //$NON-NLS-1$
+				PATH_DLOCALTOOL + "collapseall.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ELCL_STOP,
-				PATH_ELOCALTOOL + "stop.png", true); //$NON-NLS-1$
+				PATH_ELOCALTOOL + "stop.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ELCL_STOP_DISABLED, PATH_DLOCALTOOL
-				+ "stop.png", true); //$NON-NLS-1$
+				+ "stop.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_NEW_PAGE, PATH_EVIEW
-                + "new_persp.png", false); //$NON-NLS-1$
+                + "new_persp.gif", false); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ETOOL_HOME_NAV, PATH_ELOCALTOOL
-				+ "home_nav.png", true); //$NON-NLS-1$
+				+ "home_nav.gif", true); //$NON-NLS-1$
 		declareImage(ISharedImages.IMG_ETOOL_HOME_NAV_DISABLED, PATH_DLOCALTOOL
-				+ "home_nav.png", true); //$NON-NLS-1$
+				+ "home_nav.gif", true); //$NON-NLS-1$
 
 		declareImage(ISharedImages.IMG_ETOOL_DEF_PERSPECTIVE, PATH_EVIEW
-				+ "default_persp.png", true); //$NON-NLS-1$
+				+ "default_persp.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_WIZBAN_NEW_WIZ, PATH_WIZBAN
                         + "new_wiz.png", false); //$NON-NLS-1$
@@ -296,9 +297,9 @@ public/*final*/class WorkbenchImages {
 //                + "new_wiz.png", false); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_IMPORT_WIZ, PATH_ETOOL
-                        + "import_wiz.png", false); //$NON-NLS-1$
+                        + "import_wiz.gif", false); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_ETOOL_EXPORT_WIZ, PATH_ETOOL
-                        + "export_wiz.png", false); //$NON-NLS-1$
+                        + "export_wiz.gif", false); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_WIZ, PATH_WIZBAN
                         + "import_wiz.png", false); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_WIZ, PATH_WIZBAN
@@ -312,73 +313,73 @@ public/*final*/class WorkbenchImages {
                 PATH_WIZBAN + "workset_wiz.png", false); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_VIEW_DEFAULTVIEW_MISC,
-                PATH_EVIEW + "defaultview_misc.png", false); //$NON-NLS-1$
+                PATH_EVIEW + "defaultview_misc.gif", false); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_FONT, PATH_OBJECT
-                + "font.png", true); //$NON-NLS-1$
+                + "font.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_THEME_CATEGORY,
-                PATH_OBJECT + "theme_category.png", true); //$NON-NLS-1$
+                PATH_OBJECT + "theme_category.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_ACTIVITY, PATH_OBJECT
-                + "activity.png", true); //$NON-NLS-1$
+                + "activity.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_ACTIVITY_CATEGORY,
-                PATH_OBJECT + "activity_category.png", true); //$NON-NLS-1$
+                PATH_OBJECT + "activity_category.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_WORKING_SETS, 
-     		   PATH_OBJECT + "workingsets.png", true); //$NON-NLS-1$
+     		   PATH_OBJECT + "workingsets.gif", true); //$NON-NLS-1$
         
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_SEPARATOR, 
-      		   PATH_OBJECT + "separator.png", true); //$NON-NLS-1$
+      		   PATH_OBJECT + "separator.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_NODE,
-        		PATH_OBJECT + "generic_elements.png", true); //$NON-NLS-1$
+        		PATH_OBJECT + "generic_elements.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_OBJ_ELEMENT,
-        		PATH_OBJECT + "generic_element.png", true); //$NON-NLS-1$
+        		PATH_OBJECT + "generic_element.gif", true); //$NON-NLS-1$
         
         declareImage(ISharedImages.IMG_OBJ_ADD,
-                PATH_OBJECT + "add_obj.png", true); //$NON-NLS-1$
+                PATH_OBJECT + "add_obj.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_OBJ_FILE,
-                PATH_OBJECT + "file_obj.png", true); //$NON-NLS-1$
+                PATH_OBJECT + "file_obj.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_OBJ_FOLDER,
-                PATH_OBJECT + "fldr_obj.png", true); //$NON-NLS-1$
+                PATH_OBJECT + "fldr_obj.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_OBJ_ELEMENT, PATH_OBJECT
-                + "elements_obj.png", true); //$NON-NLS-1$
+                + "elements_obj.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_DEF_VIEW, PATH_EVIEW
-                + "defaultview_misc.png", true); //$NON-NLS-1$
+                + "defaultview_misc.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_CLOSE_VIEW,
-                PATH_ELOCALTOOL + "close_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "close_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_PIN_VIEW,
-                PATH_ELOCALTOOL + "pin_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "pin_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_MIN_VIEW,
-                PATH_ELOCALTOOL + "min_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "min_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_VIEW_MENU,
-                PATH_ELOCALTOOL + "view_menu.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "view_menu.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_BUTTON_MENU,
-        		PATH_ELOCALTOOL + "button_menu.png", true); //$NON-NLS-1$
+        		PATH_ELOCALTOOL + "button_menu.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_LCL_LINKTO_HELP,
-                PATH_ELOCALTOOL + "linkto_help.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "linkto_help.gif", true); //$NON-NLS-1$
 
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_CLOSE_VIEW_THIN,
-                PATH_ELOCALTOOL + "thin_close_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_close_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_HIDE_TOOLBAR_THIN,
-                PATH_ELOCALTOOL + "thin_hide_toolbar.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_hide_toolbar.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_MAX_VIEW_THIN,
-                PATH_ELOCALTOOL + "thin_max_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_max_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_MIN_VIEW_THIN,
-                PATH_ELOCALTOOL + "thin_min_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_min_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_RESTORE_VIEW_THIN,
-                PATH_ELOCALTOOL + "thin_restore_view.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_restore_view.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_SHOW_TOOLBAR_THIN,
-                PATH_ELOCALTOOL + "thin_show_toolbar.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_show_toolbar.gif", true); //$NON-NLS-1$
         declareImage(IWorkbenchGraphicConstants.IMG_LCL_VIEW_MENU_THIN,
-                PATH_ELOCALTOOL + "thin_view_menu.png", true); //$NON-NLS-1$
+                PATH_ELOCALTOOL + "thin_view_menu.gif", true); //$NON-NLS-1$
 
         
         declareImage(ISharedImages.IMG_OBJS_ERROR_TSK, PATH_OBJECT
-                + "error_tsk.png", true); //$NON-NLS-1$
+                + "error_tsk.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_OBJS_WARN_TSK, PATH_OBJECT
-                + "warn_tsk.png", true); //$NON-NLS-1$
+                + "warn_tsk.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_OBJS_INFO_TSK, PATH_OBJECT
-                + "info_tsk.png", true); //$NON-NLS-1$
+                + "info_tsk.gif", true); //$NON-NLS-1$
 
         declareImage(ISharedImages.IMG_OBJS_DND_LEFT_SOURCE,
                 PATH_POINTER + "left_source.bmp", true); //$NON-NLS-1$
@@ -415,11 +416,11 @@ public/*final*/class WorkbenchImages {
         
         // signed jar images
 		declareImage(IWorkbenchGraphicConstants.IMG_OBJ_SIGNED_YES, PATH_OBJECT
-				+ "signed_yes_tbl.png", true); //$NON-NLS-1$
+				+ "signed_yes_tbl.gif", true); //$NON-NLS-1$
 		declareImage(IWorkbenchGraphicConstants.IMG_OBJ_SIGNED_NO, PATH_OBJECT
-				+ "signed_no_tbl.png", true); //$NON-NLS-1$
+				+ "signed_no_tbl.gif", true); //$NON-NLS-1$
 		declareImage(IWorkbenchGraphicConstants.IMG_OBJ_SIGNED_UNKNOWN,
-				PATH_OBJECT + "signed_unkn_tbl.png", true); //$NON-NLS-1$
+				PATH_OBJECT + "signed_unkn_tbl.gif", true); //$NON-NLS-1$
         
 		declareHoverImages();
 		
@@ -453,28 +454,27 @@ public/*final*/class WorkbenchImages {
      * 
      * @deprecated As of 3.0, since the workbench itself no longer uses the hover image variants
      */
-    @Deprecated
-	private final static void declareHoverImages() {
+    private final static void declareHoverImages() {
         declareImage(ISharedImages.IMG_TOOL_UNDO_HOVER, PATH_ETOOL
-        		+ "undo_edit.png", true); //$NON-NLS-1$
+        		+ "undo_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_REDO_HOVER, PATH_ETOOL
-                + "redo_edit.png", true); //$NON-NLS-1$
+                + "redo_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_CUT_HOVER, PATH_ETOOL
-        		+ "cut_edit.png", true); //$NON-NLS-1$
+        		+ "cut_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_COPY_HOVER, PATH_ETOOL
-                + "copy_edit.png", true); //$NON-NLS-1$
+                + "copy_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_PASTE_HOVER, PATH_ETOOL
-                + "paste_edit.png", true); //$NON-NLS-1$
+                + "paste_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_FORWARD_HOVER, PATH_ELOCALTOOL
-                + "forward_nav.png", true); //$NON-NLS-1$
+                + "forward_nav.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_DELETE_HOVER, PATH_ETOOL
-        		+ "delete_edit.png", true); //$NON-NLS-1$
+        		+ "delete_edit.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_NEW_WIZARD_HOVER, PATH_ETOOL
-                        + "new_wiz.png", true); //$NON-NLS-1$
+                        + "new_wiz.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_BACK_HOVER, PATH_ELOCALTOOL
-        		+ "backward_nav.png", true); //$NON-NLS-1$
+        		+ "backward_nav.gif", true); //$NON-NLS-1$
         declareImage(ISharedImages.IMG_TOOL_UP_HOVER, PATH_ELOCALTOOL
-                + "up_nav.png", true); //$NON-NLS-1$
+                + "up_nav.gif", true); //$NON-NLS-1$
     }
 
     /**
@@ -611,24 +611,32 @@ public/*final*/class WorkbenchImages {
     }
 
     /**
-	 * Initialize the image registry by declaring all of the required graphics.
-	 * This involves creating JFace image descriptors describing how to
-	 * create/find the image should it be needed. The image is not actually
-	 * allocated until requested.
-	 *
-	 * Prefix conventions Wizard Banners WIZBAN_ Preference Banners PREF_BAN_
-	 * Property Page Banners PROPBAN_ Enable toolbar ETOOL_ Disable toolbar
-	 * DTOOL_ Local enabled toolbar ELCL_ Local Disable toolbar DLCL_ Object
-	 * large OBJL_ Object small OBJS_ View VIEW_ Product images PROD_ Misc
-	 * images MISC_
-	 *
-	 * Where are the images? The images (typically png files) are found in the
-	 * same location as this plugin class. This may mean the same package
-	 * directory as the package holding this class. The images are declared
-	 * using this.getClass() to ensure they are looked up via this plugin class.
-	 * 
-	 * @see ImageRegistry
-	 */
+     *  Initialize the image registry by declaring all of the required
+     *  graphics. This involves creating JFace image descriptors describing
+     *  how to create/find the image should it be needed.
+     *  The image is not actually allocated until requested.
+     *
+     *  Prefix conventions
+     *      Wizard Banners          WIZBAN_
+     *      Preference Banners      PREF_BAN_
+     *      Property Page Banners   PROPBAN_
+     *      Enable toolbar          ETOOL_
+     *      Disable toolbar         DTOOL_
+     *      Local enabled toolbar   ELCL_
+     *      Local Disable toolbar   DLCL_
+     *      Object large            OBJL_
+     *      Object small            OBJS_
+     *      View                    VIEW_
+     *      Product images          PROD_
+     *      Misc images             MISC_
+     *
+     *  Where are the images?
+     *      The images (typically gifs) are found in the same location as this plugin class.
+     *      This may mean the same package directory as the package holding this class.
+     *      The images are declared using this.getClass() to ensure they are looked up via
+     *      this plugin class.
+     *  @see ImageRegistry
+     */
     private static void initializeImageRegistry() {
         imageRegistry = new ImageRegistry();
         descriptors = new HashMap();

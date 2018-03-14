@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,7 +32,6 @@ public class WizardElement extends QuickAccessElement {
 		this.wizardDescriptor = wizardDescriptor;
 	}
 
-	@Override
 	public void execute() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -43,23 +42,19 @@ public class WizardElement extends QuickAccessElement {
 		}
 	}
 
-	@Override
 	public String getId() {
 		return wizardDescriptor.getId();
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return wizardDescriptor.getImageDescriptor();
 	}
 
-	@Override
 	public String getLabel() {
 		return wizardDescriptor.getLabel() + separator
 				+ wizardDescriptor.getDescription();
 	}
 
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -69,7 +64,6 @@ public class WizardElement extends QuickAccessElement {
 		return result;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

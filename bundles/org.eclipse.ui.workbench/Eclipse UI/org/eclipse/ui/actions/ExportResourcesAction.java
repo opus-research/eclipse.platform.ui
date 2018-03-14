@@ -90,8 +90,7 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
      * @param workbench the workbench
      * @deprecated use the constructor <code>ExportResourcesAction(IWorkbenchWindow)</code>
      */
-    @Deprecated
-	public ExportResourcesAction(IWorkbench workbench) {
+    public ExportResourcesAction(IWorkbench workbench) {
         this(workbench.getActiveWorkbenchWindow());
     }
 
@@ -102,16 +101,14 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
      * @param label the label
      * @deprecated use the constructor <code>ExportResourcesAction(IWorkbenchWindow, String)</code>
      */
-    @Deprecated
-	public ExportResourcesAction(IWorkbench workbench, String label) {
+    public ExportResourcesAction(IWorkbench workbench, String label) {
         this(workbench.getActiveWorkbenchWindow(), label);
     }
 
     /**
      * Invoke the Export wizards selection Wizard.
      */
-    @Override
-	public void run() {
+    public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;
@@ -125,12 +122,13 @@ public class ExportResourcesAction extends BaseSelectionListenerAction
      * @param selection the new selection
      * @deprecated
      */
-    @Deprecated
-	public void setSelection(IStructuredSelection selection) {
+    public void setSelection(IStructuredSelection selection) {
         selectionChanged(selection);
     }
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
+	 */
 	public void dispose() {
 		workbenchWindow = null;
 		if (action!=null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,7 +99,6 @@ public abstract class TriggerSequence {
 		return Util.endsWith(triggers, triggerSequence.triggers, equals);
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		// Check if they're the same.
 		if (object == this) {
@@ -154,7 +153,11 @@ public abstract class TriggerSequence {
 		return triggerCopy;
 	}
 
-	@Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+	 */
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL;

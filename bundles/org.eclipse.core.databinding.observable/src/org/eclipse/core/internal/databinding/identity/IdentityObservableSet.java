@@ -54,36 +54,30 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		this.elementType = elementType;
 	}
 
-	@Override
 	protected Set getWrappedSet() {
 		return wrappedSet;
 	}
 
-	@Override
 	public Object getElementType() {
 		return elementType;
 	}
 
-	@Override
 	public Iterator iterator() {
 		getterCalled();
 		final Iterator wrappedIterator = wrappedSet.iterator();
 		return new Iterator() {
 			Object last;
 
-			@Override
 			public boolean hasNext() {
 				getterCalled();
 				return wrappedIterator.hasNext();
 			}
 
-			@Override
 			public Object next() {
 				getterCalled();
 				return last = wrappedIterator.next();
 			}
 
-			@Override
 			public void remove() {
 				getterCalled();
 				wrappedIterator.remove();
@@ -93,7 +87,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		};
 	}
 
-	@Override
 	public boolean add(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.add(o);
@@ -103,7 +96,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean addAll(Collection c) {
 		getterCalled();
 		Set additions = new IdentitySet();
@@ -118,7 +110,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean remove(Object o) {
 		getterCalled();
 		boolean changed = wrappedSet.remove(o);
@@ -128,7 +119,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean removeAll(Collection c) {
 		getterCalled();
 		Set removals = new IdentitySet();
@@ -143,7 +133,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public boolean retainAll(Collection c) {
 		getterCalled();
 		Set removals = new IdentitySet();
@@ -166,7 +155,6 @@ public class IdentityObservableSet extends AbstractObservableSet {
 		return changed;
 	}
 
-	@Override
 	public void clear() {
 		getterCalled();
 		if (!wrappedSet.isEmpty()) {

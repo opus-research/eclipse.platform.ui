@@ -50,13 +50,11 @@ public class ExportPage extends ImportExportPage {
 		super(aWorkbench, currentSelection);
 	}
 	
-	@Override
 	protected void initialize() {
 		workbench.getHelpSystem().setHelp(getControl(),
                 IWorkbenchHelpContextIds.EXPORT_WIZARD_SELECTION_WIZARD_PAGE);
 	}
 
-	@Override
 	protected Composite createTreeViewer(Composite parent) {
 		IWizardCategory root = WorkbenchPlugin.getDefault()
 			.getExportWizardRegistry().getRootCategory();
@@ -64,14 +62,12 @@ public class ExportPage extends ImportExportPage {
 				root, WorkbenchMessages.ExportWizard_selectDestination);
 		Composite exportComp = exportTree.createControl(parent);
 		exportTree.getViewer().addSelectionChangedListener(new ISelectionChangedListener(){
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				listSelectionChanged(event.getSelection());    	       			
 			}
 		});
 		exportTree.getViewer().addDoubleClickListener(new IDoubleClickListener(){
-	    	@Override
-			public void doubleClick(DoubleClickEvent event) {
+	    	public void doubleClick(DoubleClickEvent event) {
 	    		treeDoubleClicked(event);
 	    	}
 	    });
@@ -79,14 +75,12 @@ public class ExportPage extends ImportExportPage {
 	    return exportComp;
 	}
 	
-	@Override
 	public void saveWidgetValues(){
     	storeExpandedCategories(STORE_EXPANDED_EXPORT_CATEGORIES, exportTree.getViewer());
         storeSelectedCategoryAndWizard(STORE_SELECTED_EXPORT_WIZARD_ID, exportTree.getViewer()); 	
         super.saveWidgetValues();
 	}
 	
-	@Override
 	protected void restoreWidgetValues(){
         IWizardCategory exportRoot = WorkbenchPlugin.getDefault().getExportWizardRegistry().getRootCategory();
         expandPreviouslyExpandedCategories(STORE_EXPANDED_EXPORT_CATEGORIES, exportRoot, exportTree.getViewer());
@@ -94,13 +88,11 @@ public class ExportPage extends ImportExportPage {
         super.restoreWidgetValues();
 	}
 	
-	@Override
 	protected ITriggerPoint getTriggerPoint(){
 		return getWorkbench().getActivitySupport()
     		.getTriggerPointManager().getTriggerPoint(WorkbenchTriggerPoints.EXPORT_WIZARDS);
 	}
 	
-	@Override
 	protected void updateMessage(){
 		setMessage(WorkbenchMessages.ImportExportPage_chooseExportDestination); 
 		super.updateMessage();

@@ -34,12 +34,10 @@ public class StalenessTracker {
 	private final IStalenessConsumer stalenessConsumer;
 
 	private class ChildListener implements IStaleListener, IChangeListener {
-		@Override
 		public void handleStale(StaleEvent event) {
 			processStalenessChange((IObservable) event.getSource(), true);
 		}
 
-		@Override
 		public void handleChange(ChangeEvent event) {
 			processStalenessChange((IObservable) event.getSource(), true);
 		}

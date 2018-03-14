@@ -54,8 +54,8 @@ import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
  */
 public class ActionSet {
 
-	public static final String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
-	public static final String MAIN_MENU = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
+	protected static final String MAIN_TOOLBAR = "org.eclipse.ui.main.toolbar"; //$NON-NLS-1$
+	protected static final String MAIN_MENU = "org.eclipse.ui.main.menu"; //$NON-NLS-1$
 
 	protected IConfigurationElement configElement;
 
@@ -204,6 +204,9 @@ public class ActionSet {
 
 	protected void addContribution(String idContrib, ArrayList<MMenuContribution> contributions,
 			IConfigurationElement element, boolean isMenu, String parentId) {
+		if (isEditorAction(element)) {
+			return;
+		}
 		MMenuContribution menuContribution = MenuFactoryImpl.eINSTANCE.createMenuContribution();
 		menuContribution.setVisibleWhen(createVisibleWhen());
 		menuContribution.getTags().add(ContributionsAnalyzer.MC_MENU);

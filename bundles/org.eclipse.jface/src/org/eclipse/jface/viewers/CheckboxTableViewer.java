@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,8 +67,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @deprecated use newCheckList(Composite, int) or new CheckboxTableViewer(Table)
      *   instead (see below for details)
      */
-    @Deprecated
-	public CheckboxTableViewer(Composite parent) {
+    public CheckboxTableViewer(Composite parent) {
         this(parent, SWT.BORDER);
     }
 
@@ -103,8 +102,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      * @deprecated use newCheckList(Composite, int) or new CheckboxTableViewer(Table) 
      *   instead (see above for details)
      */
-    @Deprecated
-	public CheckboxTableViewer(Composite parent, int style) {
+    public CheckboxTableViewer(Composite parent, int style) {
         this(createTable(parent, style));
     }
 
@@ -143,8 +141,10 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         super(table);
     }
 
-    @Override
-	public void addCheckStateListener(ICheckStateListener listener) {
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
+    public void addCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.add(listener);
     }
     
@@ -164,8 +164,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
     /*
      * Extends this method to update check box states.
      */
-    @Override
-	protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
+    protected void doUpdateItem(Widget widget, Object element, boolean fullMap) {
     	super.doUpdateItem(widget, element, fullMap);
     	if(!widget.isDisposed()) {
     		if(checkStateProvider != null) {
@@ -209,16 +208,17 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         for (int i = 0; i < array.length; i++) {
             final ICheckStateListener l = (ICheckStateListener) array[i];
             SafeRunnable.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.checkStateChanged(event);
                 }
             });
         }
     }
 
-    @Override
-	public boolean getChecked(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
+    public boolean getChecked(Object element) {
         Widget widget = findItem(element);
         if (widget instanceof TableItem) {
             return ((TableItem) widget).getChecked();
@@ -293,8 +293,10 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 		return v.toArray();
 	}
 
-    @Override
-	public void handleSelect(SelectionEvent event) {
+    /* (non-Javadoc)
+     * Method declared on StructuredViewer.
+     */
+    public void handleSelect(SelectionEvent event) {
         if (event.detail == SWT.CHECK) {
             super.handleSelect(event); // this will change the current selection
 
@@ -309,8 +311,10 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
 		}
     }
 
-    @Override
-	protected void preservingSelection(Runnable updateCode) {
+    /* (non-Javadoc)
+     * Method declared on Viewer.
+     */
+    protected void preservingSelection(Runnable updateCode) {
 		if (!getPreserveSelection()) {
 			return;
 		}
@@ -354,8 +358,10 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         }
     }
 
-    @Override
-	public void removeCheckStateListener(ICheckStateListener listener) {
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
+    public void removeCheckStateListener(ICheckStateListener listener) {
         checkStateListeners.remove(listener);
     }
 
@@ -394,8 +400,10 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
         }
     }
 
-    @Override
-	public boolean setChecked(Object element, boolean state) {
+    /* (non-Javadoc)
+     * Method declared on ICheckable.
+     */
+    public boolean setChecked(Object element, boolean state) {
         Assert.isNotNull(element);
         Widget widget = findItem(element);
 		if (widget instanceof TableItem) {

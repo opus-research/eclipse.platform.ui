@@ -18,9 +18,7 @@ public class NonRestorableView extends ViewPart {
 
 	public NonRestorableView() {	}
 
-	@Override
 	public void createPartControl(Composite parent) {}
 
-	@Override
 	public void setFocus() {	}
 }

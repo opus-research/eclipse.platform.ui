@@ -27,7 +27,9 @@ public class StringToByteValidator extends AbstractStringToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.AbstractStringToNumberValidator#isInRange(java.lang.Number)
+	 */
 	protected boolean isInRange(Number number) {
 		return StringToNumberParser.inByteRange(number);
 	}

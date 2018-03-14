@@ -48,7 +48,6 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 	/*
 	 * (non-Javadoc) Method declared on IContentProvider.
 	 */
-	@Override
 	public void dispose() {
 		if (viewer != null) {
 			IWorkspace workspace = null;
@@ -69,7 +68,6 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 	/*
 	 * (non-Javadoc) Method declared on IContentProvider.
 	 */
-	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		super.inputChanged(viewer, oldInput, newInput);
 
@@ -103,7 +101,6 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 	/*
 	 * (non-Javadoc) Method declared on IResourceChangeListener.
 	 */
-	@Override
 	public final void resourceChanged(final IResourceChangeEvent event) {
 
 		processDelta(event.getDelta());
@@ -112,17 +109,17 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 
 	/**
 	 * Process the resource delta.
-	 *
+	 * 
 	 * @param delta
 	 */
-	protected void processDelta(IResourceDelta delta) {
+	protected void processDelta(IResourceDelta delta) {		
 
 		Control ctrl = viewer.getControl();
 		if (ctrl == null || ctrl.isDisposed()) {
 			return;
 		}
-
-
+		
+		
 		final Collection runnables = new ArrayList();
 		processDelta(delta, runnables);
 
@@ -138,14 +135,13 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 				/* (non-Javadoc)
 				 * @see java.lang.Runnable#run()
 				 */
-				@Override
 				public void run() {
 					//Abort if this happens after disposes
 					Control ctrl = viewer.getControl();
 					if (ctrl == null || ctrl.isDisposed()) {
 						return;
 					}
-
+					
 					runUpdates(runnables);
 				}
 			});
@@ -162,7 +158,7 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		while(runnableIterator.hasNext()){
 			((Runnable)runnableIterator.next()).run();
 		}
-
+		
 	}
 
 	/**
@@ -178,7 +174,7 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 
 		// Get the affected resource
 		final IResource resource = delta.getResource();
-
+	
 		// If any children have changed type, just do a full refresh of this
 		// parent,
 		// since a simple update on such children won't work,
@@ -281,9 +277,8 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		}
 		// heuristic test for items moving within same folder (i.e. renames)
 		final boolean hasRename = numMovedFrom > 0 && numMovedTo > 0;
-
+		
 		Runnable addAndRemove = new Runnable(){
-			@Override
 			public void run() {
 				if (viewer instanceof AbstractTreeViewer) {
 					AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
@@ -322,7 +317,6 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 	 */
 	private Runnable getRefreshRunnable(final IResource resource) {
 		return new Runnable(){
-			@Override
 			public void run() {
 				((StructuredViewer) viewer).refresh(resource);
 			}
@@ -336,7 +330,6 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		 */
 		private Runnable getUpdateRunnable(final IResource resource) {
 			return new Runnable(){
-				@Override
 				public void run() {
 					((StructuredViewer) viewer).update(resource, null);
 				}

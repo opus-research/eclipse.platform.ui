@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,6 @@ public abstract class ExtensionContributionFactory extends
 	 * 
 	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getLocation()
 	 */
-	@Override
 	public final String getLocation() {
 		return locationURI;
 	}
@@ -63,7 +62,6 @@ public abstract class ExtensionContributionFactory extends
 	 * 
 	 * @see org.eclipse.ui.menus.AbstractContributionFactory#getNamespace()
 	 */
-	@Override
 	public final String getNamespace() {
 		return namespace;
 	}
@@ -76,7 +74,6 @@ public abstract class ExtensionContributionFactory extends
 	 * @throws CoreException
 	 *             so that a subclass may throw this
 	 */
-	@Override
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		locationURI = config

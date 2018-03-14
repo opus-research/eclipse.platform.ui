@@ -40,7 +40,6 @@ public class CloseEditorHandler extends AbstractEvaluationHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -50,11 +49,14 @@ public class CloseEditorHandler extends AbstractEvaluationHandler {
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression()
+	 */
 	protected Expression getEnabledWhenExpression() {
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
-				@Override
 				public EvaluationResult evaluate(IEvaluationContext context)
 						throws CoreException {
 					IEditorPart part = InternalHandlerUtil
@@ -66,7 +68,11 @@ public class CloseEditorHandler extends AbstractEvaluationHandler {
 					return EvaluationResult.FALSE;
 				}
 
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
+				 */
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info.addVariableNameAccess(ISources.ACTIVE_EDITOR_NAME);
 				}

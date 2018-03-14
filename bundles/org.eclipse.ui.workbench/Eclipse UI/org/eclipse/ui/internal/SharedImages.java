@@ -23,8 +23,7 @@ public class SharedImages implements ISharedImages {
      *
      * @see ISharedImages
      */
-    @Override
-	public Image getImage(String symbolicName) {
+    public Image getImage(String symbolicName) {
         Image image = WorkbenchImages.getImage(symbolicName);
         if (image != null) {
 			return image;
@@ -44,8 +43,7 @@ public class SharedImages implements ISharedImages {
      *
      * @see ISharedImages
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(String symbolicName) {
+    public ImageDescriptor getImageDescriptor(String symbolicName) {
         return WorkbenchImages.getImageDescriptor(symbolicName);
     }
 }

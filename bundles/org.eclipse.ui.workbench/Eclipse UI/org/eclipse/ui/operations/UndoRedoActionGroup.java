@@ -59,7 +59,11 @@ public final class UndoRedoActionGroup extends ActionGroup {
 		redoActionHandler.setPruneHistory(pruneHistory);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
+	 */
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);
 		if (undoActionHandler != null) {

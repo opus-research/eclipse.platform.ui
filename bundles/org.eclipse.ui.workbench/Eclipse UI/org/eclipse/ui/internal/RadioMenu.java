@@ -36,8 +36,7 @@ public class RadioMenu implements IChangeListener {
     private List items = new ArrayList();
 
     SelectionAdapter selectionAdapter = new SelectionAdapter() {
-        @Override
-		public void widgetSelected(SelectionEvent e) {
+        public void widgetSelected(SelectionEvent e) {
             Object newState = e.widget.getData();
 
             data.setState(newState, RadioMenu.this);
@@ -124,8 +123,10 @@ public class RadioMenu implements IChangeListener {
         }
     }
 
-    @Override
-	public void update(boolean changed) {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.controls.IView#changed()
+     */
+    public void update(boolean changed) {
         refreshSelection();
     }
 

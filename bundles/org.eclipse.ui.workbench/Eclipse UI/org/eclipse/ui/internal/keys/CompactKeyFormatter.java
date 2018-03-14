@@ -32,8 +32,12 @@ import org.eclipse.ui.keys.NaturalKey;
  */
 public class CompactKeyFormatter extends NativeKeyFormatter {
 
-    @Override
-	public String format(KeySequence keySequence) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#format(org.eclipse.ui.keys.KeySequence)
+     */
+    public String format(KeySequence keySequence) {
         StringBuffer stringBuffer = new StringBuffer();
 
         List keyStrokes = keySequence.getKeyStrokes();
@@ -68,6 +72,11 @@ public class CompactKeyFormatter extends NativeKeyFormatter {
         return stringBuffer.toString();
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.keys.KeyFormatter#formatKeyStroke(org.eclipse.ui.keys.KeyStroke)
+     */
     public String formatKeyStrokes(Set modifierKeys, List naturalKeys) {
         StringBuffer stringBuffer = new StringBuffer();
         String keyDelimiter = getKeyDelimiter();

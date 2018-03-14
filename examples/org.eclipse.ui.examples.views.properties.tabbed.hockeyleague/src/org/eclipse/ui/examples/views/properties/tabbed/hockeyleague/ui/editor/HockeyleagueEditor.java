@@ -1323,8 +1323,7 @@ public class HockeyleagueEditor
 	 * @generated NOT
 	 */
 	public TabbedPropertySheetPage getPropertySheetPage() {
-        if (propertySheetPage == null || propertySheetPage.getControl() == null
-                || propertySheetPage.getControl().isDisposed()) {
+		if (propertySheetPage == null || propertySheetPage.getControl() == null) {
 			propertySheetPage = new HockeyleaguePropertySheetPage(this);
 		}
 

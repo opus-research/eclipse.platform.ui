@@ -106,8 +106,7 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
     /*
      * @see Window#configureShell(shell)
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         if (fImage != null) {
 			shell.setImage(fImage);
@@ -142,8 +141,7 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
     /*
      * @see Dialog#okPressed()
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         computeResult();
         super.okPressed();
     }
@@ -151,8 +149,7 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
     /*
      * @see Window#create()
      */
-    @Override
-	public void create() {
+    public void create() {
         super.create();
         if (fLastStatus != null) {
 			updateStatus(fLastStatus);
@@ -162,8 +159,7 @@ public abstract class SelectionStatusDialog extends SelectionDialog {
     /*
      * @see Dialog#createButtonBar(Composite)
      */
-    @Override
-	protected Control createButtonBar(Composite parent) {
+    protected Control createButtonBar(Composite parent) {
         Font font = parent.getFont();
         Composite composite = new Composite(parent, SWT.NULL);
         GridLayout layout = new GridLayout();

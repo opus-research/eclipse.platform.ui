@@ -37,12 +37,10 @@ public class ChangeEvent extends ObservableEvent {
 		super(source);
 	}
 
-	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IChangeListener) listener).handleChange(this);
 	}
 
-	@Override
 	protected Object getListenerType() {
 		return TYPE;
 	}

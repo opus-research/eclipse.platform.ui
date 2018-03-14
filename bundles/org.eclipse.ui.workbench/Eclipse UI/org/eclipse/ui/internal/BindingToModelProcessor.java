@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2012 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,8 @@ package org.eclipse.ui.internal;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.eclipse.core.commands.CommandManager;
 import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -27,9 +25,7 @@ import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MCommandsFactory;
-import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.ui.internal.keys.BindingPersistence;
@@ -40,7 +36,6 @@ public class BindingToModelProcessor {
 	private Map<String, MBindingContext> contexts = new HashMap<String, MBindingContext>();
 	private Map<String, MCommand> commands = new HashMap<String, MCommand>();
 	private Map<String, MBindingTable> tables = new HashMap<String, MBindingTable>();
-	private Set<MKeyBinding> keys = new HashSet<MKeyBinding>();
 
 	@Execute
 	void process(final MApplication application, IEclipseContext context) {
@@ -75,19 +70,12 @@ public class BindingToModelProcessor {
 			addBinding(application, binding);
 		}
 
-		removeBindings();
-
 		persistence.dispose();
-		contexts.clear();
-		commands.clear();
-		tables.clear();
-		keys.clear();
 	}
 
 	private void gatherTables(List<MBindingTable> bindingTables) {
 		for (MBindingTable table : bindingTables) {
 			tables.put(table.getBindingContext().getElementId(), table);
-			keys.addAll(table.getBindings());
 		}
 	}
 
@@ -98,20 +86,7 @@ public class BindingToModelProcessor {
 		if (table == null) {
 			table = createTable(application, binding.getContextId());
 		}
-		MKeyBinding model = BindingService.createORupdateMKeyBinding(application, table, binding);
-		keys.remove(model);
-	}
-
-	private void removeBindings() {
-		for (MKeyBinding key : keys) {
-			if (!key.getTags().contains("type:user")) { //$NON-NLS-1$
-				EObject obj = ((EObject) key).eContainer();
-				if (obj instanceof MBindingTable) {
-					MBindingTable table = (MBindingTable) obj;
-					table.getBindings().remove(key);
-				}
-			}
-		}
+		BindingService.createORupdateMKeyBinding(application, table, binding);
 	}
 
 	public MBindingContext getBindingContext(MApplication application, String id) {

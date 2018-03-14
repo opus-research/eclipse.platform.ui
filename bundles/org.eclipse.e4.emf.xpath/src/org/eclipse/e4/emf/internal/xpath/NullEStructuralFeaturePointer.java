@@ -51,57 +51,46 @@ public class NullEStructuralFeaturePointer extends EStructuralFeaturePointer {
         super(parent);
     }
 
-    @Override
-	public QName getName() {
+    public QName getName() {
         return new QName(propertyName);
     }
 
-    @Override
-	public void setPropertyIndex(int index) {
+    public void setPropertyIndex(int index) {
     }
 
-    @Override
-	public int getLength() {
+    public int getLength() {
         return 0;
     }
 
-    @Override
-	public Object getBaseValue() {
+    public Object getBaseValue() {
         return null;
     }
 
-    @Override
-	public Object getImmediateNode() {
+    public Object getImmediateNode() {
         return null;
     }
 
-    @Override
-	public boolean isLeaf() {
+    public boolean isLeaf() {
         return true;
     }
 
-    @Override
-	public NodePointer getValuePointer() {
+    public NodePointer getValuePointer() {
         return new NullPointer(this,  new QName(getPropertyName()));
     }
 
-    @Override
-	protected boolean isActualProperty() {
+    protected boolean isActualProperty() {
         return false;
     }
 
-    @Override
-	public boolean isActual() {
+    public boolean isActual() {
         return false;
     }
 
-    @Override
-	public boolean isContainer() {
+    public boolean isContainer() {
         return true;
     }
 
-    @Override
-	public void setValue(Object value) {
+    public void setValue(Object value) {
         if (parent == null || parent.isContainer()) {
             throw new JXPathInvalidAccessException(
                 "Cannot set property "
@@ -126,8 +115,7 @@ public class NullEStructuralFeaturePointer extends EStructuralFeaturePointer {
         }
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context) {
+    public NodePointer createPath(JXPathContext context) {
         NodePointer newParent = parent.createPath(context);
         if (isAttribute()) {
             return newParent.createAttribute(context, getName());
@@ -155,8 +143,7 @@ public class NullEStructuralFeaturePointer extends EStructuralFeaturePointer {
         return newParent.createChild(context, getName(), getIndex());
     }
 
-    @Override
-	public NodePointer createPath(JXPathContext context, Object value) {
+    public NodePointer createPath(JXPathContext context, Object value) {
         NodePointer newParent = parent.createPath(context);
         if (isAttribute()) {
             NodePointer pointer = newParent.createAttribute(context, getName());
@@ -173,24 +160,20 @@ public class NullEStructuralFeaturePointer extends EStructuralFeaturePointer {
         return newParent.createChild(context, getName(), index, value);
     }
 
-    @Override
-	public NodePointer createChild(JXPathContext context, QName name, int index) {
+    public NodePointer createChild(JXPathContext context, QName name, int index) {
         return createPath(context).createChild(context, name, index);
     }
 
-    @Override
-	public NodePointer createChild(JXPathContext context, QName name,
+    public NodePointer createChild(JXPathContext context, QName name,
             int index, Object value) {
         return createPath(context).createChild(context, name, index, value);
     }
 
-    @Override
-	public String getPropertyName() {
+    public String getPropertyName() {
         return propertyName;
     }
 
-    @Override
-	public void setPropertyName(String propertyName) {
+    public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
     }
 
@@ -203,23 +186,19 @@ public class NullEStructuralFeaturePointer extends EStructuralFeaturePointer {
         byNameAttribute = true;
     }
 
-    @Override
-	public boolean isCollection() {
+    public boolean isCollection() {
         return getIndex() != WHOLE_COLLECTION;
     }
 
-    @Override
-	public int getPropertyCount() {
+    public int getPropertyCount() {
         return 0;
     }
 
-    @Override
-	public String[] getPropertyNames() {
+    public String[] getPropertyNames() {
         return new String[0];
     }
 
-    @Override
-	public String asPath() {
+    public String asPath() {
         if (!byNameAttribute) {
             return super.asPath();
         }

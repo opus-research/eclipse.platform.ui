@@ -38,7 +38,6 @@ import org.eclipse.core.databinding.observable.map.MapDiff;
  * 
  * @deprecated This class is deprecated.
  */
-@Deprecated
 public class MappedSet extends ObservableSet {
 
 	private final IObservableMap wrappedMap;
@@ -49,7 +48,6 @@ public class MappedSet extends ObservableSet {
 	private Map valueCounts = new HashMap();
 
 	private ISetChangeListener domainListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			Set additions = new HashSet();
 			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
@@ -72,7 +70,6 @@ public class MappedSet extends ObservableSet {
 	};
 
 	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			Set additions = new HashSet();
@@ -154,7 +151,6 @@ public class MappedSet extends ObservableSet {
 		return false;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		wrappedMap.removeMapChangeListener(mapChangeListener);
 		input.removeSetChangeListener(domainListener);

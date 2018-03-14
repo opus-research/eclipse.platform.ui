@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -71,7 +70,7 @@ public class ActionSetManager {
 	private IContextService contextService;
     
     public ActionSetManager(IServiceLocator locator) {
-    	contextService = locator.getService(IContextService.class);
+    	contextService = (IContextService) locator.getService(IContextService.class);
 		addListener(getContextListener());
     }
     
@@ -81,7 +80,6 @@ public class ActionSetManager {
 	private IPropertyListener getContextListener() {
 		if (contextListener == null) {
 			contextListener = new IPropertyListener() {
-				@Override
 				public void propertyChanged(Object source, int propId) {
 					if (source instanceof IActionSetDescriptor) {
 						IActionSetDescriptor desc = (IActionSetDescriptor) source;

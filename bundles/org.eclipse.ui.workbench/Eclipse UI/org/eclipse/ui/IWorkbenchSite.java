@@ -75,7 +75,6 @@ public interface IWorkbenchSite extends IAdaptable, IShellProvider,
 	 * 
 	 * @return the shell for this workbench site
 	 */
-	@Override
 	public Shell getShell();
 
 	/**

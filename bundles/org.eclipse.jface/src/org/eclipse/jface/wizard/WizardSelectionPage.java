@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * List of wizard nodes that have cropped up in the past
      * (element type: <code>IWizardNode</code>).
      */
-    private List<IWizardNode> selectedWizardNodes = new ArrayList<IWizardNode>();
+    private List selectedWizardNodes = new ArrayList();
 
     /**
      * Creates a new wizard selection page with the given name, and
@@ -73,8 +73,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * this <code>IWizardPage</code> method returns <code>true</code>
      * if there is a selected node.
      */
-    @Override
-	public boolean canFlipToNextPage() {
+    public boolean canFlipToNextPage() {
         return selectedNode != null;
     }
 
@@ -82,12 +81,11 @@ public abstract class WizardSelectionPage extends WizardPage {
      * The <code>WizardSelectionPage</code> implementation of an <code>IDialogPage</code>
      * method disposes of all nested wizards. Subclasses may extend.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         // notify nested wizards
         for (int i = 0; i < selectedWizardNodes.size(); i++) {
-            selectedWizardNodes.get(i).dispose();
+            ((IWizardNode) selectedWizardNodes.get(i)).dispose();
         }
     }
 
@@ -96,8 +94,7 @@ public abstract class WizardSelectionPage extends WizardPage {
      * this <code>IWizardPage</code> method returns the first page 
      * of the currently selected wizard if there is one.
      */
-    @Override
-	public IWizardPage getNextPage() {
+    public IWizardPage getNextPage() {
         if (selectedNode == null) {
 			return null;
 		}

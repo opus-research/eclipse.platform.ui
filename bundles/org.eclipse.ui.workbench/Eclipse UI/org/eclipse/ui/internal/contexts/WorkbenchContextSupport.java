@@ -84,7 +84,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 				.getContextManagerWrapper(contextManager);
 	}
 
-	@Override
 	public final void addEnabledSubmission(
 			final EnabledSubmission enabledSubmission) {
 		final IContextActivation activation = contextService.activateContext(
@@ -98,7 +97,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		activationsBySubmission.put(enabledSubmission, activation);
 	}
 
-	@Override
 	public final void addEnabledSubmissions(final Collection enabledSubmissions) {
 		final Iterator submissionItr = enabledSubmissions.iterator();
 		while (submissionItr.hasNext()) {
@@ -106,32 +104,26 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final IContextManager getContextManager() {
 		return contextManagerWrapper;
 	}
 
-	@Override
 	public final int getShellType(Shell shell) {
 		return contextService.getShellType(shell);
 	}
 
-	@Override
 	public final boolean isKeyFilterEnabled() {
 		return bindingService.isKeyFilterEnabled();
 	}
 
-	@Override
 	public final void openKeyAssistDialog() {
 		bindingService.openKeyAssistDialog();
 	}
 
-	@Override
 	public final boolean registerShell(final Shell shell, final int type) {
 		return contextService.registerShell(shell, type);
 	}
 
-	@Override
 	public final void removeEnabledSubmission(
 			final EnabledSubmission enabledSubmission) {
 		if (activationsBySubmission == null) {
@@ -145,7 +137,6 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final void removeEnabledSubmissions(
 			final Collection enabledSubmissions) {
 		final Iterator submissionItr = enabledSubmissions.iterator();
@@ -154,12 +145,10 @@ public class WorkbenchContextSupport implements IWorkbenchContextSupport {
 		}
 	}
 
-	@Override
 	public final void setKeyFilterEnabled(final boolean enabled) {
 		bindingService.setKeyFilterEnabled(enabled);
 	}
 
-	@Override
 	public final boolean unregisterShell(final Shell shell) {
 		return contextService.unregisterShell(shell);
 	}

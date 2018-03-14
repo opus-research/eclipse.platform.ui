@@ -1,6 +1,6 @@
 /*
 
-   Copyright 2002  The Apache Software Foundation
+   Copyright 2002  The Apache Software Foundation 
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -54,8 +54,7 @@ public class CSSLangConditionImpl
      * Indicates whether some other object is "equal to" this one.
      * @param obj the reference object with which to compare.
      */
-    @Override
-	public boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null || (obj.getClass() != getClass())) {
             return false;
         }
@@ -67,32 +66,28 @@ public class CSSLangConditionImpl
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.Condition#getConditionType()}.
      */
-    @Override
-	public short getConditionType() {
+    public short getConditionType() {
         return SAC_LANG_CONDITION;
     }
 
     /**
      * <b>SAC</b>: Implements {@link org.w3c.css.sac.LangCondition#getLang()}.
      */
-    @Override
-	public String getLang() {
+    public String getLang() {
         return lang;
     }
 
     /**
      * Returns the specificity of this condition.
      */
-    @Override
-	public int getSpecificity() {
+    public int getSpecificity() {
         return 1 << 8;
     }
 
     /**
      * Tests whether this condition matches the given element.
      */
-    @Override
-	public boolean match(Element e, String pseudoE) {
+    public boolean match(Element e, String pseudoE) {
         String s = e.getAttribute("lang").toLowerCase();
         if (s.equals(lang) || s.startsWith(langHyphen)) {
             return true;
@@ -105,16 +100,14 @@ public class CSSLangConditionImpl
     /**
      * Fills the given set with the attribute names found in this selector.
      */
-    @Override
-	public void fillAttributeSet(Set attrSet) {
+    public void fillAttributeSet(Set attrSet) {
         attrSet.add("lang");
     }
 
     /**
      * Returns a text representation of this object.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return ":lang(" + lang + ')';
     }
 }

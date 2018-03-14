@@ -24,9 +24,9 @@ import org.eclipse.ui.internal.ide.Policy;
 
 /**
  * The MarkerAdapter is the adapter for the deferred update of markers.
- *
+ * 
  * @since 3.1
- *
+ * 
  */
 public class MarkerAdapter {
 
@@ -45,7 +45,7 @@ public class MarkerAdapter {
 		/**
 		 * Create a new instance of the receiver that has the markers between
 		 * startIndex and endIndex showing.
-		 *
+		 * 
 		 * @param adapter
 		 * @param startIndex
 		 * @param endIndex
@@ -60,10 +60,9 @@ public class MarkerAdapter {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getChildren()
 		 */
-		@Override
 		public MarkerNode[] getChildren() {
 
 			if (children == null) {
@@ -94,7 +93,7 @@ public class MarkerAdapter {
 
 		/**
 		 * Return the number of errors being displayed.
-		 *
+		 * 
 		 * @return int
 		 */
 		int getDisplayedSize() {
@@ -106,20 +105,18 @@ public class MarkerAdapter {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getParent()
 		 */
-		@Override
 		public MarkerNode getParent() {
 			return null;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getDescription()
 		 */
-		@Override
 		public String getDescription() {
 
 			int size = end - start + 1;
@@ -140,7 +137,7 @@ public class MarkerAdapter {
 
 		/**
 		 * Get the total size of the receiver.
-		 *
+		 * 
 		 * @return int
 		 */
 		private int getTotalSize() {
@@ -149,27 +146,25 @@ public class MarkerAdapter {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.views.markers.internal.MarkerNode#isConcrete()
 		 */
-		@Override
 		public boolean isConcrete() {
 			return false;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see org.eclipse.ui.views.markers.internal.MarkerNode#getConcreteRepresentative()
 		 */
-		@Override
 		public ConcreteMarker getConcreteRepresentative() {
 			return markerAdapter.lastMarkers.getMarker(start);
 		}
 
 		/**
 		 * Return the name of the receiver.
-		 *
+		 * 
 		 * @return String
 		 */
 		public String getName() {
@@ -189,7 +184,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param markerView
 	 */
 	MarkerAdapter(MarkerView markerView) {
@@ -199,7 +194,7 @@ public class MarkerAdapter {
 	/**
 	 * Return the category sorter for the receiver. This should only be called
 	 * in hierarchal mode or there will be a ClassCastException.
-	 *
+	 * 
 	 * @return CategorySorter
 	 */
 	public CategoryComparator getCategorySorter() {
@@ -208,7 +203,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Build all of the markers in the receiver.
-	 *
+	 * 
 	 * @param collector
 	 * @param monitor
 	 */
@@ -262,9 +257,9 @@ public class MarkerAdapter {
 
 				newMarkers = SortUtil.getFirst(newMarkers, (Comparator) sorter,
 						markerLimit, mon);
-				if (monitor.isCanceled())
+				if (monitor.isCanceled()) 
 					return;
-
+				
 				sorter.sort(view.getViewer(), newMarkers.toArray());
 			}
 
@@ -298,7 +293,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Return whether or not a hierarchy is showing.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean isShowingHierarchy() {
@@ -312,7 +307,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Break the marker up into categories
-	 *
+	 * 
 	 * @param markers
 	 * @param start
 	 *            the start index in the markers
@@ -371,7 +366,7 @@ public class MarkerAdapter {
 	/**
 	 * Get the name for the category from the marker at categoryStart in
 	 * markers.
-	 *
+	 * 
 	 * @param markers
 	 * @param categoryStart
 	 * @return String
@@ -383,7 +378,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Return the current list of markers.
-	 *
+	 * 
 	 * @return MarkerList
 	 */
 	public MarkerList getCurrentMarkers() {
@@ -399,7 +394,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Return the elements in the adapter.
-	 *
+	 * 
 	 * @param root
 	 * @return Object[]
 	 */
@@ -421,7 +416,7 @@ public class MarkerAdapter {
 	/**
 	 * Return whether or not the receiver has markers without scheduling
 	 * anything if it doesn't.
-	 *
+	 * 
 	 * @return boolean <code>true</code> if the markers have not been
 	 *         calculated.
 	 */
@@ -431,7 +426,7 @@ public class MarkerAdapter {
 
 	/**
 	 * Return the categories for the receiver.
-	 *
+	 * 
 	 * @return MarkerCategory[] or <code>null</code> if there are no
 	 *         categories.
 	 */

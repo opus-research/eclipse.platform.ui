@@ -211,7 +211,6 @@ public interface IContextService extends IServiceWithSources {
 	 *             {@link IContextService#activateContext(String, Expression)}
 	 *             instead.
 	 */
-	@Deprecated
 	public IContextActivation activateContext(String contextId,
 			Expression expression, int sourcePriorities);
 

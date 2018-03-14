@@ -74,8 +74,12 @@ public abstract class WorkbenchWizardListSelectionPage extends
         this.message = message;
     }
 
-    @Override
-	public void createControl(Composite parent) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createControl(Composite parent) {
 
         Font font = parent.getFont();
 
@@ -133,8 +137,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
     /**
      * An item in a viewer has been double-clicked.
      */
-    @Override
-	public void doubleClick(DoubleClickEvent event) {
+    public void doubleClick(DoubleClickEvent event) {
         selectionChanged(new SelectionChangedEvent(event.getViewer(), event
                 .getViewer().getSelection()));
         getContainer().showPage(getNextPage());
@@ -203,8 +206,7 @@ public abstract class WorkbenchWizardListSelectionPage extends
      * 
      * @param event the selection changed event
      */
-    @Override
-	public void selectionChanged(SelectionChangedEvent event) {
+    public void selectionChanged(SelectionChangedEvent event) {
         setErrorMessage(null);
         IStructuredSelection selection = (IStructuredSelection) event
                 .getSelection();

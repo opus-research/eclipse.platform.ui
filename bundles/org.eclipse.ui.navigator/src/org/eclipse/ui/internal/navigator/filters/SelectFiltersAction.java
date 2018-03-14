@@ -46,7 +46,6 @@ public class SelectFiltersAction extends Action {
 		filterGroup = aFilterGroup;
 	}
 
-	@Override
 	public void run() {
 		CommonFilterSelectionDialog filterSelectionDialog = new CommonFilterSelectionDialog(commonViewer);
 		filterSelectionDialog.open();

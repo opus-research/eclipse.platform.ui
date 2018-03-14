@@ -39,8 +39,7 @@ public final class ActivityRequirementBinding implements
         this.activityId = activityId;
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         ActivityRequirementBinding castedObject = (ActivityRequirementBinding) object;
         int compareTo = Util.compare(requiredActivityId,
                 castedObject.requiredActivityId);
@@ -52,8 +51,7 @@ public final class ActivityRequirementBinding implements
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof ActivityRequirementBinding)) {
 			return false;
 		}
@@ -66,18 +64,15 @@ public final class ActivityRequirementBinding implements
         return Util.equals(activityId, castedObject.activityId);
     }
 
-    @Override
-	public String getRequiredActivityId() {
+    public String getRequiredActivityId() {
         return requiredActivityId;
     }
 
-    @Override
-	public String getActivityId() {
+    public String getActivityId() {
         return activityId;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR
                     + Util.hashCode(requiredActivityId);
@@ -90,8 +85,7 @@ public final class ActivityRequirementBinding implements
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

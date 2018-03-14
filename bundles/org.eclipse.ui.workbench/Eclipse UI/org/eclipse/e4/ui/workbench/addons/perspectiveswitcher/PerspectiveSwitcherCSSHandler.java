@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,9 +35,6 @@ public class PerspectiveSwitcherCSSHandler extends AbstractCSSPropertySWTHandler
 				Color curveColor = null;
 				if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
 					borderColor = (Color) engine.convert(value, Color.class, control.getDisplay());
-					borderColor = borderColor == null || borderColor.isDisposed() ? null
-							: borderColor;
-
 					((PerspectiveSwitcher) bar).setKeylineColor(borderColor, borderColor);
 				} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 					CSSValueList list = (CSSValueList) value;
@@ -46,14 +43,8 @@ public class PerspectiveSwitcherCSSHandler extends AbstractCSSPropertySWTHandler
 						CSSValue curve = list.item(1);
 						borderColor = (Color) engine.convert(border, Color.class,
 								control.getDisplay());
-						borderColor = borderColor == null || borderColor.isDisposed() ? null
-								: borderColor;
-
 						curveColor = (Color) engine.convert(curve, Color.class,
 								control.getDisplay());
-						curveColor = curveColor == null || curveColor.isDisposed() ? null
-								: curveColor;
-
 						((PerspectiveSwitcher) bar).setKeylineColor(borderColor, curveColor);
 					}
 				}

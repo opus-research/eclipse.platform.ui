@@ -24,7 +24,12 @@ public class WorkbenchWindowPropertyTester extends PropertyTester {
 	private static final String PROPERTY_IS_COOLBAR_VISIBLE = "isCoolbarVisible"; //$NON-NLS-1$
 	private static final String PROPERTY_IS_PERSPECTIVEBAR_VISIBLE = "isPerspectiveBarVisible"; //$NON-NLS-1$
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object,
+	 *      java.lang.String, java.lang.Object[], java.lang.Object)
+	 */
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		

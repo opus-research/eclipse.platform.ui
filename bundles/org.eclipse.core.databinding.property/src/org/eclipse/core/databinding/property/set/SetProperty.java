@@ -50,7 +50,6 @@ public abstract class SetProperty implements ISetProperty {
 	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public Set getSet(Object source) {
 		if (source == null) {
 			return Collections.EMPTY_SET;
@@ -79,7 +78,6 @@ public abstract class SetProperty implements ISetProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setSet(Object source, Set set) {
 		if (source != null) {
 			doSetSet(source, set);
@@ -103,7 +101,6 @@ public abstract class SetProperty implements ISetProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void updateSet(Object source, SetDiff diff) {
 		if (source != null && !diff.isEmpty()) {
 			doUpdateSet(source, diff);
@@ -129,38 +126,31 @@ public abstract class SetProperty implements ISetProperty {
 		}
 	}
 
-	@Override
 	public IObservableSet observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory setFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory setFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableSet observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailSet(master,
 				setFactory(master.getRealm()), getElementType());
 	}
 
-	@Override
 	public final IMapProperty values(IValueProperty detailValues) {
 		return new SetPropertyDetailValuesMap(this, detailValues);
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -136,7 +136,6 @@ public abstract class IconAndMessageDialog extends Dialog {
 	 */
 	private void addAccessibleListeners(Label label, final Image image) {
 		label.getAccessible().addAccessibleListener(new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent event) {
 				final String accessibleMessage = getAccessibleMessageFor(image);
 				if (accessibleMessage == null) {
@@ -161,7 +160,6 @@ public abstract class IconAndMessageDialog extends Dialog {
 	/*
 	 * @see Dialog.createButtonBar()
 	 */
-	@Override
 	protected Control createButtonBar(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayoutFactory.fillDefaults().numColumns(0) // this is incremented
@@ -190,7 +188,6 @@ public abstract class IconAndMessageDialog extends Dialog {
 	/*
 	 * @see Dialog.createContents(Composite)
 	 */
-	@Override
 	protected Control createContents(Composite parent) {
 		// initialize the dialog units
 		initializeDialogUnits(parent);
@@ -290,7 +287,6 @@ public abstract class IconAndMessageDialog extends Dialog {
 
 		final Image[] image = new Image[1];
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				image[0] = display.getSystemImage(imageID);
 			}

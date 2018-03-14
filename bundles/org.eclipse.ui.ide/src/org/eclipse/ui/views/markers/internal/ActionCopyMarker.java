@@ -40,7 +40,7 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Creates the action.
-	 *
+	 * 
 	 * @param part
 	 * @param provider
 	 */
@@ -54,7 +54,7 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 
 	/**
 	 * Sets the clipboard that the marker(s) will be copied to.
-	 *
+	 * 
 	 * @param clipboard
 	 *            the clipboard
 	 */
@@ -65,7 +65,7 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 	/**
 	 * Sets the properties to be added to the plain-text marker report that will
 	 * be copied to the clipboard.
-	 *
+	 * 
 	 * @param properties
 	 */
 	void setProperties(IField[] properties) {
@@ -77,7 +77,6 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 	 * been set, also copies a plain-text report of the selected markers to the
 	 * clipboard.
 	 */
-	@Override
 	public void run() {
 		IMarker[] markers = getSelectedMarkers();
 		setClipboard(markers, createMarkerReport(markers));
@@ -85,10 +84,9 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(Util.allConcreteSelection(selection));
 	}
@@ -123,7 +121,7 @@ public class ActionCopyMarker extends MarkerSelectionProviderAction {
 	/**
 	 * Creates a plain-text report of the selected markers based on predefined
 	 * properties.
-	 *
+	 * 
 	 * @param rawMarkers
 	 * @return the marker report
 	 */

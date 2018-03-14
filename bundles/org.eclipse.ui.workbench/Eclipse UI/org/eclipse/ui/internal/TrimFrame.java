@@ -66,8 +66,7 @@ public class TrimFrame {
                  gc.drawLine(x1, y1, x2, y2);
             }
             
-            @Override
-			public void paintControl(PaintEvent e) {
+            public void paintControl(PaintEvent e) {
                 Canvas canvas = (Canvas)e.widget;
                 Control child = canvas.getChildren ()[0];
                 
@@ -139,7 +138,6 @@ public class TrimFrame {
         // correct location
         canvas.setLayout(new Layout() {
 
-			@Override
 			protected Point computeSize(Composite composite, int wHint,
                     int hHint, boolean changed) {
                 Control[] children = composite.getChildren();
@@ -160,8 +158,7 @@ public class TrimFrame {
                 return innerSize;
             }
 
-            @Override
-			protected void layout(Composite composite, boolean flushCache) { 
+            protected void layout(Composite composite, boolean flushCache) { 
                 Control[] children = composite.getChildren();
                 if (children.length == 0)
                     return;

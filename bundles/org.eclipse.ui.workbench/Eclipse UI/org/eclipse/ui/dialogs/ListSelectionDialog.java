@@ -118,8 +118,7 @@ public class ListSelectionDialog extends SelectionDialog {
                 IDialogConstants.SELECT_ALL_ID, SELECT_ALL_TITLE, false);
 
         SelectionListener listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(true);
             }
         };
@@ -129,8 +128,7 @@ public class ListSelectionDialog extends SelectionDialog {
                 IDialogConstants.DESELECT_ALL_ID, DESELECT_ALL_TITLE, false);
 
         listener = new SelectionAdapter() {
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 listViewer.setAllChecked(false);
             }
         };
@@ -149,15 +147,20 @@ public class ListSelectionDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected void configureShell(Shell shell) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.LIST_SELECTION_DIALOG);
     }
 
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
+    protected Control createDialogArea(Composite parent) {
         // page group
         Composite composite = (Composite) super.createDialogArea(parent);
         
@@ -209,8 +212,7 @@ public class ListSelectionDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected elements for later
      * retrieval by the client and closes this dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
 
         // Get the input children.
         Object[] children = contentProvider.getElements(inputElement);

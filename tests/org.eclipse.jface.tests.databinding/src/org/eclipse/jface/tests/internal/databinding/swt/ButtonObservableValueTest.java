@@ -38,7 +38,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 	private ISWTObservableValue observableValue;
 	private ValueChangeEventTracker listener;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -119,7 +118,6 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 
 		Button button;
 
-		@Override
 		public void setUp() {
 			super.setUp();
 
@@ -127,30 +125,25 @@ public class ButtonObservableValueTest extends AbstractSWTTestCase {
 			button = new Button(shell, SWT.CHECK);
 		}
 
-		@Override
 		public void tearDown() {
 			super.tearDown();
 
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.selection().observe(realm, button);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Boolean.TYPE;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			((IObservableValue) observable).setValue(Boolean
 					.valueOf(changeValue(button)));
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return Boolean.valueOf(changeValue(button));
 		}

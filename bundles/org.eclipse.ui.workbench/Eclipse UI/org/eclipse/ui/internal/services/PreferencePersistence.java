@@ -390,7 +390,6 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 	/**
 	 * Detaches the preference change listener from the registry.
 	 */
-	@Override
 	public final void dispose() {
 		super.dispose();
 
@@ -414,7 +413,6 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 	 * Reads the various elements from the registry. Subclasses should extend,
 	 * but must not override.
 	 */
-	@Override
 	protected void read() {
 		super.read();
 
@@ -433,7 +431,6 @@ public abstract class PreferencePersistence extends RegistryPersistence {
 		super();
 
 		preferenceChangeListener = new IPropertyChangeListener() {
-			@Override
 			public final void propertyChange(final PropertyChangeEvent event) {
 				if (isChangeImportant(event)) {
 					read();

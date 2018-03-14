@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -85,8 +85,7 @@ public class FontFieldEditor extends FieldEditor {
             string = s;
             text = new Text(parent, SWT.READ_ONLY | SWT.BORDER);
             text.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent e) {
+                public void widgetDisposed(DisposeEvent e) {
                     if (font != null) {
 						font.dispose();
 					}
@@ -160,8 +159,10 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void adjustForNumColumns(int numColumns) {
 
         GridData data = new GridData();
         if (valueControl.getLayoutData() != null) {
@@ -172,15 +173,19 @@ public class FontFieldEditor extends FieldEditor {
         valueControl.setLayoutData(data);
     }
 
-    @Override
-	protected void applyFont() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void applyFont() {
         if (chosenFont != null && previewer != null) {
 			previewer.setFont(chosenFont);
 		}
     }
 
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         getLabelControl(parent);
 
         valueControl = getValueControl(parent);
@@ -207,8 +212,10 @@ public class FontFieldEditor extends FieldEditor {
 
     }
 
-    @Override
-	protected void doLoad() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoad() {
         if (changeFontButton == null) {
 			return;
 		}
@@ -216,8 +223,10 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceName()));
     }
 
-    @Override
-	protected void doLoadDefault() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doLoadDefault() {
         if (changeFontButton == null) {
 			return;
 		}
@@ -225,8 +234,10 @@ public class FontFieldEditor extends FieldEditor {
                 getPreferenceStore(), getPreferenceName()));
     }
 
-    @Override
-	protected void doStore() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    protected void doStore() {
         if (chosenFont != null) {
 			PreferenceConverter.setValue(getPreferenceStore(),
                     getPreferenceName(), chosenFont);
@@ -246,8 +257,7 @@ public class FontFieldEditor extends FieldEditor {
 				changeFontButton.setText(changeButtonText);
 			}
             changeFontButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     FontDialog fontDialog = new FontDialog(changeFontButton
                             .getShell());
                     if (chosenFont != null) {
@@ -270,8 +280,7 @@ public class FontFieldEditor extends FieldEditor {
                 }
             });
             changeFontButton.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     changeFontButton = null;
                 }
             });
@@ -283,8 +292,10 @@ public class FontFieldEditor extends FieldEditor {
         return changeFontButton;
     }
 
-    @Override
-	public int getNumberOfControls() {
+    /* (non-Javadoc)
+     * Method declared on FieldEditor.
+     */
+    public int getNumberOfControls() {
         if (previewer == null) {
 			return 3;
 		}
@@ -329,8 +340,7 @@ public class FontFieldEditor extends FieldEditor {
             valueControl = new Label(parent, SWT.LEFT);
             valueControl.setFont(parent.getFont());
             valueControl.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     valueControl = null;
                 }
             });
@@ -401,8 +411,7 @@ public class FontFieldEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    @Override
-	public void setEnabled(boolean enabled, Composite parent) {
+    public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         getChangeControl(parent).setEnabled(enabled);
         getValueControl(parent).setEnabled(enabled);

@@ -44,8 +44,7 @@ class PageSelectionService extends AbstractSelectionService {
     /*
      * @see AbstractSelectionService#createPartTracker(String)
      */
-    @Override
-	protected AbstractPartSelectionTracker createPartTracker(String partId) {
+    protected AbstractPartSelectionTracker createPartTracker(String partId) {
         return new PagePartSelectionTracker(getPage(), partId);
     }
 

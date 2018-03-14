@@ -46,7 +46,6 @@ import org.eclipse.ui.internal.util.Util;
  * @deprecated Please use org.eclipse.jface.bindings.keys.KeySequence
  * @since 3.0
  */
-@Deprecated
 public final class KeySequence implements Comparable {
 
     /**
@@ -256,8 +255,7 @@ public final class KeySequence implements Comparable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         KeySequence castedObject = (KeySequence) object;
         int compareTo = Util.compare(keyStrokes, castedObject.keyStrokes);
         return compareTo;
@@ -286,8 +284,7 @@ public final class KeySequence implements Comparable {
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof KeySequence)) {
 			return false;
 		}
@@ -319,8 +316,7 @@ public final class KeySequence implements Comparable {
     /**
      * @see java.lang.Object#hashCode()
      */
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + keyStrokes.hashCode();
@@ -379,8 +375,7 @@ public final class KeySequence implements Comparable {
      *         Guaranteed not to be <code>null</code>.
      * @see java.lang.Object#toString()
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return KeyFormatterFactory.getFormalKeyFormatter().format(this);
     }
 }

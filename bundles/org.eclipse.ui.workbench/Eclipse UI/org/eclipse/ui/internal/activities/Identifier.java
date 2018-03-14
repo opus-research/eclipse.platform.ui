@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,7 @@ final class Identifier implements IIdentifier {
         this.id = id;
     }
 
-    @Override
-	public void addIdentifierListener(IIdentifierListener identifierListener) {
+    public void addIdentifierListener(IIdentifierListener identifierListener) {
         if (identifierListener == null) {
 			throw new NullPointerException();
 		}
@@ -64,8 +63,7 @@ final class Identifier implements IIdentifier {
         strongReferences.add(this);
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         Identifier castedObject = (Identifier) object;
         int compareTo = Util.compare(activityIdsAsArray,
                 castedObject.activityIdsAsArray);
@@ -81,8 +79,7 @@ final class Identifier implements IIdentifier {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof Identifier)) {
 			return false;
 		}
@@ -113,18 +110,15 @@ final class Identifier implements IIdentifier {
 		}
     }
 
-	@Override
 	public Set<String> getActivityIds() {
         return activityIds;
     }
 
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (hashCode == HASH_INITIAL) {
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(activityIds);
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(enabled);
@@ -137,13 +131,11 @@ final class Identifier implements IIdentifier {
         return hashCode;
     }
 
-    @Override
-	public boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    @Override
-	public void removeIdentifierListener(IIdentifierListener identifierListener) {
+    public void removeIdentifierListener(IIdentifierListener identifierListener) {
         if (identifierListener == null) {
 			throw new NullPointerException();
 		}
@@ -181,8 +173,7 @@ final class Identifier implements IIdentifier {
         return false;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

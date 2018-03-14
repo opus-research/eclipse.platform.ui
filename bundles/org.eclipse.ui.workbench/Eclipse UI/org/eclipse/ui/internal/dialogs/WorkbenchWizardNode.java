@@ -73,8 +73,10 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
      */
     public abstract IWorkbenchWizard createWizard() throws CoreException;
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizardNode#dispose()
+     */
+    public void dispose() {
         // Do nothing since the wizard wasn't created via reflection.
     }
 
@@ -85,13 +87,17 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         return parentWizardPage.getCurrentResourceSelection();
     }
 
-    @Override
-	public Point getExtent() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizardNode#getExtent()
+     */
+    public Point getExtent() {
         return new Point(-1, -1);
     }
 
-    @Override
-	public String getLocalId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getLocalId()
+     */
+    public String getLocalId() {
     	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
 				IPluginContribution.class);
 		if (contribution != null) {
@@ -100,8 +106,10 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 		return wizardElement.getId();
     }
 
-    @Override
-	public String getPluginId() {
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IPluginContribution#getPluginId()
+     */
+    public String getPluginId() {
        	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
 				IPluginContribution.class);
 		if (contribution != null) {
@@ -110,8 +118,10 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 		return null;
     }
 
-    @Override
-	public IWizard getWizard() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizardNode#getWizard()
+     */
+    public IWizard getWizard() {
         if (wizard != null) {
 			return wizard; // we've already created it
 		}
@@ -121,14 +131,12 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         // Start busy indicator.
         BusyIndicator.showWhile(parentWizardPage.getShell().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         SafeRunner.run(new SafeRunnable() {
                             /**
                              * Add the exception details to status is one happens.
                              */
-                            @Override
-							public void handleException(Throwable e) {
+                            public void handleException(Throwable e) {
                                	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
                                 statuses[0] = new Status(
                                         IStatus.ERROR,
@@ -138,8 +146,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                                         e);
                             }
 
-                            @Override
-							public void run() {
+                            public void run() {
                                 try {
                                     workbenchWizard[0] = createWizard();
                                     // create instance of target wizard
@@ -197,8 +204,10 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         return parentWizardPage.getWorkbench();
     }
 
-    @Override
-	public boolean isContentCreated() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.wizard.IWizardNode#isContentCreated()
+     */
+    public boolean isContentCreated() {
         return wizard != null;
     }
 }

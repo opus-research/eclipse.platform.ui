@@ -53,8 +53,7 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         this.match = match;
     }
 
-    @Override
-	public int compareTo(Object object) {
+    public int compareTo(Object object) {
         KeySequenceBinding castedObject = (KeySequenceBinding) object;
         int compareTo = Util.compare(match, castedObject.match);
 
@@ -65,8 +64,7 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return compareTo;
     }
 
-    @Override
-	public boolean equals(Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof KeySequenceBinding)) {
 			return false;
 		}
@@ -79,8 +77,7 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return Util.equals(match, castedObject.match);
     }
 
-    @Override
-	public KeySequence getKeySequence() {
+    public KeySequence getKeySequence() {
         return keySequence;
     }
 
@@ -88,8 +85,7 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return match;
     }
 
-    @Override
-	public int hashCode() {
+    public int hashCode() {
         if (!hashCodeComputed) {
             hashCode = HASH_INITIAL;
             hashCode = hashCode * HASH_FACTOR + Util.hashCode(keySequence);
@@ -100,8 +96,7 @@ public final class KeySequenceBinding implements IKeySequenceBinding {
         return hashCode;
     }
 
-    @Override
-	public String toString() {
+    public String toString() {
         if (string == null) {
             final StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append('[');

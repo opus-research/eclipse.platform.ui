@@ -72,8 +72,7 @@ public class SwitchToWindowMenu extends ContributionItem {
      * Fills the given menu with menu items for all
      * opened workbench windows.
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
 
         // Get workbench windows.
         IWorkbench workbench = workbenchWindow.getWorkbench();
@@ -102,8 +101,7 @@ public class SwitchToWindowMenu extends ContributionItem {
                     count++;
                     mi.setText(name);
                     mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-						public void widgetSelected(SelectionEvent e) {
+                        public void widgetSelected(SelectionEvent e) {
                             Shell windowShell = window.getShell();
                             if (windowShell.getMinimized()) {
 								windowShell.setMinimized(false);
@@ -121,16 +119,14 @@ public class SwitchToWindowMenu extends ContributionItem {
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
 		return true;
     }
 
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 }

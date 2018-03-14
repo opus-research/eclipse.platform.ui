@@ -35,8 +35,7 @@ public class WorkbenchProject extends WorkbenchResource implements
      *	considering the passed open status as well iff appropriate for the type of
      *	passed resource
      */
-    @Override
-	protected ImageDescriptor getBaseImage(IResource resource) {
+    protected ImageDescriptor getBaseImage(IResource resource) {
         IProject project = (IProject) resource;
         boolean isOpen = project.isOpen();
         String baseKey = isOpen ? IDE.SharedImages.IMG_OBJ_PROJECT
@@ -75,8 +74,7 @@ public class WorkbenchProject extends WorkbenchResource implements
     /**
      * Returns the children of this container.
      */
-    @Override
-	public Object[] getChildren(Object o) {
+    public Object[] getChildren(Object o) {
         IProject project = (IProject) o;
         if (project.isOpen()) {
             try {
@@ -97,8 +95,7 @@ public class WorkbenchProject extends WorkbenchResource implements
      * @param value the attriute value
      * @return <code>true</code> if the attribute matches; <code>false</code> otherwise
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         if (!(target instanceof IProject)) {
             return false;
         }

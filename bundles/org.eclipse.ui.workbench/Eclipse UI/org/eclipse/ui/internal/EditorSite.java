@@ -55,11 +55,9 @@ public class EditorSite extends PartSite implements IEditorSite {
 		// EditorSite.
 		final IDragAndDropService editorDTService = new EditorSiteDragAndDropServiceImpl();
 		serviceLocator.registerService(IDragAndDropService.class, editorDTService);
-		serviceLocator.registerService(IEditorPart.class, (IEditorPart) getPart());
 	}
 	
-    @Override
-	public void setActionBars(SubActionBars bars) {
+    public void setActionBars(SubActionBars bars) {
         super.setActionBars(bars);
         
         if (bars instanceof IActionBars2) {
@@ -69,16 +67,14 @@ public class EditorSite extends PartSite implements IEditorSite {
         }
     }
     
-    @Override
-	public void activateActionBars(boolean forceVisibility) {
+    public void activateActionBars(boolean forceVisibility) {
         if (ab != null) {
             ab.activate(forceVisibility);
         }
         super.activateActionBars(forceVisibility);
     }
 
-    @Override
-	public void deactivateActionBars(boolean forceHide) {
+    public void deactivateActionBars(boolean forceHide) {
         if (ab != null) {
             ab.deactivate(forceHide);
         }
@@ -96,8 +92,7 @@ public class EditorSite extends PartSite implements IEditorSite {
      *
      * @return the editor action bar contributor
      */
-    @Override
-	public IEditorActionBarContributor getActionBarContributor() {
+    public IEditorActionBarContributor getActionBarContributor() {
         EditorActionBars bars = (EditorActionBars) getActionBars();
         if (bars != null) {
 			return bars.getEditorContributor();
@@ -125,13 +120,11 @@ public class EditorSite extends PartSite implements IEditorSite {
         return (IEditorPart) getPart();
     }
 
-    @Override
-	protected String getInitialScopeId() {
+    protected String getInitialScopeId() {
         return "org.eclipse.ui.textEditorScope"; //$NON-NLS-1$
     }
     
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         
         if (ab != null) {
@@ -140,16 +133,14 @@ public class EditorSite extends PartSite implements IEditorSite {
         }
     }
     
-    @Override
-	public final void registerContextMenu(final MenuManager menuManager,
+    public final void registerContextMenu(final MenuManager menuManager,
             final ISelectionProvider selectionProvider,
             final boolean includeEditorInput) {
         registerContextMenu(getId(), menuManager, selectionProvider,
                 includeEditorInput);
     }
     
-    @Override
-	public final void registerContextMenu(final String menuId,
+    public final void registerContextMenu(final String menuId,
             final MenuManager menuManager,
             final ISelectionProvider selectionProvider,
             final boolean includeEditorInput) {

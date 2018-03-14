@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,24 +37,23 @@ public class AnimatedTabFeedback extends ImageCycleFeedbackBase {
 		tabItem = item;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
+	 */
 	public void initialize(AnimationEngine engine) {
 		// TODO Auto-generated method stub
 		background = tabItem.getParent().getBackground();
 		display = tabItem.getParent().getDisplay();
 	}
 
-	@Override
 	public void saveStoppedImage() {
 		stoppedImage = tabItem.getImage();
 	}
 
-	@Override
 	public void setStoppedImage(Image image) {
 		tabItem.setImage(image);
 	}
 
-	@Override
 	public void showImage(Image image) {
 		if (tabItem.isDisposed())
 			return;

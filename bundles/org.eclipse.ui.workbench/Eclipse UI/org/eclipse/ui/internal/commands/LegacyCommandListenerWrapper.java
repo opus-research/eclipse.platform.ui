@@ -62,7 +62,6 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 	 * 
 	 * @see org.eclipse.commands.ICommandListener#commandChanged(org.eclipse.commands.CommandEvent)
 	 */
-	@Override
 	public final void commandChanged(final CommandEvent commandEvent) {
 		final ICommand command = new CommandLegacyWrapper(commandEvent.getCommand(),
 				bindingManager);
@@ -77,7 +76,6 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyCommandListenerWrapper) {
 			final LegacyCommandListenerWrapper wrapper = (LegacyCommandListenerWrapper) object;
@@ -92,7 +90,6 @@ final class LegacyCommandListenerWrapper implements ICommandListener {
 		return false;
 	}
 
-	@Override
 	public final int hashCode() {
 		return listener.hashCode();
 	}

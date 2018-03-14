@@ -40,13 +40,11 @@ public class SWTObservableListDecorator extends DecoratingObservableList
 	}
 
 	private Listener disposeListener = new Listener() {
-		@Override
 		public void handleEvent(Event event) {
 			SWTObservableListDecorator.this.dispose();
 		}
 	};
 
-	@Override
 	public synchronized void dispose() {
 		WidgetListenerUtil.asyncRemoveListener(widget, SWT.Dispose,
 				disposeListener);
@@ -57,7 +55,6 @@ public class SWTObservableListDecorator extends DecoratingObservableList
 	/**
 	 * @return Returns the widget.
 	 */
-	@Override
 	public Widget getWidget() {
 		return widget;
 	}

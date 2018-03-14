@@ -159,7 +159,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 	 *            The menu being presented to the user.
 	 * @see ActionGroup#fillContextMenu(IMenuManager)
 	 */
-	@Override
 	public void fillContextMenu(IMenuManager aMenu) {
 		Assert.isTrue(!disposed);
 
@@ -193,12 +192,10 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 
 	private boolean filterActionProvider(final CommonActionProviderDescriptor providerDesc) {
 		IPluginContribution piCont = new IPluginContribution() {
-			@Override
 			public String getLocalId() {
 				return providerDesc.getId();
 			}
 
-			@Override
 			public String getPluginId() {
 				return providerDesc.getPluginId();
 			}
@@ -217,7 +214,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 			for (int i = 0; i < providerDescriptors.length; i++) {
 				final CommonActionProviderDescriptor providerDescriptorLocal = providerDescriptors[i];
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						if (!filterActionProvider(providerDescriptorLocal)) {
 							CommonActionProvider provider = getActionProviderInstance(providerDescriptorLocal);
@@ -239,7 +235,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 	 *            The action bars in use by the current view site.
 	 * @see ActionGroup#fillActionBars(IActionBars)
 	 */
-	@Override
 	public void fillActionBars(final IActionBars theActionBars) {
 		Assert.isTrue(!disposed);
 
@@ -256,7 +251,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 				final CommonActionProviderDescriptor providerDesciptorLocal = providerDescriptors[i];
 				final ActionContext actionContextLocal = context;
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						if (!filterActionProvider(providerDesciptorLocal)) {
 							CommonActionProvider provider = null;
@@ -278,7 +272,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 	 * 
 	 * @see ActionGroup#dispose()
 	 */
-	@Override
 	public void dispose() {
 		synchronized (actionProviderInstances) {
 			for (Iterator iter = actionProviderInstances.values().iterator(); iter.hasNext();) {
@@ -297,7 +290,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 	 * @param aMemento
 	 *            The memento retrieved from the dialog settings
 	 */
-	@Override
 	public void restoreState(IMemento aMemento) {
 		Assert.isTrue(!disposed);
 		memento = aMemento;
@@ -308,7 +300,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 				final CommonActionProvider provider = (CommonActionProvider) actionProviderIterator
 						.next();
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						provider.restoreState(memento);
 					}
@@ -323,7 +314,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 	 * @param aMemento
 	 *            The memento retrieved from the dialog settings
 	 */
-	@Override
 	public void saveState(IMemento aMemento) {
 		Assert.isTrue(!disposed);
 
@@ -355,7 +345,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 			if (provider == null) {
 				final CommonActionProvider[] retProvider = new CommonActionProvider[1];
 				SafeRunner.run(new NavigatorSafeRunnable() {
-					@Override
 					public void run() throws Exception {
 						retProvider[0] = aProviderDescriptor.createActionProvider();
 						if (retProvider[0] != null) {
@@ -378,7 +367,6 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 			final CommonActionProvider anActionProvider) {
 		if (anActionProvider != null && anActionProvider != SkeletonActionProvider.INSTANCE) {
 			SafeRunner.run(new NavigatorSafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					ICommonActionExtensionSite configuration = new CommonActionExtensionSite(id,
 							pluginId, commonViewerSite, contentService, structuredViewer);

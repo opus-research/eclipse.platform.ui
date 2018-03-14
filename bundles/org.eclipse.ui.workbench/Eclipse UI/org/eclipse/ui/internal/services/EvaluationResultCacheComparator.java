@@ -31,7 +31,6 @@ import org.eclipse.ui.internal.util.Util;
  */
 public final class EvaluationResultCacheComparator implements Comparator {
 
-	@Override
 	public final int compare(final Object object1, final Object object2) {
 		if (Util.equals(object2, object1)) {
 			return 0;

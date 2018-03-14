@@ -50,26 +50,21 @@ public abstract class WizardPropertyPage extends PropertyPage {
 			fWizard= wizard;
 		}
 		
-		@Override
 		public IWizardPage getCurrentPage() {
 			return fWizard.getPages()[0];
 		}
 		
-		@Override
 		public Shell getShell() {
 			return fPage.getShell();
 		}
 		
-		@Override
 		public void showPage(IWizardPage page) {
 		}
 		
-		@Override
 		public void updateButtons() {
 			fPage.setValid(fWizard.canFinish());
 		}
 		
-		@Override
 		public void updateMessage() {
 			IWizardPage page= getCurrentPage();
 			
@@ -96,7 +91,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 			}
 		}
 		
-		@Override
 		public void updateTitleBar() {
 			IWizardPage page= getCurrentPage();
 			String name= page.getTitle();
@@ -106,11 +100,9 @@ public abstract class WizardPropertyPage extends PropertyPage {
 			fPage.setMessage(name);
 		}
 		
-		@Override
 		public void updateWindowTitle() {
 		}
 		
-		@Override
 		public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable) throws InvocationTargetException, InterruptedException {
 			ProgressMonitorDialog dialog= new ProgressMonitorDialog(getShell());
 			dialog.run(fork, cancelable, runnable);
@@ -145,7 +137,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	protected Control createContents(final Composite parent) {
 		fWizardPageContainer= new Composite(parent, SWT.NONE);
 		fWizardPageContainer.setFont(parent.getFont());
@@ -229,7 +220,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean performOk() {
 		fWizard.performFinish();
 		applyChanges();
@@ -241,7 +231,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public boolean performCancel() {
 		fWizard.performCancel();
 		fWizard.dispose();
@@ -252,7 +241,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	protected void performApply() {
 		fWizard.performFinish();
 		applyChanges();
@@ -266,7 +254,6 @@ public abstract class WizardPropertyPage extends PropertyPage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	protected void performDefaults() {
 		fWizard.performCancel();
 		fWizard.dispose();

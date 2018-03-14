@@ -34,7 +34,6 @@ public class MapEntryObservableValue extends AbstractObservableValue {
 	private Object valueType;
 
 	private IMapChangeListener changeListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(final MapChangeEvent event) {
 			if (event.diff.getAddedKeys().contains(key)) {
 				final Object newValue = event.diff.getNewValue(key);
@@ -54,7 +53,6 @@ public class MapEntryObservableValue extends AbstractObservableValue {
 	};
 
 	private IStaleListener staleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
 		}
@@ -81,18 +79,15 @@ public class MapEntryObservableValue extends AbstractObservableValue {
 		map.addStaleListener(staleListener);
 	}
 
-	@Override
 	public Object getValueType() {
 		return this.valueType;
 	}
 
-	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return map.isStale();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (map != null) {
 			map.removeMapChangeListener(changeListener);
@@ -104,12 +99,10 @@ public class MapEntryObservableValue extends AbstractObservableValue {
 		super.dispose();
 	}
 
-	@Override
 	protected Object doGetValue() {
 		return this.map.get(this.key);
 	}
 
-	@Override
 	protected void doSetValue(Object value) {
 		this.map.put(this.key, value);
 	}

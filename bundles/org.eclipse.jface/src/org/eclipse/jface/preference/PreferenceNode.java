@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,7 +31,7 @@ public class PreferenceNode implements IPreferenceNode {
      * The list of subnodes (immediate children) of this node (element type:
      * <code>IPreferenceNode</code>).
      */
-    private List<IPreferenceNode> subNodes;
+    private List subNodes;
 
     /**
      * Name of a class that implements <code>IPreferencePage</code>, or
@@ -115,10 +115,12 @@ public class PreferenceNode implements IPreferenceNode {
         page = preferencePage;
     }
 
-    @Override
-	public void add(IPreferenceNode node) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public void add(IPreferenceNode node) {
         if (subNodes == null) {
-			subNodes = new ArrayList<IPreferenceNode>();
+			subNodes = new ArrayList();
 		}
         subNodes.add(node);
     }
@@ -132,7 +134,7 @@ public class PreferenceNode implements IPreferenceNode {
     private Object createObject(String className) {
         Assert.isNotNull(className);
         try {
-            Class<?> cl = Class.forName(className);
+            Class cl = Class.forName(className);
             if (cl != null) {
 				return cl.newInstance();
 			}
@@ -148,8 +150,10 @@ public class PreferenceNode implements IPreferenceNode {
         return null;
     }
 
-    @Override
-	public void createPage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public void createPage() {
         page = (IPreferencePage) createObject(classname);
         if (getLabelImage() != null) {
 			page.setImageDescriptor(imageDescriptor);
@@ -160,8 +164,7 @@ public class PreferenceNode implements IPreferenceNode {
     /**
      * (non-Javadoc) Method declared on IPreferenceNode.
      */
-    @Override
-	public void disposeResources() {
+    public void disposeResources() {
         if (image != null) {
             image.dispose();
             image = null;
@@ -172,8 +175,10 @@ public class PreferenceNode implements IPreferenceNode {
         }
     }
 
-    @Override
-	public IPreferenceNode findSubNode(String id) {
+    /*
+     * (non-Javadoc) Method declared on IContributionNode.
+     */
+    public IPreferenceNode findSubNode(String id) {
         Assert.isNotNull(id);
         Assert.isTrue(id.length() > 0);
         if (subNodes == null) {
@@ -181,7 +186,7 @@ public class PreferenceNode implements IPreferenceNode {
 		}
         int size = subNodes.size();
         for (int i = 0; i < size; i++) {
-            IPreferenceNode node = subNodes.get(i);
+            IPreferenceNode node = (IPreferenceNode) subNodes.get(i);
             if (id.equals(node.getId())) {
 				return node;
 			}
@@ -189,8 +194,10 @@ public class PreferenceNode implements IPreferenceNode {
         return null;
     }
 
-    @Override
-	public String getId() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public String getId() {
         return this.id;
     }
 
@@ -203,38 +210,48 @@ public class PreferenceNode implements IPreferenceNode {
         return imageDescriptor;
     }
 
-    @Override
-	public Image getLabelImage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public Image getLabelImage() {
         if (image == null && imageDescriptor != null) {
             image = imageDescriptor.createImage();
         }
         return image;
     }
 
-    @Override
-	public String getLabelText() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public String getLabelText() {
         if (page != null) {
 			return page.getTitle();
 		}
         return label;
     }
 
-    @Override
-	public IPreferencePage getPage() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferencePage getPage() {
         return page;
     }
 
-    @Override
-	public IPreferenceNode[] getSubNodes() {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferenceNode[] getSubNodes() {
         if (subNodes == null) {
 			return new IPreferenceNode[0];
 		}
-        return subNodes
+        return (IPreferenceNode[]) subNodes
                 .toArray(new IPreferenceNode[subNodes.size()]);
     }
 
-    @Override
-	public IPreferenceNode remove(String id) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public IPreferenceNode remove(String id) {
         IPreferenceNode node = findSubNode(id);
         if (node != null) {
 			remove(node);
@@ -242,8 +259,10 @@ public class PreferenceNode implements IPreferenceNode {
         return node;
     }
 
-    @Override
-	public boolean remove(IPreferenceNode node) {
+    /*
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
+    public boolean remove(IPreferenceNode node) {
         if (subNodes == null) {
 			return false;
 		}

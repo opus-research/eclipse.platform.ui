@@ -47,34 +47,41 @@ public class SubContributionItem implements IContributionItem {
      * The default implementation of this <code>IContributionItem</code>
      * delegates to the inner item. Subclasses may override.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         innerItem.dispose();
     }
 
-    @Override
-	public void fill(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void fill(Composite parent) {
         if (visible) {
 			innerItem.fill(parent);
 		}
     }
 
-    @Override
-	public void fill(Menu parent, int index) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void fill(Menu parent, int index) {
         if (visible) {
 			innerItem.fill(parent, index);
 		}
     }
 
-    @Override
-	public void fill(ToolBar parent, int index) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void fill(ToolBar parent, int index) {
         if (visible) {
 			innerItem.fill(parent, index);
 		}
     }
 
-    @Override
-	public String getId() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public String getId() {
         return innerItem.getId();
     }
 
@@ -87,66 +94,90 @@ public class SubContributionItem implements IContributionItem {
         return innerItem;
     }
 
-    @Override
-	public boolean isEnabled() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isEnabled() {
         return innerItem.isEnabled();
     }
 
-    @Override
-	public boolean isDirty() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isDirty() {
         return innerItem.isDirty();
     }
 
-    @Override
-	public boolean isDynamic() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isDynamic() {
         return innerItem.isDynamic();
     }
 
-    @Override
-	public boolean isGroupMarker() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isGroupMarker() {
         return innerItem.isGroupMarker();
     }
 
-    @Override
-	public boolean isSeparator() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isSeparator() {
         return innerItem.isSeparator();
     }
 
-    @Override
-	public boolean isVisible() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public boolean isVisible() {
         return visible && innerItem.isVisible();
     }
 
-    @Override
-	public void setParent(IContributionManager parent) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void setParent(IContributionManager parent) {
         // do nothing, the parent of our inner item
         // is its SubContributionManager
     }
 
-    @Override
-	public void setVisible(boolean visible) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
-    @Override
-	public void update() {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void update() {
         innerItem.update();
     }
 
-    @Override
-	public void update(String id) {
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     */
+    public void update(String id) {
         innerItem.update(id);
     }
 
-    @Override
-	public void fill(CoolBar parent, int index) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar, int)
+     */
+    public void fill(CoolBar parent, int index) {
         if (visible) {
 			innerItem.fill(parent, index);
 		}
     }
 
-    @Override
-	public void saveWidgetState() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
+     */
+    public void saveWidgetState() {
     }
 
 }

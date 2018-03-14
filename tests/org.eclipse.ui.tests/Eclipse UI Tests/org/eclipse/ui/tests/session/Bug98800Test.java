@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.ui.PlatformUI;
  * If a view is not activated during a session, it's part is not instantiated.
  * This tests that case, and the outcome should be the view has it's last
  * session state when it is finally instantiated in the workbench.
- *
+ * 
  * @since 3.1.1
  */
 public class Bug98800Test extends TestCase {
@@ -53,10 +53,10 @@ public class Bug98800Test extends TestCase {
 	 */
 	public void testActivateView() throws Throwable {
 		IViewPart v = fPage.showView(VIEW_WITH_STATE_ID);
-
+		
 		// put another view in front of our view
 		fPage.showView(PROBLEM_VIEW_ID);
-
+		
 		// set a state so it can be saved
 		ViewWithState view = (ViewWithState) v;
 		view.fState = 10;
@@ -65,12 +65,13 @@ public class Bug98800Test extends TestCase {
 	/**
 	 * The second session doesn't activate the view, so it should not
 	 * be instantiated.
-	 *
+	 *  
 	 * @throws Throwable
 	 */
 	public void testSecondOpening() throws Throwable {
 		IViewReference[] views = fPage.getViewReferences();
-		for (IViewReference ref : views) {
+		for (int i = 0; i < views.length; i++) {
+			IViewReference ref = views[i];
 			if (ref.getId().equals(VIEW_WITH_STATE_ID)) {
 				assertNull("The view should not be instantiated", ref
 						.getPart(false));

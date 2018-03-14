@@ -78,7 +78,6 @@ public class TaskInfo extends SubTaskInfo {
 	 * 
 	 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString(boolean)
 	 */
-	@Override
 	String getDisplayString(boolean showProgress) {
 
 		if (totalWork == IProgressMonitor.UNKNOWN) {

@@ -26,12 +26,10 @@ public class ComboSelectionProperty extends WidgetStringValueProperty {
 		super(SWT.Modify);
 	}
 
-	@Override
 	String doGetStringValue(Object source) {
 		return ((Combo) source).getText();
 	}
 
-	@Override
 	void doSetStringValue(Object source, String value) {
 		Combo combo = (Combo) source;
 		String items[] = combo.getItems();
@@ -51,7 +49,6 @@ public class ComboSelectionProperty extends WidgetStringValueProperty {
 		}
 	}
 
-	@Override
 	public String toString() {
 		return "Combo.selection <String>"; //$NON-NLS-1$
 	}

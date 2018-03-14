@@ -40,7 +40,6 @@ public class ListToSetAdapter extends ObservableSet {
 
 	private IListChangeListener listener = new IListChangeListener() {
 
-		@Override
 		public void handleListChange(ListChangeEvent event) {
 			Set added = new HashSet();
 			Set removed = new HashSet();
@@ -74,7 +73,6 @@ public class ListToSetAdapter extends ObservableSet {
 		this.list.addListChangeListener(listener);
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 		if (list != null && listener != null) {

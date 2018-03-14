@@ -41,8 +41,7 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
      * 
      * @see org.eclipse.jface.preference.PreferenceNode#findSubNode(java.lang.String)
      */
-    @Override
-	public IPreferenceNode findSubNode(String id) {
+    public IPreferenceNode findSubNode(String id) {
         return getNodeExpression(super.findSubNode(id));
     }
 
@@ -51,8 +50,7 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
      * 
      * @see org.eclipse.jface.preference.PreferenceNode#getSubNodes()
      */
-    @Override
-	public IPreferenceNode[] getSubNodes() {
+    public IPreferenceNode[] getSubNodes() {
     	IPreferenceNode[] prefNodes = super.getSubNodes();
         int size = prefNodes.length;
         List list = new ArrayList(size);
@@ -92,7 +90,6 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPluginContribution#getLocalId()
 	 */
-	@Override
 	public String getLocalId() {
 		return getId();
 	}
@@ -100,7 +97,6 @@ public class WorkbenchPreferenceExpressionNode extends PreferenceNode
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPluginContribution#getPluginId()
 	 */
-	@Override
 	public String getPluginId() {
 		return ""; //$NON-NLS-1$
 	}
