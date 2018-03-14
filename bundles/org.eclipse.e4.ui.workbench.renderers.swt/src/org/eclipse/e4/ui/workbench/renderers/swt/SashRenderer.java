@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150
- *     Steven Spungin <steven@spungin.tv> - Bug 361731
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -39,8 +38,8 @@ public class SashRenderer extends SWTPartRenderer {
 	@Inject
 	private IEventBroker eventBroker;
 
-	private static final String UNDEFINED_WEIGHT = "-1"; //$NON-NLS-1$
-	private static final String DEFAULT_WEIGHT = "5000"; //$NON-NLS-1$
+	private static final int UNDEFINED_WEIGHT = -1;
+	private static final int DEFAULT_WEIGHT = 5000;
 
 	private EventHandler sashOrientationHandler;
 	private EventHandler sashWeightHandler;
@@ -157,9 +156,9 @@ public class SashRenderer extends SWTPartRenderer {
 		super.childRendered(parentElement, element);
 
 		// Ensure that the element's 'containerInfo' is initialized
-		String weight = getWeight(element);
-		if (UNDEFINED_WEIGHT.equals(weight)) {
-			element.setContainerData(DEFAULT_WEIGHT);
+		int weight = getWeight(element);
+		if (weight == UNDEFINED_WEIGHT) {
+			element.setContainerData(Integer.toString(DEFAULT_WEIGHT));
 		}
 
 		forceLayout(parentElement);
@@ -200,16 +199,18 @@ public class SashRenderer extends SWTPartRenderer {
 		return null;
 	}
 
-	private static String getWeight(MUIElement element) {
+	private static int getWeight(MUIElement element) {
 		String info = element.getContainerData();
 		if (info == null || info.length() == 0) {
-			element.setContainerData(Integer.toString(10000) + "%"); //$NON-NLS-1$
+			element.setContainerData(Integer.toString(10000));
 			info = element.getContainerData();
 		}
 
-		if (SashLayout.patternAny.matcher(info).matches()) {
-			return info;
+		try {
+			int value = Integer.parseInt(info);
+			return value;
+		} catch (NumberFormatException e) {
+			return UNDEFINED_WEIGHT;
 		}
-		return UNDEFINED_WEIGHT;
 	}
 }
