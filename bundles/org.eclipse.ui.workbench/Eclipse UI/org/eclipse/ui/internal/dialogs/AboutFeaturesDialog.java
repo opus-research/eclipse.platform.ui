@@ -28,12 +28,16 @@ import org.eclipse.ui.internal.about.ProductInfoDialog;
  */
 public class AboutFeaturesDialog extends ProductInfoDialog {
 	   /**
-     * Constructor for AboutFeaturesDialog.
-     * 
-     * @param parentShell the parent shell
-     * @param productName the product name
-     * @param bundleGroupInfos the bundle info
-     */
+	 * Constructor for AboutFeaturesDialog.
+	 * 
+	 * @param parentShell
+	 *            the parent shell
+	 * @param productName
+	 *            the product name
+	 * @param bundleGroupInfos
+	 *            the bundle info
+	 * @param initialSelection
+	 */
     public AboutFeaturesDialog(Shell parentShell, String productName,
             AboutBundleGroupData[] bundleGroupInfos, AboutBundleGroupData initialSelection) {
         super(parentShell);
