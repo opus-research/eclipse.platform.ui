@@ -23,9 +23,6 @@ import org.eclipse.jface.util.SafeRunnable;
  */
 public class BaseLabelProvider extends EventManager implements IBaseLabelProvider {
 	
-	/* (non-Javadoc)
-     * Method declared on IBaseLabelProvider.
-     */
     @Override
 	public void addListener(ILabelProviderListener listener) {
         addListenerObject(listener);
@@ -52,9 +49,6 @@ public class BaseLabelProvider extends EventManager implements IBaseLabelProvide
     }
 
     
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
-     */
     @Override
 	public void removeListener(ILabelProviderListener listener) {
         removeListenerObject(listener);
