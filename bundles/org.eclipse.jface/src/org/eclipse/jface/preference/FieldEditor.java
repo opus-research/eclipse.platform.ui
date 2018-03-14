@@ -388,8 +388,7 @@ public abstract class FieldEditor {
 				label.setText(text);
 			}
             label.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     label = null;
                 }
             });
