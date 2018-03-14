@@ -13,10 +13,13 @@ package org.eclipse.ui.internal.monitoring;
 
 import org.eclipse.osgi.util.NLS;
 
-public final class Messages extends NLS {
+final class Messages extends NLS {
 	public static String DefaultUiFreezeEventLogger_holding_1;
 	public static String DefaultUiFreezeEventLogger_sample_header_2;
 	public static String DefaultUiFreezeEventLogger_stack_trace_header;
+	public static String DefaultUiFreezeEventLogger_starved_awake_and_asleep;
+	public static String DefaultUiFreezeEventLogger_starved_awake;
+	public static String DefaultUiFreezeEventLogger_starved_asleep;
 	public static String DefaultUiFreezeEventLogger_thread_details;
 	public static String DefaultUiFreezeEventLogger_thread_header_2;
 	public static String DefaultUiFreezeEventLogger_ui_freeze_finished_header_2;
@@ -30,7 +33,6 @@ public final class Messages extends NLS {
 	public static String EventLoopMonitorThread_external_exception_error_1;
 	public static String EventLoopMonitorThread_invalid_argument_error_1;
 	public static String EventLoopMonitorThread_invalid_logger_type_error_4;
-	public static String EventLoopMonitorThread_invalid_parameters_error;
 	public static String EventLoopMonitorThread_logging_disabled_error;
 	public static String EventLoopMonitorThread_warning_threshold_error_1;
 	public static String EventLoopMonitorThread_max_event_loop_depth_exceeded_1;
