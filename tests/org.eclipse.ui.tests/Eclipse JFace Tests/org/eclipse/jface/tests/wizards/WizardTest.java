@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2011 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  ******************************************************************************/
 
 package org.eclipse.jface.tests.wizards;
-
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -52,7 +51,7 @@ public class WizardTest extends TestCase {
 	}
 
 
-	public void testEndingWithFinish() throws IOException {
+	public void testEndingWithFinish() {
 		//test page count
         assertEquals("Wizard has wrong number of pages", NUM_PAGES, wizard.getPageCount());
 
@@ -109,7 +108,7 @@ public class WizardTest extends TestCase {
         assertEquals("Wizard didn't perform finish", true, DID_FINISH);
 	}
 	
-	public void testEndingWithCancel() throws IOException {
+	public void testEndingWithCancel() {
 		assertSame("Wizard not on starting page", wizard.page1, dialog.getCurrentPage());
 
 		//TheTestWizard's performFinish() sets DID_FINISH to true, ensure it was not called
@@ -120,7 +119,7 @@ public class WizardTest extends TestCase {
         assertEquals("Wizard performed finished but should not have", false, DID_FINISH);
 	}
 
-	public void testPageChanging() throws IOException {    
+	public void testPageChanging() {
 		//initially on first page
 	    assertSame("Wizard started on wrong page", wizard.page1, dialog.getCurrentPage());  
 		assertEquals("Back button should be disabled on first page", false, dialog.getBackButton().getEnabled());
@@ -167,7 +166,7 @@ public class WizardTest extends TestCase {
 	    assertSame("Wizard.backPressed() set wrong page", wizard.page1, dialog.getCurrentPage());  	    
 	}
 	
-	public void testShowPage() throws IOException {    
+	public void testShowPage() {
 		//move to page 3
 		dialog.nextPressed();
 		dialog.nextPressed();
@@ -183,11 +182,12 @@ public class WizardTest extends TestCase {
 		assertEquals("Next button should be enabled on first page", true, dialog.getNextButton().getEnabled());
 	}
 
-	public void testPageChangeListening() throws IOException {   
+	public void testPageChangeListening() {
 		pageChanged = false;
 		pageChangingFired = false;
 		
 		IPageChangedListener changedListener = new IPageChangedListener() {
+			@Override
 			public void pageChanged(PageChangedEvent event) {
 				pageChanged = true;				
 			}
@@ -195,6 +195,7 @@ public class WizardTest extends TestCase {
 		};
 
 		IPageChangingListener changingListener = new IPageChangingListener() {
+			@Override
 			public void handlePageChanging(PageChangingEvent event) {
 				assertEquals("Page should not have changed yet", false, pageChanged);
 				pageChangingFired = true;
@@ -229,6 +230,7 @@ public class WizardTest extends TestCase {
 
 		final boolean logged[] = new boolean[1];
 		Policy.setLog(new ILogger() {
+			@Override
 			public void log(IStatus status) {
 				logged[0] = true;
 			}
@@ -245,6 +247,7 @@ public class WizardTest extends TestCase {
         wizard.page2.setThrowExceptionOnDispose(true);
         final boolean logged[] = new boolean[1];
 		Policy.setLog(new ILogger() {
+			@Override
 			public void log(IStatus status) {
 				logged[0] = true;
 			}
@@ -260,6 +263,7 @@ public class WizardTest extends TestCase {
 	//----------------------------------------------------
 
 	
+	@Override
 	protected void setUp() throws Exception {
 		// TODO Auto-generated method stub
 		super.setUp();
@@ -270,6 +274,7 @@ public class WizardTest extends TestCase {
 		createWizardDialog();
 	}
 
+	@Override
 	protected void tearDown() throws Exception {
 		if(dialog.getShell() != null && ! dialog.getShell().isDisposed()) {
 		    dialog.close();
