@@ -413,7 +413,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Util.getAdapter(sourcePart, IShowInSource.class);
+		return (IShowInSource) Util.getAdapter(sourcePart, IShowInSource.class);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -808,12 +808,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 				// show the new
 				for (int i = 0; i < newActionSets.size(); i++) {
-					actionSets.showAction(newActionSets.get(i));
+					actionSets.showAction((IActionSetDescriptor) newActionSets.get(i));
 				}
 
 				// hide the old
 				for (int i = 0; i < oldActionSets.size(); i++) {
-					actionSets.hideAction(oldActionSets.get(i));
+					actionSets.hideAction((IActionSetDescriptor) oldActionSets.get(i));
 				}
 
 				oldActionSets = newActionSets;
@@ -2405,7 +2405,8 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public String getLabel() {
         String label = WorkbenchMessages.WorkbenchPage_UnknownLabel;
-        IWorkbenchAdapter adapter = Util.getAdapter(input, IWorkbenchAdapter.class);
+        IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util.getAdapter(input,
+                IWorkbenchAdapter.class);
         if (adapter != null) {
 			label = adapter.getLabel(input);
 		}
@@ -5195,7 +5196,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPathEditorInput getPathEditorInput(IEditorInput input) {
 		if (input instanceof IPathEditorInput)
 			return (IPathEditorInput) input;
-		return Util.getAdapter(input, IPathEditorInput.class);
+		return (IPathEditorInput) Util.getAdapter(input, IPathEditorInput.class);
 	}
 
 	/**
