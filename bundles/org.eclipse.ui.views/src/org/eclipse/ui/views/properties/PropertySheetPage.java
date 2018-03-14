@@ -441,7 +441,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         // Columns...
         columnsAction = new Action(PropertiesMessages.Columns_text){
         	public void run() {
-        		Tree tree = viewer.getPropertiesTreeControl();
+        		Tree tree = (Tree) viewer.getControl();
         		ConfigureColumns.forTree(tree, new SameShellProvider(tree));
         	}
 		};

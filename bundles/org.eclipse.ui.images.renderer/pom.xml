@@ -46,6 +46,7 @@
               <artifactId>filters</artifactId>
               <version>2.0.235-1</version>
           </dependency>
+          
         <!-- 
             Advanced Image Scaling Library
             License: New BSD License
@@ -54,22 +55,18 @@
           <dependency>
               <groupId>com.mortennobel</groupId>
               <artifactId>java-image-scaling</artifactId>
-              <version>0.8.5</version>
+              <version>0.8.4</version>
           </dependency>
+          
           <!--  
               Batik SVG Rendering Library
               License: Apache License, Version 2.0
               http://xmlgraphics.apache.org/batik/
           -->
           <dependency>
-              <groupId>org.apache.xmlgraphics</groupId>
+              <groupId>batik</groupId>
               <artifactId>batik-rasterizer</artifactId>
-              <version>1.7</version>
-          </dependency>
-          <dependency>
-              <groupId>org.apache.xmlgraphics</groupId>
-              <artifactId>batik-codec</artifactId>
-              <version>1.7</version>
+              <version>1.6-1</version>
           </dependency>
     </dependencies>
 

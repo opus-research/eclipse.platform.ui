@@ -24,8 +24,6 @@ import org.eclipse.ui.tests.fieldassist.FieldAssistTestSuite;
 import org.eclipse.ui.tests.navigator.NavigatorTestSuite;
 import org.eclipse.ui.tests.operations.OperationsTestSuite;
 import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
-import org.eclipse.ui.tests.progress.ProgressTestSuite;
-import org.eclipse.ui.tests.themes.ThemesTestSuite;
 
 /**
  * Test all areas of the UI.
@@ -65,7 +63,7 @@ public class UiTestSuite extends TestSuite {
 		// addTest(new CommandsTestSuite());
 		// addTest(new ContextsTestSuite());
 		// addTest(new DragTestSuite());
-		addTest(new ThemesTestSuite());
+		// addTest(new ThemesTestSuite());
 		// addTest(new IntroTestSuite());
 		// addTest(new MenusTestSuite());
 		addTest(new EncodingTestSuite());
@@ -79,6 +77,6 @@ public class UiTestSuite extends TestSuite {
 		// addTest(new ServicesTestSuite());
 		// addTest(new StatusHandlingTestSuite());
 		// addTest(OpenSystemInPlaceEditorTest.suite());
-		addTest(new ProgressTestSuite());
+		// addTest(new ProgressTestSuite());
 	}
 }

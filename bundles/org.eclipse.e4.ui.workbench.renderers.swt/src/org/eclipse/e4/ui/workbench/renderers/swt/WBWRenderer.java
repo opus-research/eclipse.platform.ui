@@ -31,14 +31,12 @@ import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.SWTRenderersMessages;
-import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
@@ -46,7 +44,6 @@ import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
@@ -131,9 +128,6 @@ public class WBWRenderer extends SWTPartRenderer {
 	private EventHandler sizeHandler;
 	private EventHandler themeDefinitionChanged;
 
-	@Inject
-	private EModelService modelService;
-
 	public WBWRenderer() {
 		super();
 	}
@@ -217,15 +211,13 @@ public class WBWRenderer extends SWTPartRenderer {
 				String attName = (String) event
 						.getProperty(UIEvents.EventTags.ATTNAME);
 
-				if (UIEvents.UILabel.LABEL.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_LABEL.equals(attName)) {
+				if (UIEvents.UILabel.LABEL.equals(attName)) {
 					String newTitle = (String) event
 							.getProperty(UIEvents.EventTags.NEW_VALUE);
 					theShell.setText(newTitle);
 				} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
 					theShell.setImage(getImage(windowModel));
-				} else if (UIEvents.UILabel.TOOLTIP.equals(attName)
-						|| UIEvents.UILabel.LOCALIZED_TOOLTIP.equals(attName)) {
+				} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 					String newTTip = (String) event
 							.getProperty(UIEvents.EventTags.NEW_VALUE);
 					theShell.setToolTipText(newTTip);
@@ -326,21 +318,6 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(themeDefinitionChanged);
 	}
 
-	/**
-	 * @param wbwModel
-	 * @return Returns the style override bits or -1 if there is no override
-	 */
-	private int getStyleOverride(MWindow wbwModel) {
-		String overrideStr = wbwModel.getPersistedState().get(
-				IPresentationEngine.STYLE_OVERRIDE_KEY);
-		if (overrideStr == null || overrideStr.length() == 0)
-			return -1;
-
-		int val = -1;
-		val = Integer.parseInt(overrideStr);
-		return val;
-	}
-
 	public Object createWidget(MUIElement element, Object parent) {
 		final Widget newWidget;
 
@@ -360,17 +337,16 @@ public class WBWRenderer extends SWTPartRenderer {
 				.getShell();
 
 		final Shell wbwShell;
-
-		int styleOverride = getStyleOverride(wbwModel) | rtlStyle;
 		if (parentShell == null) {
-			int style = styleOverride == -1 ? SWT.SHELL_TRIM | rtlStyle
-					: styleOverride;
-			wbwShell = new Shell(Display.getCurrent(), style);
+			wbwShell = new Shell(Display.getCurrent(), SWT.SHELL_TRIM
+					| rtlStyle);
 			wbwModel.getTags().add("topLevel"); //$NON-NLS-1$
+		} else if (wbwModel.getTags().contains("dragHost")) { //$NON-NLS-1$
+			wbwShell = new Shell(parentShell, SWT.BORDER | rtlStyle);
+			wbwShell.setAlpha(110);
 		} else {
-			int style = SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.CLOSE | rtlStyle;
-			style = styleOverride == -1 ? style : styleOverride;
-			wbwShell = new Shell(parentShell, style);
+			wbwShell = new Shell(parentShell, SWT.TITLE | SWT.RESIZE | SWT.MAX
+					| SWT.CLOSE | rtlStyle);
 
 			// Prevent ESC from closing the DW
 			wbwShell.addTraverseListener(new TraverseListener() {
@@ -574,42 +550,8 @@ public class WBWRenderer extends SWTPartRenderer {
 							w.getContext().activate();
 						}
 					}
-					updateNonFocusState(SWT.Activate, w);
 				}
 			});
-
-			shell.addListener(SWT.Deactivate, new Listener() {
-				public void handleEvent(org.eclipse.swt.widgets.Event event) {
-					updateNonFocusState(SWT.Deactivate, w);
-				}
-			});
-		}
-	}
-
-	private void updateNonFocusState(int event, MWindow win) {
-		MPerspective perspective = modelService.getActivePerspective(win);
-		if (perspective == null) {
-			return;
-		}
-
-		List<MPartStack> stacks = modelService.findElements(perspective, null,
-				MPartStack.class, Arrays.asList(CSSConstants.CSS_ACTIVE_CLASS));
-		if (stacks.isEmpty()) {
-			return;
-		}
-
-		MPartStack stack = stacks.get(0);
-		int tagsCount = stack.getTags().size();
-		boolean hasNonFocusTag = stack.getTags().contains(
-				CSSConstants.CSS_NO_FOCUS_CLASS);
-
-		if (event == SWT.Activate && hasNonFocusTag) {
-			stack.getTags().remove(CSSConstants.CSS_NO_FOCUS_CLASS);
-		} else if (event == SWT.Deactivate && !hasNonFocusTag) {
-			stack.getTags().add(CSSConstants.CSS_NO_FOCUS_CLASS);
-		}
-		if (tagsCount != stack.getTags().size()) {
-			setCSSInfo(stack, stack.getWidget());
 		}
 	}
 
