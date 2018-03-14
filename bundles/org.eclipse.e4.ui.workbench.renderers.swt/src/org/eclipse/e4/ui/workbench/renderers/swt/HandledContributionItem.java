@@ -13,6 +13,7 @@
  *     Dmitry Spiridenok - Bug 429756
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 461026
+ *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 473779
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -462,6 +463,8 @@ public class HandledContributionItem extends ContributionItem {
 		} else {
 			item.setText(""); //$NON-NLS-1$
 		}
+		final String tooltip = getToolTipText();
+		item.setToolTipText(tooltip);
 		item.setSelection(model.isSelected());
 		item.setEnabled(model.isEnabled());
 	}
