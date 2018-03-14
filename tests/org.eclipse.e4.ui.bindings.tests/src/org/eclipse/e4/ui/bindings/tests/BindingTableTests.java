@@ -8,15 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
@@ -32,8 +36,9 @@ import org.eclipse.e4.ui.bindings.internal.ContextSet;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
+import org.junit.Before;
 
-public class BindingTableTests extends TestCase {
+public class BindingTableTests {
 	private static final String ID_DIALOG = "org.eclipse.ui.contexts.dialog";
 	private static final String ID_DIALOG_AND_WINDOW = "org.eclipse.ui.contexts.dialogAndWindow";
 	private static final String ID_WINDOW = "org.eclipse.ui.contexts.window";
@@ -80,7 +85,7 @@ public class BindingTableTests extends TestCase {
 	static ContextManager contextManager = null;
 	static IEclipseContext workbenchContext;
 
-	@Override
+	@Before
 	protected void setUp() throws Exception {
 		if (loadedBindings == null) {
 			IEclipseContext globalContext = Activator.getDefault().getGlobalContext();
