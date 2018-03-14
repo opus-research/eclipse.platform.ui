@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,7 @@
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -25,21 +23,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.preference.IPreferenceNode;
-import org.eclipse.jface.preference.IPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceManager;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.preferences.WorkbenchPreferenceExpressionNode;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PreferencePageRegistryReader;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventHandler;
 
 /**
  * The WorkbenchPreferenceManager is the manager that can handle categories and
@@ -47,9 +38,6 @@ import org.osgi.service.event.EventHandler;
  */
 public class WorkbenchPreferenceManager extends PreferenceManager implements
 		IExtensionChangeHandler {
-	private IEventBroker eventBroker;
-
-	private CSSThemeChangedHandler cssThemeChangedHandler;
 
 	/**
 	 * Create a new instance of the receiver with the specified seperatorChar
@@ -84,19 +72,6 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 						}
 					}
 				});
-
-		eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-		if (eventBroker != null) {
-			cssThemeChangedHandler = new CSSThemeChangedHandler(this);
-			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, cssThemeChangedHandler);
-		}
-	}
-
-	public void dispose() {
-		if (eventBroker != null) {
-			eventBroker.unsubscribe(cssThemeChangedHandler);
-			cssThemeChangedHandler.dispose();
-		}
 	}
 
 	/**
@@ -229,89 +204,5 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 			}
 		}
 		return false;
-	}
-
-	private static class CSSThemeChangedHandler implements EventHandler {
-		private PreferenceManager preferenceManager;
-		private Map<String, IPreferenceStore> overriddenPropertyToStore = new HashMap<String, IPreferenceStore>();
-
-		public CSSThemeChangedHandler(PreferenceManager preferenceManager) {
-			this.preferenceManager = preferenceManager;
-		}
-
-		@Override
-		public void handleEvent(Event event) {
-			resetToDefaultPreferenceValues();
-			IThemeEngine themeEngine = (IThemeEngine) event.getProperty(IThemeEngine.Events.THEME_ENGINE);
-			overridePreferences(preferenceManager.getRootSubNodes(), themeEngine);
-		}
-
-		public void dispose() {
-			resetToDefaultPreferenceValues();
-		}
-
-		private void overridePreferences(IPreferenceNode[] nodes, IThemeEngine themeEngine) {
-			for (IPreferenceNode node : nodes) {
-				PreferenceNode nodeOverridable = new PreferenceNode(node.getId());
-
-				themeEngine.applyStyles(nodeOverridable, false);
-
-				overridePreferences((org.eclipse.jface.preference.PreferenceNode) node,
-						nodeOverridable.getOverriddenPreferences());
-
-				IPreferenceNode[] subNodes = node.getSubNodes();
-				if (subNodes != null && subNodes.length > 0) {
-					overridePreferences(subNodes, themeEngine);
-				}
-			}
-		}
-
-		private void overridePreferences(org.eclipse.jface.preference.PreferenceNode node,
-				Map<String, String> toOverride) {
-			if (toOverride.isEmpty()) {
-				return;
-			}
-			
-			IPreferencePage page = node.getPage();
-			if (page == null) {
-				node.createPage();
-				page = node.getPage();
-				if (!(page instanceof PreferencePage)) {
-					page.dispose();
-					page = null;
-				}
-			}
-
-			if (!(page instanceof PreferencePage)) {
-				return;
-			}
-
-			IPreferenceStore store = ((PreferencePage) page).getPreferenceStore();
-			for (Map.Entry<String, String> entry : toOverride.entrySet()) {
-				if (!store.isDefault(entry.getKey())) {
-					// preference has been overridden manually with the
-					// preference dialog
-					continue;
-				}
-				if (entry.getValue().length() > 0) {
-					overriddenPropertyToStore.put(entry.getKey(), store);
-					store.putValue(entry.getKey(), entry.getValue());
-				} else {
-					resetToDefaultPreferenceValue(store, entry.getKey());
-				}
-			}
-		}
-
-		// TODO: Perform more tests of it
-		private void resetToDefaultPreferenceValues() {
-			for (Map.Entry<String, IPreferenceStore> entry : overriddenPropertyToStore.entrySet()) {
-				resetToDefaultPreferenceValue(entry.getValue(), entry.getKey());
-			}
-			overriddenPropertyToStore.clear();
-		}
-
-		private void resetToDefaultPreferenceValue(IPreferenceStore store, String preferenceName) {
-			store.putValue(preferenceName, store.getDefaultString(preferenceName));
-		}
 	}
 }
