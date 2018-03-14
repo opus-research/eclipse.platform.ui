@@ -274,7 +274,7 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MPart) {
 			MPart part = (MPart) searchRoot;
 
-			if ((searchFlags & IN_PART) != 0) {
+			if (searchFlags != IN_MAIN_MENU) {
 				for (MMenu menu : part.getMenus()) {
 					findElementsRecursive(menu, clazz, matcher, elements, searchFlags);
 				}
