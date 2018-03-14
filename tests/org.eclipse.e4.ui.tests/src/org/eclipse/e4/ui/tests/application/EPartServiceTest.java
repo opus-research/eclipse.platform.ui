@@ -10,13 +10,6 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,11 +44,9 @@ import org.eclipse.e4.ui.workbench.modeling.IPartListener;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.emf.common.notify.Notifier;
-import org.junit.Test;
 
 public class EPartServiceTest extends UITest {
 
-	@Test
 	public void testFindPart_PartInWindow() {
 		createApplication("partId");
 
@@ -74,7 +65,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(part);
 	}
 
-	@Test
 	public void testFindPart_PartNotInWindow() {
 		createApplication("partId");
 
@@ -87,7 +77,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(part);
 	}
 
-	@Test
 	public void testFindPart_PartInAnotherWindow() {
 		createApplication(new String[] { "partInWindow1" },
 				new String[] { "partInWindow2" });
@@ -119,7 +108,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStack.getChildren().get(0), part);
 	}
 
-	@Test
 	public void testBringToTop_PartOnTop() {
 		createApplication("partFront", "partBack");
 
@@ -137,7 +125,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStack.getSelectedElement(), partFront);
 	}
 
-	@Test
 	public void testBringToTop_PartOnTop_myService() {
 		createApplication("partFront", "partBack");
 
@@ -155,7 +142,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStack.getSelectedElement(), partFront);
 	}
 
-	@Test
 	public void testBringToTop_PartNotOnTop() {
 		createApplication("partFront", "partBack");
 
@@ -174,7 +160,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStack.getSelectedElement(), partBack);
 	}
 
-	@Test
 	public void testBringToTop_PartNotOnTop_myService() {
 		createApplication("partFront", "partBack");
 
@@ -193,7 +178,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStack.getSelectedElement(), partBack);
 	}
 
-	@Test
 	public void testBringToTop_PartInAnotherWindow() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -235,7 +219,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partStackB.getSelectedElement(), partBackB);
 	}
 
-	@Test
 	public void testBringToTop_PartInAnotherWindow_myService() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -281,7 +264,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that calling bringToTop(MPart) will change the active part
 	 * if the active part is obscured by the part that's being brought to top.
 	 */
-	@Test
 	public void testBringToTop_ActivationChanges01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -337,7 +319,6 @@ public class EPartServiceTest extends UITest {
 	 * The part that is being passed to bringToTop(MPart) is a part that's being
 	 * represented by a placeholder in this case.
 	 */
-	@Test
 	public void testBringToTop_ActivationChanges02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -383,7 +364,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testBringToTop_Unrendered() {
 		createApplication("partFront", "partBack");
 
@@ -410,7 +390,6 @@ public class EPartServiceTest extends UITest {
 				partBack.isToBeRendered());
 	}
 
-	@Test
 	public void testBringToTop_Bug330508_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -440,7 +419,6 @@ public class EPartServiceTest extends UITest {
 				partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testBringToTop_Bug330508_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -476,7 +454,6 @@ public class EPartServiceTest extends UITest {
 				partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testBringToTop_Bug330508_03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -512,7 +489,6 @@ public class EPartServiceTest extends UITest {
 				partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testBringToTop_Bug330508_04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -564,7 +540,6 @@ public class EPartServiceTest extends UITest {
 				partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testGetParts_Empty() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -578,7 +553,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(0, parts.size());
 	}
 
-	@Test
 	public void testGetParts_OneWindow() {
 		createApplication("partId", "partId2");
 		MWindow window = application.getChildren().get(0);
@@ -594,7 +568,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(parts.containsAll(partStack.getChildren()));
 	}
 
-	@Test
 	public void testGetParts_TwoWindows() {
 		createApplication(new String[] { "partId", "partId2" }, new String[] {
 				"partIA", "partIdB", "partIdC" });
@@ -629,7 +602,6 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testGetParts_Bug334559_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -670,7 +642,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(parts.contains(partC));
 	}
 
-	@Test
 	public void testGetParts_Bug334559_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -710,7 +681,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(parts.contains(partC));
 	}
 
-	@Test
 	public void testGetInputParts_Bug334559_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -755,7 +725,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(parts.contains(partC));
 	}
 
-	@Test
 	public void testGetInputParts_Bug334559_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -799,7 +768,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(parts.contains(partC));
 	}
 
-	@Test
 	public void testGetInputParts() {
 		final String uri1 = "file:///a.txt";
 		final String uri2 = "file:///b.txt";
@@ -845,7 +813,6 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testGetActivePart() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -906,22 +873,18 @@ public class EPartServiceTest extends UITest {
 		assertEquals(visible, partService.isPartVisible(part));
 	}
 
-	@Test
 	public void testIsPartVisible_NotInStackTrueTrue() {
 		testIsPartVisible_NotInStack(true, true);
 	}
 
-	@Test
 	public void testIsPartVisible_NotInStackFalseTrue() {
 		testIsPartVisible_NotInStack(false, true);
 	}
 
-	@Test
 	public void testIsPartVisible_NotInStackFalseFalse() {
 		testIsPartVisible_NotInStack(false, false);
 	}
 
-	@Test
 	public void testIsPartVisible_ViewVisible() {
 		createApplication("partId");
 
@@ -937,7 +900,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService.isPartVisible(part));
 	}
 
-	@Test
 	public void testIsPartVisible_ViewVisible_myService() {
 		createApplication("partId");
 
@@ -953,7 +915,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService.isPartVisible(part));
 	}
 
-	@Test
 	public void testIsPartVisible_ViewNotVisible() {
 		createApplication("partId", "partId2");
 
@@ -970,7 +931,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(partService.isPartVisible(part));
 	}
 
-	@Test
 	public void testIsPartVisible_ViewNotVisible_myService() {
 		createApplication("partId", "partId2");
 
@@ -998,7 +958,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService2.isPartVisible(part2));
 	}
 
-	@Test
 	public void testIsPartVisible_ViewInAnotherWindow() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -1034,7 +993,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(partServiceB.isPartVisible(partBackB));
 	}
 
-	@Test
 	public void testIsPartVisible_ViewInAnotherWindow_myService() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -1070,7 +1028,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(partServiceB.isPartVisible(partBackB));
 	}
 
-	@Test
 	public void testIsPartVisible_Placeholder() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -1112,7 +1069,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService.isPartVisible(sharedPart));
 	}
 
-	@Test
 	public void testActivate_partService() {
 		createApplication("partId", "partId2");
 
@@ -1140,7 +1096,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService2.isPartVisible(part2));
 	}
 
-	@Test
 	public void testActivate_partService_twoWindows() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -1198,7 +1153,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partServiceB.isPartVisible(partBackB));
 	}
 
-	@Test
 	public void testActivate_partService_SelectedElement() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -1237,7 +1191,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partBackB, aPart);
 	}
 
-	@Test
 	public void testActivate_partService_activePart() {
 		createApplication(new String[] { "partFrontA", "partBackA" },
 				new String[] { "partFrontB", "partBackB" });
@@ -1276,7 +1229,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partBackB, partServiceB.getActivePart());
 	}
 
-	@Test
 	public void testActivate_Unrendered() {
 		createApplication("partFront", "partBack");
 
@@ -1303,7 +1255,6 @@ public class EPartServiceTest extends UITest {
 				partBack.isToBeRendered());
 	}
 
-	@Test
 	public void testActivate_Focus() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1331,7 +1282,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(editorB.wasFocusCalled());
 	}
 
-	@Test
 	public void testActivate_ChildWindow() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1361,7 +1311,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testActivate_DetachedWindow() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1401,7 +1350,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testActivate_Bug326300() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -1441,7 +1389,6 @@ public class EPartServiceTest extends UITest {
 				.getActivePart());
 	}
 
-	@Test
 	public void testActivate_Bug371894() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1465,7 +1412,6 @@ public class EPartServiceTest extends UITest {
 		partService.activate(partA);
 	}
 
-	@Test
 	public void testCreatePart() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -1481,7 +1427,6 @@ public class EPartServiceTest extends UITest {
 		assertNotNull(partService.createPart("partId"));
 	}
 
-	@Test
 	public void testCreatePart2() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -1497,31 +1442,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.createPart("partId2"));
 	}
 
-	@Test
-	public void testCreatePart_WithVariables() {
-		createApplication(1, new String[1][0]);
-		MWindow window = application.getChildren().get(0);
-		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
-				.createPartDescriptor();
-		partDescriptor.setElementId("partId");
-		partDescriptor.getVariables().add("testVariable");
-		partDescriptor.getProperties().put("testVariable", "testValue");
-		application.getDescriptors().add(partDescriptor);
-
-		getEngine().createGui(window);
-
-		EPartService partService = (EPartService) window.getContext().get(EPartService.class.getName());
-
-		MPart part = partService.createPart("partId");
-		assertNotNull(part);
-		assertEquals(1, part.getVariables().size());
-		assertEquals("testVariable", part.getVariables().get(0));
-		assertEquals(1, part.getProperties().size());
-		assertTrue(part.getProperties().containsKey("testVariable"));
-		assertEquals("testValue", part.getProperties().get("testVariable"));
-	}
-
-	@Test
 	public void testCreateSharedPart_NoDescriptor() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -1533,7 +1453,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.createSharedPart("partId"));
 	}
 
-	@Test
 	public void testCreateSharedPart_ForceFalse() {
 		createApplication(1, new String[1][0]);
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
@@ -1559,7 +1478,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, placeholderB.getRef());
 	}
 
-	@Test
 	public void testCreateSharedPart_ForceTrue() {
 		createApplication(1, new String[1][0]);
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
@@ -1588,7 +1506,6 @@ public class EPartServiceTest extends UITest {
 				|| part2 == placeholderB.getRef());
 	}
 
-	@Test
 	public void testShowPart_Id_ACTIVATE() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -1608,7 +1525,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue("Shown part should be visible", part.isVisible());
 	}
 
-	@Test
 	public void testShowPart_Id_ACTIVATE_DefinedCategoryStackNotExists() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1650,7 +1566,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part2, stack.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Id_ACTIVATE_DefinedCategoryStackExists() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1690,7 +1605,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part2, stack.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Id_CREATE() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1758,7 +1672,6 @@ public class EPartServiceTest extends UITest {
 				partB2.getContext());
 	}
 
-	@Test
 	public void testShowPart_Id_CREATE2() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1802,7 +1715,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(partService.isPartVisible(partB));
 	}
 
-	@Test
 	public void testShowPart_Id_CREATE3() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1850,7 +1762,6 @@ public class EPartServiceTest extends UITest {
 				partService.isPartVisible(partB));
 	}
 
-	@Test
 	public void testShowPart_Id_CREATE4() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1880,7 +1791,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, partService.getActivePart());
 	}
 
-	@Test
 	public void testShowPart_Id_VISIBLE() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1932,7 +1842,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB2, shownPart);
 	}
 
-	@Test
 	public void testShowPart_Id_VISIBLE2() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -1977,7 +1886,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partService.isPartVisible(partB));
 	}
 
-	@Test
 	public void testShowPart_Id_VISIBLE3() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2025,7 +1933,6 @@ public class EPartServiceTest extends UITest {
 				partService.isPartVisible(partB));
 	}
 
-	@Test
 	public void testShowPart_Id_VISIBLE4() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2055,7 +1962,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, partService.getActivePart());
 	}
 
-	@Test
 	public void testShowPart_Id_VISIBLE5() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2131,17 +2037,14 @@ public class EPartServiceTest extends UITest {
 		assertTrue("A shown part should be rendered", part.isToBeRendered());
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_CREATE() {
 		testShowPart_Id_Unrendered(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_VISIBLE() {
 		testShowPart_Id_Unrendered(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_ACTIVATE() {
 		testShowPart_Id_Unrendered(PartState.ACTIVATE);
 	}
@@ -2175,17 +2078,14 @@ public class EPartServiceTest extends UITest {
 		assertTrue("A shown part should be rendered", part.isToBeRendered());
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_CREATE2() {
 		testShowPart_Id_Unrendered2(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_VISIBLE2() {
 		testShowPart_Id_Unrendered2(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_ACTIVATE2() {
 		testShowPart_Id_Unrendered2(PartState.ACTIVATE);
 	}
@@ -2224,17 +2124,14 @@ public class EPartServiceTest extends UITest {
 		assertTrue("A shown part should be rendered", part.isToBeRendered());
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_CREATE3() {
 		testShowPart_Id_Unrendered3(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_VISIBLE3() {
 		testShowPart_Id_Unrendered3(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_Unrendered_ACTIVATE3() {
 		testShowPart_Id_Unrendered3(PartState.ACTIVATE);
 	}
@@ -2261,17 +2158,14 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, partService.getActivePart());
 	}
 
-	@Test
 	public void testShowPart_Id_PartAlreadyShown_ACTIVATE() {
 		testShowPart_Id_PartAlreadyShown(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Id_PartAlreadyShown_CREATE() {
 		testShowPart_Id_PartAlreadyShown(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_PartAlreadyShown_VISIBLE() {
 		testShowPart_Id_PartAlreadyShown(PartState.VISIBLE);
 	}
@@ -2291,17 +2185,14 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.showPart("partId2", partState));
 	}
 
-	@Test
 	public void testShowPart_Id_IncorrectDescriptor_ACTIVATE() {
 		testShowPart_Id_IncorrectDescriptor(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Id_IncorrectDescriptor_VISIBLE() {
 		testShowPart_Id_IncorrectDescriptor(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_IncorrectDescriptor_CREATE() {
 		testShowPart_Id_IncorrectDescriptor(PartState.CREATE);
 	}
@@ -2332,37 +2223,30 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, shownPart);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_TrueACTIVATE() {
 		testShowPart_Id_MultipleExists(true, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_FalseACTIVATE() {
 		testShowPart_Id_MultipleExists(false, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_TrueVISIBLE() {
 		testShowPart_Id_MultipleExists(true, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_FalseVISIBLE() {
 		testShowPart_Id_MultipleExists(false, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_TrueCREATE() {
 		testShowPart_Id_MultipleExists(true, PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_MultipleExists_FalseCREATE() {
 		testShowPart_Id_MultipleExists(false, PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Id_PartInInactivePerspective() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2443,17 +2327,14 @@ public class EPartServiceTest extends UITest {
 		partService.showPart(part, partState);
 	}
 
-	@Test
 	public void testShowPart_Part_ACTIVATE() {
 		testShowPart_Part(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Part_VISIBLE() {
 		testShowPart_Part(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Part_CREATE() {
 		testShowPart_Part(PartState.CREATE);
 	}
@@ -2490,32 +2371,26 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_TrueACTIVATE() {
 		testShowPart_Part_MultipleExists(true, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_FalseACTIVATE() {
 		testShowPart_Part_MultipleExists(false, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_TrueVISIBLE() {
 		testShowPart_Part_MultipleExists(true, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_FalseVISIBLE() {
 		testShowPart_Part_MultipleExists(false, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_TrueCREATE() {
 		testShowPart_Part_MultipleExists(true, PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleExists_FalseCREATE() {
 		testShowPart_Part_MultipleExists(false, PartState.CREATE);
 	}
@@ -2544,37 +2419,30 @@ public class EPartServiceTest extends UITest {
 		assertEquals(createdPart, shownPart);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_TrueACTIVATE() {
 		testShowPart_Part_MultipleNonexistent(true, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_FalseACTIVATE() {
 		testShowPart_Part_MultipleNonexistent(false, PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_TrueVISIBLE() {
 		testShowPart_Part_MultipleNonexistent(true, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_FalseVISIBLE() {
 		testShowPart_Part_MultipleNonexistent(false, PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_TrueCREATE() {
 		testShowPart_Part_MultipleNonexistent(true, PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleNonexistent_FalseCREATE() {
 		testShowPart_Part_MultipleNonexistent(false, PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleWithoutCategory() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2603,7 +2471,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(shownPart.equals(shownPart2));
 	}
 
-	@Test
 	public void testShowPart_Part_MultipleWithCategory() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2641,7 +2508,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(stack.getChildren().contains(shownPart2));
 	}
 
-	@Test
 	public void testShowPart_Part_ExistingInNonstandardCategory() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -2675,7 +2541,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(stack, part.getParent());
 	}
 
-	@Test
 	public void testShowPart_Bug318931() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -2723,7 +2588,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholderB, perspective.getChildren().get(1));
 	}
 
-	@Test
 	public void testShowPart_Bug321755() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -2767,7 +2631,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholder, placeholders.get(0));
 	}
 
-	@Test
 	public void testShowPart_Bug321757() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -2825,17 +2688,14 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, window.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Part_ACTIVATE() {
 		testShowPart_Bug322368_Part(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Part_VISIBLE() {
 		testShowPart_Bug322368_Part(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Part_CREATE() {
 		testShowPart_Bug322368_Part(PartState.CREATE);
 	}
@@ -2880,22 +2740,18 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholder, perspective.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Placeholder_ACTIVATE() {
 		testShowPart_Bug322368_Placeholder(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Placeholder_VISIBLE() {
 		testShowPart_Bug322368_Placeholder(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug322368_Placeholder_CREATE() {
 		testShowPart_Bug322368_Placeholder(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Bug322403_A() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -2956,7 +2812,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholderB, partStackB.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug322403_B() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -3011,7 +2866,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholderB, partStackB.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug322403_C() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3060,7 +2914,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partStackB.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug320578_A() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -3095,7 +2948,6 @@ public class EPartServiceTest extends UITest {
 		assertNotNull(partA.getCurSharedRef());
 	}
 
-	@Test
 	public void testShowPart_Bug320578_B() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3124,7 +2976,6 @@ public class EPartServiceTest extends UITest {
 		assertNotNull(partA.getCurSharedRef());
 	}
 
-	@Test
 	public void testShowPart_Bug320578_C() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3200,7 +3051,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part.getCurSharedRef(), placeholdersB.get(0));
 	}
 
-	@Test
 	public void testShowPart_Bug320578_D() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3281,7 +3131,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part.getCurSharedRef(), placeholdersB.get(0));
 	}
 
-	@Test
 	public void testShowPart_Bug320578_E() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3325,7 +3174,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(part, placeholders.get(0).getRef());
 	}
 
-	@Test
 	public void testShowPart_Bug329310_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3362,7 +3210,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partSashContainer.getChildren().get(1) instanceof MPartStack);
 	}
 
-	@Test
 	public void testShowPart_Bug329310_02() {
 		MPartDescriptor partDescriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 				.createPartDescriptor();
@@ -3448,22 +3295,18 @@ public class EPartServiceTest extends UITest {
 		assertEquals(placeholderB, partB.getCurSharedRef());
 	}
 
-	@Test
 	public void testShowPart_Bug331047_CREATE() {
 		testShowPart_Bug331047(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Bug331047_VISIBLE() {
 		testShowPart_Bug331047(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug331047_ACTIVATE() {
 		testShowPart_Bug331047(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Bug347837() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -3492,7 +3335,6 @@ public class EPartServiceTest extends UITest {
 		assertNotNull(part.getContext());
 	}
 
-	@Test
 	public void testHidePart_PartInAnotherWindow() {
 		createApplication(new String[] { "partInWindow1" },
 				new String[] { "partInWindow2" });
@@ -3554,17 +3396,14 @@ public class EPartServiceTest extends UITest {
 		assertEquals(tagged ? null : window, part.getParent());
 	}
 
-	@Test
 	public void testHidePart_Tagged_True() {
 		testHidePart_Tagged(true);
 	}
 
-	@Test
 	public void testHidePart_Tagged_False() {
 		testHidePart_Tagged(false);
 	}
 
-	@Test
 	public void testGetDirtyParts() {
 		createApplication(1, new String[1][0]);
 		MWindow window = application.getChildren().get(0);
@@ -3578,7 +3417,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(0, dirtyParts.size());
 	}
 
-	@Test
 	public void testGetDirtyParts2() {
 		createApplication("partId");
 		MWindow window = application.getChildren().get(0);
@@ -3627,27 +3465,22 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testGetDirtyParts3_TrueTrue() {
 		testGetDirtyParts3(true, true);
 	}
 
-	@Test
 	public void testGetDirtyParts3_TrueFalse() {
 		testGetDirtyParts3(true, false);
 	}
 
-	@Test
 	public void testGetDirtyParts3_FalseTrue() {
 		testGetDirtyParts3(false, true);
 	}
 
-	@Test
 	public void testGetDirtyParts3_FalseFalse() {
 		testGetDirtyParts3(false, false);
 	}
 
-	@Test
 	public void testEvent_PartActivated() {
 		createApplication("partFront", "partBack");
 
@@ -3673,7 +3506,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartActivated2() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -3717,7 +3549,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartDeactivated() {
 		createApplication("partFront", "partBack");
 
@@ -3743,7 +3574,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartDeactivated2() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -3787,7 +3617,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartHidden() {
 		createApplication("partFront", "partBack");
 
@@ -3820,7 +3649,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartHidden2() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -3864,7 +3692,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartVisible() {
 		createApplication("partFront", "partBack");
 
@@ -3897,7 +3724,6 @@ public class EPartServiceTest extends UITest {
 		assertTrue(partListener.isValid());
 	}
 
-	@Test
 	public void testEvent_PartVisible2() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -4090,122 +3916,98 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testSavePart_YesTrueTrueTrue() {
 		testSavePart(ISaveHandler.Save.YES, true, true, true);
 	}
 
-	@Test
 	public void testSavePart_YesTrueTrueFalse() {
 		testSavePart(ISaveHandler.Save.YES, true, true, false);
 	}
 
-	@Test
 	public void testSavePart_YesTrueFalseTrue() {
 		testSavePart(ISaveHandler.Save.YES, true, false, true);
 	}
 
-	@Test
 	public void testSavePart_YesTrueFalseFalse() {
 		testSavePart(ISaveHandler.Save.YES, true, false, false);
 	}
 
-	@Test
 	public void testSavePart_YesFalseTrueTrue() {
 		testSavePart(ISaveHandler.Save.YES, false, true, true);
 	}
 
-	@Test
 	public void testSavePart_YesFalseTrueFalse() {
 		testSavePart(ISaveHandler.Save.YES, false, true, false);
 	}
 
-	@Test
 	public void testSavePart_YesFalseFalseTrue() {
 		testSavePart(ISaveHandler.Save.YES, false, false, true);
 	}
 
-	@Test
 	public void testSavePart_YesFalseFalseFalse() {
 		testSavePart(ISaveHandler.Save.YES, false, false, false);
 	}
 
-	@Test
 	public void testSavePart_NoTrueTrueTrue() {
 		testSavePart(ISaveHandler.Save.NO, true, true, true);
 	}
 
-	@Test
 	public void testSavePart_NoTrueTrueFalse() {
 		testSavePart(ISaveHandler.Save.NO, true, true, false);
 	}
 
-	@Test
 	public void testSavePart_NoTrueFalseTrue() {
 		testSavePart(ISaveHandler.Save.NO, true, false, true);
 	}
 
-	@Test
 	public void testSavePart_NoTrueFalseFalse() {
 		testSavePart(ISaveHandler.Save.NO, true, false, false);
 	}
 
-	@Test
 	public void testSavePart_NoFalseTrueTrue() {
 		testSavePart(ISaveHandler.Save.NO, false, true, true);
 	}
 
-	@Test
 	public void testSavePart_NoFalseTrueFalse() {
 		testSavePart(ISaveHandler.Save.NO, false, true, false);
 	}
 
-	@Test
 	public void testSavePart_NoFalseFalseTrue() {
 		testSavePart(ISaveHandler.Save.NO, false, false, true);
 	}
 
-	@Test
 	public void testSavePart_NoFalseFalseFalse() {
 		testSavePart(ISaveHandler.Save.NO, false, false, false);
 	}
 
-	@Test
 	public void testSavePart_CancelTrueTrueTrue() {
 		testSavePart(ISaveHandler.Save.CANCEL, true, true, true);
 	}
 
-	@Test
 	public void testSavePart_CancelTrueTrueFalse() {
 		testSavePart(ISaveHandler.Save.CANCEL, true, true, false);
 	}
 
-	@Test
 	public void testSavePart_CancelTrueFalseTrue() {
 		testSavePart(ISaveHandler.Save.CANCEL, true, false, true);
 	}
 
-	@Test
 	public void testSavePart_CancelTrueFalseFalse() {
 		testSavePart(ISaveHandler.Save.CANCEL, true, false, false);
 	}
 
-	@Test
 	public void testSavePart_CancelFalseTrueTrue() {
 		testSavePart(ISaveHandler.Save.CANCEL, false, true, true);
 	}
 
-	@Test
 	public void testSavePart_CancelFalseTrueFalse() {
 		testSavePart(ISaveHandler.Save.CANCEL, false, true, false);
 	}
 
-	@Test
 	public void testSavePart_CancelFalseFalseTrue() {
 		testSavePart(ISaveHandler.Save.CANCEL, false, false, true);
 	}
 
-	@Test
 	public void testSavePart_CancelFalseFalseFalse() {
 		testSavePart(ISaveHandler.Save.CANCEL, false, false, false);
 	}
@@ -4245,42 +4047,34 @@ public class EPartServiceTest extends UITest {
 		assertEquals(beforeDirty, editor.wasSaveCalled());
 	}
 
-	@Test
 	public void testSavePart_NoHandler_TTT() {
 		testSavePart_NoHandler(true, true, true);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_TTF() {
 		testSavePart_NoHandler(true, true, false);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_TFT() {
 		testSavePart_NoHandler(true, false, true);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_TFF() {
 		testSavePart_NoHandler(true, false, false);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_FTT() {
 		testSavePart_NoHandler(false, true, true);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_FTF() {
 		testSavePart_NoHandler(false, true, false);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_FFT() {
 		testSavePart_NoHandler(false, false, true);
 	}
 
-	@Test
 	public void testSavePart_NoHandler_FFF() {
 		testSavePart_NoHandler(false, false, false);
 	}
@@ -4484,1514 +4278,1261 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_True_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YY_False_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_True_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YN_False_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_True_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_TF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FT_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FT_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FT_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FF_TT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FF_TF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FF_FT() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_YC_False_FF_FF() {
 		testSaveAll(new Save[] { Save.YES, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
-
-	@Test
 
 	public void testSaveAll_NY_True_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_True_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NY_False_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_True_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NN_False_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_True_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_TF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FT_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FT_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FT_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FF_TT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FF_TF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FF_FT() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NC_False_FF_FF() {
 		testSaveAll(new Save[] { Save.NO, Save.CANCEL }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_True_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CY_False_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.YES }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_True_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, true, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CN_False_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.NO }, false, new boolean[] {
 				false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_True_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, true,
 				new boolean[] { false, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_TF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { true, false }, new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FT_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, true }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FT_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, true }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FT_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, true }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FF_TT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, false }, new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FF_TF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, false }, new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FF_FT() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, false }, new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_CC_False_FF_FF() {
 		testSaveAll(new Save[] { Save.CANCEL, Save.CANCEL }, false,
 				new boolean[] { false, false }, new boolean[] { false, false });
@@ -6031,42 +5572,34 @@ public class EPartServiceTest extends UITest {
 		assertEquals(beforeDirty, editor.wasSaveCalled());
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_TTT() {
 		testSaveAll_NoHandler(true, true, true);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_TTF() {
 		testSaveAll_NoHandler(true, true, false);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_TFT() {
 		testSaveAll_NoHandler(true, false, true);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_TFF() {
 		testSaveAll_NoHandler(true, false, false);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_FTT() {
 		testSaveAll_NoHandler(false, true, true);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_FTF() {
 		testSaveAll_NoHandler(false, true, false);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_FFT() {
 		testSaveAll_NoHandler(false, false, true);
 	}
 
-	@Test
 	public void testSaveAll_NoHandler_FFF() {
 		testSaveAll_NoHandler(false, false, false);
 	}
@@ -6111,199 +5644,166 @@ public class EPartServiceTest extends UITest {
 				saveCalled(beforeDirty, throwException), throwException);
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TT_TT() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, true },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TT_TF() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, true },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TT_FT() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, true },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TT_FF() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, true },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TF_TT() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, false },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TF_TF() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, false },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TF_FT() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, false },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_TF_FF() {
 		testSaveAll_NoHandlers(true, new boolean[] { true, false },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FT_TT() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, true },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FT_TF() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, true },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FT_FT() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, true },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FT_FF() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, true },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FF_TT() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, false },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FF_TF() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, false },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FF_FT() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, false },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_T_FF_FF() {
 		testSaveAll_NoHandlers(true, new boolean[] { false, false },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TT_TT() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, true },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TT_TF() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, true },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TT_FT() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, true },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TT_FF() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, true },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TF_TT() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, false },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TF_TF() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, false },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TF_FT() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, false },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_TF_FF() {
 		testSaveAll_NoHandlers(false, new boolean[] { true, false },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FT_TT() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, true },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FT_TF() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, true },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FT_FT() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, true },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FT_FF() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, true },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FF_TT() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, false },
 				new boolean[] { true, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FF_TF() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, false },
 				new boolean[] { true, false });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FF_FT() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, false },
 				new boolean[] { false, true });
 	}
 
-	@Test
 	public void testSaveAll_NoHandlers_F_FF_FF() {
 		testSaveAll_NoHandlers(false, new boolean[] { false, false },
 				new boolean[] { false, false });
 	}
 
-	@Test
 	public void testSwitchWindows() {
 		// create an application with two windows
 		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -6356,7 +5856,6 @@ public class EPartServiceTest extends UITest {
 				windowService2.getActivePart());
 	}
 
-	@Test
 	public void testApplicationContextHasActivePart() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -6423,17 +5922,14 @@ public class EPartServiceTest extends UITest {
 		assertNotNull("The part should have been rendered", partB.getContext());
 	}
 
-	@Test
 	public void testShowPart_Bug307747_CREATE() {
 		testShowPart_Bug307747(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Bug307747_VISIBLE() {
 		testShowPart_Bug307747(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug307747_ACTIVATE() {
 		testShowPart_Bug307747(PartState.ACTIVATE);
 	}
@@ -6470,32 +5966,26 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partStack.getSelectedElement());
 	}
 
-	@Test
 	public void testShowPart_Bug328078_CREATE() {
 		testShowPart_Bug328078(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Bug328078_VISIBLE() {
 		testShowPart_Bug328078(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug328078_ACTIVATE() {
 		testShowPart_Bug328078(PartState.ACTIVATE);
 	}
 
-	@Test
 	public void testShowPart_Bug370026_CREATE() {
 		testShowPart_Bug370026(PartState.CREATE);
 	}
 
-	@Test
 	public void testShowPart_Bug370026_VISIBLE() {
 		testShowPart_Bug370026(PartState.VISIBLE);
 	}
 
-	@Test
 	public void testShowPart_Bug370026_ACTIVATE() {
 		testShowPart_Bug370026(PartState.ACTIVATE);
 	}
@@ -6571,12 +6061,10 @@ public class EPartServiceTest extends UITest {
 		assertEquals(force, !perspective.getChildren().contains(placeholder));
 	}
 
-	@Test
 	public void testHidePart_Bug325148_True() {
 		testHidePart_Bug325148(true);
 	}
 
-	@Test
 	public void testHidePart_Bug325148_False() {
 		testHidePart_Bug325148(false);
 	}
@@ -6616,17 +6104,14 @@ public class EPartServiceTest extends UITest {
 		partService.hidePart(partB, force);
 	}
 
-	@Test
 	public void testHidePart_Bug325148_Unrendered_True() {
 		testHidePart_Bug325148_Unrendered(true);
 	}
 
-	@Test
 	public void testHidePart_Bug325148_Unrendered_False() {
 		testHidePart_Bug325148_Unrendered(false);
 	}
 
-	@Test
 	public void testHidePart_Bug327026() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -6673,12 +6158,10 @@ public class EPartServiceTest extends UITest {
 		assertNull(stack.getSelectedElement());
 	}
 
-	@Test
 	public void testHidePart_Bug327044_True() {
 		testHidePart_Bug327044(true);
 	}
 
-	@Test
 	public void testHidePart_Bug327044_False() {
 		testHidePart_Bug327044(false);
 	}
@@ -6732,12 +6215,10 @@ public class EPartServiceTest extends UITest {
 		assertNotNull(part.getContext());
 	}
 
-	@Test
 	public void testHidePart_Bug327765_True() {
 		testHidePart_Bug327765(true);
 	}
 
-	@Test
 	public void testHidePart_Bug327765_False() {
 		testHidePart_Bug327765(false);
 	}
@@ -6829,12 +6310,10 @@ public class EPartServiceTest extends UITest {
 		assertFalse(placeholderB1.isToBeRendered());
 	}
 
-	@Test
 	public void testHidePart_Bug327917_True() {
 		testHidePart_Bug327917(true);
 	}
 
-	@Test
 	public void testHidePart_Bug327917_False() {
 		testHidePart_Bug327917(false);
 	}
@@ -6882,12 +6361,10 @@ public class EPartServiceTest extends UITest {
 		assertFalse(partPlaceholder.isToBeRendered());
 	}
 
-	@Test
 	public void testHidePart_Bug327964_True() {
 		testHidePart_Bug327964(true);
 	}
 
-	@Test
 	public void testHidePart_Bug327964_False() {
 		testHidePart_Bug327964(false);
 	}
@@ -6954,17 +6431,14 @@ public class EPartServiceTest extends UITest {
 				perspectiveContext2.getActiveChild());
 	}
 
-	@Test
 	public void testHidePart_Bug332163_True() {
 		testHidePart_Bug332163(true);
 	}
 
-	@Test
 	public void testHidePart_Bug332163_False() {
 		testHidePart_Bug332163(false);
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7003,7 +6477,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB2, stackB.getSelectedElement());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7035,7 +6508,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7064,7 +6536,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7094,7 +6565,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory05() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7128,7 +6598,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory06() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7184,7 +6653,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory07() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7238,7 +6706,6 @@ public class EPartServiceTest extends UITest {
 		assertNull(partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory08() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7299,7 +6766,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB2, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory09() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7360,7 +6826,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory10() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7409,7 +6874,6 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory11() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7488,7 +6952,6 @@ public class EPartServiceTest extends UITest {
 		}
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory12() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7548,7 +7011,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory13() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7614,7 +7076,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory14() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7698,7 +7159,6 @@ public class EPartServiceTest extends UITest {
 	 * active part after the originally active part that's being shown across
 	 * multiple perspectives has been removed.
 	 */
-	@Test
 	public void testHidePart_ActivationHistory15() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7766,7 +7226,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that switching perspectives doesn't cause a hidden shared
 	 * part to be displayed again.
 	 */
-	@Test
 	public void testHidePart_ActivationHistory16A() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7850,7 +7309,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that switching perspectives doesn't cause a hidden shared
 	 * part to be displayed again.
 	 */
-	@Test
 	public void testHidePart_ActivationHistory16B() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -7924,7 +7382,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that switching perspectives doesn't cause a hidden shared
 	 * part to be displayed again.
 	 */
-	@Test
 	public void testHidePart_ActivationHistory16C() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8018,7 +7475,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that switching perspectives doesn't cause a hidden shared
 	 * part to be displayed again.
 	 */
-	@Test
 	public void testHidePart_ActivationHistory16D() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8096,7 +7552,6 @@ public class EPartServiceTest extends UITest {
 				partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory17() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8128,7 +7583,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory18() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8182,7 +7636,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory19() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8249,7 +7702,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partD, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory20() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8278,7 +7730,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory21() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8323,7 +7774,6 @@ public class EPartServiceTest extends UITest {
 	 * despite the fact that partA is contained in the activation history.
 	 * </p>
 	 */
-	@Test
 	public void testHidePart_ActivationHistory22() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8412,7 +7862,6 @@ public class EPartServiceTest extends UITest {
 	 * the next available candidate in the activation history.
 	 * </p>
 	 */
-	@Test
 	public void testHidePart_ActivationHistory23() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8510,7 +7959,6 @@ public class EPartServiceTest extends UITest {
 	 * that partB is the next available candidate in the activation history.
 	 * </p>
 	 */
-	@Test
 	public void testHidePart_ActivationHistory24() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8542,7 +7990,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug327952_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8585,7 +8032,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug327952_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8612,7 +8058,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug327952_03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8659,7 +8104,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug327952_04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8696,7 +8140,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8741,7 +8184,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8792,7 +8234,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8843,7 +8284,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8900,7 +8340,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_05() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8932,7 +8371,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_06() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -8980,7 +8418,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_07() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9028,7 +8465,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328339_08() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9082,7 +8518,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9130,7 +8565,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9184,7 +8618,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9238,7 +8671,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9292,7 +8724,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_05() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9352,7 +8783,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_06() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9412,7 +8842,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_07() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9472,7 +8901,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_08() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9538,7 +8966,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_09() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9610,7 +9037,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug328946_10() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9685,7 +9111,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partC, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9733,7 +9158,6 @@ public class EPartServiceTest extends UITest {
 				partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_02() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9782,7 +9206,6 @@ public class EPartServiceTest extends UITest {
 				partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_03() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9859,7 +9282,6 @@ public class EPartServiceTest extends UITest {
 				partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_04() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9902,7 +9324,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_05() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -9946,7 +9367,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partA, partService.getActivePart());
 	}
 
-	@Test
 	public void testHidePart_ActivationHistory_Bug329482_06() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10023,7 +9443,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that the active part remains constant between perspective
 	 * switches.
 	 */
-	@Test
 	public void testActivationHistory01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10083,7 +9502,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(partB, partService.getActivePart());
 	}
 
-	@Test
 	public void testSwitchPerspective01() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10116,7 +9534,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(perspectiveContextB, windowContext.getActiveChild());
 	}
 
-	@Test
 	public void testSwitchPerspective02() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -10194,7 +9611,6 @@ public class EPartServiceTest extends UITest {
 				.getActiveChild());
 	}
 
-	@Test
 	public void testSwitchPerspective03() {
 		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
@@ -10244,7 +9660,6 @@ public class EPartServiceTest extends UITest {
 				.getActiveChild());
 	}
 
-	@Test
 	public void testSwitchPerspective04() {
 		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window1);
@@ -10320,7 +9735,6 @@ public class EPartServiceTest extends UITest {
 	 * active part after the originally active part that's being shown across
 	 * multiple perspectives has been removed.
 	 */
-	@Test
 	public void testSwitchPerspective05() {
 		MWindow window1 = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window1);
@@ -10396,7 +9810,6 @@ public class EPartServiceTest extends UITest {
 	 * Test to ensure that the method annotated with the {@link Focus}
 	 * annotation is invoked when switching between perspectives.
 	 */
-	@Test
 	public void testSwitchPerspective06() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10459,7 +9872,6 @@ public class EPartServiceTest extends UITest {
 		assertFalse(editorB.focusCalled);
 	}
 
-	@Test
 	public void testSwitchPerspective07() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10521,7 +9933,6 @@ public class EPartServiceTest extends UITest {
 		assertEquals(perspectiveA, perspectiveStack.getSelectedElement());
 	}
 
-	@Test
 	public void testSwitchPerspective08() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10591,7 +10002,6 @@ public class EPartServiceTest extends UITest {
 	 * not cause any problems.
 	 * </p>
 	 */
-	@Test
 	public void testSwitchPerspective_Bug329184() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10648,7 +10058,6 @@ public class EPartServiceTest extends UITest {
 	 * presumably removed and is indeed longer reachable and can be garbage
 	 * collected.
 	 */
-	@Test
 	public void testLeak() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
@@ -10683,7 +10092,6 @@ public class EPartServiceTest extends UITest {
 		assertNull("The part should no longer be reachable", ref.get());
 	}
 
-	@Test
 	public void testsEventWithExceptions() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
