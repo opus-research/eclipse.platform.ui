@@ -20,10 +20,12 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.junit.Test;
 
@@ -31,19 +33,21 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testGetPerspectiveFor_RegularElement() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspective.getChildren().add(partStack);
 		perspective.setSelectedElement(partStack);
 
@@ -59,23 +63,26 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testGetPerspectiveFor_SharedElement() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		perspective.getChildren().add(placeholder);
 		perspective.setSelectedElement(placeholder);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		placeholder.setRef(partStack);
 		partStack.setCurSharedRef(placeholder);
 
@@ -91,27 +98,31 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testGetPerspectiveFor_SharedElement2() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 		perspective.getChildren().add(placeholder);
 		perspective.setSelectedElement(placeholder);
 
-		MPartSashContainer partSashContainer = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer partSashContainer = BasicFactoryImpl.eINSTANCE
+				.createPartSashContainer();
 		placeholder.setRef(partSashContainer);
 		partSashContainer.setCurSharedRef(placeholder);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		partSashContainer.getChildren().add(partStack);
 		partSashContainer.setSelectedElement(partStack);
 
@@ -127,11 +138,11 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testBringToTop01() {
-		MWindow windowA = ems.createModelElement(MWindow.class);
+		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
 		application.setSelectedElement(windowA);
 
-		MWindow windowB = ems.createModelElement(MWindow.class);
+		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowB);
 
 		getEngine().createGui(windowA);
@@ -150,14 +161,14 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testBringToTop02() {
-		MWindow windowA = ems.createModelElement(MWindow.class);
+		MWindow windowA = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowA);
 		application.setSelectedElement(windowA);
 
-		MWindow windowB = ems.createModelElement(MWindow.class);
+		MWindow windowB = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(windowB);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		windowB.getChildren().add(partB);
 		windowB.setSelectedElement(partB);
 
@@ -177,15 +188,15 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testBringToTop_Bug334411() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		detachedWindow.setToBeRendered(false);
 		window.getWindows().add(detachedWindow);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		part.setToBeRendered(false);
 		detachedWindow.getChildren().add(part);
 
@@ -202,8 +213,9 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testGetElementLocation_Bug331062_01() {
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
-		MPart part = ems.createModelElement(MPart.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		perspective.getChildren().add(part);
 
 		EModelService modelService = applicationContext
@@ -214,11 +226,12 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testGetElementLocation_Bug331062_02() {
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
-		MWindow detachedWindow = ems.createModelElement(MWindow.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
+		MWindow detachedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(detachedWindow);
 
-		MWindow innerWindow = ems.createModelElement(MWindow.class);
+		MWindow innerWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		detachedWindow.getWindows().add(innerWindow);
 
 		EModelService modelService = applicationContext
@@ -229,15 +242,15 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testMoveWithoutIndexNoOtherElements() {
-		MWindow source = ems.createModelElement(MWindow.class);
+		MWindow source = BasicFactoryImpl.eINSTANCE.createWindow();
 
 		// The following casts are necessary because BR 465292 and can be
 		// removed, once it is fixed
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MElementContainer<? extends MUIElement> erase1 = window;
 		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		source.getChildren().add(part);
 		MUIElement uiElement = part;
 		EModelService modelService = applicationContext.get(EModelService.class);
@@ -247,15 +260,15 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testMoveWithoutIndexWithOneOtherElements() {
-		MWindow source = ems.createModelElement(MWindow.class);
+		MWindow source = BasicFactoryImpl.eINSTANCE.createWindow();
 
 		// The following casts are necessary because BR 465292 and can be
 		// removed, once it is fixed
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MElementContainer<? extends MUIElement> erase1 = window;
 		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
-		MPart part = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
 		source.getChildren().add(part);
 		target.getChildren().add(part2);
 		EModelService modelService = applicationContext.get(EModelService.class);
@@ -265,16 +278,16 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testMoveWithIndexWithTwoOtherElement() {
-		MWindow source = ems.createModelElement(MWindow.class);
+		MWindow source = BasicFactoryImpl.eINSTANCE.createWindow();
 
 		// The following casts are necessary because BR 465292 and can be
 		// removed, once it is fixed
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		MElementContainer<? extends MUIElement> erase1 = window;
 		MElementContainer<MUIElement> target = (MElementContainer<MUIElement>) erase1;
-		MPart part = ems.createModelElement(MPart.class);
-		MPart part2 = ems.createModelElement(MPart.class);
-		MPart part3 = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part2 = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part3 = BasicFactoryImpl.eINSTANCE.createPart();
 		source.getChildren().add(part);
 		target.getChildren().add(part2);
 		target.getChildren().add(part3);
@@ -285,23 +298,23 @@ public class EModelServiceTest extends UITest {
 
 	@Test
 	public void testCountRenderableChildren_WithWindows() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		perspective.getChildren().add(partStack);
 		perspective.setSelectedElement(partStack);
 
-		MWindow perspectiveWindow = ems.createModelElement(MWindow.class);
+		MWindow perspectiveWindow = BasicFactoryImpl.eINSTANCE.createWindow();
 		perspective.getWindows().add(perspectiveWindow);
 
 		getEngine().createGui(window);
