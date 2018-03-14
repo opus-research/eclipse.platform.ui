@@ -12,13 +12,12 @@ package org.eclipse.jface.viewers;
 
 /**
  * Interface to provide tool tip information for a given element.
- * @param <E> Type of an element of the model
- * 
+ *
  * @see org.eclipse.jface.viewers.CellLabelProvider
  *
  * @since 3.10
  */
-public interface IToolTipProvider<E> {
+public interface IToolTipProvider {
 
 	/**
 	 * Get the text displayed in the tool tip for object.
@@ -28,6 +27,6 @@ public interface IToolTipProvider<E> {
 	 * @return the {@link String} or <code>null</code> if there is not text to
 	 *         display
 	 */
-	public String getToolTipText(E element);
+	public String getToolTipText(Object element);
 
 }

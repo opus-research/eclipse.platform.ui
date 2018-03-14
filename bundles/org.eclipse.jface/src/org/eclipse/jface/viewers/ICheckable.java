@@ -12,14 +12,11 @@ package org.eclipse.jface.viewers;
 
 /**
  * Interface for objects that support elements with a checked state.
- * 
- * @param <E>
- *            Type of the checked element
  *
  * @see ICheckStateListener
  * @see CheckStateChangedEvent
  */
-public interface ICheckable<E> {
+public interface ICheckable {
     /**
      * Adds a listener for changes to the checked state of elements
      * in this viewer.
@@ -36,7 +33,7 @@ public interface ICheckable<E> {
      * @return <code>true</code> if the element is checked,
      *   and <code>false</code> if not checked
      */
-	public boolean getChecked(E element);
+    public boolean getChecked(Object element);
 
     /**
      * Removes the given check state listener from this viewer.
@@ -56,5 +53,5 @@ public interface ICheckable<E> {
      * @return <code>true</code> if the checked state could be set,
      *  and <code>false</code> otherwise
      */
-	public boolean setChecked(E element, boolean state);
+    public boolean setChecked(Object element, boolean state);
 }

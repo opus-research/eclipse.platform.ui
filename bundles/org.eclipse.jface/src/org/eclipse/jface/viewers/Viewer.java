@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
@@ -44,9 +43,8 @@ import org.eclipse.swt.widgets.Item;
  * </li>
  * </ul>
  * </p>
- * @param <I> Type of the input for the view
  */
-public abstract class Viewer<I> implements IInputSelectionProvider<I> {
+public abstract class Viewer implements IInputSelectionProvider {
 
     /**
      * List of selection change listeners (element type: <code>ISelectionChangedListener</code>).
@@ -203,8 +201,8 @@ public abstract class Viewer<I> implements IInputSelectionProvider<I> {
         return null;
     }
 
-	@Override
-	public abstract I getInput();
+    @Override
+	public abstract Object getInput();
 
     @Override
 	public abstract ISelection getSelection();
@@ -236,7 +234,7 @@ public abstract class Viewer<I> implements IInputSelectionProvider<I> {
      * @param oldInput the old input element or <code>null</code> if there
      *   was previously no input
      */
-    protected void inputChanged(I input, I oldInput) {
+    protected void inputChanged(Object input, Object oldInput) {
     }
 
     /**
@@ -372,7 +370,7 @@ public abstract class Viewer<I> implements IInputSelectionProvider<I> {
      *
      * @param input the input of this viewer, or <code>null</code> if none
      */
-    public abstract void setInput(I input);
+    public abstract void setInput(Object input);
 
     /**
 	 * The viewer implementation of this <code>ISelectionProvider</code>
