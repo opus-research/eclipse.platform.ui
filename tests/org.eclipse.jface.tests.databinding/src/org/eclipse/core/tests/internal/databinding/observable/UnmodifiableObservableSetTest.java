@@ -131,6 +131,11 @@ public class UnmodifiableObservableSetTest extends AbstractDefaultRealmTestCase 
 			super(wrappedSet, elementType);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.internal.databinding.provisional.observable.list.ObservableList#add(java.lang.Object)
+		 */
 		public boolean add(Object o) {
 			boolean result = wrappedSet.add(o);
 			if (result)

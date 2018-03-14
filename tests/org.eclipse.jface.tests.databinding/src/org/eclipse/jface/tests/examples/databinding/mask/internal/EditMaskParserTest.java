@@ -24,6 +24,9 @@ public class EditMaskParserTest extends TestCase {
 
 	private EditMaskParser parser;
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		parser = new EditMaskParser("(###) ###-####");
 	}

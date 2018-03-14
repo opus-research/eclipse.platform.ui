@@ -46,6 +46,11 @@ public class ObservableValueEditingSupportTest extends AbstractSWTTestCase {
 
 	private Bean bean;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.databinding.AbstractSWTTestCase#setUp()
+	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 

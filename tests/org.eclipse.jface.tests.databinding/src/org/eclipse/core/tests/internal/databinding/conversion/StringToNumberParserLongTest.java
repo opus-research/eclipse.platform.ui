@@ -24,10 +24,16 @@ public class StringToNumberParserLongTest extends
 		return StringToNumberParser.inLongRange(number);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMax()
+	 */
 	protected Number getValidMax() {
 		return new Long(Long.MAX_VALUE);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMin()
+	 */
 	protected Number getValidMin() {
 		return new Long(Long.MIN_VALUE);
 	}
