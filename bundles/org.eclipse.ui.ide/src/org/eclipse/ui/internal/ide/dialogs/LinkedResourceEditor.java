@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -100,11 +99,11 @@ public class LinkedResourceEditor {
 	 */
 	public LinkedResourceEditor() {
 		absoluteImg = IDEWorkbenchPlugin.getIDEImageDescriptor(
-				"obj16/warning.png").createImage(); //$NON-NLS-1$
+				"obj16/warning.gif").createImage(); //$NON-NLS-1$
 		brokenImg = IDEWorkbenchPlugin.getIDEImageDescriptor(
-				"obj16/error_tsk.png").createImage(); //$NON-NLS-1$
+				"obj16/error_tsk.gif").createImage(); //$NON-NLS-1$
 		fixedImg = IDEWorkbenchPlugin
-				.getIDEImageDescriptor("obj16/folder.png").createImage(); //$NON-NLS-1$
+				.getIDEImageDescriptor("obj16/folder.gif").createImage(); //$NON-NLS-1$
 
 		FIXED = IDEWorkbenchMessages.LinkedResourceEditor_fixed;
 		BROKEN = IDEWorkbenchMessages.LinkedResourceEditor_broken;
