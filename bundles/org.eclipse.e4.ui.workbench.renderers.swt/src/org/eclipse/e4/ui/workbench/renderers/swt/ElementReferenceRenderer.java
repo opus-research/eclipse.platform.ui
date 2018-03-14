@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -48,7 +47,7 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 
 		Set<MPlaceholder> renderedRefs = renderedMap.get(ref);
 		if (renderedRefs == null) {
-			renderedRefs = new HashSet<>();
+			renderedRefs = new HashSet<MPlaceholder>();
 			renderedMap.put(ref, renderedRefs);
 		}
 
