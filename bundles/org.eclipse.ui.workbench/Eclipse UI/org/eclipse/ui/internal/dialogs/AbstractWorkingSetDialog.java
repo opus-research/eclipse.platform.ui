@@ -270,6 +270,7 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 			manager.addWorkingSet(workingSet);
 			addedWorkingSets.add(workingSet);
 			availableWorkingSetsChanged();
+			workingSetAdded(workingSet);
 		}
 	}
 
@@ -292,6 +293,22 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 		if (!(deselectAllButton == null || deselectAllButton.isDisposed())){
 			deselectAllButton.setEnabled(enable);
 		}
+	}
+
+	/**
+	 * Notifies the dialog that the given working set was added to the sets
+	 * available for use. In other words, the user has just added the given
+	 * working set.
+	 *
+	 * <p>
+	 * This implementation doesn't do anything. Subclasses can override it to
+	 * auto-select the added working set.
+	 * </p>
+	 *
+	 * @param addedSet
+	 *            the added working set.
+	 */
+	protected void workingSetAdded(IWorkingSet addedSet) {
 	}
 
 	@Override
