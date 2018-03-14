@@ -324,6 +324,7 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutPluginsDialog_errorTitle;
 	public static String AboutPluginsDialog_unableToOpenFile;
 	public static String AboutPluginsDialog_filterTextMessage;
+	public static String AboutPluginsPage_Load_Bundle_Data;
 	public static String AboutFeaturesDialog_shellTitle;
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
@@ -457,6 +458,8 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
+	public static String ToggleFullScreenMode_ActivationPopup_Description;
+	public static String ToggleFullScreenMode_ActivationPopup_Description_NoKeybinding;
 
 	// --- File Editors ---
 	public static String FileEditorPreference_fileTypes;
@@ -952,8 +955,6 @@ public class WorkbenchMessages extends NLS {
     public static String ContentAssist_Cue_Description_Key;
 
 	//Settings transfer
-	public static String WorkbenchLayoutSettings_Name;
-	public static String WorkbenchSettings_CouldNotCreateDirectories;
 	public static String WorkbenchSettings_CouldNotFindLocation;
 	public static String WorkingSets_Name;
 	public static String WorkingSets_CannotSave;
@@ -976,6 +977,7 @@ public class WorkbenchMessages extends NLS {
 
 	// WorkingSetConfigurationBlock
 	public static String WorkingSetConfigurationBlock_SelectWorkingSet_button;
+	public static String WorkingSetConfigurationBlock_NewWorkingSet_button;
 	public static String WorkingSetConfigurationBlock_WorkingSetText_name;
 
 	public static String WorkingSetPropertyPage_ReadOnlyWorkingSet_description;
