@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.e4.ui.model.application.ui.advanced.util;
 
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.commands.MBindings;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
@@ -104,6 +105,7 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseUILabel(perspective);
 				if (result == null) result = caseContext(perspective);
 				if (result == null) result = caseHandlerContainer(perspective);
+				if (result == null) result = caseBindings(perspective);
 				if (result == null) result = caseUIElement(perspective);
 				if (result == null) result = caseApplicationElement(perspective);
 				if (result == null) result = caseLocalizable(perspective);
@@ -334,6 +336,21 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public T1 caseHandlerContainer(MHandlerContainer object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Bindings</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Bindings</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T1 caseBindings(MBindings object) {
 		return null;
 	}
 

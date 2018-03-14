@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
+ *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -682,7 +683,12 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	/**
 	 * Map of definition id->FontData[] capturing the temporary changes caused
 	 * by a 'defaultsTo' font change.
+	 *
+	 * @deprecated in this page, we should only care about preferences,
+	 *             preference to fontValues synchronization in registry is
+	 *             handled in the ThemeAPI and listeners
 	 */
+	@Deprecated
     private Map fontValuesToSet = new HashMap(7);
 
     /**
@@ -1533,7 +1539,7 @@ getPreferenceStore(),
 	}
 
     @Override
-	protected void performDefaults() {
+	public void performDefaults() {
         performColorDefaults();
         performFontDefaults();
 		updateControls();
@@ -1665,21 +1671,19 @@ getPreferenceStore(),
         }
     }
 
-    private void setDescendantRegistryValues(FontDefinition definition, FontData[] datas) {
+	private void setDescendantRegistryValues(FontDefinition definition, FontData[] datas, boolean reset) {
         FontDefinition[] children = getDescendantFonts(definition);
-
         for (int i = 0; i < children.length; i++) {
             if (isDefault(children[i])) {
-                setDescendantRegistryValues(children[i], datas);
-                setRegistryValue(children[i], datas);
-                fontValuesToSet.put(children[i].getId(), datas);
-				fontPreferencesToSet.remove(children[i]);
+				setFontPreferenceValue(children[i], datas, reset);
             }
         }
     }
 
 	protected void setFontPreferenceValue(FontDefinition definition, FontData[] datas, boolean reset) {
-        setDescendantRegistryValues(definition, datas);
+		// descendant values must be computed and set before updating current,
+		// or isDefault will miss them
+		setDescendantRegistryValues(definition, datas, reset);
 		fontPreferencesToSet.put(definition, datas);
 		setRegistryValue(definition, datas);
 		updateDefinitionState(definition, reset);
@@ -2118,7 +2122,9 @@ getPreferenceStore(),
 		String fontColorString = RESOURCE_BUNDLE.getString("fontColorString"); //$NON-NLS-1$
 		RGB rgb = currentColor.getRGB();
 		String messageBottom = MessageFormat
-				.format(fontColorString, new Object[] { new Integer(rgb.red), new Integer(rgb.green), new Integer(rgb.blue) });
+				.format(fontColorString,
+						new Object[] { Integer.valueOf(rgb.red), Integer.valueOf(rgb.green),
+								Integer.valueOf(rgb.blue) });
 
 		// calculate position of the vertical line
 		int separator = (clientArea.width - 2) / 3;
@@ -2212,9 +2218,12 @@ getPreferenceStore(),
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
 		if (definition instanceof ColorDefinition) {
-			RGB value = ((ColorDefinition) definition).getValue();
-			return value != null && value != EMPTY_COLOR_VALUE
-					&& colorRegistry.get(definition.getId()) != null;
+			ColorDefinition colorDef = (ColorDefinition) definition;
+			RGB value = colorDef.getValue();
+			if ((value == null || value == EMPTY_COLOR_VALUE) && colorDef.getDefaultsTo() == null) {
+				return false;
+			}
+			return colorRegistry.get(definition.getId()) != null;
 		}
 		return true;
 	}
