@@ -69,7 +69,7 @@ public class StackRendererTest {
 		partStack.getChildren().add(part);
 
 		application.setContext(context);
-		context.set(MApplication.class, application);
+		context.set(MApplication.class.getName(), application);
 
 		executedMethodsListener = new CTabItemStylingMethodsListener(part);
 
