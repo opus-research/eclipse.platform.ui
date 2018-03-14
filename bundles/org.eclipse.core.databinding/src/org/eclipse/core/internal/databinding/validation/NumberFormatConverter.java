@@ -18,9 +18,12 @@ import com.ibm.icu.text.NumberFormat;
 /**
  * Converter that uses a number format for conversion.
  *
+ * @param <T>
+ *            target number type
+ *
  * @since 1.0
  */
-public abstract class NumberFormatConverter extends Converter {
+public abstract class NumberFormatConverter<T> extends Converter<String, T> {
 	private final NumberFormat numberFormat;
 
 	/**
@@ -28,7 +31,8 @@ public abstract class NumberFormatConverter extends Converter {
 	 * @param toType
 	 * @param numberFormat
 	 */
-	public NumberFormatConverter(Object fromType, Object toType, NumberFormat numberFormat) {
+	public NumberFormatConverter(Object fromType, Object toType,
+			NumberFormat numberFormat) {
 		super(fromType, toType);
 
 		this.numberFormat = numberFormat;
@@ -37,7 +41,7 @@ public abstract class NumberFormatConverter extends Converter {
 	/**
 	 * @return number format
 	 */
-	/*package */ NumberFormat getNumberFormat() {
+	/* package */NumberFormat getNumberFormat() {
 		return numberFormat;
 	}
 }

@@ -42,31 +42,33 @@ import org.eclipse.core.runtime.IStatus;
  * <p>
  * Note:
  * <ul>
- * <li>By default, a status is valid if its
- * {@link IStatus#getSeverity() severity} is {@link IStatus#OK OK},
- * {@link IStatus#INFO INFO}, or {@link IStatus#WARNING WARNING}
+ * <li>By default, a status is valid if its {@link IStatus#getSeverity()
+ * severity} is {@link IStatus#OK OK}, {@link IStatus#INFO INFO}, or
+ * {@link IStatus#WARNING WARNING}
  * <li>Calls to {@link #setValue(Object)} on the validated observable changes
  * the value regardless of the validation status.
  * <li>This class will not forward {@link ValueChangingEvent} events from a
  * wrapped {@link IVetoableValue}.
  * </ul>
- *
+ * 
+ * @param <T>
+ * 
  * @since 1.2
  */
-public class ValidatedObservableValue extends AbstractObservableValue {
-	private IObservableValue target;
-	private IObservableValue validationStatus;
+public class ValidatedObservableValue<T> extends AbstractObservableValue<T> {
+	private IObservableValue<T> target;
+	private IObservableValue<IStatus> validationStatus;
 
-	private Object cachedValue;
+	private T cachedValue;
 	private boolean stale;
 	private boolean updatingTarget = false;
 
-	private IValueChangeListener targetChangeListener = new IValueChangeListener() {
+	private IValueChangeListener<T> targetChangeListener = new IValueChangeListener<T>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent event) {
+		public void handleValueChange(ValueChangeEvent<T> event) {
 			if (updatingTarget)
 				return;
-			IStatus status = (IStatus) validationStatus.getValue();
+			IStatus status = validationStatus.getValue();
 			if (isValid(status))
 				internalSetValue(event.diff.getNewValue(), false);
 			else
@@ -85,11 +87,11 @@ public class ValidatedObservableValue extends AbstractObservableValue {
 		}
 	};
 
-	private IValueChangeListener validationStatusChangeListener = new IValueChangeListener() {
+	private IValueChangeListener<IStatus> validationStatusChangeListener = new IValueChangeListener<IStatus>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent event) {
-			IStatus oldStatus = (IStatus) event.diff.getOldValue();
-			IStatus newStatus = (IStatus) event.diff.getNewValue();
+		public void handleValueChange(ValueChangeEvent<IStatus> event) {
+			IStatus oldStatus = event.diff.getOldValue();
+			IStatus newStatus = event.diff.getNewValue();
 			if (stale && !isValid(oldStatus) && isValid(newStatus)) {
 				internalSetValue(target.getValue(), false);
 			}
@@ -105,14 +107,13 @@ public class ValidatedObservableValue extends AbstractObservableValue {
 	 *            an observable value of type {@link IStatus}.class which
 	 *            contains the current validation status
 	 */
-	public ValidatedObservableValue(IObservableValue target,
-			IObservableValue validationStatus) {
+	public ValidatedObservableValue(IObservableValue<T> target,
+			IObservableValue<IStatus> validationStatus) {
 		super(target.getRealm());
 		Assert.isNotNull(validationStatus,
 				"Validation status observable cannot be null"); //$NON-NLS-1$
-		Assert
-				.isTrue(target.getRealm().equals(validationStatus.getRealm()),
-						"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
+		Assert.isTrue(target.getRealm().equals(validationStatus.getRealm()),
+				"Target and validation status observables must be on the same realm"); //$NON-NLS-1$
 		this.target = target;
 		this.validationStatus = validationStatus;
 		this.cachedValue = target.getValue();
@@ -136,12 +137,12 @@ public class ValidatedObservableValue extends AbstractObservableValue {
 	}
 
 	@Override
-	protected Object doGetValue() {
+	protected T doGetValue() {
 		return cachedValue;
 	}
 
-	private void internalSetValue(Object value, boolean updateTarget) {
-		Object oldValue = cachedValue;
+	private void internalSetValue(T value, boolean updateTarget) {
+		T oldValue = cachedValue;
 		cachedValue = value;
 		if (updateTarget) {
 			updatingTarget = true;
@@ -158,7 +159,7 @@ public class ValidatedObservableValue extends AbstractObservableValue {
 	}
 
 	@Override
-	protected void doSetValue(Object value) {
+	protected void doSetValue(T value) {
 		internalSetValue(value, true);
 	}
 

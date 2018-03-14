@@ -17,7 +17,7 @@ import org.eclipse.core.databinding.conversion.IConverter;
 /**
  * StringToCharacterConverter.
  */
-public class StringToCharacterConverter implements IConverter {
+public class StringToCharacterConverter implements IConverter<Object, Object> {
 
 	private final boolean primitiveTarget;
 

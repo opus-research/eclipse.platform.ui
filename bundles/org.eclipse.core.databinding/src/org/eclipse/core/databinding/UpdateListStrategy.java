@@ -38,14 +38,21 @@ import org.eclipse.core.runtime.Status;
  * is configured via policies provided on construction of the strategy (e.g.
  * {@link #POLICY_NEVER}, {@link #POLICY_ON_REQUEST}, {@link #POLICY_UPDATE}).
  * </p>
- *
- *
+ * 
+ * @param <S>
+ *            the type of the elements on the source side (i.e. the model side
+ *            if this is a model-to-target update and the target side if this is
+ *            a target-to-model update)
+ * @param <D>
+ *            the type of the elements on the destination side (i.e. the target
+ *            side if this is a model-to-target update and the model side if
+ *            this is a target-to-model update)
  * @see DataBindingContext#bindList(IObservableList, IObservableList,
  *      UpdateListStrategy, UpdateListStrategy)
  * @see IConverter
  * @since 1.0
  */
-public class UpdateListStrategy extends UpdateStrategy {
+public class UpdateListStrategy<S, D> extends UpdateStrategy {
 
 	/**
 	 * Policy constant denoting that the source observable's state should not be
@@ -82,7 +89,7 @@ public class UpdateListStrategy extends UpdateStrategy {
 		return i;
 	}
 
-	protected IConverter converter;
+	protected IConverter<S, D> converter;
 
 	private int updatePolicy;
 
@@ -141,8 +148,8 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @param element
 	 * @return the converted element
 	 */
-	public Object convert(Object element) {
-		return converter == null ? element : converter.convert(element);
+	public D convert(S element) {
+		return converter == null ? (D) element : converter.convert(element);
 	}
 
 	/**
@@ -150,13 +157,14 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @param source
 	 * @param destination
 	 */
-	protected void fillDefaults(IObservableList source,
-			IObservableList destination) {
+	protected void fillDefaults(IObservableList<S> source,
+			IObservableList<D> destination) {
 		Object sourceType = source.getElementType();
 		Object destinationType = destination.getElementType();
 		if (provideDefaults && sourceType != null && destinationType != null) {
 			if (converter == null) {
-				setConverter(createConverter(sourceType, destinationType));
+				setConverter((IConverter<S, D>) createConverter(sourceType,
+						destinationType));
 			}
 		}
 		if (converter != null) {
@@ -185,7 +193,7 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @param converter
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateListStrategy setConverter(IConverter converter) {
+	public UpdateListStrategy<S, D> setConverter(IConverter<S, D> converter) {
 		this.converter = converter;
 		return this;
 	}
@@ -199,15 +207,14 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @param index
 	 * @return a status
 	 */
-	protected IStatus doAdd(IObservableList observableList, Object element,
+	protected IStatus doAdd(IObservableList<D> observableList, D element,
 			int index) {
 		try {
 			observableList.add(index, element);
 		} catch (Exception ex) {
 			return ValidationStatus
-					.error(
-							BindingMessages
-									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+					.error(BindingMessages
+							.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
 							ex);
 		}
 		return Status.OK_STATUS;
@@ -221,14 +228,13 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @param index
 	 * @return a status
 	 */
-	protected IStatus doRemove(IObservableList observableList, int index) {
+	protected IStatus doRemove(IObservableList<D> observableList, int index) {
 		try {
 			observableList.remove(index);
 		} catch (Exception ex) {
 			return ValidationStatus
-					.error(
-							BindingMessages
-									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+					.error(BindingMessages
+							.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
 							ex);
 		}
 		return Status.OK_STATUS;
@@ -274,15 +280,14 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @return a status
 	 * @since 1.2
 	 */
-	protected IStatus doMove(IObservableList observableList, int oldIndex,
+	protected IStatus doMove(IObservableList<D> observableList, int oldIndex,
 			int newIndex) {
 		try {
 			observableList.move(oldIndex, newIndex);
 		} catch (Exception ex) {
 			return ValidationStatus
-					.error(
-							BindingMessages
-									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+					.error(BindingMessages
+							.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
 							ex);
 		}
 		return Status.OK_STATUS;
@@ -298,15 +303,14 @@ public class UpdateListStrategy extends UpdateStrategy {
 	 * @return a status
 	 * @since 1.2
 	 */
-	protected IStatus doReplace(IObservableList observableList, int index,
-			Object element) {
+	protected IStatus doReplace(IObservableList<D> observableList, int index,
+			D element) {
 		try {
 			observableList.set(index, element);
 		} catch (Exception ex) {
 			return ValidationStatus
-					.error(
-							BindingMessages
-									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+					.error(BindingMessages
+							.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
 							ex);
 		}
 		return Status.OK_STATUS;

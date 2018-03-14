@@ -26,21 +26,22 @@ import com.ibm.icu.text.NumberFormat;
  *
  * @since 1.0
  */
-public class NumberToStringConverter extends Converter {
+public class NumberToStringConverter extends Converter<Number, String> {
 	private final NumberFormat numberFormat;
-	private final Class fromType;
+	private final Class<?> fromType;
 	private boolean fromTypeFitsLong;
 	private boolean fromTypeIsDecimalType;
 	private boolean fromTypeIsBigInteger;
 	private boolean fromTypeIsBigDecimal;
 
-	static Class icuBigDecimal = null;
-	static Constructor icuBigDecimalCtr = null;
+	static Class<?> icuBigDecimal = null;
+	static Constructor<?> icuBigDecimalCtr = null;
 
 	{
 		/*
 		 * If the full ICU4J library is available, we use the ICU BigDecimal
-		 * class to support proper formatting and parsing of java.math.BigDecimal.
+		 * class to support proper formatting and parsing of
+		 * java.math.BigDecimal.
 		 *
 		 * The version of ICU NumberFormat (DecimalFormat) included in eclipse excludes
 		 * support for java.math.BigDecimal, and if used falls back to converting as
@@ -50,11 +51,12 @@ public class NumberToStringConverter extends Converter {
 		 */
 		try {
 			icuBigDecimal = Class.forName("com.ibm.icu.math.BigDecimal"); //$NON-NLS-1$
-			icuBigDecimalCtr = icuBigDecimal.getConstructor(new Class[] {BigInteger.class, int.class});
-//			System.out.println("DEBUG: Full ICU4J support state: icuBigDecimal="+(icuBigDecimal != null)+", icuBigDecimalCtr="+(icuBigDecimalCtr != null)); //$NON-NLS-1$ //$NON-NLS-2$
+			icuBigDecimalCtr = icuBigDecimal.getConstructor(new Class[] {
+					BigInteger.class, int.class });
+			//			System.out.println("DEBUG: Full ICU4J support state: icuBigDecimal="+(icuBigDecimal != null)+", icuBigDecimalCtr="+(icuBigDecimalCtr != null)); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (ClassNotFoundException e) {
+		} catch (NoSuchMethodException e) {
 		}
-		catch(ClassNotFoundException e) {}
-		catch(NoSuchMethodException e) {}
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class NumberToStringConverter extends Converter {
 	 * @param numberFormat
 	 * @param fromType
 	 */
-	private NumberToStringConverter(NumberFormat numberFormat, Class fromType) {
+	private NumberToStringConverter(NumberFormat numberFormat, Class<?> fromType) {
 		super(fromType, String.class);
 
 		this.numberFormat = numberFormat;
@@ -94,19 +96,19 @@ public class NumberToStringConverter extends Converter {
 	 * <code>fromObject</code> of <code>null</code> will be converted to an
 	 * empty string.
 	 *
-	 * @param fromObject
+	 * @param number
 	 *            value to convert. May be <code>null</code> if the converter
 	 *            was constructed for a non primitive type.
 	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 * @since 1.5
 	 */
 	@Override
-	public Object convert(Object fromObject) {
+	public String convert(Number number) {
 		// Null is allowed when the type is not primitve.
-		if (fromObject == null && !fromType.isPrimitive()) {
+		if (number == null && !fromType.isPrimitive()) {
 			return ""; //$NON-NLS-1$
 		}
 
-		Number number = (Number) fromObject;
 		String result = null;
 		if (fromTypeFitsLong) {
 			synchronized (numberFormat) {
@@ -121,19 +123,24 @@ public class NumberToStringConverter extends Converter {
 				result = numberFormat.format((BigInteger) number);
 			}
 		} else if (fromTypeIsBigDecimal) {
-			if(icuBigDecimal != null && icuBigDecimalCtr != null && numberFormat instanceof DecimalFormat) {
-				// Full ICU4J present. Convert java.math.BigDecimal to ICU BigDecimal to format. Bug #180392.
-				BigDecimal o = (BigDecimal) fromObject;
+			if (icuBigDecimal != null && icuBigDecimalCtr != null
+					&& numberFormat instanceof DecimalFormat) {
+				// Full ICU4J present. Convert java.math.BigDecimal to ICU
+				// BigDecimal to format. Bug #180392.
+				BigDecimal o = (BigDecimal) number;
 				try {
-					fromObject = icuBigDecimalCtr.newInstance(new Object[] {o.unscaledValue(), new Integer(o.scale())});
+					number = (Number) icuBigDecimalCtr
+							.newInstance(new Object[] {
+							o.unscaledValue(), new Integer(o.scale()) });
+				} catch (InstantiationException e) {
+				} catch (InvocationTargetException e) {
+				} catch (IllegalAccessException e) {
 				}
-				catch(InstantiationException e) {}
-				catch(InvocationTargetException e) {}
-				catch(IllegalAccessException e) {}
-				// Otherwise, replacement plugin present and supports java.math.BigDecimal.
+				// Otherwise, replacement plugin present and supports
+				// java.math.BigDecimal.
 			}
 			synchronized (numberFormat) {
-				result = numberFormat.format(fromObject);
+				result = numberFormat.format(number);
 			}
 		}
 
@@ -271,8 +278,8 @@ public class NumberToStringConverter extends Converter {
 	 * @return Short converter with the provided numberFormat
 	 * @since 1.2
 	 */
-	public static NumberToStringConverter fromShort(
-			NumberFormat numberFormat, boolean primitive) {
+	public static NumberToStringConverter fromShort(NumberFormat numberFormat,
+			boolean primitive) {
 		return new NumberToStringConverter(numberFormat,
 				(primitive) ? Short.TYPE : Short.class);
 	}
@@ -293,8 +300,8 @@ public class NumberToStringConverter extends Converter {
 	 * @return Byte converter with the provided numberFormat
 	 * @since 1.2
 	 */
-	public static NumberToStringConverter fromByte(
-			NumberFormat numberFormat, boolean primitive) {
+	public static NumberToStringConverter fromByte(NumberFormat numberFormat,
+			boolean primitive) {
 		return new NumberToStringConverter(numberFormat,
 				(primitive) ? Byte.TYPE : Byte.class);
 	}
