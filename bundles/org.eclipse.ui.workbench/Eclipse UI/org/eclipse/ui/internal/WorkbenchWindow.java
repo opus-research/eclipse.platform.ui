@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,8 @@
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431446, 433979, 440810, 441184
+ *     Denis Zygann <d.zygann@web.de> - Bug 457390
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -114,6 +116,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
@@ -210,6 +213,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
+
+	private static final String PERSISTED_STATE_RESTORED = "isRestored"; //$NON-NLS-1$
 
 	@Inject
 	private IWorkbench workbench;
@@ -526,9 +531,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					Object object = dirtyPart.getObject();
 					if (object instanceof CompatibilityPart) {
 						IWorkbenchPart part = ((CompatibilityPart) object).getPart();
-						if (part instanceof ISaveablePart) {
-							if (!((ISaveablePart) part).isSaveOnCloseNeeded())
+						ISaveablePart saveable = SaveableHelper.getSaveable(part);
+						if (saveable != null) {
+							if (!saveable.isSaveOnCloseNeeded()) {
 								return Save.NO;
+							}
 							return SaveableHelper.savePart((ISaveablePart) part, part,
 									WorkbenchWindow.this, true) ? Save.NO : Save.CANCEL;
 						}
@@ -751,6 +758,19 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 						false);
 				PrefUtil.saveAPIPrefs();
 			}
+
+			if (Boolean.valueOf(getModel().getPersistedState().get(PERSISTED_STATE_RESTORED))) {
+				SafeRunnable.run(new SafeRunnable() {
+
+					@Override
+					public void run() throws Exception {
+						getWindowAdvisor().postWindowRestore();
+					}
+				});
+			} else {
+				getModel().getPersistedState().put(PERSISTED_STATE_RESTORED, Boolean.TRUE.toString());
+			}
+
 			getWindowAdvisor().postWindowCreate();
 			getWindowAdvisor().openIntro();
 
@@ -1344,8 +1364,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private boolean coolBarVisible = true;
 
 	private boolean perspectiveBarVisible = true;
-
-	private boolean fastViewBarVisible = true;
 
 	private boolean statusLineVisible = true;
 
@@ -2646,33 +2664,32 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	}
 
 	/**
-	 * Tell the workbench window a visible state for the fastview bar. This is
-	 * only applicable if the window configurer also wishes the fast view bar to
-	 * be visible.
-	 *
-	 * @param visible
-	 *            <code>true</code> or <code>false</code>
-	 * @since 3.2
-	 */
-	public void setFastViewBarVisible(boolean visible) {
-		boolean oldValue = fastViewBarVisible;
-		fastViewBarVisible = visible;
-		if (oldValue != fastViewBarVisible) {
+     * Tell the workbench window a visible state for the fastview bar. This is
+     * only applicable if the window configurer also wishes the fast view bar to
+     * be visible.
+     *
+     * @param visible
+     *            <code>true</code> or <code>false</code>
+     * @since 3.2
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public void setFastViewBarVisible(boolean visible) {
+        // not supported anymore
+    }
 
-		}
-	}
-
-	/**
-	 * The workbench window take on the fastview bar. This is only applicable if
-	 * the window configurer also wishes the fast view bar to be visible.
+     /**
+	 * Returns the visible state for the fastview bar of the workbench window.
 	 *
-	 * @return <code>true</code> if the workbench window thinks the fastview bar
-	 *         should be visible.
+	 * @return <code>false</code>
 	 * @since 3.2
+	 * @deprecated discontinued support for fast views
 	 */
-	public boolean getFastViewBarVisible() {
-		return fastViewBarVisible;
-	}
+    @Deprecated
+    public boolean getFastViewBarVisible() {
+        // not supported anymore
+        return false;
+    }
 
 	/**
 	 * @param visible
@@ -2703,9 +2720,14 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		return statusLineVisible;
 	}
 
-	public boolean getShowFastViewBars() {
-		return getWindowConfigurer().getShowFastViewBars();
-	}
+    /**
+     * @return <code>false</code>
+     * @deprecated discontinued support for fast views
+     */
+    @Deprecated
+    public boolean getShowFastViewBars() {
+        return false;
+    }
 
 	protected boolean showTopSeperator() {
 		return false;
@@ -2857,7 +2879,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			setPerspectiveBarVisible(!perspectivebarVisible);
 		}
 		ICommandService commandService = (ICommandService) getService(ICommandService.class);
-		Map filter = new HashMap();
+		Map<String, WorkbenchWindow> filter = new HashMap<String, WorkbenchWindow>();
 		filter.put(IServiceScopes.WINDOW_SCOPE, this);
 		commandService.refreshElements(COMMAND_ID_TOGGLE_COOLBAR, filter);
 	}

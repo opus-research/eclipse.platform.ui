@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,14 +22,14 @@ import org.eclipse.core.commands.common.EventManager;
  * changes. Subclasses can also override {@link AbstractHandler#isEnabled()} and
  * {@link AbstractHandler#isHandled()}.
  * </p>
- * 
+ *
  * @since 3.1
  */
 public abstract class AbstractHandler extends EventManager implements IHandler2 {
 
 	/**
 	 * Track this base class enabled state.
-	 * 
+	 *
 	 * @since 3.4
 	 */
 	private boolean baseEnabled = true;
@@ -37,6 +37,7 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	/**
 	 * @see IHandler#addHandlerListener(IHandlerListener)
 	 */
+	@Override
 	public void addHandlerListener(final IHandlerListener handlerListener) {
 		addListenerObject(handlerListener);
 	}
@@ -44,9 +45,10 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	/**
 	 * The default implementation does nothing. Subclasses who attach listeners
 	 * to other objects are encouraged to detach them in this method.
-	 * 
+	 *
 	 * @see org.eclipse.core.commands.IHandler#dispose()
 	 */
+	@Override
 	public void dispose() {
 		// Do nothing.
 	}
@@ -62,7 +64,7 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	 * overriding this behaviour. If this method is overridden, then the first
 	 * line of the method should be "<code>super.fireHandlerChanged(handlerEvent);</code>".
 	 * </p>
-	 * 
+	 *
 	 * @param handlerEvent
 	 *            the event describing changes to this instance. Must not be
 	 *            <code>null</code>.
@@ -84,11 +86,12 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	 * override this method. If clients override this method they should also
 	 * consider overriding {@link #setEnabled(Object)} so they can be notified
 	 * about framework execution contexts.
-	 * 
+	 *
 	 * @return <code>true</code>
 	 * @see #setEnabled(Object)
 	 * @see #setBaseEnabled(boolean)
 	 */
+	@Override
 	public boolean isEnabled() {
 		return baseEnabled;
 	}
@@ -98,7 +101,7 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	 * will fire a HandlerEvent if necessary. If clients use this method they
 	 * should also consider overriding {@link #setEnabled(Object)} so they can
 	 * be notified about framework execution contexts.
-	 * 
+	 *
 	 * @param state
 	 *            the enabled state
 	 * @since 3.4
@@ -116,21 +119,23 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	 * by extracting the same information available at execution time. Clients
 	 * may override if they need to extract information from the application
 	 * context.
-	 * 
+	 *
 	 * @param evaluationContext
 	 *            the application context. May be <code>null</code>
 	 * @since 3.4
 	 * @see #setBaseEnabled(boolean)
 	 */
+	@Override
 	public void setEnabled(Object evaluationContext) {
 	}
 
 	/**
 	 * Whether this handler is capable of handling delegated responsibilities at
 	 * this time. Subclasses may override this method.
-	 * 
+	 *
 	 * @return <code>true</code>
 	 */
+	@Override
 	public boolean isHandled() {
 		return true;
 	}
@@ -148,7 +153,7 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	 * overriding this behaviour. If this method is overridden, then the return
 	 * value should include "<code>super.hasListeners() ||</code>".
 	 * </p>
-	 * 
+	 *
 	 * @return true iff there is one or more IHandlerListeners attached to this
 	 *         AbstractHandler
 	 */
@@ -159,6 +164,7 @@ public abstract class AbstractHandler extends EventManager implements IHandler2 
 	/**
 	 * @see IHandler#removeHandlerListener(IHandlerListener)
 	 */
+	@Override
 	public void removeHandlerListener(final IHandlerListener handlerListener) {
 		removeListenerObject(handlerListener);
 	}
