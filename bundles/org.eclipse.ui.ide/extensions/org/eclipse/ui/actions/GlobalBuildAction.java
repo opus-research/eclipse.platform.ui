@@ -177,6 +177,8 @@ public class GlobalBuildAction extends Action implements
 					ResourcesPlugin.getWorkspace().build(buildType, subMonitor.newChild(100));
                 } catch (CoreException e) {
                     return e.getStatus();
+                } finally {
+                    monitor.done();
                 }
                 return Status.OK_STATUS;
             }
