@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2016 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,6 +57,7 @@ import org.eclipse.e4.ui.workbench.modeling.IWindowCloseHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -73,6 +74,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
@@ -82,6 +84,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.osgi.service.event.Event;
@@ -120,9 +123,15 @@ public class WBWRenderer extends SWTPartRenderer {
 	Logger logger;
 
 	@Inject
+	private IEclipseContext context;
+
+	@Inject
 	private IPresentationEngine engine;
 
 	private ThemeDefinitionChangedHandler themeDefinitionChanged;
+
+	@Inject
+	private EModelService modelService;
 
 	@Inject
 	private Display display;
@@ -280,14 +289,8 @@ public class WBWRenderer extends SWTPartRenderer {
 	}
 
 	@PostConstruct
-	protected void init(MApplication application) {
+	protected void init() {
 		themeDefinitionChanged = new ThemeDefinitionChangedHandler();
-
-		// install the application global handler (can be overruled in a child
-		// context if needed, or globally changed via the UI event
-		// UILifeCycle.APP_STARTUP_COMPLETE)
-		installSaveHandler(application);
-		installCloseHandler(application);
 	}
 
 	@Override
@@ -358,11 +361,11 @@ public class WBWRenderer extends SWTPartRenderer {
 			}
 		}
 		// Force the shell onto the display if it would be invisible otherwise
-		Rectangle displayBounds = Display.getCurrent().getBounds();
+		Display display = Display.getCurrent();
+		Monitor closestMonitor = getClosestMonitor(display, Geometry.centerPoint(modelBounds));
+		Rectangle displayBounds = closestMonitor.getClientArea();
 		if (!modelBounds.intersects(displayBounds)) {
-			Rectangle clientArea = Display.getCurrent().getClientArea();
-			modelBounds.x = clientArea.x;
-			modelBounds.y = clientArea.y;
+			Geometry.moveInside(modelBounds, displayBounds);
 		}
 		wbwShell.setBounds(modelBounds);
 
@@ -386,12 +389,46 @@ public class WBWRenderer extends SWTPartRenderer {
 		// Add the shell into the WBW's context
 		localContext.set(Shell.class, wbwShell);
 		localContext.set(E4Workbench.LOCAL_ACTIVE_SHELL, wbwShell);
+		setCloseHandler(wbwModel);
 		localContext.set(IShellProvider.class, new IShellProvider() {
 			@Override
 			public Shell getShell() {
 				return wbwShell;
 			}
 		});
+		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
+			@Override
+			public Save promptToSave(MPart dirtyPart) {
+				Shell shell = (Shell) context
+						.get(IServiceConstants.ACTIVE_SHELL);
+				Object[] elements = promptForSave(shell,
+						Collections.singleton(dirtyPart));
+				if (elements == null) {
+					return Save.CANCEL;
+				}
+				return elements.length == 0 ? Save.NO : Save.YES;
+			}
+
+			@Override
+			public Save[] promptToSave(Collection<MPart> dirtyParts) {
+				List<MPart> parts = new ArrayList<>(dirtyParts);
+				Shell shell = (Shell) context
+						.get(IServiceConstants.ACTIVE_SHELL);
+				Save[] response = new Save[dirtyParts.size()];
+				Object[] elements = promptForSave(shell, parts);
+				if (elements == null) {
+					Arrays.fill(response, Save.CANCEL);
+				} else {
+					Arrays.fill(response, Save.NO);
+					for (int i = 0; i < elements.length; i++) {
+						response[parts.indexOf(elements[i])] = Save.YES;
+					}
+				}
+				return response;
+			}
+		};
+		saveHandler.logger = logger;
+		localContext.set(ISaveHandler.class, saveHandler);
 
 		if (wbwModel.getLabel() != null)
 			wbwShell.setText(wbwModel.getLocalizedLabel());
@@ -408,54 +445,67 @@ public class WBWRenderer extends SWTPartRenderer {
 		return newWidget;
 	}
 
-	void installSaveHandler(final MApplication application) {
-		final PartServiceSaveHandler saveHandler = new PartServiceSaveHandler() {
-			@Override
-			public Save promptToSave(MPart dirtyPart) {
-				Shell shell = (Shell) dirtyPart.getContext().get(IServiceConstants.ACTIVE_SHELL);
-				Object[] elements = promptForSave(shell, Collections.singleton(dirtyPart));
-				if (elements == null) {
-					return Save.CANCEL;
-				}
-				return elements.length == 0 ? Save.NO : Save.YES;
+	/**
+	 * TODO: Create an API for this method and delete this version. See bug
+	 * 491273
+	 *
+	 * Returns the monitor whose client area contains the given point. If no
+	 * monitor contains the point, returns the monitor that is closest to the
+	 * point. If this is ever made public, it should be moved into a separate
+	 * utility class.
+	 *
+	 * @param toSearch
+	 *            point to find (display coordinates)
+	 * @param toFind
+	 *            point to find (display coordinates)
+	 * @return the montor closest to the given point
+	 */
+	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
+		int closest = Integer.MAX_VALUE;
+
+		Monitor[] monitors = toSearch.getMonitors();
+		Monitor result = monitors[0];
+
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
+			Rectangle clientArea = current.getClientArea();
+
+			if (clientArea.contains(toFind)) {
+				return current;
 			}
 
-			@Override
-			public Save[] promptToSave(Collection<MPart> dirtyParts) {
-				List<MPart> parts = new ArrayList<>(dirtyParts);
-				Shell shell = (Shell) application.getContext().get(IServiceConstants.ACTIVE_SHELL);
-				Save[] response = new Save[dirtyParts.size()];
-				Object[] elements = promptForSave(shell, parts);
-				if (elements == null) {
-					Arrays.fill(response, Save.CANCEL);
-				} else {
-					Arrays.fill(response, Save.NO);
-					for (int i = 0; i < elements.length; i++) {
-						response[parts.indexOf(elements[i])] = Save.YES;
-					}
-				}
-				return response;
+			int distance = Geometry.distanceSquared(Geometry.centerPoint(clientArea), toFind);
+			if (distance < closest) {
+				closest = distance;
+				result = current;
 			}
-		};
-		saveHandler.logger = logger;
-		application.getContext().set(ISaveHandler.class, saveHandler);
+		}
+
+		return result;
 	}
 
-	void installCloseHandler(MApplication application) {
-		IEclipseContext context = application.getContext();
-		context.set(IWindowCloseHandler.class, new IWindowCloseHandler() {
-
-			@Override
-			public boolean close(MWindow window) {
-				if (window.getParent() == null) {
-					// no direct model parent, must be a detached window
-					return closeDetachedWindow(window);
-				}
-
-				EPartService partService = window.getContext().get(EPartService.class);
-				return partService.saveAll(true);
-			}
-		});
+	private void setCloseHandler(MWindow window) {
+		IEclipseContext context = window.getContext();
+		// no direct model parent, must be a detached window
+		if (window.getParent() == null) {
+			context.set(IWindowCloseHandler.class,
+					new IWindowCloseHandler() {
+						@Override
+						public boolean close(MWindow window) {
+							return closeDetachedWindow(window);
+						}
+					});
+		} else {
+			context.set(IWindowCloseHandler.class,
+					new IWindowCloseHandler() {
+						@Override
+						public boolean close(MWindow window) {
+							EPartService partService = window.getContext().get(EPartService.class);
+							return partService.saveAll(true);
+						}
+					});
+		}
 	}
 
 	@Override
@@ -742,8 +792,7 @@ public class WBWRenderer extends SWTPartRenderer {
 			label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			label.setText(SWTRenderersMessages.choosePartsToSave);
 
-			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE
-					| SWT.BORDER);
+			tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.SINGLE | SWT.BORDER);
 			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 			data.heightHint = 250;
 			data.widthHint = 300;
