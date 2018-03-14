@@ -283,7 +283,8 @@ public class Snippet021MultiFieldValidation extends WizardPage {
 		removeAddendButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				IStructuredSelection selection = addendsTarget.getStructuredSelection();
+				IStructuredSelection selection = (IStructuredSelection) addendsTarget
+						.getSelection();
 				if (!selection.isEmpty())
 					targetAddends.remove(selection.getFirstElement());
 			}

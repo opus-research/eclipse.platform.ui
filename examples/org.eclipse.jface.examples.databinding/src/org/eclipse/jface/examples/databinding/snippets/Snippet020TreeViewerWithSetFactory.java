@@ -252,7 +252,8 @@ public class Snippet020TreeViewerWithSetFactory {
 	}
 
 	private Bean getSelectedBean() {
-		IStructuredSelection selection = beanViewer.getStructuredSelection();
+		IStructuredSelection selection = (IStructuredSelection) beanViewer
+				.getSelection();
 		if (selection.isEmpty())
 			return null;
 		return (Bean) selection.getFirstElement();

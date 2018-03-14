@@ -325,7 +325,8 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 			removePersonButton.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					IStructuredSelection selected = peopleViewer.getStructuredSelection();
+					IStructuredSelection selected = (IStructuredSelection) peopleViewer
+							.getSelection();
 					if (selected.isEmpty())
 						return;
 					Person person = (Person) selected.getFirstElement();
