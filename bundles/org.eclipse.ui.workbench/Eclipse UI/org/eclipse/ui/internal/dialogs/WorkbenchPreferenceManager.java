@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,9 @@
 package org.eclipse.ui.internal.dialogs;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -23,6 +25,10 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.ui.PlatformUI;
@@ -31,6 +37,8 @@ import org.eclipse.ui.internal.misc.StatusUtil;
 import org.eclipse.ui.internal.preferences.WorkbenchPreferenceExpressionNode;
 import org.eclipse.ui.internal.registry.IWorkbenchRegistryConstants;
 import org.eclipse.ui.internal.registry.PreferencePageRegistryReader;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 
 /**
  * The WorkbenchPreferenceManager is the manager that can handle categories and
@@ -38,6 +46,9 @@ import org.eclipse.ui.internal.registry.PreferencePageRegistryReader;
  */
 public class WorkbenchPreferenceManager extends PreferenceManager implements
 		IExtensionChangeHandler {
+	private IEventBroker eventBroker;
+
+	private CSSThemeChangedHandler cssThemeChangedHandler;
 
 	/**
 	 * Create a new instance of the receiver with the specified seperatorChar
@@ -72,6 +83,19 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 						}
 					}
 				});
+
+		eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+		if (eventBroker != null) {
+			cssThemeChangedHandler = new CSSThemeChangedHandler(this);
+			eventBroker.subscribe(IThemeEngine.Events.THEME_CHANGED, cssThemeChangedHandler);
+		}
+	}
+
+	public void dispose() {
+		if (eventBroker != null) {
+			eventBroker.unsubscribe(cssThemeChangedHandler);
+			cssThemeChangedHandler.dispose();
+		}
 	}
 
 	/**
@@ -204,5 +228,64 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 			}
 		}
 		return false;
+	}
+
+	private static class CSSThemeChangedHandler implements EventHandler {
+		private PreferenceManager preferenceManager;
+		private Map<String, IEclipsePreferences> overriddenPrefNamesToPrefs = new HashMap<String, IEclipsePreferences>();
+
+		public CSSThemeChangedHandler(PreferenceManager preferenceManager) {
+			this.preferenceManager = preferenceManager;
+		}
+
+		@Override
+		public void handleEvent(Event event) {
+			resetOverriddenPreferencies();
+			IThemeEngine themeEngine = (IThemeEngine) event.getProperty(IThemeEngine.Events.THEME_ENGINE);
+			overridePreferences(preferenceManager.getRootSubNodes(), themeEngine);
+		}
+
+		public void dispose() {
+			resetOverriddenPreferencies();
+		}
+
+		private void overridePreferences(IPreferenceNode[] nodes, IThemeEngine themeEngine) {
+			for (IPreferenceNode node : nodes) {
+				if (node instanceof WorkbenchPreferenceNode) {
+					WorkbenchPreferenceNode wpNode = (WorkbenchPreferenceNode) node;
+					PreferenceNode nodeOverridable = new PreferenceNode(wpNode.getPluginId());
+
+					themeEngine.applyStyles(nodeOverridable, false);
+					overridePreferences(wpNode, nodeOverridable.getOverriddenPreferences());
+				}
+			}
+		}
+
+		private void overridePreferences(WorkbenchPreferenceNode node,
+				Map<String, String> toOverride) {
+			if (toOverride.isEmpty()) {
+				return;
+			}
+
+			IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(node.getPluginId());
+			for (Map.Entry<String, String> entry : toOverride.entrySet()) {
+				String existingValue = preferences.get(entry.getKey(), null);
+
+				// Override the pref when it isn't overridden by the user or it
+				// wasn't reset during closing the Workbench (i.e. after crash)
+				if (existingValue == null || existingValue.equals(entry.getValue())) {
+					overriddenPrefNamesToPrefs.put(entry.getKey(), preferences);
+					preferences.put(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+
+		private void resetOverriddenPreferencies() {
+			for (Map.Entry<String, IEclipsePreferences> entry : overriddenPrefNamesToPrefs
+					.entrySet()) {
+				entry.getValue().remove(entry.getKey());
+			}
+			overriddenPrefNamesToPrefs.clear();
+		}
 	}
 }
