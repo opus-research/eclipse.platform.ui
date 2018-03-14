@@ -10,8 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.layout;
 
+import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.swt.SWT;
 
 /**
@@ -63,7 +63,9 @@ public interface ITrimManager {
 	 * @see #getAreaIds()
 	 * @see #addTrim(int, IWindowTrim, IWindowTrim)
 	 */
-	public void addTrim(int areaId, IWindowTrim trim);
+	default public void addTrim(int areaId, IWindowTrim trim) {
+		addTrim(areaId, trim, null);
+	}
 
 	/**
 	 * Adds the given control to the layout's trim. Note that this must be
@@ -114,7 +116,9 @@ public interface ITrimManager {
 	 *         currently support SWT.TOP, SWT.BOTTOM, SWT.LEFT, and SWT.RIGHT.
 	 * @since 3.2
 	 */
-	public int[] getAreaIds();
+	default public int[] getAreaIds() {
+		return new int[] { ITrimManager.BOTTOM, ITrimManager.LEFT, ITrimManager.RIGHT, ITrimManager.TOP };
+	}
 
 	/**
 	 * Return a copy of the IWindowTrim in an ordered array. This will not
@@ -127,11 +131,11 @@ public interface ITrimManager {
 	 * @since 3.2
 	 * @see #getAreaIds()
 	 */
-	public List getAreaTrim(int areaId);
+	public List<IWindowTrim> getAreaTrim(int areaId);
 
 	/**
 	 * Update ID's area description with the new window trim ordering. This
-	 * applies the IWindowTrim contains in the array to the trim area named
+	 * applies the IWindowTrim contained in the array to the trim area named
 	 * "ID".
 	 *
 	 * @param id
@@ -146,7 +150,7 @@ public interface ITrimManager {
 	 * @since 3.2
 	 * @see #getAreaIds()
 	 */
-	public void updateAreaTrim(int id, List trim, boolean removeExtra);
+	public void updateAreaTrim(int areaId, List<? extends IWindowTrim> trim, boolean removeExtra);
 
 	/**
 	 * This method returns an aggregate array of all trim items known to this
@@ -155,7 +159,13 @@ public interface ITrimManager {
 	 * @return The List of all IWindowTrim elements
 	 * @since 3.2
 	 */
-	public List getAllTrim();
+	default public List<IWindowTrim> getAllTrim() {
+		ArrayList<IWindowTrim> allTrim = new ArrayList<>();
+		for (int areaId : getAreaIds()) {
+			allTrim.addAll(getAreaTrim(areaId));
+		}
+		return allTrim;
+	}
 
 	/**
 	 * Update the visibility of the trim controls. It updates any docking

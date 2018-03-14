@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.eclipse.core.commands.IHandler;
@@ -2737,48 +2738,98 @@ STATUS_LINE_ID, model);
 
 	public ITrimManager getTrimManager() {
 		if (trimManager == null) {
-			// HACK !! Add a 'null' trim manager...this is specifically in place
-			// to prevent an NPE when using Intro's 'Go to Workbench' handling
-			// See Bug 365625 for details...
+			/*
+			 * A trim manager intended solely to support Intro's
+			 * "Go To Workbench" launchbar. See Bug 365625 for details...
+			 */
 			trimManager = new ITrimManager() {
-				@Override
-				public void addTrim(int areaId, IWindowTrim trim) {
-				}
+				private Map<IWindowTrim, MToolControl> created = new HashMap<>();
 
 				@Override
 				public void addTrim(int areaId, IWindowTrim trim, IWindowTrim beforeMe) {
+					MTrimBar trimBar = findBar(areaId);
+					int index = -1;
+					MToolControl beforeControl = created.get(beforeMe);
+					if (beforeMe != null && beforeControl != null) {
+						index = trimBar.getChildren().indexOf(beforeControl);
+					}
+					// Must handle case where trim already present: move into
+					// new position
+					MToolControl trimControl = created.get(trim);
+					if (trimControl == null) {
+						trimControl = modelService.createModelElement(MToolControl.class);
+						trimControl.setElementId(trim.getId());
+						trimControl.getTransientData().put(IWindowTrim.class.getName(), trim);
+						trimControl.setContributionURI(CompatiblityWindowTrimControl.BUNDLECLASS_URI);
+						// Cannot be marked as draggable as the IWindowTrims are
+						// already rendered and provide no way to be re-rendered
+						// XXXtrimControl.getTags().add(IPresentationEngine.DRAGGABLE);
+						created.put(trim, trimControl);
+					}
+					if (index > 0) {
+						trimBar.getChildren().add(index, trimControl);
+					} else {
+						trimBar.getChildren().add(trimControl);
+					}
+				}
+
+				private MTrimBar findBar(int areaId) {
+					switch (areaId) {
+					case ITrimManager.TOP:
+						return getTopTrim();
+					case ITrimManager.LEFT:
+						return modelService.getTrim(model, SideValue.LEFT);
+					case ITrimManager.RIGHT:
+						return modelService.getTrim(model, SideValue.RIGHT);
+					case ITrimManager.BOTTOM:
+					default:
+						return modelService.getTrim(model, SideValue.BOTTOM);
+					}
 				}
 
 				@Override
 				public void removeTrim(IWindowTrim toRemove) {
+					MToolControl trimControl = created.remove(toRemove);
+					if (trimControl != null && trimControl.getParent() != null) {
+						trimControl.getParent().getChildren().remove(trimControl);
+					}
 				}
 
 				@Override
 				public IWindowTrim getTrim(String id) {
-					return null;
+					return created.keySet().stream().filter(t -> id.equals(t.getId())).findFirst().orElse(null);
 				}
 
 				@Override
-				public int[] getAreaIds() {
-					return null;
+				public List<IWindowTrim> getAreaTrim(int areaId) {
+					return findBar(areaId).getChildren().stream()
+							.filter(c -> c instanceof MToolControl
+									&& ((MToolControl) c).getObject() instanceof IWindowTrim)
+							.map(c -> (IWindowTrim) ((MToolControl) c).getObject()).collect(Collectors.toList());
 				}
 
 				@Override
-				public List getAreaTrim(int areaId) {
-					return null;
-				}
-
-				@Override
-				public void updateAreaTrim(int id, List trim, boolean removeExtra) {
-				}
-
-				@Override
-				public List getAllTrim() {
-					return null;
+				public void updateAreaTrim(int areaId, List<? extends IWindowTrim> trim, boolean removeExtra) {
+					if (removeExtra) {
+						List<IWindowTrim> existingTrim = getAreaTrim(areaId);
+						for (IWindowTrim t : existingTrim) {
+							if (!existingTrim.contains(t)) {
+								removeTrim(t);
+							}
+						}
+					}
+					addTrim(areaId, trim.get(0));
+					for (int i = 1; i < trim.size(); i++) {
+						addTrim(areaId, trim.get(i), trim.get(i - 1));
+					}
 				}
 
 				@Override
 				public void setTrimVisible(IWindowTrim trim, boolean visible) {
+					MToolControl trimControl = created.get(trim);
+					if (trimControl != null) {
+						trimControl.setVisible(visible);
+					}
 				}
 
 				@Override
