@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
@@ -13,11 +13,8 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -76,10 +73,13 @@ import org.osgi.service.event.EventHandler;
 /**
  * Create a contribute part.
  */
-public class ToolBarManagerRenderer extends SWTPartRenderer {
+public class ToolBarManagerRenderer
+extends
+ContributionManagerRenderer<MToolBar, MToolBarElement, ToolBarManager, ToolBarContributionRecord> {
 
 	private static final Selector ALL_SELECTOR = new Selector() {
 
+		@Override
 		public boolean select(MApplicationElement element) {
 			return true;
 		}
@@ -89,16 +89,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public static final String POST_PROCESSING_DISPOSE = "ToolBarManagerRenderer.postProcess.dispose"; //$NON-NLS-1$
 	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
 
-	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
-	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
-
-	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<MToolBarElement, IContributionItem>();
-	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<IContributionItem, MToolBarElement>();
-
-	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
-
-	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
-
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
 	// @Inject
@@ -107,9 +97,8 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	private MApplication application;
 
-	@Inject
-	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -138,6 +127,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -165,8 +155,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 						}
 					}
 				} else {
-					IContributionItem ici = modelToContribution
-							.remove(itemModel);
+					IContributionItem ici = getContribution(itemModel);
 					if (ici != null && parent != null) {
 						parent.remove(ici);
 					}
@@ -205,6 +194,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -220,6 +210,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -235,6 +226,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler childAdditionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBar))
@@ -270,6 +262,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			} else {
 				s = new Selector() {
 
+					@Override
 					public boolean select(MApplicationElement element) {
 						return v.equals(element.getElementId());
 					}
@@ -280,13 +273,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		getUpdater().updateContributionItems(s);
 	}
 
+	@Override
 	@PostConstruct
 	public void init() {
+		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
-				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
+		.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
 		eventBroker.subscribe(ElementContainer.TOPIC_CHILDREN,
 				childAdditionUpdater);
 
@@ -314,6 +309,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		context.runAndTrack(enablementUpdater);
 	}
 
+	@Override
 	@PreDestroy
 	public void contextDisposed() {
 		eventBroker.unsubscribe(itemUpdater);
@@ -321,6 +317,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(enabledUpdater);
 		eventBroker.unsubscribe(toBeRenderedUpdater);
 		eventBroker.unsubscribe(childAdditionUpdater);
+		super.contextDisposed();
 	}
 
 	@Override
@@ -348,7 +345,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			CSSRenderingUtils cssUtils = parentContext
 					.get(CSSRenderingUtils.class);
 			if (cssUtils != null) {
-				renderedCtrl = (Composite) cssUtils.frameMeIfPossible(newTB,
+				renderedCtrl = cssUtils.frameMeIfPossible(newTB,
 						null, vertical, true);
 			}
 		}
@@ -425,6 +422,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					record.updateVisibility(parentContext.getActiveLeaf());
 					runExternalCode(new Runnable() {
 
+						@Override
 						public void run() {
 							manager.update(false);
 							getUpdater().updateContributionItems(ALL_SELECTOR);
@@ -473,6 +471,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
 		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
 		bar.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
 			}
@@ -480,14 +479,10 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		return bar;
 	}
 
-	/**
-	 * @param element
-	 */
+	@Override
 	protected void cleanUp(MToolBar toolbarModel) {
-		Collection<ToolBarContributionRecord> vals = modelContributionToRecord
-				.values();
-		for (ToolBarContributionRecord record : vals
-				.toArray(new ToolBarContributionRecord[vals.size()])) {
+		ToolBarContributionRecord record = getContributionRecord(toolbarModel);
+		if (record != null) {
 			if (record.toolbarModel == toolbarModel) {
 				record.dispose();
 				for (MToolBarElement copy : record.generatedElements) {
@@ -498,13 +493,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				}
 				record.generatedElements.clear();
 				record.sharedElements.clear();
+				removeContributionRecord(toolbarModel);
 			}
 		}
 	}
 
 	public void cleanUpCopy(ToolBarContributionRecord record,
 			MToolBarElement copy) {
-		modelContributionToRecord.remove(copy);
+		removeContributionRecord(copy);
 		IContributionItem ici = getContribution(copy);
 		clearModelToContribution(copy, ici);
 		if (ici != null) {
@@ -624,6 +620,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@Override
 	public Object getUIContainer(MUIElement childElement) {
 		Composite intermediate = (Composite) super.getUIContainer(childElement);
 		if (intermediate == null || intermediate.isDisposed()) {
@@ -801,62 +798,12 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	public ToolBarManager getManager(MToolBar model) {
-		return modelToManager.get(model);
-	}
-
 	public MToolBar getToolBarModel(ToolBarManager manager) {
-		return managerToModel.get(manager);
-	}
-
-	public void linkModelToManager(MToolBar model, ToolBarManager manager) {
-		modelToManager.put(model, manager);
-		managerToModel.put(manager, model);
-	}
-
-	public void clearModelToManager(MToolBar model, ToolBarManager manager) {
-		modelToManager.remove(model);
-		managerToModel.remove(manager);
-	}
-
-	public IContributionItem getContribution(MToolBarElement element) {
-		return modelToContribution.get(element);
+		return getModel(manager);
 	}
 
 	public MToolBarElement getToolElement(IContributionItem item) {
-		return contributionToModel.get(item);
-	}
-
-	public void linkModelToContribution(MToolBarElement model,
-			IContributionItem item) {
-		modelToContribution.put(model, item);
-		contributionToModel.put(item, model);
-	}
-
-	public void clearModelToContribution(MToolBarElement model,
-			IContributionItem item) {
-		modelToContribution.remove(model);
-		contributionToModel.remove(item);
-	}
-
-	public ArrayList<ToolBarContributionRecord> getList(MToolBarElement item) {
-		ArrayList<ToolBarContributionRecord> tmp = sharedElementToRecord
-				.get(item);
-		if (tmp == null) {
-			tmp = new ArrayList<ToolBarContributionRecord>();
-			sharedElementToRecord.put(item, tmp);
-		}
-		return tmp;
-	}
-
-	public void linkElementToContributionRecord(MToolBarElement element,
-			ToolBarContributionRecord record) {
-		modelContributionToRecord.put(element, record);
-	}
-
-	public ToolBarContributionRecord getContributionRecord(
-			MToolBarElement element) {
-		return modelContributionToRecord.get(element);
+		return getModelElement(item);
 	}
 
 	public void reconcileManagerToModel(IToolBarManager menuManager,
@@ -905,7 +852,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#postProcess
 	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
@@ -928,6 +875,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
 	}
