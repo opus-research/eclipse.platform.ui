@@ -48,20 +48,17 @@ import org.eclipse.jface.databinding.conformance.util.RealmTester;
 public class AbstractObservableListTest extends TestCase {
 	private AbstractObservableListStub list;
 
-	@Override
 	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 		list = new AbstractObservableListStub();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
 	public void testFireChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.fireChange();
 			}
@@ -70,7 +67,6 @@ public class AbstractObservableListTest extends TestCase {
 
 	public void testFireStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.fireStale();
 			}
@@ -79,7 +75,6 @@ public class AbstractObservableListTest extends TestCase {
 
 	public void testFireListChangeRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.fireListChange(null);
 			}
@@ -94,7 +89,6 @@ public class AbstractObservableListTest extends TestCase {
 
 		final List diffEntries = new ArrayList();
 		list.addListChangeListener(new IListChangeListener() {
-			@Override
 			public void handleListChange(ListChangeEvent event) {
 				diffEntries.addAll(Arrays.asList(event.diff.getDifferences()));
 			}
@@ -131,7 +125,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testAddListChangeListener_AfterDispose() {
 		list.dispose();
 		list.addListChangeListener(new IListChangeListener() {
-			@Override
 			public void handleListChange(ListChangeEvent event) {
 				// do nothing
 			}
@@ -141,7 +134,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testRemoveListChangeListener_AfterDispose() {
 		list.dispose();
 		list.removeListChangeListener(new IListChangeListener() {
-			@Override
 			public void handleListChange(ListChangeEvent event) {
 				// do nothing
 			}
@@ -151,7 +143,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testAddChangeListener_AfterDispose() {
 		list.dispose();
 		list.addChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				// do nothing
 			}
@@ -161,7 +152,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testRemoveChangeListener_AfterDispose() {
 		list.dispose();
 		list.removeChangeListener(new IChangeListener() {
-			@Override
 			public void handleChange(ChangeEvent event) {
 				// do nothing
 			}
@@ -171,7 +161,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testAddStaleListener_AfterDispose() {
 		list.dispose();
 		list.addStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				// do nothing
 			}
@@ -181,7 +170,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testRemoveStaleListener_AfterDispose() {
 		list.dispose();
 		list.removeStaleListener(new IStaleListener() {
-			@Override
 			public void handleStale(StaleEvent staleEvent) {
 				// do nothing
 			}
@@ -191,7 +179,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testAddDisposeListener_AfterDispose() {
 		list.dispose();
 		list.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent event) {
 				// do nothing
 			}
@@ -201,7 +188,6 @@ public class AbstractObservableListTest extends TestCase {
 	public void testRemoveDisposeListener_AfterDispose() {
 		list.dispose();
 		list.removeDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent event) {
 				// do nothing
 			}
@@ -223,7 +209,6 @@ public class AbstractObservableListTest extends TestCase {
 	/* package */static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				final int itemCount) {
 
@@ -237,12 +222,10 @@ public class AbstractObservableListTest extends TestCase {
 			return observable;
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			((AbstractObservableListStub) observable).fireChange();
 		}
@@ -263,38 +246,31 @@ public class AbstractObservableListTest extends TestCase {
 			this.wrappedList = list;
 		}
 
-		@Override
 		protected int doGetSize() {
 			return wrappedList.size();
 		}
 
-		@Override
 		public Object get(int index) {
 			ObservableTracker.getterCalled(this);
 			return wrappedList.get(index);
 		}
 
-		@Override
 		public Object getElementType() {
 			return elementType;
 		}
 
-		@Override
 		protected void fireChange() {
 			super.fireChange();
 		}
 
-		@Override
 		protected void fireStale() {
 			super.fireStale();
 		}
 
-		@Override
 		protected void fireListChange(ListDiff diff) {
 			super.fireListChange(diff);
 		}
 
-		@Override
 		protected synchronized boolean hasListeners() {
 			return super.hasListeners();
 		}
@@ -303,7 +279,6 @@ public class AbstractObservableListTest extends TestCase {
 	static class MutableObservableListStub extends AbstractObservableListStub {
 		// These methods are present so we can test AbstractObservableList.move()
 
-		@Override
 		public void add(int index, Object element) {
 			checkRealm();
 			wrappedList.add(index, element);
@@ -311,7 +286,6 @@ public class AbstractObservableListTest extends TestCase {
 					index, true, element)));
 		}
 
-		@Override
 		public Object remove(int index) {
 			checkRealm();
 			Object element = wrappedList.remove(index);

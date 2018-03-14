@@ -550,6 +550,11 @@ public class MenuPopulationTest extends MenuTestCase {
 		assertEquals("endof.insert", manager.getItems()[3].getId());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.menus.MenuTestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -593,6 +598,11 @@ public class MenuPopulationTest extends MenuTestCase {
 		iconField.setAccessible(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.menus.MenuTestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		menuService.removeContributionFactory(afterOne);

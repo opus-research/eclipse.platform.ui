@@ -112,7 +112,12 @@ public class CreateMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation creates markers
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable info)
@@ -127,7 +132,12 @@ public class CreateMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation deletes markers
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable info)
@@ -142,7 +152,11 @@ public class CreateMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation maps the undo status to the deletion status.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicUndoStatus()
 	 */
 	@Override
 	protected IStatus getBasicUndoStatus() {
@@ -150,7 +164,11 @@ public class CreateMarkersOperation extends AbstractMarkersOperation {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation maps the redo status to the creation status.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractMarkersOperation#getBasicRedoStatus()
 	 */
 	@Override
 	protected IStatus getBasicRedoStatus() {
