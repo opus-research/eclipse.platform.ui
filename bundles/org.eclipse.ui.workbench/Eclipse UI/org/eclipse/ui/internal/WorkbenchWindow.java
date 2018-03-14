@@ -12,7 +12,7 @@
  *     								 removes a menu from multiple perspectives
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431446, 433979, 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -136,6 +136,7 @@ import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbench;
@@ -491,7 +492,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 						Boolean.toString(this.perspectiveBarVisible));
 			}
 
-			IServiceLocatorCreator slc = (IServiceLocatorCreator) workbench
+			IServiceLocatorCreator slc = workbench
 					.getService(IServiceLocatorCreator.class);
 			this.serviceLocator = (ServiceLocator) slc.createServiceLocator(workbench, null,
 					new IDisposable() {
@@ -577,8 +578,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					if (object instanceof CompatibilityPart) {
 						IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
 						if (workbenchPart instanceof ISaveablePart) {
-							ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
-							return page.saveSaveable(saveablePart, workbenchPart, confirm, true);
+							SaveablesList saveablesList = (SaveablesList) PlatformUI.getWorkbench()
+									.getService(ISaveablesLifecycleListener.class);
+							Object saveResult = saveablesList.preCloseParts(
+									Collections.singletonList((ISaveablePart) workbenchPart), true,
+									WorkbenchWindow.this);
+							return saveResult != null;
 						}
 					}
 					return super.save(dirtyPart, confirm);
@@ -599,8 +604,12 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					if (saveables.isEmpty()) {
 						return super.saveParts(dirtyParts, confirm);
 					}
-					return WorkbenchPage.saveAll(saveables, confirm, false, true,
-							WorkbenchWindow.this, WorkbenchWindow.this);
+
+					SaveablesList saveablesList = (SaveablesList) PlatformUI.getWorkbench()
+							.getService(ISaveablesLifecycleListener.class);
+					Object saveResult = saveablesList.preCloseParts(saveables, true,
+							WorkbenchWindow.this);
+					return saveResult != null;
 				}
 			};
 			localSaveHandler.logger = logger;
@@ -1889,7 +1898,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			// clear some lables
 			// Remove the handler submissions. Bug 64024.
 			final IWorkbench workbench = getWorkbench();
-			final IHandlerService handlerService = (IHandlerService) workbench
+			final IHandlerService handlerService = workbench
 					.getService(IHandlerService.class);
 			handlerService.deactivateHandlers(handlerActivations);
 			final Iterator<IHandlerActivation> activationItr = handlerActivations.iterator();
@@ -1901,7 +1910,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			globalActionHandlersByCommandId.clear();
 
 			// Remove the enabled submissions. Bug 64024.
-			final IContextService contextService = (IContextService) workbench
+			final IContextService contextService = workbench
 					.getService(IContextService.class);
 			contextService.unregisterShell(getShell());
 
@@ -2247,7 +2256,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			}
 		}
 		if (changeDetected) {
-			IMenuService ms = (IMenuService) getWorkbench().getService(IMenuService.class);
+			IMenuService ms = getWorkbench().getService(IMenuService.class);
 			if (ms instanceof WorkbenchMenuService) {
 				((WorkbenchMenuService) ms).updateManagers();
 			}
@@ -2856,7 +2865,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		serviceLocator.registerService(LegacyActionPersistence.class, actionPersistence);
 		actionPersistence.read();
 
-		ICommandService cmdService = (ICommandService) workbench.getService(ICommandService.class);
+		ICommandService cmdService = workbench.getService(ICommandService.class);
 		SlaveCommandService slaveCmdService = new SlaveCommandService(cmdService,
 				IServiceScopes.WINDOW_SCOPE, this, model.getContext());
 		serviceLocator.registerService(ICommandService.class, slaveCmdService);
@@ -2866,7 +2875,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				.make(ContextService.class, model.getContext());
 		serviceLocator.registerService(IContextService.class, cxs);
 
-		IMenuService parent = (IMenuService) getWorkbench().getService(IMenuService.class);
+		IMenuService parent = getWorkbench().getService(IMenuService.class);
 		IMenuService msvs = new SlaveMenuService(parent, model);
 		serviceLocator.registerService(IMenuService.class, msvs);
 	}
