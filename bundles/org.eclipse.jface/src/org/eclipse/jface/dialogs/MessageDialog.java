@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -140,7 +140,7 @@ public class MessageDialog extends IconAndMessageDialog {
      * </p>
      *
      * @param parentShell
-     *            the parent shell, or <code>null</code> to create a top-level shell
+     *            the parent shell
      * @param dialogTitle
      *            the dialog title, or <code>null</code> if none
      * @param dialogTitleImage
@@ -198,12 +198,20 @@ public class MessageDialog extends IconAndMessageDialog {
         this.defaultButtonIndex = defaultIndex;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         setReturnCode(buttonId);
         close();
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
+     */
     @Override
 	protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -215,6 +223,9 @@ public class MessageDialog extends IconAndMessageDialog {
 		}
     }
 
+    /*
+     * (non-Javadoc) Method declared on Dialog.
+     */
     @Override
 	protected void createButtonsForButtonBar(Composite parent) {
         buttons = new Button[buttonLabels.length];
@@ -503,6 +514,10 @@ public class MessageDialog extends IconAndMessageDialog {
         return true;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
+     */
     @Override
 	public Image getImage() {
         return image;

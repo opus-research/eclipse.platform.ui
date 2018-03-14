@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.tests.application.UIEventTypesTest;
 import org.eclipse.e4.ui.tests.reconciler.ModelReconcilerTestSuite;
 import org.eclipse.e4.ui.tests.workbench.Bug308317Test;
 import org.eclipse.e4.ui.tests.workbench.ContextTest;
-import org.eclipse.e4.ui.tests.workbench.ExtensionsSortTests;
 import org.eclipse.e4.ui.tests.workbench.HandlerTest;
 import org.eclipse.e4.ui.tests.workbench.InjectionEventTest;
 import org.eclipse.e4.ui.tests.workbench.MMenuItemTest;
@@ -37,7 +36,6 @@ import org.eclipse.e4.ui.tests.workbench.MWindowTest;
 import org.eclipse.e4.ui.tests.workbench.PartFocusTest;
 import org.eclipse.e4.ui.tests.workbench.PartRenderingEngineTests;
 import org.eclipse.e4.ui.tests.workbench.SashRendererTest;
-import org.eclipse.e4.ui.tests.workbench.TopoSortTests;
 import org.eclipse.e4.ui.workbench.renderers.swt.StackRendererTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.TabStateHandlerTest;
 import org.eclipse.e4.ui.workbench.renderers.swt.ThemeDefinitionChangedHandlerTest;
@@ -80,8 +78,6 @@ public class UIAllTests extends TestSuite {
 		addTestSuite(StackRendererTest.class);
 		addTestSuite(TabStateHandlerTest.class);
 		addTestSuite(ThemeDefinitionChangedHandlerTest.class);
-		addTestSuite(TopoSortTests.class);
-		addTestSuite(ExtensionsSortTests.class);
 		// addTestSuite(SWTPartRendererTest.class);
 	}
 }

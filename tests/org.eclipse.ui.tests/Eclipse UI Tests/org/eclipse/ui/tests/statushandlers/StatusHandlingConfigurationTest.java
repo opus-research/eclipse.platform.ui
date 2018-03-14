@@ -33,16 +33,15 @@ public class StatusHandlingConfigurationTest extends TestCase {
 		ts.addTest(new StatusHandlingConfigurationTest("testDefaultNotification"));
 		return ts;
 	}
-
+	
 	public StatusHandlingConfigurationTest(String name) {
 		super(name);
 	}
-
+	
 	public void testFreeStatusHandler(){
 		final StatusAdapter adapter = new StatusAdapter(new Status(IStatus.ERROR,"fakeplugin","testmessage"));
 		final boolean[] called = new boolean[]{false};
 		AbstractStatusHandler tester = new AbstractStatusHandler(){
-			@Override
 			public void handle(StatusAdapter statusAdapter, int style) {
 				if(statusAdapter == adapter){
 					called[0] = true;
@@ -53,25 +52,23 @@ public class StatusHandlingConfigurationTest extends TestCase {
 		StatusManager.getManager().handle(adapter);
 		assertEquals(true, called[0]);
 	}
-
+	
 	public void testDefaultNotification(){
 		final StatusAdapter adapter = new StatusAdapter(new Status(IStatus.ERROR,"fakeplugin","testmessage"));
 		adapter.setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY, Boolean.TRUE);
 		final StatusAdapter adapter2 = new StatusAdapter(new Status(IStatus.ERROR,"fakeplugin2","testmessage2"));
 		final boolean[] called = new boolean[]{false};
 		StatusManager.getManager().addListener(new StatusManager.INotificationListener(){
-					@Override
 					public void statusManagerNotified(int type,
 							StatusAdapter[] adapters) {
-						if (type == INotificationTypes.HANDLED) {
+						if (type == INotificationTypes.HANDLED)
 							called[0] = true;
-						}
 					}
 		});
 		StatusManager.getManager().handle(adapter, StatusManager.SHOW);
 		assertEquals(false, called[0]);
 		StatusManager.getManager().handle(adapter2, StatusManager.SHOW);
 		assertEquals(true, called[0]);
-
+		
 	}
 }

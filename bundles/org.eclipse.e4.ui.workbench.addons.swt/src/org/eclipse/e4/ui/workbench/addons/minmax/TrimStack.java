@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  ******************************************************************************/
+
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
 import org.eclipse.e4.ui.internal.workbench.swt.ShellActivationListener;
+import org.eclipse.e4.ui.model.application.MAddon;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -34,6 +37,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
@@ -49,7 +53,6 @@ import org.eclipse.e4.ui.workbench.renderers.swt.TrimmedPartLayout;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -71,7 +74,6 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.osgi.service.event.EventHandler;
 
-
 /**
  * Class for representing window trim containing minimized views and shared areas
  */
@@ -92,7 +94,7 @@ public class TrimStack {
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
 
-	public static final String MINIMIZED_AND_SHOWING = "MinimizedAndShowing"; //$NON-NLS-1$
+	private static final String MINIMIZED_AND_SHOWING = "MinimizzedAndShowing"; //$NON-NLS-1$
 
 	private Image layoutImage;
 
@@ -225,10 +227,7 @@ public class TrimStack {
 		if (trimStackTB == null || trimStackTB.isDisposed() || minimizedElement.getWidget() == null)
 			return;
 
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedElement instanceof MUIElement)) {
-			return;
-		}
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
@@ -240,11 +239,11 @@ public class TrimStack {
 		}
 
 		if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setImage(getImage((MUILabel) toolItem.getData()));
 		} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setToolTipText(getLabelText((MUILabel) toolItem.getData()));
 		}
@@ -304,6 +303,18 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
+
+	private MAddon minMaxAddon;
+
+	@Inject
+	private void setMinMaxElement(MApplication theApp) {
+		for (MAddon addon : theApp.getAddons()) {
+			String uri = addon.getContributionURI();
+			if (uri != null && uri.contains("MinMaxAddon")) { //$NON-NLS-1$
+				minMaxAddon = addon;
+			}
+		}
+	}
 
 	private void fixToolItemSelection() {
 		if (trimStackTB == null || trimStackTB.isDisposed())
@@ -658,13 +669,13 @@ public class TrimStack {
 	 */
 	private void createUseOverlaysMenu() {
 		MenuItem useOverlaysItem = new MenuItem(trimStackMenu, SWT.CHECK);
-		useOverlaysItem.setText(Messages.TrimStack_Show_In_Original_Location);
-		useOverlaysItem.setSelection(!useOverlays());
+		useOverlaysItem.setText(Messages.TrimStack_Use_Overlays);
+		useOverlaysItem.setSelection(useOverlays());
 		useOverlaysItem.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				if (toolControl != null) {
-					toolControl.getPersistedState().put(USE_OVERLAYS_KEY,
+				if (minMaxAddon != null) {
+					minMaxAddon.getPersistedState().put(USE_OVERLAYS_KEY,
 							Boolean.toString(!useOverlays()));
 				}
 			}
@@ -880,37 +891,31 @@ public class TrimStack {
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
 
 			// check to see if this stack has any valid elements
-			boolean hasRenderedElements = false;
+			boolean check = false;
 			for (MUIElement stackElement : theStack.getChildren()) {
 				if (stackElement.isToBeRendered()) {
-					hasRenderedElements = true;
+					check = true;
 					break;
 				}
 			}
 
-			if (hasRenderedElements) {
-				for (MUIElement stackElement : theStack.getChildren()) {
-					if (!stackElement.isToBeRendered()) {
-						continue;
-					}
-
-					MUILabel labelElement = getLabelElement(stackElement);
-					ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
-					newItem.setData(labelElement);
-					newItem.setImage(getImage(labelElement));
-					newItem.setToolTipText(getLabelText(labelElement));
-					newItem.addSelectionListener(toolItemSelectionListener);
-				}
-			} else if (theStack.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
-				// OK to be empty and still minimized
-				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
-				ti.setToolTipText(Messages.TrimStack_EmptyStackTooltip);
-				ti.setImage(getLayoutImage());
-				ti.addSelectionListener(toolItemSelectionListener);
-			} else {
+			if (!check) {
 				// doesn't have any children that's showing, place it back in the presentation
 				restoreStack();
 				return;
+			}
+
+			for (MUIElement stackElement : theStack.getChildren()) {
+				if (!stackElement.isToBeRendered()) {
+					continue;
+				}
+
+				MUILabel labelElement = getLabelElement(stackElement);
+				ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
+				newItem.setData(labelElement);
+				newItem.setImage(getImage(labelElement));
+				newItem.setToolTipText(getLabelText(labelElement));
+				newItem.addSelectionListener(toolItemSelectionListener);
 			}
 		}
 
@@ -938,7 +943,6 @@ public class TrimStack {
 	 */
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
-		CTabFolder ctf = ctrl instanceof CTabFolder? (CTabFolder) ctrl: null;
 
 		Composite clientAreaComposite = getCAComposite();
 		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
@@ -949,14 +953,6 @@ public class TrimStack {
 				hostPane = getHostPane();
 				originalParent = ctrl.getParent();
 				ctrl.setParent(hostPane);
-
-				// Hack ! Force a resize of the CTF to make sure the hosted
-				// view is the correct size...see bug 434062 for details
-				if (ctrl != null) {
-					Rectangle bb = ctf.getBounds();
-					bb.width--;
-					ctf.setBounds(bb);
-				}
 
 				clientAreaComposite.addControlListener(caResizeListener);
 
@@ -988,13 +984,6 @@ public class TrimStack {
 			if (minimizedElement instanceof MPartStack) {
 				MPartStack theStack = (MPartStack) minimizedElement;
 				MStackElement curSel = theStack.getSelectedElement();
-
-				// Hack for elems that are lazy initialized
-				if (ctf != null && ctf.getSelection() == null) {
-					theStack.setSelectedElement(null);
-					theStack.setSelectedElement(curSel);
-				}
-
 				if (curSel instanceof MPart) {
 					partService.activate((MPart) curSel);
 				} else if (curSel instanceof MPlaceholder) {
@@ -1008,20 +997,18 @@ public class TrimStack {
 
 				// See if we can find an element to activate...
 				MPart partToActivate = null;
-				MUIElement selectedElement = area.getSelectedElement();
-				while (partToActivate == null && selectedElement != null) {
-					if (selectedElement instanceof MPart) {
-						partToActivate = (MPart) selectedElement;
-					} else if (selectedElement instanceof MPlaceholder) {
-						MPlaceholder ph = (MPlaceholder) selectedElement;
+				MElementContainer<MPartSashContainerElement> curContainer = area;
+				while (partToActivate == null && curContainer.getSelectedElement() != null) {
+					if (curContainer.getSelectedElement() instanceof MPart) {
+						partToActivate = (MPart) curContainer.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MPlaceholder) {
+						MPlaceholder ph = (MPlaceholder) curContainer.getSelectedElement();
 						if (ph.getRef() instanceof MPart) {
 							partToActivate = (MPart) ph.getRef();
-						} else {
-							selectedElement = null;
 						}
-					} else if (selectedElement instanceof MElementContainer<?>) {
-						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = (MElementContainer<?>) container.getSelectedElement();
+					} else if (curContainer.getSelectedElement() instanceof MElementContainer<?>) {
+						curContainer = (MElementContainer<MPartSashContainerElement>) curContainer
+								.getSelectedElement();
 					}
 				}
 
@@ -1074,10 +1061,10 @@ public class TrimStack {
 	 *         to temporarily restore the stack into the current presentation.
 	 */
 	private boolean useOverlays() {
-		if (toolControl == null)
+		if (minMaxAddon == null)
 			return true;
 
-		String useOverlays = toolControl.getPersistedState().get(USE_OVERLAYS_KEY);
+		String useOverlays = minMaxAddon.getPersistedState().get(USE_OVERLAYS_KEY);
 		if (useOverlays == null)
 			useOverlays = "true"; //$NON-NLS-1$
 		return Boolean.parseBoolean(useOverlays);

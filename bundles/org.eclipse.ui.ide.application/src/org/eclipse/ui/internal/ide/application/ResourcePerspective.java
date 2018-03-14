@@ -44,8 +44,7 @@ public class ResourcePerspective implements IPerspectiveFactory {
      *
      * @param layout the factory used to add views to the perspective
      */
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout) {
         defineActions(layout);
         defineLayout(layout);
     }

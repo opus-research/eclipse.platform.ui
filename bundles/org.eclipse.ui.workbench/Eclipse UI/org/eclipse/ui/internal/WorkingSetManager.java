@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Tasktop Technologies - fix for bug 327396
- *     Mickael Istria (Red Hat Inc.) - 427887 Added method to order working sets
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -45,20 +43,26 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	// Working set persistence
 	public static final String WORKING_SET_STATE_FILENAME = "workingsets.xml"; //$NON-NLS-1$
 
-	private boolean restoreInProgress;
-
-	private boolean savePending;
-
 	public WorkingSetManager(BundleContext context) {
 		super(context);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void addRecentWorkingSet(IWorkingSet workingSet) {
 		internalAddRecentWorkingSet(workingSet);
 		saveState();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void addWorkingSet(IWorkingSet workingSet) {
 		super.addWorkingSet(workingSet);
@@ -80,6 +84,11 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 		return path.toFile();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSetManager
+	 */
 	@Override
 	public void removeWorkingSet(IWorkingSet workingSet) {
 		if (internalRemoveWorkingSet(workingSet)) {
@@ -95,8 +104,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 
 		if (stateFile != null && stateFile.exists()) {
 			try {
-				restoreInProgress = true;
-
 				FileInputStream input = new FileInputStream(stateFile);
 				BufferedReader reader = new BufferedReader(
 						new InputStreamReader(input, "utf-8")); //$NON-NLS-1$
@@ -115,13 +122,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 						e,
 						WorkbenchMessages.ProblemRestoringWorkingSetState_title,
 						WorkbenchMessages.ProblemRestoringWorkingSetState_message);
-			} finally {
-				restoreInProgress = false;
-			}
-
-			if (savePending) {
-				saveState();
-				savePending = false;
 			}
 		}
 	}
@@ -130,11 +130,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * Saves the working sets in the persistence store
 	 */
 	private void saveState() {
-		if (restoreInProgress) {
-			// bug 327396: avoid saving partial state
-			savePending = true;
-			return;
-		}
 
 		File stateFile = getWorkingSetStateFile();
 		if (stateFile == null) {
@@ -183,12 +178,6 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	@Override
 	protected void restoreWorkingSetState(IMemento memento) {
 		super.restoreWorkingSetState(memento);
-		saveState();
-	}
-
-	@Override
-	public void swapIndex(IWorkingSet one, IWorkingSet other) {
-		super.swapIndex(one, other);
 		saveState();
 	}
 }

@@ -12,7 +12,6 @@
  * Tristan Hume - <trishume@gmail.com> -
  * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  * 		Implemented workbench auto-save to correctly restore state in case of crash.
- * Mickael Istria (Red Hat Inc.) - 427887 Up and down for working set
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -26,8 +25,6 @@ import org.eclipse.osgi.util.NLS;
 public class WorkbenchMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.messages";//$NON-NLS-1$
 
-
-	public static String ThemingDisabled;
 
 	public static String ThemeChangeWarningText;
 
@@ -89,7 +86,6 @@ public class WorkbenchMessages extends NLS {
 	public static String SaveAll_toolTip;
 	public static String Workbench_revert;
 	public static String Workbench_revertToolTip;
-	public static String Workbench_missingPropertyMessage;
 	public static String Workbench_move;
 
 	public static String Workbench_moveToolTip;
@@ -651,7 +647,6 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_create_element_returned_null;
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
-	public static String EditorManager_largeDocumentWarning;
     
 	public static String EditorPane_pinEditor;
 
@@ -877,8 +872,6 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkingSetSelectionDialog_detailsButton_label;
 	public static String WorkingSetSelectionDialog_newButton_label;
 	public static String WorkingSetSelectionDialog_removeButton_label;
-	public static String WorkingSetSelectionDialog_upButton_label;
-	public static String WorkingSetSelectionDialog_downButton_label;
 	
 	public static String WorkbenchPage_workingSet_default_label;
 	public static String WorkbenchPage_workingSet_multi_label;

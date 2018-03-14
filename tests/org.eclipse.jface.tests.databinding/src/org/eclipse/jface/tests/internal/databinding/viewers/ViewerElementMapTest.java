@@ -34,7 +34,6 @@ public class ViewerElementMapTest extends TestCase {
 	Object key;
 	Object value;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		comparer = new IdentityElementComparer();
@@ -495,12 +494,10 @@ public class ViewerElementMapTest extends TestCase {
 	}
 
 	static class IdentityElementComparer implements IElementComparer {
-		@Override
 		public boolean equals(Object a, Object b) {
 			return a == b;
 		}
 
-		@Override
 		public int hashCode(Object element) {
 			return System.identityHashCode(element);
 		}
@@ -515,27 +512,22 @@ public class ViewerElementMapTest extends TestCase {
 			this.value = value;
 		}
 
-		@Override
 		public Object getKey() {
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return value;
 		}
 
-		@Override
 		public Object setValue(Object value) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public boolean equals(Object obj) {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
 		public int hashCode() {
 			throw new UnsupportedOperationException();
 		}

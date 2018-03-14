@@ -38,7 +38,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 	IObservableValue observable;
 	ValueChangeEventTracker tracker;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
@@ -49,7 +48,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 		tracker = ValueChangeEventTracker.observe(observable);
 	}
 
-	@Override
 	public void tearDown() throws Exception {
 		observable.dispose();
 		observable = null;
@@ -102,30 +100,25 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 	static class Delegate extends AbstractObservableValueContractDelegate {
 		Shell shell;
 
-		@Override
 		public void setUp() {
 			super.setUp();
 			shell = new Shell();
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 			shell = null;
 			super.tearDown();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.text().observe(realm, shell);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return String.class;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue observableValue = (IObservableValue) observable;
 			observableValue.setValue(createValue(observableValue));
@@ -133,7 +126,6 @@ public class ShellObservableValueTest extends AbstractDefaultRealmTestCase {
 
 		int counter;
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return Integer.toString(counter++);
 		}

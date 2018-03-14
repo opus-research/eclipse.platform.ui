@@ -8,13 +8,11 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -79,7 +77,7 @@ public class Snippet014TreeViewerNoMandatoryLabelProvider {
 	public class MyModel {
 		public MyModel parent;
 
-		public List<MyModel> child = new ArrayList<MyModel>();
+		public ArrayList child = new ArrayList();
 
 		public int counter;
 

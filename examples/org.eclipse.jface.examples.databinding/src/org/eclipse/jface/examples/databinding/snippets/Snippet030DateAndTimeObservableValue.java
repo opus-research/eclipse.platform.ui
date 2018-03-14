@@ -18,7 +18,7 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.DateAndTimeObservableValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class Snippet030DateAndTimeObservableValue {
 	protected Shell shell;
@@ -46,7 +46,7 @@ public class Snippet030DateAndTimeObservableValue {
 
 	/**
 	 * Launch the application
-	 *
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -63,8 +63,7 @@ public class Snippet030DateAndTimeObservableValue {
 	 */
 	public void open() {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
-			@Override
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			public void run() {
 				createContents();
 				shell.pack();
@@ -128,7 +127,6 @@ public class Snippet030DateAndTimeObservableValue {
 
 		syncTime.addListener(SWT.Selection, new Listener() {
 			Runnable runnable = new Runnable() {
-				@Override
 				public void run() {
 					if (syncTime.getSelection()) {
 						timeSelection.setValue(new Date());
@@ -137,7 +135,6 @@ public class Snippet030DateAndTimeObservableValue {
 				}
 			};
 
-			@Override
 			public void handleEvent(Event event) {
 				time.setEnabled(!syncTime.getSelection());
 				if (syncTime.getSelection()) {

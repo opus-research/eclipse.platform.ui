@@ -19,13 +19,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 public class ComboFieldAssistWindow extends AbstractFieldAssistWindow {
-
-	@Override
+	
 	protected IControlContentAdapter getControlContentAdapter() {
 		return new ComboContentAdapter();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.jface.tests.fieldassist.AbstractFieldAssistWindow#
+	 * createFieldAssistControl(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createFieldAssistControl(Composite parent) {
 		return new Combo(parent, SWT.DROP_DOWN);
 	}

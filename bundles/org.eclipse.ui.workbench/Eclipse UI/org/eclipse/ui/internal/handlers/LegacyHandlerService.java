@@ -41,7 +41,6 @@ import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.commands.internal.HandlerServiceHandler;
 import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -148,19 +147,12 @@ public class LegacyHandlerService implements IHandlerService {
 
 	public static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
 			String id, final String cmdId, IHandler handler, Expression activeWhen) {
-		return registerLegacyHandler(context, id, cmdId, handler, activeWhen, null);
-	}
 
-	private static IHandlerActivation registerLegacyHandler(final IEclipseContext context,
-			String id, final String cmdId, IHandler handler, Expression activeWhen, String helpContextId) {
 		ECommandService cs = (ECommandService) context.get(ECommandService.class.getName());
 		Command command = cs.getCommand(cmdId);
 		boolean handled = command.isHandled();
 		boolean enabled = command.isEnabled();
 		E4HandlerProxy handlerProxy = new E4HandlerProxy(command, handler);
-		if (helpContextId != null) {
-			setHelpContextId(handler, helpContextId, context);
-		}
 		HandlerActivation activation = new HandlerActivation(context, cmdId, handler, handlerProxy,
 				activeWhen);
 		addHandlerActivation(activation);
@@ -601,8 +593,7 @@ public class LegacyHandlerService implements IHandlerService {
 					commandId,
 					new org.eclipse.ui.internal.handlers.HandlerProxy(commandId, configElement,
 							IWorkbenchRegistryConstants.ATT_CLASS, enabledWhen, eclipseContext
-									.get(IEvaluationService.class)), activeWhen,
-					configElement.getAttribute(IWorkbenchRegistryConstants.ATT_HELP_CONTEXT_ID));
+									.get(IEvaluationService.class)), activeWhen);
 		}
 	}
 
@@ -632,13 +623,7 @@ public class LegacyHandlerService implements IHandlerService {
 
 	@Override
 	public void setHelpContextId(IHandler handler, String helpContextId) {
-		setHelpContextId(handler, helpContextId, eclipseContext);
-	}
+		// TODO Auto-generated method stub
 
-	private static void setHelpContextId(IHandler handler, String helpContextId,
-			IEclipseContext eclipseContext) {
-		ICommandHelpService commandHelpService = (ICommandHelpService) eclipseContext
-				.get(ICommandHelpService.class.getName());
-		commandHelpService.setHelpContextId(handler, helpContextId);
 	}
 }
