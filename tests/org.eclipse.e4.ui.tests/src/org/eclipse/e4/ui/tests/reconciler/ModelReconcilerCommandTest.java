@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.reconciler;
-
-import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -21,7 +18,6 @@ import org.eclipse.e4.ui.model.application.commands.MCommandParameter;
 import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
-import org.junit.Test;
 
 public abstract class ModelReconcilerCommandTest extends ModelReconcilerTest {
 
@@ -53,52 +49,42 @@ public abstract class ModelReconcilerCommandTest extends ModelReconcilerTest {
 		assertEquals(after, command.getCommandName());
 	}
 
-	@Test
 	public void testCommand_CommandName_NullNull() {
 		testCommand_CommandName(null, null);
 	}
 
-	@Test
 	public void testCommand_CommandName_NullEmpty() {
 		testCommand_CommandName(null, "");
 	}
 
-	@Test
 	public void testCommand_CommandName_NullString() {
 		testCommand_CommandName(null, "name");
 	}
 
-	@Test
 	public void testCommand_CommandName_EmptyNull() {
 		testCommand_CommandName("", null);
 	}
 
-	@Test
 	public void testCommand_CommandName_EmptyEmpty() {
 		testCommand_CommandName("", "");
 	}
 
-	@Test
 	public void testCommand_CommandName_EmptyString() {
 		testCommand_CommandName("", "name");
 	}
 
-	@Test
 	public void testCommand_CommandName_StringNull() {
 		testCommand_CommandName("name", null);
 	}
 
-	@Test
 	public void testCommand_CommandName_StringEmpty() {
 		testCommand_CommandName("name", "");
 	}
 
-	@Test
 	public void testCommand_CommandName_StringStringUnchanged() {
 		testCommand_CommandName("name", "name");
 	}
 
-	@Test
 	public void testCommand_CommandName_StringStringChanged() {
 		testCommand_CommandName("name", "name2");
 	}
@@ -130,57 +116,46 @@ public abstract class ModelReconcilerCommandTest extends ModelReconcilerTest {
 		assertEquals(after, command.getDescription());
 	}
 
-	@Test
 	public void testCommand_Description_NullNull() {
 		testCommand_Description(null, null);
 	}
 
-	@Test
 	public void testCommand_Description_NullEmpty() {
 		testCommand_Description(null, "");
 	}
 
-	@Test
 	public void testCommand_Description_NullString() {
 		testCommand_Description(null, "description");
 	}
 
-	@Test
 	public void testCommand_Description_EmptyNull() {
 		testCommand_Description("", null);
 	}
 
-	@Test
 	public void testCommand_Description_EmptyEmpty() {
 		testCommand_Description("", "");
 	}
 
-	@Test
 	public void testCommand_Description_EmptyString() {
 		testCommand_Description("", "description");
 	}
 
-	@Test
 	public void testCommand_Description_StringNull() {
 		testCommand_Description("description", null);
 	}
 
-	@Test
 	public void testCommand_Description_StringEmpty() {
 		testCommand_Description("description", "");
 	}
 
-	@Test
 	public void testCommand_Description_StringStringUnchanged() {
 		testCommand_Description("description", "description");
 	}
 
-	@Test
 	public void testCommand_Description_StringStringChanged() {
 		testCommand_Description("description", "description2");
 	}
 
-	@Test
 	public void testCommand_Parameters_Add() {
 		MApplication application = createApplication();
 		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
@@ -211,7 +186,6 @@ public abstract class ModelReconcilerCommandTest extends ModelReconcilerTest {
 		assertEquals("parameterName", command.getParameters().get(0).getName());
 	}
 
-	@Test
 	public void testCommand_Parameters_Remove() {
 		MApplication application = createApplication();
 		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
