@@ -30,8 +30,10 @@ public class EditorActionDelegate implements IEditorActionDelegate {
         // do nothing
     }
 
-    @Override
-	public void run(IAction action) {
+    /* (non-Javadoc)
+     * Method declared on IActionDelegate
+     */
+    public void run(IAction action) {
         MessageDialog.openInformation(editor.getSite().getShell(), MessageUtil
                 .getString("Readme_Editor"), //$NON-NLS-1$
                 MessageUtil.getString("Editor_Action_executed")); //$NON-NLS-1$
@@ -52,8 +54,7 @@ public class EditorActionDelegate implements IEditorActionDelegate {
      * point. These rules allow enable state control before
      * the delegate has been loaded.</p>
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
         // do nothing
     }
 
@@ -68,8 +69,7 @@ public class EditorActionDelegate implements IEditorActionDelegate {
      * @param action action proxy that represents this delegate in the workbench
      * @param editor the matching editor that has been activated
      */
-    @Override
-	public void setActiveEditor(IAction action, IEditorPart editor) {
+    public void setActiveEditor(IAction action, IEditorPart editor) {
         this.editor = editor;
     }
 }
