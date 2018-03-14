@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
  *  Peter Friese <peter.friese@gentleware.com>
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
- *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 485128
+ *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -2305,10 +2305,6 @@ public abstract class FilteredItemsSelectionDialog extends SelectionStatusDialog
 			String stringPattern = ""; //$NON-NLS-1$
 			if (pattern != null && !pattern.getText().equals("*")) { //$NON-NLS-1$
 				stringPattern = pattern.getText();
-			}
-			// add wildcard at beginning if not specified
-			if (stringPattern.indexOf("*") != 0 && stringPattern.indexOf("?") != 0 && stringPattern.indexOf(".") != 0) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				stringPattern = "*" + stringPattern; //$NON-NLS-1$
 			}
 			patternMatcher.setPattern(stringPattern);
 		}
