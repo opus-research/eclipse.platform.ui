@@ -43,7 +43,6 @@ public abstract class BasicUIJob extends Job {
 	 *      Note: this message is marked final. Implementors should use
 	 *      runInUIThread() instead.
 	 */
-	@Override
 	public final IStatus run(final IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
@@ -54,7 +53,6 @@ public abstract class BasicUIJob extends Job {
 			return Status.CANCEL_STATUS;
 		}
 		asyncDisplay.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				IStatus result = null;
 				try {
