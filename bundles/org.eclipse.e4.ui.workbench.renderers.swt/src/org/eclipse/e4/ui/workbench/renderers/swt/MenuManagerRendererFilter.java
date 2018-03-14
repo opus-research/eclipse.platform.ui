@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 485823
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 488978
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
