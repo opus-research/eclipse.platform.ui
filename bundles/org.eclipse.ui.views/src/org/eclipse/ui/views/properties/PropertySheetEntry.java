@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.jface.viewers.IColorProvider;
@@ -34,6 +33,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.internal.views.ViewsPlugin;
 
 /**
  * <code>PropertySheetEntry</code> is an implementation of
@@ -447,13 +447,14 @@ public class PropertySheetEntry extends EventManager implements
 		IPropertySourceProvider provider = propertySourceProvider;
 
 		if (provider == null && object != null) {
-			provider = Adapters.getAdapter(object, IPropertySourceProvider.class, false);
+			provider = ViewsPlugin.getAdapter(object,
+                    IPropertySourceProvider.class, false);
         }
 
 		if (provider != null) {
 			result = provider.getPropertySource(object);
 		} else {
-			result = Adapters.getAdapter(object, IPropertySource.class, false);
+			result = ViewsPlugin.getAdapter(object, IPropertySource.class, false);
         }
 
 		sources.put(object, result);
