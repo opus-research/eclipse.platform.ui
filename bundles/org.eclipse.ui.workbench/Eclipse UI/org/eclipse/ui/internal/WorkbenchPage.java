@@ -33,6 +33,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -144,6 +145,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -2717,6 +2719,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		broker.subscribe(UIEvents.Contribution.TOPIC_OBJECT, firingHandler);
 		broker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN, childrenHandler);
 
+		addPerspectiveExtrasToStack();
+
 		MPerspectiveStack perspectiveStack = getPerspectiveStack();
 		if (perspectiveStack != null) {
 			extendPerspectives(perspectiveStack);
@@ -4003,6 +4007,77 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private HashMap<MPerspective, Perspective> modelToPerspectiveMapping = new HashMap<MPerspective, Perspective>();
 
+	/**
+	 * Returns the perspective for the given {@link IPerspectiveDescriptor} or
+	 * null if the perspective cannot be found in the stack.
+	 */
+	private MPerspective findInPerspectiveStack(IPerspectiveDescriptor desc) {
+		MPerspectiveStack perspectives = getPerspectiveStack();
+		for (MPerspective mperspective : perspectives.getChildren()) {
+			if (mperspective.getElementId().equals(desc.getId())) {
+				return mperspective;
+			}
+		}
+		return null;
+	}
+
+	private MPerspective getOrCreateModelPerspective(IPerspectiveDescriptor desc) {
+		MPerspective modelPerspective = (MPerspective) modelService.cloneSnippet(application, desc.getId(), window);
+
+		if (modelPerspective == null) {
+
+			// couldn't find the perspective, create a new one
+			modelPerspective = modelService.createModelElement(MPerspective.class);
+
+			// tag it with the same id
+			modelPerspective.setElementId(desc.getId());
+
+			// instantiate the perspective
+			IPerspectiveFactory factory = ((PerspectiveDescriptor) desc).createFactory();
+			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService, partService, modelPerspective,
+					desc, this, true);
+			factory.createInitialLayout(modelLayout);
+			PerspectiveTagger.tagPerspective(modelPerspective, modelService);
+			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
+			reader.extendLayout(getExtensionTracker(), desc.getId(), modelLayout);
+		}
+
+		modelPerspective.setLabel(desc.getLabel());
+
+		ImageDescriptor imageDescriptor = desc.getImageDescriptor();
+		if (imageDescriptor != null) {
+			String imageURL = MenuHelper.getImageUrl(imageDescriptor);
+			modelPerspective.setIconURI(imageURL);
+		}
+
+		// Hide placeholders for parts that exist in the 'global' areas
+		modelService.hideLocalPlaceholders(window, modelPerspective);
+
+		return modelPerspective;
+	}
+
+	/**
+	 * Get the value of
+	 * {@link IWorkbenchPreferenceConstants#PERSPECTIVE_BAR_EXTRAS} from the
+	 * pluing_customizatiobn.ini and add those perspectives to the perspective
+	 * stack.
+	 * 
+	 */
+	private void addPerspectiveExtrasToStack() {
+		String extras = PrefUtil.getAPIPreferenceStore()
+				.getString(IWorkbenchPreferenceConstants.PERSPECTIVE_BAR_EXTRAS);
+		StringTokenizer tok = new StringTokenizer(extras, ", "); //$NON-NLS-1$
+		while (tok.hasMoreTokens()) {
+			String id = tok.nextToken();
+			IPerspectiveDescriptor desc = getPerspectiveDesc(id);
+			if (desc != null && findInPerspectiveStack(desc) == null) {
+				MPerspective perspective = getOrCreateModelPerspective(desc);
+				getPerspectiveStack().getChildren().add(perspective);
+			}
+		}
+
+	}
+
 	private Perspective getPerspective(MPerspective mperspective) {
 		if (mperspective == null) {
 			return null;
@@ -4030,54 +4105,22 @@ public class WorkbenchPage implements IWorkbenchPage {
 		}
 
 		MPerspectiveStack perspectives = getPerspectiveStack();
-		for (MPerspective mperspective : perspectives.getChildren()) {
-			if (mperspective.getElementId().equals(perspective.getId())) {
-				if (lastPerspective != null) {
-					legacyWindow.firePerspectiveDeactivated(this, lastPerspective);
-				}
-
-				// this perspective already exists, switch to this one
-				perspectives.setSelectedElement(mperspective);
-				mperspective.getContext().activate();
-				return;
+		MPerspective mperspective = findInPerspectiveStack(perspective);
+		if (mperspective != null) {
+			if (lastPerspective != null) {
+				legacyWindow.firePerspectiveDeactivated(this, lastPerspective);
 			}
+
+			// this perspective already exists, switch to this one
+			perspectives.setSelectedElement(mperspective);
+			mperspective.getContext().activate();
+			return;
 		}
 
-		MPerspective modelPerspective = (MPerspective) modelService.cloneSnippet(application,
-				perspective.getId(), window);
-
-		if (modelPerspective == null) {
-
-			// couldn't find the perspective, create a new one
-			modelPerspective = modelService.createModelElement(MPerspective.class);
-
-			// tag it with the same id
-			modelPerspective.setElementId(perspective.getId());
-
-			// instantiate the perspective
-			IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
-			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
-					partService, modelPerspective, perspective, this, true);
-			factory.createInitialLayout(modelLayout);
-			PerspectiveTagger.tagPerspective(modelPerspective, modelService);
-			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
-			reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
-		}
-
-		modelPerspective.setLabel(perspective.getLabel());
-
-		ImageDescriptor imageDescriptor = perspective.getImageDescriptor();
-		if (imageDescriptor != null) {
-			String imageURL = MenuHelper.getImageUrl(imageDescriptor);
-			modelPerspective.setIconURI(imageURL);
-		}
-
+		MPerspective modelPerspective = getOrCreateModelPerspective(perspective);
 		if (lastPerspective != null) {
 			legacyWindow.firePerspectiveDeactivated(this, lastPerspective);
 		}
-
-		// Hide placeholders for parts that exist in the 'global' areas
-		modelService.hideLocalPlaceholders(window, modelPerspective);
 
 		// add it to the stack
 		perspectives.getChildren().add(modelPerspective);
