@@ -110,8 +110,7 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_BG_END {
 }
 
 ColorDefinition#org-eclipse-ui-workbench-ACTIVE_NOFOCUS_TAB_TEXT_COLOR {
-	/* Never use black */
-	color: #101010;
+	color: #000000;
 }
 
 .MTrimmedWindow.topLevel {
