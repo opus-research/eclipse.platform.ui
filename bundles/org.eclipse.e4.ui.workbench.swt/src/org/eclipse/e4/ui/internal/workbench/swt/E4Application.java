@@ -12,7 +12,6 @@
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
- *     Christian Georgi (SAP)            - Bug 432480
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -108,7 +107,6 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
 	private static final String PERSPECTIVE_ARG_NAME = "perspective";
-	private static final String SHOWLOCATION_ARG_NAME = "showLocation";
 	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
 	public static final String HIGH_CONTRAST_THEME_ID = "org.eclipse.e4.ui.css.theme.high-contrast";
 
@@ -246,11 +244,6 @@ public class E4Application implements IApplication {
 			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID, forcedPerspectiveId);
 		}
 
-		String showLocation = getLocationFromCommandLine();
-		if (showLocation != null) {
-			appContext.set(E4Workbench.FORCED_SHOW_LOCATION, showLocation);
-		}
-
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext, appContext);
 		appModel.setContext(appContext);
@@ -288,7 +281,8 @@ public class E4Application implements IApplication {
 
 		// Parse out parameters from both the command line and/or the product
 		// definition (if any) and put them in the context
-		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext, false);
+		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
+				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
 		setCSSContextVariables(applicationContext, appContext);
@@ -313,14 +307,14 @@ public class E4Application implements IApplication {
 		boolean highContrastMode = getApplicationDisplay().getHighContrast();
 
 		String cssURI = highContrastMode ? null : getArgValue(
-IWorkbench.CSS_URI_ARG, applicationContext, false);
+				IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 		if (cssURI != null) {
 			context.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
-		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID : getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
+		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID
+				: getArgValue(E4Application.THEME_ID, applicationContext, false);
 
 		if (themeId == null && cssURI == null) {
 			themeId = DEFAULT_THEME_ID;
@@ -336,7 +330,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 			context.set(E4Application.THEME_ID, cssURI);
 		}
 
-		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG, applicationContext, false);
+		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
+				applicationContext, false);
 		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 	}
 
@@ -381,7 +376,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		eclipseContext.set(E4Workbench.DELTA_RESTORE,
 				Boolean.valueOf(deltaRestore));
 
-		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false);
+		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER,
+				appContext, false);
 
 		if (resourceHandler == null) {
 			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
@@ -430,19 +426,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 	}
 
-	/**
-	 * Finds an argument's value in the app's command line arguments, branding,
-	 * and system properties
-	 *
-	 * @param argName
-	 *            the argument name
-	 * @param appContext
-	 *            the application context
-	 * @param singledCmdArgValue
-	 *            whether it's a single-valued argument
-	 * @return the value, or <code>null</code>
-	 */
-	private String getArgValue(String argName, IApplicationContext appContext, boolean singledCmdArgValue) {
+	private String getArgValue(String argName, IApplicationContext appContext,
+			boolean singledCmdArgValue) {
 		// Is it in the arg list ?
 		if (argName == null || argName.length() == 0)
 			return null;
@@ -462,29 +447,6 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		final String brandingProperty = appContext.getBrandingProperty(argName);
 		return brandingProperty == null ? System.getProperty(argName)
 				: brandingProperty;
-	}
-
-	/**
-	 * @return the value of the {@link E4Application#SHOWLOCATION_ARG_NAME
-	 *         showlocation} command line argument, or <code>null</code> if it
-	 *         is not set
-	 */
-	private String getLocationFromCommandLine() {
-		final String fullArgName = "-" + SHOWLOCATION_ARG_NAME;
-		for (int i = 0; i < args.length; i++) {
-			// ignore case for compatibility reasons
-			if (fullArgName.equalsIgnoreCase(args[i])) { //$NON-NLS-1$
-				String name = null;
-				if (args.length > i + 1) {
-					name = args[i + 1];
-				}
-				if (name != null && name.indexOf("-") == -1) { //$NON-NLS-1$
-					return name;
-				}
-				return Platform.getLocation().toOSString();
-			}
-		}
-		return null;
 	}
 
 	@Override
@@ -654,14 +616,14 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		 * // -data @noDefault or -data not specified, prompt and set
 		 * ChooseWorkspaceData launchData = new ChooseWorkspaceData(instanceLoc
 		 * .getDefault());
-		 *
+		 * 
 		 * boolean force = false; while (true) { URL workspaceUrl =
 		 * promptForWorkspace(shell, launchData, force); if (workspaceUrl ==
 		 * null) { return false; }
-		 *
+		 * 
 		 * // if there is an error with the first selection, then force the //
 		 * dialog to open to give the user a chance to correct force = true;
-		 *
+		 * 
 		 * try { // the operation will fail if the url is not a valid //
 		 * instance data area, so other checking is unneeded if
 		 * (instanceLocation.setURL(workspaceUrl, true)) {
@@ -670,7 +632,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		 * shell, IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
 		 * IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
 		 * return false; }
-		 *
+		 * 
 		 * // by this point it has been determined that the workspace is //
 		 * already in use -- force the user to choose again
 		 * MessageDialog.openError(shell,
@@ -685,7 +647,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 	 * false otherwise. A version check will be performed, and a confirmation
 	 * box may be displayed on the argument shell if an older version is
 	 * detected.
-	 *
+	 * 
 	 * @return true if the argument URL is ok to use as a workspace and false
 	 *         otherwise.
 	 */
@@ -799,7 +761,7 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 	 * The version file is stored in the metadata area of the workspace. This
 	 * method returns an URL to the file or null if the directory or file does
 	 * not exist (and the create parameter is false).
-	 *
+	 * 
 	 * @param create
 	 *            If the directory and file does not exist this parameter
 	 *            controls whether it will be created.

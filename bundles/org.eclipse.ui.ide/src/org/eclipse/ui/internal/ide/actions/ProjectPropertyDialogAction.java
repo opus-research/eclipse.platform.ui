@@ -43,7 +43,7 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
 
     /**
      * Create a new dialog.
-     *
+     * 
      * @param window the window
      */
     public ProjectPropertyDialogAction(IWorkbenchWindow window) {
@@ -116,7 +116,8 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
         if (!(selection instanceof IAdaptable)) {
 			return null;
 		}
-        IResource resource = ((IAdaptable) selection).getAdapter(IResource.class);
+        IResource resource = (IResource) ((IAdaptable) selection)
+                .getAdapter(IResource.class);
         if (resource == null) {
 			return null;
 		}

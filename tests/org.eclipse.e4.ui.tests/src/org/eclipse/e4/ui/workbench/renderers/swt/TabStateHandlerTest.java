@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,20 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import junit.framework.TestCase;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
@@ -33,44 +29,38 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.osgi.service.event.Event;
 
-public class TabStateHandlerTest {
+public class TabStateHandlerTest extends TestCase {
 	private StackRendererTestable renderer;
 	private TabStateHandler handler;
 	private Shell shell;
 
-	@Before
-	public void setUp() {
+	@Override
+	public void setUp() throws Exception {
 		shell = new Shell();
 		renderer = new StackRendererTestable();
 		handler = renderer.new TabStateHandler();
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	public void tearDown() throws Exception {
 		shell.dispose();
 	}
 
-	@Test
-	public void testValidateElement() {
+	public void testValidateElement() throws Exception {
 		assertTrue(handler.validateElement(MBasicFactory.INSTANCE.createPart()));
 		assertTrue(handler.validateElement(MBasicFactory.INSTANCE
 				.createPartStack()));
 	}
 
-	@Test
-	public void testValidateElementWhenInvalidElement() {
+	public void testValidateElementWhenInvalidElement() throws Exception {
 		assertFalse(handler.validateElement(MBasicFactory.INSTANCE
 				.createTrimBar()));
 		assertFalse(handler.validateElement(null));
 	}
 
-	@Test
-	public void testValidateValues() {
+	public void testValidateValues() throws Exception {
 		assertTrue(handler.validateValues(null,
 				placeHolder(MBasicFactory.INSTANCE.createPart())));
 		assertTrue(handler.validateValues(null, CSSConstants.CSS_BUSY_CLASS));
@@ -79,15 +69,13 @@ public class TabStateHandlerTest {
 				CSSConstants.CSS_CONTENT_CHANGE_CLASS));
 	}
 
-	@Test
-	public void testValidateValuesWhenInvalidValue() {
+	public void testValidateValuesWhenInvalidValue() throws Exception {
 		assertFalse(handler.validateValues(null,
 				MBasicFactory.INSTANCE.createPart()));
 		assertFalse(handler.validateValues(null, "new not supported tag"));
 	}
 
-	@Test
-	public void testHandleEventWhenTabBusyEvent() {
+	public void testHandleEventWhenTabBusyEvent() throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -110,8 +98,7 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
-	public void testHandleEventWhenTabIdleEvent() {
+	public void testHandleEventWhenTabIdleEvent() throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -134,8 +121,8 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
-	public void testHandleEventWhenTabContentChangedEventAndTabInactive() {
+	public void testHandleEventWhenTabContentChangedEventAndTabInactive()
+			throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -164,8 +151,8 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
-	public void testHandleEventWhenTabContentChangedEventAndTabActive() {
+	public void testHandleEventWhenTabContentChangedEventAndTabActive()
+			throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -194,8 +181,8 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
-	public void testHandleEventWhenTabActivateEventAndItsContentChanged() {
+	public void testHandleEventWhenTabActivateEventAndItsContentChanged()
+			throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -219,8 +206,8 @@ public class TabStateHandlerTest {
 		tabFolder.dispose();
 	}
 
-	@Test
-	public void testHandleEventWhenTabActivateEventAndTabItemForPartNotFound() {
+	public void testHandleEventWhenTabActivateEventAndTabItemForPartNotFound()
+			throws Exception {
 		// given
 		MPart part = MBasicFactory.INSTANCE.createPart();
 		CTabFolder tabFolder = new CTabFolder(shell, SWT.NONE);
@@ -270,7 +257,6 @@ public class TabStateHandlerTest {
 		return (MPlaceholder) Proxy.newProxyInstance(getClass()
 				.getClassLoader(), new Class<?>[] { MPlaceholder.class },
 				new InvocationHandler() {
-					@Override
 					public Object invoke(Object arg0, Method method,
 							Object[] arg2) throws Throwable {
 						if ("getRef".equals(method.getName())) {
@@ -290,17 +276,14 @@ public class TabStateHandlerTest {
 			this.value = value;
 		}
 
-		@Override
 		public String getKey() {
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return value;
 		}
 
-		@Override
 		public Object setValue(Object arg0) {
 			return null;
 		}

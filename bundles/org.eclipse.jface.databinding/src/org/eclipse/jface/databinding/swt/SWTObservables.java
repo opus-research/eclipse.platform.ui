@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 327086
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 413611
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 449022
- *     Eugen Neufeld - bug 461560
  *******************************************************************************/
 package org.eclipse.jface.databinding.swt;
 
@@ -35,7 +34,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * A factory for creating observables for SWT widgets
- *
+ * 
  * @since 1.1
  * @deprecated
  */
@@ -44,7 +43,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns the realm representing the UI thread for the given display.
-	 *
+	 * 
 	 * @param display
 	 * @return the realm representing the UI thread for the given display
 	 * @deprecated please use {@link DisplayRealm#getRealm(Display)} instead.
@@ -74,7 +73,7 @@ public class SWTObservables {
 	 * <p>
 	 * Note that this observable will not forward {@link ValueChangingEvent}
 	 * events from a wrapped {@link IVetoableValue}.
-	 *
+	 * 
 	 * @param delay
 	 *            the delay in milliseconds
 	 * @param observable
@@ -82,7 +81,7 @@ public class SWTObservables {
 	 * @return an observable which delays notification of value change events
 	 *         from <code>observable</code> until <code>delay</code>
 	 *         milliseconds have elapsed since the last change event.
-	 *
+	 * 
 	 * @since 1.2
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
@@ -104,7 +103,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.ScrollBar</li>
 	 * <li>org.eclipse.swt.widgets.ToolItem</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable value tracking the enabled state of the given
 	 *         widget.
@@ -119,7 +118,7 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the enabled state of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the enabled state of the given
@@ -134,7 +133,7 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the visible state of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the visible state of the given
@@ -158,10 +157,10 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.TrayItem</li>
 	 * <li>org.eclipse.swt.widgets.TreeColumn</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable value tracking the tooltip text of the given item
-	 *
+	 * 
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
@@ -173,7 +172,7 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the tooltip text of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the tooltip text of the given
@@ -197,7 +196,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.MenuItem (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -222,7 +221,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Spinner</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -242,7 +241,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -262,7 +261,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Slider (since 1.5)</li>
 	 * <li>org.eclipse.swt.widgets.Scale</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -281,7 +280,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @param events
 	 *            array of SWT event types to register for change events. May
@@ -305,7 +304,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @param event
 	 *            event type to register for change events
@@ -327,7 +326,6 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
-	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Item</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
@@ -335,12 +333,12 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.StyledText (as of 1.3)</li>
 	 * <li>org.eclipse.swt.widgets.Text (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
 	 *             if the type of <code>widget</code> is unsupported
-	 *
+	 * 
 	 * @since 1.3
 	 * @deprecated use <code>WidgetProperties</code> instead
 	 */
@@ -357,14 +355,13 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.custom.CLabel</li>
 	 * <li>org.eclipse.swt.widgets.Combo</li>
-	 * <li>org.eclipse.swt.widgets.Group (as of 1.7)</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * <li>org.eclipse.swt.widgets.Link (as of 1.2)</li>
 	 * <li>org.eclipse.swt.widgets.Shell</li>
 	 * <li>org.eclipse.swt.custom.StyledText (as of 1.3)</li>
 	 * <li>org.eclipse.swt.widgets.Text (as of 1.3)</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -383,7 +380,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * <li>org.eclipse.swt.widgets.ToolTip</li>
 	 * <ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return an observable observing the message attribute of the provided
 	 *         <code>widget</code>.
@@ -404,7 +401,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.widgets.Item</li>
 	 * <li>org.eclipse.swt.widgets.Label</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param widget
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -425,7 +422,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.widgets.List</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable list
 	 * @throws IllegalArgumentException
@@ -446,7 +443,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.CCombo</li>
 	 * <li>org.eclipse.swt.widgets.List</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException
@@ -462,7 +459,7 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the foreground color of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the foreground color of the given
@@ -477,7 +474,7 @@ public class SWTObservables {
 	/**
 	 * Returns an observable value tracking the background color of the given
 	 * control
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the background color of the given
@@ -491,7 +488,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the font of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the font of the given control
@@ -504,7 +501,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the size of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the size of the given control
@@ -518,7 +515,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the location of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the location of the given control
@@ -530,7 +527,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the focus of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the focus of the given control
@@ -544,7 +541,7 @@ public class SWTObservables {
 
 	/**
 	 * Returns an observable value tracking the bounds of the given control.
-	 *
+	 * 
 	 * @param control
 	 *            the control to observe
 	 * @return an observable value tracking the bounds of the given control
@@ -564,7 +561,7 @@ public class SWTObservables {
 	 * <li>org.eclipse.swt.custom.StyledText (since 1.6)</li>
 	 * <li>org.eclipse.swt.widgets.Text</li>
 	 * </ul>
-	 *
+	 * 
 	 * @param control
 	 * @return observable value
 	 * @throws IllegalArgumentException

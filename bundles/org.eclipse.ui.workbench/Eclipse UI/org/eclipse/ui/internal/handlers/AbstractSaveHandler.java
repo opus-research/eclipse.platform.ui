@@ -46,10 +46,10 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 				public EvaluationResult evaluate(IEvaluationContext context) {
 					return AbstractSaveHandler.this.evaluate(context);
 				}
-
+	
 				/*
 				 * (non-Javadoc)
-				 *
+				 * 
 				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
 				 */
 				@Override
@@ -60,22 +60,22 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 		}
 		return enabledWhen;
 	}
-
+	
 	protected abstract EvaluationResult evaluate(IEvaluationContext context);
-
+	
 	protected ISaveablePart getSaveablePart(IEvaluationContext context) {
 		IWorkbenchPart activePart = InternalHandlerUtil.getActivePart(context);
 
 		if (activePart instanceof ISaveablePart)
 			return (ISaveablePart) activePart;
 
-		ISaveablePart part = Util.getAdapter(activePart, ISaveablePart.class);
+		ISaveablePart part = (ISaveablePart) Util.getAdapter(activePart, ISaveablePart.class);
 		if (part != null)
 			return part;
 
 		return InternalHandlerUtil.getActiveEditor(context);
 	}
-
+	
 	protected ISaveablePart getSaveablePart(ExecutionEvent event) {
 
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
@@ -83,7 +83,7 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 			return (ISaveablePart) activePart;
 		}
 
-		ISaveablePart part = Util.getAdapter(activePart, ISaveablePart.class);
+		ISaveablePart part = (ISaveablePart) Util.getAdapter(activePart, ISaveablePart.class);
 		if (part != null)
 			return part;
 

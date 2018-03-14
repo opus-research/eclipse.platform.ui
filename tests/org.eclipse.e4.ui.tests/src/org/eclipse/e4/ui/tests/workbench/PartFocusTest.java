@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,14 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -42,15 +37,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Ensure that setting focus to a widget within an non-active part causes the
  * part to be activated while not changing the focus.
  */
-public class PartFocusTest {
+public class PartFocusTest extends TestCase {
 
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
@@ -63,8 +55,7 @@ public class PartFocusTest {
 
 	protected MPart otherPart;
 
-	@Before
-	public void setUp() {
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
@@ -134,8 +125,8 @@ public class PartFocusTest {
 		assertTrue(((PartBackend) otherPart.getObject()).text1.isFocusControl());
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
@@ -143,7 +134,7 @@ public class PartFocusTest {
 	}
 
 	/**
-	 *
+	 * 
 	 */
 	private void processEvents() {
 		// renderer.run(window, appContext);
@@ -160,7 +151,6 @@ public class PartFocusTest {
 		}
 	}
 
-	@Test
 	public void testFocusChangesOnExplicitPartActivation() {
 		assertFalse(((PartBackend) part.getObject()).text1.isFocusControl());
 		eps.activate(part);
@@ -177,34 +167,28 @@ public class PartFocusTest {
 		assertTrue(((TextField) toolControl.getObject()).text.isFocusControl());
 	}
 
-	@Test
 	public void testNoActivationOnExplicitInPartWidgetSelection() {
 		assertTrue(eps.getActivePart() == otherPart);
 		assertTrue(((PartBackend) otherPart.getObject()).text1.isFocusControl());
 
 		final boolean[] changed = new boolean[] { false };
 		eps.addPartListener(new IPartListener() {
-			@Override
 			public void partVisible(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partHidden(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partDeactivated(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partBroughtToTop(MPart part) {
 				changed[0] = true;
 			}
 
-			@Override
 			public void partActivated(MPart part) {
 				changed[0] = true;
 			}

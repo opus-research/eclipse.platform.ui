@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,8 +74,6 @@ public class DirectContributionItem extends ContributionItem {
 	private static final String DISABLED_URI = "disabledURI"; //$NON-NLS-1$
 	private static final String DCI_STATIC_CONTEXT = "DCI-staticContext"; //$NON-NLS-1$
 
-	private static final Object missingExecute = new Object();
-
 	private MItem model;
 	private Widget widget;
 	private Listener menuItemListener;
@@ -91,7 +89,7 @@ public class DirectContributionItem extends ContributionItem {
 	private ISWTResourceUtilities resUtils = null;
 
 	@Inject
-	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
+	void setResourceUtils(IResourceUtilities utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
@@ -462,12 +460,8 @@ public class DirectContributionItem extends ContributionItem {
 		}
 		MContribution contrib = (MContribution) model;
 		IEclipseContext staticContext = getStaticContext(trigger);
-		Object result = ContextInjectionFactory.invoke(contrib.getObject(),
-				Execute.class, getExecutionContext(lclContext), staticContext,
- missingExecute);
-		if (result == missingExecute && logger != null) {
-			logger.error("Contribution is missing @Execute: " + contrib.getContributionURI()); //$NON-NLS-1$
-		}
+		ContextInjectionFactory.invoke(contrib.getObject(), Execute.class,
+				getExecutionContext(lclContext), staticContext, null);
 	}
 
 	private boolean canExecuteItem(Event trigger) {

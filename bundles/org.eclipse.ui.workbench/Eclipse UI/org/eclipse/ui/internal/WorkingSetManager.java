@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tasktop Technologies - fix for bug 327396
+ *     Mickael Istria (Red Hat Inc.) - 427887 Added method to order working sets
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -34,7 +35,7 @@ import org.osgi.framework.BundleListener;
  * A working set manager stores working sets and provides property change
  * notification when a working set is added or removed. Working sets are
  * persisted whenever one is added or removed.
- *
+ * 
  * @see IWorkingSetManager
  * @since 2.0
  */
@@ -67,7 +68,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	/**
 	 * Returns the file used as the persistence store, or <code>null</code> if
 	 * there is no available file.
-	 *
+	 * 
 	 * @return the file used as the persistence store, or <code>null</code>
 	 */
 	private File getWorkingSetStateFile() {
@@ -153,7 +154,7 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	 * Persists all working sets and fires a property change event for the
 	 * changed working set. Should only be called by
 	 * org.eclipse.ui.internal.WorkingSet.
-	 *
+	 * 
 	 * @param changedWorkingSet
 	 *            the working set that has changed
 	 * @param propertyChangeId
@@ -182,6 +183,12 @@ public class WorkingSetManager extends AbstractWorkingSetManager implements
 	@Override
 	protected void restoreWorkingSetState(IMemento memento) {
 		super.restoreWorkingSetState(memento);
+		saveState();
+	}
+
+	@Override
+	public void swapWorkingSets(IWorkingSet one, IWorkingSet other) {
+		super.swapWorkingSets(one, other);
 		saveState();
 	}
 }
