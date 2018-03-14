@@ -2188,7 +2188,9 @@ public class PartRenderingEngineTests {
 					.getActiveChild());
 		}
 	}
-
+	
+	//Test was ignore before converting to Junit4
+	@Ignore
 	@Test
 	public void testBug326175_True() {
 		testBug326175(true);
