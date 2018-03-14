@@ -66,9 +66,6 @@ public class PropertiesMessages extends NLS {
 	/** */
 	public static String CopyToClipboardProblemDialog_message;
 
-	/** */
-	public static String ShowFilterTextToggle_toolTip;
-
 	static {
 		// load message values from bundle file
 		NLS.initializeMessages(BUNDLE_NAME, PropertiesMessages.class);
