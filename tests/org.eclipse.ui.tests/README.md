@@ -10,7 +10,7 @@ Running the tests
 -----------------
 
 Use the following command to run the tests via Maven:
-mvn clean verify -Pbuild-individual-bundles -DskipTests=false
+mvn clean verify -Pbuild-individual-bundles -Dmaven.test.skip=false
 
 
 See [https://wiki.eclipse.org/Platform_UI/How_to_Contribute#Unit_Testing][2] for more information.
