@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
@@ -107,7 +106,7 @@ public class JobsView extends ViewPart {
 		}
 
 		if (useGroup) {
-			group = Platform.getJobManager().createProgressGroup();
+			group = Job.getJobManager().createProgressGroup();
 			group.beginTask("Group", total); //$NON-NLS-1$
 		}
 
@@ -336,14 +335,14 @@ public class JobsView extends ViewPart {
 	 * Wakes up all sleeping test jobs.
 	 */
 	protected void doWakeUp() {
-		Platform.getJobManager().wakeUp(TestJob.FAMILY_TEST_JOB);
+		Job.getJobManager().wakeUp(TestJob.FAMILY_TEST_JOB);
 	}
 
 	/**
 	 * Puts to sleep all waiting test jobs.
 	 */
 	protected void doSleep() {
-		Platform.getJobManager().sleep(TestJob.FAMILY_TEST_JOB);
+		Job.getJobManager().sleep(TestJob.FAMILY_TEST_JOB);
 	}
 
 	/**
