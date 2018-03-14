@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429598
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -175,10 +176,12 @@ public abstract class Wizard implements IWizard {
         for (int i = 0; i < pages.size(); i++) {
             IWizardPage page = pages.get(i);
             page.createControl(pageContainer);
-            // page is responsible for ensuring the created control is
-            // accessable
+			// page is responsible for ensuring the created control is
+			// accessible
             // via getControl.
-            Assert.isNotNull(page.getControl());
+			Assert.isNotNull(
+					page.getControl(),
+					"getControl of wizard page returns null. Did you call setControl() in your wizard page?"); //$NON-NLS-1$
         }
     }
 
