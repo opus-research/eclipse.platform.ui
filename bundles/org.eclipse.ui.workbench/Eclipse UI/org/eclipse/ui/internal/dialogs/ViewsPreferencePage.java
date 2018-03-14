@@ -198,7 +198,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private List<ITheme> getCSSThemes(boolean highContrastMode) {
-		List<ITheme> themes = new ArrayList<ITheme>();
+		List<ITheme> themes = new ArrayList<>();
 		for (ITheme theme : engine.getThemes()) {
 			/*
 			 * When we have Win32 OS - when the high contrast mode is enabled on
@@ -470,7 +470,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private Map<String, String> createThemeAssociations() {
-		Map<String, String> result = new HashMap<String, String>();
+		Map<String, String> result = new HashMap<>();
 		IExtensionRegistry registry = RegistryFactory.getRegistry();
 		IExtensionPoint extPoint = registry.getExtensionPoint(E4_THEME_EXTENSION_POINT);
 
@@ -488,7 +488,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private List<ColorsAndFontsTheme> getColorsAndFontsThemes() {
-		List<ColorsAndFontsTheme> result = new ArrayList<ColorsAndFontsTheme>();
+		List<ColorsAndFontsTheme> result = new ArrayList<>();
 		org.eclipse.ui.themes.ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager()
 				.getCurrentTheme();
 

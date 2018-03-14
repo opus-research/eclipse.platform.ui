@@ -34,7 +34,7 @@ final class ContributionRoot implements
 		IContributionRoot {
 
 	private List topLevelItems = new ArrayList();
-	private Map<IContributionItem, Expression> itemsToExpressions = new HashMap<IContributionItem, Expression>();
+	private Map<IContributionItem, Expression> itemsToExpressions = new HashMap<>();
 	// private WorkbenchMenuService menuService;
 	Set restriction;
 	private ContributionManager mgr;

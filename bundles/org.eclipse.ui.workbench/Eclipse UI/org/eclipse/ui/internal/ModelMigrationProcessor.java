@@ -42,7 +42,7 @@ public class ModelMigrationProcessor {
 	 */
 	private void removeE4CommandsFromIDE(MApplication application) {
 		List<MCommand> commands = application.getCommands();
-		Set<MCommand> toBeRemoved = new HashSet<MCommand>();
+		Set<MCommand> toBeRemoved = new HashSet<>();
 		for (MCommand command : commands) {
 			final String elementId = command.getElementId();
 			if ("e4.exit".equals(elementId)) { //$NON-NLS-1$

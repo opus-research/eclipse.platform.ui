@@ -52,7 +52,7 @@ public class WorkingCopyPreferences extends EventManager implements
 		super();
 		this.original = original;
 		this.manager = manager;
-		this.temporarySettings = new HashMap<String, Object>();
+		this.temporarySettings = new HashMap<>();
 	}
 
 	/*
@@ -468,7 +468,7 @@ public class WorkingCopyPreferences extends EventManager implements
 	@Override
 	public String[] keys() throws BackingStoreException {
 		checkRemoved();
-		HashSet<String> allKeys = new HashSet<String>(Arrays.asList(getOriginal().keys()));
+		HashSet<String> allKeys = new HashSet<>(Arrays.asList(getOriginal().keys()));
 		for (Entry<String, Object> entry : temporarySettings.entrySet()) {
 			String key = entry.getKey();
 			if (entry.getValue() != null) {

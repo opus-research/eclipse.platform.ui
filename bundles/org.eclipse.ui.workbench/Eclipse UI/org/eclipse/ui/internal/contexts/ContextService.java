@@ -41,7 +41,7 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  */
 public final class ContextService implements IContextService {
 
-	private HashMap<IContextActivation, UpdateExpression> activationToRat = new HashMap<IContextActivation, ContextService.UpdateExpression>();
+	private HashMap<IContextActivation, UpdateExpression> activationToRat = new HashMap<>();
 
 	/**
 	 * The central authority for determining which context we should use.

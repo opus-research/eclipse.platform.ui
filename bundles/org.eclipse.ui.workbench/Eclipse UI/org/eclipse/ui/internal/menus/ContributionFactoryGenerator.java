@@ -71,14 +71,14 @@ public class ContributionFactoryGenerator extends ContextFunction {
 	public Object compute(IEclipseContext context, String contextKey) {
 		AbstractContributionFactory factory = getFactory();
 		final IMenuService menuService = context.get(IMenuService.class);
-		final ContributionRoot root = new ContributionRoot(menuService, new HashSet<Object>(),
+		final ContributionRoot root = new ContributionRoot(menuService, new HashSet<>(),
 				null, factory);
 		ServiceLocator sl = new ServiceLocator();
 		sl.setContext(context);
 		factory.createContributionItems(sl, root);
 		final List contributionItems = root.getItems();
 		final Map<IContributionItem, Expression> itemsToExpression = root.getVisibleWhen();
-		List<MUIElement> menuElements = new ArrayList<MUIElement>();
+		List<MUIElement> menuElements = new ArrayList<>();
 		for (Object obj : contributionItems) {
 			if (obj instanceof IContributionItem) {
 				IContributionItem ici = (IContributionItem) obj;

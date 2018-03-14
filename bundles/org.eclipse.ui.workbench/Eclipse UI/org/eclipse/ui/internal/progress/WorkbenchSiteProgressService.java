@@ -60,7 +60,7 @@ public class WorkbenchSiteProgressService implements
 	 * requested.</li>
 	 * </ul>
 	 */
-	private Map<Job, Boolean> busyJobs = new HashMap<Job, Boolean>();
+	private Map<Job, Boolean> busyJobs = new HashMap<>();
 
     private Object busyLock = new Object();
 

@@ -172,7 +172,7 @@ public class SaveableHelper {
 	 */
 	private static boolean saveModels(ISaveablesSource modelSource, final IWorkbenchWindow window, final boolean confirm) {
 		Saveable[] selectedModels = modelSource.getActiveSaveables();
-		final ArrayList<Saveable> dirtyModels = new ArrayList<Saveable>();
+		final ArrayList<Saveable> dirtyModels = new ArrayList<>();
 		for (int i = 0; i < selectedModels.length; i++) {
 			Saveable model = selectedModels[i];
 			if (model.isDirty()) {
@@ -434,7 +434,7 @@ public class SaveableHelper {
 	}
 
 	private static void notifySaveAction(final IWorkbenchPart[] parts) {
-		Set<IWorkbenchWindow> wwindows = new HashSet<IWorkbenchWindow>();
+		Set<IWorkbenchWindow> wwindows = new HashSet<>();
 		for (int i = 0; i < parts.length; i++) {
 			wwindows.add(parts[i].getSite().getWorkbenchWindow());
 		}
@@ -452,7 +452,7 @@ public class SaveableHelper {
 	 * @return true if the user canceled.
 	 */
 	private static boolean waitForBackgroundSaveJob(final Saveable model) {
-		List<Saveable> models = new ArrayList<Saveable>();
+		List<Saveable> models = new ArrayList<>();
 		models.add(model);
 		return waitForBackgroundSaveJobs(models);
 	}

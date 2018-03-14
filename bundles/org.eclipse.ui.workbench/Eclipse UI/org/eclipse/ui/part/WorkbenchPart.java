@@ -498,7 +498,7 @@ public abstract class WorkbenchPart extends EventManager implements
 		}
     }
 
-	private Map<String, String> partProperties = new HashMap<String, String>();
+	private Map<String, String> partProperties = new HashMap<>();
 
     @Override
 	public void setPartProperty(String key, String value) {

@@ -29,7 +29,7 @@ import org.eclipse.ui.internal.WorkbenchImages;
 public class PreferenceProvider extends QuickAccessProvider {
 
 	private QuickAccessElement[] cachedElements;
-	private Map<String, PreferenceElement> idToElement = new HashMap<String, PreferenceElement>();
+	private Map<String, PreferenceElement> idToElement = new HashMap<>();
 
 	@Override
 	public String getId() {
@@ -45,7 +45,7 @@ public class PreferenceProvider extends QuickAccessProvider {
 	@Override
 	public QuickAccessElement[] getElements() {
 		if (cachedElements == null) {
-			List<PreferenceElement> list = new ArrayList<PreferenceElement>();
+			List<PreferenceElement> list = new ArrayList<>();
 			collectElements("", PlatformUI.getWorkbench().getPreferenceManager().getRootSubNodes(), list); //$NON-NLS-1$
 			cachedElements = new PreferenceElement[list.size()];
 			for (int i = 0; i < list.size(); i++) {

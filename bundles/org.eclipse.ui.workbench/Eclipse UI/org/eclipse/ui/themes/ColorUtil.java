@@ -66,7 +66,7 @@ public final class ColorUtil {
 		if (cachedFields == null) {
 			Class<SWT> clazz = SWT.class;
 			Field[] allFields = clazz.getDeclaredFields();
-			ArrayList<Field> applicableFields = new ArrayList<Field>(allFields.length);
+			ArrayList<Field> applicableFields = new ArrayList<>(allFields.length);
 
 			for (int i = 0; i < allFields.length; i++) {
 				Field field = allFields[i];

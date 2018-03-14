@@ -26,7 +26,7 @@ final class Identifier implements IIdentifier {
     private final static int HASH_INITIAL = Identifier.class.getName()
             .hashCode();
 
-	private final static Set<Identifier> strongReferences = new HashSet<Identifier>();
+	private final static Set<Identifier> strongReferences = new HashSet<>();
 
 	private Set<String> activityIds = Collections.emptySet();
 
