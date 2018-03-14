@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 package org.eclipse.ui.internal.views;
 
@@ -89,19 +88,19 @@ public final class ViewsPlugin extends AbstractUIPlugin {
      * @return a representation of sourceObject that is assignable to the
      *         adapter type, or null if no such representation exists
      */
-	public static <T> T getAdapter(Object sourceObject, Class<T> adapter, boolean activatePlugins) {
+    public static Object getAdapter(Object sourceObject, Class adapter, boolean activatePlugins) {
     	Assert.isNotNull(adapter);
         if (sourceObject == null) {
             return null;
         }
         if (adapter.isInstance(sourceObject)) {
-			return adapter.cast(sourceObject);
+            return sourceObject;
         }
 
         if (sourceObject instanceof IAdaptable) {
             IAdaptable adaptable = (IAdaptable) sourceObject;
 
-			T result = adaptable.getAdapter(adapter);
+            Object result = adaptable.getAdapter(adapter);
             if (result != null) {
                 // Sanity-check
                 Assert.isTrue(adapter.isInstance(result));
@@ -110,9 +109,9 @@ public final class ViewsPlugin extends AbstractUIPlugin {
         }
 
         if (!(sourceObject instanceof PlatformObject)) {
-			T result;
+        	Object result;
         	if (activatePlugins) {
-				result = adapter.cast(Platform.getAdapterManager().loadAdapter(sourceObject, adapter.getName()));
+        		result = Platform.getAdapterManager().loadAdapter(sourceObject, adapter.getName());
         	} else {
         		result = Platform.getAdapterManager().getAdapter(sourceObject, adapter);
         	}

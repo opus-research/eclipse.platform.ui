@@ -464,7 +464,7 @@ public class TrimLayout extends Layout implements ICachingLayout, ITrimManager {
 	 */
 	@Override
 	public int[] getAreaIds() {
-		return TRIM_ID_INFO.clone();
+		return (int[]) TRIM_ID_INFO.clone();
 	}
 
 	/*

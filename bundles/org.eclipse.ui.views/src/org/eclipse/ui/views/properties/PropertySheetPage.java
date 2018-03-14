@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -296,9 +295,9 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
      * @since 3.2
      */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (ISaveablePart.class.equals(adapter)) {
-			return adapter.cast(getSaveablePart());
+			return getSaveablePart();
 		}
     	return null;
     }

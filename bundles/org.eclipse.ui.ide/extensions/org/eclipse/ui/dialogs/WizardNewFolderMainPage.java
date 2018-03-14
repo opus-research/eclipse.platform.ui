@@ -707,7 +707,8 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			if (next instanceof IResource) {
 				selectedResource = (IResource) next;
 			} else if (next instanceof IAdaptable) {
-				selectedResource = ((IAdaptable) next).getAdapter(IResource.class);
+				selectedResource = (IResource) ((IAdaptable) next)
+						.getAdapter(IResource.class);
 			}
 			if (selectedResource != null) {
 				if (selectedResource.getType() == IResource.FILE) {

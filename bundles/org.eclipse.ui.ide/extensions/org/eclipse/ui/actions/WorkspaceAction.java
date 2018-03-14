@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -95,8 +94,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 			@Override
 			public Shell getShell() {
 				return shell;
-			}
-		};
+			} };
 	}
 
 	/**
@@ -145,7 +143,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *            a progress monitor
 	 * @return The result of the execution
 	 */
-	final IStatus execute(List<? extends IResource> resources, IProgressMonitor monitor) {
+	final IStatus execute(List<IResource> resources, IProgressMonitor monitor) {
 		MultiStatus errors = null;
 		// 1FTIMQN: ITPCORE:WIN - clients required to do too much iteration work
 		if (shouldPerformResourcePruning()) {
@@ -158,14 +156,15 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 		// call setTaskName as its the only was to assure the task name is
 		// set in the monitor (see bug 31824)
 		monitor.setTaskName(getOperationMessage());
-		Iterator<? extends IResource> resourcesEnum = resources.iterator();
+		Iterator<IResource> resourcesEnum = resources.iterator();
 		try {
 			while (resourcesEnum.hasNext()) {
 				IResource resource = resourcesEnum.next();
 				try {
 					// 1FV0B3Y: ITPUI:ALL - sub progress monitors granularity
 					// issues
-					invokeOperation(resource, new SubProgressMonitor(monitor, 1000));
+					invokeOperation(resource, new SubProgressMonitor(monitor,
+							1000));
 				} catch (CoreException e) {
 					errors = recordError(errors, e);
 				}
@@ -262,7 +261,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 * @since 3.1
 	 */
 	@Deprecated
-	protected void invokeOperation(IResource resource, IProgressMonitor monitor) throws CoreException {
+	protected void invokeOperation(IResource resource,
+			IProgressMonitor monitor) throws CoreException {
 
 	}
 
@@ -279,7 +279,9 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 */
 	boolean isDescendent(List<IResource> resources, IResource child) {
 		IResource parent = child.getParent();
-		return parent != null && (resources.contains(parent) || isDescendent(resources, parent));
+		return parent != null
+				&& (resources.contains(parent) || isDescendent(resources,
+						parent));
 	}
 
 	/**
@@ -292,8 +294,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *         after pruning.
 	 * @see #shouldPerformResourcePruning
 	 */
-	List<IResource> pruneResources(List<? extends IResource> resourceCollection) {
-		List<IResource> prunedList = new ArrayList<>(resourceCollection);
+	List<IResource> pruneResources(List<IResource> resourceCollection) {
+		List<IResource> prunedList = new ArrayList<IResource>(resourceCollection);
 		Iterator<IResource> elementsEnum = prunedList.iterator();
 		while (elementsEnum.hasNext()) {
 			IResource currentResource = elementsEnum.next();
@@ -313,7 +315,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 */
 	MultiStatus recordError(MultiStatus errors, CoreException error) {
 		if (errors == null) {
-			errors = new MultiStatus(IDEWorkbenchPlugin.IDE_WORKBENCH, IStatus.ERROR, getProblemsMessage(), null);
+			errors = new MultiStatus(IDEWorkbenchPlugin.IDE_WORKBENCH,
+					IStatus.ERROR, getProblemsMessage(), null);
 		}
 		errors.merge(error.getStatus());
 		return errors;
@@ -334,7 +337,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	public void run() {
 		IStatus[] errorStatus = new IStatus[1];
 		try {
-			new ProgressMonitorJobsDialog(shellProvider.getShell()).run(true, true, createOperation(errorStatus));
+			new ProgressMonitorJobsDialog(shellProvider.getShell()).run(true, true,
+					createOperation(errorStatus));
 		} catch (InterruptedException e) {
 			return;
 		} catch (InvocationTargetException e) {
@@ -343,14 +347,17 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 			String msg = NLS.bind(
 					IDEWorkbenchMessages.WorkspaceAction_logTitle, getClass()
 							.getName(), e.getTargetException());
-			IDEWorkbenchPlugin.log(msg, StatusUtil.newStatus(IStatus.ERROR, msg, e.getTargetException()));
+			IDEWorkbenchPlugin.log(msg, StatusUtil.newStatus(IStatus.ERROR,
+					msg, e.getTargetException()));
 			displayError(e.getTargetException().getMessage());
 		}
 		// If errors occurred, open an Error dialog & build a multi status error
 		// for it
 		if (errorStatus[0] != null && !errorStatus[0].isOK()) {
-			// no special message
-			ErrorDialog.openError(shellProvider.getShell(), getProblemsTitle(), null, errorStatus[0]);
+			ErrorDialog.openError(shellProvider.getShell(), getProblemsTitle(), null, // no
+					// special
+					// message
+					errorStatus[0]);
 		}
 	}
 
@@ -404,7 +411,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 *
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<? extends IResource> getActionResources() {
+	protected List<IResource> getActionResources() {
 		return getSelectedResources();
 	}
 
@@ -453,7 +460,7 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 	 */
 	public void runInBackground(ISchedulingRule rule, final Object[] jobFamilies) {
 		// obtain a copy of the selected resources before the job is forked
-		final List<IResource> resources = new ArrayList<>(getActionResources());
+		final List<IResource> resources = new ArrayList<IResource>(getActionResources());
 		Job job = new WorkspaceJob(removeMnemonics(getText())) {
 
 			@Override
@@ -477,9 +484,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 		if (rule != null) {
 			job.setRule(rule);
 		}
-		if (job.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD)) {
+		if(job.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD))
 			job.setProperty(IProgressConstants2.SHOW_IN_TASKBAR_ICON_PROPERTY, Boolean.TRUE);
-		}
 		job.setUser(true);
 		job.schedule();
 	}
@@ -506,7 +512,8 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 		return new WorkspaceModifyOperation() {
 			@Override
 			public void execute(IProgressMonitor monitor) {
-				errorStatus[0] = WorkspaceAction.this.execute(getActionResources(), monitor);
+				errorStatus[0] = WorkspaceAction.this.execute(
+						getActionResources(), monitor);
 			}
 		};
 	}

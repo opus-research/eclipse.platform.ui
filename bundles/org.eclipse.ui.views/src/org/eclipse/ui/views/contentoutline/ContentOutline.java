@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.contentoutline;
@@ -124,8 +123,9 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     @Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
         // Try to get an outline page.
-		IContentOutlinePage page = ViewsPlugin.getAdapter(part, IContentOutlinePage.class, false);
-		if (page != null) {
+        Object obj = ViewsPlugin.getAdapter(part, IContentOutlinePage.class, false);
+        if (obj instanceof IContentOutlinePage) {
+            IContentOutlinePage page = (IContentOutlinePage) obj;
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
 			}
@@ -144,14 +144,14 @@ public class ContentOutline extends PageBookView implements ISelectionProvider,
     }
 
     @Override
-	public <T> T getAdapter(Class<T> key) {
+	public Object getAdapter(Class key) {
         if (key == IContributedContentsView.class) {
-			return key.cast(new IContributedContentsView() {
+			return new IContributedContentsView() {
                 @Override
 				public IWorkbenchPart getContributingPart() {
                     return getContributingEditor();
                 }
-			});
+            };
 		}
         return super.getAdapter(key);
     }

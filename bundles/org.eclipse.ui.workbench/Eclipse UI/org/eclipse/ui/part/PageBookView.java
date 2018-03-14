@@ -588,10 +588,10 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 * implements <code>IAdaptable</code>.
 	 */
 	@Override
-	public <T> T getAdapter(Class<T> key) {
+	public Object getAdapter(Class key) {
 		// delegate to the current page, if supported
 		IPage page = getCurrentPage();
-		T adapter = Util.getAdapter(page, key);
+		Object adapter = Util.getAdapter(page, key);
 		if (adapter != null) {
 			return adapter;
 		}
@@ -620,7 +620,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	 *         this object does not have an adapter for the given class
 	 * @since 3.2
 	 */
-	protected <T> T getViewAdapter(Class<T> adapter) {
+	protected Object getViewAdapter(Class adapter) {
 		return null;
 	}
 
