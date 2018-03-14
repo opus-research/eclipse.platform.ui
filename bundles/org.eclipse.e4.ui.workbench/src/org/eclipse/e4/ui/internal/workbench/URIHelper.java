@@ -115,17 +115,19 @@ public class URIHelper {
 	}
 
 	/**
-	 * Helper method which checks if given String represents a Bundleclass URI.
+	 * Helper method which checks if given String represents a Platform URI.
 	 *
 	 * @param uri
-	 *            a possible Bundleclass URI
+	 *            a possible Platform URI
 	 * @return true if the given string is not {@code null} and starts with
-	 *         {@value #BUNDLECLASS_SCHEMA}; false otherwise
+	 *         {@value #PLATFORM_SCHEMA}; false otherwise
 	 */
 	public static boolean isBundleClassUri(String uri) {
 		if (uri != null && uri.startsWith(BUNDLECLASS_SCHEMA)) {
 			String[] split = uri.substring(BUNDLECLASS_SCHEMA.length()).split("/"); //$NON-NLS-1$
-			// segments: { "bundle-symbolic-name", "fully qualified classname"}
+			// valid bundleclass uri should have two segments:
+			// first one for the bundle-symbolic-name
+			// second one for the full qualified classname
 			if (split.length == 2) {
 				return true;
 			}
