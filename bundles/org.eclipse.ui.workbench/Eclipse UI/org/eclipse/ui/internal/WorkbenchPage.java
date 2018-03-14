@@ -1192,10 +1192,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			editorReference.setPage(this);
 		}
 
-		// Avoid dups
-		if (!editorReferences.contains(editorReference)) {
-			editorReferences.add(editorReference);
-		}
+		editorReferences.add(editorReference);
 	}
 
 	MPartDescriptor findDescriptor(String id) {
