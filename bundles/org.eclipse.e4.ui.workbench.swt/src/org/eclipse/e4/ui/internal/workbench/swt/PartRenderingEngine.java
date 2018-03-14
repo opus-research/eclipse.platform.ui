@@ -1242,7 +1242,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 						cssResourcesURI));
 			}
 
-			engine.restore(cssTheme);
+			if (display.getHighContrast()) {
+				engine.setTheme(cssTheme, false);
+			} else {
+				engine.restore(cssTheme);
+			}
 			// TODO Should we create an empty default theme?
 
 			appContext.set(IThemeEngine.class.getName(), engine);
