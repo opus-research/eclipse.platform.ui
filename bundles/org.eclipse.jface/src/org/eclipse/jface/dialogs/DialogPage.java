@@ -228,6 +228,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return control;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getDescription() {
         return description;
@@ -242,6 +245,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return JFaceResources.DIALOG_FONT;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getErrorMessage() {
         return errorMessage;
@@ -256,6 +262,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return JFaceResources.getFontRegistry().get(getDialogFontName());
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public Image getImage() {
         if (image == null) {
@@ -266,11 +275,17 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return image;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getMessage() {
         return message;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IMessageProvider.
+     */
     @Override
 	public int getMessageType() {
         return messageType;
@@ -287,6 +302,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         return getControl().getShell();
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public String getTitle() {
         return title;
@@ -376,6 +394,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         control = newControl;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public void setDescription(String description) {
         this.description = description;
@@ -391,6 +412,9 @@ public abstract class DialogPage implements IDialogPage, IMessageProvider {
         errorMessage = newMessage;
     }
 
+    /*
+     * (non-Javadoc) Method declared on IDialogPage.
+     */
     @Override
 	public void setImageDescriptor(ImageDescriptor desc) {
         imageDescriptor = desc;

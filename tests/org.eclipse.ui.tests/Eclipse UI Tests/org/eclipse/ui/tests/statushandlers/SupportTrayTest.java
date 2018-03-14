@@ -35,6 +35,9 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 public class SupportTrayTest extends TestCase {
 	
 
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();

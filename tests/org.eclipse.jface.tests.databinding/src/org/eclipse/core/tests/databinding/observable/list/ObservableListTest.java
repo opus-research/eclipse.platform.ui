@@ -41,7 +41,6 @@ import org.eclipse.jface.databinding.conformance.util.RealmTester;
 public class ObservableListTest extends TestCase {
 	private ObservableListStub list;
 
-	@Override
 	protected void setUp() throws Exception {
 		RealmTester.setDefault(new CurrentRealm(true));
 
@@ -53,14 +52,12 @@ public class ObservableListTest extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);
 	}
 
 	public void testIsStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.isStale();
 			}
@@ -69,7 +66,6 @@ public class ObservableListTest extends TestCase {
 
 	public void testSetStaleRealmChecks() throws Exception {
 		RealmTester.exerciseCurrent(new Runnable() {
-			@Override
 			public void run() {
 				list.setStale(false);
 			}
@@ -84,7 +80,6 @@ public class ObservableListTest extends TestCase {
 
 		final List diffEntries = new ArrayList();
 		list.addListChangeListener(new IListChangeListener() {
-			@Override
 			public void handleListChange(ListChangeEvent event) {
 				diffEntries.addAll(Arrays.asList(event.diff.getDifferences()));
 			} 
@@ -126,7 +121,6 @@ public class ObservableListTest extends TestCase {
 	}
 	
 	/* package */ static class Delegate extends AbstractObservableCollectionContractDelegate {
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm, final int elementCount) {
 			List wrappedList = new ArrayList();
 			for (int i = 0; i < elementCount; i++) {
@@ -136,7 +130,6 @@ public class ObservableListTest extends TestCase {
 			return new MutableObservableListStub(realm, wrappedList, String.class);
 		}
 		
-		@Override
 		public void change(IObservable observable) {
 			ObservableListStub list = (ObservableListStub) observable;
 			Object element = "element";
@@ -144,7 +137,6 @@ public class ObservableListTest extends TestCase {
 			list.fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(list.size(), true, element)));
 		}
 		
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
@@ -162,7 +154,6 @@ public class ObservableListTest extends TestCase {
 			this.wrappedList = wrappedList;
 		}
 		
-		@Override
 		protected void fireListChange(ListDiff diff) {
 			super.fireListChange(diff);
 		}
@@ -179,7 +170,6 @@ public class ObservableListTest extends TestCase {
 			super(realm, wrappedList, elementType);
 		}
 
-		@Override
 		public void add(int index, Object element) {
 			checkRealm();
 			wrappedList.add(index, element);
@@ -187,7 +177,6 @@ public class ObservableListTest extends TestCase {
 					index, true, element)));
 		}
 
-		@Override
 		public Object remove(int index) {
 			checkRealm();
 			Object element = wrappedList.remove(index);

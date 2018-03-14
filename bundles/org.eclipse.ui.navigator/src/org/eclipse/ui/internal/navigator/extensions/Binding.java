@@ -43,6 +43,11 @@ class Binding {
 		TAG_EXTENSION = tagExtension;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isVisibleExtension(java.lang.String)
+	 */
 	boolean isVisibleExtension(String anExtensionId) {
 		// Have we seen this pattern before?
 		if (knownIds.containsKey(anExtensionId)) {
@@ -83,6 +88,11 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isRootExtension(java.lang.String)
+	 */
 	boolean isRootExtension(String anExtensionId) {
 		if (rootPatterns.size() == 0) {
 			return false;
@@ -104,6 +114,11 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#hasOverriddenRootExtensions()
+	 */
 	boolean hasOverriddenRootExtensions() {
 		return rootPatterns.size() > 0;
 	}

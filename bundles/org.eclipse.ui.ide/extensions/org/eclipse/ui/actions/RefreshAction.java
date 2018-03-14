@@ -147,16 +147,25 @@ public class RefreshAction extends WorkspaceAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.RefreshAction_progressMessage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.RefreshAction_problemMessage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.RefreshAction_problemTitle;
@@ -211,6 +220,11 @@ public class RefreshAction extends WorkspaceAction {
 		selectionChanged(currentSelection);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.WorkspaceAction#createOperation(org.eclipse.core.runtime.IStatus[])
+	 */
 	@Override
 	final protected IRunnableWithProgress createOperation(
 			final IStatus[] errorStatus) {
@@ -292,6 +306,9 @@ public class RefreshAction extends WorkspaceAction {
 		resource.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.WorkspaceAction#run()
+	 */
 	@Override
 	public void run() {
 		final IStatus[] errorStatus = new IStatus[1];

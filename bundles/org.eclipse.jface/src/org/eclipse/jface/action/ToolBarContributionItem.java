@@ -151,6 +151,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
     @Override
 	public void dispose() {
         // Dispose of the ToolBar and all its contributions
@@ -172,6 +177,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         disposed = true;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
+     *      int)
+     */
     @Override
 	public void fill(CoolBar coolBar, int index) {
         if (checkDisposed()) {
@@ -465,6 +476,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return (visibleItem || super.isVisible());
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
+     */
     @Override
 	public void saveWidgetState() {
         if (checkDisposed()) {
@@ -576,6 +592,11 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         useChevron = value;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
+     */
     @Override
 	public void update(String propertyName) {
         if (checkDisposed()) {

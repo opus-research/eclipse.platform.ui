@@ -46,7 +46,6 @@ public class SelectionProviderSingleSelectionObservableValueTest extends
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
 	protected void setUp() throws Exception {
 		Shell shell = new Shell();
 		viewer = new TableViewer(shell, SWT.NONE);
@@ -60,7 +59,6 @@ public class SelectionProviderSingleSelectionObservableValueTest extends
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = viewer.getTable().getShell();
 		if (!shell.isDisposed())
