@@ -173,8 +173,6 @@ public class DialogCheck {
      * @param label The label to verify,
      */
 	private static void verifyLabelText(Label label) {
-		if (!label.isVisible())
-			return;
         String widget = label.toString();
         Point size = label.getSize();
         String labelText = label.getText();
