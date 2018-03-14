@@ -269,6 +269,9 @@ public class PopupMenuExtender implements IMenuListener2,
 	private void addEditorActions(IMenuManager mgr, Set<IObjectActionContributor> alreadyContributed) {
         ISelectionProvider activeEditor = new ISelectionProvider() {
 
+            /* (non-Javadoc)
+             * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+             */
             @Override
 			public void addSelectionChangedListener(
                     ISelectionChangedListener listener) {
@@ -276,6 +279,9 @@ public class PopupMenuExtender implements IMenuListener2,
                 "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+             */
             @Override
 			public ISelection getSelection() {
                 if (part instanceof IEditorPart) {
@@ -287,6 +293,9 @@ public class PopupMenuExtender implements IMenuListener2,
                 return new StructuredSelection(new Object[0]);
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+             */
             @Override
 			public void removeSelectionChangedListener(
                     ISelectionChangedListener listener) {
@@ -294,6 +303,9 @@ public class PopupMenuExtender implements IMenuListener2,
                 "This ISelectionProvider is static, and cannot be modified."); //$NON-NLS-1$
             }
 
+            /* (non-Javadoc)
+             * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+             */
             @Override
 			public void setSelection(ISelection selection) {
                 throw new UnsupportedOperationException(
@@ -586,6 +598,11 @@ public class PopupMenuExtender implements IMenuListener2,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IRegistryChangeListener#registryChanged(org.eclipse.core.runtime.IRegistryChangeEvent)
+	 */
 	@Override
 	public void registryChanged(final IRegistryChangeEvent event) {
 		Display display = Display.getDefault();
