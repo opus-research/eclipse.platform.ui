@@ -7,7 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 400771
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -1331,10 +1331,11 @@ public class StackRenderer extends LazyStackRenderer {
 	}
 
 	private boolean isClosable(MPart part) {
-		// if it's a shared part check its current ref
+		// if it's a shared part check if the NO_CLOSE tag is set
 		if (part.getCurSharedRef() != null) {
-			return !(part.getCurSharedRef().getTags()
-					.contains(IPresentationEngine.NO_CLOSE));
+			if (part.getTags().contains(IPresentationEngine.NO_CLOSE)) {
+				return false;
+			}
 		}
 
 		return part.isCloseable();
