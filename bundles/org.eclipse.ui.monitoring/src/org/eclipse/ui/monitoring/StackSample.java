@@ -16,7 +16,6 @@ import java.lang.management.ThreadInfo;
 /**
  * A sample of the stack that contains the stack traces and the time stamp.
  *
- * @noextend This class is not intended to be subclassed by clients.
  * @since 1.0
  */
 public class StackSample {
