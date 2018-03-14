@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# script to upload a file called "output.txt" to https://wiki.eclipse.org/Platform_UI/Plan/4.5/Milestones
+# script to upload a file called "output.txt" to https://wiki.eclipse.org/Platform_UI/Plan/4.6/Milestones
 # usage: ./updateMileStoneWiki.sh eclipseuser eclipsepw 
 # generate "output.txt" via:
 #  ./wiki-from-csv.sh > output
@@ -11,7 +11,7 @@ cookie_jar="eclipsewiki.txt"
 USERNAME=$1
 PASSWORD=$2
 NEWTEXT=""
-TITLE="Platform_UI/Plan/4.5/Milestones"
+TITLE="Platform_UI/Plan/4.6/Milestones"
 echo "Loggingin ..."
 CR=$(curl 'https://dev.eclipse.org/site_login/index.php' -L \
 --cookie $cookie_jar \
