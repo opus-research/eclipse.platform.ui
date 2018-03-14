@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
@@ -14,7 +14,6 @@ package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,18 +21,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -76,29 +71,22 @@ import org.osgi.service.event.EventHandler;
 /**
  * Create a contribute part.
  */
-public class MenuManagerRenderer extends SWTPartRenderer {
+public class MenuManagerRenderer
+extends
+ContributionManagerRenderer<MMenu, MMenuElement, MenuManager, ContributionRecord> {
 	public static final String VISIBILITY_IDENTIFIER = "IIdentifier"; //$NON-NLS-1$
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
 
-	private Map<MMenu, MenuManager> modelToManager = new HashMap<MMenu, MenuManager>();
-	private Map<MenuManager, MMenu> managerToModel = new HashMap<MenuManager, MMenu>();
+	private static final String MODEL_TO_MANAGER_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.modelToManager"; //$NON-NLS-1$
+	private static final String MANAGER_TO_MODEL_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.managerToModel"; //$NON-NLS-1$
+	private static final String MODEL_TO_CONTRIBUTION_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.modelToContribution"; //$NON-NLS-1$
+	private static final String CONTRIBUTION_TO_MODEL_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.contributionToModel"; //$NON-NLS-1$
+	private static final String MODEL_CONTRIBUTION_TO_RECORD_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.modelContributionToRecord"; //$NON-NLS-1$
+	private static final String SHARED_ELEMENT_TO_RECORD_MAP = "org.eclipse.e4.ui.workbench.renderers.swt.MenuManagerRenderer.sharedElementToRecord"; //$NON-NLS-1$
 
-	private Map<MMenuElement, IContributionItem> modelToContribution = new HashMap<MMenuElement, IContributionItem>();
-	private Map<IContributionItem, MMenuElement> contributionToModel = new HashMap<IContributionItem, MMenuElement>();
-
-	private Map<MMenuElement, ContributionRecord> modelContributionToRecord = new HashMap<MMenuElement, ContributionRecord>();
-	private Map<MMenuElement, ArrayList<ContributionRecord>> sharedElementToRecord = new HashMap<MMenuElement, ArrayList<ContributionRecord>>();
-
-	@Inject
-	private Logger logger;
-
-	@Inject
-	private MApplication application;
-
-	@Inject
-	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -124,6 +112,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler labelUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenu
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
@@ -148,6 +137,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			String attName = (String) event
@@ -220,6 +210,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -235,6 +226,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -251,14 +243,16 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	private MenuManagerRendererFilter rendererFilter;
 
+	@Override
 	@PostConstruct
 	public void init() {
+		super.init();
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, labelUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_SELECTED, selectionUpdater);
 		eventBroker.subscribe(UIEvents.Item.TOPIC_ENABLED, enabledUpdater);
 		eventBroker
-				.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
+		.subscribe(UIEvents.UIElement.TOPIC_ALL, toBeRenderedUpdater);
 
 		context.set(MenuManagerRenderer.class, this);
 		Display display = context.get(Display.class);
@@ -277,8 +271,10 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 
 	}
 
+	@Override
 	@PreDestroy
 	public void contextDisposed() {
+		super.contextDisposed();
 		eventBroker.unsubscribe(itemUpdater);
 		eventBroker.unsubscribe(labelUpdater);
 		eventBroker.unsubscribe(selectionUpdater);
@@ -290,7 +286,7 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				context);
 		MenuManagerEventHelper.getInstance().setShowHelper(null);
 		ContextInjectionFactory.uninject(
-MenuManagerEventHelper.getInstance()
+				MenuManagerEventHelper.getInstance()
 				.getHideHelper(),
 				context);
 		MenuManagerEventHelper.getInstance().setHideHelper(null);
@@ -311,7 +307,7 @@ MenuManagerEventHelper.getInstance()
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
 	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
@@ -376,6 +372,7 @@ MenuManagerEventHelper.getInstance()
 		}
 		if (newMenu != null) {
 			newMenu.addDisposeListener(new DisposeListener() {
+				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
 				}
@@ -388,6 +385,12 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
+		cleanUp(menuModel, getWindow());
+	}
+
+	@Override
+	protected void cleanUp(MMenu menuModel, MWindow window) {
+		Map<MMenuElement, ContributionRecord> modelContributionToRecord = getModelContributionToRecord(window);
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
@@ -396,10 +399,10 @@ MenuManagerEventHelper.getInstance()
 			if (record.menuModel == menuModel) {
 				record.dispose();
 				for (MMenuElement copy : record.generatedElements) {
-					cleanUpCopy(record, copy);
+					cleanUpCopy(record, copy, window);
 				}
 				for (MMenuElement copy : record.sharedElements) {
-					cleanUpCopy(record, copy);
+					cleanUpCopy(record, copy, window);
 				}
 				record.generatedElements.clear();
 				record.sharedElements.clear();
@@ -418,7 +421,12 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void cleanUpCopy(ContributionRecord record, MMenuElement copy) {
-		modelContributionToRecord.remove(copy);
+		cleanUpCopy(record, copy, getWindow());
+	}
+
+	public void cleanUpCopy(ContributionRecord record, MMenuElement copy,
+			MWindow window) {
+		getModelContributionToRecord(window).remove(copy);
 		if (copy instanceof MMenu) {
 			MMenu menuCopy = (MMenu) copy;
 			cleanUp(menuCopy);
@@ -538,7 +546,8 @@ MenuManagerEventHelper.getInstance()
 	private static ArrayList<ContributionRecord> DEFAULT = new ArrayList<ContributionRecord>();
 
 	public ArrayList<ContributionRecord> getList(MMenuElement item) {
-		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		ArrayList<ContributionRecord> tmp = getSharedElementToRecord(
+				getWindow()).get(item);
 		if (tmp == null) {
 			tmp = DEFAULT;
 		}
@@ -546,20 +555,24 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void addRecord(MMenuElement item, ContributionRecord rec) {
-		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		MWindow window = getWindow();
+		ArrayList<ContributionRecord> tmp = getSharedElementToRecord(window)
+				.get(item);
 		if (tmp == null) {
 			tmp = new ArrayList<ContributionRecord>();
-			sharedElementToRecord.put(item, tmp);
+			getSharedElementToRecord(window).put(item, tmp);
 		}
 		tmp.add(rec);
 	}
 
 	public void removeRecord(MMenuElement item, ContributionRecord rec) {
-		ArrayList<ContributionRecord> tmp = sharedElementToRecord.get(item);
+		MWindow window = getWindow();
+		ArrayList<ContributionRecord> tmp = getSharedElementToRecord(window)
+				.get(item);
 		if (tmp != null) {
 			tmp.remove(rec);
 			if (tmp.isEmpty()) {
-				sharedElementToRecord.remove(item);
+				getSharedElementToRecord(window).remove(item);
 			}
 		}
 	}
@@ -573,7 +586,7 @@ MenuManagerEventHelper.getInstance()
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
 	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
@@ -688,7 +701,7 @@ MenuManagerEventHelper.getInstance()
 	 * @param itemModel
 	 */
 	void processRenderedItem(MenuManager parentManager,
- MMenuItem itemModel) {
+			MMenuItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
@@ -835,63 +848,72 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public MenuManager getManager(MMenu model) {
-		return modelToManager.get(model);
+		return getModelToManager(getWindow()).get(model);
 	}
 
 	public MMenu getMenuModel(MenuManager manager) {
-		return managerToModel.get(manager);
+		return getManagerToModel(getWindow()).get(manager);
 	}
 
 	public void linkModelToManager(MMenu model, MenuManager manager) {
-		modelToManager.put(model, manager);
-		managerToModel.put(manager, model);
+		MWindow window = getWindow();
+		getModelToManager(window).put(model, manager);
+		getManagerToModel(window).put(manager, model);
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
-		modelToManager.remove(model);
-		managerToModel.remove(manager);
+		MWindow window = getWindow();
+		getModelToManager(window).remove(model);
+		getManagerToModel(window).remove(manager);
 	}
 
 	public IContributionItem getContribution(MMenuElement model) {
-		return modelToContribution.get(model);
+		return getModelToContribution(getWindow()).get(
+				model);
 	}
 
 	public MMenuElement getMenuElement(IContributionItem item) {
-		return contributionToModel.get(item);
+		return getContributionToModel(getWindow()).get(
+				item);
 	}
 
 	public void linkModelToContribution(MMenuElement model,
 			IContributionItem item) {
-		modelToContribution.put(model, item);
-		contributionToModel.put(item, model);
+		MWindow window = getWindow();
+		getModelToContribution(window).put(model, item);
+		getContributionToModel(window).put(item, model);
 	}
 
 	public void clearModelToContribution(MMenuElement model,
 			IContributionItem item) {
-		modelToContribution.remove(model);
-		contributionToModel.remove(item);
+		MWindow window = getWindow();
+		getModelToContribution(window).remove(model);
+		getContributionToModel(window).remove(item);
 	}
 
 	public ContributionRecord getContributionRecord(MMenuElement element) {
-		return modelContributionToRecord.get(element);
+		return getModelContributionToRecord(getWindow())
+				.get(element);
 	}
 
 	public void linkElementToContributionRecord(MMenuElement element,
 			ContributionRecord record) {
-		modelContributionToRecord.put(element, record);
+		getModelContributionToRecord(getWindow()).put(
+				element, record);
 	}
 
 	/**
 	 * Search the records for testing. Look, but don't touch!
-	 * 
+	 *
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
 		HashSet<ContributionRecord> records = new HashSet<ContributionRecord>(
-				modelContributionToRecord.values());
+				getModelContributionToRecord(getWindow()).values());
 		return records.toArray(new ContributionRecord[records.size()]);
 	}
 
+	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
 	}
@@ -951,9 +973,9 @@ MenuManagerEventHelper.getInstance()
 							IEclipseContext lclContext = getContext(menuModel);
 							if (lclContext != null) {
 								((MPopupMenu) childModel)
-										.setContext(lclContext
-												.createChild(childModel
-														.getElementId()));
+								.setContext(lclContext
+										.createChild(childModel
+												.getElementId()));
 							}
 						}
 					}
@@ -1070,7 +1092,7 @@ MenuManagerEventHelper.getInstance()
 	/**
 	 * Clean dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 * 
+	 *
 	 * @param menuManager
 	 * @param menuModel
 	 * @param dump
@@ -1104,5 +1126,35 @@ MenuManagerEventHelper.getInstance()
 		}
 		MenuManager mm = getManager(menu);
 		clearModelToManager(menu, mm);
+	}
+
+	@Override
+	protected String getModelToManagerMapName() {
+		return MODEL_TO_MANAGER_MAP;
+	}
+
+	@Override
+	protected String getManagerToModelMapName() {
+		return MANAGER_TO_MODEL_MAP;
+	}
+
+	@Override
+	protected String getModelToContributionMapName() {
+		return MODEL_TO_CONTRIBUTION_MAP;
+	}
+
+	@Override
+	protected String getContributionToModelMapName() {
+		return CONTRIBUTION_TO_MODEL_MAP;
+	}
+
+	@Override
+	protected String getModelContributionToRecordMapName() {
+		return MODEL_CONTRIBUTION_TO_RECORD_MAP;
+	}
+
+	@Override
+	protected String getSharedElementToRecordMapName() {
+		return SHARED_ELEMENT_TO_RECORD_MAP;
 	}
 }

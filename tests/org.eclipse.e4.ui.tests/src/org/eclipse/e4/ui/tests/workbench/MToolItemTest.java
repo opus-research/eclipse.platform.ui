@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,6 +65,7 @@ public class MToolItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
+		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -141,6 +142,7 @@ public class MToolItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
+		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
@@ -219,6 +221,7 @@ public class MToolItemTest extends TestCase {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.getChildren().add(window);
+		application.setSelectedElement(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class.getName(), application);
 
