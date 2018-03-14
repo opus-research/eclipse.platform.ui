@@ -30,7 +30,6 @@ import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.dialogs.TrayDialog;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.Policy;
@@ -370,10 +369,13 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 		createSash(composite,treeControl);
 
 		Label versep = new Label(composite, SWT.SEPARATOR | SWT.VERTICAL);
-		GridDataFactory.fillDefaults().grab(false, true).applyTo(versep);
+		GridData verGd = new GridData(GridData.FILL_VERTICAL | GridData.GRAB_VERTICAL);
+
+		versep.setLayoutData(verGd);
+		versep.setLayoutData(new GridData(SWT.LEFT, SWT.FILL, false, true));
 
 		Composite pageAreaComposite = new Composite(composite, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(pageAreaComposite);
+		pageAreaComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layout = new GridLayout(1, true);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
@@ -893,8 +895,10 @@ public class PreferenceDialog extends TrayDialog implements IPreferencePageConta
 	 * @since 3.0
 	 */
 	protected void layoutTreeAreaControl(Control control) {
-		GridDataFactory.fillDefaults().hint(getLastRightWidth(), convertVerticalDLUsToPixels(120)).grab(false, true)
-				.applyTo(control);
+		GridData gd = new GridData(GridData.FILL_VERTICAL);
+		gd.widthHint = getLastRightWidth();
+		gd.verticalSpan = 1;
+		control.setLayoutData(gd);
 	}
 
 	/**
