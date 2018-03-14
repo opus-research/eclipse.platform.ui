@@ -256,7 +256,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 			// Name filter
 			if (nameFilter != null) {
 				String objectName = object.toString();
-				IWorkbenchAdapter adapter = Util.getAdapter(object, IWorkbenchAdapter.class);
+				IWorkbenchAdapter adapter = (IWorkbenchAdapter) Util
+						.getAdapter(object, IWorkbenchAdapter.class);
 				if (adapter != null) {
 					String elementName = adapter.getLabel(object);
 					if (elementName != null) {
@@ -279,7 +280,8 @@ public class RegistryPageContributor implements IPropertyPageContributor,
 				object = adaptedObject;
 			}
 
-			filter = Util.getAdapter(object, IActionFilter.class);
+			filter = (IActionFilter) Util.getAdapter(object,
+					IActionFilter.class);
 
 			if (filter != null && !testCustom(object, filter))
 				return false;

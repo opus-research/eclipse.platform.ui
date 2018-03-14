@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Benjamin Muskalla - bug 105041
  *     Remy Chi Jian Suen - bug 144102
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 
 package org.eclipse.ui.views.navigator;
@@ -20,14 +19,31 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.osgi.util.NLS;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IPath;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -51,19 +67,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
@@ -286,7 +290,8 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
                     resource = (IResource) o;
                 } else {
                     if (o instanceof IAdaptable) {
-                        resource = ((IAdaptable) o).getAdapter(IResource.class);
+                        resource = (IResource) ((IAdaptable) o)
+                                .getAdapter(IResource.class);
                     }
                 }
                 if (resource != null) {
@@ -616,7 +621,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
             if (input instanceof IResource) {
                 resource = (IResource) input;
             } else {
-                resource = input.getAdapter(IResource.class);
+                resource = (IResource) input.getAdapter(IResource.class);
             }
             if (resource != null) {
                 switch (resource.getType()) {
@@ -1516,13 +1521,16 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
         this.actionGroup = actionGroup;
     }
 
+    /*
+     * @see IWorkbenchPart#getAdapter(Class)
+     */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
         if (adapter == IShowInSource.class) {
-			return adapter.cast(getShowInSource());
+            return getShowInSource();
         }
         if (adapter == IShowInTarget.class) {
-			return adapter.cast(getShowInTarget());
+            return getShowInTarget();
         }
         return null;
     }

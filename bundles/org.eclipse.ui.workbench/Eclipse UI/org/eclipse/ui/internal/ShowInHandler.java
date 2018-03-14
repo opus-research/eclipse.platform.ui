@@ -116,7 +116,7 @@ public class ShowInHandler extends AbstractHandler implements IElementUpdater {
 	 * @return the <code>IShowInTarget</code> or <code>null</code>
 	 */
 	private IShowInTarget getShowInTarget(IWorkbenchPart targetPart) {
-		return Util.getAdapter(targetPart, IShowInTarget.class);
+		return (IShowInTarget) Util.getAdapter(targetPart, IShowInTarget.class);
 	}
 
 	@Override
