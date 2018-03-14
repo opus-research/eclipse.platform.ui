@@ -186,7 +186,7 @@ public class InternalDialog extends TrayDialog {
 		}
 		if (id == IDialogConstants.DETAILS_ID) {
 			// was the details button pressed?
-			dialogState.put(IStatusDialogConstants.DETAILS_OPENED, Boolean.valueOf(
+			dialogState.put(IStatusDialogConstants.DETAILS_OPENED, new Boolean(
 					toggleDetailsArea()));
 		} else {
 			super.buttonPressed(id);

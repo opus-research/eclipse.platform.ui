@@ -88,7 +88,7 @@ public class Adventure extends ModelObject {
 	public void setPetsAllowed(boolean b) {
 		boolean oldValue = petsAllowed;
 		petsAllowed = b;
-		firePropertyChange("petsAllowed", Boolean.valueOf(oldValue), Boolean.valueOf(
+		firePropertyChange("petsAllowed", new Boolean(oldValue), new Boolean(
 				petsAllowed));
 	}
 
