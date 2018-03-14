@@ -80,14 +80,12 @@ public class FilteredList extends Composite {
 	private class DefaultFilterMatcher implements FilterMatcher {
 		private StringMatcher fMatcher;
 
-		@Override
 		public void setFilter(String pattern, boolean ignoreCase,
 				boolean ignoreWildCards) {
 			fMatcher = new StringMatcher(pattern + '*', ignoreCase,
 					ignoreWildCards);
 		}
 
-		@Override
 		public boolean match(Object element) {
 			return fMatcher.match(fLabelProvider.getText(element));
 		}
@@ -188,7 +186,6 @@ public class FilteredList extends Composite {
 			labelIgnoreCase = ignoreCase;
 		}
 
-		@Override
 		public int compare(Object left, Object right) {
 			Label leftLabel = (Label) left;
 			Label rightLabel = (Label) right;
@@ -245,7 +242,6 @@ public class FilteredList extends Composite {
 		fList.setLayoutData(new GridData(GridData.FILL_BOTH));
 		fList.setFont(parent.getFont());
 		fList.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				fLabelProvider.dispose();
 				if (fUpdateJob != null) {
@@ -571,7 +567,11 @@ public class FilteredList extends Composite {
 			fCount = count;
 		}
 
-@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 public IStatus runInUIThread(IProgressMonitor monitor) {
             if (fTable.isDisposed()) {
 				return Status.CANCEL_STATUS;
@@ -773,7 +773,6 @@ public IStatus runInUIThread(IProgressMonitor monitor) {
 	 * 
 	 * @since 3.3
 	 */
-	@Override
 	public Accessible getAccessible() {
 		return fList.getAccessible();
 	}

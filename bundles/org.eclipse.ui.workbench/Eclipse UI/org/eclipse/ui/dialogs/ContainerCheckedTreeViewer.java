@@ -63,18 +63,15 @@ public class ContainerCheckedTreeViewer extends CheckboxTreeViewer {
     private void initViewer() {
         setUseHashlookup(true);
         addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
+            public void checkStateChanged(CheckStateChangedEvent event) {
                 doCheckStateChanged(event.getElement());
             }
         });
         addTreeListener(new ITreeViewerListener() {
-            @Override
-			public void treeCollapsed(TreeExpansionEvent event) {
+            public void treeCollapsed(TreeExpansionEvent event) {
             }
 
-            @Override
-			public void treeExpanded(TreeExpansionEvent event) {
+            public void treeExpanded(TreeExpansionEvent event) {
                 Widget item = findItem(event.getElement());
                 if (item instanceof TreeItem) {
                     initializeItem((TreeItem) item);
@@ -143,8 +140,10 @@ public class ContainerCheckedTreeViewer extends CheckboxTreeViewer {
     }
 
     
-    @Override
-	public boolean setChecked(Object element, boolean state) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ICheckable#setChecked(java.lang.Object, boolean)
+     */
+    public boolean setChecked(Object element, boolean state) {
         if (super.setChecked(element, state)) {
             doCheckStateChanged(element);
             return true;
@@ -153,8 +152,10 @@ public class ContainerCheckedTreeViewer extends CheckboxTreeViewer {
     }
 
  
-    @Override
-	public void setCheckedElements(Object[] elements) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.CheckboxTreeViewer#setCheckedElements(java.lang.Object[])
+     */
+    public void setCheckedElements(Object[] elements) {
         super.setCheckedElements(elements);
         for (int i = 0; i < elements.length; i++) {
             doCheckStateChanged(elements[i]);
@@ -162,8 +163,10 @@ public class ContainerCheckedTreeViewer extends CheckboxTreeViewer {
     }
 
 
-    @Override
-	protected void setExpanded(Item item, boolean expand) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.AbstractTreeViewer#setExpanded(org.eclipse.swt.widgets.Item, boolean)
+     */
+    protected void setExpanded(Item item, boolean expand) {
         super.setExpanded(item, expand);
         if (expand && item instanceof TreeItem) {
             initializeItem((TreeItem) item);
@@ -171,8 +174,10 @@ public class ContainerCheckedTreeViewer extends CheckboxTreeViewer {
     }
 
    
-    @Override
-	public Object[] getCheckedElements() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.CheckboxTreeViewer#getCheckedElements()
+     */
+    public Object[] getCheckedElements() {
         Object[] checked = super.getCheckedElements();
         // add all items that are children of a checked node but not created yet
         ArrayList result = new ArrayList();

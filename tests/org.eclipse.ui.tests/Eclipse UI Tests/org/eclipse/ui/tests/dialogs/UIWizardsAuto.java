@@ -120,8 +120,7 @@ public class UIWizardsAuto extends TestCase {
     /**
      * @see junit.framework.TestCase#tearDown()
      */
-    @Override
-	protected void tearDown() throws Exception {
+    protected void tearDown() throws Exception {
         super.tearDown();
         try {
             if (project != null) {
@@ -184,8 +183,7 @@ public class UIWizardsAuto extends TestCase {
      */
     public void testNewFile2() {
         BasicNewFileResourceWizard wizard = new BasicNewFileResourceWizard() {
-            @Override
-			public void addPages() {
+            public void addPages() {
                 super.addPages();
                 IWizardPage page = getPage("newFilePage1");
                 assertTrue("Expected newFilePage1",

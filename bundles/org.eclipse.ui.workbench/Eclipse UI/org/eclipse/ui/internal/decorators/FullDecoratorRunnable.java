@@ -40,8 +40,7 @@ abstract class FullDecoratorRunnable implements ISafeRunnable {
     /*
      * @see ISafeRunnable.handleException(Throwable).
      */
-    @Override
-	public void handleException(Throwable exception) {
+    public void handleException(Throwable exception) {
         IStatus status = StatusUtil.newStatus(IStatus.ERROR, exception
                 .getMessage(), exception);
 		String message = NLS.bind(WorkbenchMessages.DecoratorWillBeDisabled,

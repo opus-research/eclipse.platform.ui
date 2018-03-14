@@ -61,7 +61,6 @@ public class CSSSWTHelpers {
 				}
 			}
 			
-			@Override
 			public void paintControl(PaintEvent e) {
 				CSSBorderProperties border = (CSSBorderProperties) control
 						.getData(CSSSWTConstants.CONTROL_CSS2BORDER_KEY);

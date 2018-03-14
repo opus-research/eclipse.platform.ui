@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.contexts.IContextActivation;
@@ -73,7 +69,11 @@ public class MenuVisibilityTest extends UITestCase {
 	public void testBasicContribution() throws Exception {
 
 		IAction a = new Action() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#run()
+			 */
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -85,7 +85,12 @@ public class MenuVisibilityTest extends UITestCase {
 				new String[] { ISources.ACTIVE_CONTEXT_NAME });
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
+			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
+			 */
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, activeContextExpr);
@@ -95,29 +100,18 @@ public class MenuVisibilityTest extends UITestCase {
 		menuService.addContributionFactory(factory);
 		menuService.populateContributionManager(manager, LOCATION);
 		
-		Shell shell = window.getShell();
-
-		// Test the initial menu creation
-		final Menu menuBar = manager.createContextMenu(shell);
-		Event e = new Event();
-		e.type = SWT.Show;
-		e.widget = menuBar;
-		menuBar.notifyListeners(SWT.Show, e);
-		
 		assertFalse("starting state", item.isVisible());
 
 		activeContext = contextService
 				.activateContext(MenuContributionHarness.CONTEXT_TEST1_ID);
-		menuBar.notifyListeners(SWT.Show, e);
 
 		assertTrue("active context", item.isVisible());
 
 		contextService.deactivateContext(activeContext);
 		activeContext = null;
-		menuBar.notifyListeners(SWT.Show, e);
 
 		assertFalse("after deactivation", item.isVisible());
-		
+
 		menuService.releaseContributions(manager);
 		menuService.removeContributionFactory(factory);
 		manager.dispose();
@@ -125,7 +119,11 @@ public class MenuVisibilityTest extends UITestCase {
 
 	public void testExtensionContributionExpression() throws Exception {
 		IAction a = new Action() {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.action.Action#run()
+			 */
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -158,7 +156,12 @@ public class MenuVisibilityTest extends UITestCase {
 		assertNotNull("Failed to find expression", activeContextExpr[0]);
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
+			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
+			 */
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(aci, activeContextExpr[0]);
@@ -172,18 +175,12 @@ public class MenuVisibilityTest extends UITestCase {
 
 		activeContext = contextService
 				.activateContext(MenuContributionHarness.CONTEXT_TEST1_ID);
-		final Menu menu = manager.createContextMenu(window.getShell());
-		menu.notifyListeners(SWT.Show, new Event());
 		assertTrue("active context", aci.isVisible());
-		menu.notifyListeners(SWT.Hide, new Event());
 
-		
 		contextService.deactivateContext(activeContext);
 		activeContext = null;
 
-		menu.notifyListeners(SWT.Show, new Event());
 		assertFalse("after deactivation", aci.isVisible());
-		menu.notifyListeners(SWT.Hide, new Event());
 
 		menuService.releaseContributions(manager);
 		menuService.removeContributionFactory(factory);
@@ -191,13 +188,11 @@ public class MenuVisibilityTest extends UITestCase {
 	}
 
 	private static class TestEnabled extends AbstractEnabledHandler {
-		@Override
 		public Object execute(ExecutionEvent event) {
 			System.out.println("go");
 			return null;
 		}
 
-		@Override
 		public void setEnabled(boolean isEnabled) {
 			super.setEnabled(isEnabled);
 		}
@@ -213,7 +208,6 @@ public class MenuVisibilityTest extends UITestCase {
 
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, null);
@@ -226,7 +220,7 @@ public class MenuVisibilityTest extends UITestCase {
 		assertFalse(item.isEnabled());
 		assertFalse("starting state", item.isVisible());
 
-		IHandlerService handlers = window
+		IHandlerService handlers = (IHandlerService) window
 				.getService(IHandlerService.class);
 		TestEnabled handler = new TestEnabled();
 		IHandlerActivation activateHandler = handlers.activateHandler(
@@ -253,13 +247,17 @@ public class MenuVisibilityTest extends UITestCase {
 		manager.dispose();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
 		window = openTestWindow();
-		menuService = window.getService(IMenuService.class);
-		contextService = window
+		menuService = (IMenuService) window.getService(IMenuService.class);
+		contextService = (IContextService) window
 				.getService(IContextService.class);
 		Context context1 = contextService
 				.getContext(MenuContributionHarness.CONTEXT_TEST1_ID);
@@ -269,7 +267,11 @@ public class MenuVisibilityTest extends UITestCase {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);

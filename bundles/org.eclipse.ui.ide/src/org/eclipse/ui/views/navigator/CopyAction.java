@@ -40,7 +40,6 @@ import org.eclipse.ui.part.ResourceTransfer;
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  * @since 2.0
  */
-@Deprecated
 /*package*/class CopyAction extends SelectionListenerAction {
 
     /**
@@ -99,8 +98,7 @@ import org.eclipse.ui.part.ResourceTransfer;
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.Action#run()
      */
-    @Override
-	public void run() {
+    public void run() {
     	 /**
          * The <code>CopyAction</code> implementation of this method defined 
          * on <code>IAction</code> copies the selected resources to the 
@@ -182,8 +180,7 @@ import org.eclipse.ui.part.ResourceTransfer;
     /* (non-Javadoc)
      * @see org.eclipse.ui.actions.BaseSelectionListenerAction#updateSelection(org.eclipse.jface.viewers.IStructuredSelection)
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
     	
     	 /**
          * The <code>CopyAction</code> implementation of this

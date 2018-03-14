@@ -36,7 +36,11 @@ public class CommonFilterLabelProvider implements ITableLabelProvider, ILabelPro
 
 	 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
+	 */
 	public Image getImage(Object element) {
 		if (element instanceof NavigatorContentDescriptor) {
 			return CONTENT_DESCRIPTOR_REGISTRY.getImage(((INavigatorContentDescriptor) element).getId());
@@ -44,7 +48,11 @@ public class CommonFilterLabelProvider implements ITableLabelProvider, ILabelPro
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
+	 */
 	public String getText(Object element) {
 		if (element instanceof NavigatorContentDescriptor) {
 			return ((INavigatorContentDescriptor) element).getName();
@@ -54,26 +62,47 @@ public class CommonFilterLabelProvider implements ITableLabelProvider, ILabelPro
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+	 */
 	public void dispose() {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
+	 *      java.lang.String)
+	 */
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+	 */
 	public void removeListener(ILabelProviderListener listener) {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object, int)
+	 */
 	public Image getColumnImage(Object element, int columnIndex) {
 		switch (columnIndex) {
 			case 0 :
@@ -83,7 +112,11 @@ public class CommonFilterLabelProvider implements ITableLabelProvider, ILabelPro
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object, int)
+	 */
 	public String getColumnText(Object element, int columnIndex) {
 		switch (columnIndex) {
 			case 0 :

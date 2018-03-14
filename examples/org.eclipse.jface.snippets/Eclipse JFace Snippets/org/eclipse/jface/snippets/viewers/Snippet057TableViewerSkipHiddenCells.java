@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2010 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,14 +7,11 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442343
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -22,11 +19,13 @@ import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
@@ -34,10 +33,26 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example of showing how easy cell-navigation with hidden cells is in 3.4
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
  */
 public class Snippet057TableViewerSkipHiddenCells {
+
+	private class MyContentProvider implements IStructuredContentProvider {
+
+		public Object[] getElements(Object inputElement) {
+			return (Person[]) inputElement;
+		}
+
+		public void dispose() {
+
+		}
+
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
+		}
+
+	}
 
 	public class Person {
 		public String givenname;
@@ -61,17 +76,14 @@ public class Snippet057TableViewerSkipHiddenCells {
 			editor = new TextCellEditor(viewer.getTable());
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			this.doSetValue(element, value);
 			this.getViewer().update(element, null);
@@ -85,22 +97,21 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 		final TableViewer tableviewer = new TableViewer(shell, SWT.BORDER
 				| SWT.FULL_SELECTION);
-		tableviewer.setContentProvider(ArrayContentProvider.getInstance());
+		tableviewer.setContentProvider(new MyContentProvider());
 		MenuManager mgr = new MenuManager();
 		mgr.add(new Action("toggle surname visibility") {
 
-			@Override
 			public void run() {
 				if( tableviewer.getTable().getColumn(1).getWidth() == 0) {
 					tableviewer.getTable().getColumn(1).setWidth(200);
 				} else {
-					tableviewer.getTable().getColumn(1).setWidth(0);
+					tableviewer.getTable().getColumn(1).setWidth(0);	
 				}
-
+				
 			}
-
+			
 		});
-		tableviewer.getControl().setMenu(mgr.createContextMenu(tableviewer.getControl()));
+		tableviewer.getControl().setMenu(mgr.createContextMenu(tableviewer.getControl())); 
 
 		// Column 1
 		TableViewerColumn column = new TableViewerColumn(tableviewer, SWT.NONE);
@@ -109,7 +120,6 @@ public class Snippet057TableViewerSkipHiddenCells {
 		column.getColumn().setMoveable(false);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).givenname;
 			}
@@ -118,12 +128,10 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 		column.setEditingSupport(new AbstractEditingSupport(tableviewer) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).givenname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).givenname = value.toString();
 			}
@@ -138,7 +146,6 @@ public class Snippet057TableViewerSkipHiddenCells {
 		column.getColumn().setResizable(false);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).surname;
 			}
@@ -147,12 +154,10 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 		column.setEditingSupport(new AbstractEditingSupport(tableviewer) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).surname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).surname = value.toString();
 			}
@@ -166,7 +171,6 @@ public class Snippet057TableViewerSkipHiddenCells {
 		column.getColumn().setMoveable(false);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).email;
 			}
@@ -175,12 +179,10 @@ public class Snippet057TableViewerSkipHiddenCells {
 
 		column.setEditingSupport(new AbstractEditingSupport(tableviewer) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).email;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).email = value.toString();
 			}
@@ -198,7 +200,6 @@ public class Snippet057TableViewerSkipHiddenCells {
 		ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
 				tableviewer) {
 
-			@Override
 			protected boolean isEditorActivationEvent(
 
 			ColumnViewerEditorActivationEvent event) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,6 @@ public abstract class AbstractColumnLayout extends Layout {
 
 	private Listener resizeListener = new Listener() {
 
-		@Override
 		public void handleEvent(Event event) {
 			if (!inupdateMode) {
 				updateColumnData(event.widget);
@@ -218,13 +217,25 @@ public abstract class AbstractColumnLayout extends Layout {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
+	 * , int, int, boolean)
+	 */
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		return computeTableTreeSize(getControl(composite), wHint, hHint);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
+	 * boolean)
+	 */
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle area = composite.getClientArea();
 		Scrollable table = getControl(composite);

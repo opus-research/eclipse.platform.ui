@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2011 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -408,7 +408,6 @@ class Markers {
 	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -421,7 +420,6 @@ class Markers {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

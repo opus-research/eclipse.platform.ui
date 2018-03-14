@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -37,7 +36,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchEncoding;
@@ -84,10 +82,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 	private RadioGroupFieldEditor openReferencesEditor;
 
-	private StringFieldEditor systemExplorer;
-
-    @Override
-	protected Control createContents(Composite parent) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferencePage
+     */
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
@@ -115,10 +115,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		createSpace(composite);
 		
 		createOpenPrefControls(composite);
-
-		createSpace(composite);
-		createSystemExplorerGroup(composite);
-		createSpace(composite);
 		
 		Composite lower = new Composite(composite,SWT.NONE);
 		GridLayout lowerLayout = new GridLayout();
@@ -220,8 +216,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
         saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
 
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
+            public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(saveInterval.isValid());
 				}
@@ -298,7 +293,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		encodingEditor.setPage(this);
 		encodingEditor.load();
 		encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+			 */
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(encodingEditor.isValid());
@@ -326,44 +323,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		lineSeparatorEditor = new LineDelimiterEditor(lineComposite);
 		lineSeparatorEditor.doLoad();
     }
-
-	/**
-	 * Create the widget for the system explorer command.
-	 * 
-	 * @param composite
-	 */
-	protected void createSystemExplorerGroup(Composite composite) {
-		Composite groupComposite = new Composite(composite, SWT.LEFT);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		groupComposite.setLayout(layout);
-		GridData gd = new GridData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		groupComposite.setLayoutData(gd);
-
-		systemExplorer = new StringFieldEditor(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER,
-				IDEWorkbenchMessages.IDEWorkbenchPreference_workbenchSystemExplorer, 40, groupComposite);
-		Text textControl = systemExplorer.getTextControl(groupComposite);
-		BidiUtils.applyBidiProcessing(textControl, BidiUtils.LEFT_TO_RIGHT);
-		gd = (GridData) textControl.getLayoutData();
-		gd.horizontalAlignment = GridData.FILL;
-		gd.grabExcessHorizontalSpace = true;
-		systemExplorer.setPreferenceStore(getIDEPreferenceStore());
-		systemExplorer.setPage(this);
-
-		systemExplorer.load();
-
-		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(systemExplorer.isValid());
-				}
-			}
-		});
-	}
-
     /**
      * Returns the IDE preference store.
      * @return the preference store.
@@ -408,7 +367,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         return composite;
     }
 	
-	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
         //no-op
     }
@@ -416,8 +374,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The default button has been pressed.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
 
         // core holds onto this preference.
         boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
@@ -451,16 +408,13 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		lineSeparatorEditor.loadDefault();
 		openReferencesEditor.loadDefault();
 
-		systemExplorer.loadDefault();
-
         super.performDefaults();
     }
 
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();
@@ -505,9 +459,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         }
         
         workspaceName.store();
-
-		systemExplorer.store();
-
+        
         Preferences preferences = ResourcesPlugin.getPlugin()
                 .getPluginPreferences();
 
@@ -526,8 +478,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         encodingEditor.store();
 		lineSeparatorEditor.store();
 		openReferencesEditor.store();
-
-		return super.performOk();
+        return super.performOk();
     }
 
 }

@@ -32,12 +32,17 @@ public class ViewPatternFilter extends PatternFilter {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementSelectable(java.lang.Object)
+	 */
 	public boolean isElementSelectable(Object element) {
 		return element instanceof IViewDescriptor;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.PatternFilter#isElementMatch(org.eclipse.jface.viewers.Viewer, java.lang.Object)
+	 */
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		if (element instanceof IViewCategory) {
 			return false;

@@ -22,18 +22,15 @@ import org.eclipse.ui.part.EditorPart;
 
 public class EditorWithCreateControlsException extends EditorPart {
 
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
 
     }
 
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
 
     }
 
-    @Override
-	public void init(IEditorSite site, IEditorInput input)
+    public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
         if (!(input instanceof IFileEditorInput))
             throw new PartInitException("Invalid Input: Must be IFileEditorInput");
@@ -41,18 +38,15 @@ public class EditorWithCreateControlsException extends EditorPart {
         setInput(input);
     }
 
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
         return false;
     }
 
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         Label testLabel = new Label(parent, SWT.NONE);
         
         testLabel.setText("If you can read this, widgets are not being disposed properly when errors occur in createPartControl");
@@ -61,8 +55,7 @@ public class EditorWithCreateControlsException extends EditorPart {
 
     }
 
-    @Override
-	public void setFocus() {
+    public void setFocus() {
 
     }
 

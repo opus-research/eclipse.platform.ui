@@ -78,7 +78,6 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 	 */
 	public abstract void setStoppedImage(Image image);
 
-	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
 		if (stoppedImage == null || stoppedImage.isDisposed())
@@ -92,12 +91,10 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 			offScreenImage.dispose();
 	}
 
-	@Override
 	public boolean jobInit(AnimationEngine engine) {
 		return super.jobInit(engine);
 	}
 
-	@Override
 	public void renderStep(AnimationEngine engine) {
 		// TODO Auto-generated method stub
 		if (offScreenImage == null) {
@@ -116,7 +113,11 @@ public abstract class ImageCycleFeedbackBase extends AnimationFeedbackBase {
 			final Image finalImage = image;
 
 			display.syncExec(new Runnable() {
-				@Override
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.lang.Runnable#run()
+				 */
 				public void run() {
 					showImage(finalImage);
 

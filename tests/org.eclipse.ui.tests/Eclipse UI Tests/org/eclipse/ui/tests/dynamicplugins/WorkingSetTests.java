@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,28 +46,46 @@ public class WorkingSetTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.DynamicWorkingSetElementAdapter";
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#testClass()
+	 */
 	public void testClass() throws Exception {
 		super.testClass();
 		// commented out for now - it's causing grief
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newWorkingSet1.testDynamicWorkingSetAddition1";
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_WORKINGSETS;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
 	protected String getInstallLocation() {
 		return "data/org.eclipse.newWorkingSet1";
 	}
@@ -87,7 +105,6 @@ public class WorkingSetTests extends DynamicTestCase {
 
 		IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				synchronized (this) {
 					events[0] = event;
@@ -162,7 +179,6 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
-			@Override
 			public Object getAdapter(Class adapter) {
 				if (adapter == IResource.class)
 					return ResourcesPlugin.getWorkspace().getRoot();
@@ -208,7 +224,6 @@ public class WorkingSetTests extends DynamicTestCase {
 				.getWorkingSetManager();
 		IAdaptable adaptable = new IAdaptable() {
 
-			@Override
 			public Object getAdapter(Class adapter) {
 				if (adapter == IResource.class)
 					return ResourcesPlugin.getWorkspace().getRoot();

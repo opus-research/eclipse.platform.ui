@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,10 +15,12 @@ import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MGenericTile;
-import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
-import org.eclipse.e4.ui.model.application.ui.advanced.*;
+import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedPackageImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -92,7 +94,6 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseStackElement(placeholder);
 				if (result == null) result = caseUIElement(placeholder);
 				if (result == null) result = caseApplicationElement(placeholder);
-				if (result == null) result = caseLocalizable(placeholder);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -104,7 +105,6 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseContext(perspective);
 				if (result == null) result = caseUIElement(perspective);
 				if (result == null) result = caseApplicationElement(perspective);
-				if (result == null) result = caseLocalizable(perspective);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -115,7 +115,6 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = casePartSashContainerElement(perspectiveStack);
 				if (result == null) result = caseWindowElement(perspectiveStack);
 				if (result == null) result = caseApplicationElement(perspectiveStack);
-				if (result == null) result = caseLocalizable(perspectiveStack);
 				if (result == null) result = caseElementContainer(perspectiveStack);
 				if (result == null) result = caseUIElement(perspectiveStack);
 				if (result == null) result = defaultCase(theEObject);
@@ -132,7 +131,6 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 				if (result == null) result = caseElementContainer(area);
 				if (result == null) result = caseUIElement(area);
 				if (result == null) result = caseApplicationElement(area);
-				if (result == null) result = caseLocalizable(area);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -272,21 +270,6 @@ public class AdvancedSwitch<T1> extends Switch<T1> {
 	 * @generated
 	 */
 	public <T extends MUIElement> T1 caseElementContainer(MElementContainer<T> object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpreting the object as an instance of '<em>Localizable</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T1 caseLocalizable(MLocalizable object) {
 		return null;
 	}
 

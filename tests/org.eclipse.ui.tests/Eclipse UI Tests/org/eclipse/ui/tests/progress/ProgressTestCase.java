@@ -34,7 +34,9 @@ public abstract class ProgressTestCase extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		window = openTestWindow("org.eclipse.ui.resourcePerspective");

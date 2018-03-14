@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,33 +58,43 @@ public final class LocalResourceManager extends AbstractResourceManager {
         this(parentRegistry);
         
         owner.addDisposeListener(new DisposeListener() {
-	        @Override
-			public void widgetDisposed(DisposeEvent e) {
+	        /* (non-Javadoc)
+	         * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	         */
+	        public void widgetDisposed(DisposeEvent e) {
 	            LocalResourceManager.this.dispose();
 	        } 
         });
     }
     
-    @Override
-	public Device getDevice() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDevice()
+     */
+    public Device getDevice() {
         return parentRegistry.getDevice();
     }
     
-    @Override
-	protected Object allocate(DeviceResourceDescriptor descriptor)
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#allocate(org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected Object allocate(DeviceResourceDescriptor descriptor)
             throws DeviceResourceException {
         return parentRegistry.create(descriptor);
     }
     
-    @Override
-	protected void deallocate(Object resource,
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.AbstractResourceManager#deallocate(java.lang.Object, org.eclipse.jface.resource.DeviceResourceDescriptor)
+     */
+    protected void deallocate(Object resource,
             DeviceResourceDescriptor descriptor) {
         
         parentRegistry.destroy(descriptor);
     }
 
-    @Override
-	protected Image getDefaultImage() {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.resource.ResourceManager#getDefaultImage()
+     */
+    protected Image getDefaultImage() {
         return parentRegistry.getDefaultImage();
     }
 }

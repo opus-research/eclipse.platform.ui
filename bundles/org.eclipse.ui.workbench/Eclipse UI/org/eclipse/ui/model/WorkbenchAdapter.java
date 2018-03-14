@@ -33,8 +33,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter</code> method
      * returns the empty list. Subclasses may override.
      */
-    @Override
-	public Object[] getChildren(Object object) {
+    public Object[] getChildren(Object object) {
         return NO_CHILDREN;
     }
 
@@ -42,8 +41,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter</code> method
      * returns <code>null</code>. Subclasses may override.
      */
-    @Override
-	public ImageDescriptor getImageDescriptor(Object object) {
+    public ImageDescriptor getImageDescriptor(Object object) {
         return null;
     }
 
@@ -52,8 +50,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * returns the empty string if the object is <code>null</code>, and
      * the object's <code>toString</code> otherwise. Subclasses may override.
      */
-    @Override
-	public String getLabel(Object object) {
+    public String getLabel(Object object) {
         return object == null ? "" : object.toString(); //$NON-NLS-1$
     }
 
@@ -61,8 +58,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter</code> method
      * returns <code>null</code>. Subclasses may override.
      */
-    @Override
-	public Object getParent(Object object) {
+    public Object getParent(Object object) {
         return null;
     }
 
@@ -70,8 +66,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter2</code> method
      * returns <code>null</code>. Subclasses may override.
      */
-    @Override
-	public RGB getBackground(Object element) {
+    public RGB getBackground(Object element) {
         return null;
     }
 
@@ -79,8 +74,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter2</code> method
      * returns <code>null</code>. Subclasses may override.
      */
-    @Override
-	public RGB getForeground(Object element) {
+    public RGB getForeground(Object element) {
         return null;
     }
 
@@ -88,8 +82,7 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
      * The default implementation of this <code>IWorkbenchAdapter2</code> method
      * returns <code>null</code>. Subclasses may override.
      */
-    @Override
-	public FontData getFont(Object element) {
+    public FontData getFont(Object element) {
         return null;
     }
 
@@ -103,7 +96,6 @@ public abstract class WorkbenchAdapter implements IWorkbenchAdapter,
 	 * 
 	 * @since 3.7
 	 */
-	@Override
 	public StyledString getStyledText(Object object) {
 		return new StyledString(getLabel(object));
     }

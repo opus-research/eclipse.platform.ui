@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,11 @@ public class OpenWorkspaceAction extends Action implements
 			setToolTipText(IDEWorkbenchMessages.OpenWorkspaceAction_toolTip);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		public void run() {
 			OpenWorkspaceAction.this.run();
 		}
@@ -88,7 +92,11 @@ public class OpenWorkspaceAction extends Action implements
 			this.data = data;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.Action#run()
+		 */
 		public void run() {
 			data.workspaceSelected(location);
 			data.writePersistedData();
@@ -150,11 +158,14 @@ public class OpenWorkspaceAction extends Action implements
 			}
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
+		 */
 		public Menu getMenu(Control parent) {
 			createDropDownMenuMgr();
 			dropDownMenuMgr.addMenuListener(new IMenuListener() {
-				@Override
 				public void menuAboutToShow(IMenuManager manager) {
 					IContributionItem[] items = getContributionItems();
 					for (int i = 0; i < items.length; i++) {
@@ -166,12 +177,15 @@ public class OpenWorkspaceAction extends Action implements
 			return dropDownMenuMgr.createContextMenu(parent);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
+		 */
 		public Menu getMenu(Menu parent) {
 			createDropDownMenuMgr();
 			final Menu menu = new Menu(parent);
 			menu.addListener(SWT.Show, new Listener() {
-				@Override
 				public void handleEvent(Event event) {
 					if (menu.isDisposed()) {
 						return;
@@ -191,7 +205,11 @@ public class OpenWorkspaceAction extends Action implements
 			return menu;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.action.IMenuCreator#dispose()
+		 */
 		public void dispose() {
 			if (dropDownMenuMgr != null) {
 				dropDownMenuMgr.dispose();
@@ -232,7 +250,11 @@ public class OpenWorkspaceAction extends Action implements
 		setMenuCreator(new MenuCreator());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#run()
+	 */
 	public void run() {
 		String path = promptForWorkspace();
 		if (path == null) {
@@ -353,7 +375,11 @@ public class OpenWorkspaceAction extends Action implements
 		return result.toString();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.action.Action#dispose()
+	 */
 	public void dispose() {
 		window = null;
 	}

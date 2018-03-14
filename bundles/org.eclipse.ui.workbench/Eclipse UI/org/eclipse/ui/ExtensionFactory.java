@@ -143,7 +143,6 @@ public class ExtensionFactory implements IExecutableExtensionFactory,
 	 * Creates the object referenced by the factory id obtained from the
 	 * extension data.
 	 */
-	@Override
 	public Object create() throws CoreException {
 		if (APPEARANCE_PREFERENCE_PAGE.equals(id)) {
 			return configure(new ViewsPreferencePage());
@@ -193,7 +192,12 @@ public class ExtensionFactory implements IExecutableExtensionFactory,
 				0, "Unknown id in data argument for " + getClass(), null)); //$NON-NLS-1$
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
+	 *      java.lang.String, java.lang.Object)
+	 */
 	public void setInitializationData(IConfigurationElement config,
 			String propertyName, Object data) throws CoreException {
 		if (data instanceof String) {

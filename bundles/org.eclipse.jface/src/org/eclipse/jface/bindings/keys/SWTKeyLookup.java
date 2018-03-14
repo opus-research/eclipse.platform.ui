@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 444070
  *******************************************************************************/
 package org.eclipse.jface.bindings.keys;
 
@@ -35,19 +34,19 @@ public final class SWTKeyLookup implements IKeyLookup {
 	 * The look-up table for modifier keys. This is a map of formal name (<code>String</code>)
 	 * to integer value (<code>Integer</code>).
 	 */
-	private final Map<String, Integer> modifierKeyTable = new HashMap<String, Integer>();
+	private final Map modifierKeyTable = new HashMap();
 
 	/**
 	 * The look-up table for formal names. This is a map of integer value (<code>Integer</code>)
 	 * to formal name (<code>String</code>).
 	 */
-	private final Map<Integer, String> nameTable = new HashMap<Integer, String>();
+	private final Map nameTable = new HashMap();
 
 	/**
 	 * The look-up table for natural keys. This is a map of formal name (<code>String</code>)
 	 * to integer value (<code>Integer</code>).
 	 */
-	private final Map<String, Integer> naturalKeyTable = new HashMap<String, Integer>();
+	private final Map naturalKeyTable = new HashMap();
 
 	/**
 	 * Constructs a new look-up class. This should only be done by the look-up
@@ -267,8 +266,13 @@ public final class SWTKeyLookup implements IKeyLookup {
 		naturalKeyTable.put(VT_NAME, vt);
 		nameTable.put(vt, VT_NAME);
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalKeyLookup(java.lang.String)
+ 	 * 
+	 */	
 	public final int formalKeyLookup(final String name) {
 		final Object value = naturalKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -282,8 +286,13 @@ public final class SWTKeyLookup implements IKeyLookup {
 
 		return name.charAt(0);
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalKeyLookupInteger(java.lang.String)
+ 	 * 
+	 */	
 	public final Integer formalKeyLookupInteger(final String name) {
 		final Object value = naturalKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -292,8 +301,13 @@ public final class SWTKeyLookup implements IKeyLookup {
 
 		return new Integer(name.charAt(0));
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalModifierLookup(java.lang.String)
+ 	 * 
+	 */	
 	public final int formalModifierLookup(final String name) {
 		final Object value = modifierKeyTable.get(name);
 		if (value instanceof Integer) {
@@ -302,8 +316,13 @@ public final class SWTKeyLookup implements IKeyLookup {
 
 		return 0;
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#formalNameLookup(int)
+ 	 * 
+	 */	
 	public final String formalNameLookup(final int key) {
 		final Integer keyObject = new Integer(key);
 		final Object value = nameTable.get(keyObject);
@@ -313,28 +332,53 @@ public final class SWTKeyLookup implements IKeyLookup {
 
 		return Util.ZERO_LENGTH_STRING + ((char) key);
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getAlt()
+ 	 * 
+	 */	
 	public final int getAlt() {
 		return SWT.ALT;
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getCommand()
+ 	 * 
+	 */	
 	public final int getCommand() {
 		return SWT.COMMAND;
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getCtrl()
+ 	 * 
+	 */	
 	public final int getCtrl() {
 		return SWT.CTRL;
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#getShift()
+ 	 * 
+	 */	
 	public final int getShift() {
 		return SWT.SHIFT;
 	}
-	
-	@Override
+
+	/*
+     * (non-Javadoc)
+     * 
+ 	 * @see org.eclipse.jface.bindings.keys.IKeyLookup#isModifierKey(int)
+ 	 * 
+	 */	
 	public final boolean isModifierKey(final int key) {
 		return ((key & SWT.MODIFIER_MASK) != 0);
 	}

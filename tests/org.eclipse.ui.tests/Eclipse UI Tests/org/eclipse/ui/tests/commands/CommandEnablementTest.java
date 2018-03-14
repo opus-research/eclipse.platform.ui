@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,16 +96,20 @@ public class CommandEnablementTest extends UITestCase {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
-		commandService = fWorkbench
+		commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
-		handlerService = fWorkbench
+		handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
-		contextService = fWorkbench
+		contextService = (IContextService) fWorkbench
 				.getService(IContextService.class);
-		evalService = fWorkbench
+		evalService = (IEvaluationService) fWorkbench
 				.getService(IEvaluationService.class);
 		cmd1 = commandService.getCommand(CMD1_ID);
 		cmd3 = commandService.getCommand(CMD3_ID);
@@ -118,7 +122,11 @@ public class CommandEnablementTest extends UITestCase {
 		contextHandler = new CheckContextHandler();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+	 */
 	protected void doTearDown() throws Exception {
 		if (activation1 != null) {
 			handlerService.deactivateHandler(activation1);
@@ -141,7 +149,11 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class DefaultHandler extends AbstractHandler {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
 			return null;
@@ -150,13 +162,21 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class DisabledHandler extends AbstractHandler {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
 			return null;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+		 */
 		public boolean isEnabled() {
 			return false;
 		}
@@ -164,7 +184,11 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class EnableEventHandler extends AbstractHandler {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActiveContextsChecked(event);
 			return null;
@@ -172,7 +196,11 @@ public class CommandEnablementTest extends UITestCase {
 
 		private boolean fEnabled = true;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+		 */
 		public boolean isEnabled() {
 			return fEnabled;
 		}
@@ -187,13 +215,16 @@ public class CommandEnablementTest extends UITestCase {
 
 	private static class CheckContextHandler extends AbstractHandler {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+		 */
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			HandlerUtil.getActivePartChecked(event);
 			return null;
 		}
 
-		@Override
 		public void setEnabled(Object applicationContext) {
 			Object o = HandlerUtil.getVariable(applicationContext,
 					ISources.ACTIVE_PART_NAME);
@@ -204,7 +235,11 @@ public class CommandEnablementTest extends UITestCase {
 	private static class EnablementListener implements ICommandListener {
 		public int enabledChanged = 0;
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.commands.ICommandListener#commandChanged(org.eclipse.core.commands.CommandEvent)
+		 */
 		public void commandChanged(CommandEvent commandEvent) {
 			if (commandEvent.isEnabledChanged()) {
 				enabledChanged++;
@@ -220,12 +255,10 @@ public class CommandEnablementTest extends UITestCase {
 			this.text = text;
 		}
 		
-		@Override
 		public void updateElement(UIElement element, Map parameters) {
 			element.setText(text);
 		}
 
-		@Override
 		public Object execute(ExecutionEvent event) {
 			return null;
 		}
@@ -242,7 +275,7 @@ public class CommandEnablementTest extends UITestCase {
 		
 		String menuId = "org.eclipse.ui.tests.Bug275126";
 		MenuManager manager = new MenuManager(null, menuId);
-		IMenuService menuService = fWorkbench.getService(IMenuService.class);
+		IMenuService menuService = (IMenuService) fWorkbench.getService(IMenuService.class);
 		menuService.populateContributionManager(manager, MenuUtil.menuUri(menuId));
 		IContributionItem[] items = manager.getItems();
 		assertEquals(1, items.length);
@@ -326,11 +359,11 @@ public class CommandEnablementTest extends UITestCase {
 	}
 	
 	private IHandler getHandler(Command command) {
-		EHandlerService service = getWorkbench().getService(EHandlerService.class);
+		EHandlerService service = (EHandlerService) getWorkbench().getService(EHandlerService.class);
 		if (service == null) {
 			return null;
 		}
-		IEclipseContext ctx = getWorkbench().getService(IEclipseContext.class);
+		IEclipseContext ctx = (IEclipseContext) getWorkbench().getService(IEclipseContext.class);
 		Object handler = HandlerServiceImpl.lookUpHandler(ctx, command.getId());
 		if (handler instanceof E4HandlerProxy) {
 			return ((E4HandlerProxy) handler).getHandler();
@@ -348,7 +381,7 @@ public class CommandEnablementTest extends UITestCase {
 		activation2 = handlerService.activateHandler(CMD1_ID, normalHandler2,
 				new ActiveContextExpression(CONTEXT_TEST2,
 						new String[] { ISources.ACTIVE_CONTEXT_NAME }));
-		IEclipseContext ctx = getWorkbench().getService(IEclipseContext.class);
+		IEclipseContext ctx = (IEclipseContext) getWorkbench().getService(IEclipseContext.class);
 		ctx.processWaiting();
 
 		assertFalse(cmd1.isHandled());
@@ -531,7 +564,6 @@ public class CommandEnablementTest extends UITestCase {
 	private static class Checker implements IHandlerListener {
 		boolean lastChange = false;
 
-		@Override
 		public void handlerChanged(HandlerEvent handlerEvent) {
 			lastChange = handlerEvent.isEnabledChanged();
 		}
@@ -569,7 +601,7 @@ public class CommandEnablementTest extends UITestCase {
 		Checker listener = new Checker();
 		proxy.addHandlerListener(listener);
 		assertFalse(proxy.isEnabled());
-		ISourceProviderService providers = fWorkbench
+		ISourceProviderService providers = (ISourceProviderService) fWorkbench
 				.getService(ISourceProviderService.class);
 		WorkbenchSourceProvider selectionProvider = (WorkbenchSourceProvider) providers
 				.getSourceProvider(ISources.ACTIVE_CURRENT_SELECTION_NAME);

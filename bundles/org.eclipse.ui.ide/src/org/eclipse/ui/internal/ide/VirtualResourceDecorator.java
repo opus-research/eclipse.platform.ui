@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -29,7 +28,7 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	static {
 		VIRTUAL_FOLDER = AbstractUIPlugin.imageDescriptorFromPlugin(
 				IDEWorkbenchPlugin.IDE_WORKBENCH,
-				"$nl$/icons/full/ovr16/virt_ovr.png"); //$NON-NLS-1$
+				"$nl$/icons/full/ovr16/virt_ovr.gif"); //$NON-NLS-1$
 	}
 
 	/**
@@ -41,14 +40,12 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(ILabelProviderListener)
 	 */
-	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 	 */
-	@Override
 	public void dispose() {
 		// no resources to dispose
 	}
@@ -57,7 +54,6 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
 	 *      java.lang.String)
 	 */
-	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
@@ -65,7 +61,6 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	/**
 	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(ILabelProviderListener)
 	 */
-	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
@@ -79,7 +74,6 @@ public class VirtualResourceDecorator implements ILightweightLabelDecorator {
 	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate(Object,
 	 *      IDecoration)
 	 */
-	@Override
 	public void decorate(Object element, IDecoration decoration) {
 		if (element instanceof IFolder && ((IResource) element).isVirtual()) {
 			decoration.addOverlay(VIRTUAL_FOLDER, IDecoration.BOTTOM_RIGHT);

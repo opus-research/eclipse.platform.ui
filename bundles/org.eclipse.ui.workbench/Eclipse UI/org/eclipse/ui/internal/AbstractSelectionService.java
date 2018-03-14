@@ -58,8 +58,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
      * The JFace selection listener to hook on the active part's selection provider.
      */
     private ISelectionChangedListener selListener = new ISelectionChangedListener() {
-        @Override
-		public void selectionChanged(SelectionChangedEvent event) {
+        public void selectionChanged(SelectionChangedEvent event) {
             fireSelection(activePart, event.getSelection());
         }
     };
@@ -68,8 +67,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
      * The JFace post selection listener to hook on the active part's selection provider.
      */
     private ISelectionChangedListener postSelListener = new ISelectionChangedListener() {
-        @Override
-		public void selectionChanged(SelectionChangedEvent event) {
+        public void selectionChanged(SelectionChangedEvent event) {
             firePostSelection(activePart, event.getSelection());
         }
     };
@@ -80,45 +78,63 @@ public abstract class AbstractSelectionService implements ISelectionService {
     protected AbstractSelectionService() {
     }
 
-    @Override
-	public void addSelectionListener(ISelectionListener l) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void addSelectionListener(ISelectionListener l) {
         listeners.add(l);
     }
 
-    @Override
-	public void addSelectionListener(String partId, ISelectionListener listener) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void addSelectionListener(String partId, ISelectionListener listener) {
         getPerPartTracker(partId).addSelectionListener(listener);
     }
 
-    @Override
-	public void addPostSelectionListener(ISelectionListener l) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void addPostSelectionListener(ISelectionListener l) {
         postListeners.add(l);
     }
 
-    @Override
-	public void addPostSelectionListener(String partId,
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void addPostSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).addPostSelectionListener(listener);
     }
 
-    @Override
-	public void removeSelectionListener(ISelectionListener l) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void removeSelectionListener(ISelectionListener l) {
         listeners.remove(l);
     }
 
-    @Override
-	public void removePostSelectionListener(String partId,
+    /*
+     * (non-Javadoc)
+     * Method declared on ISelectionListener.
+     */
+    public void removePostSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).removePostSelectionListener(listener);
     }
 
-    @Override
-	public void removePostSelectionListener(ISelectionListener l) {
+    /* (non-Javadoc)
+     * Method declared on ISelectionService.
+     */
+    public void removePostSelectionListener(ISelectionListener l) {
         postListeners.remove(l);
     }
 
-    @Override
-	public void removeSelectionListener(String partId,
+    /*
+     * (non-Javadoc)
+     * Method declared on ISelectionListener.
+     */
+    public void removeSelectionListener(String partId,
             ISelectionListener listener) {
         getPerPartTracker(partId).removeSelectionListener(listener);
     }
@@ -199,8 +215,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
     /**
      * Returns the selection.
      */
-    @Override
-	public ISelection getSelection() {
+    public ISelection getSelection() {
         if (activeProvider != null) {
 			return activeProvider.getSelection();
 		} else {
@@ -211,8 +226,7 @@ public abstract class AbstractSelectionService implements ISelectionService {
     /*
      * @see ISelectionService#getSelection(String)
      */
-    @Override
-	public ISelection getSelection(String partId) {
+    public ISelection getSelection(String partId) {
         return getPerPartTracker(partId).getSelection();
     }
 

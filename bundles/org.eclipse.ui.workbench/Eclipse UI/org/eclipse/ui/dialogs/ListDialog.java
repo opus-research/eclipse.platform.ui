@@ -93,8 +93,7 @@ public class ListDialog extends SelectionDialog {
         return fTableViewer;
     }
 
-    @Override
-	protected void createButtonsForButtonBar(Composite parent) {
+    protected void createButtonsForButtonBar(Composite parent) {
         if (!fAddCancelButton) {
 			createButton(parent, IDialogConstants.OK_ID,
                     IDialogConstants.OK_LABEL, true);
@@ -103,8 +102,7 @@ public class ListDialog extends SelectionDialog {
 		}
     }
 
-    @Override
-	protected Control createDialogArea(Composite container) {
+    protected Control createDialogArea(Composite container) {
         Composite parent = (Composite) super.createDialogArea(container);
         createMessageArea(parent);
         fTableViewer = new TableViewer(parent, getTableStyle());
@@ -112,8 +110,7 @@ public class ListDialog extends SelectionDialog {
         fTableViewer.setLabelProvider(fLabelProvider);
         fTableViewer.setInput(fInput);
         fTableViewer.addDoubleClickListener(new IDoubleClickListener() {
-            @Override
-			public void doubleClick(DoubleClickEvent event) {
+            public void doubleClick(DoubleClickEvent event) {
                 if (fAddCancelButton) {
 					okPressed();
 				}
@@ -144,8 +141,7 @@ public class ListDialog extends SelectionDialog {
     /*
      * Overrides method from Dialog
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
         // Build a list of selected children.
         IStructuredSelection selection = (IStructuredSelection) fTableViewer
                 .getSelection();

@@ -43,8 +43,6 @@ import java.util.Map;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @noimplement This interface is not intended to be implemented by clients.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICommand extends Comparable {
 
     /**
@@ -58,7 +56,6 @@ public interface ICommand extends Comparable {
      *            is already registered with this instance, no operation is
      *            performed.
      */
-	@Deprecated
     void addCommandListener(ICommandListener commandListener);
 
     /**
@@ -74,7 +71,6 @@ public interface ICommand extends Comparable {
      * @throws NotHandledException
      *             if this is not handled.
      */
-	@Deprecated
     Object execute(Map parameterValuesByName) throws ExecutionException,
             NotHandledException;
 
@@ -92,7 +88,6 @@ public interface ICommand extends Comparable {
      * @throws NotHandledException
      *             if this is not handled.
      */
-	@Deprecated
     Map getAttributeValuesByName() throws NotHandledException;
 
     /**
@@ -110,7 +105,6 @@ public interface ICommand extends Comparable {
      * @throws NotDefinedException
      *             if the command represented by this handle is not defined.
      */
-	@Deprecated
     String getCategoryId() throws NotDefinedException;
 
     /**
@@ -128,7 +122,6 @@ public interface ICommand extends Comparable {
      * @throws NotDefinedException
      *             if the command represented by this handle is not defined.
      */
-	@Deprecated
     String getDescription() throws NotDefinedException;
 
     /**
@@ -137,7 +130,6 @@ public interface ICommand extends Comparable {
      * @return the identifier of this handle. Guaranteed not to be
      *         <code>null</code>.
      */
-	@Deprecated
     String getId();
 
     /**
@@ -173,7 +165,6 @@ public interface ICommand extends Comparable {
      * @throws NotDefinedException
      *             if the command represented by this handle is not defined.
      */
-	@Deprecated
     String getName() throws NotDefinedException;
 
     /**
@@ -188,7 +179,6 @@ public interface ICommand extends Comparable {
      * @return <code>true</code>, iff the command represented by this handle
      *         is defined.
      */
-	@Deprecated
     boolean isDefined();
 
     /**
@@ -205,7 +195,6 @@ public interface ICommand extends Comparable {
      * 
      * @return <code>true</code>, iff this command is enabled.
      */
-	@Deprecated
     boolean isHandled();
 
     /**
@@ -219,6 +208,5 @@ public interface ICommand extends Comparable {
      *            which is not already registered with this instance, no
      *            operation is performed.
      */
-	@Deprecated
     void removeCommandListener(ICommandListener commandListener);
 }

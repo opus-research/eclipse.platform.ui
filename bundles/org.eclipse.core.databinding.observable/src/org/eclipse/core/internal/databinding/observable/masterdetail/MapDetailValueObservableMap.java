@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2011 Ovidio Mallo and others.
+ * Copyright (c) 2010 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -57,21 +57,18 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 	private IdentitySet staleDetailObservables = new IdentitySet();
 
 	private IMapChangeListener masterMapListener = new IMapChangeListener() {
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			handleMasterMapChange(event.diff);
 		}
 	};
 
 	private IStaleListener masterStaleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			fireStale();
 		}
 	};
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
-		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			addStaleDetailObservable((IObservableValue) staleEvent
 					.getObservable());
@@ -94,7 +91,6 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		masterMap.addMapChangeListener(masterMapListener);
 		masterMap.addStaleListener(masterStaleListener);
 		masterMap.addDisposeListener(new IDisposeListener() {
-			@Override
 			public void handleDispose(DisposeEvent event) {
 				MapDetailValueObservableMap.this.dispose();
 			}
@@ -175,7 +171,6 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 			keyDetailMap.put(addedKey, detailValue);
 
 			detailValue.addValueChangeListener(new IValueChangeListener() {
-				@Override
 				public void handleValueChange(ValueChangeEvent event) {
 					if (!event.getObservableValue().isStale()) {
 						staleDetailObservables.remove(event.getSource());
@@ -227,14 +222,12 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		}
 	}
 
-	@Override
 	public Set keySet() {
 		getterCalled();
 
 		return masterMap.keySet();
 	}
 
-	@Override
 	public Object get(Object key) {
 		getterCalled();
 
@@ -246,7 +239,6 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		return detailValue.getValue();
 	}
 
-	@Override
 	public Object put(Object key, Object value) {
 		if (!containsKey(key)) {
 			return null;
@@ -258,14 +250,12 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		return oldValue;
 	}
 
-	@Override
 	public boolean containsKey(Object key) {
 		getterCalled();
 
 		return masterMap.containsKey(key);
 	}
 
-	@Override
 	public Object remove(Object key) {
 		checkRealm();
 
@@ -281,14 +271,12 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		return oldValue;
 	}
 
-	@Override
 	public int size() {
 		getterCalled();
 
 		return masterMap.size();
 	}
 
-	@Override
 	public boolean isStale() {
 		return super.isStale()
 				|| (masterMap != null && masterMap.isStale())
@@ -296,22 +284,18 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 						.isEmpty());
 	}
 
-	@Override
 	public Object getKeyType() {
 		return masterMap.getKeyType();
 	}
 
-	@Override
 	public Object getValueType() {
 		return detailValueType;
 	}
 
-	@Override
 	public Object getObserved() {
 		return masterMap;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		if (masterMap != null) {
 			masterMap.removeMapChangeListener(masterMapListener);
@@ -338,7 +322,6 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 		super.dispose();
 	}
 
-	@Override
 	public Set entrySet() {
 		getterCalled();
 
@@ -354,30 +337,25 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 
 	private class EntrySet extends AbstractSet {
 
-		@Override
 		public Iterator iterator() {
 			final Iterator keyIterator = keySet().iterator();
 			return new Iterator() {
 
-				@Override
 				public boolean hasNext() {
 					return keyIterator.hasNext();
 				}
 
-				@Override
 				public Object next() {
 					Object key = keyIterator.next();
 					return new MapEntry(key);
 				}
 
-				@Override
 				public void remove() {
 					keyIterator.remove();
 				}
 			};
 		}
 
-		@Override
 		public int size() {
 			return MapDetailValueObservableMap.this.size();
 		}
@@ -391,23 +369,19 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 			this.key = key;
 		}
 
-		@Override
 		public Object getKey() {
 			MapDetailValueObservableMap.this.getterCalled();
 			return key;
 		}
 
-		@Override
 		public Object getValue() {
 			return MapDetailValueObservableMap.this.get(getKey());
 		}
 
-		@Override
 		public Object setValue(Object value) {
 			return MapDetailValueObservableMap.this.put(getKey(), value);
 		}
 
-		@Override
 		public boolean equals(Object o) {
 			MapDetailValueObservableMap.this.getterCalled();
 			if (o == this)
@@ -421,7 +395,6 @@ public class MapDetailValueObservableMap extends AbstractObservableMap
 					&& Util.equals(this.getValue(), that.getValue());
 		}
 
-		@Override
 		public int hashCode() {
 			MapDetailValueObservableMap.this.getterCalled();
 			Object value = getValue();

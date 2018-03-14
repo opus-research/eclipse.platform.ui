@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -151,8 +151,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return false;
     }
 
-    @Override
-	public void dispose() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#dispose()
+     */
+    public void dispose() {
         // Dispose of the ToolBar and all its contributions
         if (toolBarManager != null) {
             toolBarManager.dispose();
@@ -172,8 +176,13 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         disposed = true;
     }
 
-    @Override
-	public void fill(CoolBar coolBar, int index) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar,
+     *      int)
+     */
+    public void fill(CoolBar coolBar, int index) {
         if (checkDisposed()) {
             return;
         }
@@ -207,8 +216,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             if (oldToolBar != toolBar) {
 	            toolBar.addListener(SWT.MenuDetect, new Listener() {
 	
-	                @Override
-					public void handleEvent(Event event) {
+	                public void handleEvent(Event event) {
 	                    // if the toolbar does not have its own context menu then
 	                    // handle the event
 	                    if (toolBarManager.getContextMenuManager() == null) {
@@ -223,8 +231,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
                 // Chevron Support
                 coolItem.addSelectionListener(new SelectionAdapter() {
 
-                    @Override
-					public void widgetSelected(SelectionEvent event) {
+                    public void widgetSelected(SelectionEvent event) {
                         if (event.detail == SWT.ARROW) {
                             handleChevron(event);
                         }
@@ -235,8 +242,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // Handle for disposal
             coolItem.addDisposeListener(new DisposeListener() {
 
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     handleWidgetDispose(event);
                 }
             });
@@ -275,8 +281,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * 
      * @return the current height
      */
-    @Override
-	public int getCurrentHeight() {
+    public int getCurrentHeight() {
         if (checkDisposed()) {
             return -1;
         }
@@ -288,8 +293,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * 
      * @return the current size
      */
-    @Override
-	public int getCurrentWidth() {
+    public int getCurrentWidth() {
         if (checkDisposed()) {
             return -1;
         }
@@ -303,8 +307,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      *         if a value was not set
      * @see #setMinimumItemsToShow(int)
      */
-    @Override
-	public int getMinimumItemsToShow() {
+    public int getMinimumItemsToShow() {
         if (checkDisposed()) {
             return -1;
         }
@@ -318,8 +321,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      *         defined.
      * @see IToolBarManager
      */
-    @Override
-	public IToolBarManager getToolBarManager() {
+    public IToolBarManager getToolBarManager() {
         if (checkDisposed()) {
             return null;
         }
@@ -332,8 +334,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * @return <code>true</code> if chevron support is enabled, <code>false</code>
      *         otherwise
      */
-    @Override
-	public boolean getUseChevron() {
+    public boolean getUseChevron() {
         if (checkDisposed()) {
             return false;
         }
@@ -353,7 +354,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         ToolBar toolBar = (ToolBar) control;
         Rectangle toolBarBounds = toolBar.getBounds();
         ToolItem[] items = toolBar.getItems();
-        ArrayList<ToolItem> hidden = new ArrayList<ToolItem>();
+        ArrayList hidden = new ArrayList();
         for (int i = 0; i < items.length; ++i) {
             Rectangle itemBounds = items[i].getBounds();
             if (!((itemBounds.x + itemBounds.width <= toolBarBounds.width) && (itemBounds.y
@@ -367,8 +368,8 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             chevronMenuManager.dispose();
         }
         chevronMenuManager = new MenuManager();
-        for (Iterator<ToolItem> i = hidden.iterator(); i.hasNext();) {
-            ToolItem toolItem = i.next();
+        for (Iterator i = hidden.iterator(); i.hasNext();) {
+            ToolItem toolItem = (ToolItem) i.next();
             IContributionItem data = (IContributionItem) toolItem.getData();
             if (data instanceof ActionContributionItem) {
                 ActionContributionItem contribution = new ActionContributionItem(
@@ -408,8 +409,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
             // Hook listener to remove menu once it has disapeared
             parentMenu.addListener(SWT.Hide, new Listener() {
 
-                @Override
-				public void handleEvent(Event innerEvent) {
+                public void handleEvent(Event innerEvent) {
                     ToolBar innerToolBar = toolBarManager.getControl();
                     if (innerToolBar != null) {
                         innerToolBar.setMenu(null);
@@ -443,8 +443,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      *         other than group marks and separators, and the internal state is
      *         set to be visible.
      */
-    @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         if (checkDisposed()) {
             return false;
         }
@@ -465,8 +464,12 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
         return (visibleItem || super.isVisible());
     }
 
-    @Override
-	public void saveWidgetState() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
+     */
+    public void saveWidgetState() {
         if (checkDisposed()) {
             return;
         }
@@ -518,8 +521,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * @param currentHeight
      *            the current height to set
      */
-    @Override
-	public void setCurrentHeight(int currentHeight) {
+    public void setCurrentHeight(int currentHeight) {
         if (checkDisposed()) {
             return;
         }
@@ -533,8 +535,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * @param currentWidth
      *            the current width to set
      */
-    @Override
-	public void setCurrentWidth(int currentWidth) {
+    public void setCurrentWidth(int currentWidth) {
         if (checkDisposed()) {
             return;
         }
@@ -552,8 +553,7 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      * @see #getMinimumItemsToShow()
      * @see #setUseChevron(boolean)
      */
-    @Override
-	public void setMinimumItemsToShow(int minimumItemsToShow) {
+    public void setMinimumItemsToShow(int minimumItemsToShow) {
         if (checkDisposed()) {
             return;
         }
@@ -568,16 +568,19 @@ public class ToolBarContributionItem extends ContributionItem implements IToolBa
      *            <code>true</code> to enable chevron support, <code>false</code>
      *            otherwise.
      */
-    @Override
-	public void setUseChevron(boolean value) {
+    public void setUseChevron(boolean value) {
         if (checkDisposed()) {
             return;
         }
         useChevron = value;
     }
 
-    @Override
-	public void update(String propertyName) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
+     */
+    public void update(String propertyName) {
         if (checkDisposed()) {
             return;
         }
