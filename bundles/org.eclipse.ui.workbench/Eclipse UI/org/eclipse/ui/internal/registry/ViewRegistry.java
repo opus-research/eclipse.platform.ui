@@ -130,7 +130,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 
 		List<String> tags = descriptor.getTags();
-		tags.add("View"); //$NON-NLS-1$
+		tags.add(IWorkbenchRegistryConstants.TAG_E4VIEW);
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
