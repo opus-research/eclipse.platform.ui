@@ -364,7 +364,7 @@ public abstract class ResourceManager {
         Assert.isNotNull(r);
 
         if (disposeExecs == null) {
-            disposeExecs = new ArrayList<>();
+            disposeExecs = new ArrayList<Runnable>();
         }
 
         disposeExecs.add(r);
