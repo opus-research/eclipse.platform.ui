@@ -20,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.ActionSet;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.DisplayItem;
 
@@ -37,7 +38,7 @@ class GrayOutUnavailableLabelProvider extends TreeManager.TreeItemLabelProvider 
 	private Set<Image> toDispose;
 
 	public GrayOutUnavailableLabelProvider(ViewerFilter filter) {
-		this.display = Display.getDefault();
+		this.display = PlatformUI.getWorkbench().getDisplay();
 		this.filter = filter;
 		toDispose = new HashSet<Image>();
 	}
