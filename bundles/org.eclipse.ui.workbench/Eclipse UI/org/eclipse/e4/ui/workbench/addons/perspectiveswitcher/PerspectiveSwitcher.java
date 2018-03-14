@@ -376,22 +376,25 @@ public class PerspectiveSwitcher {
 
 		hookupDnD(psTB);
 
-		final ToolItem createItem = new ToolItem(psTB, SWT.PUSH);
-		createItem.setImage(getOpenPerspectiveImage());
-		createItem.setToolTipText(WorkbenchMessages.OpenPerspectiveDialogAction_tooltip);
-		createItem.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				selectPerspective();
-			}
+		boolean showOpenOnPerspectiveBar = PrefUtil.getAPIPreferenceStore()
+				.getBoolean(IWorkbenchPreferenceConstants.SHOW_OPEN_ON_PERSPECTIVE_BAR);
+		if (showOpenOnPerspectiveBar) {
+			final ToolItem createItem = new ToolItem(psTB, SWT.PUSH);
+			createItem.setImage(getOpenPerspectiveImage());
+			createItem.setToolTipText(WorkbenchMessages.OpenPerspectiveDialogAction_tooltip);
+			createItem.addSelectionListener(new SelectionListener() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					selectPerspective();
+				}
 
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				selectPerspective();
-			}
-		});
-		new ToolItem(psTB, SWT.SEPARATOR);
-
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+					selectPerspective();
+				}
+			});
+			new ToolItem(psTB, SWT.SEPARATOR);
+		}
 		MPerspectiveStack stack = getPerspectiveStack();
 		if (stack != null) {
 			// Create an item for each perspective that should show up
