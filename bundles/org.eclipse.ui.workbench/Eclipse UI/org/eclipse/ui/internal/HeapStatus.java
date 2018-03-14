@@ -405,9 +405,8 @@ public class HeapStatus extends Composite {
         int sw = w - bw - 3; // status width
         int uw = (int) (sw * usedMem / totalMem); // used mem width
         int ux = x + 1 + uw; // used mem right edge
-		if (bgCol != null) {
-        	gc.setBackground(bgCol);
-        }
+
+        gc.setBackground(bgCol);
         gc.fillRectangle(rect);
         gc.setForeground(sepCol);
 		gc.drawLine(dx, y, dx, y + h);
