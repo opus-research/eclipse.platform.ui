@@ -263,6 +263,17 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 
 		/**
+		 * Returns whether the given project description file was valid
+		 *
+		 * @return boolean
+		 */
+		public boolean isValidProject() {
+			// projectName can be null
+			// e.g. in case the project definition file could not be parsed
+			return projectName != null;
+		}
+
+		/**
 		 * Gets the label to be used when rendering this project record in the
 		 * UI.
 		 * 
@@ -295,13 +306,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 */
 	class ConflictingProjectFilter extends ViewerFilter {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers
-		 * .Viewer, java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public boolean select(Viewer viewer, Object parentElement,
 				Object element) {
@@ -414,13 +418,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		setDescription(DataTransferMessages.WizardProjectsImportPage_ImportProjectsDescription);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets
-	 * .Composite)
-	 */
 	@Override
 	public void createControl(Composite parent) {
 
@@ -529,71 +526,31 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		projectsList.getControl().setLayoutData(gridData);
 		projectsList.setContentProvider(new ITreeContentProvider() {
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java
-			 * .lang.Object)
-			 */
 			@Override
 			public Object[] getChildren(Object parentElement) {
 				return null;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.IStructuredContentProvider#getElements
-			 * (java.lang.Object)
-			 */
 			@Override
 			public Object[] getElements(Object inputElement) {
 				return getProjectRecords();
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java
-			 * .lang.Object)
-			 */
 			@Override
 			public boolean hasChildren(Object element) {
 				return false;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ITreeContentProvider#getParent(java
-			 * .lang.Object)
-			 */
 			@Override
 			public Object getParent(Object element) {
 				return null;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
 			@Override
 			public void dispose() {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse
-			 * .jface.viewers.Viewer, java.lang.Object, java.lang.Object)
-			 */
 			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
@@ -604,13 +561,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		projectsList.setLabelProvider(new ProjectLabelProvider());
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged
-			 * (org.eclipse.jface.viewers.CheckStateChangedEvent)
-			 */
 			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				ProjectRecord element = (ProjectRecord) event.getElement();
@@ -661,13 +611,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		Button deselectAll = new Button(buttonsComposite, SWT.PUSH);
 		deselectAll.setText(DataTransferMessages.DataTransfer_deselectAll);
 		deselectAll.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
@@ -681,13 +624,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		Button refresh = new Button(buttonsComposite, SWT.PUSH);
 		refresh.setText(DataTransferMessages.DataTransfer_refresh);
 		refresh.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (projectFromDirectoryRadio.getSelection()) {
@@ -756,12 +692,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		browseArchivesButton.setEnabled(false);
 
 		browseDirectoriesButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetS
-			 * elected(org.eclipse.swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleLocationDirectoryButtonPressed();
@@ -770,13 +700,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		browseArchivesButton.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				handleLocationArchiveButtonPressed();
@@ -785,14 +708,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		directoryPathField.addTraverseListener(new TraverseListener() {
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse
-			 * .swt.events.TraverseEvent)
-			 */
 			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN) {
@@ -804,14 +719,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		directoryPathField.addFocusListener(new FocusAdapter() {
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt
-			 * .events.FocusEvent)
-			 */
 			@Override
 			public void focusLost(org.eclipse.swt.events.FocusEvent e) {
 				updateProjectsList(directoryPathField.getText().trim());
@@ -827,14 +734,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		archivePathField.addTraverseListener(new TraverseListener() {
-
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.TraverseListener#keyTraversed(org.eclipse
-			 * .swt.events.TraverseEvent)
-			 */
 			@Override
 			public void keyTraversed(TraverseEvent e) {
 				if (e.detail == SWT.TRAVERSE_RETURN) {
@@ -846,13 +745,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		archivePathField.addFocusListener(new FocusAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.FocusListener#focusLost(org.eclipse.swt
-			 * .events.FocusEvent)
-			 */
 			@Override
 			public void focusLost(org.eclipse.swt.events.FocusEvent e) {
 				updateProjectsList(archivePathField.getText().trim());
@@ -867,13 +759,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		projectFromDirectoryRadio.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				directoryRadioSelected();
@@ -881,13 +766,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		});
 
 		projectFromArchiveRadio.addSelectionListener(new SelectionAdapter() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse
-			 * .swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				archiveRadioSelected();
@@ -925,10 +803,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IDialogPage. Set the focus on path
-	 * fields when page becomes visible.
-	 */
 	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
@@ -1064,8 +938,11 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 								.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
 						while (filesIterator.hasNext()) {
 							File file = (File) filesIterator.next();
-							selectedProjects[index] = new ProjectRecord(file);
-							index++;
+							ProjectRecord projectRecord = new ProjectRecord(file);
+							if(projectRecord.isValidProject()) {
+								selectedProjects[index] = projectRecord;
+								index++;
+							}
 						}
 					} else {
 						monitor.worked(60);
@@ -1253,7 +1130,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			}
 			String elementLabel = structureProvider.getLabel(child);
 			if (elementLabel.equals(IProjectDescription.DESCRIPTION_FILE_NAME)) {
-				files.add(new ProjectRecord(child, entry, level));
+				ProjectRecord projectRecord = new ProjectRecord(child, entry, level);
+				if(projectRecord.isValidProject()) {
+					files.add(projectRecord);
+				}
 			}
 		}
 		return true;
