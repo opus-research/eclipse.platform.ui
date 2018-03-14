@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,13 +21,11 @@ import org.eclipse.swt.events.MouseEvent;
  * This class is responsible to determine if a cell selection event is triggers
  * an editor activation. Implementors can extend and overwrite to implement
  * custom editing behavior
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
  *
  * @since 3.3
  */
-public class ColumnViewerEditorActivationStrategy<E,I> {
-	private ColumnViewer<E,I> viewer;
+public class ColumnViewerEditorActivationStrategy {
+	private ColumnViewer viewer;
 
 	private KeyListener keyboardActivationListener;
 
@@ -35,7 +33,7 @@ public class ColumnViewerEditorActivationStrategy<E,I> {
 	 * @param viewer
 	 *            the viewer the editor support is attached to
 	 */
-	public ColumnViewerEditorActivationStrategy(ColumnViewer<E,I> viewer) {
+	public ColumnViewerEditorActivationStrategy(ColumnViewer viewer) {
 		this.viewer = viewer;
 	}
 
@@ -46,7 +44,7 @@ public class ColumnViewerEditorActivationStrategy<E,I> {
 	 */
 	protected boolean isEditorActivationEvent(
 			ColumnViewerEditorActivationEvent event) {
-		boolean singleSelect = viewer.getStructuredSelection().size() == 1;
+		boolean singleSelect = ((IStructuredSelection)viewer.getSelection()).size() == 1;
 		boolean isLeftMouseSelect = event.eventType == ColumnViewerEditorActivationEvent.MOUSE_CLICK_SELECTION && ((MouseEvent)event.sourceEvent).button == 1;
 
 		return singleSelect && (isLeftMouseSelect
@@ -57,14 +55,14 @@ public class ColumnViewerEditorActivationStrategy<E,I> {
 	/**
 	 * @return the cell holding the current focus
 	 */
-	private ViewerCell<E> getFocusCell() {
+	private ViewerCell getFocusCell() {
 		return viewer.getColumnViewerEditor().getFocusCell();
 	}
 
 	/**
 	 * @return the viewer
 	 */
-	public ColumnViewer<E,I> getViewer() {
+	public ColumnViewer getViewer() {
 		return viewer;
 	}
 
@@ -81,7 +79,7 @@ public class ColumnViewerEditorActivationStrategy<E,I> {
 
 					@Override
 					public void keyPressed(KeyEvent e) {
-						ViewerCell<E> cell = getFocusCell();
+						ViewerCell cell = getFocusCell();
 
 						if (cell != null) {
 							viewer
