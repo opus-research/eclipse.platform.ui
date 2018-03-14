@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+ <extension
+         point="org.eclipse.e4.ui.css.core.propertyHandler">
+      <handler
+            adapter="org.eclipse.ui.forms.css.dom.SectionElement"
+            composite="false"
+            handler="org.eclipse.ui.forms.css.properties.css2.CSSPropertyTitleBackgroundFormsHandler">
+         <property-name
+               name="form-title-background">
+         </property-name>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.core.elementProvider">
+      <provider
+            class="org.eclipse.ui.forms.css.dom.FormsElementProvider">
+         <widget
+               class="org.eclipse.ui.forms.widgets.Section"></widget>
+      </provider>
+   </extension>
+</plugin>

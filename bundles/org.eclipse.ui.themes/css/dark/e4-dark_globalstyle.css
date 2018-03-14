@@ -414,3 +414,7 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
     background-color: #3f4447;
     color: #EEEEEE;
 }
+
+Section {
+    form-title-background:#FF0000;
+}
