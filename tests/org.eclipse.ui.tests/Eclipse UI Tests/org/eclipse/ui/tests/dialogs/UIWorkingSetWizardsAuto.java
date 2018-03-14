@@ -127,8 +127,7 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
      * <code>fWizard</code> must be initialized by subclasses prior to
      * calling this.
      */
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
 
         fWizardDialog = new WizardDialog(getShell(), fWizard);
@@ -162,8 +161,7 @@ public abstract class UIWorkingSetWizardsAuto extends UITestCase {
         textWidget.notifyListeners(SWT.Modify, new Event());
     }
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
         deleteResources();
         super.doTearDown();
     }

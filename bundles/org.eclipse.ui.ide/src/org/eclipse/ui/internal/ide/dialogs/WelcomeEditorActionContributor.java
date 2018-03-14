@@ -26,8 +26,7 @@ public class WelcomeEditorActionContributor extends EditorActionBarContributor {
      * <code>IEditorActionBarContributor</code> method installs the global 
      * action handler for the given editor.
      */
-    @Override
-	public void setActiveEditor(IEditorPart part) {
+    public void setActiveEditor(IEditorPart part) {
         IActionBars actionBars = getActionBars();
         if (actionBars != null) {
             actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(),

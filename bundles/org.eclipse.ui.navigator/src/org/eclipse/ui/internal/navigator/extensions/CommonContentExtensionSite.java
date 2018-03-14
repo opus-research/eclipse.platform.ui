@@ -62,7 +62,6 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 	 * 
 	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getMemento()
 	 */
-	@Override
 	public IMemento getMemento() {
 		return memento;
 	}
@@ -72,7 +71,6 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 	 * 
 	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getExtension()
 	 */
-	@Override
 	public INavigatorContentExtension getExtension() {
 		return extension;
 	}
@@ -80,7 +78,6 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getService()
 	 */
-	@Override
 	public INavigatorContentService getService() { 
 		return contentService;
 	}

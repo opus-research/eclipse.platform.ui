@@ -23,6 +23,7 @@ import com.ibm.icu.text.Collator;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -31,8 +32,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.net.proxy.IProxyService;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IAdaptable;
@@ -46,10 +49,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
+
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -59,6 +64,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.window.Window;
+
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -113,7 +119,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * session; <code>null</code> if uninitialized. Key type:
 	 * <code>String</code>, Value type: <code>AboutInfo</code>.
 	 */
-	private Map<String, AboutInfo> newlyAddedBundleGroups;
+	private Map newlyAddedBundleGroups;
 
 	/**
 	 * Array of <code>AboutInfo</code> for all new installed features that
@@ -161,7 +167,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		workbenchAdvisor = this;
 		
 		Listener closeListener = new Listener() {
-			@Override
 			public void handleEvent(Event event) {
 				boolean doExit = IDEWorkbenchWindowAdvisor.promptOnExit(null);
 				event.doit = doExit;
@@ -186,7 +191,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#initialize
 	 */
-	@Override
 	public void initialize(IWorkbenchConfigurer configurer) {
 
 		PluginActionBuilder.setAllowIdeLogging(true);
@@ -240,7 +244,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
 	 */
-	@Override
 	public void preStartup() {
 
 		// Suspend background jobs while we startup
@@ -262,7 +265,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
 	 */
-	@Override
 	public void postStartup() {
 		try {
 			refreshFromLocal();
@@ -286,7 +288,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		Bundle bundle = Platform.getBundle("org.eclipse.ui.ide"); //$NON-NLS-1$
 		Object proxyService = null;
 		if (bundle != null) {
-			ServiceReference<IProxyService> ref = bundle.getBundleContext().getServiceReference(IProxyService.class);
+			ServiceReference ref = bundle.getBundleContext().getServiceReference(IProxyService.class.getName());
 			if (ref != null)
 				proxyService = bundle.getBundleContext().getService(ref);
 		}
@@ -304,7 +306,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 			boolean currentHighContrast = Display.getCurrent()
 					.getHighContrast();
 
-			@Override
 			public void handleEvent(org.eclipse.swt.widgets.Event event) {
 				if (Display.getCurrent().getHighContrast() == currentHighContrast)
 					return;
@@ -331,7 +332,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postShutdown
 	 */
-	@Override
 	public void postShutdown() {
 		if (activityHelper != null) {
 			activityHelper.shutdown();
@@ -355,7 +355,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preShutdown()
 	 */
-	@Override
 	public boolean preShutdown() {
 		Display.getCurrent().removeListener(SWT.Settings,
 				settingsChangeListener);
@@ -367,7 +366,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#createWorkbenchWindowAdvisor(org.eclipse.ui.application.IWorkbenchWindowConfigurer)
 	 */
-	@Override
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
 			IWorkbenchWindowConfigurer configurer) {
 		return new IDEWorkbenchWindowAdvisor(this, configurer);
@@ -402,7 +400,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		final IContainer root = ResourcesPlugin.getWorkspace().getRoot();
 		Job job = new WorkspaceJob(IDEWorkbenchMessages.Workspace_refreshing) {
-			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor)
 					throws CoreException {
 				root.refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -428,7 +425,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#internalWorked(double)
 		 */
-		@Override
 		public void internalWorked(double work) {
 			super.internalWorked(work);
 			total += work;
@@ -439,14 +435,12 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		 * (non-Javadoc)
 		 * @see org.eclipse.core.runtime.ProgressMonitorWrapper#worked(int)
 		 */
-		@Override
 		public void worked(int work) {
 			super.worked(work);
 			total += work;
 			updateProgressDetails();
 		}
 
-		@Override
 		public void beginTask(String name, int totalWork) {
 			super.beginTask(name, totalWork);
 			subTask(IDEWorkbenchMessages.IDEWorkbenchAdvisor_preHistoryCompaction);
@@ -475,7 +469,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		 * (non-Javadoc)
 		 * @see org.eclipse.ui.internal.progress.ProgressMonitorJobsDialog#createDetailsButton(org.eclipse.swt.widgets.Composite)
 		 */
-		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			super.createButtonsForButtonBar(parent);
 			registerCancelButtonListener();
@@ -483,7 +476,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		public void registerCancelButtonListener() {
 			cancel.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					subTaskLabel.setText(""); //$NON-NLS-1$
 				}
@@ -507,7 +499,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 					.getDescription().isApplyFileStatePolicy();
 
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
 				public void run(IProgressMonitor monitor) {
 					try {
 						if (applyPolicy)
@@ -548,7 +539,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getDefaultPageInput
 	 */
-	@Override
 	public IAdaptable getDefaultPageInput() {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
@@ -558,7 +548,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor
 	 */
-	@Override
 	public String getInitialWindowPerspectiveId() {
 		int index = PlatformUI.getWorkbench().getWorkbenchWindowCount() - 1;
 
@@ -582,9 +571,9 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>, value type: <code>AboutInfo</code>)
 	 * @since 3.0
 	 */
-	private Map<String, AboutInfo> computeBundleGroupMap() {
+	private Map computeBundleGroupMap() {
 		// use tree map to get predicable order
-		Map<String, AboutInfo> ids = new TreeMap<String, AboutInfo>();
+		Map ids = new TreeMap();
 
 		IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
 		for (int i = 0; i < providers.length; ++i) {
@@ -613,7 +602,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 *         <code>String</code>) -> infos (value type:
 	 *         <code>AboutInfo</code>).
 	 */
-	public Map<String, AboutInfo> getNewlyAddedBundleGroups() {
+	public Map getNewlyAddedBundleGroups() {
 		if (newlyAddedBundleGroups == null) {
 			newlyAddedBundleGroups = createNewBundleGroupsMap();
 		}
@@ -623,7 +612,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/**
 	 * Updates the old features setting and returns a map of new features.
 	 */
-	private Map<String, AboutInfo> createNewBundleGroupsMap() {
+	private Map createNewBundleGroupsMap() {
 		// retrieve list of installed bundle groups from last session
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings();
@@ -631,7 +620,7 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 
 		// get a map of currently installed bundle groups and store it for next
 		// session
-		Map<String, AboutInfo> bundleGroups = computeBundleGroupMap();
+		Map bundleGroups = computeBundleGroupMap();
 		String[] currentFeaturesArray = new String[bundleGroups.size()];
 		bundleGroups.keySet().toArray(currentFeaturesArray);
 		settings.put(INSTALLED_FEATURES, currentFeaturesArray);
@@ -870,7 +859,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getMainPreferencePageId
 	 */
-	@Override
 	public String getMainPreferencePageId() {
 		// indicate that we want the Workench preference page to be prominent
 		return WORKBENCH_PREFERENCE_CATEGORY_ID;
@@ -892,10 +880,10 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 		if (welcomePerspectiveInfos == null) {
 			// support old welcome perspectives if intro plugin is not present
 			if (!hasIntro()) {
-				Map<String, AboutInfo> m = getNewlyAddedBundleGroups();
-				ArrayList<AboutInfo> list = new ArrayList<AboutInfo>(m.size());
-				for (Iterator<AboutInfo> i = m.values().iterator(); i.hasNext();) {
-					AboutInfo info = i.next();
+				Map m = getNewlyAddedBundleGroups();
+				ArrayList list = new ArrayList(m.size());
+				for (Iterator i = m.values().iterator(); i.hasNext();) {
+					AboutInfo info = (AboutInfo) i.next();
 					if (info != null && info.getWelcomePerspectiveId() != null
 							&& info.getWelcomePageURL() != null) {
 						list.add(info);
@@ -913,7 +901,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * 
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getWorkbenchErrorHandler()
 	 */
-	@Override
 	public synchronized AbstractStatusHandler getWorkbenchErrorHandler() {
 		if (ideWorkbenchErrorHandler == null) {
 			ideWorkbenchErrorHandler = new IDEWorkbenchErrorHandler(
@@ -925,7 +912,6 @@ public class IDEWorkbenchAdvisor extends WorkbenchAdvisor {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#eventLoopIdle(org.eclipse.swt.widgets.Display)
 	 */
-	@Override
 	public void eventLoopIdle(Display display) {
 		if (delayedEventsProcessor != null)
 			delayedEventsProcessor.catchUp(display);
