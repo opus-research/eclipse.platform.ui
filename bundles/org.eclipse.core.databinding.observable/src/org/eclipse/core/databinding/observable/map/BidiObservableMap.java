@@ -29,16 +29,27 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
+ * @param <K>
+ * @param <V>
+ * 
  * @since 1.2
  */
-public class BidiObservableMap extends DecoratingObservableMap {
+public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
+	/**
+	 * Inverse of wrapped map. When only a single key map to a given value, it
+	 * is put in this set. This field is null when no listeners are registered
+	 * on this observable.
+	 */
+	private Map<V, K> valuesToSingleKeys = null;
+
 	/**
 	 * Inverse of wrapped map. When multiple keys map to the same value, they
-	 * are combined into a Set. This field is null when no listeners are
+	 * are combined into a Set, put in this map, and any single key in the
+	 * single key map is removed. This field is null when no listeners are
 	 * registered on this observable.
 	 */
-	private Map valuesToKeys;
+	private Map<V, Set<K>> valuesToSetsOfKeys = null;
 
 	/**
 	 * Constructs a BidirectionalMap tracking the given observable map.
@@ -46,15 +57,16 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	 * @param wrappedMap
 	 *            the observable map to track
 	 */
-	public BidiObservableMap(IObservableMap wrappedMap) {
+	public BidiObservableMap(IObservableMap<K, V> wrappedMap) {
 		super(wrappedMap, false);
 	}
 
 	@Override
 	protected void firstListenerAdded() {
-		valuesToKeys = new HashMap();
-		for (Iterator it = entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Entry) it.next();
+		valuesToSingleKeys = new HashMap<V, K>();
+		valuesToSetsOfKeys = new HashMap<V, Set<K>>();
+		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = it.next();
 			addMapping(entry.getKey(), entry.getValue());
 		}
 		super.firstListenerAdded();
@@ -63,24 +75,26 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
-		valuesToKeys.clear();
-		valuesToKeys = null;
+		valuesToSingleKeys.clear();
+		valuesToSetsOfKeys.clear();
+		valuesToSingleKeys = null;
+		valuesToSetsOfKeys = null;
 	}
 
 	@Override
-	protected void handleMapChange(MapChangeEvent event) {
-		MapDiff diff = event.diff;
-		for (Iterator it = diff.getAddedKeys().iterator(); it.hasNext();) {
-			Object addedKey = it.next();
+	protected void handleMapChange(MapChangeEvent<K, V> event) {
+		MapDiff<K, V> diff = event.diff;
+		for (Iterator<K> it = diff.getAddedKeys().iterator(); it.hasNext();) {
+			K addedKey = it.next();
 			addMapping(addedKey, diff.getNewValue(addedKey));
 		}
-		for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
-			Object changedKey = it.next();
+		for (Iterator<K> it = diff.getChangedKeys().iterator(); it.hasNext();) {
+			K changedKey = it.next();
 			removeMapping(changedKey, diff.getOldValue(changedKey));
 			addMapping(changedKey, diff.getNewValue(changedKey));
 		}
-		for (Iterator it = diff.getRemovedKeys().iterator(); it.hasNext();) {
-			Object removedKey = it.next();
+		for (Iterator<K> it = diff.getRemovedKeys().iterator(); it.hasNext();) {
+			K removedKey = it.next();
 			removeMapping(removedKey, diff.getOldValue(removedKey));
 		}
 		super.handleMapChange(event);
@@ -90,8 +104,10 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	public boolean containsValue(Object value) {
 		getterCalled();
 		// Faster lookup
-		if (valuesToKeys != null)
-			return valuesToKeys.containsKey(value);
+		if (valuesToSingleKeys != null) {
+			return (valuesToSingleKeys.containsKey(value) || valuesToSetsOfKeys
+					.containsKey(value));
+		}
 		return super.containsValue(value);
 	}
 
@@ -99,25 +115,24 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	 * Adds a mapping from value to key in the valuesToKeys map.
 	 *
 	 * @param key
-	 *            the key being mapped
+	 *            the key being mapped, which may be the key itself or it may be
+	 *            a set of keys
 	 * @param value
 	 *            the value being mapped
 	 */
-	private void addMapping(Object key, Object value) {
-		if (!valuesToKeys.containsKey(value)) {
-			if (key instanceof Set)
-				key = new HashSet(Collections.singleton(key));
-			valuesToKeys.put(value, key);
-		} else {
-			Object elementOrSet = valuesToKeys.get(value);
-			Set set;
-			if (elementOrSet instanceof Set) {
-				set = (Set) elementOrSet;
-			} else {
-				set = new HashSet(Collections.singleton(elementOrSet));
-				valuesToKeys.put(value, set);
-			}
+	private void addMapping(K key, V value) {
+		if (valuesToSingleKeys.containsKey(value)) {
+			K element = valuesToSingleKeys.get(value);
+			Set<K> set;
+			set = new HashSet<K>(Collections.singleton(element));
+			valuesToSingleKeys.remove(value);
+			valuesToSetsOfKeys.put(value, set);
 			set.add(key);
+		} else if (valuesToSetsOfKeys.containsKey(value)) {
+			Set<K> keySet = valuesToSetsOfKeys.get(value);
+			keySet.add(key);
+		} else {
+			valuesToSingleKeys.put(value, key);
 		}
 	}
 
@@ -129,18 +144,17 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	 * @param value
 	 *            the value being unmapped
 	 */
-	private void removeMapping(Object key, Object value) {
-		if (valuesToKeys.containsKey(value)) {
-			Object elementOrSet = valuesToKeys.get(value);
-			if (elementOrSet instanceof Set) {
-				Set set = (Set) elementOrSet;
-				set.remove(key);
-				if (set.isEmpty()) {
-					valuesToKeys.remove(value);
-				}
-			} else if (elementOrSet == key
-					|| (elementOrSet != null && elementOrSet.equals(key))) {
-				valuesToKeys.remove(value);
+	private void removeMapping(Object key, V value) {
+		if (valuesToSingleKeys.containsKey(value)) {
+			K element = valuesToSingleKeys.get(value);
+			if (element == key || (element != null && element.equals(key))) {
+				valuesToSingleKeys.remove(value);
+			}
+		} else if (valuesToSetsOfKeys.containsKey(value)) {
+			Set<K> keySet = valuesToSetsOfKeys.get(value);
+			keySet.remove(key);
+			if (keySet.isEmpty()) {
+				valuesToSetsOfKeys.remove(value);
 			}
 		}
 	}
@@ -153,17 +167,18 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	 * @return the Set of keys that map to the given value. If no keys map to
 	 *         the given value, an empty set is returned.
 	 */
-	public Set getKeys(Object value) {
-		// valuesToKeys is null when no listeners are registered
-		if (valuesToKeys == null)
+	public Set<K> getKeys(Object value) {
+		// valuesToSingleKeys is null when no listeners are registered
+		if (valuesToSingleKeys == null)
 			return findKeys(value);
 
-		if (!valuesToKeys.containsKey(value))
-			return Collections.EMPTY_SET;
-		Object elementOrSet = valuesToKeys.get(value);
-		if (elementOrSet instanceof Set)
-			return Collections.unmodifiableSet((Set) elementOrSet);
-		return Collections.singleton(elementOrSet);
+		if (valuesToSingleKeys.containsKey(value)) {
+			return Collections.singleton(valuesToSingleKeys.get(value));
+		} else if (valuesToSetsOfKeys.containsKey(value)) {
+			return Collections.unmodifiableSet(valuesToSetsOfKeys.get(value));
+		} else {
+			return Collections.emptySet();
+		}
 	}
 
 	/**
@@ -174,10 +189,10 @@ public class BidiObservableMap extends DecoratingObservableMap {
 	 *            the value to search for
 	 * @return the set of keys which currently map to the specified value.
 	 */
-	private Set findKeys(Object value) {
-		Set keys = new HashSet();
-		for (Iterator it = entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+	private Set<K> findKeys(Object value) {
+		Set<K> keys = new HashSet<K>();
+		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
+			Map.Entry<K, V> entry = it.next();
 			if (Util.equals(entry.getValue(), value))
 				keys.add(entry.getKey());
 		}
@@ -186,9 +201,13 @@ public class BidiObservableMap extends DecoratingObservableMap {
 
 	@Override
 	public synchronized void dispose() {
-		if (valuesToKeys != null) {
-			valuesToKeys.clear();
-			valuesToKeys = null;
+		if (valuesToSingleKeys != null) {
+			valuesToSingleKeys.clear();
+			valuesToSingleKeys = null;
+		}
+		if (valuesToSetsOfKeys != null) {
+			valuesToSetsOfKeys.clear();
+			valuesToSetsOfKeys = null;
 		}
 		super.dispose();
 	}

@@ -24,7 +24,7 @@ import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
  *
  * @since 1.1
  */
-public class StalenessObservableValue extends AbstractObservableValue {
+public class StalenessObservableValue extends AbstractObservableValue<Boolean> {
 
 	private class MyListener implements IChangeListener, IStaleListener {
 		@Override
@@ -66,7 +66,7 @@ public class StalenessObservableValue extends AbstractObservableValue {
 	}
 
 	@Override
-	protected Object doGetValue() {
+	protected Boolean doGetValue() {
 		return tracked.isStale() ? Boolean.TRUE : Boolean.FALSE;
 	}
 
