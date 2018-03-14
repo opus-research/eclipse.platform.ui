@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 202170 [Wizards] Empy Source Folder and Package in New Class Wizard
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 416461 [Wizards] Wizard Parameter overrides command label and icon 
  *******************************************************************************/
 package org.eclipse.ui.internal.handlers;
 
@@ -22,6 +21,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -34,6 +34,7 @@ import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.LegacyResourceSupport;
+import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.ImportExportWizard;
 import org.eclipse.ui.internal.dialogs.NewWizard;
@@ -341,7 +342,9 @@ public abstract class WizardHandler extends AbstractHandler implements IElementU
 			return;
 		IWizardDescriptor wizard = getWizardRegistry().findWizard(wizardId);
 		if (wizard != null) {
+			element.setText(NLS.bind(WorkbenchMessages.WizardHandler_menuLabel, wizard.getLabel()));
 			element.setTooltip(wizard.getDescription());
+			element.setIcon(wizard.getImageDescriptor());
 		}
 	}
 
