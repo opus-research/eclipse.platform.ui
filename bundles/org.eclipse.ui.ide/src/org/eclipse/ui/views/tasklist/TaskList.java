@@ -563,6 +563,9 @@ public class TaskList extends ViewPart {
         parent.layout();
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void createPartControl(Composite parent) {
         //	long t = System.currentTimeMillis();
@@ -634,6 +637,9 @@ public class TaskList extends ViewPart {
         viewer.getControl().getAccessible().addAccessibleControlListener(
                 new AccessibleControlAdapter() {
 
+                    /* (non-Javadoc)
+                     * @see org.eclipse.swt.accessibility.AccessibleControlListener#getValue(org.eclipse.swt.accessibility.AccessibleControlEvent)
+                     */
                     @Override
 					public void getValue(AccessibleControlEvent e) {
 
@@ -755,6 +761,9 @@ public class TaskList extends ViewPart {
         new TableEditor(table);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void dispose() {
         super.dispose();
@@ -1019,6 +1028,9 @@ public class TaskList extends ViewPart {
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
@@ -1341,6 +1353,9 @@ public class TaskList extends ViewPart {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void saveState(IMemento memento) {
         if (viewer == null) {
@@ -1454,6 +1469,9 @@ public class TaskList extends ViewPart {
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void setFocus() {
         viewer.getControl().setFocus();

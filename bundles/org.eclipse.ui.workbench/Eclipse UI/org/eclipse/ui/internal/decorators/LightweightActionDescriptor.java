@@ -100,6 +100,9 @@ public class LightweightActionDescriptor implements IAdaptable,
         return image;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+     */
     @Override
 	public ImageDescriptor getImageDescriptor(Object o) {
         if (o == this) {
@@ -117,6 +120,9 @@ public class LightweightActionDescriptor implements IAdaptable,
         return label;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
+     */
     @Override
 	public String getLabel(Object o) {
         if (o == this) {
@@ -130,11 +136,17 @@ public class LightweightActionDescriptor implements IAdaptable,
         return o == null ? "" : o.toString();//$NON-NLS-1$
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+     */
     @Override
 	public Object[] getChildren(Object o) {
         return NO_CHILDREN;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+     */
     @Override
 	public Object getParent(Object o) {
         return null;
