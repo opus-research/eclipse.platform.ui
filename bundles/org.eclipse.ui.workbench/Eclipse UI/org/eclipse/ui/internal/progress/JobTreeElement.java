@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,9 +16,10 @@ import org.eclipse.swt.graphics.Image;
 /**
  * The JobTreeElement is the abstract superclass of items displayed in the tree.
  */
-public abstract class JobTreeElement implements Comparable<JobTreeElement> {
+public abstract class JobTreeElement implements Comparable {
+
 	/**
-	 * Returns the parent of this object.
+	 * Return the parent of this object.
 	 *
 	 * @return Object
 	 */
@@ -27,28 +28,28 @@ public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 	}
 
 	/**
-	 * Returns whether or not the receiver has children.
+	 * Return whether or not the receiver has children.
 	 *
 	 * @return boolean
 	 */
 	abstract boolean hasChildren();
 
 	/**
-	 * Returns the children of the receiver.
+	 * Return the children of the receiver.
 	 *
 	 * @return Object[]
 	 */
 	abstract Object[] getChildren();
 
 	/**
-	 * Returns the displayString for the receiver.
+	 * Return the displayString for the receiver.
 	 *
 	 * @return String
 	 */
 	abstract String getDisplayString();
 
 	/**
-	 * Returns the displayString for the receiver.
+	 * Return the displayString for the receiver.
 	 *
 	 * @param showProgress
 	 *            Whether or not progress is being shown (if relevant).
@@ -59,7 +60,7 @@ public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 	}
 
 	/**
-	 * Returns the image for the receiver.
+	 * Get the image for the reciever.
 	 *
 	 * @return Image or <code>null</code>.
 	 */
@@ -68,7 +69,7 @@ public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 	}
 
 	/**
-	 * Returns the condensed version of the display string.
+	 * Return the condensed version of the display string
 	 *
 	 * @return String
 	 */
@@ -77,26 +78,29 @@ public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 	}
 
 	/**
-	 * Returns whether or not the receiver is an info.
+	 * Return whether or not the receiver is an info.
 	 *
 	 * @return boolean
 	 */
 	abstract boolean isJobInfo();
 
 	@Override
-	public int compareTo(JobTreeElement other) {
-		return getDisplayString().compareTo(other.getDisplayString());
+	public int compareTo(Object arg0) {
+		if (arg0 instanceof JobTreeElement)
+			return getDisplayString().compareTo(
+					((JobTreeElement) arg0).getDisplayString());
+		return 0;
 	}
 
 	/**
-	 * Returns whether or not this is currently active.
+	 * Return whether or not this is currently active.
 	 *
 	 * @return boolean
 	 */
 	abstract boolean isActive();
 
 	/**
-	 * Returns whether or not the receiver can be cancelled.
+	 * Return whether or not the receiver can be cancelled.
 	 *
 	 * @return boolean
 	 */
@@ -105,7 +109,7 @@ public abstract class JobTreeElement implements Comparable<JobTreeElement> {
 	}
 
 	/**
-	 * Cancels the receiver.
+	 * Cancel the receiver.
 	 */
 	public void cancel() {
 		// By default do nothing.

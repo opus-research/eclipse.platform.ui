@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,9 +65,12 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      * when it changes, since many workbench adapters derive their icon from the file
      * associations in the registry.
      */
-    private IPropertyListener editorRegistryListener = (source, propId) -> {
-		if (propId == IEditorRegistry.PROP_CONTENTS) {
-			fireLabelProviderChanged(new LabelProviderChangedEvent(WorkbenchLabelProvider.this));
+    private IPropertyListener editorRegistryListener = new IPropertyListener() {
+		@Override
+		public void propertyChanged(Object source, int propId) {
+			if (propId == IEditorRegistry.PROP_CONTENTS) {
+				fireLabelProviderChanged(new LabelProviderChangedEvent(WorkbenchLabelProvider.this));
+			}
 		}
 	};
 	private ResourceManager resourceManager;
@@ -129,7 +132,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      * object is not adaptable.
      */
     protected final IWorkbenchAdapter getAdapter(Object o) {
-        return Adapters.adapt(o, IWorkbenchAdapter.class);
+        return Adapters.getAdapter(o, IWorkbenchAdapter.class, true);
     }
 
     /**
@@ -140,7 +143,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      * object is not adaptable.
      */
     protected final IWorkbenchAdapter2 getAdapter2(Object o) {
-        return Adapters.adapt(o, IWorkbenchAdapter2.class);
+        return Adapters.getAdapter(o, IWorkbenchAdapter2.class, true);
     }
 
 	/**
@@ -153,7 +156,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	 * @since 3.7
 	 */
 	protected final IWorkbenchAdapter3 getAdapter3(Object o) {
-		return Adapters.adapt(o, IWorkbenchAdapter3.class);
+		return Adapters.getAdapter(o, IWorkbenchAdapter3.class, true);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,8 +87,11 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 	protected void fillMenu(Menu menu) {
 		IWorkingSet[][] typedSets = splitSets();
 
-		for (IWorkingSet[] sets : typedSets) {
-			for (IWorkingSet set : sets) {
+		for (int i = 0; i < typedSets.length; i++) {
+			IWorkingSet[] sets = typedSets[i];
+			for (int j = 0; j < sets.length; j++) {
+				IWorkingSet set = sets[j];
+
 				// only add visible sets
 				// if (set.isVisible()) {
 				ActionContributionItem item = new ActionContributionItem(
@@ -112,8 +115,8 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 
 	private boolean isWorkingSetEnabled(IWorkingSet set) {
 		IWorkingSet[] enabledSets = getEnabledSets();
-		for (IWorkingSet enabledSet : enabledSets) {
-			if (enabledSet.equals(set)) {
+		for (int i = 0; i < enabledSets.length; i++) {
+			if (enabledSets[i].equals(set)) {
 				return true;
 			}
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -59,11 +60,14 @@ public class FocusControlSourceProvider extends AbstractSourceProvider
 
 	private DisposeListener getDisposeListener() {
 		if (disposeListener == null) {
-			disposeListener = e -> {
-				controlToId.remove(e.widget);
-				if (currentControl == e.widget) {
-					focusIn(null);
+			disposeListener = new DisposeListener() {
+				@Override
+				public void widgetDisposed(DisposeEvent e) {
+					controlToId.remove(e.widget);
+					if (currentControl == e.widget) {
+						focusIn(null);
 
+					}
 				}
 			};
 		}

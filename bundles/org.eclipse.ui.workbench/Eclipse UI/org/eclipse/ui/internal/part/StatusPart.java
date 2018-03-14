@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,14 +10,16 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.part;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -45,7 +47,7 @@ public class StatusPart {
     private Button detailsButton;
     private Composite detailsArea;
     private Control details = null;
-	private IStatus reason;
+    private IStatus reason;
 
     public StatusPart(final Composite parent, IStatus reason_) {
     	Color bgColor= parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
@@ -57,7 +59,7 @@ public class StatusPart {
         this.reason = reason_;
         GridLayout layout = new GridLayout();
 
-		layout.numColumns = 3;
+        layout.numColumns = 3;
 
         int spacing = 8;
         int margins = 8;
@@ -75,14 +77,16 @@ public class StatusPart {
         if (image != null) {
             image.setBackground(bgColor);
             imageLabel.setImage(image);
-			GridData gridData = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.VERTICAL_ALIGN_BEGINNING);
-			imageLabel.setLayoutData(gridData);
+            imageLabel.setLayoutData(new GridData(
+                    GridData.HORIZONTAL_ALIGN_CENTER
+                            | GridData.VERTICAL_ALIGN_BEGINNING));
         }
 
         Text text = new Text(parent, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
         text.setBackground(bgColor);
         text.setForeground(fgColor);
 
+        //text.setForeground(JFaceColors.getErrorText(text.getDisplay()));
 		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         text.setText(reason.getMessage());
 
@@ -97,7 +101,12 @@ public class StatusPart {
 
 
         detailsButton = new Button(buttonParent, SWT.PUSH);
-        detailsButton.addSelectionListener(widgetSelectedAdapter(e -> showDetails(!showingDetails)));
+        detailsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                showDetails(!showingDetails);
+            }
+        });
 
         detailsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
         detailsButton.setVisible(reason.getException() != null);
@@ -154,7 +163,8 @@ public class StatusPart {
             Text detailsText = new Text(detailsArea, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
                     | SWT.MULTI | SWT.READ_ONLY | SWT.LEFT_TO_RIGHT);
             detailsText.setText(getDetails(reason));
-			detailsText.setBackground(detailsText.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+            detailsText.setBackground(detailsText.getDisplay().getSystemColor(
+                    SWT.COLOR_LIST_BACKGROUND));
             details = detailsText;
             detailsArea.layout(true);
         } else {
@@ -181,21 +191,32 @@ public class StatusPart {
     }
 
     private void createShowLogButton(Composite parent){
-		IViewDescriptor descriptor = PlatformUI.getWorkbench().getViewRegistry().find(LOG_VIEW_ID);
+		IViewDescriptor descriptor = PlatformUI.getWorkbench().getViewRegistry()
+				.find(LOG_VIEW_ID);
 		if (descriptor == null) {
 			return;
 		}
 		Button button = new Button(parent, SWT.PUSH);
-		button.addSelectionListener(widgetSelectedAdapter(e -> {
-			try {
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
-			} catch (CoreException ce) {
-				StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+							.getActivePage().showView(LOG_VIEW_ID);
+				} catch (CoreException ce) {
+					StatusManager.getManager().handle(ce,
+							WorkbenchPlugin.PI_WORKBENCH);
+				}
 			}
-		}));
+		});
 		final Image image = descriptor.getImageDescriptor().createImage();
 		button.setImage(image);
 		button.setToolTipText(WorkbenchMessages.ErrorLogUtil_ShowErrorLogTooltip);
-		button.addDisposeListener(e -> image.dispose());
+		button.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				image.dispose();
+			}
+		});
     }
 }

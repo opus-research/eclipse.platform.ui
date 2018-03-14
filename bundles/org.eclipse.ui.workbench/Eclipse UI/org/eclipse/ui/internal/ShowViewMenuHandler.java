@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -26,6 +25,8 @@ import org.eclipse.e4.ui.workbench.renderers.swt.StackRenderer;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -67,7 +68,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 				Composite partContainer = (Composite) model.getWidget();
 				if (partContainer != null) {
 					Composite parent = partContainer.getParent();
-					while (parent != null) {
+					while (parent != null && parent instanceof Composite) {
 						if (parent instanceof CTabFolder) {
 							CTabFolder ctf = (CTabFolder) parent;
 							final Control topRight = ctf.getTopRight();
@@ -109,7 +110,12 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 			menu = (Menu) engine.createGui(menuModel, shell, model.getContext());
 			if (menu != null) {
 				final Menu tmpMenu = menu;
-				partContainer.addDisposeListener(e -> tmpMenu.dispose());
+				partContainer.addDisposeListener(new DisposeListener() {
+					@Override
+					public void widgetDisposed(DisposeEvent e) {
+						tmpMenu.dispose();
+					}
+				});
 			}
 		}
 
@@ -131,6 +137,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 
 	@Override
 	protected Expression getEnabledWhenExpression() {
+		// TODO Auto-generated method stub
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
 				@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
 import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
@@ -61,9 +62,9 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
 
         @Override
 		public void removeExtension(IExtension source, Object[] objects) {
-            for (Object object : objects) {
-                if (object instanceof NewWizardShortcutAction) {
-                    actions.values().remove(object);
+            for (int i = 0; i < objects.length; i++) {
+                if (objects[i] instanceof NewWizardShortcutAction) {
+                    actions.values().remove(objects[i]);
                 }
             }
         }
@@ -77,13 +78,18 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
     /**
      * TODO: should this be done with an addition listener?
      */
-    private final IRegistryChangeListener registryListener = event -> {
-	    // reset the reader.
-	    // TODO This is expensive.  Can we be more selective?
-	    if (getParent() != null) {
-	        getParent().markDirty();
-	    }
-	};
+    private final IRegistryChangeListener registryListener = new IRegistryChangeListener() {
+
+        @Override
+		public void registryChanged(IRegistryChangeEvent event) {
+            // reset the reader.
+            // TODO This is expensive.  Can we be more selective?
+            if (getParent() != null) {
+                getParent().markDirty();
+            }
+        }
+
+    };
 
     private ActionFactory.IWorkbenchAction showDlgAction;
 
@@ -136,8 +142,8 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
         IWorkbenchPage page = workbenchWindow.getActivePage();
         if (page != null) {
             String[] wizardIds = page.getNewWizardShortcuts();
-            for (String wizardId : wizardIds) {
-                IAction action = getAction(wizardId);
+            for (int i = 0; i < wizardIds.length; i++) {
+                IAction action = getAction(wizardIds[i]);
                 if (action != null) {
                     if (!WorkbenchActivityHelper.filterItem(action)) {
                         list.add(new ActionContributionItem(action));
@@ -174,7 +180,7 @@ public class BaseNewWizardMenu extends CompoundContributionItem {
                 action = new NewWizardShortcutAction(workbenchWindow,
 						wizardDesc);
 				actions.put(id, action);
-				IConfigurationElement element = Adapters.adapt(wizardDesc, IConfigurationElement.class);
+				IConfigurationElement element = Adapters.getAdapter(wizardDesc, IConfigurationElement.class, true);
 				if (element != null) {
 					workbenchWindow.getExtensionTracker().registerObject(
 							element.getDeclaringExtension(), action,

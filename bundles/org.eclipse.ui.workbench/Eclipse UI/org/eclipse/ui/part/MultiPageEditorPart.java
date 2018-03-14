@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,6 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.part;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,6 +34,10 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -51,6 +53,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IKeyBindingService;
 import org.eclipse.ui.INestableKeyBindingService;
 import org.eclipse.ui.IPartService;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
@@ -145,7 +148,7 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 
 	private IServiceLocator pageContainerSite;
 
-	private ListenerList<IPageChangedListener> pageChangeListeners = new ListenerList<>(
+	private ListenerList pageChangeListeners = new ListenerList(
 			ListenerList.IDENTITY);
 
 	/**
@@ -239,7 +242,12 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 				getOrientation(editor));
 		parent2.setLayout(new FillLayout());
 		editor.createPartControl(parent2);
-		editor.addPropertyListener((source, propertyId) -> MultiPageEditorPart.this.handlePropertyChange(propertyId));
+		editor.addPropertyListener(new IPropertyListener() {
+			@Override
+			public void propertyChanged(Object source, int propertyId) {
+				MultiPageEditorPart.this.handlePropertyChange(propertyId);
+			}
+		});
 		// create item for page only after createPartControl has succeeded
 		Item item = createItem(index, parent2);
 		// remember the editor, as both data on the item, and in the list of
@@ -280,27 +288,34 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 		parent.setLayout(new FillLayout());
 		final CTabFolder newContainer = new CTabFolder(parent, SWT.BOTTOM
 				| SWT.FLAT);
-		newContainer.addSelectionListener(widgetSelectedAdapter(e -> {
-			int newPageIndex = newContainer.indexOf((CTabItem) e.item);
-			pageChange(newPageIndex);
-		}));
-		newContainer.addTraverseListener(e -> {
-			switch (e.detail) {
-				case SWT.TRAVERSE_PAGE_NEXT:
-				case SWT.TRAVERSE_PAGE_PREVIOUS:
-					int detail = e.detail;
-					e.doit = true;
-					e.detail = SWT.TRAVERSE_NONE;
-					Control control = newContainer.getParent();
-					do {
-						if (control.traverse(detail))
-							return;
-						if (control.getListeners(SWT.Traverse).length != 0)
-							return;
-						if (control instanceof Shell)
-							return;
-						control = control.getParent();
-					} while (control != null);
+		newContainer.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				int newPageIndex = newContainer.indexOf((CTabItem) e.item);
+				pageChange(newPageIndex);
+			}
+		});
+		newContainer.addTraverseListener(new TraverseListener() {
+			// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=199499 : Switching tabs by Ctrl+PageUp/PageDown must not be caught on the inner tab set
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				switch (e.detail) {
+					case SWT.TRAVERSE_PAGE_NEXT:
+					case SWT.TRAVERSE_PAGE_PREVIOUS:
+						int detail = e.detail;
+						e.doit = true;
+						e.detail = SWT.TRAVERSE_NONE;
+						Control control = newContainer.getParent();
+						do {
+							if (control.traverse(detail))
+								return;
+							if (control.getListeners(SWT.Traverse).length != 0)
+								return;
+							if (control instanceof Shell)
+								return;
+							control = control.getParent();
+						} while (control != null);
+				}
 			}
 		});
 		return newContainer;
@@ -377,7 +392,7 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 				int pageCount = getPageCount();
 				Object[] result = new Object[pageCount];
 				for (int i = 0; i < pageCount; i++) {
-					result[i] = Integer.valueOf(i);
+					result[i] = new Integer(i);
 				}
 				return result;
 			}
@@ -645,7 +660,12 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 			} else if (data == null) {
 				IServiceLocatorCreator slc = getSite()
 						.getService(IServiceLocatorCreator.class);
-				IServiceLocator sl = slc.createServiceLocator(getSite(), null, () -> close());
+				IServiceLocator sl = slc.createServiceLocator(getSite(), null, new IDisposable(){
+					@Override
+					public void dispose() {
+						close();
+					}
+				});
 				item.setData(sl);
 				pageSites.add(sl);
 				return sl;
@@ -675,7 +695,12 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 		if (pageContainerSite == null) {
 			IServiceLocatorCreator slc = getSite()
 					.getService(IServiceLocatorCreator.class);
-			pageContainerSite = slc.createServiceLocator(getSite(), null, () -> close());
+			pageContainerSite = slc.createServiceLocator(getSite(), null, new IDisposable(){
+				@Override
+				public void dispose() {
+					close();
+				}
+			});
 		}
 		return pageContainerSite;
 	}
@@ -1171,7 +1196,7 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 			// see bug 138823 - prevent some subclasses from causing
 			// an infinite loop
 			if (innerEditor != null && innerEditor != this) {
-				result = Adapters.adapt(innerEditor, adapter);
+				result = Adapters.getAdapter(innerEditor, adapter, true);
 			}
 		}
 		return result;
@@ -1278,7 +1303,9 @@ public abstract class MultiPageEditorPart extends EditorPart implements IPageCha
 	}
 
 	private void firePageChanged(final PageChangedEvent event) {
-		for (final IPageChangedListener l : pageChangeListeners) {
+		Object[] listeners = pageChangeListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangedListener l = (IPageChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

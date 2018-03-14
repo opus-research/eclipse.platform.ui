@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,11 +79,14 @@ public abstract class EditorPart extends WorkbenchPart implements IEditorPart {
      * setContentDescription. Used for compatibility with old parts that call setTitle
      * or overload getTitle instead of using setContentDescription.
      */
-    private IPropertyListener compatibilityTitleListener = (source, propId) -> {
-	    if (propId == IWorkbenchPartConstants.PROP_TITLE) {
-	        setDefaultPartName();
-	    }
-	};
+    private IPropertyListener compatibilityTitleListener = new IPropertyListener() {
+        @Override
+		public void propertyChanged(Object source, int propId) {
+            if (propId == IWorkbenchPartConstants.PROP_TITLE) {
+                setDefaultPartName();
+            }
+        }
+    };
 
     /**
      * Creates a new workbench editor.

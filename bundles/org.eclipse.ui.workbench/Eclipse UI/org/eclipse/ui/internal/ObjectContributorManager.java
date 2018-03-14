@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -322,7 +322,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         contributorList.add(contributor);
         flushLookup();
 
-        IConfigurationElement element = Adapters.adapt(contributor, IConfigurationElement.class);
+        IConfigurationElement element = Adapters.getAdapter(contributor, IConfigurationElement.class, true);
 
         //hook the object listener
         if (element != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,16 +8,10 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 
 package org.eclipse.ui.internal.keys;
 
-import static org.eclipse.swt.events.SelectionListener.widgetDefaultSelectedAdapter;
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
-import com.ibm.icu.text.Collator;
-import com.ibm.icu.text.MessageFormat;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -34,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.CommandManager;
@@ -59,8 +54,12 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -99,6 +98,9 @@ import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.internal.util.Util;
 import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.statushandlers.StatusManager;
+
+import com.ibm.icu.text.Collator;
+import com.ibm.icu.text.MessageFormat;
 
 /**
  * The preference page for defining keyboard shortcuts. While some of its
@@ -579,7 +581,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboScheme.setLayoutData(gridData);
 		comboScheme.setVisibleItemCount(ITEMS_TO_SHOW);
 
-		comboScheme.addSelectionListener(widgetSelectedAdapter(e -> selectedComboScheme()));
+		comboScheme.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent e) {
+				selectedComboScheme();
+			}
+		});
 
 		labelSchemeExtends = new Label(compositeKeyConfiguration, SWT.LEFT);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -609,7 +616,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboCategory.setLayoutData(gridData);
 		comboCategory.setVisibleItemCount(ITEMS_TO_SHOW);
 
-		comboCategory.addSelectionListener(widgetSelectedAdapter(e -> update()));
+		comboCategory.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent e) {
+				update();
+			}
+		});
 
 		final Label labelCommand = new Label(groupCommand, SWT.LEFT);
 		gridData = new GridData();
@@ -623,7 +635,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboCommand.setLayoutData(gridData);
 		comboCommand.setVisibleItemCount(9);
 
-		comboCommand.addSelectionListener(widgetSelectedAdapter(e -> update()));
+		comboCommand.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent e) {
+				update();
+			}
+		});
 
 		labelBindingsForCommand = new Label(groupCommand, SWT.LEFT);
 		gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -668,7 +685,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 			}
 		});
 
-		tableBindingsForCommand.addSelectionListener(widgetSelectedAdapter(selectionEvent -> selectedTableBindingsForCommand()));
+		tableBindingsForCommand.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				selectedTableBindingsForCommand();
+			}
+		});
 
 		final Group groupKeySequence = new Group(composite, SWT.SHADOW_NONE);
 		gridLayout = new GridLayout();
@@ -692,7 +715,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 300;
 		textTriggerSequence.setLayoutData(gridData);
-		textTriggerSequence.addModifyListener(e -> update());
+		textTriggerSequence.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				update();
+			}
+		});
 		textTriggerSequence.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -704,9 +732,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 				bindingService.setKeyFilterEnabled(true);
 			}
 		});
-		textTriggerSequence.addDisposeListener(e -> {
-			if (!bindingService.isKeyFilterEnabled()) {
-				bindingService.setKeyFilterEnabled(true);
+		textTriggerSequence.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				if (!bindingService.isKeyFilterEnabled()) {
+					bindingService.setKeyFilterEnabled(true);
+				}
 			}
 		});
 
@@ -744,19 +775,30 @@ public final class KeysPreferencePage extends PreferencePage implements
 			final KeyStroke trappedKey = (KeyStroke) trappedKeyItr.next();
 			final MenuItem menuItem = new MenuItem(menuButtonAddKey, SWT.PUSH);
 			menuItem.setText(trappedKey.format());
-			menuItem.addSelectionListener(widgetSelectedAdapter(e -> {
-				textTriggerSequenceManager.insert(trappedKey);
-				textTriggerSequence.setFocus();
-				textTriggerSequence.setSelection(textTriggerSequence.getTextLimit());
-			}));
+			menuItem.addSelectionListener(new SelectionAdapter() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					textTriggerSequenceManager.insert(trappedKey);
+					textTriggerSequence.setFocus();
+					textTriggerSequence.setSelection(textTriggerSequence
+							.getTextLimit());
+				}
+			});
 		}
-		buttonAddKey.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-			Point buttonLocation = buttonAddKey.getLocation();
-			buttonLocation = groupKeySequence.toDisplay(buttonLocation.x, buttonLocation.y);
-			Point buttonSize = buttonAddKey.getSize();
-			menuButtonAddKey.setLocation(buttonLocation.x, buttonLocation.y + buttonSize.y);
-			menuButtonAddKey.setVisible(true);
-		}));
+		buttonAddKey.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				Point buttonLocation = buttonAddKey.getLocation();
+				buttonLocation = groupKeySequence.toDisplay(buttonLocation.x,
+						buttonLocation.y);
+				Point buttonSize = buttonAddKey.getSize();
+				menuButtonAddKey.setLocation(buttonLocation.x, buttonLocation.y
+						+ buttonSize.y);
+				menuButtonAddKey.setVisible(true);
+			}
+		});
 
 		labelBindingsForTriggerSequence = new Label(groupKeySequence, SWT.LEFT);
 		gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
@@ -801,7 +843,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 		});
 
 		tableBindingsForTriggerSequence
-				.addSelectionListener(widgetSelectedAdapter(selectionEvent -> selectedTableBindingsForTriggerSequence()));
+				.addSelectionListener(new SelectionAdapter() {
+
+					@Override
+					public void widgetSelected(SelectionEvent selectionEvent) {
+						selectedTableBindingsForTriggerSequence();
+					}
+				});
 
 		final Composite compositeContext = new Composite(composite, SWT.NULL);
 		gridLayout = new GridLayout();
@@ -818,7 +866,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 		comboContext.setLayoutData(gridData);
 		comboContext.setVisibleItemCount(ITEMS_TO_SHOW);
 
-		comboContext.addSelectionListener(widgetSelectedAdapter(e -> update()));
+		comboContext.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetSelected(final SelectionEvent e) {
+				update();
+			}
+		});
 
 		labelContextExtends = new Label(compositeContext, SWT.LEFT);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -839,7 +892,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		buttonAdd.setLayoutData(gridData);
 
-		buttonAdd.addSelectionListener(widgetSelectedAdapter(selectionEvent -> selectedButtonAdd()));
+		buttonAdd.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				selectedButtonAdd();
+			}
+		});
 
 		buttonRemove = new Button(compositeButton, SWT.CENTER | SWT.PUSH);
 		gridData = new GridData();
@@ -850,7 +909,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		buttonRemove.setLayoutData(gridData);
 
-		buttonRemove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> selectedButtonRemove()));
+		buttonRemove.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				selectedButtonRemove();
+			}
+		});
 
 		buttonRestore = new Button(compositeButton, SWT.CENTER | SWT.PUSH);
 		gridData = new GridData();
@@ -861,7 +926,13 @@ public final class KeysPreferencePage extends PreferencePage implements
 				SWT.DEFAULT, SWT.DEFAULT, true).x) + 5;
 		buttonRestore.setLayoutData(gridData);
 
-		buttonRestore.addSelectionListener(widgetSelectedAdapter(selectionEvent -> selectedButtonRestore()));
+		buttonRestore.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent selectionEvent) {
+				selectedButtonRestore();
+			}
+		});
 
 		return composite;
 	}
@@ -922,7 +993,12 @@ public final class KeysPreferencePage extends PreferencePage implements
 				.setText(UNSORTED_COLUMN_NAMES[VIEW_CONTEXT_COLUMN_INDEX]);
 		tableColumnContext.addSelectionListener(new SortOrderSelectionListener(
 				VIEW_CONTEXT_COLUMN_INDEX));
-		tableBindings.addSelectionListener(widgetDefaultSelectedAdapter(e -> selectedTableKeyBindings()));
+		tableBindings.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public final void widgetDefaultSelected(final SelectionEvent e) {
+				selectedTableKeyBindings();
+			}
+		});
 
 		// A composite for the buttons.
 		final Composite buttonBar = new Composite(composite, SWT.NONE);
@@ -1687,8 +1763,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 					while (iterator2.hasNext()) {
 						Context context = (Context) iterator2.next();
 						String uniqueName = MessageFormat.format(
-								Util.translateString(RESOURCE_BUNDLE, "uniqueName"), //$NON-NLS-1$
-								name, context.getId());
+								Util.translateString(RESOURCE_BUNDLE,
+										"uniqueName"), new Object[] { name, //$NON-NLS-1$
+										context.getId() });
 						contextIdsByUniqueName.put(uniqueName, context.getId());
 						contextUniqueNamesById.put(context.getId(), uniqueName);
 					}
@@ -1933,27 +2010,30 @@ public final class KeysPreferencePage extends PreferencePage implements
 
 		// this comparator is based on the ParameterizedCommands#compareTo(*)
 		// method, but uses the collator.
-		Comparator comparator = (o1, o2) -> {
-			String name1 = null;
-			String name2 = null;
-			try {
-				name1 = ((ParameterizedCommand) o1).getName();
-			} catch (NotDefinedException e1) {
-				return -1;
-			}
-			try {
-				name2 = ((ParameterizedCommand) o2).getName();
-			} catch (NotDefinedException e2) {
-				return 1;
-			}
-			int rc = collator.compare(name1, name2);
-			if (rc != 0) {
-				return rc;
-			}
+		Comparator comparator = new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				String name1 = null;
+				String name2 = null;
+				try {
+					name1 = ((ParameterizedCommand) o1).getName();
+				} catch (NotDefinedException e) {
+					return -1;
+				}
+				try {
+					name2 = ((ParameterizedCommand) o2).getName();
+				} catch (NotDefinedException e) {
+					return 1;
+				}
+				int rc = collator.compare(name1, name2);
+				if (rc != 0) {
+					return rc;
+				}
 
-			String id1 = ((ParameterizedCommand) o1).getId();
-			String id2 = ((ParameterizedCommand) o2).getId();
-			return collator.compare(id1, id2);
+				String id1 = ((ParameterizedCommand) o1).getId();
+				String id2 = ((ParameterizedCommand) o2).getId();
+				return collator.compare(id1, id2);
+			}
 		};
 		Collections.sort(commands, comparator);
 		return commands;
@@ -2028,8 +2108,9 @@ public final class KeysPreferencePage extends PreferencePage implements
 								.get(parentId);
 						if (name != null) {
 							labelContextExtends.setText(MessageFormat.format(
-									Util.translateString(RESOURCE_BUNDLE, "extends"), //$NON-NLS-1$
-									name));
+									Util.translateString(RESOURCE_BUNDLE,
+											"extends"), //$NON-NLS-1$
+									new Object[] { name }));
 							return;
 						}
 					}
@@ -2058,7 +2139,7 @@ public final class KeysPreferencePage extends PreferencePage implements
 				if (name != null) {
 					labelSchemeExtends.setText(MessageFormat.format(Util
 							.translateString(RESOURCE_BUNDLE, "extends"), //$NON-NLS-1$
-							name));
+							new Object[] { name }));
 					return;
 				}
 			} catch (final NotDefinedException e) {

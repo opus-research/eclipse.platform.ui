@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.views.navigator;
 
@@ -155,7 +154,7 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
 			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
 
-				IResource r = Adapters.adapt(o, IResource.class);
+				IResource r = Adapters.getAdapter(o, IResource.class, true);
 				if (r != null) {
 					selectedResources.add(r);
                 }
@@ -301,7 +300,7 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
 		if (target.isVirtual()) {
 			shouldLinkAutomatically = true;
 			for (int i = 0; i < sources.length; i++) {
-				if (sources[i].getType() != IResource.FILE) {
+				if (sources[0].getType() != IResource.FILE) {
 					shouldLinkAutomatically = false;
 					break;
 				}
@@ -413,7 +412,7 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
         getDisplay().syncExec(() -> {
 		    MessageDialog dialog = new MessageDialog(
 		            getShell(),
-					ResourceNavigatorMessages.DropAdapter_question, null, msg, MessageDialog.QUESTION, 0, options);
+		            ResourceNavigatorMessages.DropAdapter_question, null, msg, MessageDialog.QUESTION, options, 0);
 		    dialog.open();
 		    int returnVal = dialog.getReturnCode();
 		    String[] returnCodes = { YES, ALL, NO, CANCEL };

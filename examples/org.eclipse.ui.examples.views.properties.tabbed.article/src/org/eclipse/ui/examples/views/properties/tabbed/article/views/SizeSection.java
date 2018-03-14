@@ -44,7 +44,8 @@ public class SizeSection
     private ModifyListener listener = new ModifyListener() {
 
 		public void modifyText(ModifyEvent arg0) {
-			ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
+			ButtonElementProperties properties = (ButtonElementProperties) Adapters.getAdapter(buttonElement,
+					IPropertySource.class, true);
 			SizePropertySource sizePropertySource = (SizePropertySource) properties
 	                .getPropertyValue(ButtonElementProperties.PROPERTY_SIZE);
             sizePropertySource.setPropertyValue(SizePropertySource.ID_HEIGHT,
@@ -118,7 +119,8 @@ public class SizeSection
     public void refresh() {
         heightText.removeModifyListener(listener);
         widthText.removeModifyListener(listener);
-		ButtonElementProperties properties = (ButtonElementProperties) Adapters.adapt(buttonElement, IPropertySource.class);
+		ButtonElementProperties properties = (ButtonElementProperties) Adapters.getAdapter(buttonElement,
+				IPropertySource.class, true);
         widthText.setText(Integer.toString(properties.ptSize.x));
         heightText.setText(Integer.toString(properties.ptSize.y));
         heightText.addModifyListener(listener);

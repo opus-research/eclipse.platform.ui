@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@
 package org.eclipse.ui.internal.quickaccess;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -54,11 +53,7 @@ public class EditorElement extends QuickAccessElement {
 
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		Image titleImage = editorReference.getTitleImage();
-		if (titleImage == null) {
-			return null;
-		}
-		return ImageDescriptor.createFromImage(titleImage);
+		return ImageDescriptor.createFromImage(editorReference.getTitleImage());
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,15 +38,16 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 		super();
 		this.tag = tag;
 		IExtension [] extensions = getExtensionPointFilter().getExtensions();
-		for (IExtension extension : extensions) {
-			addExtension(PlatformUI.getWorkbench().getExtensionTracker(), extension);
+		for (int i = 0; i < extensions.length; i++) {
+			addExtension(PlatformUI.getWorkbench().getExtensionTracker(), extensions[i]);
 		}
 	}
 
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		IConfigurationElement [] elements = extension.getConfigurationElements();
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			if (element.getName().equals(tag)) {
 				String id = element.getAttribute(IWorkbenchRegistryConstants.ATT_ID);
 				String file = element.getAttribute(IWorkbenchRegistryConstants.ATT_ICON);
@@ -78,9 +79,9 @@ public class ImageBindingRegistry implements IExtensionChangeHandler {
 
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
-		for (Object object : objects) {
-			if (object instanceof String) {
-				registry.remove((String) object);
+		for (int i = 0; i < objects.length; i++) {
+			if (objects[i] instanceof String) {
+				registry.remove((String) objects[i]);
 			}
 		}
 	}

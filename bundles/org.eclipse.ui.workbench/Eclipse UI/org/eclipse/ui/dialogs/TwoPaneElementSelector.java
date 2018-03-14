@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,10 +19,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -174,9 +178,24 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
      */
     protected Table createLowerList(Composite parent) {
         Table list = new Table(parent, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        list.addListener(SWT.Selection, evt -> handleLowerSelectionChanged());
-        list.addListener(SWT.MouseDoubleClick, evt -> handleDefaultSelected());
-        list.addDisposeListener(e -> fQualifierRenderer.dispose());
+        list.addListener(SWT.Selection, new Listener() {
+            @Override
+			public void handleEvent(Event evt) {
+                handleLowerSelectionChanged();
+            }
+        });
+        list.addListener(SWT.MouseDoubleClick, new Listener() {
+            @Override
+			public void handleEvent(Event evt) {
+                handleDefaultSelected();
+            }
+        });
+        list.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                fQualifierRenderer.dispose();
+            }
+        });
         GridData data = new GridData();
         data.widthHint = convertWidthInCharsToPixels(50);
         data.heightHint = convertHeightInCharsToPixels(5);
@@ -222,11 +241,11 @@ public class TwoPaneElementSelector extends AbstractElementListSelectionDialog {
         fLowerList.removeAll();
 		int elementCount = 0;
 		List elements= new ArrayList(indices.length * 5);
-        for (int index : indices) {
-        	Object[] foldedElements= getFoldedElements(index);
+        for (int i= 0; i < indices.length; i++) {
+        	Object[] foldedElements= getFoldedElements(indices[i]);
 			if (foldedElements != null) {
 				elementCount = elementCount + foldedElements.length;
-				elements.add(getFoldedElements(index));
+				elements.add(getFoldedElements(indices[i]));
 			}
 		}
 		if (elementCount > 0) {

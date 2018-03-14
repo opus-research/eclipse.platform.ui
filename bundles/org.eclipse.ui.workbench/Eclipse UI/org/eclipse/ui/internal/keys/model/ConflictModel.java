@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,8 @@ import java.util.Map;
 import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.BindingManager;
 import org.eclipse.jface.bindings.TriggerSequence;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * @since 3.4
@@ -227,23 +229,26 @@ public class ConflictModel extends CommonModel {
 				updateConflictsFor(be);
 			}
 		}
-		controller.addPropertyChangeListener(event -> {
-			if (event.getSource() == ConflictModel.this
-					&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
-							.getProperty())) {
-				if (event.getNewValue() != null) {
-					updateConflictsFor(
-							(BindingElement) event.getOldValue(),
-							(BindingElement) event.getNewValue());
-					setConflicts((Collection) conflictsMap.get(event
-							.getNewValue()));
-				} else {
-					setConflicts(null);
+		controller.addPropertyChangeListener(new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getSource() == ConflictModel.this
+						&& CommonModel.PROP_SELECTED_ELEMENT.equals(event
+								.getProperty())) {
+					if (event.getNewValue() != null) {
+						updateConflictsFor(
+								(BindingElement) event.getOldValue(),
+								(BindingElement) event.getNewValue());
+						setConflicts((Collection) conflictsMap.get(event
+								.getNewValue()));
+					} else {
+						setConflicts(null);
+					}
+				} else if (BindingModel.PROP_BINDING_REMOVE.equals(event
+						.getProperty())) {
+					updateConflictsFor((BindingElement) event.getOldValue(),
+							(BindingElement) event.getNewValue(), true);
 				}
-			} else if (BindingModel.PROP_BINDING_REMOVE.equals(event
-					.getProperty())) {
-				updateConflictsFor((BindingElement) event.getOldValue(),
-						(BindingElement) event.getNewValue(), true);
 			}
 		});
 	}

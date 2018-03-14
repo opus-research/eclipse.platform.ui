@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,10 +30,6 @@ import org.eclipse.swt.widgets.Widget;
  * This is a widget independent class implementors of
  * {@link org.eclipse.swt.widgets.Table} like widgets can use to provide a
  * viewer on top of their widget implementations.
- * <p>
- * <strong> This class is not intended to be subclassed outside of the JFace
- * viewers framework.</strong>
- * </p>
  *
  * @since 3.3
  */
@@ -78,15 +74,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 					IContentProvider contentProvider = getContentProvider();
 					// If we are building lazily then request lookup now
 					if (contentProvider instanceof ILazyContentProvider) {
-						ILazyContentProvider lazyProvider = (ILazyContentProvider) contentProvider;
-						if (!isBusy()) {
-							lazyProvider.updateElement(index);
-						} else {
-							// In case event is sent during doUpdateItem() we
-							// should run async update to avoid RuntimeException
-							// from ColumnViewer.checkBusy(), see bug 488484
-							getControl().getDisplay().asyncExec(() -> lazyProvider.updateElement(index));
-						}
+						((ILazyContentProvider) contentProvider)
+								.updateElement(index);
 						return;
 					}
 				}
@@ -260,7 +249,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 			return;
 		Object[] filtered = filter(elements);
 
-		for (Object element : filtered) {
+		for (int i = 0; i < filtered.length; i++) {
+			Object element = filtered[i];
 			int index = indexForElement(element);
 			createItem(element, index);
 		}
@@ -329,7 +319,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	protected Widget doFindItem(Object element) {
 
 		Item[] children = doGetItems();
-		for (Item item : children) {
+		for (int i = 0; i < children.length; i++) {
+			Item item = children[i];
 			Object data = item.getData();
 			if (data != null && equals(data, element)) {
 				return item;
@@ -463,7 +454,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		}
 		Widget[] items = doGetSelection();
 		ArrayList list = new ArrayList(items.length);
-		for (Widget item : items) {
+		for (int i = 0; i < items.length; i++) {
+			Widget item = items[i];
 			Object e = item.getData();
 			if (e != null) {
 				list.add(e);
@@ -485,7 +477,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		int[] selectionIndices = doGetSelectionIndices();
 		if (getContentProvider() instanceof ILazyContentProvider) {
 			ILazyContentProvider lazy = (ILazyContentProvider) getContentProvider();
-			for (int selectionIndex : selectionIndices) {
+			for (int i = 0; i < selectionIndices.length; i++) {
+				int selectionIndex = selectionIndices[i];
 				lazy.updateElement(selectionIndex);// Start the update
 				// check for the case where the content provider changed the number of items
 				if (selectionIndex < doGetItemCount()) {
@@ -499,8 +492,10 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				}
 			}
 		} else {
-			for (int selectionIndex : selectionIndices) {
+			for (int i = 0; i < selectionIndices.length; i++) {
 				Object element = null;
+				// See if it is cached
+				int selectionIndex = selectionIndices[i];
 				if (selectionIndex < virtualManager.cachedElements.length) {
 					element = virtualManager.cachedElements[selectionIndex];
 				}
@@ -725,8 +720,8 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 */
 	private void internalRemove(final Object[] elements) {
 		Object input = getInput();
-		for (Object element : elements) {
-			if (equals(element, input)) {
+		for (int i = 0; i < elements.length; ++i) {
+			if (equals(elements[i], input)) {
 				boolean oldBusy = isBusy();
 				setBusy(false);
 				try {
@@ -741,10 +736,10 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		// to allow SWT to optimize multiple removals
 		int[] indices = new int[elements.length];
 		int count = 0;
-		for (Object element : elements) {
-			Widget w = findItem(element);
+		for (int i = 0; i < elements.length; ++i) {
+			Widget w = findItem(elements[i]);
 			if (w == null && virtualManager != null) {
-				int index = virtualManager.find(element);
+				int index = virtualManager.find(elements[i]);
 				if (index != -1) {
 					indices[count++] = index;
 				}
@@ -1030,18 +1025,6 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 				"Cannot get raw children with an ILazyContentProvider");//$NON-NLS-1$
 		return super.getRawChildren(parent);
 
-	}
-
-	/**
-	 * Sets the content provider used by this <code>AbstractTableViewer</code>.
-	 * <p>
-	 * Content providers for abstract table viewers must implement either
-	 * {@link IStructuredContentProvider} or {@link ILazyContentProvider}.
-	 */
-	@Override
-	public void setContentProvider(IContentProvider provider) {
-		// the actual check is in assertContentProviderType
-		super.setContentProvider(provider);
 	}
 
 	@Override

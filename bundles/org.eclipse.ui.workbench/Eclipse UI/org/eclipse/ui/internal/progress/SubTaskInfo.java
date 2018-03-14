@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,11 +14,13 @@ package org.eclipse.ui.internal.progress;
  * SubTaskInfo is the class that displays a subtask in the tree.
  */
 class SubTaskInfo extends JobTreeElement {
+
 	protected String taskName;
-	protected final JobInfo jobInfo;
+
+	JobInfo jobInfo;
 
 	/**
-	 * Creates a new instance of the receiver.
+	 * Create a new instance of the receiver.
 	 *
 	 * @param parentJob
 	 * @param name
@@ -47,7 +49,7 @@ class SubTaskInfo extends JobTreeElement {
 	}
 
 	/**
-	 * Sets the taskName of the receiver.
+	 * Set the taskName of the receiver.
 	 *
 	 * @param name
 	 */

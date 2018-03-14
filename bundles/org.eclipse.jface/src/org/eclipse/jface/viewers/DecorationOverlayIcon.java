@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,6 @@
 package org.eclipse.jface.viewers;
 
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -32,16 +30,14 @@ import org.eclipse.swt.graphics.Point;
  */
 public class DecorationOverlayIcon extends CompositeImageDescriptor {
 
-	private Object referenceImageOrDescriptor;
+    // the base image
+    private Image base;
 
     // the overlay images
     private ImageDescriptor[] overlays;
 
-	// This imageData of the base image
-	private Supplier<ImageData> baseImageData;
-
-	// The size of the base image (that's also the size of this composite image)
-	private Supplier<Point> size;
+    // the size
+    private Point size;
 
     /**
      * Create the decoration overlay for the base image using the array of
@@ -57,24 +53,9 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
      */
     public DecorationOverlayIcon(Image baseImage,
             ImageDescriptor[] overlaysArray, Point sizeValue) {
-		this.referenceImageOrDescriptor = baseImage;
+        this.base = baseImage;
         this.overlays = overlaysArray;
-		this.baseImageData = new Supplier<ImageData>() {
-			private ImageData value;
-			@Override
-			public ImageData get() {
-				if (value == null) {
-					value = baseImage.getImageData();
-				}
-				return value;
-			}
-		};
-		this.size = new Supplier<Point>() {
-			@Override
-			public Point get() {
-				return sizeValue;
-			}
-		};
+        this.size = sizeValue;
     }
 
     /**
@@ -104,45 +85,6 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 	 */
 	public DecorationOverlayIcon(Image baseImage, ImageDescriptor overlayImage, int quadrant) {
 		this(baseImage, createArrayFrom(overlayImage, quadrant));
-	}
-
-	/**
-	 * Create a decoration overlay icon that will place the given overlay icon
-	 * in the given quadrant of the base image descriptor.
-	 *
-	 * @param baseImageDescriptor
-	 *            the base image descriptor
-	 * @param overlayImageDescriptor
-	 *            the overlay image descriptor
-	 * @param quadrant
-	 *            the quadrant (one of {@link IDecoration}
-	 *            ({@link IDecoration#TOP_LEFT}, {@link IDecoration#TOP_RIGHT},
-	 *            {@link IDecoration#BOTTOM_LEFT},
-	 *            {@link IDecoration#BOTTOM_RIGHT} or
-	 *            {@link IDecoration#UNDERLAY})
-	 * @since 3.13
-	 */
-	public DecorationOverlayIcon(ImageDescriptor baseImageDescriptor, ImageDescriptor overlayImageDescriptor,
-			int quadrant) {
-		this.referenceImageOrDescriptor = baseImageDescriptor;
-		this.overlays = createArrayFrom(overlayImageDescriptor, quadrant);
-		this.size = new Supplier<Point>() {
-			@Override
-			public Point get() {
-				ImageData data = baseImageData.get();
-				return new Point(data.width, data.height);
-			}
-		};
-		this.baseImageData = new Supplier<ImageData>() {
-			private ImageData value;
-			@Override
-			public ImageData get() {
-				if (value == null) {
-					value = baseImageDescriptor.getImageData();
-				}
-				return value;
-			}
-		};
 	}
 
 	/**
@@ -180,13 +122,13 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
                 drawImage(overlayData, 0, 0);
                 break;
             case IDecoration.TOP_RIGHT:
-				drawImage(overlayData, getSize().x - overlayData.width, 0);
+                drawImage(overlayData, size.x - overlayData.width, 0);
                 break;
             case IDecoration.BOTTOM_LEFT:
-				drawImage(overlayData, 0, getSize().y - overlayData.height);
+                drawImage(overlayData, 0, size.y - overlayData.height);
                 break;
             case IDecoration.BOTTOM_RIGHT:
-				drawImage(overlayData, getSize().x - overlayData.width, getSize().y
+                drawImage(overlayData, size.x - overlayData.width, size.y
                         - overlayData.height);
                 break;
             }
@@ -199,16 +141,16 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
 			return false;
 		}
         DecorationOverlayIcon other = (DecorationOverlayIcon) o;
-		return Objects.equals(referenceImageOrDescriptor, other.referenceImageOrDescriptor)
+        return base.equals(other.base)
                 && Arrays.equals(overlays, other.overlays);
     }
 
     @Override
 	public int hashCode() {
-		int code = System.identityHashCode(referenceImageOrDescriptor);
-        for (ImageDescriptor overlay : overlays) {
-            if (overlay != null) {
-				code ^= overlay.hashCode();
+        int code = System.identityHashCode(base);
+        for (int i = 0; i < overlays.length; i++) {
+            if (overlays[i] != null) {
+				code ^= overlays[i].hashCode();
 			}
         }
         return code;
@@ -225,19 +167,19 @@ public class DecorationOverlayIcon extends CompositeImageDescriptor {
     	if (overlays.length > IDecoration.REPLACE && overlays[IDecoration.REPLACE] != null) {
     		drawImage(overlays[IDecoration.REPLACE].getImageData(), 0, 0);
     	} else {
-			drawImage(baseImageData.get(), 0, 0);
+    		drawImage(base.getImageData(), 0, 0);
     	}
         drawOverlays(overlays);
     }
 
     @Override
 	protected Point getSize() {
-		return size.get();
+        return size;
     }
 
     @Override
 	protected int getTransparentPixel() {
-		return baseImageData.get().transparentPixel;
+    	return base.getImageData().transparentPixel;
     }
 
 }

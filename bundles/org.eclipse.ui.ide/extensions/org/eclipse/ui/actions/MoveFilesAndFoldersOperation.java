@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
@@ -78,7 +79,7 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 	protected void copy(IResource[] resources, IPath destination, IProgressMonitor monitor) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(monitor, resources.length);
 		for (int i = 0; i < resources.length; i++) {
-			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
+			SubMonitor iterationMonitor = subMonitor.newChild(1).setWorkRemaining(100);
 			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
@@ -89,31 +90,34 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 				// move the children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationMonitor.split(50));
-					delete(source, iterationMonitor.split(50));
+					copy(children, destinationPath, iterationMonitor.newChild(100));
+					delete(source, subMonitor);
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					delete(existing, iterationMonitor.split(50));
+					delete(existing, iterationMonitor.newChild(50));
 					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationMonitor.split(50));
+							iterationMonitor.newChild(50));
 				}
 			} else {
 				// if we're merging folders, we could be overwriting an existing
 				// file
 				if (existing != null) {
 					if (homogenousResources(source, existing)) {
-						moveExisting(source, existing, iterationMonitor.split(100));
+						moveExisting(source, existing, iterationMonitor.newChild(100));
 					} else {
 						// Moving a linked resource over unlinked or vice versa.
 						// Can't use setContents here. Fixes bug 28772.
-						delete(existing, iterationMonitor.split(50));
+						delete(existing, iterationMonitor.newChild(50));
 						source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-								iterationMonitor.split(50));
+								iterationMonitor.newChild(50));
 					}
 				} else {
 					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
-							iterationMonitor.split(100));
+							iterationMonitor.newChild(100));
+				}
+				if (subMonitor.isCanceled()) {
+					throw new OperationCanceledException();
 				}
 			}
 		}
@@ -199,8 +203,8 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 			IFile sourceFile = getFile(source);
 
 			if (sourceFile != null) {
-				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.split(1));
-				delete(sourceFile, subMonitor.split(1));
+				existingFile.setContents(sourceFile.getContents(), IResource.KEEP_HISTORY, subMonitor.newChild(1));
+				delete(sourceFile, subMonitor.newChild(1));
 			}
 		}
 	}

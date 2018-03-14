@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ import java.util.Iterator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IRegistryChangeEvent;
+import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.ExtensionTracker;
@@ -50,14 +52,18 @@ public class WorkbenchPreferenceManager extends PreferenceManager implements
 
 		// add a listener for keyword deltas. If any occur clear all page caches
 		Platform.getExtensionRegistry().addRegistryChangeListener(
-				event -> {
-					if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
-							IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
-						for (Iterator j = getElements(
-								PreferenceManager.POST_ORDER).iterator(); j
-								.hasNext();) {
-							((WorkbenchPreferenceNode) j.next())
-									.clearKeywords();
+				new IRegistryChangeListener() {
+
+					@Override
+					public void registryChanged(IRegistryChangeEvent event) {
+						if (event.getExtensionDeltas(PlatformUI.PLUGIN_ID,
+								IWorkbenchRegistryConstants.PL_KEYWORDS).length > 0) {
+							for (Iterator j = getElements(
+									PreferenceManager.POST_ORDER).iterator(); j
+									.hasNext();) {
+								((WorkbenchPreferenceNode) j.next())
+										.clearKeywords();
+							}
 						}
 					}
 				});

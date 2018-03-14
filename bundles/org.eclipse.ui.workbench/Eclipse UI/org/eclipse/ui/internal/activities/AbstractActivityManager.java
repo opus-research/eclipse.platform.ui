@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import org.eclipse.ui.activities.IActivityManager;
 import org.eclipse.ui.activities.IActivityManagerListener;
 
 public abstract class AbstractActivityManager implements IActivityManager {
-	private ListenerList<IActivityManagerListener> activityManagerListeners;
+	private ListenerList activityManagerListeners;
 
     protected AbstractActivityManager() {
     }
@@ -30,7 +30,7 @@ public abstract class AbstractActivityManager implements IActivityManager {
 		}
 
         if (activityManagerListeners == null) {
-			activityManagerListeners = new ListenerList<>();
+			activityManagerListeners = new ListenerList();
 		}
 
 		activityManagerListeners.add(activityManagerListener);
@@ -43,8 +43,10 @@ public abstract class AbstractActivityManager implements IActivityManager {
 		}
 
 		if (activityManagerListeners != null) {
-			for (IActivityManagerListener listener : activityManagerListeners) {
-				listener.activityManagerChanged(activityManagerEvent);
+			Object[] listeners = activityManagerListeners.getListeners();
+			for (int i = 0; i < listeners.length; i++) {
+				((IActivityManagerListener) listeners[i])
+						.activityManagerChanged(activityManagerEvent);
 			}
 		}
     }

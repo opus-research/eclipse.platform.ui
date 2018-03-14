@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,9 +76,12 @@ public class ShowInMenu extends ContributionItem implements
 
 	private boolean dirty = true;
 
-	private IMenuListener menuListener = manager -> {
-		manager.markDirty();
-		dirty = true;
+	private IMenuListener menuListener = new IMenuListener() {
+		@Override
+		public void menuAboutToShow(IMenuManager manager) {
+			manager.markDirty();
+			dirty = true;
+		}
 	};
 
 	private IServiceLocator locator;
@@ -218,7 +221,8 @@ public class ShowInMenu extends ContributionItem implements
 			ContributionsAnalyzer.addMenuContributions(menuModel, toContribute,
 					menuContributionsToRemove);
 
-			ICommandImageService imgService = workbenchWindow.getService(ICommandImageService.class);
+			ICommandImageService imgService = (ICommandImageService) workbenchWindow
+					.getService(ICommandImageService.class);
 
 			for (MMenuElement menuElement : menuModel.getChildren()) {
 				if (menuElement instanceof MHandledMenuItem) {
@@ -292,7 +296,7 @@ public class ShowInMenu extends ContributionItem implements
 				}
 			}
 		}
-		IShowInTargetList targetList = Adapters.adapt(sourcePart, IShowInTargetList.class);
+		IShowInTargetList targetList = Adapters.getAdapter(sourcePart, IShowInTargetList.class, true);
 		if (targetList != null) {
 			String[] partIds = targetList.getShowInTargetIds();
 			if (partIds != null) {
@@ -341,7 +345,7 @@ public class ShowInMenu extends ContributionItem implements
 	 */
 	protected ShowInContext getContext(IWorkbenchPart sourcePart) {
 		if (sourcePart != null) {
-			IShowInSource source = Adapters.adapt(sourcePart, IShowInSource.class);
+			IShowInSource source = Adapters.getAdapter(sourcePart, IShowInSource.class, true);
 			if (source != null) {
 				ShowInContext context = source.getShowInContext();
 				if (context != null) {

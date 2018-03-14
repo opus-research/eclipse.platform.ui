@@ -431,9 +431,12 @@ public class PopupMenuExtender implements IMenuListener2,
     			// has been fired.
     			// This is less threatening if the popup: menu
     			// contributions aren't tied to the evaluation service
-				workbench.getDisplay().asyncExec(() -> {
-					final Workbench realWorkbench = (Workbench) workbench;
-					runCleanUp(realWorkbench);
+				workbench.getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						final Workbench realWorkbench = (Workbench) workbench;
+						runCleanUp(realWorkbench);
+					}
 				});
 			}
     	}
@@ -610,7 +613,12 @@ public class PopupMenuExtender implements IMenuListener2,
 				}
 
 				if (clearPopups) {
-					display.syncExec(() -> clearStaticActions());
+					display.syncExec(new Runnable() {
+						@Override
+						public void run() {
+							clearStaticActions();
+						}
+					});
 				}
 			}
 		}

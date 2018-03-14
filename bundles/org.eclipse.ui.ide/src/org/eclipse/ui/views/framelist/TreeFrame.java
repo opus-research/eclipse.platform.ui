@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -187,7 +187,7 @@ public class TreeFrame extends Frame {
      */
     private void saveElements(Object[] elements, IMemento memento) {
         for (int i = 0; i < elements.length; i++) {
-			IPersistableElement persistable = Adapters.adapt(elements[i], IPersistableElement.class);
+			IPersistableElement persistable = Adapters.getAdapter(elements[i], IPersistableElement.class, true);
 			if (persistable != null) {
 				IMemento elementMem = memento.createChild(TAG_ELEMENT);
 				elementMem.putString(TAG_FACTORY_ID, persistable.getFactoryId());
@@ -202,7 +202,7 @@ public class TreeFrame extends Frame {
      * @param memento memento to persist the frame state in.
      */
     public void saveState(IMemento memento) {
-		IPersistableElement persistable = Adapters.adapt(input, IPersistableElement.class);
+		IPersistableElement persistable = Adapters.getAdapter(input, IPersistableElement.class, true);
         if (persistable != null) {
             IMemento frameMemento = memento.createChild(TAG_FRAME_INPUT);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.preferences;
 import java.util.Set;
 
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.themes.IThemeManager;
 
 /**
@@ -22,7 +23,12 @@ public class ThemeManagerAdapter extends PropertyMapAdapter {
 
     private IThemeManager manager;
 
-    private IPropertyChangeListener listener = event -> firePropertyChange(event.getProperty());
+    private IPropertyChangeListener listener = new IPropertyChangeListener() {
+        @Override
+		public void propertyChange(PropertyChangeEvent event) {
+            firePropertyChange(event.getProperty());
+        }
+    };
 
     public ThemeManagerAdapter(IThemeManager manager) {
         this.manager = manager;

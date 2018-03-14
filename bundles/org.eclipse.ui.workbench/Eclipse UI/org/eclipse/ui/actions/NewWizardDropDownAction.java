@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -77,7 +77,8 @@ public class NewWizardDropDownAction extends Action implements
             createDropDownMenuMgr();
             Menu menu = new Menu(parent);
             IContributionItem[] items = dropDownMenuMgr.getItems();
-            for (IContributionItem item : items) {
+            for (int i = 0; i < items.length; i++) {
+                IContributionItem item = items[i];
                 IContributionItem newItem = item;
                 if (item instanceof ActionContributionItem) {
                     newItem = new ActionContributionItem(

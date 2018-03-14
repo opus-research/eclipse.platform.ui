@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
@@ -170,7 +171,12 @@ public abstract class AbstractMultiEditor extends EditorPart {
         activeEditorIndex = 0;
 
 		for (int i = 0; i < children.length; i++) {
-			children[i].addPropertyListener( (source, propId) -> handlePropertyChange(propId));
+			children[i].addPropertyListener( new IPropertyListener() {
+				@Override
+				public void propertyChanged(Object source, int propId) {
+					handlePropertyChange(propId);
+				}
+			});
 		}
 
         innerEditorsCreated();

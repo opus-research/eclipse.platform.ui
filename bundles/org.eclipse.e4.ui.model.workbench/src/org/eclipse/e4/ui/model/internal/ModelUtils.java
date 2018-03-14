@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     René Brandstetter - Bug 411821 - [QuickAccess] Contribute SearchField
  *                                      through a fragment or other means
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 474865
  *******************************************************************************/
 package org.eclipse.e4.ui.model.internal;
 
@@ -94,42 +93,42 @@ public class ModelUtils {
 				PositionInfo posInfo = PositionInfo.parse(positionInList);
 
 				if( posInfo != null ){
-					switch (posInfo.getPosition()){
-					case FIRST:
-						index = 0;
-						break;
+				  switch (posInfo.getPosition()){
+				    case FIRST:
+				      index = 0;
+				      break;
 
-					case INDEX:
-						index = posInfo.getPositionReferenceAsInteger();
-						break;
+				    case INDEX:
+				      index = posInfo.getPositionReferenceAsInteger();
+				      break;
 
-					case BEFORE:
-					case AFTER:
-						int tmpIndex = -1;
-						String elementId = posInfo.getPositionReference();
+				    case BEFORE:
+				    case AFTER:
+				      int tmpIndex = -1;
+				      String elementId = posInfo.getPositionReference();
 
-						for( int i = 0; i < list.size(); i++ ) {
-							if( elementId.equals((list.get(i)).getElementId()) ) {
-								tmpIndex = i;
-								break;
-							}
-						}
+				      for( int i = 0; i < list.size(); i++ ) {
+		            if( elementId.equals((list.get(i)).getElementId()) ) {
+		              tmpIndex = i;
+		              break;
+		            }
+		          }
 
-						if( tmpIndex != -1 ) {
-							if( posInfo.getPosition() == Position.BEFORE ) {
-								index = tmpIndex;
-							} else {
-								index = tmpIndex + 1;
-							}
-						} else {
-							System.err.println("Could not find element with Id '"+elementId+"'");
-						}
+				      if( tmpIndex != -1 ) {
+		            if( posInfo.getPosition() == Position.BEFORE ) {
+		              index = tmpIndex;
+		            } else {
+		              index = tmpIndex + 1;
+		            }
+		          } else {
+		            System.err.println("Could not find element with Id '"+elementId+"'");
+		          }
 
-					case LAST:
-					default:
-						// both no special operation, because the default is adding it at the last position
-						break;
-					}
+				    case LAST:
+				      default:
+				        // both no special operation, because the default is adding it at the last position
+				        break;
+				  }
 				} else {
 					System.err.println("Not a valid list position.");
 				}
@@ -206,8 +205,7 @@ public class ModelUtils {
 	static MApplicationElement getParent(MApplicationElement element) {
 		if ( (element instanceof MUIElement) && ((MUIElement)element).getCurSharedRef() != null) {
 			return ((MUIElement)element).getCurSharedRef().getParent();
-		} else if (element != null && element.getTransientData() != null
-				&& element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
+		} else if (element.getTransientData().get(CONTAINING_PARENT) instanceof MApplicationElement) {
 			return (MApplicationElement) element.getTransientData().get(CONTAINING_PARENT);
 		} else if (element instanceof EObject) {
 			EObject eContainer = ((EObject) element).eContainer();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,8 +12,8 @@ package org.eclipse.jface.window;
 
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -113,7 +113,7 @@ public abstract class Window implements IShellProvider {
 		 * Handle the exception.
 		 *
 		 * @param t
-		 *            The exception that occurred.
+		 *            The exception that occured.
 		 */
 		public void handleException(Throwable t);
 	}
@@ -438,7 +438,7 @@ public abstract class Window implements IShellProvider {
 	 * getLayout() to return null.
 	 *
 	 * <p>
-	 * It is common practice to create and return a single composite that
+	 * It is common practise to create and return a single composite that
 	 * contains the entire window contents.
 	 * </p>
 	 *
@@ -687,8 +687,8 @@ public abstract class Window implements IShellProvider {
 	 * Returns the shell style bits.
 	 * <p>
 	 * The default value is <code>SWT.CLOSE|SWT.MIN|SWT.MAX|SWT.RESIZE</code>.
-	 * Subclasses should call <code>setShellStyle</code> to change this value,
-	 * rather than overriding this method.
+	 * Subclassers should call <code>setShellStyle</code> to change this
+	 * value, rather than overriding this method.
 	 * </p>
 	 *
 	 * @return the shell style bits
@@ -905,7 +905,7 @@ public abstract class Window implements IShellProvider {
 	 *            point to find (display coordinates)
 	 * @param toFind
 	 *            point to find (display coordinates)
-	 * @return the monitor closest to the given point
+	 * @return the montor closest to the given point
 	 */
 	private static Monitor getClosestMonitor(Display toSearch, Point toFind) {
 		int closest = Integer.MAX_VALUE;
@@ -913,7 +913,9 @@ public abstract class Window implements IShellProvider {
 		Monitor[] monitors = toSearch.getMonitors();
 		Monitor result = monitors[0];
 
-		for (Monitor current : monitors) {
+		for (int idx = 0; idx < monitors.length; idx++) {
+			Monitor current = monitors[idx];
+
 			Rectangle clientArea = current.getClientArea();
 
 			if (clientArea.contains(toFind)) {
@@ -1002,8 +1004,8 @@ public abstract class Window implements IShellProvider {
 
 		if (manager != null) {
 			Window[] windows = manager.getWindows();
-			for (Window window : windows) {
-				if (window == this) {
+			for (int i = 0; i < windows.length; i++) {
+				if (windows[i] == this) {
 					return;
 				}
 			}

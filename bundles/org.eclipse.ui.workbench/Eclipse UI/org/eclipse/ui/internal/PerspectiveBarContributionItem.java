@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,13 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ToolBar;
@@ -86,7 +86,13 @@ public class PerspectiveBarContributionItem extends ContributionItem {
             toolItem.setImage(image);
 
             toolItem.setToolTipText(NLS.bind(WorkbenchMessages.PerspectiveBarContributionItem_toolTip, perspective.getLabel()));
-            toolItem.addSelectionListener(widgetSelectedAdapter(event -> select()));
+            toolItem.addSelectionListener(new SelectionAdapter() {
+
+                @Override
+				public void widgetSelected(SelectionEvent event) {
+                    select();
+                }
+            });
             toolItem.setData(this); //TODO review need for this
             update();
         }

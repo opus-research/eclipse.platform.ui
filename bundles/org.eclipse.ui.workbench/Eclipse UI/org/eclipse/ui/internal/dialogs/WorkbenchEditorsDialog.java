@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
@@ -25,6 +23,8 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -111,18 +111,21 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
 
     private static final String COLUMNS = "columns"; //$NON-NLS-1$
 
-    private SelectionListener headerListener = widgetSelectedAdapter(e -> {
-		TableColumn column = (TableColumn) e.widget;
-		int index = editorsTable.indexOf(column);
-	    if (index == sortColumn) {
-			reverse = !reverse;
-		} else {
-			sortColumn = index;
-		}
-		editorsTable.setSortDirection(reverse ? SWT.DOWN : SWT.UP);
-		editorsTable.setSortColumn(column);
-	    updateItems();
-	});
+    private SelectionListener headerListener = new SelectionAdapter() {
+        @Override
+		public void widgetSelected(SelectionEvent e) {
+			TableColumn column = (TableColumn) e.widget;
+			int index = editorsTable.indexOf(column);
+            if (index == sortColumn) {
+				reverse = !reverse;
+			} else {
+				sortColumn = index;
+			}
+			editorsTable.setSortDirection(reverse ? SWT.DOWN : SWT.UP);
+			editorsTable.setSortColumn(column);
+            updateItems();
+        }
+    };
 
     /**
      * Constructor for WorkbenchEditorsDialog.
@@ -143,16 +146,16 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
             String[] array = s.getArray(BOUNDS);
             if (array != null) {
                 bounds = new Rectangle(0, 0, 0, 0);
-                bounds.x = Integer.valueOf(array[0]).intValue();
-                bounds.y = Integer.valueOf(array[1]).intValue();
-                bounds.width = Integer.valueOf(array[2]).intValue();
-                bounds.height = Integer.valueOf(array[3]).intValue();
+                bounds.x = new Integer(array[0]).intValue();
+                bounds.y = new Integer(array[1]).intValue();
+                bounds.width = new Integer(array[2]).intValue();
+                bounds.height = new Integer(array[3]).intValue();
             }
             array = s.getArray(COLUMNS);
             if (array != null) {
                 columnsWidth = new int[array.length];
                 for (int i = 0; i < columnsWidth.length; i++) {
-					columnsWidth[i] = Integer.valueOf(array[i]).intValue();
+					columnsWidth[i] = new Integer(array[i]).intValue();
 				}
             }
         }
@@ -279,30 +282,40 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
         //Select clean editors button
         selectClean = new Button(selectionButtons, SWT.PUSH);
         selectClean.setText(WorkbenchMessages.WorkbenchEditorsDialog_selectClean);
-        selectClean.addSelectionListener(widgetSelectedAdapter(e -> {
-		    editorsTable.setSelection(selectClean(editorsTable.getItems()));
-		    updateButtons();
-		}));
+        selectClean.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                editorsTable.setSelection(selectClean(editorsTable.getItems()));
+                updateButtons();
+            }
+        });
         selectClean.setFont(font);
         setButtonLayoutData(selectClean);
 
         //Invert selection button
         invertSelection = new Button(selectionButtons, SWT.PUSH);
         invertSelection.setText(WorkbenchMessages.WorkbenchEditorsDialog_invertSelection);
-        invertSelection.addSelectionListener(widgetSelectedAdapter(e -> {
-			editorsTable.setSelection(invertedSelection(editorsTable.getItems(), editorsTable.getSelection()));
-		    updateButtons();
-		}));
+        invertSelection.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                editorsTable.setSelection(invertedSelection(editorsTable
+                        .getItems(), editorsTable.getSelection()));
+                updateButtons();
+            }
+        });
         invertSelection.setFont(font);
         setButtonLayoutData(invertSelection);
 
         //Select all button
         allSelection = new Button(selectionButtons, SWT.PUSH);
         allSelection.setText(WorkbenchMessages.WorkbenchEditorsDialog_allSelection);
-        allSelection.addSelectionListener(widgetSelectedAdapter(e -> {
-		    editorsTable.setSelection(editorsTable.getItems());
-		    updateButtons();
-		}));
+        allSelection.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                editorsTable.setSelection(editorsTable.getItems());
+                updateButtons();
+            }
+        });
         allSelection.setFont(font);
         setButtonLayoutData(allSelection);
 
@@ -321,14 +334,24 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
         //Close selected editors button
         closeSelected = new Button(actionButtons, SWT.PUSH);
         closeSelected.setText(WorkbenchMessages.WorkbenchEditorsDialog_closeSelected);
-        closeSelected.addSelectionListener(widgetSelectedAdapter(e -> closeItems(editorsTable.getSelection())));
+        closeSelected.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                closeItems(editorsTable.getSelection());
+            }
+        });
         closeSelected.setFont(font);
         setButtonLayoutData(closeSelected);
 
         //Save selected editors button
         saveSelected = new Button(actionButtons, SWT.PUSH);
         saveSelected.setText(WorkbenchMessages.WorkbenchEditorsDialog_saveSelected);
-        saveSelected.addSelectionListener(widgetSelectedAdapter(e -> saveItems(editorsTable.getSelection())));
+        saveSelected.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                saveItems(editorsTable.getSelection());
+            }
+        });
         saveSelected.setFont(font);
         setButtonLayoutData(saveSelected);
 
@@ -338,10 +361,13 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
         showAllPerspButton.setSelection(showAllPersp);
         showAllPerspButton.setFont(font);
         setButtonLayoutData(showAllPerspButton);
-        showAllPerspButton.addSelectionListener(widgetSelectedAdapter(e -> {
-		    showAllPersp = showAllPerspButton.getSelection();
-		    updateItems();
-		}));
+        showAllPerspButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
+                showAllPersp = showAllPerspButton.getSelection();
+                updateItems();
+            }
+        });
         //Create the items and update buttons state
         updateItems();
         updateButtons();
@@ -357,18 +383,21 @@ public class WorkbenchEditorsDialog extends SelectionDialog {
                 okPressed();
             }
         });
-        editorsTable.addDisposeListener(e -> {
-		    for (Iterator images1 = imageCache.values().iterator(); images1
-		            .hasNext();) {
-		        Image i1 = (Image) images1.next();
-		        i1.dispose();
-		    }
-		    for (Iterator images2 = disabledImageCache.values().iterator(); images2
-		            .hasNext();) {
-		        Image i2 = (Image) images2.next();
-		        i2.dispose();
-		    }
-		});
+        editorsTable.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                for (Iterator images = imageCache.values().iterator(); images
+                        .hasNext();) {
+                    Image i = (Image) images.next();
+                    i.dispose();
+                }
+                for (Iterator images = disabledImageCache.values().iterator(); images
+                        .hasNext();) {
+                    Image i = (Image) images.next();
+                    i.dispose();
+                }
+            }
+        });
         editorsTable.setFocus();
         applyDialogFont(dialogArea);
         return dialogArea;

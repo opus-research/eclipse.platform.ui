@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -781,7 +780,7 @@ public class ActionContributionItem extends ContributionItem {
 								&& acceleratorText.length() != 0) {
 							toolTip = JFaceResources.format(
 									"Toolbar_Tooltip_Accelerator", //$NON-NLS-1$
-									toolTip, acceleratorText);
+									new Object[] { toolTip, acceleratorText });
 						}
 					}
 
@@ -845,7 +844,8 @@ public class ActionContributionItem extends ContributionItem {
 						final IKeyLookup lookup = KeyLookupFactory.getDefault();
 						final TriggerSequence[] triggerSequences = bindingManagerCallback
 								.getActiveBindingsFor(commandId);
-						for (final TriggerSequence triggerSequence : triggerSequences) {
+						for (int i = 0; i < triggerSequences.length; i++) {
+							final TriggerSequence triggerSequence = triggerSequences[i];
 							final Trigger[] triggers = triggerSequence
 									.getTriggers();
 							if (triggers.length == 1) {
@@ -1260,7 +1260,8 @@ public class ActionContributionItem extends ContributionItem {
 		};
 
 		MenuItem[] items = realMenu.getItems();
-		for (final MenuItem realItem : items) {
+		for (int i = 0; i < items.length; i++) {
+			final MenuItem realItem = items[i];
 			final MenuItem proxyItem = new MenuItem(proxy, realItem.getStyle());
 			proxyItem.setData(realItem);
 			proxyItem.setAccelerator(realItem.getAccelerator());

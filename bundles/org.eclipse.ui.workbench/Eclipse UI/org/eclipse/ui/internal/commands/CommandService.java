@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -137,9 +137,11 @@ public final class CommandService implements ICommandService, IUpdateService {
 		 * state has a chance to persist any changes.
 		 */
 		final Command[] commands = commandManager.getAllCommands();
-		for (final Command command : commands) {
+		for (int i = 0; i < commands.length; i++) {
+			final Command command = commands[i];
 			final String[] stateIds = command.getStateIds();
-			for (final String stateId : stateIds) {
+			for (int j = 0; j < stateIds.length; j++) {
+				final String stateId = stateIds[j];
 				final State state = command.getState(stateId);
 				if (state instanceof PersistentState) {
 					final PersistentState persistentState = (PersistentState) state;
@@ -394,7 +396,12 @@ public final class CommandService implements ICommandService, IUpdateService {
 		try {
 			final IElementReference reference = registerElementForCommand(parameterizedCommand,
 					element);
-			return () -> unregisterElement(reference);
+			return new Runnable() {
+				@Override
+				public void run() {
+					unregisterElement(reference);
+				}
+			};
 		} catch (NotDefinedException e) {
 			WorkbenchPlugin.log(e);
 		}

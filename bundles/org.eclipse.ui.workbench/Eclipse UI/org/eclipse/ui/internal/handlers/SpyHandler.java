@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,7 +147,7 @@ public class SpyHandler extends AbstractHandler {
 		if (data instanceof ContributionInfo) {
 			return (ContributionInfo) data;
 		}
-		ContributionInfo result = Adapters.adapt(data, ContributionInfo.class);
+		ContributionInfo result = Adapters.getAdapter(data, ContributionInfo.class, true);
 		if (optionalElementType != null && result == null && data != null) {
 			Bundle bundle = FrameworkUtil.getBundle(data.getClass());
 			if (bundle != null) {

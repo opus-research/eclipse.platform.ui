@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -173,7 +173,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 					// preferred
 					// comparison class has been provided.
 					if (affectedObjectsClass != null) {
-						Object adapter = Adapters.adapt(modifiedElement, affectedObjectsClass);
+						Object adapter = Adapters.getAdapter(modifiedElement, affectedObjectsClass, true);
 						if (adapter != null && elementsContains(adapter)) {
 							local = true;
 						}
@@ -195,12 +195,14 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// a syncExec because operation approval notifications may come from
 		// a background thread.
 		final int[] answer = new int[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
-					null, message, MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, discardButton,
-					IDialogConstants.CANCEL_LABEL); // yes is the default
-		    answer[0] = dialog.open();
-});
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
+						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
+		                        discardButton, IDialogConstants.CANCEL_LABEL }, 0); // yes is the default
+		        answer[0] = dialog.open();
+		}});
 		switch (answer[0]) {
 		case 0:
 			return Status.OK_STATUS;
@@ -234,7 +236,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Adapters.adapt(uiInfo, IUndoContext.class);
+			IUndoContext originatingContext = Adapters.getAdapter(uiInfo, IUndoContext.class, true);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;
@@ -262,7 +264,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {
-					Object adapter = Adapters.adapt(element, affectedObjectsClass);
+					Object adapter = Adapters.getAdapter(element, affectedObjectsClass, true);
 					if (adapter != null) {
 						elementsAndAdapters.add(adapter);
 					}

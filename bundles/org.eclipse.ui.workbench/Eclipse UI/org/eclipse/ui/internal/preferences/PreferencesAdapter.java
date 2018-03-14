@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.preferences;
 
 import java.util.HashSet;
 import java.util.Set;
+
 import org.eclipse.core.runtime.Preferences;
 
 /**
@@ -20,7 +21,12 @@ import org.eclipse.core.runtime.Preferences;
 public final class PreferencesAdapter extends PropertyMapAdapter {
     private Preferences store;
 
-    private Preferences.IPropertyChangeListener listener = event -> firePropertyChange(event.getProperty());
+    private Preferences.IPropertyChangeListener listener = new Preferences.IPropertyChangeListener() {
+        @Override
+		public void propertyChange(Preferences.PropertyChangeEvent event) {
+            firePropertyChange(event.getProperty());
+        }
+    };
 
     public PreferencesAdapter(Preferences toConvert) {
         this.store = toConvert;
@@ -70,7 +76,7 @@ public final class PreferencesAdapter extends PropertyMapAdapter {
         }
 
         if (propertyType == Integer.class) {
-			return Integer.valueOf(store.getInt(propertyId));
+            return new Integer(store.getInt(propertyId));
         }
 
         if (propertyType == Long.class) {

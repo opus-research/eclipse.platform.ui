@@ -369,11 +369,11 @@ public class PatternFilter extends ViewerFilter {
 
 	/**
 	 * Return whether or not if any of the words in text satisfy the match
-	 * criteria.
+	 * critera.
 	 *
 	 * @param text
 	 *            the text to match
-	 * @return boolean <code>true</code> if one of the words in text satisfies
+	 * @return boolean <code>true</code> if one of the words in text satisifes
 	 *         the match criteria.
 	 */
 	protected boolean wordMatches(String text) {

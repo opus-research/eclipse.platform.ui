@@ -359,11 +359,11 @@ public class CloseResourceAction extends WorkspaceAction implements IResourceCha
 			return null;
 		}
 		// here we can only guess how the input might be related to a resource
-		IFile adapter = Adapters.adapt(input, IFile.class);
+		IFile adapter = Adapters.getAdapter(input, IFile.class, true);
 		if (adapter != null) {
 			return adapter;
 		}
-		return Adapters.adapt(input, IResource.class);
+		return Adapters.getAdapter(input, IResource.class, true);
 	}
 
 	private static boolean belongsTo(List<? extends IResource> roots, IResource leaf) {

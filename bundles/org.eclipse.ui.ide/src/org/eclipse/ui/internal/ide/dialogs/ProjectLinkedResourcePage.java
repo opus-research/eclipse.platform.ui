@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,7 +63,7 @@ public class ProjectLinkedResourcePage extends PropertyPage implements
 				IIDEHelpContextIds.LINKED_RESOURCE_PAGE);
 
 		IAdaptable adaptable = getElement();
-		IProject project = Adapters.adapt(adaptable, IProject.class);
+		IProject project = Adapters.getAdapter(adaptable, IProject.class, true);
 		if (project != null) {
 			pathVariablesGroup.setResource(project);
 			linkedResourceEditor.setProject(project);

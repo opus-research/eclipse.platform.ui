@@ -11,8 +11,6 @@
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -25,6 +23,8 @@ import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.FontMetrics;
@@ -588,10 +588,6 @@ public abstract class Dialog extends Window {
 	 * assumed to be a <code>GridLayout</code> and the number of columns in
 	 * this layout is incremented. Subclasses may override.
 	 * </p>
-	 * <p>
-	 * Note: The common button order is: <b>{other buttons}</b>, <b>OK</b>, <b>Cancel</b>.
-	 * On some platforms, {@link #initializeBounds()} will move the default button to the right.
-	 * </p>
 	 *
 	 * @param parent
 	 *            the parent composite
@@ -609,21 +605,27 @@ public abstract class Dialog extends Window {
 	 * @see #getCancelButton
 	 * @see #getOKButton()
 	 */
-	protected Button createButton(Composite parent, int id, String label, boolean defaultButton) {
+	protected Button createButton(Composite parent, int id, String label,
+			boolean defaultButton) {
 		// increment the number of columns in the button bar
 		((GridLayout) parent.getLayout()).numColumns++;
 		Button button = new Button(parent, SWT.PUSH);
 		button.setText(label);
 		button.setFont(JFaceResources.getDialogFont());
-		button.setData(Integer.valueOf(id));
-		button.addSelectionListener(widgetSelectedAdapter(event -> buttonPressed(((Integer) event.widget.getData()).intValue())));
+		button.setData(new Integer(id));
+		button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				buttonPressed(((Integer) event.widget.getData()).intValue());
+			}
+		});
 		if (defaultButton) {
 			Shell shell = parent.getShell();
 			if (shell != null) {
 				shell.setDefaultButton(button);
 			}
 		}
-		buttons.put(Integer.valueOf(id), button);
+		buttons.put(new Integer(id), button);
 		setButtonLayoutData(button);
 		return button;
 	}
@@ -703,10 +705,6 @@ public abstract class Dialog extends Window {
 	 */
 	@Override
 	protected void initializeBounds() {
-		// UI guidelines:
-		// https://developer.gnome.org/hig/stable/dialogs.html.en#primary-buttons
-		// https://developer.apple.com/library/mac/documentation/UserExperience/Conceptual/OSXHIGuidelines/WindowDialogs.html#//apple_ref/doc/uid/20000957-CH43-SW5
-		// https://msdn.microsoft.com/en-us/library/windows/desktop/dn742499(v=vs.85).aspx#win_dialog_box_image25
 		Shell shell = getShell();
 		if (shell != null) {
 			if (shell.getDisplay().getDismissalAlignment() == SWT.RIGHT) {
@@ -831,7 +829,7 @@ public abstract class Dialog extends Window {
 	 * @since 2.0
 	 */
 	protected Button getButton(int id) {
-		return buttons.get(Integer.valueOf(id));
+		return buttons.get(new Integer(id));
 	}
 
 	/**
@@ -1031,8 +1029,8 @@ public abstract class Dialog extends Window {
 		}
 		if (control instanceof Composite) {
 			Control[] children = ((Composite) control).getChildren();
-			for (Control element : children) {
-				applyDialogFont(element, dialogFont);
+			for (int i = 0; i < children.length; i++) {
+				applyDialogFont(children[i], dialogFont);
 			}
 		}
 	}

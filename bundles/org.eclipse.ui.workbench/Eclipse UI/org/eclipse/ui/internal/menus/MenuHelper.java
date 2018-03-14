@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.expressions.EvaluationResult;
@@ -71,6 +70,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionDelegate;
@@ -100,10 +100,9 @@ import org.osgi.framework.FrameworkUtil;
 public class MenuHelper {
 
 	public static void trace(String msg, Throwable error) {
-		WorkbenchSWTActivator.trace(Policy.DEBUG_MENUS_FLAG, msg, error);
+		WorkbenchSWTActivator.trace(Policy.MENUS, msg, error);
 	}
 
-	private static final Pattern SCHEME_PATTERN = Pattern.compile("\\p{Alpha}[\\p{Alnum}+.-]*:.*"); //$NON-NLS-1$
 	public static final String MAIN_MENU_ID = ActionSet.MAIN_MENU;
 	private static Field urlField;
 
@@ -146,18 +145,25 @@ public class MenuHelper {
 		return getIconURI(imageDescriptor, null);
 	}
 
-	private static String getUrl(Class<? extends ImageDescriptor> idc, ImageDescriptor imageDescriptor) {
+	private static URL getUrl(Class<?> idc, ImageDescriptor imageDescriptor) {
 		try {
 			if (urlField == null) {
 				urlField = idc.getDeclaredField("url"); //$NON-NLS-1$
 				urlField.setAccessible(true);
 			}
-			Object value = urlField.get(imageDescriptor);
-			if (value != null) {
-				return value.toString();
-			}
-		} catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
-			WorkbenchPlugin.log(e);
+			return (URL) urlField.get(imageDescriptor);
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -169,7 +175,11 @@ public class MenuHelper {
 				locationField.setAccessible(true);
 			}
 			return (Class<?>) locationField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -182,7 +192,11 @@ public class MenuHelper {
 				nameField.setAccessible(true);
 			}
 			return (String) nameField.get(imageDescriptor);
-		} catch (SecurityException | NoSuchFieldException | IllegalAccessException e) {
+		} catch (SecurityException e) {
+			WorkbenchPlugin.log(e);
+		} catch (NoSuchFieldException e) {
+			WorkbenchPlugin.log(e);
+		} catch (IllegalAccessException e) {
 			WorkbenchPlugin.log(e);
 		}
 		return null;
@@ -254,9 +268,14 @@ public class MenuHelper {
 					// visWhenMap.put(configElement, visWhen);
 				}
 			}
-		} catch (InvalidRegistryObjectException | CoreException e) {
+		} catch (InvalidRegistryObjectException e) {
 			// visWhenMap.put(configElement, null);
-			WorkbenchPlugin.log(e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CoreException e) {
+			// visWhenMap.put(configElement, null);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -343,7 +362,7 @@ public class MenuHelper {
 		// If iconPath doesn't specify a scheme, then try to transform to a URL
 		// RFC 3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 		// This allows using data:, http:, or other custom URL schemes
-		if (!SCHEME_PATTERN.matcher(iconPath).matches()) {
+		if (!iconPath.matches("\\p{Alpha}[\\p{Alnum}+.-]*:.*")) { //$NON-NLS-1$
 			// First attempt to resolve in ISharedImages (e.g. "IMG_OBJ_FOLDER")
 			// as per bug 391232 & AbstractUIPlugin.imageDescriptorFromPlugin().
 			ImageDescriptor d = WorkbenchPlugin.getDefault().getSharedImages()
@@ -392,10 +411,8 @@ public class MenuHelper {
 			return ItemType.RADIO;
 		}
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)) {
-			if (Policy.DEBUG_MENUS) {
-				trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
-				// return CommandContributionItem.STYLE_PULLDOWN;
-			}
+			trace("Failed to get style for " + IWorkbenchRegistryConstants.STYLE_PULLDOWN, null); //$NON-NLS-1$
+			// return CommandContributionItem.STYLE_PULLDOWN;
 		}
 		return ItemType.PUSH;
 	}
@@ -715,13 +732,16 @@ public class MenuHelper {
 				}
 				ActionDescriptor desc = getDescriptor(context);
 				final IAction action = desc.getAction();
-				final IPropertyChangeListener propListener = event -> {
-					if (IAction.CHECKED.equals(event.getProperty())) {
-						boolean checked = false;
-						if (event.getNewValue() instanceof Boolean) {
-							checked = ((Boolean) event.getNewValue()).booleanValue();
+				final IPropertyChangeListener propListener = new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						if (IAction.CHECKED.equals(event.getProperty())) {
+							boolean checked = false;
+							if (event.getNewValue() instanceof Boolean) {
+								checked = ((Boolean) event.getNewValue()).booleanValue();
+							}
+							model.setSelected(checked);
 						}
-						model.setSelected(checked);
 					}
 				};
 				action.addPropertyChangeListener(propListener);
@@ -747,99 +767,94 @@ public class MenuHelper {
 	}
 
 	public static MMenuItem createItem(MApplication application, CommandContributionItem cci) {
-		MCommand command = getMCommand(application, cci);
-		if (command != null) {
-			CommandContributionItemParameter data = cci.getData();
-			MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createHandledMenuItem();
-			menuItem.setCommand(command);
-			menuItem.setContributorURI(command.getContributorURI());
-			if (data.label != null) {
-				menuItem.setLabel(data.label);
-			} else {
-				menuItem.setLabel(command.getCommandName());
+		if (cci.getCommand() == null) {
+			return null;
+		}
+		String id = cci.getCommand().getId();
+		for (MCommand command : application.getCommands()) {
+			if (id.equals(command.getElementId())) {
+				CommandContributionItemParameter data = cci.getData();
+				MHandledMenuItem menuItem = MenuFactoryImpl.eINSTANCE.createHandledMenuItem();
+				menuItem.setCommand(command);
+				menuItem.setContributorURI(command.getContributorURI());
+				if (data.label != null) {
+					menuItem.setLabel(data.label);
+				} else {
+					menuItem.setLabel(command.getCommandName());
+				}
+				if (data.mnemonic != null) {
+					menuItem.setMnemonics(data.mnemonic);
+				}
+				if (data.icon != null) {
+					menuItem.setIconURI(getIconURI(data.icon, application.getContext()));
+				} else {
+					menuItem.setIconURI(getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DEFAULT));
+				}
+				String itemId = cci.getId();
+				menuItem.setElementId(itemId == null ? id : itemId);
+				return menuItem;
 			}
-			if (data.mnemonic != null) {
-				menuItem.setMnemonics(data.mnemonic);
-			}
-			if (data.icon != null) {
-				menuItem.setIconURI(getIconURI(data.icon, application.getContext()));
-			} else {
-				menuItem.setIconURI(getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DEFAULT));
-			}
-			String itemId = cci.getId();
-			menuItem.setElementId(itemId == null ? command.getElementId() : itemId);
-			return menuItem;
 		}
 		return null;
 	}
 
 	public static MHandledToolItem createToolItem(MApplication application, CommandContributionItem cci) {
-		MCommand command = getMCommand(application, cci);
-		if (command != null) {
-			CommandContributionItemParameter data = cci.getData();
-			MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
-			toolItem.setCommand(command);
-			toolItem.setContributorURI(command.getContributorURI());
-			toolItem.setVisible(cci.isVisible());
+		String id = cci.getCommand().getId();
+		for (MCommand command : application.getCommands()) {
+			if (id.equals(command.getElementId())) {
+				CommandContributionItemParameter data = cci.getData();
+				MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
+				toolItem.setCommand(command);
+				toolItem.setContributorURI(command.getContributorURI());
+				toolItem.setVisible(cci.isVisible());
 
-			String iconURI = null;
-			String disabledIconURI = null;
+				String iconURI = null;
+				String disabledIconURI = null;
 
-			toolItem.setType(ItemType.PUSH);
-			if (data.style == CommandContributionItem.STYLE_CHECK)
-				toolItem.setType(ItemType.CHECK);
-			else if (data.style == CommandContributionItem.STYLE_RADIO)
-				toolItem.setType(ItemType.RADIO);
+				toolItem.setType(ItemType.PUSH);
+				if (data.style == CommandContributionItem.STYLE_CHECK)
+					toolItem.setType(ItemType.CHECK);
+				else if (data.style == CommandContributionItem.STYLE_RADIO)
+					toolItem.setType(ItemType.RADIO);
 
-			if (data.icon != null) {
-				iconURI = getIconURI(data.icon, application.getContext());
-			}
-			if (iconURI == null) {
-				iconURI = getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DEFAULT);
-			}
-			if (iconURI == null) {
-				toolItem.setLabel(command.getCommandName());
-			} else {
-				toolItem.setIconURI(iconURI);
-			}
-
-			if (data.disabledIcon != null) {
-				disabledIconURI = getIconURI(data.disabledIcon, application.getContext());
-			}
-
-			if (disabledIconURI == null) {
-				disabledIconURI = getIconURI(command.getElementId(), application.getContext(),
-						ICommandImageService.TYPE_DISABLED);
-			}
-
-			if (disabledIconURI != null) {
-				setDisabledIconURI(toolItem, disabledIconURI);
-			}
-
-			if (data.tooltip != null) {
-				toolItem.setTooltip(data.tooltip);
-			} else if (data.label != null) {
-				toolItem.setTooltip(data.label);
-			} else {
-				toolItem.setTooltip(command.getDescription());
-			}
-
-			String itemId = cci.getId();
-			toolItem.setElementId(itemId == null ? command.getElementId() : itemId);
-			return toolItem;
-		}
-		return null;
-	}
-
-	public static MCommand getMCommand(MApplication application, CommandContributionItem contribution) {
-		ParameterizedCommand command = contribution.getCommand();
-		if (command != null) {
-			for (MCommand mcommand : application.getCommands()) {
-				if (mcommand.getElementId().equals(command.getId())) {
-					return mcommand;
+				if (data.icon != null) {
+					iconURI = getIconURI(data.icon, application.getContext());
 				}
+				if (iconURI == null) {
+					iconURI = getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DEFAULT);
+				}
+				if (iconURI == null) {
+					toolItem.setLabel(command.getCommandName());
+				} else {
+					toolItem.setIconURI(iconURI);
+				}
+
+				if (data.disabledIcon != null) {
+					disabledIconURI = getIconURI(data.disabledIcon, application.getContext());
+				}
+
+				if (disabledIconURI == null) {
+					disabledIconURI = getIconURI(id, application.getContext(),
+							ICommandImageService.TYPE_DISABLED);
+				}
+
+				if (disabledIconURI != null) {
+					setDisabledIconURI(toolItem, disabledIconURI);
+				}
+
+				if (data.tooltip != null) {
+					toolItem.setTooltip(data.tooltip);
+				} else if (data.label != null) {
+					toolItem.setTooltip(data.label);
+				} else {
+					toolItem.setTooltip(command.getDescription());
+				}
+
+				String itemId = cci.getId();
+				toolItem.setElementId(itemId == null ? id : itemId);
+				return toolItem;
 			}
 		}
 		return null;
@@ -945,22 +960,30 @@ public class MenuHelper {
 			toolItem.setObject(new DirectProxy(action));
 			toolItem.setEnabled(action.isEnabled());
 
-			final IPropertyChangeListener propertyListener = event -> {
-				String property = event.getProperty();
-				if (property.equals(IAction.ENABLED)) {
-					toolItem.setEnabled(action.isEnabled());
-				} else if (property.equals(IAction.CHECKED)) {
-					toolItem.setSelected(action.isChecked());
-				} else if (property.equals(IAction.TEXT)) {
-					toolItem.setLabel(action.getText());
-				} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
-					toolItem.setLabel(action.getToolTipText());
+			final IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent event) {
+					String property = event.getProperty();
+					if (property.equals(IAction.ENABLED)) {
+						toolItem.setEnabled(action.isEnabled());
+					} else if (property.equals(IAction.CHECKED)) {
+						toolItem.setSelected(action.isChecked());
+					} else if (property.equals(IAction.TEXT)) {
+						toolItem.setLabel(action.getText());
+					} else if (property.equals(IAction.TOOL_TIP_TEXT)) {
+						toolItem.setLabel(action.getToolTipText());
+					}
 				}
 			};
 			// property listener is removed in
 			// DirectContributionItem#handleWidgetDispose()
 			action.addPropertyChangeListener(propertyListener);
-			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, (Runnable) () -> action.removePropertyChangeListener(propertyListener));
+			toolItem.getTransientData().put(AbstractContributionItem.DISPOSABLE, new Runnable() {
+						@Override
+						public void run() {
+							action.removePropertyChangeListener(propertyListener);
+						}
+					});
 			return toolItem;
 		}
 		return null;
@@ -1091,8 +1114,8 @@ public class MenuHelper {
 		// Attempt to retrieve URIs from the descriptor and convert into a more
 		// durable form in case it's to be persisted
 		if (descriptor.getClass().toString().endsWith("URLImageDescriptor")) { //$NON-NLS-1$
-			String url = getUrl(descriptor.getClass(), descriptor);
-			return rewriteDurableURL(url);
+			URL url = getUrl(descriptor.getClass(), descriptor);
+			return rewriteDurableURL(url.toExternalForm());
 		} else if (descriptor.getClass().toString().endsWith("FileImageDescriptor")) { //$NON-NLS-1$
 			Class<?> sourceClass = getLocation(descriptor);
 			if (sourceClass == null) {

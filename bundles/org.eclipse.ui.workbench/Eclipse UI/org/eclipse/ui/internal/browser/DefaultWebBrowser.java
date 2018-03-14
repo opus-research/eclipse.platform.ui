@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -126,11 +126,11 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 */
 	private String urlEncodeForSpaces(char[] input) {
 		StringBuffer retu = new StringBuffer(input.length);
-		for (char element : input) {
-			if (element == ' ') {
+		for (int i = 0; i < input.length; i++) {
+			if (input[i] == ' ') {
 				retu.append("%20"); //$NON-NLS-1$
 			} else {
-				retu.append(element);
+				retu.append(input[i]);
 			}
 		}
 		return retu.toString();
@@ -174,10 +174,15 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 * display an error message
 	 */
 	private void openWebBrowserError(Display display) {
-		display.asyncExec(() -> MessageDialog
-				.openError(
-						null,
-						WorkbenchMessages.ProductInfoDialog_errorTitle,
-						WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser));
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				MessageDialog
+						.openError(
+								null,
+								WorkbenchMessages.ProductInfoDialog_errorTitle,
+								WorkbenchMessages.ProductInfoDialog_unableToOpenWebBrowser);
+			}
+		});
 	}
 }

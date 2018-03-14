@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,23 +55,6 @@ public class SelectionChangedEvent extends EventObject {
     public ISelection getSelection() {
         return selection;
     }
-
-	/**
-	 * Returns the selection.
-	 *
-	 * @return IStructuredSelection
-	 * @throws ClassCastException
-	 *             if the selection is not an instance of IStructuredSelection
-	 * @since 3.13
-	 */
-	public IStructuredSelection getStructuredSelection() throws ClassCastException {
-		ISelection selection = getSelection();
-		if (selection instanceof IStructuredSelection) {
-			return (IStructuredSelection) selection;
-		}
-		throw new ClassCastException(
-				"ISelection is not an instance of IStructuredSelection."); //$NON-NLS-1$
-	}
 
     /**
      * Returns the selection provider that is the source of this event.

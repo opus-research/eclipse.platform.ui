@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -17,13 +19,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.internal.WorkbenchWindow;
 
 /**
  * The AnimationItem is the class that manages the animation for the progress.
  */
 public abstract class AnimationItem {
-	IWorkbenchWindow window;
+    WorkbenchWindow window;
 
     interface IAnimationContainer {
         /**
@@ -56,7 +58,7 @@ public abstract class AnimationItem {
      * @param workbenchWindow
      *            the window being created
      */
-	public AnimationItem(IWorkbenchWindow workbenchWindow) {
+    public AnimationItem(WorkbenchWindow workbenchWindow) {
         this.window = workbenchWindow;
     }
 
@@ -85,7 +87,12 @@ public abstract class AnimationItem {
                 //Do nothing
             }
         });
-        animationItem.addDisposeListener(e -> AnimationManager.getInstance().removeItem(AnimationItem.this));
+        animationItem.addDisposeListener(new DisposeListener() {
+            @Override
+			public void widgetDisposed(DisposeEvent e) {
+                AnimationManager.getInstance().removeItem(AnimationItem.this);
+            }
+        });
         AnimationManager.getInstance().addItem(this);
     }
 
@@ -151,7 +158,7 @@ public abstract class AnimationItem {
 	/**
 	 * @return Returns the window.
 	 */
-	public IWorkbenchWindow getWindow() {
+	public WorkbenchWindow getWindow() {
 		return window;
 	}
 }

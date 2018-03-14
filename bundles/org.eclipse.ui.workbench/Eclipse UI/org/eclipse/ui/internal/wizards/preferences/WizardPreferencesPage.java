@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.preferences;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,12 +24,18 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.LayoutConstants;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -145,7 +148,7 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		setButtonLayoutData(button);
 
-		button.setData(Integer.valueOf(id));
+		button.setData(new Integer(id));
 		button.setText(label);
 
 		if (defaultButton) {
@@ -284,20 +287,32 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		descriptionData.heightHint = convertHeightInCharsToPixels(3);
 		descText.setLayoutData(descriptionData);
 
-		transferAllButton.addSelectionListener(widgetSelectedAdapter(e -> {
-			if (transferAllButton.getSelection()) {
-				viewer.setAllChecked(false);
+		transferAllButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (transferAllButton.getSelection()) {
+					viewer.setAllChecked(false);
+				}
+				updateEnablement();
+				updatePageCompletion();
 			}
-			updateEnablement();
-			updatePageCompletion();
-		}));
+		});
 
-		viewer.addSelectionChangedListener(event -> updateDescription());
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-		viewer.addCheckStateListener(event -> {
-			transferAllButton.setSelection(false);
-			updateEnablement();
-			updatePageCompletion();
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateDescription();
+			}
+		});
+
+		viewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				transferAllButton.setSelection(false);
+				updateEnablement();
+				updatePageCompletion();
+			}
 		});
 
 		addSelectionButtons(group);
@@ -351,25 +366,31 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 
 		selectAllButton = new Button(buttonComposite, SWT.PUSH);
 		selectAllButton.setText(PreferencesMessages.SelectionDialog_selectLabel);
-		selectAllButton.setData(Integer.valueOf(IDialogConstants.SELECT_ALL_ID));
+		selectAllButton.setData(new Integer(IDialogConstants.SELECT_ALL_ID));
 		setButtonLayoutData(selectAllButton);
 
-		SelectionListener listener = widgetSelectedAdapter(e -> {
-			viewer.setAllChecked(true);
-			updatePageCompletion();
-		});
+		SelectionListener listener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				viewer.setAllChecked(true);
+				updatePageCompletion();
+			}
+		};
 		selectAllButton.addSelectionListener(listener);
 		selectAllButton.setFont(parentFont);
 
 		deselectAllButton = new Button(buttonComposite, SWT.PUSH);
 		deselectAllButton.setText(PreferencesMessages.SelectionDialog_deselectLabel);
-		deselectAllButton.setData(Integer.valueOf(IDialogConstants.DESELECT_ALL_ID));
+		deselectAllButton.setData(new Integer(IDialogConstants.DESELECT_ALL_ID));
 		setButtonLayoutData(deselectAllButton);
 
-		listener = widgetSelectedAdapter(e -> {
-			viewer.setAllChecked(false);
-			updatePageCompletion();
-		});
+		listener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				viewer.setAllChecked(false);
+				updatePageCompletion();
+			}
+		};
 		deselectAllButton.addSelectionListener(listener);
 		deselectAllButton.setFont(parentFont);
 	}
@@ -482,7 +503,8 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 	protected boolean queryYesNoQuestion(String message) {
 		MessageDialog dialog = new MessageDialog(getContainer().getShell(),
 				PreferencesMessages.Question, (Image) null, message,
-				MessageDialog.NONE, 0, IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL) {
+				MessageDialog.NONE, new String[] { IDialogConstants.YES_LABEL,
+						IDialogConstants.NO_LABEL }, 0) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
@@ -957,9 +979,14 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 									.toOSString());
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), PreferencesMessages.Question, null,
-				messageString, MessageDialog.QUESTION, 0, IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL,
-				IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL) {
+		final MessageDialog dialog = new MessageDialog(getContainer()
+				.getShell(), PreferencesMessages.Question, null, messageString,
+				MessageDialog.QUESTION, new String[] {
+						IDialogConstants.YES_LABEL,
+						IDialogConstants.YES_TO_ALL_LABEL,
+						IDialogConstants.NO_LABEL,
+						IDialogConstants.NO_TO_ALL_LABEL,
+						IDialogConstants.CANCEL_LABEL }, 0) {
 			@Override
 			protected int getShellStyle() {
 				return super.getShellStyle() | SWT.SHEET;
@@ -968,7 +995,12 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
-		getControl().getDisplay().syncExec(() -> dialog.open());
+		getControl().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				dialog.open();
+			}
+		});
 		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog
 				.getReturnCode()];
 	}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.ui.internal.themes;
 
 import java.util.ResourceBundle;
 import java.util.Set;
+
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -119,19 +120,17 @@ public class Theme extends EventManager implements ITheme {
 
                         if (Util.equals(thisTheme, theme)) {
 							if (getFontRegistry().hasValueFor(key)) {
-								FontData[] data = event.getNewValue() instanceof String
-										? PreferenceConverter.basicGetFontData((String) event.getNewValue())
-										: (FontData[]) event.getNewValue();
+								FontData[] data = PreferenceConverter
+										.basicGetFontData((String) event
+												.getNewValue());
 
 								getFontRegistry().put(key, data);
 								processDefaultsTo(key, data);
 								return;
 							}
 							else if (getColorRegistry().hasValueFor(key)) {
-								RGB rgb = event.getNewValue() instanceof String
-										? StringConverter.asRGB((String) event.getNewValue())
-										: (RGB) event.getNewValue();
-
+								RGB rgb = StringConverter.asRGB((String) event
+										.getNewValue());
 								getColorRegistry().put(key, rgb);
 								processDefaultsTo(key, rgb);
 								return;
@@ -199,7 +198,13 @@ public class Theme extends EventManager implements ITheme {
      */
     private IPropertyChangeListener getCascadeListener() {
         if (themeListener == null) {
-            themeListener = event -> firePropertyChange(event);
+            themeListener = new IPropertyChangeListener() {
+
+                @Override
+				public void propertyChange(PropertyChangeEvent event) {
+                    firePropertyChange(event);
+                }
+            };
         }
         return themeListener;
     }

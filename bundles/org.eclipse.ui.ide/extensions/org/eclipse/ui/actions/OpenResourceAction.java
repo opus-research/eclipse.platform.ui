@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -224,11 +224,8 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 			 * Opens a project along with all projects it references
 			 */
 			private void doOpenWithReferences(IProject project, IProgressMonitor mon) throws CoreException {
-				if (!project.exists() || project.isOpen()) {
-					return;
-				}
 				SubMonitor subMonitor = SubMonitor.convert(mon, openProjectReferences ? 2 : 1);
-				project.open(subMonitor.split(1));
+				project.open(subMonitor.newChild(1));
 				final IProject[] references = project.getReferencedProjects();
 				if (!hasPrompted) {
 					openProjectReferences = false;
@@ -253,9 +250,9 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 					}
 				}
 				if (openProjectReferences) {
-					SubMonitor loopMonitor = subMonitor.split(1).setWorkRemaining(references.length);
+					SubMonitor loopMonitor = subMonitor.newChild(1).setWorkRemaining(references.length);
 					for (int i = 0; i < references.length; i++) {
-						doOpenWithReferences(references[i], loopMonitor.split(1));
+						doOpenWithReferences(references[i], loopMonitor.newChild(1));
 					}
 				}
 			}
@@ -274,7 +271,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 					if (!project.exists() || project.isOpen()) {
 						continue;
 					}
-					doOpenWithReferences(project, subMonitor.split(1));
+					doOpenWithReferences(project, subMonitor.newChild(1));
 				}
 				return Status.OK_STATUS;
 			}

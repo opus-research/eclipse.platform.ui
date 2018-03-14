@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,6 +72,16 @@ class ValueBinding extends Binding {
 		this.model = modelObservableValue;
 		this.targetToModel = targetToModel;
 		this.modelToTarget = modelToTarget;
+		if ((targetToModel.getUpdatePolicy() & (UpdateValueStrategy.POLICY_CONVERT | UpdateValueStrategy.POLICY_UPDATE)) != 0) {
+			target.addValueChangeListener(targetChangeListener);
+		} else {
+			targetChangeListener = null;
+		}
+		if ((modelToTarget.getUpdatePolicy() & (UpdateValueStrategy.POLICY_CONVERT | UpdateValueStrategy.POLICY_UPDATE)) != 0) {
+			model.addValueChangeListener(modelChangeListener);
+		} else {
+			modelChangeListener = null;
+		}
 	}
 
 	@Override
@@ -88,27 +98,13 @@ class ValueBinding extends Binding {
 	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE) {
-			model.addValueChangeListener(modelChangeListener);
 			updateModelToTarget();
 		} else if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
-			model.addValueChangeListener(modelChangeListener);
 			validateModelToTarget();
-		} else {
-			modelChangeListener = null;
 		}
-
-		if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE) {
-			target.addValueChangeListener(targetChangeListener);
-			if (modelToTarget.getUpdatePolicy() == UpdateValueStrategy.POLICY_NEVER) {
-				updateTargetToModel();
-			} else {
-				validateTargetToModel();
-			}
-		} else if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
-			target.addValueChangeListener(targetChangeListener);
+		if (targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_UPDATE
+				|| targetToModel.getUpdatePolicy() == UpdateValueStrategy.POLICY_CONVERT) {
 			validateTargetToModel();
-		} else {
-			targetChangeListener = null;
 		}
 	}
 

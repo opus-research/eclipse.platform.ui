@@ -112,11 +112,11 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 		boolean hasClosedProjects = false;
 		boolean hasBuilder = true; // false if any project is closed or does not
 									// have builder
-		Iterator<?> resources = selection.iterator();
+		Iterator<Object> resources = selection.iterator();
 
 		while (resources.hasNext() && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
 			Object next = resources.next();
-			IProject project = Adapters.adapt(next, IProject.class);
+			IProject project = Adapters.getAdapter(next, IProject.class, true);
 
 			if (project == null) {
 				isProjectSelection = false;
@@ -229,8 +229,8 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 				job.schedule();
 			}
 		};
-		refreshAction.setDisabledImageDescriptor(getImageDescriptor("dlcl16/refresh_nav.png"));//$NON-NLS-1$
-		refreshAction.setImageDescriptor(getImageDescriptor("elcl16/refresh_nav.png"));//$NON-NLS-1$
+		refreshAction.setDisabledImageDescriptor(getImageDescriptor("dlcl16/refresh_nav.gif"));//$NON-NLS-1$
+		refreshAction.setImageDescriptor(getImageDescriptor("elcl16/refresh_nav.gif"));//$NON-NLS-1$
 		refreshAction.setActionDefinitionId(IWorkbenchCommandConstants.FILE_REFRESH);
 
 		buildAction = new BuildAction(sp, IncrementalProjectBuilder.INCREMENTAL_BUILD);

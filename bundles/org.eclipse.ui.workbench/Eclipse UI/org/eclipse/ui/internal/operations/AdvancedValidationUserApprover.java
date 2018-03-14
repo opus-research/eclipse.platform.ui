@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 package org.eclipse.ui.internal.operations;
 
@@ -181,19 +180,22 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 		// The next two methods make a number of UI calls, so we wrap the
 		// whole thing up in a syncExec.
 		final IStatus[] status = new IStatus[1];
-		PlatformUI.getWorkbench().getDisplay().syncExec(() -> {
-			// Compute the undoable or redoable status
-			status[0] = computeOperationStatus(operation, history, uiInfo,
-					doing);
+		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+			@Override
+			public void run() {
+				// Compute the undoable or redoable status
+				status[0] = computeOperationStatus(operation, history, uiInfo,
+						doing);
 
-			// Report non-OK statuses to the user. In some cases, the user
-			// may choose to proceed, and the returned status will be
-			// different than what is reported.
-			if (!status[0].isOK()) {
-				status[0] = reportAndInterpretStatus(status[0], uiInfo,
-						operation, doing);
+				// Report non-OK statuses to the user. In some cases, the user
+				// may choose to proceed, and the returned status will be
+				// different than what is reported.
+				if (!status[0].isOK()) {
+					status[0] = reportAndInterpretStatus(status[0], uiInfo,
+							operation, doing);
+				}
+
 			}
-
 		});
 
 		// If the operation is still not OK, inform the history that the
@@ -325,7 +327,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 			String[] buttons = new String[] { IDialogConstants.YES_LABEL,
 					IDialogConstants.NO_LABEL };
 			MessageDialog dialog = new MessageDialog(shell, title, null,
-					message, MessageDialog.WARNING, 0, buttons);
+					message, MessageDialog.WARNING, buttons, 0);
 			int dialogAnswer = dialog.open();
 			// The user has been given the specific status and has chosen
 			// to proceed or to cancel. The user choice determines what
@@ -380,7 +382,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 */
 	Shell getShell(IAdaptable uiInfo) {
 		if (uiInfo != null) {
-			Shell shell = Adapters.adapt(uiInfo, Shell.class);
+			Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
 			if (shell != null) {
 				return shell;
 			}

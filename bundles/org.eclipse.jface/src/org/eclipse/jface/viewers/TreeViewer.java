@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2017 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -294,7 +294,7 @@ public class TreeViewer extends AbstractTreeViewer {
 	}
 
 	@Override
-	protected void setSelection(List<Item> items) {
+	protected void setSelection(List items) {
 
 		Item[] current = getSelection(getTree());
 
@@ -797,8 +797,8 @@ public class TreeViewer extends AbstractTreeViewer {
 	public void remove(final Object parentOrTreePath, final int index) {
 		if (checkBusy())
 			return;
-		final List<TreePath> oldSelection = new LinkedList<>(
-				Arrays.asList(((TreeSelection) getSelection()).getPaths()));
+		final List oldSelection = new LinkedList(Arrays
+				.asList(((TreeSelection) getSelection()).getPaths()));
 		preservingSelection(() -> {
 			TreePath removedPath = null;
 			if (internalIsInputOrEmptyPath(parentOrTreePath)) {
@@ -839,8 +839,9 @@ public class TreeViewer extends AbstractTreeViewer {
 			}
 			if (removedPath != null) {
 				boolean removed = false;
-				for (Iterator<TreePath> it = oldSelection.iterator(); it.hasNext();) {
-					TreePath path = it.next();
+				for (Iterator it = oldSelection.iterator(); it
+						.hasNext();) {
+					TreePath path = (TreePath) it.next();
 					if (path.startsWith(removedPath, getComparer())) {
 						it.remove();
 						removed = true;
@@ -848,7 +849,7 @@ public class TreeViewer extends AbstractTreeViewer {
 				}
 				if (removed) {
 					setSelection(new TreeSelection(
-							oldSelection
+							(TreePath[]) oldSelection
 									.toArray(new TreePath[oldSelection
 											.size()]), getComparer()),
 							false);
@@ -892,14 +893,6 @@ public class TreeViewer extends AbstractTreeViewer {
 		super.handleTreeCollapse(event);
 	}
 
-	/**
-	 * Sets the content provider used by this <code>TreeViewer</code>.
-	 * <p>
-	 * Content providers for tree viewers must implement either
-	 * {@link ITreeContentProvider}, or {@link ITreePathContentProvider}, or
-	 * {@link ILazyTreeContentProvider}, or
-	 * {@link ILazyTreePathContentProvider}.
-	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		contentProviderIsLazy = (provider instanceof ILazyTreeContentProvider)
