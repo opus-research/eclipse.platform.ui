@@ -23,7 +23,7 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <properties>
-	<skipTests>true</skipTests>
+	<skipTests>false</skipTests>
   	<testSuite>org.eclipse.e4.ui.tests.UIAllTests</testSuite>
   </properties>
 
