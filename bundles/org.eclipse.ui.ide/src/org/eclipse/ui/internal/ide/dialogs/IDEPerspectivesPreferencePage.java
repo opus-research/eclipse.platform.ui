@@ -57,7 +57,6 @@ public class IDEPerspectivesPreferencePage extends PerspectivesPreferencePage {
         Composite composite = createComposite(parent);
 
         createOpenPerspButtonGroup(composite);
-        createOpenViewButtonGroup(composite);
         createProjectPerspectiveGroup(composite);
         createCustomizePerspective(composite);
 
