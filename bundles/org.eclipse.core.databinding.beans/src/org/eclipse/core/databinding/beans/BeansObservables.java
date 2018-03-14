@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Matthew Hall - bug 221704, 234686, 246625, 226289, 246782, 194734,
  *                    195222, 247997
  *     Thomas Kratz - bug 213787
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 443399
  *******************************************************************************/
 package org.eclipse.core.databinding.beans;
 
@@ -43,7 +42,6 @@ import org.eclipse.core.runtime.Status;
  * 
  * @since 1.1
  * 
- * @deprecated use <code>BeanProperties</code> instead
  */
 final public class BeansObservables {
 
@@ -62,8 +60,6 @@ final public class BeansObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value tracking the current value of the named
 	 *         property of the given bean
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableValue observeValue(Object bean, String propertyName) {
 		return observeValue(Realm.getDefault(), bean, propertyName);
@@ -81,8 +77,6 @@ final public class BeansObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value tracking the current value of the named
 	 *         property of the given bean
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableValue observeValue(Realm realm, Object bean,
 			String propertyName) {
@@ -104,8 +98,6 @@ final public class BeansObservables {
 	 * @return an observable map tracking the current values of the named
 	 *         property for the beans in the given domain set
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(IObservableSet domain,
 			String propertyName) {
@@ -124,8 +116,6 @@ final public class BeansObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable map tracking the current values of the named
 	 *         property for the beans in the given domain set
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(IObservableSet domain,
 			Class beanClass, String propertyName) {
@@ -146,8 +136,6 @@ final public class BeansObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given bean object
 	 * @since 1.1
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Realm realm, Object bean,
 			String propertyName) {
@@ -173,8 +161,6 @@ final public class BeansObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given bean object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Realm realm, Object bean,
 			String propertyName, Class keyType, Class valueType) {
@@ -193,8 +179,6 @@ final public class BeansObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given bean object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Object bean, String propertyName) {
 		return observeMap(Realm.getDefault(), bean, propertyName, null, null);
@@ -217,8 +201,6 @@ final public class BeansObservables {
 	 * @return an observable map tracking the map-typed named property of the
 	 *         given bean object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeMap(Object bean, String propertyName,
 			Class keyType, Class valueType) {
@@ -241,8 +223,6 @@ final public class BeansObservables {
 	 * @return an array of observable maps tracking the current values of the
 	 *         named propertys for the beans in the given domain set
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap[] observeMaps(IObservableSet domain,
 			String[] propertyNames) {
@@ -266,8 +246,6 @@ final public class BeansObservables {
 	 *            the array of property names. May be nested e.g. "parent.name"
 	 * @return an array of observable maps tracking the current values of the
 	 *         named propertys for the beans in the given domain set
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap[] observeMaps(IObservableSet domain,
 			Class beanClass, String[] propertyNames) {
@@ -292,8 +270,6 @@ final public class BeansObservables {
 	 * @return an observable list tracking the collection-typed named property
 	 *         of the given bean object
 	 * @see #observeList(Realm, Object, String, Class)
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableList observeList(Realm realm, Object bean,
 			String propertyName) {
@@ -340,8 +316,6 @@ final public class BeansObservables {
 	 *            element type will be <code>null</code>.
 	 * @return an observable list tracking the collection-typed named property
 	 *         of the given bean object
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableList observeList(Realm realm, Object bean,
 			String propertyName, Class elementType) {
@@ -388,8 +362,6 @@ final public class BeansObservables {
 	 *            the name of the property
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given bean object
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Realm realm, Object bean,
 			String propertyName) {
@@ -407,8 +379,6 @@ final public class BeansObservables {
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given bean object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Object bean, String propertyName) {
 		return observeSet(Realm.getDefault(), bean, propertyName);
@@ -423,8 +393,6 @@ final public class BeansObservables {
 	 * @param propertyName
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value factory
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory valueFactory(final Realm realm,
 			final String propertyName) {
@@ -439,8 +407,6 @@ final public class BeansObservables {
 	 *            the name of the property. May be nested e.g. "parent.name"
 	 * @return an observable value factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory valueFactory(String propertyName) {
 		return valueFactory(Realm.getDefault(), propertyName);
@@ -456,8 +422,6 @@ final public class BeansObservables {
 	 *            the name of the property
 	 * @param elementType
 	 * @return an observable list factory
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory listFactory(final Realm realm,
 			final String propertyName, final Class elementType) {
@@ -474,8 +438,6 @@ final public class BeansObservables {
 	 * @param elementType
 	 * @return an observable list factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory listFactory(String propertyName,
 			Class elementType) {
@@ -491,8 +453,6 @@ final public class BeansObservables {
 	 * @param propertyName
 	 *            the name of the property
 	 * @return an observable set factory
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(final Realm realm,
 			final String propertyName) {
@@ -507,8 +467,6 @@ final public class BeansObservables {
 	 *            the name of the property
 	 * @return an observable set factory
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(String propertyName) {
 		return setFactory(Realm.getDefault(), propertyName);
@@ -529,7 +487,6 @@ final public class BeansObservables {
 	 *         property for the current value of the master observable value
 	 * 
 	 * @see MasterDetailObservables
-	 * 
 	 * @deprecated Use
 	 *             {@link #observeDetailValue(IObservableValue, String, Class)}
 	 *             instead
@@ -538,13 +495,11 @@ final public class BeansObservables {
 			IObservableValue master, String propertyName, Class propertyType) {
 		warnIfDifferentRealms(realm, master.getRealm());
 
-		IObservableValue value = MasterDetailObservables.detailValue(
-				master,
+		IObservableValue value = MasterDetailObservables.detailValue(master,
 				BeanProperties.value(propertyName, propertyType).valueFactory(
 						realm), propertyType);
-		return new BeanObservableValueDecorator(value,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableValueDecorator(value, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/* package */static void warnIfDifferentRealms(Realm detailRealm,
@@ -575,8 +530,6 @@ final public class BeansObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableValue observeDetailValue(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -621,9 +574,8 @@ final public class BeansObservables {
 		IObservableValue value = MasterDetailObservables.detailValue(master,
 				BeanProperties.value(masterType, propertyName, propertyType)
 						.valueFactory(realm), propertyType);
-		return new BeanObservableValueDecorator(value,
-				BeanPropertyHelper.getPropertyDescriptor(masterType,
-						propertyName));
+		return new BeanObservableValueDecorator(value, BeanPropertyHelper
+				.getPropertyDescriptor(masterType, propertyName));
 	}
 
 	/**
@@ -647,8 +599,6 @@ final public class BeansObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableValue observeDetailValue(IObservableValue master,
 			Class masterType, String propertyName, Class propertyType) {
@@ -698,8 +648,6 @@ final public class BeansObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableList observeDetailList(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -735,9 +683,8 @@ final public class BeansObservables {
 		IObservableSet observableSet = MasterDetailObservables.detailSet(
 				master, BeanProperties.set(propertyName, propertyType)
 						.setFactory(realm), propertyType);
-		return new BeanObservableSetDecorator(observableSet,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableSetDecorator(observableSet, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/**
@@ -753,8 +700,6 @@ final public class BeansObservables {
 	 * 
 	 * @see MasterDetailObservables
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableSet observeDetailSet(IObservableValue master,
 			String propertyName, Class propertyType) {
@@ -784,9 +729,8 @@ final public class BeansObservables {
 		warnIfDifferentRealms(realm, master.getRealm());
 		IObservableMap observableMap = MasterDetailObservables.detailMap(
 				master, BeanProperties.map(propertyName).mapFactory(realm));
-		return new BeanObservableMapDecorator(observableMap,
-				BeanPropertyHelper.getValueTypePropertyDescriptor(master,
-						propertyName));
+		return new BeanObservableMapDecorator(observableMap, BeanPropertyHelper
+				.getValueTypePropertyDescriptor(master, propertyName));
 	}
 
 	/**
@@ -798,8 +742,6 @@ final public class BeansObservables {
 	 * @return an observable map that tracks the map-type named property for the
 	 *         current value of the master observable value.
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableMap observeDetailMap(IObservableValue master,
 			String propertyName) {
@@ -832,8 +774,6 @@ final public class BeansObservables {
 	 *            element type will be <code>null</code>.
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given bean object
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Realm realm, Object bean,
 			String propertyName, Class elementType) {
@@ -862,8 +802,6 @@ final public class BeansObservables {
 	 * @return an observable set tracking the collection-typed named property of
 	 *         the given bean object
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableSet observeSet(Object bean, String propertyName,
 			Class elementType) {
@@ -885,8 +823,6 @@ final public class BeansObservables {
 	 *            element type will be <code>null</code>.
 	 * @return a factory for creating observable sets in the given realm,
 	 *         tracking the given property of a particular bean object
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory setFactory(final Realm realm,
 			final String propertyName, final Class elementType) {
@@ -927,8 +863,6 @@ final public class BeansObservables {
 	 * @return a factory for creating {@link IObservableMap} objects
 	 * 
 	 * @since 1.1
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory setToMapFactory(final Class beanClass,
 			final String propertyName) {
@@ -953,8 +887,6 @@ final public class BeansObservables {
 	 *            the name of the property
 	 * @return a factory for creating {@link IObservableMap} objects.
 	 * @since 1.1
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory mapPropertyFactory(final Realm realm,
 			final String propertyName) {
@@ -971,8 +903,6 @@ final public class BeansObservables {
 	 *            the name of the property
 	 * @return a factory for creating {@link IObservableMap} objects.
 	 * @since 1.2
-	 * 
-	 * @deprecated use <code>BeanProperties</code> instead
 	 */
 	public static IObservableFactory mapPropertyFactory(String propertyName) {
 		return mapPropertyFactory(Realm.getDefault(), propertyName);
