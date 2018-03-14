@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Hendrik Still <hendrik.still@gammas.de> - bug 412273
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -26,8 +27,9 @@ import org.eclipse.swt.graphics.Image;
  * <li><code>dispose</code></li>
  * </ul>
  * </p>
+ * @param <E> Type of an element of the model
  */
-public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
+public class LabelProvider<E> extends BaseLabelProvider<E> implements ILabelProvider<E> {
 
 	/**
 	 * Creates a new label provider.
@@ -42,7 +44,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * Subclasses may override.
 	 */
 	@Override
-	public Image getImage(Object element) {
+	public Image getImage(E element) {
 		return null;
 	}
 
@@ -52,7 +54,7 @@ public class LabelProvider extends BaseLabelProvider implements ILabelProvider {
 	 * <code>toString</code> string. Subclasses may override.
 	 */
 	@Override
-	public String getText(Object element) {
+	public String getText(E element) {
 		return element == null ? "" : element.toString();//$NON-NLS-1$
 	}
 }
