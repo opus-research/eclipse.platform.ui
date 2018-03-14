@@ -24,7 +24,7 @@ public class PerspectiveReader extends MementoReader {
 
 	private DescriptorReader descriptor;
 
-	PerspectiveReader(IMemento memento) {
+	public PerspectiveReader(IMemento memento) {
 		super(memento);
 	}
 

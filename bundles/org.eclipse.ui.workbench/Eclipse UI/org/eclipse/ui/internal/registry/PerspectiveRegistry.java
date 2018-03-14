@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,24 +25,35 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionChangeHandler;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.e4.compatibility.E4Util;
+import org.eclipse.ui.internal.e4.migration.PerspectiveBuilder;
+import org.eclipse.ui.internal.e4.migration.PerspectiveReader;
 import org.eclipse.ui.internal.util.PrefUtil;
 
 /**
  * Perspective registry.
  */
 public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChangeHandler {
+
+	private static final String PERSP = "_persp"; //$NON-NLS-1$
 
 	@Inject
 	private IExtensionRegistry extensionRegistry;
@@ -52,7 +64,12 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 	@Inject
 	MApplication application;
 
+	@Inject
+	private IEclipseContext context;
+
 	private Map<String, PerspectiveDescriptor> descriptors = new HashMap<String, PerspectiveDescriptor>();
+
+	private IPropertyChangeListener preferenceListener;
 
 	@PostConstruct
 	void postConstruct(MApplication application) {
@@ -85,6 +102,45 @@ public class PerspectiveRegistry implements IPerspectiveRegistry, IExtensionChan
 				}
 			}
 		}
+		initializePreferenceChangeListener();
+		WorkbenchPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceListener);
+	}
+
+	private void initializePreferenceChangeListener() {
+		preferenceListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().endsWith(PERSP)) {
+					String id = event.getProperty().substring(0, event.getProperty().lastIndexOf(PERSP));
+					if (findPerspectiveWithId(id) == null) {
+						StringReader reader = new StringReader((String) event.getNewValue());
+						try {
+							XMLMemento memento = XMLMemento.createReadRoot(reader);
+							MPerspective newPersp = createPerspectiveBuilder(new PerspectiveReader(memento))
+									.createPerspective();
+							application.getSnippets().add(newPersp);
+							// String label = newPersp.getLabel();
+							// String originalId =
+							// getOriginalId(newPersp.getElementId());
+							// PerspectiveDescriptor originalDescriptor =
+							// descriptors.get(originalId);
+							// PerspectiveDescriptor newDescriptor = new
+							// PerspectiveDescriptor(id, label,
+							// originalDescriptor);
+							// descriptors.put(id, newDescriptor);
+						} catch (WorkbenchException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		};
+	}
+
+	public PerspectiveBuilder createPerspectiveBuilder(PerspectiveReader perspReader) {
+		IEclipseContext childContext = context.createChild();
+		childContext.set(PerspectiveReader.class, perspReader);
+		return ContextInjectionFactory.make(PerspectiveBuilder.class, childContext);
 	}
 
 	/**

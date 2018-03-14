@@ -72,7 +72,7 @@ public class PerspectiveBuilder {
 		layoutUtils = new ModeledPageLayoutUtils(modelService);
 	}
 
-	MPerspective createPerspective() {
+	public MPerspective createPerspective() {
 		create();
 		tags = perspective.getTags();
 		populate();
