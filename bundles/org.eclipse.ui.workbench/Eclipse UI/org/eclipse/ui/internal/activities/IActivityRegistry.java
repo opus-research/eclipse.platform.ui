@@ -17,17 +17,17 @@ public interface IActivityRegistry {
 
 	void addActivityRegistryListener(IActivityRegistryListener activityRegistryListener);
 
-	List getActivityRequirementBindingDefinitions();
+	List<ActivityRequirementBindingDefinition> getActivityRequirementBindingDefinitions();
 
 	List<ActivityDefinition> getActivityDefinitions();
 
-	List getActivityPatternBindingDefinitions();
+	List<ActivityPatternBindingDefinition> getActivityPatternBindingDefinitions();
 
-	List getCategoryActivityBindingDefinitions();
+	List<CategoryActivityBindingDefinition> getCategoryActivityBindingDefinitions();
 
-	List getCategoryDefinitions();
+	List<CategoryDefinition> getCategoryDefinitions();
 
-	List getDefaultEnabledActivities();
+	List<String> getDefaultEnabledActivities();
 
 	void removeActivityRegistryListener(IActivityRegistryListener activityRegistryListener);
 }
