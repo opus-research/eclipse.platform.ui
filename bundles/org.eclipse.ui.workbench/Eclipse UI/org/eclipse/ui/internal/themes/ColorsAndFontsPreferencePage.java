@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug https://bugs.eclipse.org/436247
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -769,7 +770,8 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 
 		private boolean isAnyThemeChanged() {
 			return currentTheme != workbench.getThemeManager().getCurrentTheme()
-					|| currentCSSTheme != themeEngine.getActiveTheme();
+					|| (themeEngine != null ? currentCSSTheme != themeEngine.getActiveTheme()
+							: currentCSSTheme != null);
 		}
 	};
 
@@ -1379,7 +1381,7 @@ getPreferenceStore(),
 
         currentTheme = manager.getCurrentTheme();
 
-		currentCSSTheme = themeEngine.getActiveTheme();
+		currentCSSTheme = themeEngine != null ? themeEngine.getActiveTheme() : null;
 
         colorRegistry = new CascadingColorRegistry(currentTheme.getColorRegistry());
         fontRegistry = new CascadingFontRegistry(currentTheme.getFontRegistry());
