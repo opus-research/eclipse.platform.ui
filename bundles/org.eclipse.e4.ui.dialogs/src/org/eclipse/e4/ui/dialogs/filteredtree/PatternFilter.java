@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654, 469057
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 469057, 474836
  *******************************************************************************/
 package org.eclipse.e4.ui.dialogs.filteredtree;
 
@@ -16,9 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 
@@ -31,12 +39,12 @@ public class PatternFilter extends ViewerFilter {
 	/*
 	 * Cache of filtered elements in the tree
 	 */
-	private Map<Object, Object[]> cache = new HashMap<Object, Object[]>();
+	private Map<Object, Object[]> cache = new HashMap<>();
 
 	/*
 	 * Maps parent elements to TRUE or FALSE
 	 */
-	private Map<Object, Boolean> foundAnyCache = new HashMap<Object, Boolean>();
+	private Map<Object, Boolean> foundAnyCache = new HashMap<>();
 
 	private boolean useCache = false;
 
@@ -54,6 +62,21 @@ public class PatternFilter extends ViewerFilter {
 	private boolean useEarlyReturnIfMatcherIsNull = true;
 
 	private static Object[] EMPTY = new Object[0];
+
+	public PatternFilter() {
+	}
+
+	/**
+	 * Constructor to specify the includeLeadingWildcard flag.
+	 *
+	 * @param includeLeadingWildcard
+	 *            flag
+	 *
+	 * @since 1.1.0
+	 */
+	public PatternFilter(boolean includeLeadingWildcard) {
+		this.includeLeadingWildcard = includeLeadingWildcard;
+	}
 
 	@Override
 	public final Object[] filter(Viewer viewer, Object parent, Object[] elements) {
@@ -273,13 +296,40 @@ public class PatternFilter extends ViewerFilter {
 	 * @return true if the given element's label matches the filter text
 	 */
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
-		String labelText = ((ILabelProvider) ((StructuredViewer) viewer)
-				.getLabelProvider()).getText(element);
+		// check for CellLabelProvider, which are also ILabelProvider,
+		// e.g., ColumnLabelProvider
+		CellLabelProvider cellLabelProvider = null;
+		if (viewer instanceof ColumnViewer) {
+			cellLabelProvider = ((ColumnViewer) viewer).getLabelProvider(0);
+		}
+		String labelText = getTextFromLabelProvider(cellLabelProvider, element);
 
 		if (labelText == null) {
-			return false;
+			IBaseLabelProvider baseLabelProvider = ((StructuredViewer) viewer).getLabelProvider();
+			labelText = getTextFromLabelProvider(baseLabelProvider, element);
 		}
 		return wordMatches(labelText);
+	}
+
+	private String getTextFromLabelProvider(IBaseLabelProvider baseLabelProvider, Object element) {
+		if (baseLabelProvider == null) {
+			return null;
+		}
+		String labelText = null;
+		if (baseLabelProvider instanceof ILabelProvider) {
+			labelText = ((ILabelProvider) baseLabelProvider).getText(element);
+		} else if (baseLabelProvider instanceof IStyledLabelProvider) {
+			labelText = ((IStyledLabelProvider) baseLabelProvider).getStyledText(element).getString();
+		} else if (baseLabelProvider instanceof DelegatingStyledCellLabelProvider) {
+			IStyledLabelProvider styledStringProvider = ((DelegatingStyledCellLabelProvider) baseLabelProvider)
+					.getStyledStringProvider();
+			StyledString styledText = styledStringProvider.getStyledText(element);
+			if (styledText != null) {
+				labelText = styledText.getString();
+			}
+		}
+
+		return labelText;
 	}
 
 	/**
@@ -290,7 +340,7 @@ public class PatternFilter extends ViewerFilter {
 	 * @return an array of words
 	 */
 	private String[] getWords(String text) {
-		List<String> words = new ArrayList<String>();
+		List<String> words = new ArrayList<>();
 		// Break the text up into words, separating based on whitespace and
 		// common punctuation.
 		// Previously used String.split(..., "\\W"), where "\W" is a regular

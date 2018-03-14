@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2011 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 436225
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -36,12 +38,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 			key = serviceInterface;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.eclipse.ui.services.IServiceLocator#getService(java.lang.Class)
-		 */
 		@Override
 		public Object getService(Class api) {
 			if (key.equals(api)) {
@@ -50,12 +46,6 @@ public final class ServiceLocator implements IDisposable, INestable,
 			return null;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 *
-		 * @see
-		 * org.eclipse.ui.services.IServiceLocator#hasService(java.lang.Class)
-		 */
 		@Override
 		public boolean hasService(Class api) {
 			if (key.equals(api)) {
@@ -76,11 +66,11 @@ public final class ServiceLocator implements IDisposable, INestable,
 
 	private boolean disposed;
 
-	private final IDisposable owner;
+	private IDisposable owner;
 
 	private IEclipseContext e4Context;
 
-	private Map<Class<?>, Object> servicesToDispose = new HashMap<Class<?>, Object>();
+	private Map<Class<?>, Object> servicesToDispose = new HashMap<>();
 
 	/**
 	 * Constructs a service locator with no parent.
@@ -140,6 +130,7 @@ public final class ServiceLocator implements IDisposable, INestable,
 		servicesToDispose.clear();
 		e4Context = null;
 		disposed = true;
+		owner = null;
 	}
 
 	@Override
