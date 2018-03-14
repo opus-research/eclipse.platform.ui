@@ -11,6 +11,7 @@
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
+ *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -191,10 +192,12 @@ import org.osgi.service.event.EventHandler;
 /**
  * A collection of views and editors in a workbench.
  */
-public class WorkbenchPage extends CompatibleWorkbenchPage implements
-        IWorkbenchPage {
+public class WorkbenchPage implements IWorkbenchPage {
 
 	private static final String ATT_AGGREGATE_WORKING_SET_ID = "aggregateWorkingSetId"; //$NON-NLS-1$
+
+	private static final int WINDOW_SCOPE = EModelService.OUTSIDE_PERSPECTIVE
+			| EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_SHARED_AREA;
 
 	class E4PartListener implements org.eclipse.e4.ui.workbench.modeling.IPartListener {
 
@@ -883,7 +886,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 						editorReferences.remove(eRef);
 					ViewReference vRef = getViewReference(changedPart);
 					if (vRef != null)
-						viewReferences.remove(eRef);
+						viewReferences.remove(vRef);
 				}
 			}
 		}
@@ -1123,6 +1126,10 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 
 	List<EditorReference> getSortedEditorReferences() {
+		return getSortedEditorReferences(false);
+	}
+
+	private List<EditorReference> getSortedEditorReferences(boolean allPerspectives) {
 		List<EditorReference> sortedReferences = new ArrayList<EditorReference>();
 		for (MPart part : activationList) {
 			for (EditorReference ref : editorReferences) {
@@ -1141,9 +1148,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		MPerspective currentPerspective = getCurrentPerspective();
 		if (currentPerspective != null) {
+			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
 			List<MPart> placeholders = modelService.findElements(window,
-					CompatibilityEditor.MODEL_ELEMENT_ID, MPart.class, null,
-					EModelService.PRESENTATION);
+					CompatibilityEditor.MODEL_ELEMENT_ID, MPart.class, null, scope);
 			List<EditorReference> visibleReferences = new ArrayList<EditorReference>();
 			for (EditorReference reference : sortedReferences) {
 				for (MPart placeholder : placeholders) {
@@ -1910,7 +1917,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		// final WorkbenchPartReference ref = (WorkbenchPartReference) refs[i];
 		// //partList.removePart(ref);
 		// //firePartClosed(refs[i]);
-		// Platform.run(new SafeRunnable() {
+		// SafeRunner.run(new SafeRunnable() {
 		// public void run() {
 		// // WorkbenchPlugin.log(new Status(IStatus.WARNING,
 		// WorkbenchPlugin.PI_WORKBENCH,
@@ -2357,24 +2364,38 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	}
 	
 	public IEditorReference[] getSortedEditors() {
-		IWorkbenchPartReference[] parts = getSortedParts(true, false);
+		IWorkbenchPartReference[] parts = getSortedParts(true, false, false);
 		IEditorReference[] editors = new IEditorReference[parts.length];
 		System.arraycopy(parts, 0, editors, 0, parts.length);
 		return editors;
 	}
 
 	public IWorkbenchPartReference[] getSortedParts() {
-		return getSortedParts(true, true);
+		return getSortedParts(true, true, false);
 	}
 
-	private IWorkbenchPartReference[] getSortedParts(boolean editors, boolean views) {
+	/**
+	 * Returns a sorted array of references to editors and/or views from this
+	 * page.
+	 *
+	 * @param editors
+	 *            include editors
+	 * @param views
+	 *            include views
+	 * @param allPerspectives
+	 *            if {@code false}, does not include parts from inactive
+	 *            perspectives
+	 * @return a sorted array of references to editors and/or views
+	 */
+	private IWorkbenchPartReference[] getSortedParts(boolean editors, boolean views,
+			boolean allPerspectives) {
 		if (!editors && !views) {
 			return new IWorkbenchPartReference[0];
 		}
 
 		List<IWorkbenchPartReference> sortedReferences = new ArrayList<IWorkbenchPartReference>();
-		IViewReference[] viewReferences = getViewReferences();
-		List<EditorReference> editorReferences = getSortedEditorReferences();
+		IViewReference[] viewReferences = getViewReferences(allPerspectives);
+		List<EditorReference> editorReferences = getSortedEditorReferences(allPerspectives);
 
 		activationLoop: for (MPart part : activationList) {
 			if (views) {
@@ -2519,10 +2540,15 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
      */
     @Override
 	public IViewReference[] getViewReferences() {
+		return getViewReferences(false);
+	}
+
+	private IViewReference[] getViewReferences(boolean allPerspectives) {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
+			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
 			List<MPlaceholder> placeholders = modelService.findElements(window, null,
-					MPlaceholder.class, null, EModelService.PRESENTATION);
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
 				for (MPlaceholder placeholder : placeholders) {
@@ -3541,7 +3567,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 	public ISaveablePart[] getDirtyParts() {
 		List result = new ArrayList(3);
-		IWorkbenchPartReference[] allParts = getSortedParts();
+		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
 		for (int i = 0; i < allParts.length; i++) {
 			IWorkbenchPartReference reference = allParts[i];
 
@@ -3581,165 +3607,32 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (closing) {
 			// if the parts are going to be closed, then we only save those that
 			// need to be saved when closed, see bug 272070
-			for (Iterator it = dirtyParts.iterator(); it.hasNext();) {
-				ISaveablePart saveablePart = (ISaveablePart) it.next();
-				if (!saveablePart.isSaveOnCloseNeeded()) {
-					it.remove();
-				}
-			}
+			removeSaveOnCloseNotNeededParts(dirtyParts);
 		}
 
 		List modelsToSave;
 		if (confirm) {
-			boolean saveable2Processed = false;
-			// Process all parts that implement ISaveablePart2.
-			// These parts are removed from the list after saving
-			// them. We then need to restore the workbench to
-			// its previous state, for now this is just last
-			// active perspective.
-			// Note that the given parts may come from multiple
-			// windows, pages and perspectives.
-			ListIterator listIterator = dirtyParts.listIterator();
-
-			WorkbenchPage currentPage = null;
-			Perspective currentPageOriginalPerspective = null;
-			while (listIterator.hasNext()) {
-				IWorkbenchPart part = (IWorkbenchPart) listIterator.next();
-				if (part instanceof ISaveablePart2) {
-					WorkbenchPage page = (WorkbenchPage) part.getSite().getPage();
-					if (!Util.equals(currentPage, page)) {
-						if (currentPage != null && currentPageOriginalPerspective != null) {
-							if (!currentPageOriginalPerspective.equals(currentPage
-									.getActivePerspective())) {
-								currentPage
-										.setPerspective(currentPageOriginalPerspective.getDesc());
-							}
-						}
-						currentPage = page;
-						currentPageOriginalPerspective = page.getActivePerspective();
-					}
-					if (confirm) {
-						// if (part instanceof IViewPart) {
-						// Perspective perspective = page
-						// .getFirstPerspectiveWithView((IViewPart) part);
-						// if (perspective != null) {
-						// page.setPerspective(perspective.getDesc());
-						// }
-						// }
-						// // show the window containing the page?
-						// IWorkbenchWindow partsWindow =
-						// page.getWorkbenchWindow();
-						// if (partsWindow !=
-						// partsWindow.getWorkbench().getActiveWorkbenchWindow())
-						// {
-						// Shell shell = partsWindow.getShell();
-						// if (shell.getMinimized()) {
-						// shell.setMinimized(false);
-						// }
-						// shell.setActive();
-						// }
-						page.bringToTop(part);
-					}
-					// try to save the part
-					int choice = SaveableHelper.savePart((ISaveablePart2) part,
-							page.getWorkbenchWindow(), confirm);
-					if (choice == ISaveablePart2.CANCEL) {
-						// If the user cancels, don't restore the previous
-						// workbench state, as that will
-						// be an unexpected switch from the current state.
-						return false;
-					} else if (choice != ISaveablePart2.DEFAULT) {
-						saveable2Processed = true;
-						listIterator.remove();
-					}
-				}
-			}
-
-			// try to restore the workbench to its previous state
-			if (currentPage != null && currentPageOriginalPerspective != null) {
-				if (!currentPageOriginalPerspective.equals(currentPage.getActivePerspective())) {
-					currentPage.setPerspective(currentPageOriginalPerspective.getDesc());
-				}
-			}
-
-			// if processing a ISaveablePart2 caused other parts to be
-			// saved, remove them from the list presented to the user.
-			if (saveable2Processed) {
-				listIterator = dirtyParts.listIterator();
-				while (listIterator.hasNext()) {
-					ISaveablePart part = (ISaveablePart) listIterator.next();
-					if (!part.isDirty()) {
-						listIterator.remove();
-					}
-				}
+			if (processSaveable2(dirtyParts)) {
+				return false;
 			}
 
 			modelsToSave = convertToSaveables(dirtyParts, closing, addNonPartSources);
-
 			// If nothing to save, return.
 			if (modelsToSave.isEmpty()) {
 				return true;
 			}
-			boolean canceled = SaveableHelper.waitForBackgroundSaveJobs(modelsToSave);
-			if (canceled) {
+
+			if (SaveableHelper.waitForBackgroundSaveJobs(modelsToSave)) {
 				return false;
 			}
-			// Use a simpler dialog if there's only one
+
 			if (modelsToSave.size() == 1) {
-				Saveable model = (Saveable) modelsToSave.get(0);
-				String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
-						model.getName());
-				// Show a dialog.
-				String[] buttons = new String[] { IDialogConstants.YES_LABEL,
-						IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL };
-				MessageDialog d = new MessageDialog(shellProvider.getShell(),
-						WorkbenchMessages.Save_Resource, null, message, MessageDialog.QUESTION,
-						buttons, 0) {
-					@Override
-					protected int getShellStyle() {
-						return super.getShellStyle() | SWT.SHEET;
-					}
-				};
-
-				int choice = SaveableHelper.testGetAutomatedResponse();
-				if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
-					choice = d.open();
-				}
-
-				// Branch on the user choice.
-				// The choice id is based on the order of button labels
-				// above.
-				switch (choice) {
-				case ISaveablePart2.YES: // yes
-					break;
-				case ISaveablePart2.NO: // no
-					return true;
-				default:
-				case ISaveablePart2.CANCEL: // cancel
-					return false;
-				}
+				modelsToSave = promptForSaving(shellProvider, (Saveable) modelsToSave.get(0));
 			} else {
-				ListSelectionDialog dlg = new ListSelectionDialog(shellProvider.getShell(),
-						modelsToSave, new ArrayContentProvider(), new WorkbenchPartLabelProvider(),
-						WorkbenchMessages.EditorManager_saveResourcesMessage) {
-					@Override
-					protected int getShellStyle() {
-						return super.getShellStyle() | SWT.SHEET;
-					}
-				};
-				dlg.setInitialSelections(modelsToSave.toArray());
-				dlg.setTitle(WorkbenchMessages.EditorManager_saveResourcesTitle);
-
-				// this "if" statement aids in testing.
-				if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
-					int result = dlg.open();
-					// Just return false to prevent the operation continuing
-					if (result == IDialogConstants.CANCEL_ID) {
-						return false;
-					}
-
-					modelsToSave = Arrays.asList(dlg.getResult());
-				}
+				modelsToSave = promptForSaving(shellProvider, modelsToSave);
+			}
+			if (modelsToSave == null) {
+				return false;
 			}
 		} else {
 			modelsToSave = convertToSaveables(dirtyParts, closing, addNonPartSources);
@@ -3752,7 +3645,184 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		// Create save block.
 		final List finalModels = modelsToSave;
-		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
+		IRunnableWithProgress progressOp = createRunnableWithProgress(confirm, closing, shellProvider, finalModels);
+
+		// Do the save.
+		return SaveableHelper.runProgressMonitorOperation(WorkbenchMessages.Save_All, progressOp,
+				runnableContext, shellProvider);
+	}
+
+	/**
+	 * Removes from the provided list parts that don't need to be saved on
+	 * close.
+	 *
+	 * @param parts
+	 *            the list of the parts (ISaveablePart)
+	 */
+	private static void removeSaveOnCloseNotNeededParts(List parts) {
+		for (Iterator it = parts.iterator(); it.hasNext();) {
+			ISaveablePart saveablePart = (ISaveablePart) it.next();
+			if (!saveablePart.isSaveOnCloseNeeded()) {
+				it.remove();
+			}
+		}
+	}
+
+	/**
+	 * Processes all parts that implement ISaveablePart2 and removes them from
+	 * the list.
+	 *
+	 * @param dirtyParts
+	 *            the list of the parts
+	 * @return true if cancelled
+	 */
+	private static boolean processSaveable2(List dirtyParts) {
+		boolean saveable2Processed = false;
+		// Process all parts that implement ISaveablePart2.
+		// These parts are removed from the list after saving
+		// them. We then need to restore the workbench to
+		// its previous state, for now this is just last
+		// active perspective.
+		// Note that the given parts may come from multiple
+		// windows, pages and perspectives.
+		ListIterator listIterator = dirtyParts.listIterator();
+
+		WorkbenchPage currentPage = null;
+		Perspective currentPageOriginalPerspective = null;
+		while (listIterator.hasNext()) {
+			IWorkbenchPart part = (IWorkbenchPart) listIterator.next();
+			if (part instanceof ISaveablePart2) {
+				WorkbenchPage page = (WorkbenchPage) part.getSite().getPage();
+				if (!Util.equals(currentPage, page)) {
+					if (currentPage != null && currentPageOriginalPerspective != null) {
+						if (!currentPageOriginalPerspective.equals(currentPage
+								.getActivePerspective())) {
+							currentPage
+									.setPerspective(currentPageOriginalPerspective.getDesc());
+						}
+					}
+					currentPage = page;
+					currentPageOriginalPerspective = page.getActivePerspective();
+				}
+				page.bringToTop(part);
+				// try to save the part
+				int choice = SaveableHelper.savePart((ISaveablePart2) part, page.getWorkbenchWindow(), true);
+				if (choice == ISaveablePart2.CANCEL) {
+					// If the user cancels, don't restore the previous
+					// workbench state, as that will
+					// be an unexpected switch from the current state.
+					return true;
+				} else if (choice != ISaveablePart2.DEFAULT) {
+					saveable2Processed = true;
+					listIterator.remove();
+				}
+			}
+		}
+
+		// try to restore the workbench to its previous state
+		if (currentPage != null && currentPageOriginalPerspective != null) {
+			if (!currentPageOriginalPerspective.equals(currentPage.getActivePerspective())) {
+				currentPage.setPerspective(currentPageOriginalPerspective.getDesc());
+			}
+		}
+
+		// if processing a ISaveablePart2 caused other parts to be
+		// saved, remove them from the list presented to the user.
+		if (saveable2Processed) {
+			removeNonDirtyParts(dirtyParts);
+		}
+
+		return false;
+	}
+
+	private static void removeNonDirtyParts(List parts) {
+		ListIterator listIterator;
+		listIterator = parts.listIterator();
+		while (listIterator.hasNext()) {
+			ISaveablePart part = (ISaveablePart) listIterator.next();
+			if (!part.isDirty()) {
+				listIterator.remove();
+			}
+		}
+	}
+
+	/**
+	 * Prompt the user to save the given saveable.
+	 *
+	 * @param shellProvider
+	 *            the provider used to obtain a shell in prompting is required
+	 * @param modelToSave
+	 *            the saveable to be saved
+	 * @return a list with the model to save (empty if the saveable is not
+	 *         accepted to be saved) or null if canceled
+	 */
+	private static List promptForSaving(final IShellProvider shellProvider, Saveable modelToSave) {
+		String message = NLS.bind(WorkbenchMessages.EditorManager_saveChangesQuestion,
+ modelToSave.getName());
+		// Show a dialog.
+		String[] buttons = new String[] { IDialogConstants.YES_LABEL,
+				IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL };
+		MessageDialog d = new MessageDialog(shellProvider.getShell(),
+				WorkbenchMessages.Save_Resource, null, message, MessageDialog.QUESTION,
+				buttons, 0) {
+			@Override
+			protected int getShellStyle() {
+				return super.getShellStyle() | SWT.SHEET;
+			}
+		};
+
+		int choice = SaveableHelper.testGetAutomatedResponse();
+		if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
+			choice = d.open();
+		}
+		if (choice == ISaveablePart2.CANCEL) {
+			return null;
+		}
+
+		List<Saveable> modelsToSave = new ArrayList<Saveable>();
+		if (choice != ISaveablePart2.NO) {
+			modelsToSave.add(modelToSave);
+		}
+		return modelsToSave;
+	}
+
+	/**
+	 * Prompt the user to save the given saveables.
+	 *
+	 * @param shellProvider
+	 *            the provider used to obtain a shell in prompting is required
+	 * @param modelsToSave
+	 *            the saveables to be saved
+	 * @return a list with the models selected to save or null if canceled
+	 */
+	private static List promptForSaving(final IShellProvider shellProvider, List modelsToSave) {
+		ListSelectionDialog dlg = new ListSelectionDialog(shellProvider.getShell(), modelsToSave,
+				new ArrayContentProvider(), new WorkbenchPartLabelProvider(),
+				WorkbenchMessages.EditorManager_saveResourcesMessage) {
+			@Override
+			protected int getShellStyle() {
+				return super.getShellStyle() | SWT.SHEET;
+			}
+		};
+		dlg.setInitialSelections(modelsToSave.toArray());
+		dlg.setTitle(WorkbenchMessages.EditorManager_saveResourcesTitle);
+
+		// this "if" statement aids in testing.
+		if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
+			int result = dlg.open();
+			// Just return false to prevent the operation continuing
+			if (result == IDialogConstants.CANCEL_ID) {
+				return null;
+			}
+
+			modelsToSave = Arrays.asList(dlg.getResult());
+		}
+		return modelsToSave;
+	}
+
+	private static IRunnableWithProgress createRunnableWithProgress(final boolean confirm, final boolean closing,
+			final IShellProvider shellProvider, final List finalModels) {
+		return new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
@@ -3765,8 +3835,8 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 						monitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1),
-							shellProvider, closing || confirm);
+					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), shellProvider, closing
+							|| confirm);
 					if (monitorWrap.isCanceled()) {
 						break;
 					}
@@ -3774,10 +3844,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				monitorWrap.done();
 			}
 		};
-
-		// Do the save.
-		return SaveableHelper.runProgressMonitorOperation(WorkbenchMessages.Save_All, progressOp,
-				runnableContext, shellProvider);
 	}
 
 	/**
@@ -4403,8 +4469,11 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 
 			if (parent instanceof MPartStack) {
-				List<CompatibilityView> stack = new ArrayList<CompatibilityView>();
+				MStackElement selectedElement = ((MPartStack) parent).getSelectedElement();
+				final MUIElement topPart = selectedElement instanceof MPlaceholder ? ((MPlaceholder) selectedElement)
+						.getRef() : null;
 
+				List<CompatibilityView> stack = new ArrayList<CompatibilityView>();
 				for (Object child : parent.getChildren()) {
 					MPart siblingPart = child instanceof MPart ? (MPart) child
 							: (MPart) ((MPlaceholder) child).getRef();
@@ -4420,8 +4489,26 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 				Collections.sort(stack, new Comparator<CompatibilityView>() {
 					@Override
 					public int compare(CompatibilityView o1, CompatibilityView o2) {
-						int pos1 = (-1) * activationList.indexOf(o1.getModel());
-						int pos2 = (-1) * activationList.indexOf(o2.getModel());
+						MPart model1 = o1.getModel();
+						MPart model2 = o2.getModel();
+
+						/*
+						 * WORKAROUND: Since we only have the activation list
+						 * and not a bingToTop list, we can't set/know the order
+						 * for inactive stacks. This workaround makes sure that
+						 * the topmost part is at least at the first position.
+						 */
+						if (model1 == topPart)
+							return Integer.MIN_VALUE;
+						if (model2 == topPart)
+							return Integer.MAX_VALUE;
+
+						int pos1 = activationList.indexOf(model1);
+						int pos2 = activationList.indexOf(model2);
+						if (pos1 == -1)
+							pos1 = Integer.MAX_VALUE;
+						if (pos2 == -1)
+							pos2 = Integer.MAX_VALUE;
 						return pos1 - pos2;
 					}
 				});
