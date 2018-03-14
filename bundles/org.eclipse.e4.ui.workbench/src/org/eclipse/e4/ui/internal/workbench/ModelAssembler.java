@@ -75,8 +75,8 @@ public class ModelAssembler {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 
-		List<MApplicationElement> imports = new ArrayList<>();
-		List<MApplicationElement> addedElements = new ArrayList<>();
+		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
+		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
@@ -266,7 +266,7 @@ public class ModelAssembler {
 		if (imports.isEmpty())
 			return;
 		// now that we have all components loaded, resolve imports
-		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<>();
+		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
 		for (MApplicationElement importedElement : imports) {
 			MApplicationElement realElement = ModelUtils.findElementById(application,
 					importedElement.getElementId());
@@ -278,7 +278,7 @@ public class ModelAssembler {
 		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(addedElements);
-		List<Runnable> commands = new ArrayList<>();
+		List<Runnable> commands = new ArrayList<Runnable>();
 
 		// TODO Probably use EcoreUtil.UsageCrossReferencer
 		while (it.hasNext()) {

@@ -32,8 +32,8 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 
 public class E4XMIResource extends XMIResourceImpl {
 
-	private Map<EObject, String> objectMap = new WeakHashMap<>();
-	private Set<String> knownIds = new HashSet<>();
+	private Map<EObject, String> objectMap = new WeakHashMap<EObject, String>();
+	private Set<String> knownIds = new HashSet<String>();
 
 	public E4XMIResource() {
 	}
@@ -109,7 +109,7 @@ public class E4XMIResource extends XMIResourceImpl {
 		MApplicationElement create();
 	}
 
-	static final Map<String, ObjectCreator> deprecatedTypeMappings = new HashMap<>();
+	static final Map<String, ObjectCreator> deprecatedTypeMappings = new HashMap<String, ObjectCreator>();
 	static {
 		deprecatedTypeMappings.put("OpaqueMenu", new ObjectCreator() { //$NON-NLS-1$
 
