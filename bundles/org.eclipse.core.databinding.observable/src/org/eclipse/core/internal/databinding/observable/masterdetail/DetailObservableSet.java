@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 221351, 247875, 246782, 249526, 268022, 251424
  *     Ovidio Mallo - bug 241318
+ *     Steven Spungin <steven@spungin.tv> - Bug 432440
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -184,13 +185,18 @@ public class DetailObservableSet extends ObservableSet implements IObserving {
 	}
 
 	public void clear() {
-		getterCalled();
+		try {
+			getterCalled();
+		} catch (Exception e) {
+			// Ignore assert for disposed widgets
+		}
 		ObservableTracker.setIgnore(true);
 		try {
 			wrappedSet.clear();
-		} finally {
-			ObservableTracker.setIgnore(false);
+		} catch (Throwable e) {
+			// Ignore assert for disposed widgets
 		}
+		ObservableTracker.setIgnore(false);
 	}
 
 	public synchronized void dispose() {
