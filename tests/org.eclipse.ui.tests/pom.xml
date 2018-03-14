@@ -25,7 +25,6 @@
   <properties>
    	<testSuiteUITests>**/org/eclipse/ui/tests/UiTestSuite.java</testSuiteUITests>
 	<testSuiteJFace>**/org/eclipse/jface/tests/AllTests.java</testSuiteJFace>
-	 <skipTests>false</skipTests>
   </properties>
 
   <build>
