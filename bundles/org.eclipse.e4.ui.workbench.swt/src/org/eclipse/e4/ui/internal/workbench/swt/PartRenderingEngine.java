@@ -44,7 +44,6 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.ModelAssembler;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -515,12 +514,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
 					throw (Error) e;
-				} else {
-					// log exceptions otherwise
-					if (logger != null) {
-						String message = "Exception occurred while rendering: {0}"; //$NON-NLS-1$
-						logger.error(e, NLS.bind(message, element));
-					}
+				}
+				// log exceptions otherwise
+				if (logger != null) {
+					String message = "Exception occurred while rendering: {0}"; //$NON-NLS-1$
+					logger.error(e, NLS.bind(message, element));
 				}
 			}
 
@@ -697,12 +695,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
 					throw (Error) e;
-				} else {
-					// log exceptions otherwise
-					if (logger != null) {
-						String message = "Exception occurred while rendering: {0}"; //$NON-NLS-1$
-						logger.error(e, NLS.bind(message, element));
-					}
+				}
+				// log exceptions otherwise
+				if (logger != null) {
+					String message = "Exception occurred while rendering: {0}"; //$NON-NLS-1$
+					logger.error(e, NLS.bind(message, element));
 				}
 			}
 
@@ -820,12 +817,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (e instanceof Error) {
 					// errors are deadly, we shouldn't ignore these
 					throw (Error) e;
-				} else {
-					// log exceptions otherwise
-					if (logger != null) {
-						String message = "Exception occurred while unrendering: {0}"; //$NON-NLS-1$
-						logger.error(e, NLS.bind(message, element));
-					}
+				}
+				// log exceptions otherwise
+				if (logger != null) {
+					String message = "Exception occurred while unrendering: {0}"; //$NON-NLS-1$
+					logger.error(e, NLS.bind(message, element));
 				}
 			}
 
@@ -1076,22 +1072,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 						// Special handling for partial models (for testing...)
 						testShell = new Shell(display, SWT.SHELL_TRIM);
 						createGui((MUIElement) uiRoot, testShell, null);
-					}
-				}
-
-				// Starts the final model assembly phase (bug 376486) (if
-				// cleaning)
-				Object o = appContext.get(E4Workbench.NO_SAVED_MODEL_FOUND);
-				if (o instanceof Boolean) {
-					if (((Boolean) o).booleanValue()) {
-						String xmiUriArg = System
-								.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
-						if ("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg)) { //$NON-NLS-1$
-							ModelAssembler contribProcessor = ContextInjectionFactory
-									.make(ModelAssembler.class, appContext);
-							contribProcessor
-									.processModel(ModelAssembler.AFTER_MODEL_CREATION);
-						}
 					}
 				}
 
