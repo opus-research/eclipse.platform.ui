@@ -52,17 +52,6 @@ public class EventLoopMonitorThread extends Thread {
 	private static final String TRACE_PREFIX = "Event Loop Monitor"; //$NON-NLS-1$
 	private static final Tracer tracer =
 			Tracer.create(TRACE_PREFIX, PreferenceConstants.PLUGIN_ID + TRACE_EVENT_MONITOR);
-	// TODO(sprigogin): Move to a preference.
-	private static final FilterHandler NON_INTERESTING_THREAD_FILTER = new FilterHandler(
-			"java.*" //$NON-NLS-1$
-			+ ",sun.*" //$NON-NLS-1$
-			+ ",org.eclipse.core.internal.jobs.WorkerPool.sleep" //$NON-NLS-1$
-			+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob" //$NON-NLS-1$
-			+ ",org.eclipse.core.internal.jobs.Worker.run" //$NON-NLS-1$
-			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent" //$NON-NLS-1$
-			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run" //$NON-NLS-1$
-			+ ",org.eclipse.equinox.internal.util.impl.tpt.timer.TimerImpl.run" //$NON-NLS-1$
-			+ ",org.eclipse.equinox.internal.util.impl.tpt.threadpool.Executor.run"); //$NON-NLS-1$
 
 	/* NOTE: All time-related values in this class are in milliseconds. */
 
@@ -84,11 +73,13 @@ public class EventLoopMonitorThread extends Thread {
 		public int maxStackSamples;
 		/** If true, log freeze events to the Eclipse error log on the local machine. */
 		public boolean logToErrorLog;
-		/** Contains the list of fully qualified methods to filter out. */
-		public String filterTraces;
+		/** @see org.eclipse.ui.monitoring.PreferenceConstants#UI_THREAD_FILTER */
+		public String uiThreadFilter;
+		/** @see org.eclipse.ui.monitoring.PreferenceConstants#NONINTERESTING_THREAD_FILTER */
+		public String noninterestingThreadFilter;
 
 		/**
-		 * Checks if parameters for plug-in are valid before startup.
+		 * Checks if the values of parameters for UI responsiveness monitoring are valid.
 		 *
 		 * @throws IllegalArgumentException if the parameter values are invalid or inconsistent.
 		 */
@@ -169,8 +160,8 @@ public class EventLoopMonitorThread extends Thread {
 			 */
 			switch (event.type) {
 			case SWT.PreEvent:
-				if (!doesEventIndicateResponsiveUI(event.detail)) {
-					break;  // Ignore events that may be produced during a UI freeze.
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
 				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
@@ -180,8 +171,8 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(true, true);
 				break;
 			case SWT.PostEvent:
-				if (!doesEventIndicateResponsiveUI(event.detail)) {
-					break;  // Ignore events that may be produced during a UI freeze.
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
 				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
@@ -203,27 +194,11 @@ public class EventLoopMonitorThread extends Thread {
 					eventHistory.recordEvent(event.type);
 				}
 				restoreNestingLevel();
-				// Don't log a long interval, start the timer.
-				handleEventTransition(false, true);
+				// Don't log a long interval, start the timer if inside another event.
+				handleEventTransition(false, nestingLevel > 0);
 				break;
 			default:
 				break;
-			}
-		}
-
-		/**
-		 * Returns {@code true} if dispatching of an event of the given type indicates that the UI
-		 * is responsive. Events that may be produced during UI freezes are irrelevant to UI
-		 * responsiveness monitoring.
-		 */
-		private boolean doesEventIndicateResponsiveUI(int eventType) {
-			switch (eventType) {
-			case SWT.Skin:
-			case SWT.MeasureItem:
-			case SWT.Dispose:
-				return false;
-			default:
-				return true;
 			}
 		}
 
@@ -273,7 +248,7 @@ public class EventLoopMonitorThread extends Thread {
 
 			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 &&
 					totalDuration > deadlockThreshold &&
-					filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 				stackSamples = Arrays.copyOf(stackSamples, numSamples);
 				logEvent(new UiFreezeEvent(lastActive, totalDuration,
 						Arrays.copyOf(stackSamples, numSamples), true));
@@ -382,7 +357,8 @@ public class EventLoopMonitorThread extends Thread {
 			new ArrayList<IUiFreezeEventLogger>();
 	private DefaultUiFreezeEventLogger defaultLogger;
 	private final Display display;
-	private final FilterHandler filterHandler;
+	private final FilterHandler uiThreadFilter;
+	private final FilterHandler noninterestingThreadFilter;
 	private final int longEventErrorThreshold;
 	private final long sampleInterval;
 	private final long allThreadsSampleInterval;
@@ -427,7 +403,8 @@ public class EventLoopMonitorThread extends Thread {
 		allThreadsSampleInterval = longEventErrorThreshold * 2 / 3;
 		deadlockThreshold = args.deadlockThreshold;
 		logToErrorLog = args.logToErrorLog;
-		filterHandler = new FilterHandler(args.filterTraces);
+		uiThreadFilter = new FilterHandler(args.uiThreadFilter);
+		noninterestingThreadFilter = new FilterHandler(args.noninterestingThreadFilter);
 		sleepMonitor = new Object();
 	}
 
@@ -637,7 +614,7 @@ public class EventLoopMonitorThread extends Thread {
 						numSamples = maxLoggedStackSamples;
 					}
 
-					if (filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
+					if (uiThreadFilter.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
 						logEvent(new UiFreezeEvent(eventSnapshot.start, eventSnapshot.duration,
 								Arrays.copyOf(stackSamples, numSamples), false));
 					}
@@ -682,11 +659,11 @@ public class EventLoopMonitorThread extends Thread {
 
 	/**
 	 * A thread is considered interesting if its stack trace includes at least one frame not
-	 * matching any of the methods in {@link #NON_INTERESTING_THREAD_FILTER}.
+	 * matching any of the methods in {@link #noninterestingThreadFilter}.
 	 */
 	private boolean isInteresting(ThreadInfo thread) {
 		for (StackTraceElement element : thread.getStackTrace()) {
-			if (!NON_INTERESTING_THREAD_FILTER.matchesFilter(element)) {
+			if (!noninterestingThreadFilter.matchesFilter(element)) {
 				return true;
 			}
 		}
