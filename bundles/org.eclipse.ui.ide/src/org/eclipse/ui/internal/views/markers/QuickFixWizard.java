@@ -76,6 +76,8 @@ class QuickFixWizard extends Wizard {
 			for (int i = 0; i < pages.length; i++) {
 				// Allow for cancel event processing
 				getShell().getDisplay().readAndDispatch();
+				if (subMonitor.isCanceled())
+					return;
 				QuickFixPage wizardPage = (QuickFixPage) pages[i];
 				wizardPage.performFinish(subMonitor.split(10));
 			}
