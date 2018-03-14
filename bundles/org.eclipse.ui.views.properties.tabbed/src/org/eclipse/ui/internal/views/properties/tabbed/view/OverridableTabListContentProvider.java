@@ -10,12 +10,13 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
+
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
@@ -106,23 +107,21 @@ class OverridableTabListContentProvider extends TabListContentProvider
 	private void init(TabbedPropertyViewer newTabbedPropertyViewer) {
 		this.tabbedPropertyViewer = newTabbedPropertyViewer;
 		currentPart = tabbedPropertyViewer.getWorkbenchPart();
-		IPropertySheetPage page = (IPropertySheetPage) Adapters.getAdapter(currentPart, IPropertySheetPage.class, true);
-		if (page instanceof TabbedPropertySheetPage) {
-			tabbedPropertySheetPage = (TabbedPropertySheetPage) page;
+		if (currentPart.getAdapter(IPropertySheetPage.class) != null) {
+			tabbedPropertySheetPage = (TabbedPropertySheetPage) currentPart
+					.getAdapter(IPropertySheetPage.class);
 		} else {
 			/*
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = (IContributedContentsView) Adapters.getAdapter(currentPart,
-					IContributedContentsView.class, true);
+			IContributedContentsView view = (IContributedContentsView) currentPart
+					.getAdapter(IContributedContentsView.class);
 			if (view != null) {
 				IWorkbenchPart part = view.getContributingPart();
 				if (part != null) {
-					page = (IPropertySheetPage) Adapters.getAdapter(part, IPropertySheetPage.class, true);
-					if (page instanceof TabbedPropertySheetPage) {
-						tabbedPropertySheetPage = (TabbedPropertySheetPage) page;
-					}
+					tabbedPropertySheetPage = (TabbedPropertySheetPage) part
+							.getAdapter(IPropertySheetPage.class);
 				}
 			}
 		}

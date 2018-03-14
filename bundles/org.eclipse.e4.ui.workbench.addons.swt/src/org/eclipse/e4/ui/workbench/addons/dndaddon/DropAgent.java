@@ -89,10 +89,4 @@ abstract class DropAgent {
 
 	public void dragLeave(MUIElement dragElement, DnDInfo info) {
 	}
-
-	/**
-	 * This agent is being disposed
-	 */
-	public void dispose() {
-	}
 }
