@@ -227,11 +227,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
      */
     private void createUpdateJob() {
         updateJob = new UIJob(ProgressMessages.ProgressContentProvider_UpdateProgressJob) {
-            /*
-             * (non-Javadoc)
-             *
-             * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
-             */
             public IStatus runInUIThread(IProgressMonitor monitor) {
 				synchronized (updateScheduled) {
 					// updates requested while we are running should cause it to
@@ -284,11 +279,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 				return Status.OK_STATUS;
 			}
 
-			/*
-			 * (non-Javadoc)
-			 *
-			 * @see org.eclipse.core.runtime.jobs.Job#canceling()
-			 */
 			protected void canceling() {
 				synchronized (updateScheduled) {
 					updateScheduled.value = false;
@@ -332,9 +322,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
-     */
     public void refreshJobInfo(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
@@ -349,9 +336,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
-     */
     public void refreshGroup(GroupInfo info) {
         synchronized (updateLock) {
             currentInfo.refresh(info);
@@ -361,9 +345,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
-     */
     public void addGroup(GroupInfo info) {
 
         synchronized (updateLock) {
@@ -373,11 +354,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
-     */
     public void refreshAll() {
 
         synchronized (updateLock) {
@@ -389,11 +365,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#add(org.eclipse.ui.internal.progress.JobInfo)
-     */
     public void addJob(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
@@ -413,11 +384,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeJob(org.eclipse.ui.internal.progress.JobInfo)
-     */
     public void removeJob(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
@@ -435,9 +401,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
         scheduleUpdate();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
-     */
     public void removeGroup(GroupInfo group) {
         synchronized (updateLock) {
             currentInfo.remove(group);
@@ -446,11 +409,6 @@ public class ProgressViewUpdater implements IJobProgressManagerListener {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
-     */
     public boolean showsDebug() {
     	return Preferences.getBoolean(IProgressConstants.SHOW_SYSTEM_JOBS);
     }

@@ -458,11 +458,6 @@ public class ProgressManagerUtil {
 //	static IShellProvider getShellProvider() {
 //		return new IShellProvider() {
 //
-//			/*
-//			 * (non-Javadoc)
-//			 *
-//			 * @see org.eclipse.jface.window.IShellProvider#getShell()
-//			 */
 //			@Override
 //            public Shell getShell() {
 //				return getDefaultParent();
