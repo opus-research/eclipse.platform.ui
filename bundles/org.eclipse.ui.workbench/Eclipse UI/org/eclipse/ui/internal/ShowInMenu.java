@@ -317,17 +317,14 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @return the source part or <code>null</code>
 	 */
-	private IWorkbenchPart getSourcePart() {
+	protected IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
 
 		if (window == null)
 			return null;
 
 		IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			return page.getActivePart();
-		}
-		return null;
+		return page != null ? page.getActivePart() : null;
 	}
 
 	/**
