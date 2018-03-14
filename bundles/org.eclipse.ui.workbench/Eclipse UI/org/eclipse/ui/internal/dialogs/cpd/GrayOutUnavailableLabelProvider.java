@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 420956 - Fix perspective customization on 4.x
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -20,7 +19,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.ActionSet;
 import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.DisplayItem;
 
 /**
@@ -31,14 +29,13 @@ import org.eclipse.ui.internal.dialogs.cpd.CustomizePerspectiveDialog.DisplayIte
  * @since 3.5
  *
  */
-class GrayOutUnavailableLabelProvider extends
-		TreeManager.TreeItemLabelProvider implements IColorProvider {
+class GrayOutUnavailableLabelProvider extends TreeManager.TreeItemLabelProvider implements IColorProvider {
 	private Display display;
 	private ViewerFilter filter;
 	private Set<Image> toDispose;
 
-	public GrayOutUnavailableLabelProvider(ViewerFilter filter) {
-		this.display = Display.getDefault();
+	public GrayOutUnavailableLabelProvider(Display display, ViewerFilter filter) {
+		this.display = display;
 		this.filter = filter;
 		toDispose = new HashSet<Image>();
 	}
@@ -50,15 +47,8 @@ class GrayOutUnavailableLabelProvider extends
 
 	@Override
 	public Color getForeground(Object element) {
-		if (element instanceof DisplayItem) {
-			if (!CustomizePerspectiveDialog.isEffectivelyAvailable((DisplayItem) element, filter)) {
-				return display.getSystemColor(SWT.COLOR_GRAY);
-			}
-		}
-		if (element instanceof ActionSet) {
-			if (!((ActionSet) element).isActive()) {
-				return display.getSystemColor(SWT.COLOR_GRAY);
-			}
+		if (!CustomizePerspectiveDialog.isEffectivelyAvailable((DisplayItem) element, filter)) {
+			return display.getSystemColor(SWT.COLOR_GRAY);
 		}
 		return null;
 	}
@@ -70,10 +60,8 @@ class GrayOutUnavailableLabelProvider extends
 		if (element instanceof DisplayItem && actual != null) {
 			DisplayItem item = (DisplayItem) element;
 			if (!CustomizePerspectiveDialog.isEffectivelyAvailable(item, filter)) {
-				ImageDescriptor original = ImageDescriptor
-						.createFromImage(actual);
-				ImageDescriptor disable = ImageDescriptor.createWithFlags(
-						original, SWT.IMAGE_DISABLE);
+				ImageDescriptor original = ImageDescriptor.createFromImage(actual);
+				ImageDescriptor disable = ImageDescriptor.createWithFlags(original, SWT.IMAGE_DISABLE);
 				Image newImage = disable.createImage();
 				toDispose.add(newImage);
 				return newImage;
@@ -88,7 +76,6 @@ class GrayOutUnavailableLabelProvider extends
 		for (Image image : toDispose) {
 			image.dispose();
 		}
-		toDispose.clear();
 		super.dispose();
 	}
 }

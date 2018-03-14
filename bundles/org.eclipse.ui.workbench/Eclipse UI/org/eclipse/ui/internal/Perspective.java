@@ -16,7 +16,6 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.ui.IPerspectiveDescriptor;
@@ -144,16 +143,6 @@ public class Perspective {
 	}
 
 	/**
-	 * Returns the ids of the parts to list in the Show In... dialog. This is a
-	 * List of Strings.
-	 *
-	 * @return non null list of strings
-	 */
-	public List<?> getShowInPartIds() {
-		return page.getShowInPartIds();
-	}
-
-	/**
 	 * Returns the show view shortcuts associated with this perspective.
 	 *
 	 * @return an array of view identifiers
@@ -204,16 +193,6 @@ public class Perspective {
 		if (removed) {
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_UNMASK);
 		}
-	}
-
-	/**
-	 * Returns the ActionSets read from perspectiveExtensions in the registry.
-	 */
-	protected List<?> getPerspectiveExtensionActionSets() {
-		if (descriptor == null) {
-			return Collections.emptyList();
-		}
-		return page.getPerspectiveExtensionActionSets(descriptor.getOriginalId());
 	}
 
 	public void turnOnActionSets(IActionSetDescriptor[] newArray) {
