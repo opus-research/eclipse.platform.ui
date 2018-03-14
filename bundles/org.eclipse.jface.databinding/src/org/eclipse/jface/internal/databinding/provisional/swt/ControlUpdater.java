@@ -105,12 +105,7 @@ public abstract class ControlUpdater {
 
 	}
 
-	private Runnable updateRunnable = new Runnable() {
-		@Override
-		public void run() {
-			updateControl();
-		}
-	};
+	private Runnable updateRunnable = () -> updateControl();
 
 	private PrivateInterface privateInterface = new PrivateInterface();
 	private Control theControl;

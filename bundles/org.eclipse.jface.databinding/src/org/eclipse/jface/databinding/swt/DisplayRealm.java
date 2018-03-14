@@ -61,12 +61,7 @@ public class DisplayRealm extends Realm {
 
 	@Override
 	public void asyncExec(final Runnable runnable) {
-		Runnable safeRunnable = new Runnable() {
-			@Override
-			public void run() {
-				safeRun(runnable);
-			}
-		};
+		Runnable safeRunnable = () -> safeRun(runnable);
 		if (!display.isDisposed()) {
 			display.asyncExec(safeRunnable);
 		}
@@ -75,12 +70,7 @@ public class DisplayRealm extends Realm {
 	@Override
 	public void timerExec(int milliseconds, final Runnable runnable) {
 		if (!display.isDisposed()) {
-			Runnable safeRunnable = new Runnable() {
-				@Override
-				public void run() {
-					safeRun(runnable);
-				}
-			};
+			Runnable safeRunnable = () -> safeRun(runnable);
 			display.timerExec(milliseconds, safeRunnable);
 		}
 	}

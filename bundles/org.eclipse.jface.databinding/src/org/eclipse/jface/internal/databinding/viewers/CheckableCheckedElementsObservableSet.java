@@ -21,7 +21,6 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.AbstractObservableSet;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckable;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -63,20 +62,17 @@ public class CheckableCheckedElementsObservableSet extends
 		this.elementType = elementType;
 		this.elementComparer = elementComparer;
 
-		listener = new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-				Object element = event.getElement();
-				if (event.getChecked()) {
-					if (wrappedSet.add(element))
-						fireSetChange(Diffs.createSetDiff(Collections
-								.singleton(element), Collections.EMPTY_SET));
-				} else {
-					if (wrappedSet.remove(element))
-						fireSetChange(Diffs.createSetDiff(
-								Collections.EMPTY_SET, Collections
-										.singleton(element)));
-				}
+		listener = event -> {
+			Object element = event.getElement();
+			if (event.getChecked()) {
+				if (wrappedSet.add(element))
+					fireSetChange(Diffs.createSetDiff(Collections
+							.singleton(element), Collections.EMPTY_SET));
+			} else {
+				if (wrappedSet.remove(element))
+					fireSetChange(Diffs.createSetDiff(
+							Collections.EMPTY_SET, Collections
+									.singleton(element)));
 			}
 		};
 		checkable.addCheckStateListener(listener);

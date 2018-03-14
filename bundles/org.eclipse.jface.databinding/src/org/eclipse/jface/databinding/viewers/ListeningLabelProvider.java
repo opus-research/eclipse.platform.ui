@@ -15,7 +15,6 @@ import java.util.Iterator;
 
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.ISetChangeListener;
-import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.jface.internal.databinding.provisional.viewers.ViewerLabelProvider;
 
 /**
@@ -24,15 +23,12 @@ import org.eclipse.jface.internal.databinding.provisional.viewers.ViewerLabelPro
  */
 public abstract class ListeningLabelProvider extends ViewerLabelProvider {
 
-	private ISetChangeListener listener = new ISetChangeListener() {
-		@Override
-		public void handleSetChange(SetChangeEvent event) {
-			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
-				addListenerTo(it.next());
-			}
-			for (Iterator it = event.diff.getRemovals().iterator(); it.hasNext();) {
-				removeListenerFrom(it.next());
-			}
+	private ISetChangeListener listener = event -> {
+		for (Iterator it1 = event.diff.getAdditions().iterator(); it1.hasNext();) {
+			addListenerTo(it1.next());
+		}
+		for (Iterator it2 = event.diff.getRemovals().iterator(); it2.hasNext();) {
+			removeListenerFrom(it2.next());
 		}
 	};
 

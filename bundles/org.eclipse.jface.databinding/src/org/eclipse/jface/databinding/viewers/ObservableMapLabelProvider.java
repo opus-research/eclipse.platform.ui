@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
@@ -44,14 +43,11 @@ public class ObservableMapLabelProvider extends LabelProvider implements ITableL
 	 */
 	protected IObservableMap[] attributeMaps;
 
-	private IMapChangeListener mapChangeListener = new IMapChangeListener() {
-		@Override
-		public void handleMapChange(MapChangeEvent event) {
-			Set affectedElements = event.diff.getChangedKeys();
-			LabelProviderChangedEvent newEvent = new LabelProviderChangedEvent(
-					ObservableMapLabelProvider.this, affectedElements.toArray());
-			fireLabelProviderChanged(newEvent);
-		}
+	private IMapChangeListener mapChangeListener = event -> {
+		Set affectedElements = event.diff.getChangedKeys();
+		LabelProviderChangedEvent newEvent = new LabelProviderChangedEvent(
+				ObservableMapLabelProvider.this, affectedElements.toArray());
+		fireLabelProviderChanged(newEvent);
 	};
 
 	/**

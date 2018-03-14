@@ -93,20 +93,12 @@ public class SWTUtil {
 				result = new WorkQueue(d);
 				final WorkQueue q = result;
 				mapDisplayOntoWorkQueue.put(d, result);
-				d.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						d.disposeExec(new Runnable() {
-							@Override
-							public void run() {
-								synchronized (mapDisplayOntoWorkQueue) {
-									q.cancelAll();
-									mapDisplayOntoWorkQueue.remove(d);
-								}
-							}
-						});
+				d.asyncExec(() -> d.disposeExec(() -> {
+					synchronized (mapDisplayOntoWorkQueue) {
+						q.cancelAll();
+						mapDisplayOntoWorkQueue.remove(d);
 					}
-				});
+				}));
 			}
 			return result;
 		}
