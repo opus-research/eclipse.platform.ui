@@ -18,7 +18,6 @@ import java.util.Set;
 import org.eclipse.core.commands.common.EventManager;
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.action.IAction;
@@ -748,17 +747,6 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 				showPageRec(rec);
 			} else {
 				showPageRec(defaultPageRec);
-			}
-		}
-
-		// If *we* are activating then activate the context
-		if (part == this) {
-			PageSite pageSite = getPageSite(getCurrentPage());
-			if (pageSite != null) {
-				IEclipseContext pageContext = pageSite.getSiteContext();
-				if (pageContext != null) {
-					pageContext.activate();
-				}
 			}
 		}
 	}
