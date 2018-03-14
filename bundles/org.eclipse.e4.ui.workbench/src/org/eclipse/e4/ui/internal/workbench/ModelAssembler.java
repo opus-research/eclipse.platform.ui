@@ -214,12 +214,12 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param afterFragments
 	 */
-	private void runProcessors(IExtension[] extensions, boolean initial, boolean afterFragments) {
+	private void runProcessors(IExtension[] extensions, boolean initial, Boolean afterFragments) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
-				if ("processor".equals(ce.getName()) && afterFragments == parseBoolean) { //$NON-NLS-1$
+				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$
 					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
 						runProcessor(ce);
 					}
