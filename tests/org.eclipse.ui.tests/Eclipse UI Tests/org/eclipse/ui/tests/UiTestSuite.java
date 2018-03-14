@@ -29,27 +29,17 @@ import org.eclipse.ui.tests.themes.ThemesTestSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.Test;
+
 /**
  * Test all areas of the UI.
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-	StartupTest.class,
-	UIAutomatedSuite.class,
-	ApiTestSuite.class,
-	NavigatorTestSuite.class,
-	DecoratorsTestSuite.class,
-	DataTransferTestSuite.class,
-	PreferencesTestSuite.class,
-	KeysTestSuite.class,
-	ActivitiesTestSuite.class,
-	ThemesTestSuite.class,
-	EncodingTestSuite.class,
-	OperationsTestSuite.class,
-	FieldAssistTestSuite.class,
-	ServicesTestSuite.class,
-	ProgressTestSuite.class
-})
+@Suite.SuiteClasses({ StartupTest.class, UIAutomatedSuite.class, ApiTestSuite.class, NavigatorTestSuite.class,
+		DecoratorsTestSuite.class, DataTransferTestSuite.class, PreferencesTestSuite.class, KeysTestSuite.class,
+		ActivitiesTestSuite.class, ThemesTestSuite.class, EncodingTestSuite.class, OperationsTestSuite.class,
+		FieldAssistTestSuite.class, ServicesTestSuite.class, ProgressTestSuite.class })
 public class UiTestSuite {
 
 	// Not enabled tests:
@@ -72,4 +62,8 @@ public class UiTestSuite {
 	// FilteredTreeTests.class,
 	// StatusHandlingTestSuite.class,
 	// OpenSystemInPlaceEditorTest..class,
+
+	public static Test suite() {
+		return new JUnit4TestAdapter(UiTestSuite.class);
+	}
 }
