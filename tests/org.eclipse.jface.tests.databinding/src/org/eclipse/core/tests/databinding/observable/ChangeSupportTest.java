@@ -66,14 +66,15 @@ public class ChangeSupportTest extends AbstractDefaultRealmTestCase {
 
 		changeSupport.removeStaleListener(staleListener);
 		assertFalse(changeSupport.hasListeners());
-		assertEquals(Arrays.asList(new Object[] { ADD_FIRST, REMOVE_LAST }), changeSupport.log);
+		assertEquals(Arrays.asList(new Object[] { ADD_FIRST, REMOVE_LAST }),
+				changeSupport.log);
 	}
 
 	private static final String ADD_FIRST = "firstListenerAdded";
 	private static final String REMOVE_LAST = "lastListenerRemoved";
 
 	private static class ChangeSupportStub extends ChangeSupport {
-		List<String> log = new ArrayList<String>();
+		List log = new ArrayList();
 
 		ChangeSupportStub(Realm realm) {
 			super(realm);
