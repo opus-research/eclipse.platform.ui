@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,66 +7,71 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Chris Gross <schtoo@schtoo.com> 
+ *     Chris Gross <schtoo@schtoo.com>
  *     - Fix for 99155 - allow standalone view placeholders
  *     Chris Gross chris.gross@us.ibm.com Bug 107443
+ *     Denis Zygann <d.zygann@web.de> - Bug 457390
  *******************************************************************************/
 package org.eclipse.ui;
 
 /**
- * A page layout defines the initial layout for a perspective within a page 
- * in a workbench window.
+ * A page layout defines the initial layout for a perspective within a page in a
+ * workbench window.
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
  * <p>
- * When a perspective is opened, it creates a new page layout with a single editor area. 
- * This layout is then passed to the perspective factory (implementation of
- * {@link org.eclipse.ui.IPerspectiveFactory#createInitialLayout(IPageLayout)}) where 
- * additional views and other content can be added, using the existing editor area as 
- * the initial point of reference.
+ * When a perspective is opened, it creates a new page layout with a single
+ * editor area. This layout is then passed to the perspective factory
+ * (implementation of
+ * {@link org.eclipse.ui.IPerspectiveFactory#createInitialLayout(IPageLayout)})
+ * where additional views and other content can be added, using the existing
+ * editor area as the initial point of reference.
  * </p>
  * <p>
  * In some cases, multiple instances of a particular view may need to be added
- * to the same layout.  These are disambiguated using a secondary id.  
- * In layout methods taking a view id, the id can have the compound form: 
- * <strong>primaryId [':' secondaryId]</strong>.
- * If a secondary id is given, the view must allow multiple instances by
- * having specified <code>allowMultiple="true"</code> in its extension.
- * View placeholders may also have a secondary id.
+ * to the same layout. These are disambiguated using a secondary id. In layout
+ * methods taking a view id, the id can have the compound form:
+ * <strong>primaryId [':' secondaryId]</strong>. If a secondary id is given, the
+ * view must allow multiple instances by having specified
+ * <code>allowMultiple="true"</code> in its extension. View placeholders may
+ * also have a secondary id.
  * </p>
  * <p>
- * Wildcards are permitted in placeholder ids (but not regular view ids).  
- * '*' matches any substring, '?' matches any single character. 
- * Wildcards can be specified for the primary id, the secondary id, or both.  
- * For example, the placeholder "someView:*" will match any occurrence of the view 
- * that has primary id "someView" and that also has some non-null secondary id.
- * Note that this placeholder will not match the view if it has no secondary id,
- * since the compound id in this case is simply "someView".
+ * Wildcards are permitted in placeholder ids (but not regular view ids). '*'
+ * matches any substring, '?' matches any single character. Wildcards can be
+ * specified for the primary id, the secondary id, or both. For example, the
+ * placeholder "someView:*" will match any occurrence of the view that has
+ * primary id "someView" and that also has some non-null secondary id. Note that
+ * this placeholder will not match the view if it has no secondary id, since the
+ * compound id in this case is simply "someView".
  * </p>
  * <p>
  * Example of populating a layout with standard workbench views:
+ * 
  * <pre>
  * IPageLayout layout = ...
  * // Get the editor area.
  * String editorArea = layout.getEditorArea();
- *
+ * 
  * // Top left: Project Explorer view and Bookmarks view placeholder
  * IFolderLayout topLeft = layout.createFolder("topLeft", IPageLayout.LEFT, 0.25f,
  *    editorArea);
  * topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
  * topLeft.addPlaceholder(IPageLayout.ID_BOOKMARKS);
- *
+ * 
  * // Bottom left: Outline view and Property Sheet view
  * IFolderLayout bottomLeft = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.50f,
  * 	   "topLeft");
  * bottomLeft.addView(IPageLayout.ID_OUTLINE);
  * bottomLeft.addView(IPageLayout.ID_PROP_SHEET);
- *
+ * 
  * // Bottom right: Task List view
  * layout.addView(IPageLayout.ID_TASK_LIST, IPageLayout.BOTTOM, 0.66f, editorArea);
  * </pre>
+ * 
  * </p>
+ * 
  * @noimplement This interface is not intended to be implemented by clients.
  */
 public interface IPageLayout {
@@ -168,9 +173,11 @@ public interface IPageLayout {
     public static final float RATIO_MAX = 0.95f;
 
     /**
-     * The default fast view ratio width.
-     * @since 2.0
-     */
+	 * The default fast view ratio width.
+	 * @since 2.0
+	 * @deprecated discontinued support for fast views
+	 */
+	@Deprecated
     public static final float DEFAULT_FASTVIEW_RATIO = 0.3f;
 
     /**
@@ -192,47 +199,58 @@ public interface IPageLayout {
     public static final float NULL_RATIO = -2f;
 
     /**
-     * Adds an action set with the given id to this page layout.
-     * The id must name an action set contributed to the workbench's extension 
-     * point (named <code>"org.eclipse.ui.actionSet"</code>).
-     *
-     * @param actionSetId the action set id
-     */
+	 * Adds an action set with the given id to this page layout. The id must
+	 * name an action set contributed to the workbench's extension point (named
+	 * <code>"org.eclipse.ui.actionSet"</code>).
+	 *
+	 * @param actionSetId
+	 *            the action set id
+	 */
     public void addActionSet(String actionSetId);
 
     /**
-     * Adds the view with the given compound id to the page layout as a fast view.  
-     * See the {@link IPageLayout} type documentation for more details about compound ids.
-     * The primary id must name a view contributed to the workbench's view extension
-     * point (named <code>"org.eclipse.ui.views"</code>).
-     * 
-     * @param viewId the compound id of the view to be added
-     * @since 2.0
-     */
+	 * Adds the view with the given compound id to the page layout as a fast
+	 * view. See the {@link IPageLayout} type documentation for more details
+	 * about compound ids. The primary id must name a view contributed to the
+	 * workbench's view extension point (named
+	 * <code>"org.eclipse.ui.views"</code>).
+	 *
+	 * @param viewId
+	 *            the compound id of the view to be added
+	 * @since 2.0
+	 * @deprecated discontinued support for fast views
+	 */
+	@Deprecated
     public void addFastView(String viewId);
 
     /**
-     * Adds the view with the given compound id to the page layout as a fast view
-     * with the given width ratio. 
-     * See the {@link IPageLayout} type documentation for more details about compound ids.
-     * The primary id must name a view contributed to the workbench's view extension 
-     * point (named <code>"org.eclipse.ui.views"</code>).
-     * 
-     * @param viewId the compound id of the view to be added
-     * @param ratio the percentage of the workbench the fast view will cover
-     * @since 2.0
-     */
+	 * Adds the view with the given compound id to the page layout as a fast
+	 * view with the given width ratio. See the {@link IPageLayout} type
+	 * documentation for more details about compound ids. The primary id must
+	 * name a view contributed to the workbench's view extension point (named
+	 * <code>"org.eclipse.ui.views"</code>).
+	 *
+	 * @param viewId
+	 *            the compound id of the view to be added
+	 * @param ratio
+	 *            the percentage of the workbench the fast view will cover
+	 * @since 2.0
+	 * @deprecated discontinued support for fast views
+	 */
+	@Deprecated
     public void addFastView(String viewId, float ratio);
 
     /**
-     * Adds a new wizard shortcut to the page layout.
-     * These are typically shown in the UI to allow rapid navigation to appropriate new wizards.  
-     * For example, in the Eclipse IDE, these appear as items under the File > New menu.
-     * The id must name a new wizard extension contributed to the 
-     * workbench's new wizards extension point (named <code>"org.eclipse.ui.newWizards"</code>).
-     *
-     * @param id the wizard id
-     */
+	 * Adds a new wizard shortcut to the page layout. These are typically shown
+	 * in the UI to allow rapid navigation to appropriate new wizards. For
+	 * example, in the Eclipse IDE, these appear as items under the File > New
+	 * menu. The id must name a new wizard extension contributed to the
+	 * workbench's new wizards extension point (named
+	 * <code>"org.eclipse.ui.newWizards"</code>).
+	 *
+	 * @param id
+	 *            the wizard id
+	 */
     public void addNewWizardShortcut(String id);
 
     /**
