@@ -173,7 +173,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 					// preferred
 					// comparison class has been provided.
 					if (affectedObjectsClass != null) {
-						Object adapter = Adapters.adapt(modifiedElement, affectedObjectsClass);
+						Object adapter = Adapters.getAdapter(modifiedElement, affectedObjectsClass, true);
 						if (adapter != null && elementsContains(adapter)) {
 							local = true;
 						}
@@ -236,7 +236,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Adapters.adapt(uiInfo, IUndoContext.class);
+			IUndoContext originatingContext = Adapters.getAdapter(uiInfo, IUndoContext.class, true);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;
@@ -264,7 +264,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {
-					Object adapter = Adapters.adapt(element, affectedObjectsClass);
+					Object adapter = Adapters.getAdapter(element, affectedObjectsClass, true);
 					if (adapter != null) {
 						elementsAndAdapters.add(adapter);
 					}

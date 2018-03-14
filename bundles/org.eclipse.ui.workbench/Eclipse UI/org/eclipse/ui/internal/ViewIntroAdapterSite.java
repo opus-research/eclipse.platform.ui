@@ -44,7 +44,7 @@ final class ViewIntroAdapterSite implements IIntroSite {
 
     @Override
 	public <T> T getAdapter(Class<T> adapter) {
-		return Adapters.adapt(viewSite, adapter);
+		return Adapters.getAdapter(viewSite, adapter, true);
     }
 
     @Override

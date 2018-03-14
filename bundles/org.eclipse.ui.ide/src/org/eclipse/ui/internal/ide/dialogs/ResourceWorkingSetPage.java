@@ -108,7 +108,7 @@ public class ResourceWorkingSetPage extends WizardPage implements
         IPath containerPath = container.getFullPath();
 
         for (int i = 0; i < elements.length; i++) {
-			IResource resource = Adapters.adapt(elements[i], IResource.class);
+			IResource resource = Adapters.getAdapter(elements[i], IResource.class, true);
 
             if (resource != null) {
                 IPath resourcePath = resource.getFullPath();
@@ -389,12 +389,12 @@ public class ResourceWorkingSetPage extends WizardPage implements
 		    		continue;
 		    	}
 		    	item = (IAdaptable)items[i];
-				IContainer container = Adapters.adapt(item, IContainer.class);
+				IContainer container = Adapters.getAdapter(item, IContainer.class, true);
 
 		        if (container != null) {
 		            setSubtreeChecked(container, true, true);
 		        }
-				IResource resource = Adapters.adapt(item, IResource.class);
+				IResource resource = Adapters.getAdapter(item, IResource.class, true);
 		        if (resource != null && resource.isAccessible() == false) {
 		            IProject project = resource.getProject();
 		            if (tree.getChecked(project) == false) {
