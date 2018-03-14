@@ -24,7 +24,6 @@ public class DocumentHandlerFactoryImpl extends DocumentHandlerFactory {
 	 *
 	 * @see org.eclipse.e4.ui.css.core.sac.IDocumentHandlerFactory#makeDocumentHandler()
 	 */
-	@Override
 	public ExtendedDocumentHandler makeDocumentHandler() {
 		return new CSSDocumentHandlerImpl();
 	}

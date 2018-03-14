@@ -30,23 +30,19 @@ public class MediaListImpl implements MediaList {
 
 	}
 
-	@Override
 	public void appendMedium(String newMedium) throws DOMException {
 		if (mediaList.contains(newMedium)) mediaList.remove(newMedium);
 		mediaList.add(newMedium);
 	}
 
-	@Override
 	public void deleteMedium(String oldMedium) throws DOMException {
 		mediaList.remove(oldMedium);
 	}
 
-	@Override
 	public int getLength() {
 		return (mediaList != null) ? mediaList.size() : 0;
 	}
 
-	@Override
 	public String getMediaText() {
 		StringBuilder media = new StringBuilder();
 		int size = mediaList.size();
@@ -60,13 +56,11 @@ public class MediaListImpl implements MediaList {
 		return media.toString();
 	}
 
-	@Override
 	public String item(int index) {
 		if (index > mediaList.size()) return null;
 		return (String) mediaList.get(index);
 	}
 
-	@Override
 	public void setMediaText(String mediaText) throws DOMException {
 		while (mediaText.length() > 0) {
 			int next = mediaText.indexOf(',');
