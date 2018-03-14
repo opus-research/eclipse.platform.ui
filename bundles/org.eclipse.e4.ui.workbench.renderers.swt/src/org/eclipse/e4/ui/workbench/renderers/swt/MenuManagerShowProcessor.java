@@ -7,14 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, 398865, 398866, 
- *         403081, 403083, 442570
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, 
+ *         Bug403081, Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
@@ -70,13 +71,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
-	 * .action.IMenuManager)
-	 */
 	@Override
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -104,15 +98,6 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
-	 * .action.IMenuManager)
-	 * 
-	 * SWT.Show post processing method for MenuManager
-	 */
 	@Override
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
@@ -178,6 +163,19 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					continue;
 				}
 
+				// remove existing entries for this dynamic contribution item if
+				// there are any
+				Map<String, Object> storageMap = currentMenuElement
+						.getTransientData();
+				@SuppressWarnings("unchecked")
+				ArrayList<MMenuElement> dump = (ArrayList<MMenuElement>) storageMap
+						.get(DYNAMIC_ELEMENT_STORAGE_KEY);
+				if (dump != null && dump.size() > 0)
+					renderer.removeDynamicMenuContributions(menuManager,
+							menuModel, dump);
+
+				storageMap.remove(DYNAMIC_ELEMENT_STORAGE_KEY);
+
 				if (mel.size() > 0) {
 
 					int position = 0;
@@ -191,7 +189,8 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 					}
 
 					// ensure that each element of the list has a valid element
-					// id and set the parent of the entries
+					// id
+					// and set the parent of the entries
 					for (int j = 0; j < mel.size(); j++) {
 						MMenuElement menuElement = mel.get(j);
 						if (menuElement.getElementId() == null
@@ -202,9 +201,7 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 						menuModel.getChildren().add(position++, menuElement);
 						renderer.modelProcessSwitch(menuManager, menuElement);
 					}
-					currentMenuElement.getTransientData().put(
-							DYNAMIC_ELEMENT_STORAGE_KEY, mel);
-
+					storageMap.put(DYNAMIC_ELEMENT_STORAGE_KEY, mel);
 				}
 			}
 		}
