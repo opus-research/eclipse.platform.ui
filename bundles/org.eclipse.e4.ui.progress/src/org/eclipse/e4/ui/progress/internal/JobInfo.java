@@ -94,6 +94,11 @@ public class JobInfo extends JobTreeElement {
         taskInfo = new TaskInfo(this, taskName, work);
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#cancel()
+     */
     public void cancel() {
         this.canceled = true;
         this.job.cancel();
@@ -108,6 +113,11 @@ public class JobInfo extends JobTreeElement {
         children.clear();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
+     */
     void clearTaskInfo() {
 		finishedJobs.remove(taskInfo);
         taskInfo = null;
@@ -160,6 +170,11 @@ public class JobInfo extends JobTreeElement {
         return 1;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(Object arg0) {
 
         if (!(arg0 instanceof JobInfo)) {
@@ -206,10 +221,20 @@ public class JobInfo extends JobTreeElement {
         return blockedStatus;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
+     */
     Object[] getChildren() {
         return children.toArray();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getCondensedDisplayString()
+     */
     String getCondensedDisplayString() {
     	TaskInfo info = getTaskInfo();
         if (info != null) {
@@ -218,6 +243,11 @@ public class JobInfo extends JobTreeElement {
         return getJob().getName();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayImage()
+     */
     public Image getDisplayImage() {
         int done = getPercentDone();
         if (done > 0) {
@@ -237,10 +267,16 @@ public class JobInfo extends JobTreeElement {
         return super.getDisplayImage();
 
     }
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
+     */
     String getDisplayString() {
     	return getDisplayString(true);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString(boolean)
+     */
     String getDisplayString(boolean showProgress) {
         String name = getDisplayStringWithStatus(showProgress);
         if (job.isSystem()) {
@@ -301,6 +337,11 @@ public class JobInfo extends JobTreeElement {
         return job;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#getParent()
+     */
 	public GroupInfo getParent() {
         return parent;
     }
@@ -332,6 +373,11 @@ public class JobInfo extends JobTreeElement {
         return taskInfo;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
+     */
     boolean hasChildren() {
         return children.size() > 0;
     }
@@ -345,6 +391,11 @@ public class JobInfo extends JobTreeElement {
         return taskInfo != null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
+     */
     boolean isActive() {
         return getJob().getState() != Job.NONE;
     }
@@ -368,10 +419,20 @@ public class JobInfo extends JobTreeElement {
         return canceled;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#isCancellable()
+     */
     public boolean isCancellable() {
         return super.isCancellable();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
+     */
     boolean isJobInfo() {
         return true;
     }

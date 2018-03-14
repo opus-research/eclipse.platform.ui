@@ -41,10 +41,16 @@ public abstract class AnimationItem {
 
     //Create a containter that does nothing by default
     IAnimationContainer animationContainer = new IAnimationContainer() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationDone()
+         */
         public void animationDone() {
             //Do nothing by default
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationStart()
+         */
         public void animationStart() {
             //Do nothing by default
         }
@@ -70,14 +76,29 @@ public abstract class AnimationItem {
         Control animationItem = createAnimationItem(parent);
 
         animationItem.addMouseListener(new MouseListener() {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+             */
             public void mouseDoubleClick(MouseEvent arg0) {
                 ProgressManagerUtil.openProgressView();
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+             */
             public void mouseDown(MouseEvent arg0) {
                 //Do nothing
             }
 
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+             */
             public void mouseUp(MouseEvent arg0) {
                 //Do nothing
             }
