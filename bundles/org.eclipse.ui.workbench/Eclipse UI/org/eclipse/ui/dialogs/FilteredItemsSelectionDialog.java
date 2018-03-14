@@ -13,6 +13,7 @@
  *     - Fix for bug 208602 - [Dialogs] Open Type dialog needs accessible labels
  *  Simon Muschel <smuschel@gmx.de> - bug 258493
  *  Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *  Simon Scholz <simon.scholz@vogella.com> - Bug 440275
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -129,7 +130,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
 /**
  * Shows a list of items to the user with a text entry field for a string
  * pattern used to filter the list of items.
- * 
+ *
  * @since 3.3
  */
 public abstract class FilteredItemsSelectionDialog extends
@@ -1922,7 +1923,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 			return NLS
 					.bind(
-							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
+WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
 									new Integer(
@@ -2460,14 +2461,33 @@ public abstract class FilteredItemsSelectionDialog extends
 	}
 
 	/**
+	 * This {@link ItemsFilter} automatically inserts a wildcard (*) in front of
+	 * the text, which is checked for a match.
+	 *
+	 * @since 3.107
+	 */
+	protected abstract class WildcardItemsFilter extends ItemsFilter {
+
+		@Override
+		protected boolean matches(String text) {
+			String pattern = patternMatcher.getPattern();
+			if (pattern.indexOf("*") != 0 & pattern.indexOf("?") != 0 & pattern.indexOf(".") != 0) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				pattern = "*" + pattern; //$NON-NLS-1$
+				patternMatcher.setPattern(pattern);
+			}
+			return patternMatcher.matches(text);
+		}
+	}
+
+	/**
 	 * An interface to content providers for
-	 * <code>FilterItemsSelectionDialog</code>.
+	 * <code>FilterItemsSelectionDialog</code>
 	 */
 	protected abstract class AbstractContentProvider {
 		/**
 		 * Adds the item to the content provider iff the filter matches the
 		 * item. Otherwise does nothing.
-		 * 
+		 *
 		 * @param item
 		 *            the item to add
 		 * @param itemsFilter
