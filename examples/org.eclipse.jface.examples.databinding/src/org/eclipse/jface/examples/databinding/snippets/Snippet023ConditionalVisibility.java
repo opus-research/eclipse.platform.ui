@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -14,6 +15,7 @@ package org.eclipse.jface.examples.databinding.snippets;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.internal.databinding.provisional.swt.ControlUpdater;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -38,6 +40,7 @@ public class Snippet023ConditionalVisibility {
 		shell.setLayout(new GridLayout(1, false));
 
 		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				new Snippet023ConditionalVisibility().createControls(shell);
 			}
@@ -94,13 +97,12 @@ public class Snippet023ConditionalVisibility {
 
 		GridLayoutFactory.swtDefaults().numColumns(2).generateLayout(composite);
 
-		final ISWTObservableValue rangeSelected = SWTObservables
-				.observeSelection(rangeButton);
-		final ISWTObservableValue textSelected = SWTObservables
-				.observeSelection(textButton);
+		final ISWTObservableValue rangeSelected = WidgetProperties.selection().observe(rangeButton);
+		final ISWTObservableValue textSelected = WidgetProperties.selection().observe(textButton);
 
 		// Note that ControlUpdater is not API.
 		new ControlUpdater(oneOfTwo) {
+			@Override
 			protected void updateControl() {
 				if (((Boolean) rangeSelected.getValue()).booleanValue()) {
 					stackLayout.topControl = rangeGroup;

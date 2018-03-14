@@ -77,9 +77,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.bindings.keys.SWTKeySupport;
 import org.eclipse.jface.bindings.keys.formatting.KeyFormatterFactory;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.PlatformAdmin;
-import org.eclipse.osgi.service.resolver.State;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
@@ -90,6 +87,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.testing.TestableObject;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.Element;
@@ -1250,7 +1249,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
-		IThemeEngine themeEngineForEvent = null;
 		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
@@ -1282,7 +1280,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (cssTheme != null) {
 			final IThemeEngine themeEngine = createThemeEngine(display,
 					appContext);
-			themeEngineForEvent = themeEngine;
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
@@ -1292,9 +1289,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				themeEngine.registerResourceLocator(new OSGiResourceLocator(
 						cssResourcesURI));
 			}
-
-			themeEngine.restore(cssTheme);
-
+			
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
@@ -1326,6 +1321,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 					themeEngine.applyStyles(widget, true);
 				}
 			});
+
+			setCSSTheme(display, themeEngine, cssTheme);
+
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
@@ -1416,21 +1414,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(
 				CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
-
-		IEventBroker broker = appContext.get(IEventBroker.class);
-		if (broker != null) {
-			Map<String, Object> data = null;
-			if (themeEngineForEvent != null) {
-				data = new HashMap<String, Object>();
-				data.put(IThemeEngine.Events.THEME_ENGINE, themeEngineForEvent);
-				data.put(IThemeEngine.Events.THEME,
-						themeEngineForEvent.getActiveTheme());
-				data.put(IThemeEngine.Events.DEVICE, display);
-				data.put(IThemeEngine.Events.RESTORE, false);
-			}
-			broker.send(IThemeEngine.Events.THEME_CHANGED, data);
-			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
-		}
 	}
 
 	private static IThemeEngine createThemeEngine(Display display, IEclipseContext appContext) {
@@ -1446,6 +1429,15 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		appContext.set(IThemeEngine.class.getName(), themeEngine);
 		return themeEngine;
+	}
+
+	private static void setCSSTheme(Display display, IThemeEngine themeEngine,
+			String cssTheme) {
+		if (display.getHighContrast()) {
+			themeEngine.setTheme(cssTheme, false);
+		} else {
+			themeEngine.restore(cssTheme);
+		}
 	}
 
 	public static class StylingPreferencesHandler implements EventHandler {
@@ -1501,15 +1493,12 @@ public class PartRenderingEngine implements IPresentationEngine {
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
 				prefs = new HashSet<IEclipsePreferences>();
-				PlatformAdmin admin = WorkbenchSWTActivator.getDefault()
-						.getPlatformAdmin();
-
-				State state = admin.getState(false);
-				BundleDescription[] bundles = state.getBundles();
-
-				for (BundleDescription desc : bundles) {
-					if (desc.getName() != null) {
-						prefs.add(InstanceScope.INSTANCE.getNode(desc.getName()));
+				BundleContext context = WorkbenchSWTActivator.getDefault()
+						.getContext();
+				for (Bundle bundle : context.getBundles()) {
+					if (bundle.getSymbolicName() != null) {
+						prefs.add(InstanceScope.INSTANCE.getNode(bundle
+								.getSymbolicName()));
 					}
 				}
 			}

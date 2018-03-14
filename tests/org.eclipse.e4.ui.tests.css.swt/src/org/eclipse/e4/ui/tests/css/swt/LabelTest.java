@@ -3,15 +3,12 @@
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *      Remy Chi Jian Suen <remy.suen@gmail.com> - bug 137650
- *      Stefan Winkler <stefan@winklerweb.net> - Bug 430208
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
-
-import java.lang.reflect.Method;
 
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
@@ -28,13 +25,13 @@ public class LabelTest extends CSSSWTTestCase {
 	static final RGB RED = new RGB(255, 0, 0);
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
-
+	
 	CSSEngine engine;
-
+		
 	protected Label createTestLabel(String styleSheet) {
 		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
-
+		
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		FillLayout layout = new FillLayout();
@@ -52,32 +49,12 @@ public class LabelTest extends CSSSWTTestCase {
 		shell.pack();
 		return labelToTest;
 	}
-
-
+	
+	
 	public void testColor() throws Exception {
 		Label labelToTest = createTestLabel("Label { background-color: #FF0000; color: #0000FF }");
 		assertEquals(RED, labelToTest.getBackground().getRGB());
 		assertEquals(BLUE, labelToTest.getForeground().getRGB());
-	}
-
-	public void testTransparent() throws Exception {
-		Label labelToTest = createTestLabel("Label { background-color: transparent; }");
-
-		Method drawsBackgroundMethod = labelToTest.getClass()
-				.getDeclaredMethod("drawsBackground");
-		drawsBackgroundMethod.setAccessible(true);
-		Boolean result = (Boolean) drawsBackgroundMethod.invoke(labelToTest);
-		assertFalse(result);
-	}
-
-	public void testTransparentProperty() throws Exception {
-		Label labelToTest = createTestLabel("Label { color: red; }");
-		labelToTest.setBackground(null);
-		labelToTest.setBackgroundImage(null);
-
-		String value = engine.retrieveCSSProperty(
-				engine.getElement(labelToTest), "background-color", null);
-		assertEquals("transparent", value);
 	}
 
 	public void testFontRegular() throws Exception {
@@ -86,7 +63,7 @@ public class LabelTest extends CSSSWTTestCase {
 		FontData fontData = labelToTest.getFont().getFontData()[0];
 		assertEquals("Verdana", fontData.getName());
 		assertEquals(16, fontData.getHeight());
-		assertEquals(SWT.NORMAL, fontData.getStyle());
+		assertEquals(SWT.NORMAL, fontData.getStyle());		
 	}
 
 	public void testFontBold() throws Exception {
@@ -95,32 +72,32 @@ public class LabelTest extends CSSSWTTestCase {
 		FontData fontData = labelToTest.getFont().getFontData()[0];
 		assertEquals("Arial", fontData.getName());
 		assertEquals(12, fontData.getHeight());
-		assertEquals(SWT.BOLD, fontData.getStyle());
+		assertEquals(SWT.BOLD, fontData.getStyle());		
 	}
 
 	public void testFontItalic() throws Exception {
 		Label labelToTest = createTestLabel("Label { font-style: italic }");
 		assertEquals(1, labelToTest.getFont().getFontData().length);
 		FontData fontData = labelToTest.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
+		assertEquals(SWT.ITALIC, fontData.getStyle());		
 	}
-
+	
 	public void testAlignment() throws Exception {
 		Label labelToTest = createTestLabel("Label { alignment: right }");
 		assertEquals(SWT.RIGHT, labelToTest.getAlignment());
-
+		
 		labelToTest = createTestLabel("Label { alignment: center; }");
 		assertEquals(SWT.CENTER, labelToTest.getAlignment());
 
 		labelToTest = createTestLabel("Label { alignment: left; }");
 		assertEquals(SWT.LEFT, labelToTest.getAlignment());
-
+		
 	}
-
+	
 	public void testAlignment2() throws Exception {
 		Label labelToTest = createTestLabel("Label { alignment: trail }");
 		assertEquals(SWT.TRAIL, labelToTest.getAlignment());
-
+		
 		labelToTest = createTestLabel("Label { alignment: lead; }");
 		assertEquals(SWT.LEAD, labelToTest.getAlignment());
 	}

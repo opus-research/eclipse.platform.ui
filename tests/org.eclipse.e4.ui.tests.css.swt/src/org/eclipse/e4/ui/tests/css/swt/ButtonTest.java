@@ -3,15 +3,12 @@
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *      Remy Chi Jian Suen <remy.suen@gmail.com> - bug 137650
- *      Stefan Winkler <stefan@winklerweb.net> - Bug 430208
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
-
-import java.lang.reflect.Method;
 
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
@@ -28,12 +25,12 @@ public class ButtonTest extends CSSSWTTestCase {
 	static final RGB RED = new RGB(255, 0, 0);
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
-	CSSEngine engine;
-
+	CSSEngine engine;	
+	
 	protected Button createTestButton(String styleSheet) {
 		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
-
+		
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		FillLayout layout = new FillLayout();
@@ -51,11 +48,11 @@ public class ButtonTest extends CSSSWTTestCase {
 		shell.pack();
 		return buttonToTest;
 	}
-
+	
 	protected Button createTestArrowButton(String styleSheet) {
 		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
-
+		
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
 		FillLayout layout = new FillLayout();
@@ -72,31 +69,11 @@ public class ButtonTest extends CSSSWTTestCase {
 		shell.pack();
 		return buttonToTest;
 	}
-
+	
 	public void testColor() throws Exception {
 		Button buttonToTest = createTestButton("Button { background-color: #FF0000; color: #0000FF }");
 		assertEquals(RED, buttonToTest.getBackground().getRGB());
 		assertEquals(BLUE, buttonToTest.getForeground().getRGB());
-	}
-
-	public void testTransparent() throws Exception {
-		Button buttonToTest = createTestButton("Button { background-color: transparent; }");
-
-		Method drawsBackgroundMethod = buttonToTest.getClass()
-				.getDeclaredMethod("drawsBackground");
-		drawsBackgroundMethod.setAccessible(true);
-		Boolean result = (Boolean) drawsBackgroundMethod.invoke(buttonToTest);
-		assertFalse(result);
-	}
-
-	public void testTransparentProperty() throws Exception {
-		Button buttonToTest = createTestButton("Button { background-color: transparent; }");
-		buttonToTest.setBackground(null);
-		buttonToTest.setBackgroundImage(null);
-
-		String value = engine.retrieveCSSProperty(
-				engine.getElement(buttonToTest), "background-color", null);
-		assertEquals("transparent", value);
 	}
 
 	public void testFontRegular() throws Exception {
@@ -105,7 +82,7 @@ public class ButtonTest extends CSSSWTTestCase {
 		FontData fontData = buttonToTest.getFont().getFontData()[0];
 		assertEquals("Verdana", fontData.getName());
 		assertEquals(16, fontData.getHeight());
-		assertEquals(SWT.NORMAL, fontData.getStyle());
+		assertEquals(SWT.NORMAL, fontData.getStyle());		
 	}
 
 	public void testFontBold() throws Exception {
@@ -114,54 +91,54 @@ public class ButtonTest extends CSSSWTTestCase {
 		FontData fontData = buttonToTest.getFont().getFontData()[0];
 		assertEquals("Arial", fontData.getName());
 		assertEquals(12, fontData.getHeight());
-		assertEquals(SWT.BOLD, fontData.getStyle());
+		assertEquals(SWT.BOLD, fontData.getStyle());		
 	}
 
 	public void testFontItalic() throws Exception {
 		Button buttonToTest = createTestButton("Button { font-style: italic }");
 		assertEquals(1, buttonToTest.getFont().getFontData().length);
 		FontData fontData = buttonToTest.getFont().getFontData()[0];
-		assertEquals(SWT.ITALIC, fontData.getStyle());
+		assertEquals(SWT.ITALIC, fontData.getStyle());		
 	}
-
+	
 //	public void testSelectedPseudo() throws Exception {
-//		Button buttonToTest = createTestButton("Button { color: #FF0000; }\n" +
+//		Button buttonToTest = createTestButton("Button { color: #FF0000; }\n" + 
 //				"Button:selected { color: #0000FF; }");
 //		assertEquals(RED, buttonToTest.getForeground().getRGB());
 //		buttonToTest.setSelection(true);
 //		engine.applyStyles(buttonToTest.getShell(), true);
 //		assertEquals(BLUE, buttonToTest.getForeground().getRGB());
 //	}
-
+	
 	public void testAlignment() throws Exception {
-		Button buttonToTest = createTestButton("Button { alignment: right; }");
+		Button buttonToTest = createTestButton("Button { alignment: right; }");		
 		assertEquals(SWT.RIGHT, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestButton("Button { alignment: left; }");
 		assertEquals(SWT.LEFT, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestButton("Button { alignment: center; }");
 		assertEquals(SWT.CENTER, buttonToTest.getAlignment());
 	}
-
+	
 	public void testAlignment2() throws Exception {
 		Button buttonToTest = createTestButton("Button { alignment: trail; }");
 		assertEquals(SWT.TRAIL, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestButton("Button { alignment: lead; }");
 		assertEquals(SWT.LEAD, buttonToTest.getAlignment());
 	}
 
 	public void testArrowAlignment() throws Exception {
-		Button buttonToTest = createTestArrowButton("Button { alignment: up; }");
+		Button buttonToTest = createTestArrowButton("Button { alignment: up; }");		
 		assertEquals(SWT.UP, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestArrowButton("Button { alignment: down; }");
 		assertEquals(SWT.DOWN, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestArrowButton("Button { alignment: left; }");
 		assertEquals(SWT.LEFT, buttonToTest.getAlignment());
-
+		
 		buttonToTest = createTestArrowButton("Button { alignment: right; }");
 		assertEquals(SWT.RIGHT, buttonToTest.getAlignment());
 	}

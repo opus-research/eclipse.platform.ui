@@ -7,11 +7,10 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,8 +20,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -55,12 +52,10 @@ import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
-import org.eclipse.e4.ui.workbench.modeling.ISaveHandler.Save;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.ACC;
 import org.eclipse.swt.accessibility.Accessible;
@@ -82,7 +77,10 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.RowData;
@@ -98,8 +96,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 import org.w3c.dom.css.CSSValue;
@@ -149,6 +145,9 @@ public class StackRenderer extends LazyStackRenderer {
 	@Inject
 	IPresentationEngine renderer;
 
+	@Inject
+	EModelService modelService;
+
 	private EventHandler itemUpdater;
 
 	private EventHandler dirtyUpdater;
@@ -197,20 +196,13 @@ public class StackRenderer extends LazyStackRenderer {
 		return itemsToSet;
 	}
 
-	/**
-	 * This is the new way to handle UIEvents (as opposed to subscring and
-	 * unsubscribing them with the event broker.
-	 * 
-	 * The method is described in detail at
-	 * http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
-	 */
+
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void handleTransientDataEvents(
+	private void subscribeTopicTransientDataChanged(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
-		MUIElement changedElement = (MUIElement) event
-				.getProperty(UIEvents.EventTags.ELEMENT);
+		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		if (!(changedElement instanceof MPart))
 			return;
@@ -290,10 +282,6 @@ public class StackRenderer extends LazyStackRenderer {
 		}
 
 		return super.requiresFocus(element);
-	}
-
-	public StackRenderer() {
-		super();
 	}
 
 	@PostConstruct
@@ -507,12 +495,10 @@ public class StackRenderer extends LazyStackRenderer {
 				MPartStack pStack = (MPartStack) (partParent instanceof MPartStack ? partParent
 						: null);
 
-				EModelService ms = newActivePart.getContext().get(
-						EModelService.class);
 				List<String> tags = new ArrayList<String>();
 				tags.add(CSSConstants.CSS_ACTIVE_CLASS);
-				List<MUIElement> activeElements = ms.findElements(
-						ms.getTopLevelWindowFor(newActivePart), null,
+				List<MUIElement> activeElements = modelService.findElements(
+						modelService.getTopLevelWindowFor(newActivePart), null,
 						MUIElement.class, tags);
 				for (MUIElement element : activeElements) {
 					if (element instanceof MPartStack && element != pStack) {
@@ -875,7 +861,8 @@ public class StackRenderer extends LazyStackRenderer {
 			MElementContainer<MUIElement> stack) {
 		if (stack == null)
 			stack = element.getParent();
-
+		if (!(stack.getWidget() instanceof CTabFolder))
+			return null;
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
 		if (ctf == null || ctf.isDisposed())
 			return null;
@@ -1258,7 +1245,10 @@ public class StackRenderer extends LazyStackRenderer {
 		// Ensure that the newly selected control is correctly sized
 		if (cti.getControl() instanceof Composite) {
 			Composite ctiComp = (Composite) cti.getControl();
-			ctiComp.layout(true, true);
+			// Do not call layout(true, true) because it forces all
+			// subcomponents to relayout as well
+			// ctiComp.layout(true, true);
+			ctiComp.setBounds(ctf.getClientArea());
 		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
@@ -1313,12 +1303,42 @@ public class StackRenderer extends LazyStackRenderer {
 
 	private Image getViewMenuImage() {
 		if (viewMenuImage == null) {
-			Bundle bundle = FrameworkUtil.getBundle(this.getClass());
-			URL url = FileLocator.find(bundle, new Path(
-					"icons/full/etool16/view_dropdown.png"), null); //$NON-NLS-1$
-			ImageDescriptor imageDescriptor = ImageDescriptor
-					.createFromURL(url);
-			viewMenuImage = imageDescriptor.createImage();
+			Display d = Display.getCurrent();
+
+			Image viewMenu = new Image(d, 16, 16);
+			Image viewMenuMask = new Image(d, 16, 16);
+
+			Display display = Display.getCurrent();
+			GC gc = new GC(viewMenu);
+			GC maskgc = new GC(viewMenuMask);
+			gc.setForeground(display
+					.getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+			gc.setBackground(display.getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+
+			int[] shapeArray = new int[] { 6, 3, 15, 3, 11, 7, 10, 7 };
+			gc.fillPolygon(shapeArray);
+			gc.drawPolygon(shapeArray);
+
+			Color black = display.getSystemColor(SWT.COLOR_BLACK);
+			Color white = display.getSystemColor(SWT.COLOR_WHITE);
+
+			maskgc.setBackground(black);
+			maskgc.fillRectangle(0, 0, 16, 16);
+
+			maskgc.setBackground(white);
+			maskgc.setForeground(white);
+			maskgc.fillPolygon(shapeArray);
+			maskgc.drawPolygon(shapeArray);
+			gc.dispose();
+			maskgc.dispose();
+
+			ImageData data = viewMenu.getImageData();
+			data.transparentPixel = data.getPixel(0, 0);
+
+			viewMenuImage = new Image(d, viewMenu.getImageData(),
+					viewMenuMask.getImageData());
+			viewMenu.dispose();
+			viewMenuMask.dispose();
 		}
 		return viewMenuImage;
 	}
@@ -1479,26 +1499,15 @@ public class StackRenderer extends LazyStackRenderer {
 			final List<MPart> toPrompt = new ArrayList<MPart>(others);
 			toPrompt.retainAll(partService.getDirtyParts());
 
-			final Save[] response;
+			boolean cancel = false;
 			if (toPrompt.size() > 1) {
-				response = saveHandler.promptToSave(toPrompt);
+				cancel = !saveHandler.saveParts(toPrompt, true);
 			} else if (toPrompt.size() == 1) {
-				response = new Save[] { saveHandler.promptToSave(toPrompt
-						.get(0)) };
-			} else {
-				response = new Save[] {};
+				cancel = !saveHandler.save(toPrompt.get(0), true);
 			}
-			final List<MPart> toSave = new ArrayList<MPart>(toPrompt.size());
-			for (int i = 0; i < response.length; i++) {
-				final Save save = response[i];
-				final MPart mPart = toPrompt.get(i);
-				if (save == Save.CANCEL) {
-					return;
-				} else if (save == Save.YES) {
-					toSave.add(mPart);
-				}
+			if (cancel) {
+				return;
 			}
-			saveHandler.saveParts(toSave, false);
 
 			for (MPart other : others) {
 				partService.hidePart(other);
