@@ -523,8 +523,7 @@ public class ThemeEngine implements IThemeEngine {
 	}
 
 	private IEclipsePreferences getPreferences() {
-		return InstanceScope.INSTANCE.getNode(
-				FrameworkUtil.getBundle(
+		return new InstanceScope().getNode(FrameworkUtil.getBundle(
 				ThemeEngine.class).getSymbolicName());
 	}
 

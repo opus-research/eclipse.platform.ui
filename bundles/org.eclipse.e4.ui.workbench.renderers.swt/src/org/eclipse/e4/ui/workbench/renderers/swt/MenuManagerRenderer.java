@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,6 @@
  *     Steven Spungin <steven@spungin.tv> - Bug 437747
  *     Alan Staves <alan.staves@microfocus.com> - Bug 435274
  *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
- *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -67,7 +64,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.SubContributionItem;
 import org.eclipse.jface.internal.MenuManagerEventHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -212,7 +208,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					manager.setVisible(menuModel.isVisible());
 					if (manager.getParent() != null) {
 						manager.getParent().markDirty();
-						manager.getParent().update(false);
 					}
 				} else if (element instanceof MMenuElement) {
 					MMenuElement itemModel = (MMenuElement) element;
@@ -224,7 +219,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 					item.setVisible(itemModel.isVisible());
 					if (item.getParent() != null) {
 						item.getParent().markDirty();
-						item.getParent().update(false);
 					}
 				}
 			}
@@ -412,14 +406,14 @@ MenuManagerEventHelper.getInstance()
 				.toArray(new ContributionRecord[vals.size()])) {
 			if (record.menuModel == menuModel) {
 				record.dispose();
-				for (MMenuElement copy : record.getGeneratedElements()) {
+				for (MMenuElement copy : record.generatedElements) {
 					cleanUpCopy(record, copy);
 				}
-				for (MMenuElement copy : record.getSharedElements()) {
+				for (MMenuElement copy : record.sharedElements) {
 					cleanUpCopy(record, copy);
 				}
-				record.getGeneratedElements().clear();
-				record.getSharedElements().clear();
+				record.generatedElements.clear();
+				record.sharedElements.clear();
 				disposedRecords.add(record);
 			}
 		}
@@ -934,12 +928,6 @@ MenuManagerEventHelper.getInstance()
 		IContributionItem[] items = menuManager.getItems();
 		for (int src = 0, dest = 0; src < items.length; src++, dest++) {
 			IContributionItem item = items[src];
-
-			if (item instanceof SubContributionItem) {
-				// get the wrapped contribution item
-				item = ((SubContributionItem) item).getInnerItem();
-			}
-
 			if (item instanceof MenuManager) {
 				MenuManager childManager = (MenuManager) item;
 				MMenu childModel = getMenuModel(childManager);
@@ -947,8 +935,6 @@ MenuManagerEventHelper.getInstance()
 					MMenu legacyModel = OpaqueElementUtil.createOpaqueMenu();
 					legacyModel.setElementId(childManager.getId());
 					legacyModel.setVisible(childManager.isVisible());
-					legacyModel.setLabel(childManager.getMenuText());
-
 					linkModelToManager(legacyModel, childManager);
 					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
 					if (modelChildren.size() > dest) {
@@ -979,10 +965,6 @@ MenuManagerEventHelper.getInstance()
 														.getElementId()));
 							}
 						}
-					}
-
-					if (childModel.getChildren().size() != childManager.getSize()) {
-						reconcileManagerToModel(childManager, childModel);
 					}
 				}
 			} else if (item.isSeparator() || item.isGroupMarker()) {

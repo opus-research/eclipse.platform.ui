@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.IProgressConstants;
 
 /**
@@ -64,7 +63,7 @@ public class TestJob extends Job {
 		this.unknown = indeterminate;
 		this.reschedule = reschedule;
 		this.rescheduleWait = rescheduleWait;
-		setProperty(IProgressConstants.ICON_PROPERTY, AbstractUIPlugin
+		setProperty(IProgressConstants.ICON_PROPERTY, ProgressExamplesPlugin
 				.imageDescriptorFromPlugin(ProgressExamplesPlugin.ID,
 						"icons/sample.gif")); //$NON-NLS-1$
 		if (lock)
