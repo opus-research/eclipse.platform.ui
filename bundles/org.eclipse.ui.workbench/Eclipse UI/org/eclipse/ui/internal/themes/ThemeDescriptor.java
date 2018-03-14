@@ -89,6 +89,9 @@ public class ThemeDescriptor implements IThemeDescriptor {
         dataMap.put(key, data);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getColorOverrides()
+     */
     @Override
 	public ColorDefinition[] getColors() {
         ColorDefinition[] defs = (ColorDefinition[]) colors
@@ -97,11 +100,17 @@ public class ThemeDescriptor implements IThemeDescriptor {
         return defs;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getDescription()
+     */
     @Override
 	public String getDescription() {
         return description;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getFontOverrides()
+     */
     @Override
 	public FontDefinition[] getFonts() {
         FontDefinition[] defs = (FontDefinition[]) fonts
@@ -110,11 +119,17 @@ public class ThemeDescriptor implements IThemeDescriptor {
         return defs;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getID()
+     */
     @Override
 	public String getId() {
         return id;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getName()
+     */
     @Override
 	public String getName() {
     	if (name == null)
@@ -142,6 +157,9 @@ public class ThemeDescriptor implements IThemeDescriptor {
 		}
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getData()
+     */
     @Override
 	public Map getData() {
         return Collections.unmodifiableMap(dataMap);

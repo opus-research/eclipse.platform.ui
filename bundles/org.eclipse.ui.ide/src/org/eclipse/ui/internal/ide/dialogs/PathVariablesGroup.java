@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,11 @@
  *     Serge Beauchamp (Freescale Semiconductor) - [229633] Group and Project Path Variable Support
  *     Helena Halperin (IBM) - bug #299212
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
- *     Robert Roth <robert.roth.off@gmail.com> - Bug 57371
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
 import java.net.URI;
+import java.text.Collator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -73,8 +73,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-
-import com.ibm.icu.text.Collator;
 
 /**
  * A widget group that displays path variables.
@@ -171,8 +169,9 @@ public class PathVariablesGroup {
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
         removedVariableNames = new HashSet();
-        Collator ignoreCaseComparator = Collator.getInstance();
-        tempPathVariables = new TreeMap(ignoreCaseComparator);
+		Collator ignoreCaseComparator = Collator.getInstance();
+		ignoreCaseComparator.setStrength(Collator.TERTIARY);
+		tempPathVariables = new TreeMap(ignoreCaseComparator);
         // initialize internal model
         initTemporaryState();
     }
