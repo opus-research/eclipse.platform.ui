@@ -169,6 +169,8 @@ public class EditorSelectionDialog extends Dialog {
 	static {
 		if (Util.isWindows()) {
 			Executable_Filters = new String[] { "*.exe", "*.bat", "*.*" };//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		} else if (Util.isMac()) {
+			Executable_Filters = new String[] { "*.app", "*" }; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			Executable_Filters = new String[] { "*" }; //$NON-NLS-1$
 		}
@@ -572,6 +574,7 @@ public class EditorSelectionDialog extends Dialog {
 		}
 		updateFileMappings(reg, false);
 		reg.setDefaultEditor("*." + getFileType(), editorId); //$NON-NLS-1$
+		reg.saveAssociations();
 	}
 
 	/**
