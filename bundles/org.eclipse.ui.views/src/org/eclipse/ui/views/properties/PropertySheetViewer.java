@@ -444,8 +444,7 @@ class PropertySheetViewer extends Viewer {
 	private TreeItem findItem(IPropertySheetEntry entry) {
 		// Iterate through treeItems to find item
 		TreeItem[] items = tree.getItems();
-		for (int i = 0; i < items.length; i++) {
-			TreeItem item = items[i];
+		for (TreeItem item : items) {
 			TreeItem findItem = findItem(entry, item);
 			if (findItem != null) {
 				return findItem;
@@ -479,8 +478,7 @@ class PropertySheetViewer extends Viewer {
 
 		// recurse over children
 		TreeItem[] items = item.getItems();
-		for (int i = 0; i < items.length; i++) {
-			TreeItem childItem = items[i];
+		for (TreeItem childItem : items) {
 			TreeItem findItem = findItem(entry, childItem);
 			if (findItem != null) {
 				return findItem;
@@ -498,8 +496,8 @@ class PropertySheetViewer extends Viewer {
 	 */
 	private void fireCellEditorActivated(CellEditor activatedCellEditor) {
 		Object[] listeners = activationListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((ICellEditorActivationListener) listeners[i])
+		for (Object listener : listeners) {
+			((ICellEditorActivationListener) listener)
 					.cellEditorActivated(activatedCellEditor);
 		}
 	}
@@ -513,8 +511,8 @@ class PropertySheetViewer extends Viewer {
 	 */
 	private void fireCellEditorDeactivated(CellEditor activatedCellEditor) {
 		Object[] listeners = activationListeners.getListeners();
-		for (int i = 0; i < listeners.length; ++i) {
-			((ICellEditorActivationListener) listeners[i])
+		for (Object listener : listeners) {
+			((ICellEditorActivationListener) listener)
 					.cellEditorDeactivated(activatedCellEditor);
 		}
 	}
@@ -625,14 +623,13 @@ class PropertySheetViewer extends Viewer {
 
 		// check each entry for the filter
 		List<IPropertySheetEntry> filteredEntries = new ArrayList<>(entries.length);
-		for (int i = 0; i < entries.length; i++) {
-			IPropertySheetEntry entry = entries[i];
+		for (IPropertySheetEntry entry : entries) {
 			if (entry != null) {
 				String[] filters = entry.getFilters();
 				boolean expert = false;
 				if (filters != null) {
-					for (int j = 0; j < filters.length; j++) {
-						if (filters[j].equals(IPropertySheetEntry.FILTER_ID_EXPERT)) {
+					for (String filter : filters) {
+						if (filter.equals(IPropertySheetEntry.FILTER_ID_EXPERT)) {
 							expert = true;
 							break;
 						}
@@ -698,8 +695,7 @@ class PropertySheetViewer extends Viewer {
 		}
 		TreeItem[] sel = tree.getSelection();
 		List<IPropertySheetEntry> entries = new ArrayList<>(sel.length);
-		for (int i = 0; i < sel.length; i++) {
-			TreeItem ti = sel[i];
+		for (TreeItem ti : sel) {
 			Object data = ti.getData();
 			if (data instanceof IPropertySheetEntry) {
 				entries.add((IPropertySheetEntry) data);
@@ -1104,9 +1100,9 @@ class PropertySheetViewer extends Viewer {
 
 		// cache old categories by their descriptor name
 		Map<String, PropertySheetCategory> categoryCache = new HashMap<>(categories.length * 2 + 1);
-		for (int i = 0; i < categories.length; i++) {
-			categories[i].removeAllEntries();
-			categoryCache.put(categories[i].getCategoryName(), categories[i]);
+		for (PropertySheetCategory categorie : categories) {
+			categorie.removeAllEntries();
+			categoryCache.put(categorie.getCategoryName(), categorie);
 		}
 
 		// create a list of categories to get rid of
@@ -1236,9 +1232,9 @@ class PropertySheetViewer extends Viewer {
 		}
 		if (item != null && !item.getExpanded()) {
 			// remove all children
-			for (int i = 0; i < childItems.length; i++) {
-				if (childItems[i].getData() != null) {
-					removeItem(childItems[i]);
+			for (TreeItem childItem : childItems) {
+				if (childItem.getData() != null) {
+					removeItem(childItem);
 				}
 			}
 
@@ -1269,18 +1265,18 @@ class PropertySheetViewer extends Viewer {
 		// remove items
 		Set<Object> set = new HashSet<>(childItems.length * 2 + 1);
 
-		for (int i = 0; i < childItems.length; i++) {
-			Object data = childItems[i].getData();
+		for (TreeItem childItem : childItems) {
+			Object data = childItem.getData();
 			if (data != null) {
 				Object e = data;
 				int ix = children.indexOf(e);
 				if (ix < 0) { // not found
-					removeItem(childItems[i]);
+					removeItem(childItem);
 				} else { // found
 					set.add(e);
 				}
 			} else if (data == null) { // the dummy
-				childItems[i].dispose();
+				childItem.dispose();
 			}
 		}
 
@@ -1403,8 +1399,8 @@ class PropertySheetViewer extends Viewer {
 		if (removeAll) {
 			// remove all children
 			TreeItem[] items = item.getItems();
-			for (int i = 0; i < items.length; i++) {
-				removeItem(items[i]);
+			for (TreeItem item2 : items) {
+				removeItem(item2);
 			}
 		}
 
