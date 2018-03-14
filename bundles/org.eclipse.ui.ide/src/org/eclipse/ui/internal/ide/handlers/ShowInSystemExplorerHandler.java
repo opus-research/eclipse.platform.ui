@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.handlers;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.core.services.statusreporter.StatusReporter;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -35,7 +35,6 @@ import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEPreferenceInitializer;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
-
 
 /**
  * @since 3.106
@@ -59,9 +58,6 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 			return null;
 		}
 
-		final StatusReporter statusReporter = HandlerUtil.getActiveWorkbenchWindow(event).getService(
-				StatusReporter.class);
-
 		Job job = new Job(IDEWorkbenchMessages.ShowInSystemExplorerHandler_jobTitle) {
 
 			@Override
@@ -77,14 +73,22 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 				try {
 					File canonicalPath = getSystemExplorerPath(item);
 					if (canonicalPath == null) {
-						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
-								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation, null);
+						return new Status(
+								IStatus.ERROR,
+								IDEWorkbenchPlugin.getDefault().getBundle()
+								.getSymbolicName(),
+								logMsgPrefix
+								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_notDetermineLocation);
 					}
 					String launchCmd = formShowInSytemExplorerCommand(canonicalPath);
 
 					if ("".equals(launchCmd)) { //$NON-NLS-1$
-						return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix
-								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable, null);
+						return new Status(
+								IStatus.ERROR,
+								IDEWorkbenchPlugin.getDefault().getBundle()
+								.getSymbolicName(),
+								logMsgPrefix
+								+ IDEWorkbenchMessages.ShowInSystemExplorerHandler_commandUnavailable);
 					}
 
 					File dir = item.getWorkspace().getRoot().getLocation().toFile();
@@ -96,14 +100,19 @@ public class ShowInSystemExplorerHandler extends AbstractHandler {
 					}
 					int retCode = p.waitFor();
 					if (retCode != 0 && !Util.isWindows()) {
-						return statusReporter.newStatus(IStatus.ERROR, "Execution of '" + launchCmd //$NON-NLS-1$
-								+ "' failed with return code: " + retCode, null); //$NON-NLS-1$
+						return new Status(IStatus.ERROR, IDEWorkbenchPlugin
+								.getDefault().getBundle().getSymbolicName(),
+								logMsgPrefix + "Execution of '" + launchCmd //$NON-NLS-1$
+										+ "' failed with return code: " + retCode); //$NON-NLS-1$
 					}
 				} catch (Exception e) {
-					return statusReporter.newStatus(IStatus.ERROR, logMsgPrefix + "Unhandled failure.", e); //$NON-NLS-1$
+					return new Status(IStatus.ERROR, IDEWorkbenchPlugin.getDefault()
+							.getBundle().getSymbolicName(), logMsgPrefix
+							+ "Unhandled failure.", e); //$NON-NLS-1$
 				}
 				return Status.OK_STATUS;
 			}
+
 		};
 		job.schedule();
 		return null;
