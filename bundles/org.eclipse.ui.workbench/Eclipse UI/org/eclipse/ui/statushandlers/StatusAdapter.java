@@ -34,7 +34,6 @@ public class StatusAdapter implements IAdaptable {
 	 * 
 	 * @deprecated use {@link IStatusAdapterConstants#TITLE_PROPERTY} instead
 	 */
-	@Deprecated
 	public static final QualifiedName TITLE_PROPERTY = IStatusAdapterConstants.TITLE_PROPERTY;
 
 	/**
@@ -49,7 +48,6 @@ public class StatusAdapter implements IAdaptable {
 	 * @deprecated use {@link IStatusAdapterConstants#TIMESTAMP_PROPERTY}
 	 *             instead
 	 */
-	@Deprecated
 	public static final QualifiedName TIMESTAMP_PROPERTY = IStatusAdapterConstants.TIMESTAMP_PROPERTY;
 
 	private IStatus status;
@@ -85,7 +83,11 @@ public class StatusAdapter implements IAdaptable {
 		adapters.put(adapter, object);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (adapters == null) {
 			return null;

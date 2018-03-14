@@ -139,7 +139,9 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 	}
 
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.window.Window#close()
+	 */
 	public boolean close() {
 		instance = null;
 		return super.close();
@@ -154,7 +156,6 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 	 * 
 	 * @see org.eclipse.jface.preference.PreferenceDialog#findNodeMatching(java.lang.String)
 	 */
-	@Override
 	protected IPreferenceNode findNodeMatching(String nodeId) {
 		IPreferenceNode node = super.findNodeMatching(nodeId);
 		if (WorkbenchActivityHelper.filterItem(node)) {
@@ -163,12 +164,18 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
 		return node;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	protected void okPressed() {
 		super.okPressed();
 	}
 	
-	@Override
+	/* (non-Javadoc)
+     * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
+     * 
+     * @since 3.2
+     */
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = WorkbenchPlugin.getDefault().getDialogSettings();
         IDialogSettings section = settings.getSection(DIALOG_SETTINGS_SECTION);
@@ -178,25 +185,22 @@ public class WorkbenchPreferenceDialog extends FilteredPreferenceDialog {
         return section;
 	}
 	
-	/**
-	 * Overridden to persist only the location, not the size, since the current
-	 * page dictates the most appropriate size for the dialog.
-	 *
-	 * @since 3.2
-	 */
-	@Override
+	/* (non-Javadoc)
+     * @see org.eclipse.jface.window.Dialog#getDialogBoundsStrategy()
+     * 
+     * Overridden to persist only the location, not the size, since the current
+     * page dictates the most appropriate size for the dialog.
+     * @since 3.2
+     */
 	protected int getDialogBoundsStrategy() {
 		return DIALOG_PERSISTLOCATION;
 	}
 	
-	/**
-	 *
-	 * Overrides to set focus to the specific page if it a specific page was
-	 * requested.
-	 *
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.PreferenceDialog#open()
+	 * Overrides to set focus to the specific page if it a specific page was requested. 
 	 * @since 3.5
 	 */
-	@Override
 	public int open() {
 		IPreferencePage selectedPage = getCurrentPage();
 		if ((initialPageId != null) && (selectedPage != null)) {

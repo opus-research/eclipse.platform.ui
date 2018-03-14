@@ -94,7 +94,9 @@ public class TableLayout extends Layout {
 		columns.add(data);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Layout.
+	 */
 	public Point computeSize(Composite c, int wHint, int hHint, boolean flush) {
 		if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
 			return new Point(wHint, hHint);
@@ -130,7 +132,9 @@ public class TableLayout extends Layout {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on Layout.
+	 */
 	public void layout(Composite c, boolean flush) {
 		// Only do initial layout. Trying to maintain proportions when resizing
 		// is too hard,

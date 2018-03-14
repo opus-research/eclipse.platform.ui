@@ -93,12 +93,10 @@ public class TarFile {
 	 */
 	public Enumeration entries() {
 		return new Enumeration() {
-			@Override
 			public boolean hasMoreElements() {
 				return (curEntry != null);
 			}
 			
-			@Override
 			public Object nextElement() {
 				TarEntry oldEntry = curEntry;
 				try {
@@ -137,7 +135,6 @@ public class TarFile {
 				internalEntryStream = new FileInputStream(file);
 			}
 			entryStream = new TarInputStream(internalEntryStream, entry) {
-				@Override
 				public void close() {
 					// Ignore close() since we want to reuse the stream.
 				}
@@ -159,7 +156,6 @@ public class TarFile {
 	 * @see java.util.zip.ZipFile#finalize()
 	 * 
 	 */
-	@Override
 	protected void finalize() throws Throwable {
 		close();
 	}

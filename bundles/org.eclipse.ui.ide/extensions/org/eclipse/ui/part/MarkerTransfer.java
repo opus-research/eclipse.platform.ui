@@ -96,8 +96,7 @@ public class MarkerTransfer extends ByteArrayTransfer {
     /* (non-Javadoc)
      * Method declared on Transfer.
      */
-    @Override
-	protected int[] getTypeIds() {
+    protected int[] getTypeIds() {
         return new int[] { TYPEID };
     }
 
@@ -106,8 +105,7 @@ public class MarkerTransfer extends ByteArrayTransfer {
      *
      * @return the list of type names
      */
-    @Override
-	protected String[] getTypeNames() {
+    protected String[] getTypeNames() {
         return new String[] { TYPE_NAME };
     }
 
@@ -117,8 +115,7 @@ public class MarkerTransfer extends ByteArrayTransfer {
      * OLE.S_OK. If this transfer agent is unable to perform the conversion, the
      * transferData.result field will be set to the failure value of OLE.DV_E_TYMED.
      */
-    @Override
-	protected void javaToNative(Object object, TransferData transferData) {
+    protected void javaToNative(Object object, TransferData transferData) {
         /**
          * Transfer data is an array of markers.  Serialized version is:
          * (int) number of markers
@@ -169,8 +166,7 @@ public class MarkerTransfer extends ByteArrayTransfer {
     /* (non-Javadoc)
      * Method declared on Transfer.
      */
-    @Override
-	protected Object nativeToJava(TransferData transferData) {
+    protected Object nativeToJava(TransferData transferData) {
         byte[] bytes = (byte[]) super.nativeToJava(transferData);
         DataInputStream in = new DataInputStream(
                 new ByteArrayInputStream(bytes));

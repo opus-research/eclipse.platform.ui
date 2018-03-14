@@ -68,8 +68,7 @@ public class PluginActionSet implements IActionSet {
     /**
      * Disposes of this action set.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         Iterator iter = pluginActions.iterator();
         while (iter.hasNext()) {
             WWinPluginAction action = (WWinPluginAction) iter.next();
@@ -114,8 +113,7 @@ public class PluginActionSet implements IActionSet {
      * @param window the workbench window
      * @param bars the action bars
      */
-    @Override
-	public void init(IWorkbenchWindow window, IActionBars bars) {
+    public void init(IWorkbenchWindow window, IActionBars bars) {
         this.bars = (ActionSetActionBars) bars;
     }
 
@@ -125,11 +123,4 @@ public class PluginActionSet implements IActionSet {
 		}
 		disposableBuilder = builder;
 	}
-
-	@Override
-	public String toString() {
-		return "PluginActionSet [desc=" + desc + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ (pluginActions != null ? "actions=" + pluginActions : "") + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-	}
-
 }

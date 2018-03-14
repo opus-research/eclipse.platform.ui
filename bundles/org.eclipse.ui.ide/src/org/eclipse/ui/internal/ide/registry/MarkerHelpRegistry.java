@@ -73,7 +73,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		/*
 		 * (non-Javadoc) Method declared on Object.
 		 */
-		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof QueryComparator)) {
 				return false;
@@ -84,7 +83,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		/*
 		 * (non-Javadoc) Method declared on Comparator.
 		 */
-		@Override
 		public int compare(Object o1, Object o2) {
 			// more attribues come first
 			MarkerQuery q1 = (MarkerQuery) o1;
@@ -106,7 +104,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/*
 	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
 	 */
-	@Override
 	public String getHelp(IMarker marker) {
 		if (sortedHelpQueries == null) {
 			Set set = helpQueries.keySet();
@@ -142,7 +139,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/*
 	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
 	 */
-	@Override
 	public boolean hasResolutions(IMarker marker) {
 		// Detect a match
 		for (Iterator iter = resolutionQueries.keySet().iterator(); iter
@@ -225,7 +221,6 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IMarkerHelpRegistry#getResolutions(org.eclipse.core.resources.IMarker)
 	 */
-	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		// Collect all matches
 		ArrayList resolutions = new ArrayList();

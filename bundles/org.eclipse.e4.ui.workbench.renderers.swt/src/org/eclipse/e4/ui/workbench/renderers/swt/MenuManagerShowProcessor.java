@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866,
+ *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, 
  *         Bug403081, Bug 403083
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -71,7 +71,13 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 
 	private HashMap<Menu, Runnable> pendingCleanup = new HashMap<Menu, Runnable>();
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
+	 * .action.IMenuManager)
+	 */
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -98,7 +104,15 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
+	 * .action.IMenuManager)
+	 * 
+	 * SWT.Show post processing method for MenuManager
+	 */
 	public void menuAboutToHide(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -122,10 +136,10 @@ public class MenuManagerShowProcessor implements IMenuListener2 {
 	/**
 	 * Process dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 *
+	 * 
 	 * @param menuModel
 	 * @param menuManager
-	 *
+	 * 
 	 */
 	private void processDynamicElements(MMenu menuModel, MenuManager menuManager) {
 		MMenuElement[] ml = menuModel.getChildren().toArray(

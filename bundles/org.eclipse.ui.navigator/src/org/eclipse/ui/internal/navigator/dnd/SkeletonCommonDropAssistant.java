@@ -34,13 +34,23 @@ public class SkeletonCommonDropAssistant extends CommonDropAdapterAssistant {
 	private SkeletonCommonDropAssistant() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#handleDrop(org.eclipse.ui.navigator.CommonDropAdapter,
+	 *      org.eclipse.swt.dnd.DropTargetEvent, java.lang.Object)
+	 */
 	public IStatus handleDrop(CommonDropAdapter aDropAdapter,
 			DropTargetEvent aDropTargetEvent, Object aTarget) {
 		return Status.CANCEL_STATUS;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDropAdapterAssistant#validateDrop(java.lang.Object,
+	 *      int, org.eclipse.swt.dnd.TransferData)
+	 */
 	public IStatus validateDrop(Object target, int operation,
 			TransferData transferType) {
 		return Status.CANCEL_STATUS;

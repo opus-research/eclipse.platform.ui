@@ -15,10 +15,10 @@ import org.w3c.dom.css.RGBColor;
 
 /**
  * Simple {@link RGBColor} implementation.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class CSS2RGBColorImpl implements RGBColor {
 
@@ -32,17 +32,14 @@ public class CSS2RGBColorImpl implements RGBColor {
 		blue = new CSS2PrimitiveValueImpl(b);
 	}
 
-	@Override
 	public CSSPrimitiveValue getBlue() {
 		return blue;
 	}
 
-	@Override
 	public CSSPrimitiveValue getGreen() {
 		return green;
 	}
 
-	@Override
 	public CSSPrimitiveValue getRed() {
 		return red;
 	}

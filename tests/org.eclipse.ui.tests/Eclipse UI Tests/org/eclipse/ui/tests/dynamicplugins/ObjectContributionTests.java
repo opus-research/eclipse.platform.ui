@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.dynamicplugins;
 
-import java.util.HashSet;
 import java.util.Random;
 
 import junit.framework.TestSuite;
@@ -26,7 +25,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.internal.IObjectActionContributor;
 import org.eclipse.ui.internal.ObjectActionContributorManager;
 import org.eclipse.ui.internal.PartSite;
 import org.eclipse.ui.internal.PopupMenuExtender;
@@ -40,11 +38,11 @@ public class ObjectContributionTests extends DynamicTestCase {
 	private static final String GROUP_ID = "#OC";
 	private static final String OBJECT_ACTION_ID = "org.eclipse.newOC1";
 	private static final String VIEWER_ACTION_ID = "org.eclipse.newOC2";
-
+	
 	public static TestSuite suite() {
 		return new TestSuite(ObjectContributionTests.class);
 	}
-
+	
 	/**
 	 * @param testName
 	 */
@@ -52,21 +50,27 @@ public class ObjectContributionTests extends DynamicTestCase {
 		super(testName);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionId()
+	 */
 	protected String getExtensionId() {
 		return "newOC1.testDynamicOCAddition";
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getExtensionPoint()
+	 */
 	protected String getExtensionPoint() {
 		return IWorkbenchRegistryConstants.PL_POPUP_MENU;
 	}
 
-	@Override
-	protected String getInstallLocation() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getInstallLocation()
+	 */
+	protected String getInstallLocation() {		
 		return "data/org.eclipse.newOC1";
 	}
-
+	
 	public void testViewerContributions() {
 		IWorkbenchWindow window = openTestWindow(IDE.RESOURCE_PERSPECTIVE_ID);
 		IWorkbenchPart part = window.getActivePage().getActivePart();
@@ -74,44 +78,40 @@ public class ObjectContributionTests extends DynamicTestCase {
 		resetViewerMenu(menu);
 		ISelectionProvider provider = new ISelectionProvider() {
 
-			@Override
 			public void addSelectionChangedListener(ISelectionChangedListener listener) {
-
+				
 			}
 
-			@Override
 			public ISelection getSelection() {
 				return new StructuredSelection(new Random());
 			}
 
-			@Override
 			public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public void setSelection(ISelection selection) {
 			}
-
+			
 		};
-
+		
 		PopupMenuExtender extender = new PopupMenuExtender(GROUP_ID, menu, provider, part, ((PartSite)part.getSite()).getContext());
 		extender.menuAboutToShow(menu);
-
+					
 		assertNull(menu.find(VIEWER_ACTION_ID));
 		resetViewerMenu(menu);
 		getBundle();
-
+		
 		extender.menuAboutToShow(menu);
 		assertNotNull(menu.find(VIEWER_ACTION_ID));
 		resetViewerMenu(menu);
 		removeBundle();
-
-		extender.menuAboutToShow(menu);
-		assertNull(menu.find(VIEWER_ACTION_ID));
-
+		
+		extender.menuAboutToShow(menu);		
+		assertNull(menu.find(VIEWER_ACTION_ID));	
+		
 		extender.dispose();
 	}
-
+	
 	/**
 	 * @param menu
 	 */
@@ -128,42 +128,40 @@ public class ObjectContributionTests extends DynamicTestCase {
 		IMenuManager menu = new MenuManager();
 		ISelectionProvider provider = new ISelectionProvider() {
 
-			@Override
 			public void addSelectionChangedListener(ISelectionChangedListener listener) {
-
+				
 			}
 
-			@Override
 			public ISelection getSelection() {
 				return new StructuredSelection(new Random());
 			}
 
-			@Override
 			public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 			}
 
-			@Override
 			public void setSelection(ISelection selection) {
 			}
-
+			
 		};
 
-		manager.contributeObjectActions(part, menu, provider, new HashSet<IObjectActionContributor>());
+		manager.contributeObjectActions(part, menu, provider);		
 		assertNull(menu.find(OBJECT_ACTION_ID));
 		menu.removeAll();
 		getBundle();
-
-		manager.contributeObjectActions(part, menu, provider, new HashSet<IObjectActionContributor>());
+		
+		manager.contributeObjectActions(part, menu, provider);
 		assertNotNull(menu.find(OBJECT_ACTION_ID));
 		menu.removeAll();
 		removeBundle();
-
-		manager.contributeObjectActions(part, menu, provider, new HashSet<IObjectActionContributor>());
+		
+		manager.contributeObjectActions(part, menu, provider);		
 		assertNull(menu.find(OBJECT_ACTION_ID));
 		menu.removeAll();
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.tests.dynamicplugins.DynamicTestCase#getMarkerClass()
+	 */
 	protected String getMarkerClass() {
 		return "org.eclipse.ui.dynamic.MockObjectActionDelegate";
 	}

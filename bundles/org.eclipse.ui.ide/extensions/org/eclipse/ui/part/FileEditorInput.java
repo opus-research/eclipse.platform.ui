@@ -97,7 +97,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on Object.
 	 */
-	@Override
 	public int hashCode() {
 		return file.hashCode();
 	}
@@ -109,7 +108,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	 * method bases the equality of two <code>FileEditorInput</code> objects on the
 	 * equality of their underlying <code>IFile</code> resources.
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -124,7 +122,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
-	@Override
 	public boolean exists() {
 		return file.exists();
 	}
@@ -132,7 +129,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IPersistableElement.
 	 */
-	@Override
 	public String getFactoryId() {
 		return FileEditorInputFactory.getFactoryId();
 	}
@@ -140,7 +136,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IFileEditorInput.
 	 */
-	@Override
 	public IFile getFile() {
 		return file;
 	}
@@ -148,7 +143,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		IContentType contentType = IDE.getContentType(file);
 		return PlatformUI.getWorkbench().getEditorRegistry()
@@ -158,7 +152,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
-	@Override
 	public String getName() {
 		return file.getName();
 	}
@@ -166,7 +159,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
-	@Override
 	public IPersistableElement getPersistable() {
 		return this;
 	}
@@ -174,7 +166,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IStorageEditorInput.
 	 */
-	@Override
 	public IStorage getStorage() {
 		return file;
 	}
@@ -182,7 +173,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IEditorInput.
 	 */
-	@Override
 	public String getToolTipText() {
 		return file.getFullPath().makeRelative().toString();
 	}
@@ -190,7 +180,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * Method declared on IPersistableElement.
 	 */
-	@Override
 	public void saveState(IMemento memento) {
 		FileEditorInputFactory.saveState(memento, this);
 	}
@@ -200,7 +189,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IURIEditorInput#getURI()
 	 */
-	@Override
 	public URI getURI() {
 		return file.getLocationURI();
 	}
@@ -209,7 +197,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPathEditorInput#getPath()
 	 */
-	@Override
 	public IPath getPath() {
 		IPath location = file.getLocation();
 		if (location != null)
@@ -240,7 +227,6 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		return getClass().getName() + "(" + getFile().getFullPath() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -252,27 +238,22 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
-	@Override
 	public Object getAdapter(Class adapter) {
 		if (IWorkbenchAdapter.class.equals(adapter)) {
 			return new IWorkbenchAdapter() {
 
-				@Override
 				public Object[] getChildren(Object o) {
 					return new Object[0];
 				}
 
-				@Override
 				public ImageDescriptor getImageDescriptor(Object object) {
 					return FileEditorInput.this.getImageDescriptor();
 				}
 
-				@Override
 				public String getLabel(Object o) {
 					return FileEditorInput.this.getName();
 				}
 
-				@Override
 				public Object getParent(Object o) {
 					return FileEditorInput.this.getFile().getParent();
 				}

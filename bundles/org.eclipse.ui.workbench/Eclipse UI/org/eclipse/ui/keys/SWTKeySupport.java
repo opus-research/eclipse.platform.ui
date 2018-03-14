@@ -25,7 +25,6 @@ import org.eclipse.ui.internal.keys.NativeKeyFormatter;
  * @deprecated Please use {@link org.eclipse.jface.bindings.keys.SWTKeySupport}
  * @since 3.0
  */
-@Deprecated
 public final class SWTKeySupport {
 
     /**

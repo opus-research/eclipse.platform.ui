@@ -1,14 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441150
- *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -30,7 +28,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Shell;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
@@ -42,11 +39,10 @@ import org.osgi.service.event.EventHandler;
  * from being rendered, calling 'childAdded' instead. This not only saves time
  * and SWT resources but is necessary in an IDE world where we must not
  * arbitrarily cause plug-in loading.
- *
+ * 
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
 	private EventHandler lazyLoader = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
@@ -70,6 +66,10 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		}
 	};
 
+	public LazyStackRenderer() {
+		super();
+	}
+
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
 		// will call this method
@@ -86,11 +86,9 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(lazyLoader);
 	}
 
-	@Override
 	public void postProcess(MUIElement element) {
-		if (!(element instanceof MGenericStack<?>) || isMinimizedStack(element)) {
+		if (!(element instanceof MGenericStack<?>))
 			return;
-		}
 
 		MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
 		MUIElement selPart = stack.getSelectedElement();
@@ -141,7 +139,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 	/**
 	 * This method is necessary to allow the parent container to show affordance
 	 * (i.e. tabs) for child elements -without- creating the actual part
-	 *
+	 * 
 	 * @param me
 	 *            The parent model element
 	 * @param part
@@ -161,6 +159,13 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 	private void hideElementRecursive(MUIElement element) {
 		if (element == null || element.getWidget() == null)
 			return;
+
+		if (element instanceof MPartStack
+				&& element.getRenderer() instanceof StackRenderer) {
+			StackRenderer sr = (StackRenderer) element.getRenderer();
+			CTabFolder ctf = (CTabFolder) element.getWidget();
+			sr.clearTR(ctf);
+		}
 
 		if (element instanceof MPlaceholder) {
 			MPlaceholder ph = (MPlaceholder) element;
@@ -215,7 +220,7 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			if (curSel instanceof MPlaceholder) {
 				part.setCurSharedRef((MPlaceholder) curSel);
 			}
-			sr.adjustTopRight(ctf);
+			sr.adjustTR(ctf, part);
 		}
 
 		if (element instanceof MPlaceholder && element.getWidget() != null) {
@@ -243,7 +248,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 			}
 		}
 
-		Shell layoutShellLater = null;
 		// Show any floating windows
 		if (element instanceof MWindow && element.getWidget() != null) {
 			int visCount = 0;
@@ -251,14 +255,8 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				if (kid.isToBeRendered() && kid.isVisible())
 					visCount++;
 			}
-			if (visCount > 0) {
+			if (visCount > 0)
 				element.setVisible(true);
-				Object widget = element.getWidget();
-				if (widget instanceof Shell) {
-					Shell shell = (Shell) widget;
-					layoutShellLater = shell;
-				}
-			}
 		}
 
 		if (element instanceof MGenericStack<?>) {
@@ -288,17 +286,5 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 				}
 			}
 		}
-
-		// i.e.: Bug 436763: after we make items visible, if we made a new
-		// floating shell visible, we have to re-layout it for its contents to
-		// become correct.
-		if (layoutShellLater != null) {
-			layoutShellLater.layout(true, true);
-		}
-	}
-
-	private boolean isMinimizedStack(MUIElement stack) {
-		return stack.getTags().contains(IPresentationEngine.MINIMIZED)
-				&& !stack.getTags().contains(IPresentationEngine.ACTIVE);
 	}
 }

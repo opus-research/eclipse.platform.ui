@@ -34,18 +34,15 @@ public class ActionProvider extends QuickAccessProvider {
 
 	private Map idToElement;
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.actions"; //$NON-NLS-1$
 	}
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (ActionElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
@@ -84,18 +81,15 @@ public class ActionProvider extends QuickAccessProvider {
 		}
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Menus;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
 	}

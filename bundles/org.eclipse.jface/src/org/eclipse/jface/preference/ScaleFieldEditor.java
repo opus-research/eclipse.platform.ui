@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2013 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -97,13 +97,22 @@ public class ScaleFieldEditor extends FieldEditor {
         setValues(min, max, increment, pageIncrement);
     }
 
-    @Override
-	protected void adjustForNumColumns(int numColumns) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+     */
+    protected void adjustForNumColumns(int numColumns) {
         ((GridData) scale.getLayoutData()).horizontalSpan = numColumns - 1;
     }
 
-    @Override
-	protected void doFillIntoGrid(Composite parent, int numColumns) {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite,
+     *      int)
+     */
+    protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
         GridData gd = new GridData();
         control.setLayoutData(gd);
@@ -117,8 +126,12 @@ public class ScaleFieldEditor extends FieldEditor {
         updateScale();
     }
 
-    @Override
-	protected void doLoad() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+     */
+    protected void doLoad() {
         if (scale != null) {
             int value = getPreferenceStore().getInt(getPreferenceName());
             scale.setSelection(value);
@@ -126,8 +139,12 @@ public class ScaleFieldEditor extends FieldEditor {
         }
     }
 
-    @Override
-	protected void doLoadDefault() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+     */
+    protected void doLoadDefault() {
         if (scale != null) {
             int value = getPreferenceStore().getDefaultInt(getPreferenceName());
             scale.setSelection(value);
@@ -135,8 +152,12 @@ public class ScaleFieldEditor extends FieldEditor {
         valueChanged();
     }
 
-    @Override
-	protected void doStore() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#doStore()
+     */
+    protected void doStore() {
         getPreferenceStore()
                 .setValue(getPreferenceName(), scale.getSelection());
     }
@@ -171,8 +192,12 @@ public class ScaleFieldEditor extends FieldEditor {
         return minValue;
     }
 
-    @Override
-	public int getNumberOfControls() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+     */
+    public int getNumberOfControls() {
         return 2;
     }
 
@@ -209,14 +234,12 @@ public class ScaleFieldEditor extends FieldEditor {
             scale = new Scale(parent, SWT.HORIZONTAL);
             scale.setFont(parent.getFont());
             scale.addSelectionListener(new SelectionAdapter() {
-                @Override
-				public void widgetSelected(SelectionEvent event) {
+                public void widgetSelected(SelectionEvent event) {
                     valueChanged();
                 }
             });
             scale.addDisposeListener(new DisposeListener() {
-                @Override
-				public void widgetDisposed(DisposeEvent event) {
+                public void widgetDisposed(DisposeEvent event) {
                     scale = null;
                 }
             });
@@ -239,8 +262,12 @@ public class ScaleFieldEditor extends FieldEditor {
         setValues(0, 10, 1, 1);
     }
 
-    @Override
-	public void setFocus() {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.FieldEditor#setFocus()
+     */
+    public void setFocus() {
         if (scale != null && !scale.isDisposed()) {
             scale.setFocus();
         }

@@ -100,27 +100,21 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 			// Create a listener that will delegate to the appropriate listener
 			// NOTE: the -editor- wins (i.e. it can over-ride WB behaviour if it wants
 			realDropTarget.addDropListener(new DropTargetListener() {
-				@Override
 				public void dragEnter(DropTargetEvent event) {
 					getAppropriateListener(event, true).dragEnter(event);
 				}
-				@Override
 				public void dragLeave(DropTargetEvent event) {
 					getAppropriateListener(event, false).dragLeave(event);
 				}
-				@Override
 				public void dragOperationChanged(DropTargetEvent event) {
 					getAppropriateListener(event, true).dragOperationChanged(event);
 				}
-				@Override
 				public void dragOver(DropTargetEvent event) {
 					getAppropriateListener(event, true).dragOver(event);
 				}
-				@Override
 				public void drop(DropTargetEvent event) {
 					getAppropriateListener(event, true).drop(event);
 				}
-				@Override
 				public void dropAccept(DropTargetEvent event) {
 					getAppropriateListener(event, true).dropAccept(event);
 				}
@@ -156,7 +150,9 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 	// Cache any listeners for cleanup
 	List addedListeners = new ArrayList();
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dnd.IEditorDropTargetService#addDropTarget(org.eclipse.swt.widgets.Control, int, org.eclipse.swt.dnd.Transfer[], org.eclipse.swt.dnd.DropTargetListener)
+	 */
 	public void addMergedDropTarget(Control control, int ops, Transfer[] transfers,
 			DropTargetListener listener) {
 		 // First we have to remove any existing drop target from the control
@@ -177,7 +173,6 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 		addedListeners.add(newTarget);
 
 		newTarget.realDropTarget.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				Object mdt = e.widget.getData(MDT_KEY);
 				addedListeners.remove(mdt);
@@ -200,7 +195,9 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 		return (DropTarget)curDT;
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dnd.IDragAndDropService#removeMergedDropTarget(org.eclipse.swt.widgets.Control)
+	 */
 	public void removeMergedDropTarget(Control control) {
 		DropTarget targetForControl = getCurrentDropTarget(control);
 		if (targetForControl != null) {
@@ -209,7 +206,9 @@ public class EditorSiteDragAndDropServiceImpl implements IDragAndDropService, ID
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public void dispose() {
 		addedListeners.clear();
 	}

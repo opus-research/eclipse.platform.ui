@@ -113,7 +113,6 @@ public class ActionExpression {
 			super(element);
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof AndExpression) {
 				final AndExpression that = (AndExpression) object;
@@ -123,7 +122,9 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
 			while (iter.hasNext()) {
@@ -174,7 +175,11 @@ public class ActionExpression {
 			}
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		public String[] extractObjectClasses() {
 			Iterator iterator = list.iterator();
 			List classNames = null;
@@ -204,7 +209,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(list);
@@ -215,7 +219,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			Iterator iterator = list.iterator();
@@ -228,7 +234,11 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		public Collection valuesForExpression(String expressionType) {
 			Iterator iterator = list.iterator();
 			Collection allValues = null;
@@ -265,7 +275,9 @@ public class ActionExpression {
 			super(element);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			return !super.isEnabledFor(object);
 		}
@@ -336,7 +348,6 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof ObjectClassExpression) {
 				final ObjectClassExpression that = (ObjectClassExpression) object;
@@ -347,7 +358,11 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		public String[] extractObjectClasses() {
 			extracted = true;
 			return new String[] { className };
@@ -358,7 +373,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR
@@ -371,7 +385,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
 				return false;
@@ -402,7 +418,9 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			if (expressionType.equals(EXP_TYPE_OBJECT_CLASS)) {
@@ -439,7 +457,6 @@ public class ActionExpression {
 			}
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof ObjectStateExpression) {
 				final ObjectStateExpression that = (ObjectStateExpression) object;
@@ -459,7 +476,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(name);
@@ -471,7 +487,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			if (object == null) {
 				return false;
@@ -512,7 +530,11 @@ public class ActionExpression {
 			return filter.testAttribute(object, name, value);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		public Collection valuesForExpression(String expressionType) {
 			if (expressionType.equals(name)) {
 				Collection returnValue = new HashSet();
@@ -541,7 +563,6 @@ public class ActionExpression {
 			super(element);
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof OrExpression) {
 				final OrExpression that = (OrExpression) object;
@@ -551,7 +572,9 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			Iterator iter = list.iterator();
 			while (iter.hasNext()) {
@@ -591,7 +614,6 @@ public class ActionExpression {
 			}
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof PluginStateExpression) {
 				final PluginStateExpression that = (PluginStateExpression) object;
@@ -607,7 +629,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(id);
@@ -619,7 +640,9 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			Bundle bundle = Platform.getBundle(id);
 			if (!BundleUtility.isReady(bundle)) {
@@ -680,7 +703,6 @@ public class ActionExpression {
 			child = createExpression(children[0]);
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof SingleExpression) {
 				final SingleExpression that = (SingleExpression) object;
@@ -690,7 +712,11 @@ public class ActionExpression {
 			return false;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#extractObjectClasses()
+		 */
 		public String[] extractObjectClasses() {
 			return child.extractObjectClasses();
 		}
@@ -700,7 +726,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(child);
@@ -711,18 +736,26 @@ public class ActionExpression {
 			return expressionHashCode;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			return child.isEnabledFor(object);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledForExpression(Object object,
 				String expressionType) {
 			return child.isEnabledForExpression(object, expressionType);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.ActionExpression.AbstractExpression#valuesForExpression(java.lang.String)
+		 */
 		public Collection valuesForExpression(String expressionType) {
 			return child.valuesForExpression(expressionType);
 		}
@@ -756,7 +789,9 @@ public class ActionExpression {
 			}
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc) Method declared on AbstractExpression.
+		 */
 		public boolean isEnabledFor(Object object) {
 			String str = System.getProperty(name);
 			if (str == null) {
@@ -765,7 +800,6 @@ public class ActionExpression {
 			return value.equals(str);
 		}
 
-		@Override
 		public final boolean equals(final Object object) {
 			if (object instanceof SystemPropertyExpression) {
 				final SystemPropertyExpression that = (SystemPropertyExpression) object;
@@ -781,7 +815,6 @@ public class ActionExpression {
 		 * 
 		 * @return The hash code for this object.
 		 */
-		@Override
 		public final int hashCode() {
 			if (expressionHashCode == HASH_CODE_NOT_COMPUTED) {
 				expressionHashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(name);
@@ -943,7 +976,6 @@ public class ActionExpression {
 		}
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof ActionExpression) {
 			final ActionExpression that = (ActionExpression) object;
@@ -971,7 +1003,6 @@ public class ActionExpression {
 	 * 
 	 * @return The hash code for this object.
 	 */
-	@Override
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(root);

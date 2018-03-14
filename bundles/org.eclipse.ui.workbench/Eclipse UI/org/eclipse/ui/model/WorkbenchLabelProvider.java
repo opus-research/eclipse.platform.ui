@@ -66,7 +66,6 @@ public class WorkbenchLabelProvider extends LabelProvider implements
      * associations in the registry.
      */
     private IPropertyListener editorRegistryListener = new IPropertyListener() {
-		@Override
 		public void propertyChanged(Object source, int propId) {
 			if (propId == IEditorRegistry.PROP_CONTENTS) {
 				fireLabelProviderChanged(new LabelProviderChangedEvent(WorkbenchLabelProvider.this));
@@ -115,8 +114,10 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return input;
     }
 
-    @Override
-	public void dispose() {
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
+    public void dispose() {
     	PlatformUI.getWorkbench().getEditorRegistry().removePropertyListener(editorRegistryListener);
 		if (resourceManager != null)
 			resourceManager.dispose();
@@ -173,8 +174,10 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 		return resourceManager;
 	}
 
-    @Override
-	public final Image getImage(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
+    public final Image getImage(Object element) {
         //obtain the base image by querying the element
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null) {
@@ -202,8 +205,7 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 	 * 
 	 * @since 3.7
 	 */
-    @Override
-	public StyledString getStyledText(Object element) {
+    public StyledString getStyledText(Object element) {
         IWorkbenchAdapter3 adapter = getAdapter3(element);
 		if (adapter == null) {
 			// If adapter class doesn't implement IWorkbenchAdapter3 than use
@@ -236,8 +238,10 @@ public class WorkbenchLabelProvider extends LabelProvider implements
 		return StyledString.DECORATIONS_STYLER;
 	}
 
-    @Override
-	public final String getText(Object element) {
+    /* (non-Javadoc)
+     * Method declared on ILabelProvider
+     */
+    public final String getText(Object element) {
         //query the element for its label
         IWorkbenchAdapter adapter = getAdapter(element);
         if (adapter == null) {
@@ -249,18 +253,24 @@ public class WorkbenchLabelProvider extends LabelProvider implements
         return decorateText(label, element);
     }
 
-    @Override
-	public Color getForeground(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+     */
+    public Color getForeground(Object element) {
         return getColor(element, true);
     }
 
-    @Override
-	public Color getBackground(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+     */
+    public Color getBackground(Object element) {
         return getColor(element, false);
     }
 
-    @Override
-	public Font getFont(Object element) {
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+     */
+    public Font getFont(Object element) {
         IWorkbenchAdapter2 adapter = getAdapter2(element);
         if (adapter == null) {
             return null;

@@ -63,7 +63,6 @@ public class BookmarkView extends MarkerView {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object, java.lang.String)
 		 */
-		@Override
 		public Object getValue(Object element, String property) {
 			if (element instanceof ConcreteMarker
 					&& IMarker.MESSAGE.equals(property)) {
@@ -75,7 +74,6 @@ public class BookmarkView extends MarkerView {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object, java.lang.String)
 		 */
-		@Override
 		public boolean canModify(Object element, String property) {
 			return element instanceof ConcreteMarker && IMarker.MESSAGE.equals(property);
 		}
@@ -83,7 +81,6 @@ public class BookmarkView extends MarkerView {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object, java.lang.String, java.lang.Object)
 		 */
-		@Override
 		public void modify(Object element, String property, Object value) {
 			if (element instanceof Item) {
 				Item item = (Item) element;
@@ -126,7 +123,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#createPartControl(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
@@ -151,7 +147,6 @@ public class BookmarkView extends MarkerView {
 		cellEditorActionHandler.setRedoAction(redoAction);
 	}
 
-	@Override
 	public void dispose() {
 		if (cellEditorActionHandler != null) {
 			cellEditorActionHandler.dispose();
@@ -160,7 +155,6 @@ public class BookmarkView extends MarkerView {
 		super.dispose();
 	}
 
-	@Override
 	protected IDialogSettings getDialogSettings() {
 		IDialogSettings workbenchSettings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
 		IDialogSettings settings = workbenchSettings
@@ -176,7 +170,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getSortingFields()
 	 */
-	@Override
 	protected IField[] getSortingFields() {
 		IField[] all = new IField[VISIBLE_FIELDS.length + HIDDEN_FIELDS.length];
 		
@@ -189,18 +182,15 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.TableView#getAllFields()
 	 */
-	@Override
 	protected IField[] getAllFields() {
 		return getSortingFields();
 	}
 
-	@Override
 	protected String[] getRootTypes() {
 		return ROOT_TYPES;
 	}
 
 
-	@Override
 	public void setSelection(IStructuredSelection structuredSelection,
 			boolean reveal) {
 		// TODO: added because nick doesn't like public API inherited from
@@ -213,7 +203,6 @@ public class BookmarkView extends MarkerView {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerTypes()
 	 */
-	@Override
 	protected String[] getMarkerTypes() {
 		return new String[] { IMarker.BOOKMARK };
 	}
@@ -221,7 +210,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#createFiltersDialog()
 	 */
-	@Override
 	protected DialogMarkerFilter createFiltersDialog() {
 
 		MarkerFilter[] filters = getUserFilters();
@@ -230,7 +218,6 @@ public class BookmarkView extends MarkerView {
 		return new DialogBookmarkFilter(getSite().getShell(), bookmarkFilters);
 	}
 
-	@Override
 	protected String getStaticContextId() {
 		return PlatformUI.PLUGIN_ID + ".bookmark_view_context"; //$NON-NLS-1$
 	}
@@ -238,7 +225,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#createFilter(java.lang.String)
 	 */
-	@Override
 	protected MarkerFilter createFilter(String name) {
 		return new BookmarkFilter(name);
 	}
@@ -246,7 +232,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getSectionTag()
 	 */
-	@Override
 	protected String getSectionTag() {
 		return TAG_DIALOG_SECTION;
 	}
@@ -254,7 +239,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#fillContextMenuAdditions(org.eclipse.jface.action.IMenuManager)
 	 */
-	@Override
 	void fillContextMenuAdditions(IMenuManager manager) {
 		//Do nothing in this view
 		
@@ -263,7 +247,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerEnablementPreferenceName()
 	 */
-	@Override
 	String getMarkerEnablementPreferenceName() {
 		return IDEInternalPreferences.LIMIT_BOOKMARKS;
 	}
@@ -271,7 +254,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerLimitPreferenceName()
 	 */
-	@Override
 	String getMarkerLimitPreferenceName() {
 		return IDEInternalPreferences.BOOKMARKS_LIMIT;
 	}
@@ -279,7 +261,6 @@ public class BookmarkView extends MarkerView {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getFiltersPreferenceName()
 	 */
-	@Override
 	String getFiltersPreferenceName() {
 		return IDEInternalPreferences.BOOKMARKS_FILTERS;
 	}
@@ -289,7 +270,6 @@ public class BookmarkView extends MarkerView {
 	 * 
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getMarkerName()
 	 */
-	@Override
 	protected String getMarkerName() {
 		return MarkerMessages.bookmark_title;
 	}
@@ -298,7 +278,6 @@ public class BookmarkView extends MarkerView {
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerView#getUndoContext()
 	 */
-	@Override
 	protected IUndoContext getUndoContext() {
 		return WorkspaceUndoUtil.getBookmarksUndoContext();
 	}

@@ -24,7 +24,6 @@ import java.util.List;
  * the applicaiton's UI state (i.e. whenther a Dialog is open...).
  * </p>
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>

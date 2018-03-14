@@ -24,12 +24,10 @@ public class EObjModelHandler extends ModelHandlerBase implements IAdapterFactor
 	public EObjModelHandler() {
 	}
 
-	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		return this;
 	}
 
-	@Override
 	public Class[] getAdapterList() {
 		return new Class[] { ModelHandlerBase.class };
 	}

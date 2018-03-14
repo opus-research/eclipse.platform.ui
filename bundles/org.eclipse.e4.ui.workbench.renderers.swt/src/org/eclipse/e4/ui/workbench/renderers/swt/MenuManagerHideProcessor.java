@@ -43,7 +43,15 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	@Inject
 	private EModelService modelService;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.IMenuListener#menuAboutToShow(org.eclipse.jface
+	 * .action.IMenuManager)
+	 * 
+	 * SWT.Hide pre-processing method for MenuManager
+	 */
 	public void menuAboutToShow(IMenuManager manager) {
 		if (!(manager instanceof MenuManager)) {
 			return;
@@ -61,15 +69,14 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	/**
 	 * Process dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 *
+	 * 
 	 * @param menu
 	 * @param menuModel
-	 *
+	 * 
 	 */
 	private void processDynamicElements(Menu menu, final MMenu menuModel) {
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 
 					MMenuElement[] ml = menuModel.getChildren().toArray(
@@ -104,7 +111,13 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.jface.action.IMenuListener2#menuAboutToHide(org.eclipse.jface
+	 * .action.IMenuManager)
+	 */
 	public void menuAboutToHide(IMenuManager manager) {
 	}
 
@@ -116,7 +129,6 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 		popupContext.remove(MenuManagerRendererFilter.TMP_ORIGINAL_CONTEXT);
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					if (originalChild == null) {
 						popupContext.deactivate();

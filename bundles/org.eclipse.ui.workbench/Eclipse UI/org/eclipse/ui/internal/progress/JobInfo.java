@@ -91,8 +91,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#cancel()
      */
-    @Override
-	public void cancel() {
+    public void cancel() {
         this.canceled = true;
         this.job.cancel();
         //Call the refresh so that this is updated immediately
@@ -168,8 +167,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    @Override
-	public int compareTo(Object arg0) {
+    public int compareTo(Object arg0) {
 
         if (!(arg0 instanceof JobInfo)) {
 			return super.compareTo(arg0);
@@ -220,8 +218,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
      */
-    @Override
-	Object[] getChildren() {
+    Object[] getChildren() {
         return children.toArray();
     }
 
@@ -230,8 +227,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getCondensedDisplayString()
      */
-    @Override
-	String getCondensedDisplayString() {
+    String getCondensedDisplayString() {
     	TaskInfo info = getTaskInfo();
         if (info != null) {
 			return info.getDisplayStringWithoutTask(true);
@@ -244,8 +240,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayImage()
      */
-    @Override
-	public Image getDisplayImage() {
+    public Image getDisplayImage() {
         int done = getPercentDone();
         if (done > 0) {
             return super.getDisplayImage();
@@ -267,16 +262,14 @@ public class JobInfo extends JobTreeElement {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
      */
-    @Override
-	String getDisplayString() {
+    String getDisplayString() {
     	return getDisplayString(true);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString(boolean)
      */
-    @Override
-	String getDisplayString(boolean showProgress) {
+    String getDisplayString(boolean showProgress) {
         String name = getDisplayStringWithStatus(showProgress);
         if (job.isSystem()) {
 			return NLS.bind(ProgressMessages.JobInfo_System, (new Object[] { name }));
@@ -341,7 +334,6 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#getParent()
      */
-	@Override
 	public Object getParent() {
         return parent;
     }
@@ -378,8 +370,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
      */
-    @Override
-	boolean hasChildren() {
+    boolean hasChildren() {
         return children.size() > 0;
     }
 
@@ -397,8 +388,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
      */
-    @Override
-	boolean isActive() {
+    boolean isActive() {
         return getJob().getState() != Job.NONE;
     }
 
@@ -426,8 +416,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#isCancellable()
      */
-    @Override
-	public boolean isCancellable() {
+    public boolean isCancellable() {
         return super.isCancellable();
     }
 
@@ -436,8 +425,7 @@ public class JobInfo extends JobTreeElement {
      * 
      * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
      */
-    @Override
-	boolean isJobInfo() {
+    boolean isJobInfo() {
         return true;
     }
 

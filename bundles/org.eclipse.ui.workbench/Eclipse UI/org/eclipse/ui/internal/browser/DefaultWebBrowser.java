@@ -52,7 +52,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 * 
 	 * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
 	 */
-	@Override
 	public void openURL(URL url) throws PartInitException {
 		// format the href for an html file (file:///<filename.html>
 		// required for Mac only.
@@ -80,7 +79,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 			}
 		} else {
 			Thread launcher = new Thread("About Link Launcher") {//$NON-NLS-1$
-				@Override
 				public void run() {
 					try {
 						/*
@@ -122,7 +120,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 * 
 	 * @see org.eclipse.ui.browser.IWebBrowser#close()
 	 */
-	@Override
 	public boolean close() {
 		support.unregisterBrowser(this);
 		return super.close();
@@ -185,7 +182,6 @@ public class DefaultWebBrowser extends AbstractWebBrowser {
 	 */
 	private void openWebBrowserError(Display display) {
 		display.asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				MessageDialog
 						.openError(
