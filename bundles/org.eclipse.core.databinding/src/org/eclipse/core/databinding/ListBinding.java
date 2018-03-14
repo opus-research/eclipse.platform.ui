@@ -219,7 +219,7 @@ public class ListBinding extends Binding {
 									if (useMoveAndReplace) {
 										IStatus setterStatus = updateListStrategy
 												.doReplace(destination, index,
-												updateListStrategy.convert(newElement));
+														newElement);
 
 										mergeStatus(multiStatus, setterStatus);
 									} else {
