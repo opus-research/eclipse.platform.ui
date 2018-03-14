@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278
  *******************************************************************************/
 package org.eclipse.jface.examples.databinding.snippets;
 
@@ -25,7 +25,6 @@ import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -238,7 +237,8 @@ public class Snippet020TreeViewerWithSetFactory {
 	protected DataBindingContext initDataBindings() {
 		IObservableValue treeViewerSelectionObserveSelection = ViewersObservables
 				.observeSingleSelection(beanViewer);
-		IObservableValue textTextObserveWidget = WidgetProperties.text(SWT.Modify).observe(beanText);
+		IObservableValue textTextObserveWidget = SWTObservables.observeText(
+				beanText, SWT.Modify);
 		IObservableValue treeViewerValueObserveDetailValue = BeansObservables
 				.observeDetailValue(treeViewerSelectionObserveSelection,
 						"text", String.class);
@@ -268,14 +268,14 @@ public class Snippet020TreeViewerWithSetFactory {
 				return Boolean.valueOf(beanViewerSelection.getValue() != null);
 			}
 		};
-		dbc.bindValue(WidgetProperties.enabled().observe(addChildBeanButton),
+		dbc.bindValue(SWTObservables.observeEnabled(addChildBeanButton),
 				beanSelected);
-		dbc.bindValue(WidgetProperties.enabled().observe(removeBeanButton),
+		dbc.bindValue(SWTObservables.observeEnabled(removeBeanButton),
 				beanSelected);
 
 		clipboard = new WritableValue();
-		dbc.bindValue(WidgetProperties.enabled().observe(copyButton), beanSelected);
-		dbc.bindValue(WidgetProperties.enabled().observe(pasteButton),
+		dbc.bindValue(SWTObservables.observeEnabled(copyButton), beanSelected);
+		dbc.bindValue(SWTObservables.observeEnabled(pasteButton),
 				new ComputedValue(Boolean.TYPE) {
 					@Override
 					protected Object calculate() {

@@ -31,7 +31,6 @@ public class StatusToStringConverter extends Converter implements IConverter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
 	 */
-	@Override
 	public Object convert(Object fromObject) {
 		if (fromObject == null) {
 			throw new IllegalArgumentException("Parameter 'fromObject' was null."); //$NON-NLS-1$
