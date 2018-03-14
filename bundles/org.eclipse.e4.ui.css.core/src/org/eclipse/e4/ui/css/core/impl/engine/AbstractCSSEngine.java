@@ -177,30 +177,20 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 		int counter;
 		for (counter = 0; counter < length; counter++) {
 			CSSRule rule = rules.item(counter);
-			if (rule.getType() != CSSRule.IMPORT_RULE) {
+			if (rule.getType() !=  CSSRule.IMPORT_RULE) {
 				break;
 			}
-			// processing an import CSS
-			CSSImportRule importRule = (CSSImportRule) rule;
-			URL url = null;
-			if (importRule.getHref().startsWith("platform")) {
-				url = FileLocator.resolve(new URL(importRule.getHref()));
-				System.out.println(url);
-			} else {
-				Path p = new Path(source.getURI());
-				IPath trim = p.removeLastSegments(1);
+			Path p = new Path(source.getURI());
+			IPath trim = p.removeLastSegments(1);
 
-				url = FileLocator.resolve(new URL(trim.addTrailingSeparator()
-						.toString() + ((CSSImportRule) rule).getHref()));
-				File testFile = new File(url.getFile());
-				if (!testFile.exists()) {
-					// look in platform default
-					String path = getResourcesLocatorManager().resolve(
-							(importRule).getHref());
-					testFile = new File(new URL(path).getFile());
-					if (testFile.exists()) {
-						url = new URL(path);
-					}
+			URL url = FileLocator.resolve(new URL(trim.addTrailingSeparator().toString() + ((CSSImportRule) rule).getHref()));
+			File testFile = new File(url.getFile());
+			if (!testFile.exists()) {
+				//look in platform default
+				String path = getResourcesLocatorManager().resolve(((CSSImportRule) rule).getHref());
+				testFile = new File(new URL(path).getFile());
+				if (testFile.exists()) {
+					url = new URL(path);
 				}
 			}
 			InputStream stream = null;
@@ -223,12 +213,12 @@ public abstract class AbstractCSSEngine implements CSSEngine {
 			}
 		}
 
-		// add remaining non import rules
+		//add remaining non import rules
 		for (int i = counter; i < length; i++) {
 			masterList.add(rules.item(i));
 		}
 
-		// final stylesheet
+		//final stylesheet
 		CSSStyleSheetImpl s = new CSSStyleSheetImpl();
 		s.setRuleList(masterList);
 		if (!parseImport) {
