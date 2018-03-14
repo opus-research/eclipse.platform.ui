@@ -7,16 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 234331
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * A selection containing elements.
  */
-public interface IStructuredSelection extends Iterable, ISelection {
+public interface IStructuredSelection extends ISelection {
     /**
      * Returns the first element in this selection, or <code>null</code>
      * if the selection is empty.
@@ -24,6 +24,13 @@ public interface IStructuredSelection extends Iterable, ISelection {
      * @return an element, or <code>null</code> if none
      */
     public Object getFirstElement();
+
+    /**
+     * Returns an iterator over the elements of this selection.
+     *
+     * @return an iterator over the selected elements
+     */
+    public Iterator iterator();
 
     /**
      * Returns the number of elements selected in this selection.
