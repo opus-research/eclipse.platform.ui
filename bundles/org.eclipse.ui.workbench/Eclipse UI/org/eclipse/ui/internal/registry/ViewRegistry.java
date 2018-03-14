@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Hendrik Diederich, Bredex GmbH - bug 201052
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430616, 441267, 441282, 445609, 441280
  *******************************************************************************/
 package org.eclipse.ui.internal.registry;
 
@@ -130,7 +130,7 @@ public class ViewRegistry implements IViewRegistry {
 		}
 
 		List<String> tags = descriptor.getTags();
-		tags.add("View"); //$NON-NLS-1$
+		tags.add(IWorkbenchRegistryConstants.TAG_E4VIEW);
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
