@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 BestSolution.at and others.
+ * Copyright (c) 2008, 2013 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Christian Georgi (SAP)                   - Bug 432480
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -81,12 +80,6 @@ public class E4Workbench implements IWorkbench {
 	public static final String FORCED_PERSPECTIVE_ID = "forcedPerspetiveId"; //$NON-NLS-1$
 
 	public static final String NO_SAVED_MODEL_FOUND = "NO_SAVED_MODEL_FOUND"; //$NON-NLS-1$
-	/**
-	 * The argument for the whether to show the location in the window title<br>
-	 * <br>
-	 * Value is: <code>showLocation</code>
-	 */
-	public static final String SHOW_LOCATION = "showLocation"; //$NON-NLS-1$
 
 	private final String id;
 	private ServiceRegistration<?> osgiRegistration;

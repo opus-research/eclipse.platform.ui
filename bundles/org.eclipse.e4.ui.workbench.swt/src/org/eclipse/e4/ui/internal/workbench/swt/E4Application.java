@@ -12,7 +12,6 @@
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 366364, 445724, 446088
  *     Terry Parker <tparker@google.com> - Bug 416673
- *     Christian Georgi (SAP)            - Bug 432480
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -245,12 +244,6 @@ public class E4Application implements IApplication {
 			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID, forcedPerspectiveId);
 		}
 
-		String showLocation = getLocationFromCommandLine();
-		if (showLocation != null) {
-			// also write value if it's empty since the UI needs this info
-			appContext.set(E4Workbench.SHOW_LOCATION, showLocation);
-		}
-
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext, appContext);
 		appModel.setContext(appContext);
@@ -288,7 +281,8 @@ public class E4Application implements IApplication {
 
 		// Parse out parameters from both the command line and/or the product
 		// definition (if any) and put them in the context
-		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext, false);
+		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
+				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
 		setCSSContextVariables(applicationContext, appContext);
@@ -313,14 +307,14 @@ public class E4Application implements IApplication {
 		boolean highContrastMode = getApplicationDisplay().getHighContrast();
 
 		String cssURI = highContrastMode ? null : getArgValue(
-IWorkbench.CSS_URI_ARG, applicationContext, false);
+				IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 		if (cssURI != null) {
 			context.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
-		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID : getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
+		String themeId = highContrastMode ? HIGH_CONTRAST_THEME_ID
+				: getArgValue(E4Application.THEME_ID, applicationContext, false);
 
 		if (themeId == null && cssURI == null) {
 			themeId = DEFAULT_THEME_ID;
@@ -336,7 +330,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 			context.set(E4Application.THEME_ID, cssURI);
 		}
 
-		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG, applicationContext, false);
+		String cssResourcesURI = getArgValue(IWorkbench.CSS_RESOURCE_URI_ARG,
+				applicationContext, false);
 		context.set(IWorkbench.CSS_RESOURCE_URI_ARG, cssResourcesURI);
 	}
 
@@ -381,7 +376,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		eclipseContext.set(E4Workbench.DELTA_RESTORE,
 				Boolean.valueOf(deltaRestore));
 
-		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false);
+		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER,
+				appContext, false);
 
 		if (resourceHandler == null) {
 			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/"
@@ -430,19 +426,8 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 
 	}
 
-	/**
-	 * Finds an argument's value in the app's command line arguments, branding,
-	 * and system properties
-	 *
-	 * @param argName
-	 *            the argument name
-	 * @param appContext
-	 *            the application context
-	 * @param singledCmdArgValue
-	 *            whether it's a single-valued argument
-	 * @return the value, or <code>null</code>
-	 */
-	private String getArgValue(String argName, IApplicationContext appContext, boolean singledCmdArgValue) {
+	private String getArgValue(String argName, IApplicationContext appContext,
+			boolean singledCmdArgValue) {
 		// Is it in the arg list ?
 		if (argName == null || argName.length() == 0)
 			return null;
@@ -462,28 +447,6 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		final String brandingProperty = appContext.getBrandingProperty(argName);
 		return brandingProperty == null ? System.getProperty(argName)
 				: brandingProperty;
-	}
-
-	/**
-	 * @return the value of 'showlocation' command line argument, or
-	 *         <code>null</code> if it is not set
-	 */
-	private String getLocationFromCommandLine() {
-		final String fullArgName = "-" + E4Workbench.SHOW_LOCATION;
-		for (int i = 0; i < args.length; i++) {
-			// ignore case for compatibility reasons
-			if (fullArgName.equalsIgnoreCase(args[i])) { //$NON-NLS-1$
-				String name = null;
-				if (args.length > i + 1) {
-					name = args[i + 1];
-				}
-				if (name != null && name.indexOf("-") == -1) { //$NON-NLS-1$
-					return name;
-				}
-				return Platform.getLocation().toOSString();
-			}
-		}
-		return null;
 	}
 
 	@Override
