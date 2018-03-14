@@ -13,6 +13,7 @@ package org.eclipse.ui.examples.jobs.actions;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,10 +32,12 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
  * @see IWorkbenchWindowActionDelegate
  */
 public class JobAction implements IWorkbenchWindowActionDelegate {
+	@Override
 	public void run(IAction action) {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		Job job = new WorkspaceJob("Background job") { //$NON-NLS-1$
-			public IStatus runInWorkspace(IProgressMonitor monitor) {
+			@Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				monitor.beginTask("Doing something in background", 100); //$NON-NLS-1$
 				for (int i = 0; i < 100; i++) {
 					try {
@@ -50,12 +53,15 @@ public class JobAction implements IWorkbenchWindowActionDelegate {
 		job.setRule(workspace.getRoot());
 		job.schedule();
 	}
+	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
 		//do nothing
 	}
+	@Override
 	public void dispose() {
 		//do nothing
 	}
+	@Override
 	public void init(IWorkbenchWindow window) {
 		//do nothing
 	}
