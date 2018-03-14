@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 445600
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -23,16 +23,5 @@ public interface EHelpService {
 	 * @param contextId
 	 *            the ID of the context to display
 	 */
-	void displayHelp(String contextId);
-
-	/**
-	 * Sets the given id for the help system on the given object.
-	 *
-	 * @param element
-	 *            the element on which to register the help id
-	 * @param helpContextId
-	 *            the id to use when help system is invoked
-	 */
-	void setHelp(Object element, String helpContextId);
-
+	public void displayHelp(String contextId);
 }
