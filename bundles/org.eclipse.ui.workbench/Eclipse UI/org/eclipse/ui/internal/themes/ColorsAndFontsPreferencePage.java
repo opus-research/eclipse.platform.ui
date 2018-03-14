@@ -2087,6 +2087,8 @@ getPreferenceStore(),
 
 	private Composite createColorPreviewControl() {
 		colorSampler = new Canvas(previewComposite, SWT.NONE);
+		colorSampler.setData("org.eclipse.e4.ui.css.id", "ColorsAndFontPreferencesPage-ColorPreviewControl"); //$NON-NLS-1$ //$NON-NLS-2$
+
         GridLayout gridLayout = new GridLayout();
         gridLayout.marginWidth = 0;
         gridLayout.marginHeight = 0;
