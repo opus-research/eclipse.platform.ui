@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
+import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
@@ -92,8 +93,10 @@ public class CleanupAddon {
 						if (lclContainer.getChildren().size() == 0) {
 							MElementContainer<MUIElement> parent = container.getParent();
 							if (parent != null && !lastStack) {
-								container.setToBeRendered(false);
-								parent.getChildren().remove(container);
+								if (!isEmptyStackOnTopWindow(container)) {
+									container.setToBeRendered(false);
+									parent.getChildren().remove(container);
+								}
 							} else if (container instanceof MWindow) {
 								// Must be a Detached Window
 								MUIElement eParent = (MUIElement) ((EObject) container)
@@ -310,5 +313,22 @@ public class CleanupAddon {
 
 	boolean isLastEditorStack(MUIElement element) {
 		return modelService.isLastEditorStack(element);
+	}
+
+	private boolean isEmptyStackOnTopWindow(MUIElement element) {
+		return element instanceof MPartStack && ((MPartStack) element).getChildren().isEmpty()
+				&& geWindow(element) == getTopLevelWindow(element);
+	}
+
+	private MWindow getTopLevelWindow(MUIElement element) {
+		return modelService.getTopLevelWindowFor(element);
+	}
+
+	private MWindow geWindow(MUIElement element) {
+		MElementContainer<?> parent = element.getParent();
+		while (parent != null && !(parent instanceof MWindow)) {
+			parent = parent.getParent();
+		}
+		return parent instanceof MWindow ? ((MWindow) parent) : null;
 	}
 }

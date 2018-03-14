@@ -35,7 +35,6 @@ public class WidgetImageProperty extends WidgetDelegatingValueProperty {
 		super(Image.class);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Button) {
 			if (button == null)

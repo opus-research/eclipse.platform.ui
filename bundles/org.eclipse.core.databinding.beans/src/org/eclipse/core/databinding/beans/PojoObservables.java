@@ -596,7 +596,6 @@ final public class PojoObservables {
 	 *             {@link #observeDetailValue(IObservableValue, String, Class)}
 	 *             instead
 	 */
-	@Deprecated
 	public static IObservableValue observeDetailValue(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
@@ -650,7 +649,6 @@ final public class PojoObservables {
 	 *             {@link #observeDetailList(IObservableValue, String, Class)}
 	 *             instead
 	 */
-	@Deprecated
 	public static IObservableList observeDetailList(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
@@ -703,7 +701,6 @@ final public class PojoObservables {
 	 *             {@link #observeDetailSet(IObservableValue, String, Class)}
 	 *             instead.
 	 */
-	@Deprecated
 	public static IObservableSet observeDetailSet(Realm realm,
 			IObservableValue master, String propertyName, Class propertyType) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
@@ -750,7 +747,6 @@ final public class PojoObservables {
 	 * @deprecated Use {@link #observeDetailMap(IObservableValue, String)}
 	 *             instead
 	 */
-	@Deprecated
 	public static IObservableMap observeDetailMap(Realm realm,
 			IObservableValue master, String propertyName) {
 		BeansObservables.warnIfDifferentRealms(realm, master.getRealm());
