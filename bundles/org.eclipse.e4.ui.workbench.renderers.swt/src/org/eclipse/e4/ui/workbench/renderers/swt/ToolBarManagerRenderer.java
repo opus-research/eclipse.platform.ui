@@ -199,6 +199,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			// extra override mechanics controlling element visibility
 			if (ov == null) {
 				ici.setVisible(itemModel.isVisible());
+			} else {
+				Boolean visible = ov.getVisible(ici);
+				if (visible == null) {
+					// same as above: only change state if there are no extra
+					// override mechanics controlling element visibility
+					ici.setVisible(itemModel.isVisible());
+				}
 			}
 
 			parent.markDirty();

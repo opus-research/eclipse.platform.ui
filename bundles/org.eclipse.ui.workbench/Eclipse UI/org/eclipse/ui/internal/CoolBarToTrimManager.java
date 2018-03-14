@@ -635,6 +635,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				if (toolItem == null) {
 					continue;
 				}
+				// this section below should match what's in
+				// org.eclipse.e4.ui.workbench.renderers.swt.ToolBarManagerRenderer.processHandledItem(ToolBarManager,
+				// MHandledToolItem)
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
