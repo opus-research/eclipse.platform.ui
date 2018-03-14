@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 436645
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator;
 
@@ -18,6 +19,7 @@ import org.eclipse.core.expressions.ElementHandler;
 import org.eclipse.core.expressions.EvaluationResult;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionConverter;
+import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -79,6 +81,16 @@ public class CustomAndExpression extends Expression {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public void collectExpressionInfo(ExpressionInfo info) {
+		if (fExpressions == null)
+			return;
+		for (Iterator<Expression> iter = fExpressions.iterator(); iter.hasNext();) {
+			Expression expression = iter.next();
+			expression.collectExpressionInfo(info);
+		}
 	}
 
 }
