@@ -17,7 +17,6 @@
  * Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
- * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -940,8 +939,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String ChooseWorkspaceDialog_browseLabel;
 	public static String ChooseWorkspaceDialog_directoryBrowserTitle;
 	public static String ChooseWorkspaceDialog_directoryBrowserMessage;
-	public static String ChooseWorkspaceDialog_removeWorkspaceSelection;
-	public static String ChooseWorkspaceDialog_recentWorkspaces;
 	public static String ChooseWorkspaceDialog_useDefaultMessage;
 
 	public static String ChooseWorkspaceWithSettingsDialog_SettingsGroupName;
@@ -1018,9 +1015,6 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String editorAssociationOverride_error_couldNotCreate_message;
 	public static String editorAssociationOverride_error_invalidElementName_message;
 	public static String editorAssociationOverride_error_invalidExtension_message;
-
-	public static String ExtendedFileEditorsPreferencePage_strategyForUnknownFiles;
-	public static String ExtendedFileEditorsPreferencePage_labelNotResolved;
 
 	static {
 		// load message values from bundle file

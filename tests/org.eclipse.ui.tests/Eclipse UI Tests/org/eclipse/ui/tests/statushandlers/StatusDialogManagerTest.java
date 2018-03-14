@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -51,7 +52,6 @@ import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
-import org.eclipse.ui.tests.harness.util.UITestCase;
 
 import junit.framework.TestCase;
 
@@ -574,26 +574,10 @@ public class StatusDialogManagerTest extends TestCase {
 		// this verifies if support is opened for correct statusAdapter
 		openSupportArea(statusAdapter1, passed);
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertEquals(statusAdapter2, passed[0]);
-	}
-
-	private void processRemainingUiEvents() {
-		UITestCase.processEvents();
-		int count = 0;
-		while (count < 3 && (StatusDialogUtil.getStatusShell() != null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-	}
-
-	private void assertStatusShellOpen() {
-		int count = 0;
-		while (count < 42 && (StatusDialogUtil.getStatusShell() == null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-		assertNotNull("Status shell was not shown!", StatusDialogUtil.getStatusShell());
 	}
 
 	/**
@@ -620,7 +604,10 @@ public class StatusDialogManagerTest extends TestCase {
 
 		assertNotNull(details[0]);
 		assertFalse(details[0].isDisposed());
-		processRemainingUiEvents();
+		//process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 
 		assertEquals(statusAdapter2, passed[0]);
 	}
@@ -646,7 +633,10 @@ public class StatusDialogManagerTest extends TestCase {
 
 		selectTable(table, 1);
 
-		processRemainingUiEvents();
+		// process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 
 		assertEquals(MESSAGE_2, titleLabel.getText());
 		assertEquals(JOB_NAME, table.getItem(1).getText());
@@ -756,7 +746,7 @@ public class StatusDialogManagerTest extends TestCase {
 	}
 
 	//error link present
-	public void testBug278965_1() {
+	public void testBug278965_1(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
@@ -770,22 +760,14 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW | StatusManager.LOG);
 		assertEquals(1, wsdm[0].getStatusAdapters().size());
-
-		assertStatusShellOpen();
-
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
 
 	//error link hidden
@@ -824,21 +806,14 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW);
 		weh.handle(createStatusAdapter(MESSAGE_2), StatusManager.SHOW | StatusManager.LOG);
-
-		assertStatusShellOpen();
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
 
 	// two statuses, details, resize
@@ -952,11 +927,15 @@ public class StatusDialogManagerTest extends TestCase {
 
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
 
 		selectTable(table, 0);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 	}
 
@@ -993,7 +972,9 @@ public class StatusDialogManagerTest extends TestCase {
 
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
@@ -1007,7 +988,9 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
 
@@ -1020,7 +1003,9 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNotNull(StatusDialogUtil.getSupportLink());
 	}
 

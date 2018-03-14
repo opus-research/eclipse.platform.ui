@@ -16,6 +16,7 @@ import java.util.Iterator;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -95,10 +96,13 @@ public class GroupsContribution extends MarkersContribution {
 			 * @return Listener
 			 */
 			private Listener getMenuItemListener(final MarkerGroup gr, final ExtendedMarkersView view) {
-				return event -> {
-					MenuItem item = (MenuItem) event.widget;
-					if (item.getSelection() && view != null) {
-						view.setCategoryGroup(gr);
+				return new Listener() {
+					@Override
+					public void handleEvent(Event event) {
+						MenuItem item = (MenuItem) event.widget;
+						if (item.getSelection() && view != null) {
+							view.setCategoryGroup(gr);
+						}
 					}
 				};
 			}
