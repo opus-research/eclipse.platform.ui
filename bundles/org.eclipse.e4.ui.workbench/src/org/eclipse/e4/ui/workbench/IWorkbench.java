@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
+ *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset the perspective
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -88,6 +89,40 @@ public interface IWorkbench {
 	 * @since 0.12.0
 	 */
 	public static final String XMI_URI_ARG = "applicationXMI"; //$NON-NLS-1$
+
+	/**
+	 * The argument for disabling the default perspective keeper.
+	 * <p>
+	 * The default perspective keeper will create a snippet of the perspective when it becomes
+	 * opened for the first time. To disable the automatic snippet creation either provide this
+	 * property as single commandline argument or as a branding or system property.
+	 * </p>
+	 * <p>
+	 * Value is: {@value #USE_CUSTOM_PERSPECTIVE_KEEPER}
+	 * </p>
+	 * <p>
+	 * Usage example:
+	 * <ul>
+	 * <li>as commandline argument: <code>-useCustomPerspectiveKeeper</code></li>
+	 * <li>as system property: <code>-DuseCustomPerspectiveKeeper=true</code></li>
+	 * <li>as a branding property under the <code>org.eclipse.core.runtime.products</code> extension
+	 * point: <code>
+	 * <pre>
+	 * &lt;product application="org.eclipse.e4.ui.workbench.swt.E4Application" name="ExmapleApplication"&gt;
+	 *   &lt;property name="appName" value="ExmapleApplication" /&gt;
+	 *   &lt;/property&gt;
+	 *   <i>&lt;!-- ... other properties ... --&gt;</i>
+	 *   <b>&lt;property name="useCustomPerspectiveKeeper" value="true"&gt;
+	 *   &lt;/property&gt;</b>
+	 * &lt;/product&gt;
+	 * </pre>
+	 * </code></li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * @since 1.1.0
+	 */
+	public static final String USE_CUSTOM_PERSPECTIVE_KEEPER = "useCustomPerspectiveKeeper"; //$NON-NLS-1$
 
 	/**
 	 * Close the workbench instance

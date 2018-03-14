@@ -13,6 +13,7 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
+ *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset the perspective
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -581,6 +582,18 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 				System.setProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG,
 						"org.eclipse.ui.workbench/LegacyIDE.e4xmi"); //$NON-NLS-1$
+
+				/*
+				 * Disable the new e4 based perspective keeper, because the
+				 * legacy application model doesn't use the
+				 * ApplicationModel-File (e4xmi-File) to define Perspectives it
+				 * still uses the Eclipse ExtensionRegistry and it also uses the
+				 * Eclipse ExtensionRegistry to restore a perspective!
+				 */
+				System.setProperty(
+						org.eclipse.e4.ui.workbench.IWorkbench.USE_CUSTOM_PERSPECTIVE_KEEPER,
+						Boolean.TRUE.toString());
+
 				Object obj = getApplication(Platform.getCommandLineArgs());
 				if (obj instanceof E4Application) {
 					E4Application e4app = (E4Application) obj;
