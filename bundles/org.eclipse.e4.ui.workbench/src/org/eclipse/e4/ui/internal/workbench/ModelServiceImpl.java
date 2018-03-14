@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     René Brandstetter - Bug 404231 - resetPerspectiveModel() does not reset the perspective
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -52,6 +53,7 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
+import org.eclipse.e4.ui.workbench.modeling.EPerspectiveRestoreService;
 import org.eclipse.e4.ui.workbench.modeling.EPlaceholderResolver;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
 import org.eclipse.emf.ecore.EObject;
@@ -912,6 +914,51 @@ public class ModelServiceImpl implements EModelService {
 
 	public void resetPerspectiveModel(MPerspective persp, MWindow window) {
 		resetPerspectiveModel(persp, window, true);
+
+		/*
+		 * Restore of the state is called only in the public method, because the private
+		 * resetPerspectiveModel() method is also called during removePerspectiveModel() which will
+		 * remove the Perspective anyhow and so a previous reset to the old state isn't necessary.
+		 */
+
+		EPerspectiveRestoreService restoreService = appContext
+				.get(EPerspectiveRestoreService.class);
+		if (restoreService == null)
+			return;
+
+		// restore the old state (will only work if an add-on added an EPerspectiveRestoreService
+		// implementation)
+		MPerspective state = restoreService.reloadPerspective(persp.getElementId(), window);
+		if (state != null) {
+			boolean wasPerspectiveActive = (persp.getParent().getSelectedElement() == persp);
+			/*
+			 * Un-render the perspective (destroy the parts) must be done before it is replaced,
+			 * because otherwise the @PreDestroy methods on the parts are not invoked! (shared
+			 * elements are excluded if they are already opened in other perspectives)
+			 */
+			persp.setToBeRendered(false);
+
+			// replace the current perspective with the stored state
+			EcoreUtil.replace((EObject) persp, (EObject) state);
+
+			if (wasPerspectiveActive) { // switch to perspective only if it was active
+				/*
+				 * Activate the restored perspective This will re-create the parts based on all the
+				 * model settings which exists before the perspective was changed. (shared elements
+				 * are reused if they are already opened in other perspectives)
+				 */
+				IEclipseContext context = window.getContext();
+				if (context == null) {
+					/*
+					 * sometimes the window doesn't have a context and to prevent a NPE just try our
+					 * luck with the application context
+					 */
+					context = appContext;
+				}
+				EPartService ps = context.get(EPartService.class);
+				ps.switchPerspective(state); // no null-check, because we want to fail early
+			}
+		}
 	}
 
 	private void resetPerspectiveModel(MPerspective persp, MWindow window,
