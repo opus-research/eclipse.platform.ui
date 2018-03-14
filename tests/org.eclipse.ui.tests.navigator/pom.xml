@@ -21,25 +21,9 @@
   <artifactId>org.eclipse.ui.tests.navigator</artifactId>
   <version>3.4.300-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
-  
-  <properties>
-	<testSuite>org.eclipse.ui.tests.navigator.NavigatorTestSuite</testSuite>
- 	<skipTests>false</skipTests>
-  </properties>
 
    <build>
     <plugins>
-      <plugin>
-  		<groupId>org.eclipse.tycho</groupId>
-  			<artifactId>tycho-surefire-plugin</artifactId>
-  			<version>${tycho.version}</version>
-			<configuration>
-				<testSuite>org.eclipse.ui.tests.navigator</testSuite>
-				<testClass>${testSuite}</testClass>
-				<useUIHarness>true</useUIHarness>
-				<useUIThread>true</useUIThread>
-			</configuration>
-  	  </plugin>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-compiler-plugin</artifactId>
