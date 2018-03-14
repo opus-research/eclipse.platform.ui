@@ -15,16 +15,16 @@ import java.util.Date;
 
 import org.eclipse.core.databinding.conversion.IConverter;
 
-
 /**
  * Convert a String to a java.util.Date, respecting the current locale
  *
  * @since 1.0
  */
-public class StringToDateConverter extends DateConversionSupport implements IConverter {
+public class StringToDateConverter extends DateConversionSupport implements
+		IConverter<String, Date> {
 	@Override
-	public Object convert(Object source) {
-		return parse(source.toString());
+	public Date convert(String source) {
+		return parse(source);
 	}
 
 	@Override
