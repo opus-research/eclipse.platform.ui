@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 366364
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -53,6 +54,7 @@ import org.eclipse.e4.ui.internal.workbench.ReflectionContributionFactory;
 import org.eclipse.e4.ui.internal.workbench.ResourceHandler;
 import org.eclipse.e4.ui.internal.workbench.SelectionAggregator;
 import org.eclipse.e4.ui.internal.workbench.SelectionServiceImpl;
+import org.eclipse.e4.ui.internal.workbench.URIHelper;
 import org.eclipse.e4.ui.internal.workbench.WorkbenchLogger;
 import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -104,6 +106,8 @@ public class E4Application implements IApplication {
 	private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 	private static final String WORKSPACE_VERSION_VALUE = "2"; //$NON-NLS-1$
 	private static final String APPLICATION_MODEL_PATH_DEFAULT = "Application.e4xmi";
+	private static final String PERSPECTIVE_ARG_NAME = "perspective";
+	private static final String DEFAULT_THEME_ID = "org.eclipse.e4.ui.css.theme.e4_default";
 
 	private String[] args;
 
@@ -211,12 +215,9 @@ public class E4Application implements IApplication {
 		});
 		appContext.set(IApplicationContext.class, applicationContext);
 
-		// Check if DS is running
-		if (!appContext
-				.containsKey("org.eclipse.e4.ui.workbench.modeling.EPartService")) {
-			throw new IllegalStateException(
-					"Core services not available. Please make sure that a declarative service implementation (such as the bundle 'org.eclipse.equinox.ds') is available!");
-		}
+		// This context will be used by the injector for its
+		// extended data suppliers
+		ContextInjectionFactory.setDefault(appContext);
 
 		// Get the factory to create DI instances with
 		IContributionFactory factory = (IContributionFactory) appContext
@@ -234,6 +235,14 @@ public class E4Application implements IApplication {
 						PostContextCreate.class, appContext, null);
 			}
 		}
+
+		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
+				applicationContext, false);
+		if (forcedPerspectiveId != null) {
+			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
+					forcedPerspectiveId);
+		}
+
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext,
 				appContext);
@@ -253,10 +262,6 @@ public class E4Application implements IApplication {
 
 		// Set the app's context after adding itself
 		appContext.set(MApplication.class.getName(), appModel);
-
-		// This context will be used by the injector for its
-		// extended data suppliers
-		ContextInjectionFactory.setDefault(appContext);
 
 		// adds basic services to the contexts
 		initializeServices(appModel);
@@ -284,15 +289,18 @@ public class E4Application implements IApplication {
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
 
-		String themeId = getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
-		appContext.set(E4Application.THEME_ID, themeId);
-
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
 		if (cssURI != null) {
 			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
+
+		String themeId = getArgValue(E4Application.THEME_ID,
+				applicationContext, false);
+		if (themeId == null && cssURI == null) {
+			themeId = DEFAULT_THEME_ID;
+		}
+		appContext.set(E4Application.THEME_ID, themeId);
 
 		// Temporary to support old property as well
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
@@ -341,8 +349,17 @@ public class E4Application implements IApplication {
 		}
 		Assert.isNotNull(appModelPath, IWorkbench.XMI_URI_ARG
 				+ " argument missing"); //$NON-NLS-1$
-		final URI initialWorkbenchDefinitionInstance = URI
-				.createPlatformPluginURI(appModelPath, true);
+
+		URI initialWorkbenchDefinitionInstance;
+
+		// check if the appModelPath is already a platform-URI and if so use it
+		if (URIHelper.isPlatformURI(appModelPath)) {
+			initialWorkbenchDefinitionInstance = URI.createURI(appModelPath,
+					true);
+		} else {
+			initialWorkbenchDefinitionInstance = URI.createPlatformPluginURI(
+					appModelPath, true);
+		}
 
 		eclipseContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI,
 				initialWorkbenchDefinitionInstance);
@@ -439,13 +456,6 @@ public class E4Application implements IApplication {
 		serviceContext.set(IExceptionHandler.class, exceptionHandler);
 		serviceContext.set(IExtensionRegistry.class, registry);
 
-		// translation
-		String locale = Locale.getDefault().toString();
-		serviceContext.set(TranslationService.LOCALE, locale);
-		TranslationService bundleTranslationProvider = TranslationProviderFactory
-				.bundleTranslationService(serviceContext);
-		serviceContext.set(TranslationService.class, bundleTranslationProvider);
-
 		serviceContext.set(Adapter.class, ContextInjectionFactory.make(
 				EclipseAdapter.class, serviceContext));
 
@@ -498,6 +508,13 @@ public class E4Application implements IApplication {
 					String id) {
 			}
 		});
+
+		// translation
+		String locale = Locale.getDefault().toString();
+		appContext.set(TranslationService.LOCALE, locale);
+		TranslationService bundleTranslationProvider = TranslationProviderFactory
+				.bundleTranslationService(appContext);
+		appContext.set(TranslationService.class, bundleTranslationProvider);
 
 		return appContext;
 	}

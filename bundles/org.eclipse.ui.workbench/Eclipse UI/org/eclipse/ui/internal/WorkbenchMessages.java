@@ -474,9 +474,9 @@ public class WorkbenchMessages extends NLS {
 	// public static String ViewsPreference_perspectiveBar_topLeft;
 	// public static String ViewsPreference_perspectiveBar_left;
 	// public static String ViewsPreference_traditionalTabs;
-	// public static String ViewsPreference_currentTheme;
-	// public static String ViewsPreference_currentThemeDescription;
-	// public static String ViewsPreference_currentThemeFormat;
+	public static String ViewsPreference_currentTheme;
+	public static String ViewsPreference_currentThemeDescription;
+	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
@@ -1011,6 +1011,12 @@ public class WorkbenchMessages extends NLS {
 //	public static String ShowKyrsoftViewAction_KyrsoftNotInstalled;
 //	public static String ShowKyrsoftViewAction_OpenPerspectiveFirst;
 //	public static String ShowKyrsoftViewAction_ErrorShowingKyrsoftView;
+
+
+	public static String SplitValues_Horizontal;
+
+
+	public static String SplitValues_Vertical;
 
 
     // ==============================================================================

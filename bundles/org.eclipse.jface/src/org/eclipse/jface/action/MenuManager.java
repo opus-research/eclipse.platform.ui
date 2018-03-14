@@ -210,7 +210,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return the menu control
      * @deprecated use <code>createMenuBar(Decorations)</code> instead.
      */
-    public Menu createMenuBar(Shell parent) {
+    @Deprecated
+	public Menu createMenuBar(Shell parent) {
         return createMenuBar((Decorations) parent);
     }
 
@@ -416,7 +417,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.IContributionManager#getOverrides()
      */
-    public IContributionManagerOverrides getOverrides() {
+    @Override
+	public IContributionManagerOverrides getOverrides() {
         if (overrides == null) {
             if (parent == null) {
                 overrides = new IContributionManagerOverrides() {
@@ -491,12 +493,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void initializeMenu() {
         menu.addMenuListener(new MenuAdapter() {
-            public void menuHidden(MenuEvent e) {
+            @Override
+			public void menuHidden(MenuEvent e) {
                 //			ApplicationWindow.resetDescription(e.widget);
             	handleAboutToHide();
             }
 
-            public void menuShown(MenuEvent e) {
+            @Override
+			public void menuShown(MenuEvent e) {
                 handleAboutToShow();
             }
         });
@@ -548,7 +552,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @deprecated this method is no longer a part of the 
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
-    public boolean isSubstituteFor(IContributionItem item) {
+    @Deprecated
+	public boolean isSubstituteFor(IContributionItem item) {
         return this.equals(item);
     }
 
@@ -585,7 +590,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * 
      * @since 3.1
      */
-    public void markDirty() {
+    @Override
+	public void markDirty() {
         super.markDirty();
         // Can't optimize by short-circuiting when the first dirty manager is encountered,
         // since non-visible children are not even processed.
@@ -631,7 +637,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @param newOverrides the overrides for the items of this manager
      * @since 2.0
      */
-    public void setOverrides(IContributionManagerOverrides newOverrides) {
+    @Override
+	public void setOverrides(IContributionManagerOverrides newOverrides) {
         overrides = newOverrides;
         super.setOverrides(overrides);
     }
@@ -761,7 +768,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List clean = new ArrayList(items.length);
+                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
                 IContributionItem separator = null;
                 for (int i = 0; i < items.length; ++i) {
                     IContributionItem ci = items[i];
@@ -803,8 +810,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 int srcIx = 0;
                 int destIx = 0;
 
-                for (Iterator e = clean.iterator(); e.hasNext();) {
-                    IContributionItem src = (IContributionItem) e.next();
+                for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
+                    IContributionItem src = e.next();
                     IContributionItem dest;
 
                     // get corresponding item in SWT widget
@@ -1002,5 +1009,21 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 			return v.booleanValue();
 		}
 		return item.isVisible();
+	}
+
+	/**
+	 * @param menuText The text (label) of the menu.
+	 * @since 3.10
+	 */
+	public void setMenuText(String menuText) {
+		this.menuText = menuText;
+	}
+
+	/**
+	 * @param imageDescriptor The image descriptor to set.
+	 * @since 3.10
+	 */
+	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
+		this.image = imageDescriptor;
 	}
 }
