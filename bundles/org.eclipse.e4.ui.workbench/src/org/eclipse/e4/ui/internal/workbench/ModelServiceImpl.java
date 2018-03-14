@@ -136,19 +136,27 @@ public class ModelServiceImpl implements EModelService {
 				"Unsupported model object type: " + elementType.getCanonicalName()); //$NON-NLS-1$
 	}
 
-	private <T> void findElementsRecursive(MApplicationElement searchRoot, Class<T> clazz,
-			Selector matcher, List<T> elements, int searchFlags) {
-		Assert.isLegal(searchRoot != null);
-		if (searchFlags == 0) {
-			return;
-		}
-
-		// are *we* a match ?
+	private <T> void match(Selector matcher, MApplicationElement searchRoot, List<T> elements) {
 		if (matcher.select(searchRoot)) {
 			if (!elements.contains(searchRoot)) {
 				elements.add((T) searchRoot);
 			}
 		}
+	}
+	private <T> void findElementsRecursive(MApplicationElement searchRoot, Class<T> clazz,
+			Selector matcher, List<T> elements, int searchFlags) {
+		Assert.isLegal(searchRoot != null && matcher != null);
+		if (searchFlags == 0) {
+			return;
+		}
+
+		// are *we* a match ?
+		if (clazz != null && clazz.isInstance(searchRoot)) {
+			match(matcher, searchRoot, elements);
+		} else if (clazz == null) {
+			match(matcher, searchRoot, elements);
+		}
+
 
 		if (searchRoot instanceof MApplication && (searchFlags == ANYWHERE)) {
 			MApplication app = (MApplication) searchRoot;
