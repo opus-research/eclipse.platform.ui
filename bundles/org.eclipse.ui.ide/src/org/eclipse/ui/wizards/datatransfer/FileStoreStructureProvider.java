@@ -40,7 +40,6 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 * 
 	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getChildren(java.lang.Object)
 	 */
-	@Override
 	public List getChildren(Object element) {
 		try {
 			return Arrays.asList(((IFileStore) element).childStores(EFS.NONE,
@@ -66,7 +65,6 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 * 
 	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getContents(java.lang.Object)
 	 */
-	@Override
 	public InputStream getContents(Object element) {
 		try {
 			return ((IFileStore) element).openInputStream(EFS.NONE,
@@ -82,7 +80,6 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 * 
 	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getFullPath(java.lang.Object)
 	 */
-	@Override
 	public String getFullPath(Object element) {
 		return ((IFileStore) element).toURI().getSchemeSpecificPart();
 	}
@@ -92,7 +89,6 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 * 
 	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#getLabel(java.lang.Object)
 	 */
-	@Override
 	public String getLabel(Object element) {
 		return ((IFileStore) element).getName();
 	}
@@ -102,7 +98,6 @@ public class FileStoreStructureProvider implements IImportStructureProvider {
 	 * 
 	 * @see org.eclipse.ui.wizards.datatransfer.IImportStructureProvider#isFolder(java.lang.Object)
 	 */
-	@Override
 	public boolean isFolder(Object element) {
 		return ((IFileStore) element).fetchInfo().isDirectory();
 	}

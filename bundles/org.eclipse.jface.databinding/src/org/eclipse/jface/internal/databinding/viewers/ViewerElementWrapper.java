@@ -39,7 +39,6 @@ public class ViewerElementWrapper {
 		this.comparer = comparer;
 	}
 
-	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof ViewerElementWrapper)) {
 			return false;
@@ -47,7 +46,6 @@ public class ViewerElementWrapper {
 		return comparer.equals(element, ((ViewerElementWrapper) obj).element);
 	}
 
-	@Override
 	public int hashCode() {
 		return comparer.hashCode(element);
 	}

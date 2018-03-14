@@ -28,7 +28,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 /**
  * A MultiPageEditorPart with methods that take a peek at things like selection
  * events or selection status or page change events.
- *
+ * 
  * @since 3.2
  */
 public class MultiVariablePageEditor extends MultiPageEditorPart {
@@ -39,7 +39,6 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 	 * Default with 2 pages, although they're on the same editor input and
 	 * they're the TextEditor.
 	 */
-	@Override
 	protected void createPages() {
 		try {
 			TextEditor section1 = new TextEditor();
@@ -59,12 +58,10 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 		}
 	}
 
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		// do nothing
 	}
 
-	@Override
 	public void doSaveAs() {
 		throw new UnsupportedOperationException(
 				"doSaveAs should not be called.");
@@ -72,15 +69,18 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * No save as.
-	 *
+	 * 
 	 * @return false
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#pageChange(int)
+	 */
 	protected void pageChange(int newPageIndex) {
 		super.pageChange(newPageIndex);
 		IEditorPart part = getEditor(newPageIndex);
@@ -106,7 +106,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 	/**
 	 * Set the active page in this MPEP. Just delegate back to
 	 * setActivePage(int).
-	 *
+	 * 
 	 * @param index
 	 *            The page index which must be valid.
 	 */
@@ -116,7 +116,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * Add a page with a composite for testing.
-	 *
+	 * 
 	 */
 	public void addLastPage() {
 		lastPage = new Composite(getContainer(), SWT.NONE);
@@ -127,7 +127,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * remove the last page for testing.
-	 *
+	 * 
 	 */
 	public void removeLastPage() {
 		if (getPageCount() > 0) {
@@ -138,21 +138,20 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * Get the last page composite for testing.
-	 *
+	 * 
 	 * @return the last page.
 	 */
 	public Control getLastPage() {
 		return lastPage;
 	}
-
-	@Override
+	
 	public IEditorPart getEditor(int pageIndex) {
 		return super.getEditor(pageIndex);
 	}
 
 	/**
 	 * Return the control for testing (like the editor control).
-	 *
+	 * 
 	 * @param index
 	 *            the page index to get
 	 * @return the control for that page

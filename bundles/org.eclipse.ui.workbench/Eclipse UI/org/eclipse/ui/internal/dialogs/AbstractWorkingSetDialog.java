@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,7 @@
  * Contributors:
  *      IBM Corporation - initial API and implementation 
  * 		Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font
- *   	    should be activated and used by other components.
- *      Mickael Istria (Red Hat Inc.) - 427887 Up/Down to order working sets
+ *   	should be activated and used by other components.
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -20,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -57,31 +57,30 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 	private static final int ID_REMOVE = ID_DETAILS + 1;
 	private static final int ID_SELECTALL = ID_REMOVE + 1;
 	private static final int ID_DESELECTALL = ID_SELECTALL + 1;
-	private static final int ID_UP = ID_DESELECTALL + 1;
-	private static final int ID_DOWN = ID_UP + 1;
-
+	
 	private Button newButton;
+
 	private Button detailsButton;
+
 	private Button removeButton;
-	protected Button upButton;
-	protected Button downButton;
 	
 	private Button selectAllButton;
+	
 	private Button deselectAllButton;
 
 	private IWorkingSet[] result;
 
-	private List<IWorkingSet> addedWorkingSets;
+	private List addedWorkingSets;
 
-	private List<IWorkingSet> removedWorkingSets;
+	private List removedWorkingSets;
 
-	private Map<IWorkingSet, IWorkingSet> editedWorkingSets;
+	private Map editedWorkingSets;
 
-	private List<IWorkingSet> removedMRUWorkingSets;
+	private List removedMRUWorkingSets;
 
-	private Set<String> workingSetIds;
+	private Set workingSetIds;
 	
-	protected boolean canEdit;
+	private boolean canEdit;
 
 	protected AbstractWorkingSetDialog(Shell parentShell, String[] workingSetIds, boolean canEdit) {
 		super(parentShell);
@@ -154,26 +153,6 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 					removeSelectedWorkingSets();
 				}
 			});
-
-			this.upButton = createButton(buttonComposite, ID_UP,
-					WorkbenchMessages.WorkingSetSelectionDialog_upButton_label, false);
-			this.upButton.setEnabled(false);
-			this.upButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					upSelectedWorkingSet();
-				}
-			});
-
-			this.downButton = createButton(buttonComposite, ID_DOWN,
-					WorkbenchMessages.WorkingSetSelectionDialog_downButton_label, false);
-			this.downButton.setEnabled(false);
-			this.downButton.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(SelectionEvent e) {
-					downSelectedWorkingSet();
-				}
-			});
 		}
 		
 		layout.numColumns = 1; // must manually reset the number of columns because createButton increments it - we want these buttons to be laid out vertically.
@@ -227,10 +206,6 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 	 * Deselect all working sets.
 	 */
 	protected abstract void deselectAllSets();
-
-	protected abstract void upSelectedWorkingSet();
-
-	protected abstract void downSelectedWorkingSet();
 
 	/**
 	 * Opens a working set wizard for editing the currently selected working
@@ -320,16 +295,27 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.IWorkingSetSelectionDialog#getSelection()
+	 */
 	@Override
 	public IWorkingSet[] getSelection() {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.IWorkingSetSelectionDialog#setSelection(org.eclipse.ui.IWorkingSet[])
+	 */
 	@Override
 	public void setSelection(IWorkingSet[] selection) {
 		result = selection;
 	}
 
+	/**
+	 * Overrides method in Dialog
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#open()
+	 */
 	@Override
 	public int open() {
 		addedWorkingSets = new ArrayList();
@@ -391,6 +377,9 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 
 		newButton.setEnabled(registry.hasNewPageWorkingSetDescriptor());
 
+		if (canEdit)
+			removeButton.setEnabled(hasSelection);
+
 		IWorkingSet selectedWorkingSet = null;
 		if (hasSelection) {
 			hasSingleSelection = selection.size() == 1;
@@ -399,11 +388,9 @@ public abstract class AbstractWorkingSetDialog extends SelectionDialog
 						.get(0);
 			}
 		}
-		if (canEdit) {
-			this.removeButton.setEnabled(hasSelection);
-			this.detailsButton.setEnabled(hasSingleSelection
+		if (canEdit)
+			detailsButton.setEnabled(hasSingleSelection
 				&& selectedWorkingSet.isEditable());
-		}
 
 		getOkButton().setEnabled(true);
 	}

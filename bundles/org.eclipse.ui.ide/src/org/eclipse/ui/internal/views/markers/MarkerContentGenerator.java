@@ -681,7 +681,6 @@ public class MarkerContentGenerator {
 		if (filterPreferenceListener == null) {
 			filterPreferenceListener = new IPropertyChangeListener() {
 
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(getMementoPreferenceName())) {
 						rebuildFilters();

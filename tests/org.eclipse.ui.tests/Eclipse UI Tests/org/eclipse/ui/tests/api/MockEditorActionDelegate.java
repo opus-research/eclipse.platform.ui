@@ -28,8 +28,7 @@ public class MockEditorActionDelegate extends MockActionDelegate implements
     /**
      * @see IEditorActionDelegate#setActiveEditor(IAction, IEditorPart)
      */
-    @Override
-	public void setActiveEditor(IAction action, IEditorPart targetEditor) {
+    public void setActiveEditor(IAction action, IEditorPart targetEditor) {
         callHistory.add("setActiveEditor");
         target = targetEditor;
     }
