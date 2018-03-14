@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1494,16 +1493,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
+				prefs = new HashSet<IEclipsePreferences>();
 				PlatformAdmin admin = WorkbenchSWTActivator.getDefault()
 						.getPlatformAdmin();
-				if (admin == null) {
-					return Collections.emptySet();
-				}
 
 				State state = admin.getState(false);
 				BundleDescription[] bundles = state.getBundles();
 
-				prefs = new HashSet<IEclipsePreferences>();
 				for (BundleDescription desc : bundles) {
 					if (desc.getName() != null) {
 						prefs.add(InstanceScope.INSTANCE.getNode(desc.getName()));
