@@ -21,18 +21,20 @@ import org.eclipse.ui.navigator.resources.ResourceDropAdapterAssistant;
 
 public class TestCopyDropAssistant extends ResourceDropAdapterAssistant {
 
+	@Override
 	public IStatus handleDrop(CommonDropAdapter aDropAdapter,
 			DropTargetEvent aDropTargetEvent, Object aTarget) {
 		return super.handleDrop(aDropAdapter, aDropTargetEvent, aTarget);
 	}
 
+	@Override
 	public IStatus validateDrop(Object target, int operation,
 			TransferData transferType) {
 
 		// Make sure we have the event
 		DropTargetEvent event = getCurrentEvent();
 		Assert.isTrue(event != null);
-		
+
 		// Switch to copy
 		getCommonDropAdapter().overrideOperation(DND.DROP_COPY);
 		return super.validateDrop(target, operation, transferType);

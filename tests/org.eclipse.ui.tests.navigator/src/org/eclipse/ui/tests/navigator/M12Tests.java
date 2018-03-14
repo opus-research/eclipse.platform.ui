@@ -123,7 +123,7 @@ public class M12Tests extends NavigatorTestBase {
 	 * Verifies that M1 interceptAdd is called when the resourceContent provider
 	 * invokes viewer.add(IResource). As of Galileo, add(IResource) is correctly
 	 * pipelined but remove is not.
-	 * 
+	 *
 	 * @throws CoreException
 	 */
 	public void testInterceptAdd() throws CoreException {
@@ -149,7 +149,7 @@ public class M12Tests extends NavigatorTestBase {
 	 * Verifies that M1 interceptRemove is called when the resourceContent
 	 * provider invokes viewer.remove(IResource). Currently fails in Ganymede
 	 * and Galileo due to defect #285529.
-	 * 
+	 *
 	 * @throws CoreException
 	 */
 	// Turned off until 285529 is fixed
@@ -185,7 +185,7 @@ public class M12Tests extends NavigatorTestBase {
 	 * IResource as possible children. M1 replaces IResources with M1Resources,
 	 * its interceptRefresh method should be called when
 	 * viewer.refresh(IResource) is called.
-	 * 
+	 *
 	 * @throws CoreException
 	 */
 	// Turned off until 285529 is fixed
@@ -196,6 +196,7 @@ public class M12Tests extends NavigatorTestBase {
 
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
 
+			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {
 				file2.delete(true, new NullProgressMonitor());
 				file2.create(null, true, null);

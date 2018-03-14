@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
  *     Markus Schorn (Wind River Systems) -  bug 284447
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -19,7 +20,11 @@ import java.util.List;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Preferences;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -58,8 +63,7 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
  *Note:This class extends from PreferencePage,and there's no WorkspacePreferencePage class.
  *Hence when the IDE settings doesn't appear in this preference page, this page will be empty.
  */
-public class IDEWorkspacePreferencePage extends PreferencePage
-        implements IWorkbenchPreferencePage{
+public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	private Button autoBuildButton;
 
@@ -68,6 +72,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     private IntegerFieldEditor saveInterval;
 
 	private FieldEditor workspaceName;
+	private FieldEditor showLocationInWindowTitle;
 
 	private Button autoRefreshButton;
 
@@ -100,16 +105,17 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
 		area.getControl().setLayoutData(data);
-        
-		Label space = new Label(composite,SWT.NONE);
-		space.setLayoutData(new GridData());
-		
+
+		createSpace(composite);
         createAutoBuildPref(composite);
         createAutoRefreshControls(composite);
         createSaveAllBeforeBuildPref(composite);
         createCloseUnrelatedProjPrefControls(composite);
-        
+
         createSpace(composite);
+		createWorkspaceLocationGroup(composite);
+
+		createSpace(composite);
         createSaveIntervalGroup(composite);
         createWindowTitleGroup(composite);
 		createSpace(composite);
@@ -180,6 +186,40 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         autoBuildButton.setSelection(ResourcesPlugin.getWorkspace()
                 .isAutoBuilding());
     }
+
+	/**
+	 * Create a composite that contains entry fields specifying the workspace
+	 * location.
+	 *
+	 * @param composite
+	 *            the Composite the group is created in.
+	 */
+	private void createWorkspaceLocationGroup(Composite composite) {
+		Composite groupComposite = new Composite(composite, SWT.LEFT);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(groupComposite);
+		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(groupComposite);
+
+		// true workspace location
+		Label locationLabel = new Label(groupComposite, SWT.NONE);
+		locationLabel.setText(IDEWorkbenchMessages.IDEWorkspacePreference_workspaceLocation);
+		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(locationLabel);
+		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
+		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+		workspacePath.setText(Platform.getLocation().toOSString());
+		workspacePath.setToolTipText(workspacePath.getText());
+		workspacePath.setSelection(workspacePath.getText().length());
+		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
+				.hint(convertHorizontalDLUsToPixels(200), SWT.DEFAULT).applyTo(workspacePath);
+
+		Composite showLocationComposite = new Composite(composite, SWT.LEFT);
+		GridDataFactory.fillDefaults().grab(true, false).applyTo(showLocationComposite);
+		GridLayoutFactory.fillDefaults().applyTo(showLocationComposite);
+		showLocationInWindowTitle = new BooleanFieldEditor(IDEInternalPreferences.SHOW_LOCATION,
+				IDEWorkbenchMessages.IDEWorkspacePreference_showLocationInWindowTitle, showLocationComposite);
+		showLocationInWindowTitle.setPage(this);
+		showLocationInWindowTitle.setPreferenceStore(getIDEPreferenceStore());
+		showLocationInWindowTitle.load();
+	}
 
     /**
      * Create a composite that contains entry fields specifying save interval
@@ -256,10 +296,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     }
 
 	/**
-     * Create the Refresh controls
-     * 
-     * @param parent
-     */
+	 * Create the Refresh controls
+	 *
+	 * @param parent
+	 */
     private void createAutoRefreshControls(Composite parent) {
 
         this.autoRefreshButton = new Button(parent, SWT.CHECK);
@@ -270,22 +310,20 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         this.lightweightRefreshButton.setText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonText);
         this.lightweightRefreshButton.setToolTipText(IDEWorkbenchMessages.IDEWorkspacePreference_RefreshLightweightButtonToolTip);
 
-        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
-                .getPluginPreferences().getBoolean(
-                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
-        boolean autoRefresh = ResourcesPlugin.getPlugin()
-		        .getPluginPreferences().getBoolean(
-		                ResourcesPlugin.PREF_AUTO_REFRESH);
-        
+		boolean lightweightRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+				ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false, null);
+		boolean autoRefresh = Platform.getPreferencesService().getBoolean(ResourcesPlugin.PI_RESOURCES,
+				ResourcesPlugin.PREF_AUTO_REFRESH, false, null);
+
         this.autoRefreshButton.setSelection(autoRefresh);
         this.lightweightRefreshButton.setSelection(lightweightRefresh);
     }
 
     /**
-     * Create a composite that contains the encoding controls
-     * 
-     * @param parent
-     */
+	 * Create a composite that contains the encoding controls
+	 *
+	 * @param parent
+	 */
     private void createEncodingEditorControls(Composite parent){    			
 		Composite encodingComposite = new Composite(parent,SWT.NONE);
 		encodingComposite.setLayout(new GridLayout());
@@ -407,10 +445,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 | GridData.HORIZONTAL_ALIGN_FILL));
         return composite;
     }
-	
+
 	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
-        //no-op
     }
     
     /**
@@ -429,6 +466,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
+		showLocationInWindowTitle.loadDefault();
         workspaceName.loadDefault();
         
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
@@ -504,6 +542,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
             }
         }
         
+		showLocationInWindowTitle.store();
         workspaceName.store();
 
 		systemExplorer.store();
