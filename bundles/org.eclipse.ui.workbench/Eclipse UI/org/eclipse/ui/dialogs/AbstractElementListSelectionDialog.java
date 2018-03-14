@@ -75,7 +75,8 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
      * @param parent The parent for the list.
      * @param renderer ILabelProvider for the list
      */
-	protected AbstractElementListSelectionDialog(Shell parent, ILabelProvider renderer) {
+    protected AbstractElementListSelectionDialog(Shell parent,
+            ILabelProvider renderer) {
         super(parent);
         fRenderer = renderer;
     }

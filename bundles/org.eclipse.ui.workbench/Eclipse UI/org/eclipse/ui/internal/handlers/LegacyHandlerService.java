@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Daniel Kruegler <daniel.kruegler@gmail.com> - Bug 487418
- *     Friederike Schertel <friederike@schertel.org> - Bug 478336
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -83,6 +81,9 @@ public class LegacyHandlerService implements IHandlerService {
 
 		private final String commandId;
 
+		/**
+		 *
+		 */
 		public HandlerSelectionFunction(String commandId) {
 			this.commandId = commandId;
 		}
@@ -93,7 +94,6 @@ public class LegacyHandlerService implements IHandlerService {
 			HashSet<HandlerActivation> activationSet = new HashSet<>();
 			IEclipseContext current = context;
 			while (current != null) {
-				@SuppressWarnings("unchecked")
 				List<HandlerActivation> handlerActivations = (List<HandlerActivation>) current
 						.getLocal(LEGACY_H_ID + commandId);
 				if (handlerActivations != null) {
@@ -177,17 +177,15 @@ public class LegacyHandlerService implements IHandlerService {
 	}
 
 	static void addHandlerActivation(HandlerActivation eActivation) {
-		@SuppressWarnings("unchecked")
-		List<HandlerActivation> handlerActivations = (List<HandlerActivation>) eActivation.context
-				.getLocal(LEGACY_H_ID
+		List handlerActivations = (List) eActivation.context.getLocal(LEGACY_H_ID
 				+ eActivation.getCommandId());
 		if (handlerActivations == null) {
-			handlerActivations = new ArrayList<>();
+			handlerActivations = new ArrayList();
 		} else {
 			if (handlerActivations.contains(eActivation)) {
 				return;
 			}
-			handlerActivations = new ArrayList<>(handlerActivations);
+			handlerActivations = new ArrayList(handlerActivations);
 		}
 		handlerActivations.add(eActivation);
 		// setting this so that we trigger invalidations
@@ -195,14 +193,12 @@ public class LegacyHandlerService implements IHandlerService {
 	}
 
 	static void removeHandlerActivation(HandlerActivation eActivation) {
-		@SuppressWarnings("unchecked")
-		List<HandlerActivation> handlerActivations = (List<HandlerActivation>) eActivation.context
-				.getLocal(LEGACY_H_ID
+		List handlerActivations = (List) eActivation.context.getLocal(LEGACY_H_ID
 				+ eActivation.getCommandId());
 		if (handlerActivations == null) {
-			handlerActivations = new ArrayList<>();
+			handlerActivations = new ArrayList();
 		} else {
-			handlerActivations = new ArrayList<>(handlerActivations);
+			handlerActivations = new ArrayList(handlerActivations);
 		}
 		handlerActivations.remove(eActivation);
 		// setting this so that we trigger invalidations
@@ -231,10 +227,14 @@ public class LegacyHandlerService implements IHandlerService {
 
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -270,16 +270,10 @@ public class LegacyHandlerService implements IHandlerService {
 		if (global || defaultExpression == null) {
 			return registerLegacyHandler(eclipseContext, commandId, commandId, handler, expression);
 		}
-		Expression e;
-		if (expression != null) {
-			AndExpression andExpr = new AndExpression();
-			andExpr.add(expression);
-			andExpr.add(defaultExpression);
-			e = andExpr;
-		} else {
-			e = defaultExpression;
-		}
-		return registerLegacyHandler(eclipseContext, commandId, commandId, handler, e);
+		AndExpression andExpr = new AndExpression();
+		andExpr.add(expression);
+		andExpr.add(defaultExpression);
+		return registerLegacyHandler(eclipseContext, commandId, commandId, handler, andExpr);
 	}
 
 	@Override
@@ -373,6 +367,7 @@ public class LegacyHandlerService implements IHandlerService {
 	public Object executeCommandInContext(ParameterizedCommand command, Event event,
 			IEvaluationContext context) throws ExecutionException, NotDefinedException,
 			NotEnabledException, NotHandledException {
+
 		IHandler handler = command.getCommand().getHandler();
 		boolean enabled = handler.isEnabled();
 		IEclipseContext staticContext = null;
@@ -431,11 +426,11 @@ public class LegacyHandlerService implements IHandlerService {
 	private void populateSnapshot(IEvaluationContext context, IEclipseContext staticContext) {
 		IEvaluationContext ctxPtr = context;
 		while (ctxPtr != null && !(ctxPtr instanceof ExpressionContext)) {
-			Map<?, ?> vars = getVariables(ctxPtr);
+			Map vars = getVariables(ctxPtr);
 			if (vars != null) {
-				Iterator<?> i = vars.entrySet().iterator();
+				Iterator i = vars.entrySet().iterator();
 				while (i.hasNext()) {
-					Map.Entry<?, ?> entry = (Map.Entry<?, ?>) i.next();
+					Map.Entry entry = (Map.Entry) i.next();
 					if (staticContext.getLocal(entry.getKey().toString()) == null) {
 						staticContext.set(entry.getKey().toString(), entry.getValue());
 					}
@@ -445,11 +440,11 @@ public class LegacyHandlerService implements IHandlerService {
 		}
 	}
 
-	private Map<?, ?> getVariables(IEvaluationContext ctx) {
+	private Map getVariables(IEvaluationContext ctx) {
 		Field vars = getContextVariablesField();
 		if (vars != null) {
 			try {
-				return (Map<?, ?>) vars.get(ctx);
+				return (Map) vars.get(ctx);
 			} catch (IllegalArgumentException e) {
 
 			} catch (IllegalAccessException e) {

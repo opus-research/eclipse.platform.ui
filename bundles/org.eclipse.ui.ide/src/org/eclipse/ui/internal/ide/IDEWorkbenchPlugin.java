@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,11 +91,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
      * Marker image registry; lazily initialized.
      */
     private MarkerImageProviderRegistry markerImageProviderRegistry = null;
-
-	/**
-	 * Unassociated file/editor strategy registry; lazily initialized
-	 */
-	private UnassociatedEditorStrategyRegistry unassociatedEditorStrategyRegistry = null;
 
 	private ResourceManager resourceManager;
 
@@ -267,17 +262,6 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         return markerImageProviderRegistry;
     }
 
-	/**
-	 * Returns the unassociated file/editor strategy registry for the workbench.
-	 *
-	 * @return the unassociated file/editor strategy registry
-	 */
-	public synchronized UnassociatedEditorStrategyRegistry getUnassociatedEditorStrategyRegistry() {
-		if (unassociatedEditorStrategyRegistry == null) {
-			unassociatedEditorStrategyRegistry = new UnassociatedEditorStrategyRegistry();
-		}
-		return unassociatedEditorStrategyRegistry;
-	}
 
     /**
      * Returns the about information of all known features,
