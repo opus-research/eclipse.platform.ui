@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - 427887 Added method to order working sets
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -298,10 +297,10 @@ public interface IWorkingSetManager {
     public IWorkingSet getWorkingSet(String name);
 
     /**
-	 * Returns an array of all working sets stored in the receiver. Any working
-	 * set whose {@link IWorkingSet#isVisible()} method returns false will not be
-	 * included in this array. For a complete list of working sets please use
-	 * {@link #getAllWorkingSets()}.
+	 * Returns an array of all working sets stored in the receiver. The array is
+	 * sorted by names. Any working set whose {@link IWorkingSet#isVisible()}
+	 * method returns false will not be included in this array. For a complete
+	 * list of working sets please use {@link #getAllWorkingSets()}.
 	 * 
 	 * @return the working sets stored in the receiver
 	 */
@@ -369,15 +368,4 @@ public interface IWorkingSetManager {
 	 * @since 3.7
 	 */
 	public int getRecentWorkingSetsLength();
-
-	/**
-	 * Allows to reorder working sets internally by swapping 2 of them
-	 * 
-	 * @param first
-	 *            working set to swap
-	 * @param second
-	 *            working set to swap
-	 * @since 3.107
-	 */
-	public void swapWorkingSets(IWorkingSet first, IWorkingSet second);
 }
