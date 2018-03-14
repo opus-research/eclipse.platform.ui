@@ -73,6 +73,7 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -2782,6 +2783,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (extensions.length == 0) {
 			return;
 		}
+
+		int numProcessors = Runtime.getRuntime().availableProcessors();
+		final JobGroup jobGroup = new JobGroup("Early startup job group", numProcessors, 1); //$NON-NLS-1$
+
 		Job job = new Job("Workbench early startup") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -2792,13 +2797,31 @@ UIEvents.Context.TOPIC_CONTEXT,
 					if (monitor.isCanceled() || !isRunning()) {
 						return Status.CANCEL_STATUS;
 					}
-					IExtension extension = extensions[i];
+					final IExtension extension = extensions[i];
 
 					// if the plugin is not in the set of disabled plugins, then
 					// execute the code to start it
 					if (!disabledPlugins.contains(extension.getNamespace())) {
 						monitor.subTask(extension.getNamespace());
-						SafeRunner.run(new EarlyStartupRunnable(extension));
+
+						Job extensionJob = new Job("Early stattup job") { //$NON-NLS-1$
+							@Override
+							protected IStatus run(IProgressMonitor monitor) {
+								monitor.beginTask(extension.getNamespaceIdentifier(), 1);
+								SafeRunner.run(new EarlyStartupRunnable(extension));
+								monitor.done();
+								return Status.OK_STATUS;
+							}
+
+							@Override
+							public boolean belongsTo(Object family) {
+								return EARLY_STARTUP_FAMILY.equals(family);
+							}
+						};
+
+						extensionJob.setSystem(true);
+						extensionJob.setJobGroup(jobGroup);
+						extensionJob.schedule();
 					}
 					monitor.worked(1);
 				}
@@ -2812,6 +2835,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 		};
 		job.setSystem(true);
+		job.setJobGroup(jobGroup);
 		job.schedule();
 	}
 
