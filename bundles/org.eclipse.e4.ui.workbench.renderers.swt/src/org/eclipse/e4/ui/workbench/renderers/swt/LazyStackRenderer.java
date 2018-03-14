@@ -67,10 +67,6 @@ public abstract class LazyStackRenderer extends SWTPartRenderer {
 		}
 	};
 
-	public LazyStackRenderer() {
-		super();
-	}
-
 	public void init(IEventBroker eventBroker) {
 		// Ensure that there only ever *one* listener. Each subclass
 		// will call this method
