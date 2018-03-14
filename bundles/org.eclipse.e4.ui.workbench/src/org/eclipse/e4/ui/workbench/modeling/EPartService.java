@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 395825, 433188
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 395825
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.modeling;
 
@@ -343,22 +343,18 @@ public interface EPartService {
 	 * @param perspective
 	 *            the perspective to switch to, must not be <code>null</code> and it must be a
 	 *            perspective that's being managed by this service
-	 *
-	 * @since 1.4
+	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	public void switchPerspective(MPerspective perspective);
 
 	/**
-	 * Switch to the specified perspective. It will be selected and brought to
-	 * top (if necessary). It may not necessarily be granted focus if there is
-	 * another active window present.
+	 * Switch to the specified perspective. It will be selected and brought to top (if necessary).
+	 * It may not necessarily be granted focus if there is another active window present.
 	 *
 	 * @param perspectiveId
-	 *            the perspective to switch to, must not be <code>null</code>
-	 *            and it must identify a perspective that's being managed by
-	 *            this service
-	 *
-	 * @since 1.4
+	 *            the perspective to switch to, must not be <code>null</code> and it must identify
+	 *            a perspective that's being managed by this service
+	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	public void switchPerspective(String perspectiveId);
 
