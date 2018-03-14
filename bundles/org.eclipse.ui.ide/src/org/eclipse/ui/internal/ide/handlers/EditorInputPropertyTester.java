@@ -42,11 +42,12 @@ public class EditorInputPropertyTester extends PropertyTester {
 			return true;
 		}
 		if (input == null) {
-			IDEWorkbenchPlugin.log("IEditorPart passed in without IEditorInput set for  " + editor.getClass()); //$NON-NLS-1$
+			IllegalArgumentException e = new IllegalArgumentException(
+					"IEditorPart passed in without IEditorInput set for  " + editor.getClass()); //$NON-NLS-1$
+			IDEWorkbenchPlugin.log(e.getMessage(), e);
 			return false;
 		}
 		Object obj = input.getAdapter(IResource.class);
 		return obj != null;
 	}
-
 }
