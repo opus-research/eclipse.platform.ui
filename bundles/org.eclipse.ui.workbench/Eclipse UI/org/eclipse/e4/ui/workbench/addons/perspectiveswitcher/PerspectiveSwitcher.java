@@ -477,9 +477,6 @@ public class PerspectiveSwitcher {
 		bar.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				if (dragItem == null)
-					return;
-
 				ToolBar bar = (ToolBar) e.widget;
 				ToolItem curItem = bar.getItem(new Point(e.x, e.y));
 				if (curItem != null && curItem.getData() instanceof MPerspective) {
