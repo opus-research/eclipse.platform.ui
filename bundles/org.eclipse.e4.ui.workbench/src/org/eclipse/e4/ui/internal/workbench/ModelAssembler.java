@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -78,19 +78,22 @@ public class ModelAssembler {
 		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
+		runProcessors(extensions, false);
+		runFragments(extensions, imports, addedElements);
+		runProcessors(extensions, true);
+
+		resolveImports(imports, addedElements);
+	}
+
+	/**
+	 * @param extensions
+	 * @param imports
+	 * @param addedElements
+	 */
+	private void runFragments(IExtension[] extensions, List<MApplicationElement> imports,
+			List<MApplicationElement> addedElements) {
 		E4XMIResource applicationResource = (E4XMIResource) ((EObject) application).eResource();
 		ResourceSet resourceSet = applicationResource.getResourceSet();
-
-		for (IExtension extension : extensions) {
-			IConfigurationElement[] ces = extension.getConfigurationElements();
-			for (IConfigurationElement ce : ces) {
-				if (!"processor".equals(ce.getName()) || !Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
-				}
-				runProcessor(ce);
-			}
-		}
-
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
@@ -190,19 +193,23 @@ public class ModelAssembler {
 				}
 			}
 		}
+	}
 
+	/**
+	 * @param extensions
+	 * @param b
+	 */
+	private void runProcessors(IExtension[] extensions, Boolean afterFragments) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
-				if (!"processor".equals(ce.getName()) || Boolean.parseBoolean(ce.getAttribute("beforefragment"))) { //$NON-NLS-1$ //$NON-NLS-2$
-					continue;
+				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
+				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$ 
+					runProcessor(ce);
 				}
 
-				runProcessor(ce);
 			}
 		}
-
-		resolveImports(imports, addedElements);
 	}
 
 	private void runProcessor(IConfigurationElement ce) {
