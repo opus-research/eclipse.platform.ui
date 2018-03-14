@@ -133,9 +133,17 @@
             <command
                   commandId="org.eclipse.ui.window.newEditor"
                   label="%command.clone.label"
+                  mnemonic="%command.clone.mnemonic"
                   style="push">
             </command>
          </menu>
       </menuContribution>
+   </extension>
+   <extension
+         id="id1"
+         point="org.eclipse.e4.workbench.model">
+      <fragment
+            uri="LegacyIDE_fragment.e4xmi">
+      </fragment>
    </extension>
 </plugin>
