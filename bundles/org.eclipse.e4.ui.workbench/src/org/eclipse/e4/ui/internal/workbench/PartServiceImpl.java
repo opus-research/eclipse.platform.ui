@@ -977,6 +977,9 @@ public class PartServiceImpl implements EPartService {
 			((List) lastContainer.getChildren()).add(placeholder);
 		}
 
+		// Force the stack with the new part to be visible
+		lastContainer.setToBeRendered(true);
+
 		if (category != null) {
 			lastContainer.getTags().add(category);
 		}
