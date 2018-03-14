@@ -15,27 +15,28 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 class PreviousPicksProvider extends QuickAccessProvider {
 
-	private List<QuickAccessElement> previousPicksList;
+	private List<IQuickAccessElement> previousPicksList;
 
-	PreviousPicksProvider(List<QuickAccessElement> previousPicksList) {
+	PreviousPicksProvider(List<IQuickAccessElement> previousPicksList) {
 		this.previousPicksList = previousPicksList;
 	}
 
 	@Override
-	public QuickAccessElement getElementForId(String id) {
+	public IQuickAccessElement getElementForId(String id) {
 		return null;
 	}
 
 	@Override
-	public QuickAccessElement[] getElements() {
-		return previousPicksList.toArray(new QuickAccessElement[previousPicksList.size()]);
+	public IQuickAccessElement[] getElements() {
+		return previousPicksList.toArray(new IQuickAccessElement[previousPicksList.size()]);
 	}
 
 	@Override
-	public QuickAccessElement[] getElementsSorted() {
+	public IQuickAccessElement[] getElementsSorted() {
 		return getElements();
 	}
 

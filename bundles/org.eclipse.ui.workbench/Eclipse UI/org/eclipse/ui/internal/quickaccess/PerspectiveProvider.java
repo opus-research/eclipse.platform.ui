@@ -19,6 +19,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -26,7 +27,7 @@ import org.eclipse.ui.internal.WorkbenchImages;
  */
 public class PerspectiveProvider extends QuickAccessProvider {
 
-	private QuickAccessElement[] cachedElements;
+	private IQuickAccessElement[] cachedElements;
 	private Map<String, PerspectiveElement> idToElement = new HashMap<String, PerspectiveElement>();
 
 	@Override
@@ -35,17 +36,17 @@ public class PerspectiveProvider extends QuickAccessProvider {
 	}
 
 	@Override
-	public QuickAccessElement getElementForId(String id) {
+	public IQuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
 	@Override
-	public QuickAccessElement[] getElements() {
+	public IQuickAccessElement[] getElements() {
 		if (cachedElements == null) {
 			IPerspectiveDescriptor[] perspectives = PlatformUI.getWorkbench()
 					.getPerspectiveRegistry().getPerspectives();
-			cachedElements = new QuickAccessElement[perspectives.length];
+			cachedElements = new IQuickAccessElement[perspectives.length];
 			for (int i = 0; i < perspectives.length; i++) {
 				if (!WorkbenchActivityHelper.filterItem(perspectives[i])) {
 					PerspectiveElement perspectiveElement = new PerspectiveElement(perspectives[i],

@@ -25,6 +25,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -40,13 +41,13 @@ public class ActionProvider extends QuickAccessProvider {
 	}
 
 	@Override
-	public QuickAccessElement getElementForId(String id) {
+	public IQuickAccessElement getElementForId(String id) {
 		getElements();
 		return (ActionElement) idToElement.get(id);
 	}
 
 	@Override
-	public QuickAccessElement[] getElements() {
+	public IQuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
 			IWorkbenchWindow window = PlatformUI

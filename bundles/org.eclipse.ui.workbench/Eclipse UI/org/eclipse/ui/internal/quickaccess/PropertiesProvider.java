@@ -25,6 +25,7 @@ import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.dialogs.PropertyPageContributorManager;
 import org.eclipse.ui.internal.dialogs.PropertyPageManager;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -35,13 +36,13 @@ public class PropertiesProvider extends QuickAccessProvider {
 	private Map idToElement;
 
 	@Override
-	public QuickAccessElement getElementForId(String id) {
+	public IQuickAccessElement getElementForId(String id) {
 		getElements();
 		return (PropertiesElement) idToElement.get(id);
 	}
 
 	@Override
-	public QuickAccessElement[] getElements() {
+	public IQuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
 			IWorkbenchPage activePage = PlatformUI.getWorkbench()
@@ -68,8 +69,8 @@ public class PropertiesProvider extends QuickAccessProvider {
 				}
 			}
 		}
-		return (QuickAccessElement[]) idToElement.values().toArray(
-				new QuickAccessElement[idToElement.values().size()]);
+		return (IQuickAccessElement[]) idToElement.values().toArray(
+				new IQuickAccessElement[idToElement.values().size()]);
 	}
 
 	@Override
