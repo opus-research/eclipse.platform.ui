@@ -1585,6 +1585,11 @@ public final class Workbench extends EventManager implements IWorkbench,
 			}
 		});
 		initializeE4Services();
+		initializeDefaultServices();
+		initializeFonts();
+		initializeColors();
+		initializeApplicationColors();
+
 		IIntroRegistry introRegistry = WorkbenchPlugin.getDefault().getIntroRegistry();
 		if (introRegistry.getIntroCount() > 0) {
 			IProduct product = Platform.getProduct();
@@ -1593,10 +1598,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 						.getId());
 			}
 		}
-		initializeDefaultServices();
-		initializeFonts();
-		initializeColors();
-		initializeApplicationColors();
 
 		// now that the workbench is sufficiently initialized, let the advisor
 		// have a turn.
