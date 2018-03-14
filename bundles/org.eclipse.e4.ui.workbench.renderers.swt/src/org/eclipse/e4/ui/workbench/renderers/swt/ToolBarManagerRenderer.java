@@ -7,7 +7,8 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 41042
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -786,6 +787,13 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private void addToManager(ToolBarManager parentManager,
 			MToolBarElement model, IContributionItem ci) {
 		MElementContainer<MUIElement> parent = model.getParent();
+
+		if (Arrays.asList(parentManager.getItems()).contains(ci)) {
+			// The parent manager contributions are already up to date.
+			// This can happen for programmatic contributions.
+			return;
+		}
+
 		// technically this shouldn't happen
 		if (parent == null) {
 			parentManager.add(ci);

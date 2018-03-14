@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -722,6 +723,9 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				//new Exception("fill(MToolBar container, IContributionManager manager) with " //$NON-NLS-1$
 				//		+ item + " to " + manager2).printStackTrace(); //$NON-NLS-1$
 				fill(container, manager2);
+			} else if (item instanceof IMenuManager) {
+				// No element to add in toolbar: 
+			    // let the menu manager control its contributions.
 			} else if (item instanceof IContributionManager) {
 				// new Exception(
 				//		"fill(MToolBar container, IContributionManager manager) with rogue contribution manager: " //$NON-NLS-1$
