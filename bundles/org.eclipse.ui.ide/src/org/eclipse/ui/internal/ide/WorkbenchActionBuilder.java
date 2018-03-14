@@ -657,8 +657,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 		showViewMenuMgr.add(showViewMenu);
 		return showViewMenuMgr;
 	}
-
-/**
+	/**
 	 * Adds the perspective actions to the specified menu.
 	 */
 	private MenuManager addPerspectiveActions() {
@@ -672,14 +671,20 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 		IContributionItem changePerspMenuItem = ContributionItemFactory.PERSPECTIVES_SHORTLIST.create(getWindow());
 		changePerspMenuMgr.add(changePerspMenuItem);
 		menu.add(changePerspMenuMgr);
-
+		
+		String closeText = IDEWorkbenchMessages.Workbench_closePerspective;
+		MenuManager closePerspMenuMgr = new MenuManager(closeText, "closePerspective"); //$NON-NLS-1$
+		
+		closePerspMenuMgr.add(closePerspAction);
+		closePerspMenuMgr.add(closeAllPerspsAction);
+		menu.add(closePerspMenuMgr);
+		menu.add(getResetPerspectiveItem());
+		
+		
 		menu.add(new Separator());
 		menu.add(editActionSetAction);
 		menu.add(getSavePerspectiveItem());
-		menu.add(getResetPerspectiveItem());
-		menu.add(closePerspAction);
-		menu.add(closeAllPerspsAction);
-
+	
 		return menu;
 	}
 
