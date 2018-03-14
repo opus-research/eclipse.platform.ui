@@ -4032,21 +4032,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 				perspective.getId(), window);
 
 		if (modelPerspective == null) {
-
 			// couldn't find the perspective, create a new one
-			modelPerspective = modelService.createModelElement(MPerspective.class);
-
-			// tag it with the same id
-			modelPerspective.setElementId(perspective.getId());
-
-			// instantiate the perspective
-			IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
-			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
-					partService, modelPerspective, perspective, this, true);
-			factory.createInitialLayout(modelLayout);
-			PerspectiveTagger.tagPerspective(modelPerspective, modelService);
-			PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
-			reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
+			modelPerspective = createPerspective(perspective);
 		}
 
 		modelPerspective.setLabel(perspective.getLabel());
@@ -4074,6 +4061,27 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
+	}
+
+	/**
+	 * @param perspective
+	 * @return never null
+	 */
+	public MPerspective createPerspective(IPerspectiveDescriptor perspective) {
+		MPerspective modelPerspective = modelService.createModelElement(MPerspective.class);
+
+		// tag it with the same id
+		modelPerspective.setElementId(perspective.getId());
+
+		// instantiate the perspective
+		IPerspectiveFactory factory = ((PerspectiveDescriptor) perspective).createFactory();
+		ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
+				partService, modelPerspective, perspective, this, true);
+		factory.createInitialLayout(modelLayout);
+		PerspectiveTagger.tagPerspective(modelPerspective, modelService);
+		PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
+		reader.extendLayout(getExtensionTracker(), perspective.getId(), modelLayout);
+		return modelPerspective;
 	}
 
 	void perspectiveActionSetChanged(Perspective perspective, IActionSetDescriptor descriptor,
