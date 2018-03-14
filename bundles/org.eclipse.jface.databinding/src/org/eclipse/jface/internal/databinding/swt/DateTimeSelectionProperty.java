@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,18 +8,10 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 169876)
  *     Matthew Hall - bug 271720
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 468293
- *     Simon Scholz <Simon.Scholz @vogella.com> - Bug 468293
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.swt;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -32,9 +24,6 @@ import org.eclipse.swt.widgets.DateTime;
  *
  */
 public class DateTimeSelectionProperty extends WidgetValueProperty {
-
-	private static final int MONTH_MAPPING_VALUE = 1;
-
 	/**
 	 *
 	 */
@@ -44,20 +33,33 @@ public class DateTimeSelectionProperty extends WidgetValueProperty {
 
 	@Override
 	public Object getValueType() {
-		return TemporalAdjuster.class;
+		return Date.class;
 	}
+
+	// One calendar per thread to preserve thread-safety
+	private static final ThreadLocal calendar = new ThreadLocal() {
+		@Override
+		protected Object initialValue() {
+			return Calendar.getInstance();
+		}
+	};
 
 	@Override
 	protected Object doGetValue(Object source) {
 		DateTime dateTime = (DateTime) source;
 
-		// create LocalTime instance, if SWT.TIME is used,...
+		Calendar cal = (Calendar) calendar.get();
+		cal.clear();
 		if ((dateTime.getStyle() & SWT.TIME) != 0) {
-			return LocalTime.of(dateTime.getHours(), dateTime.getMinutes(), dateTime.getSeconds());
+			cal.set(Calendar.HOUR_OF_DAY, dateTime.getHours());
+			cal.set(Calendar.MINUTE, dateTime.getMinutes());
+			cal.set(Calendar.SECOND, dateTime.getSeconds());
+		} else {
+			cal.set(Calendar.YEAR, dateTime.getYear());
+			cal.set(Calendar.MONTH, dateTime.getMonth());
+			cal.set(Calendar.DAY_OF_MONTH, dateTime.getDay());
 		}
-
-		// ... otherwise LocalDate
-		return LocalDate.of(dateTime.getYear(), dateTime.getMonth() + MONTH_MAPPING_VALUE, dateTime.getDay());
+		return cal.getTime();
 	}
 
 	@Override
@@ -65,39 +67,17 @@ public class DateTimeSelectionProperty extends WidgetValueProperty {
 		DateTime dateTime = (DateTime) source;
 
 		if (value == null)
-			throw new IllegalArgumentException("Cannot set null selection on DateTime"); //$NON-NLS-1$
+			throw new IllegalArgumentException(
+					"Cannot set null selection on DateTime"); //$NON-NLS-1$
 
-		TemporalAccessor temporalAccessor = getTemporalAccessor(value);
-
-		if (temporalAccessor == null)
-			throw new IllegalArgumentException("Cannot find TemporalAccessor for the given value"); //$NON-NLS-1$
-
-		// set only hours, minutes and seconds in case the SWT.TIME flag is
-		// set,...
+		Calendar cal = (Calendar) calendar.get();
+		cal.setTime((Date) value);
 		if ((dateTime.getStyle() & SWT.TIME) != 0) {
-			dateTime.setTime(temporalAccessor.get(ChronoField.HOUR_OF_DAY),
-					temporalAccessor.get(ChronoField.MINUTE_OF_HOUR),
-					temporalAccessor.get(ChronoField.SECOND_OF_MINUTE));
+			dateTime.setTime(cal.get(Calendar.HOUR_OF_DAY), cal
+					.get(Calendar.MINUTE), cal.get(Calendar.SECOND));
 		} else {
-			// ... otherwise set year, month and day.
-			dateTime.setDate(temporalAccessor.get(ChronoField.YEAR),
-					temporalAccessor.get(ChronoField.MONTH_OF_YEAR) - MONTH_MAPPING_VALUE,
-					temporalAccessor.get(ChronoField.DAY_OF_MONTH));
+			dateTime.setDate(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH),
+					cal.get(Calendar.DAY_OF_MONTH));
 		}
 	}
-
-	// get TemporalAccessor from a Date, Calendar or TemporalAccessor object
-	private TemporalAccessor getTemporalAccessor(Object value) {
-		TemporalAccessor temporalAccessor = null;
-
-		if (value instanceof Date) {
-			temporalAccessor = LocalDateTime.from(((Date) value).toInstant());
-		} else if (value instanceof TemporalAccessor) {
-			temporalAccessor = (TemporalAccessor) value;
-		} else if (value instanceof Calendar) {
-			temporalAccessor = LocalDateTime.from(((Calendar) value).toInstant());
-		}
-		return temporalAccessor;
-	}
-
 }
