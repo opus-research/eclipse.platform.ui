@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 427777
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -291,7 +292,8 @@ public class UIEvents {
 		/**
 		 * Sent when a perspective is reset
 		 * 
-		 * @since 1.2
+		 * @since 1.3
+		 * 
 		 */
 		public static final String PERSPECTIVE_RESET = TOPIC + TOPIC_SEP + "perspReset"; //$NON-NLS-1$
 
