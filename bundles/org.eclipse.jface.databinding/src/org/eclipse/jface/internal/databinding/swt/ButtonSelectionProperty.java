@@ -26,17 +26,14 @@ public class ButtonSelectionProperty extends WidgetBooleanValueProperty {
 		super(SWT.Selection);
 	}
 
-	@Override
 	boolean doGetBooleanValue(Object source) {
 		return ((Button) source).getSelection();
 	}
 
-	@Override
 	void doSetBooleanValue(Object source, boolean value) {
 		((Button) source).setSelection(value);
 	}
 
-	@Override
 	public String toString() {
 		return "Button.selection <Boolean>"; //$NON-NLS-1$
 	}

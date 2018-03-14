@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664, 442278
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -42,6 +41,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -78,7 +78,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 	private static final String E4_THEME_EXTENSION_POINT = "org.eclipse.e4.ui.css.swt.theme"; //$NON-NLS-1$
 
-	/** The workbench theme engine; may be {@code null} if no engine */
 	private IThemeEngine engine;
 	private ComboViewer themeIdCombo;
 	private ControlDecoration themeComboDecorator;
@@ -102,10 +101,6 @@ public class ViewsPreferencePage extends PreferencePage implements
 		GridLayout layout = new GridLayout(2, false);
 		layout.horizontalSpacing = 10;
 		comp.setLayout(layout);
-		if (engine == null) {
-			new Label(comp, SWT.NONE).setText(WorkbenchMessages.ThemingDisabled);
-			return comp;
-		}
 		new Label(comp, SWT.NONE).setText(WorkbenchMessages.ViewsPreferencePage_Theme);
 		highContrastMode = parent.getDisplay().getHighContrast();
 
@@ -139,6 +134,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 				} else {
 					themeComboDecorator.hide();
 				}
+				engine.setTheme(selection, false);
 				try {
 					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 							.setSelection(selection);
@@ -222,12 +218,12 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	/** @return the currently selected theme or null if there are no themes */
 	private ITheme getSelectedTheme() {
-		return (ITheme) (themeIdCombo.getStructuredSelection().getFirstElement());
+		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
-		MApplication application = workbench.getService(MApplication.class);
+		MApplication application = (MApplication) workbench.getService(MApplication.class);
 		IEclipseContext context = application.getContext();
 		defaultTheme = (String) context.get(E4Application.THEME_ID);
 		engine = context.get(IThemeEngine.class);
@@ -235,19 +231,17 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	@Override
 	public boolean performOk() {
-		if (engine != null) {
-			ITheme theme = getSelectedTheme();
-			if (theme != null) {
-				engine.setTheme(getSelectedTheme(), !highContrastMode);
-			}
-
-			IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
-			apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
-					enableAnimations.getSelection());
-			apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS,
-					useColoredLabels.getSelection());
-			((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
+		ITheme theme = getSelectedTheme();
+		if (theme != null) {
+			engine.setTheme(getSelectedTheme(), !highContrastMode);
 		}
+
+		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
+		apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
+				enableAnimations.getSelection());
+		apiStore.setValue(IWorkbenchPreferenceConstants.USE_COLORED_LABELS,
+				useColoredLabels.getSelection());
+		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performOK();
 		return super.performOk();
 	}
 
@@ -261,53 +255,47 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 	@Override
 	protected void performDefaults() {
-		if (engine != null) {
-			setColorsAndFontsTheme(currentColorsAndFontsTheme);
+		setColorsAndFontsTheme(currentColorsAndFontsTheme);
 
-			((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performDefaults();
-			engine.setTheme(defaultTheme, true);
-			if (engine.getActiveTheme() != null) {
-				themeIdCombo.setSelection(new StructuredSelection(engine.getActiveTheme()));
-			}
-			IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
-			enableAnimations.setSelection(apiStore
-					.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
-			useColoredLabels.setSelection(apiStore
-					.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
+		((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY)).performDefaults();
+		engine.setTheme(defaultTheme, true);
+		if (engine.getActiveTheme() != null) {
+			themeIdCombo.setSelection(new StructuredSelection(engine.getActiveTheme()));
 		}
+		IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
+		enableAnimations.setSelection(apiStore
+				.getDefaultBoolean(IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS));
+		useColoredLabels.setSelection(apiStore
+				.getDefaultBoolean(IWorkbenchPreferenceConstants.USE_COLORED_LABELS));
 		super.performDefaults();
 	}
 
 	@Override
 	public boolean performCancel() {
-		if (engine != null) {
-			setColorsAndFontsTheme(currentColorsAndFontsTheme);
+		setColorsAndFontsTheme(currentColorsAndFontsTheme);
 
-			if (currentTheme != null) {
-				engine.setTheme(currentTheme, false);
-			}
+		if (currentTheme != null) {
+			engine.setTheme(currentTheme, false);
 		}
-
 		return super.performCancel();
 	}
 
 	@Override
 	protected void performApply() {
 		super.performApply();
-		if (engine != null) {
-			ITheme theme = getSelectedTheme();
-			if (theme != null) {
-				currentTheme = theme;
-			}
 
-			ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
-			if (colorsAndFontsTheme != null) {
-				currentColorsAndFontsTheme = colorsAndFontsTheme;
-			}
-
-			themeComboDecorator.hide();
-			colorFontsDecorator.hide();
+		ITheme theme = getSelectedTheme();
+		if (theme != null) {
+			currentTheme = theme;
 		}
+
+		ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
+		if (colorsAndFontsTheme != null) {
+			currentColorsAndFontsTheme = colorsAndFontsTheme;
+		}
+
+		themeComboDecorator.hide();
+		colorFontsDecorator.hide();
 	}
 
 	private void createColorsAndFontsThemeCombo(Composite composite) {
@@ -462,7 +450,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 	}
 
 	private ColorsAndFontsTheme getSelectedColorsAndFontsTheme() {
-		return (ColorsAndFontsTheme) colorsAndFontsThemeCombo.getStructuredSelection().getFirstElement();
+		return (ColorsAndFontsTheme) ((IStructuredSelection) colorsAndFontsThemeCombo
+				.getSelection()).getFirstElement();
 	}
 
 	private ColorsAndFontsTheme getCurrentColorsAndFontsTheme() {

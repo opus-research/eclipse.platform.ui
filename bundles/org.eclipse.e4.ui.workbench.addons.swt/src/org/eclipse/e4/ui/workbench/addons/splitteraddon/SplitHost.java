@@ -1,16 +1,5 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2014 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.splitteraddon;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import javax.inject.Inject;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -31,6 +20,8 @@ import org.osgi.service.event.Event;
 
 /**
  * Support containment of split internal parts.
+ * 
+ * @since 1.1
  */
 public class SplitHost {
 	@Inject
@@ -92,7 +83,7 @@ public class SplitHost {
 		return parentObj == myPart;
 	}
 
-	void callingAllParts(Class<? extends Annotation> clz) {
+	void callingAllParts(Class clz) {
 		List<MPart> parts = ms.findElements(myPart, null, MPart.class, null);
 		for (MPart part : parts) {
 			if (part == myPart)

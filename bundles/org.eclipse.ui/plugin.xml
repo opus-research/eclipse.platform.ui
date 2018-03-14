@@ -36,6 +36,7 @@
    <extension-point id="popupMenus" name="%ExtPoint.popupMenus" schema="schema/popupMenus.exsd"/>
    <extension-point id="preferencePages" name="%ExtPoint.preferencePages" schema="schema/preferencePages.exsd"/>
    <extension-point id="preferenceTransfer" name="%ExtPoint.preferenceTransfer" schema="schema/preferenceTransfer.exsd"/>
+   <extension-point id="presentationFactories" name="%ExtPoint.presentationFactories" schema="schema/presentationFactories.exsd"/>
    <extension-point id="propertyPages" name="%ExtPoint.propertyPages" schema="schema/propertyPages.exsd"/>
    <extension-point id="services" name="%ExtPoint.services" schema="schema/services.exsd"/>
    <extension-point id="splashHandlers" name="%ExtPoint.splashHandlers" schema="schema/splashHandlers.exsd"/>
@@ -732,23 +733,6 @@
          </parameter>
       </key>
       <key
-            locale="ja"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+_"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-      <key
-      		locale="ja"
-            commandId="org.eclipse.ui.window.splitEditor"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+M2+-"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-         <parameter
-               id="Splitter.isHorizontal"
-               value="true">
-         </parameter>
-      </key>
-      <key
             platform="carbon"
             commandId=""
             contextId="org.eclipse.ui.contexts.window"
@@ -759,7 +743,7 @@
             platform="carbon"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="COMMAND+SHIFT+-"
+            sequence="Command+Shift+-"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
          <parameter
                id="Splitter.isHorizontal"
@@ -787,7 +771,7 @@
             platform="carbon"
             commandId="org.eclipse.ui.window.splitEditor"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="COMMAND+SHIFT+["
+            sequence="Command+Shift+["
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
          <parameter
                id="Splitter.isHorizontal"
@@ -922,7 +906,7 @@
             description="%command.save.description"
             defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
             categoryId="org.eclipse.ui.category.file"
-            id="org.eclipse.ui.file.save"/>
+            id="org.eclipse.ui.file.save" />
       <command
             name="%command.saveAs.name"
             description="%command.saveAs.description"
@@ -1528,6 +1512,14 @@
             %Presentation.misc.desc
          </description>
       </themeElementCategory>
+      <categoryPresentationBinding
+            categoryId="org.eclipse.ui.presentation.default"
+            presentationId="org.eclipse.ui.presentations.default">
+      </categoryPresentationBinding>
+      <categoryPresentationBinding
+            categoryId="org.eclipse.ui.presentation.default"
+            presentationId="org.eclipse.ui.presentations.r30">
+      </categoryPresentationBinding>
       <fontDefinition
             label="%FontsPreference.BannerFontLabel"
             categoryId="org.eclipse.ui.workbenchMisc"
@@ -2540,14 +2532,5 @@
             class="org.eclipse.ui.internal.about.AboutSystemPage"
             id="31.SystemPage">
           </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.themes">
-      <theme
-            id="org.eclipse.ui.theme1">
-      </theme>
-      <themeElementCategory
-            id="org.eclipse.ui.themeElementCategory1">
-      </themeElementCategory>
    </extension>
 </plugin>

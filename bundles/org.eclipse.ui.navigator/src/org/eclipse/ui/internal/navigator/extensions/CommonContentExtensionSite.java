@@ -57,17 +57,27 @@ public class CommonContentExtensionSite extends CommonExtensionSite implements
 		contentService = aContentService;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getMemento()
+	 */
 	public IMemento getMemento() {
 		return memento;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getExtension()
+	 */
 	public INavigatorContentExtension getExtension() {
 		return extension;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonContentExtensionSite#getService()
+	 */
 	public INavigatorContentService getService() { 
 		return contentService;
 	}

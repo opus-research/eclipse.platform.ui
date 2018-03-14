@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * Snippet -1.
- *
+ * 
  * Hello, no databinding. Bind changes in a GUI to a Model object but don't
  * worry about propogating changes from the Model to the GUI -- using *manual*
  * code. (0xffffffff is -1 in 32-bit two's complement binary arithmatic)
@@ -82,7 +82,7 @@ public class Snippet0xffffffff {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	//
+	// 
 	// In this example, we only push changes from the GUI to the model, so we
 	// don't worry about implementing JavaBeans bound properties. If we need
 	// our GUI to automatically reflect changes in the Person object, the
@@ -134,11 +134,10 @@ public class Snippet0xffffffff {
 			shell.setLayout(new RowLayout(SWT.VERTICAL));
 
 			final Text name = new Text(shell, SWT.BORDER);
-
+			
 			// Bind it (manually)
 			name.setText(viewModel.getPerson().getName());
 			name.addModifyListener(new ModifyListener() {
-				@Override
 				public void modifyText(ModifyEvent e) {
 					final String text = name.getText();
 					// validation
@@ -148,10 +147,8 @@ public class Snippet0xffffffff {
 			});
 			viewModel.person.addPropertyChangeListener("name",
 					new PropertyChangeListener() {
-						@Override
 						public void propertyChange(PropertyChangeEvent evt) {
 							display.asyncExec(new Runnable() {
-								@Override
 								public void run() {
 									final String newName = viewModel.person.getName();
 									// conversion

@@ -59,30 +59,28 @@
       <theme
             basestylesheeturi="css/e4_default_win7.css"
             id="org.eclipse.e4.ui.css.theme.e4_default"
-            label="%theme.win"
+            label="%theme.win7"
             os="win32"
-            os_version="6.0,6.1,6.2,6.3">
+            os_version="6.1">
       </theme>
       <theme
             basestylesheeturi="css/e4_default_winxp_blu.css"
-            id="org.eclipse.e4.ui.css.theme.e4_default"
+            id="org.eclipse.e4.ui.css.theme.e4_default.xpblu"
             label="%theme.winxpBlue"
-            os="win32"
-            os_version="5.1">
+            os="win32">
       </theme>
 	  <theme
             basestylesheeturi="css/e4_default_winxp_olv.css"
             id="org.eclipse.e4.ui.css.theme.e4_default.xpolive"
             label="%theme.winxpOlive"
-            os="win32"
-            os_version="5.1">
+            os="win32">
       </theme>
    <theme
          basestylesheeturi="css/e4_classic_win7.css"
          id="org.eclipse.e4.ui.css.theme.e4_classic"
-         label="%theme.winClassic"
+         label="%theme.win7Classic"
          os="win32"
-         os_version="6.0,6.1,6.2,6.3">
+         os_version="6.1">
    </theme>
    <theme
 		basestylesheeturi="css/high-contrast.css"
@@ -94,11 +92,6 @@
 		themeId="org.eclipse.e4.ui.css.theme.e4_classic"
 		colorAndFontId="org.eclipse.ui.defaultTheme">
    </themeAssociation>
-   <stylesheet
-         uri="css/dark/e4-dark_preferencestyle.css">
-      <themeid
-            refid="org.eclipse.e4.ui.css.theme.e4_dark"></themeid>
-   </stylesheet>
 
    </extension>
 
