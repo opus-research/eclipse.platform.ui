@@ -52,12 +52,10 @@ public class DateConversionSupportTest extends TestCase {
 	}
 	
 	static class StubConverter extends DateConversionSupport {
-		@Override
 		protected DateFormat getDateFormat(int index) {
 			return super.getDateFormat(index);
 		}
 		
-		@Override
 		protected String format(Date date) {
 			return super.format(date);
 		}

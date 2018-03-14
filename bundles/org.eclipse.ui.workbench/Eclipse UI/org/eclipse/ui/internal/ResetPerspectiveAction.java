@@ -45,6 +45,9 @@ public class ResetPerspectiveAction extends PerspectiveAction {
 				IWorkbenchHelpContextIds.RESET_PERSPECTIVE_ACTION);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PerspectiveAction.
+     */
     @Override
 	protected void run(IWorkbenchPage page, IPerspectiveDescriptor persp) {
         String message = NLS.bind(WorkbenchMessages.ResetPerspective_message, persp.getLabel() );

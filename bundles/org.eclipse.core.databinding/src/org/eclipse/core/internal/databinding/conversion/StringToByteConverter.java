@@ -52,7 +52,9 @@ public class StringToByteConverter extends NumberFormatConverter {
 		return toByte(NumberFormat.getIntegerInstance(), primitive);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.databinding.conversion.IConverter#convert(java.lang.Object)
+	 */
 	public Object convert(Object fromObject) {
 		ParseResult result = StringToNumberParser.parse(fromObject,
 				numberFormat, primitive);

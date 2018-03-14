@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui;
 
@@ -191,7 +190,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 				final Map.Entry value = (Map.Entry) activationItr.next();
 				final IServiceLocator locator = (IServiceLocator) value
 						.getKey();
-				final IHandlerService service = locator
+				final IHandlerService service = (IHandlerService) locator
 						.getService(IHandlerService.class);
 				final Map activationsByActionId = (Map) value.getValue();
 				Collection activations = activationsByActionId.values();
@@ -499,7 +498,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 			// Add a mapping from this action id to the command id.
 			if (serviceLocator != null) {
 				String commandId = null;
-				final IActionCommandMappingService mappingService = serviceLocator
+				final IActionCommandMappingService mappingService = (IActionCommandMappingService) serviceLocator
 						.getService(IActionCommandMappingService.class);
 				if (mappingService != null) {
 					commandId = mappingService.getCommandId(actionID);
@@ -509,7 +508,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 				}
 
 				// Update the handler activations.
-				final IHandlerService service = serviceLocator
+				final IHandlerService service = (IHandlerService) serviceLocator
 						.getService(IHandlerService.class);
 				Map activationsByActionId = null;
 				if (activationsByActionIdByServiceLocator == null) {
@@ -576,7 +575,7 @@ public class SubActionBars extends EventManager implements IActionBars {
 
 			// Remove the handler activation.
 			if (serviceLocator != null) {
-				final IHandlerService service = serviceLocator
+				final IHandlerService service = (IHandlerService) serviceLocator
 						.getService(IHandlerService.class);
 				if (activationsByActionIdByServiceLocator != null) {
 					final Map activationsByActionId = (Map) activationsByActionIdByServiceLocator

@@ -34,6 +34,10 @@ public class ActionSetSeparator extends ContributionItem implements
         actionSetId = newActionSetId;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given menu with a SWT separator MenuItem.
+     */
     @Override
 	public void fill(Menu menu, int index) {
         if (index >= 0) {
@@ -43,6 +47,10 @@ public class ActionSetSeparator extends ContributionItem implements
 		}
     }
 
+    /* (non-Javadoc)
+     * Method declared on IContributionItem.
+     * Fills the given tool bar with a SWT separator ToolItem.
+     */
     @Override
 	public void fill(ToolBar toolbar, int index) {
         if (index >= 0) {

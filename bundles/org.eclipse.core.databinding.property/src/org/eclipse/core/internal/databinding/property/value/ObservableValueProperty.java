@@ -45,22 +45,18 @@ public class ObservableValueProperty extends SimpleValueProperty {
 		this.valueType = valueType;
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
 
-	@Override
 	protected Object doGetValue(Object source) {
 		return ((IObservableValue) source).getValue();
 	}
 
-	@Override
 	protected void doSetValue(Object source, Object value) {
 		((IObservableValue) source).setValue(value);
 	}
 
-	@Override
 	public INativePropertyListener adaptListener(
 			ISimplePropertyListener listener) {
 		return new Listener(this, listener);
@@ -72,24 +68,20 @@ public class ObservableValueProperty extends SimpleValueProperty {
 			super(property, listener);
 		}
 
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			fireChange(event.getObservable(), event.diff);
 		}
 
-		@Override
 		public void handleStale(StaleEvent event) {
 			fireStale(event.getObservable());
 		}
 
-		@Override
 		protected void doAddTo(Object source) {
 			IObservableValue observable = (IObservableValue) source;
 			observable.addValueChangeListener(this);
 			observable.addStaleListener(this);
 		}
 
-		@Override
 		protected void doRemoveFrom(Object source) {
 			IObservableValue observable = (IObservableValue) source;
 			observable.removeValueChangeListener(this);
@@ -97,13 +89,11 @@ public class ObservableValueProperty extends SimpleValueProperty {
 		}
 	}
 
-	@Override
 	public IObservableValue observe(Realm realm, Object source) {
 		// Ignore realm if different
 		return (IObservableValue) source;
 	}
 
-	@Override
 	public String toString() {
 		String result = "IObservableValue#value"; //$NON-NLS-1$
 		if (valueType != null)

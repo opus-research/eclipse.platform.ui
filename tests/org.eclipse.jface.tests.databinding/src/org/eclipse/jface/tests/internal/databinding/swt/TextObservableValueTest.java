@@ -32,7 +32,6 @@ public class TextObservableValueTest extends AbstractDefaultRealmTestCase {
 	private Text text;
 	private ValueChangeEventTracker listener;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

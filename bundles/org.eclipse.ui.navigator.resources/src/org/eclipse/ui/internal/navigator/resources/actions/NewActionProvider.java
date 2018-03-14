@@ -137,6 +137,9 @@ public class NewActionProvider extends CommonActionProvider {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (showDlgAction!=null) {

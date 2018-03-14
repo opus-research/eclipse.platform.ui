@@ -29,7 +29,6 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
  * for scrubbing local content.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class ScrubLocalAction extends WorkspaceAction {
 
     /**
@@ -53,32 +52,28 @@ public class ScrubLocalAction extends WorkspaceAction {
     /* (non-Javadoc)
      * Method declared on WorkspaceAction.
      */
-    @Override
-	protected String getOperationMessage() {
+    protected String getOperationMessage() {
         return IDEWorkbenchMessages.ScrubLocalAction_progress;
     }
 
     /* (non-Javadoc)
      * Method declared on WorkspaceAction.
      */
-    @Override
-	protected String getProblemsMessage() {
+    protected String getProblemsMessage() {
         return IDEWorkbenchMessages.ScrubLocalAction_problemsMessage;
     }
 
     /* (non-Javadoc)
      * Method declared on WorkspaceAction.
      */
-    @Override
-	protected String getProblemsTitle() {
+    protected String getProblemsTitle() {
         return IDEWorkbenchMessages.ScrubLocalAction_problemsTitle;
     }
 
     /* (non-Javadoc)
      * Method declared on WorkspaceAction.
      */
-    @Override
-	protected void invokeOperation(IResource resource, IProgressMonitor monitor)
+    protected void invokeOperation(IResource resource, IProgressMonitor monitor)
             throws CoreException {
         resource.setLocal(false, IResource.DEPTH_INFINITE, monitor);
     }
@@ -88,8 +83,7 @@ public class ScrubLocalAction extends WorkspaceAction {
      * <code>SelectionListenerAction</code> method ensures that this action is
      * disabled if any of the selections are not resources.
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection s) {
+    protected boolean updateSelection(IStructuredSelection s) {
         return super.updateSelection(s)
                 && getSelectedNonResources().size() == 0;
     }

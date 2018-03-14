@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Rüdiger Herrmann - 395426: [JFace] StatusDialog should escape ampersand in status message
+ *     R�diger Herrmann - 395426: [JFace] StatusDialog should escape ampersand in status message
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 

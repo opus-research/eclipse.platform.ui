@@ -23,21 +23,17 @@ public class CheckableCheckedElementsObservableSetTest extends
 		// init
 		ICheckable checkable = new ICheckable() {
 
-			@Override
 			public void addCheckStateListener(ICheckStateListener listener) {
 			}
 
-			@Override
 			public boolean getChecked(Object element) {
 				return false;
 			}
 
-			@Override
 			public void removeCheckStateListener(ICheckStateListener listener) {
 
 			}
 
-			@Override
 			public boolean setChecked(Object element, boolean state) {
 				return false;
 			}

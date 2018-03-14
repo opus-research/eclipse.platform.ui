@@ -31,24 +31,21 @@ public class IEditorSiteTest extends IWorkbenchPartSiteTest {
     /**
      * @see IWorkbenchPartSiteTest#getTestPartName()
      */
-    @Override
-	protected String getTestPartName() throws Throwable {
+    protected String getTestPartName() throws Throwable {
         return MockEditorPart.NAME;
     }
 
     /**
      * @see IWorkbenchPartSiteTest#getTestPartId()
      */
-    @Override
-	protected String getTestPartId() throws Throwable {
+    protected String getTestPartId() throws Throwable {
         return MockEditorPart.ID1;
     }
 
     /**
      * @see IWorkbenchPartSiteTest#createTestPart(IWorkbenchPage)
      */
-    @Override
-	protected IWorkbenchPart createTestPart(IWorkbenchPage page)
+    protected IWorkbenchPart createTestPart(IWorkbenchPage page)
             throws Throwable {
         IProject proj = FileUtil.createProject("createTestPart");
         IFile file = FileUtil.createFile("test1.mock1", proj);
@@ -56,7 +53,7 @@ public class IEditorSiteTest extends IWorkbenchPartSiteTest {
     }
 
     public void testGetActionBarContributor() throws Throwable {
-        // From Javadoc: "Returns the editor action bar contributor for
+        // From Javadoc: "Returns the editor action bar contributor for 
         // this editor.
 
         IEditorPart editor = (IEditorPart) createTestPart(fPage);

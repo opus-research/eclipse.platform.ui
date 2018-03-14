@@ -40,6 +40,10 @@ class NewWizardCollectionComparator extends ViewerComparator {
         super();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ViewerSorter#category(java.lang.Object)
+     */
     @Override
 	public int category(Object element) {
     	if (element instanceof WorkbenchWizardElement) {

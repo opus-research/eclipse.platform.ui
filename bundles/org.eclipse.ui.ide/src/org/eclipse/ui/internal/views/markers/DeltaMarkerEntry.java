@@ -39,7 +39,6 @@ class DeltaMarkerEntry extends MarkerEntry {
 		this.markerDelta=markerDelta;
 	}
 
-	@Override
 	Object getAttributeValue(String attribute) {
 		Object value = getCache().get(attribute);
 		if(value == null) {
@@ -58,7 +57,6 @@ class DeltaMarkerEntry extends MarkerEntry {
 	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getCreationTime()
 	 */
-	@Override
 	long getCreationTime() {
 			//return markerDelta.getCreationTime();
 			return super.getCreationTime();
@@ -69,7 +67,6 @@ class DeltaMarkerEntry extends MarkerEntry {
 	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getID()
 	 */
-	@Override
 	long getID() {
 		return markerDelta.getId();
 	}
@@ -79,7 +76,6 @@ class DeltaMarkerEntry extends MarkerEntry {
 	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getMarkerTypeName()
 	 */
-	@Override
 	String getMarkerTypeName() {
 		return MarkerTypesModel.getInstance().getType(markerDelta.getType())
 				.getLabel();
@@ -90,7 +86,6 @@ class DeltaMarkerEntry extends MarkerEntry {
 	 * 
 	 * @see org.eclipse.ui.views.markers.MarkerItem#getPath()
 	 */
-	@Override
 	public String getPath() {
 		String folder = getAttributeValue(MarkerViewUtil.PATH_ATTRIBUTE, null);
 		if (folder != null) {

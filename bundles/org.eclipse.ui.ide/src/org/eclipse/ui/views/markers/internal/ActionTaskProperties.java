@@ -40,7 +40,6 @@ public class ActionTaskProperties extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
-	@Override
 	public void run() {
 
 		DialogMarkerProperties dialog = new DialogTaskProperties(part.getSite()
@@ -54,7 +53,6 @@ public class ActionTaskProperties extends MarkerSelectionProviderAction {
 	 * 
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
-	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(Util.isSingleConcreteSelection(selection));
 	}

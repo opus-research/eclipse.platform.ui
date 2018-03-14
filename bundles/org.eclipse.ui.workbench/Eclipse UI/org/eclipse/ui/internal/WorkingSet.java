@@ -112,11 +112,21 @@ public class WorkingSet extends AbstractWorkingSet {
 		return descriptor != null && descriptor.isEditable();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSet
+	 */
 	@Override
 	public String getId() {
 		return editPageId;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSet#getImageDescriptor()
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		WorkingSetDescriptor descriptor = getDescriptor(DEFAULT_ID);
@@ -231,6 +241,11 @@ public class WorkingSet extends AbstractWorkingSet {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSet
+	 */
 	@Override
 	public void setElements(IAdaptable[] newElements) {
 		internalSetElements(newElements);
@@ -238,6 +253,11 @@ public class WorkingSet extends AbstractWorkingSet {
 				IWorkingSetManager.CHANGE_WORKING_SET_CONTENT_CHANGE, null);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSet
+	 */
 	@Override
 	public void setId(String pageId) {
 		editPageId = pageId;
@@ -281,6 +301,11 @@ public class WorkingSet extends AbstractWorkingSet {
 		return registry.getWorkingSetDescriptor(id);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkingSet#adaptElements(org.eclipse.core.runtime.IAdaptable[])
+	 */
 	@Override
 	public IAdaptable[] adaptElements(IAdaptable[] objects) {
 		IWorkingSetManager manager = getManager();

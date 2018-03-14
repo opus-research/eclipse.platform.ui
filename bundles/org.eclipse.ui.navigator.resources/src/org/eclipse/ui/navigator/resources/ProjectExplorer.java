@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 package org.eclipse.ui.navigator.resources;
 
@@ -244,9 +243,13 @@ public final class ProjectExplorer extends CommonNavigator {
 		return workingSetLabel;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.CommonNavigator#handleDoubleClick(org.eclipse.jface.viewers.DoubleClickEvent)
+	 * @since 4.3
+	 */
 	@Override
 	protected void handleDoubleClick(DoubleClickEvent anEvent) {
-		ICommandService commandService = getViewSite().getService(ICommandService.class);
+		ICommandService commandService = (ICommandService) getViewSite().getService(ICommandService.class);
 		Command openProjectCommand = commandService.getCommand(IWorkbenchCommandConstants.PROJECT_OPEN_PROJECT);
 		if (openProjectCommand != null && openProjectCommand.isHandled()) {
 			IStructuredSelection selection = (IStructuredSelection) anEvent

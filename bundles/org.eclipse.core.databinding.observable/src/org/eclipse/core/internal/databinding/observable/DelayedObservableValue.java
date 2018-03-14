@@ -58,7 +58,6 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 			cancel = true;
 		}
 
-		@Override
 		public void run() {
 			if (!cancel)
 				try {
@@ -102,19 +101,16 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		cachedValue = doGetValue();
 	}
 
-	@Override
 	public void handleValueChange(ValueChangeEvent event) {
 		if (!updating)
 			makeDirty();
 	}
 
-	@Override
 	public void handleStale(StaleEvent staleEvent) {
 		if (!updating)
 			fireStale();
 	}
 
-	@Override
 	protected Object doGetValue() {
 		if (dirty) {
 			cachedValue = observable.getValue();
@@ -129,7 +125,6 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		return cachedValue;
 	}
 
-	@Override
 	protected void doSetValue(Object value) {
 		updating = true;
 		try {
@@ -151,7 +146,6 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 		}
 	}
 
-	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return (dirty && updater != null) || observable.isStale();
@@ -163,12 +157,10 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 	 * 
 	 * @see org.eclipse.core.databinding.observable.value.IObservableValue#getValueType()
 	 */
-	@Override
 	public Object getValueType() {
 		return observable.getValueType();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		cancelScheduledUpdate();
 		if (observable != null) {
@@ -202,12 +194,10 @@ public class DelayedObservableValue extends AbstractObservableValue implements
 	private void internalFireValueChange(final Object oldValue) {
 		cancelScheduledUpdate();
 		fireValueChange(new ValueDiff() {
-			@Override
 			public Object getOldValue() {
 				return oldValue;
 			}
 
-			@Override
 			public Object getNewValue() {
 				return getValue();
 			}

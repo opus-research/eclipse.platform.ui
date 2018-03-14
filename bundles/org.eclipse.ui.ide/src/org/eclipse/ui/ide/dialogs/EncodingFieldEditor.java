@@ -64,13 +64,16 @@ public final class EncodingFieldEditor extends AbstractEncodingFieldEditor {
 		init(name, labelText);
 		createControl(parent);
 	}
-
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
+	 */
 	protected String getStoredValue() {
 		return getPreferenceStore().getString(getPreferenceName());
 	}
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
+	 */
 	protected void doStore() {
 		String encoding = getSelectedEncoding();
 		

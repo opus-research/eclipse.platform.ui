@@ -43,14 +43,12 @@ import org.eclipse.core.internal.databinding.property.set.SimplePropertyObservab
  * @since 1.2
  */
 public abstract class SimpleSetProperty extends SetProperty {
-	@Override
 	public IObservableSet observe(Realm realm, Object source) {
 		return new SimplePropertyObservableSet(realm, source, this);
 	}
 
 	// Accessors
 
-	@Override
 	protected abstract Set doGetSet(Object source);
 
 	// Mutators
@@ -84,13 +82,11 @@ public abstract class SimpleSetProperty extends SetProperty {
 	 */
 	protected abstract void doSetSet(Object source, Set set, SetDiff diff);
 
-	@Override
 	protected void doSetSet(Object source, Set set) {
 		SetDiff diff = Diffs.computeLazySetDiff(doGetSet(source), set);
 		doSetSet(source, set, diff);
 	}
 
-	@Override
 	protected void doUpdateSet(Object source, SetDiff diff) {
 		Set set = new HashSet(doGetSet(source));
 		diff.applyTo(set);

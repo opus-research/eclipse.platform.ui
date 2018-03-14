@@ -43,6 +43,11 @@ public class DefaultSaveable extends Saveable {
 		this.part = part;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		if (part instanceof ISaveablePart) {
@@ -51,6 +56,11 @@ public class DefaultSaveable extends Saveable {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getName()
+	 */
 	@Override
 	public String getName() {
 		if (part instanceof IWorkbenchPart2) {
@@ -59,6 +69,11 @@ public class DefaultSaveable extends Saveable {
 		return part.getTitle();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getImageDescriptor()
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		Image image = part.getTitleImage();
@@ -68,11 +83,21 @@ public class DefaultSaveable extends Saveable {
 		return ImageDescriptor.createFromImage(image);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#getToolTipText()
+	 */
 	@Override
 	public String getToolTipText() {
 		return part.getTitleToolTip();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.Saveable#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		if (part instanceof ISaveablePart) {
@@ -81,11 +106,17 @@ public class DefaultSaveable extends Saveable {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		return part.hashCode();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -103,6 +134,9 @@ public class DefaultSaveable extends Saveable {
 		return true;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.Saveable#show(org.eclipse.ui.IWorkbenchPage)
+	 */
 	@Override
 	public boolean show(IWorkbenchPage page) {
 		IWorkbenchPartReference reference = page.getReference(part);

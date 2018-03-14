@@ -91,6 +91,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
+	 * ()
+	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -118,6 +125,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return new ErrorViewPart(status);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
+	 * (org.eclipse.ui.IWorkbenchPart)
+	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
 		ViewSite viewSite = new ViewSite(getModel(), part, this, descriptor == null ? null

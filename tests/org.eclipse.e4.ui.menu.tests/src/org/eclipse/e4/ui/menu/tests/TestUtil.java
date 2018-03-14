@@ -55,7 +55,6 @@ import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.equinox.log.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.commands.ICommandImageService;
@@ -420,15 +419,11 @@ class TestUtil {
 			@Override
 			public void log(ServiceReference<?> sr, int level, String message,
 					Throwable exception) {
+				// TODO Auto-generated method stub
 
 			}
 		});
 		appContext.set(IResourceUtilities.class, new ISWTResourceUtilities() {
-
-			@Override
-			public Image adornImage(Image toAdorn, Image adornment) {
-				return null;
-			}
 
 			@Override
 			public ImageDescriptor imageDescriptorFromURI(URI iconPath) {

@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -40,7 +41,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
 
     protected BasicContribution currentContribution;
 
-	protected ArrayList cache;
+    protected ArrayList cache;
 
     /**
      * The default constructor.
@@ -63,7 +64,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
 		}
 
         for (int i = 0; i < cache.size(); i++) {
-			BasicContribution contribution = (BasicContribution) cache.get(i);
+            BasicContribution contribution = (BasicContribution) cache.get(i);
             contribution.contribute(menu, appendIfMissing, toolbar,
                     appendIfMissing);
         }
@@ -170,9 +171,9 @@ public abstract class PluginActionBuilder extends RegistryReader {
      * contribution element.
      */
     protected static class BasicContribution {
-		protected ArrayList menus;
+        protected ArrayList menus;
 
-		protected ArrayList actions;
+        protected ArrayList actions;
 
         /**
          * Add a menu. 
@@ -212,7 +213,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
                 IToolBarManager toolbar, boolean toolAppendIfMissing) {
             if (menus != null && menu != null) {
                 for (int i = 0; i < menus.size(); i++) {
-					IConfigurationElement menuElement = (IConfigurationElement) menus
+                    IConfigurationElement menuElement = (IConfigurationElement) menus
                             .get(i);
                     contributeMenu(menuElement, menu, menuAppendIfMissing);
                 }
@@ -220,7 +221,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
 
             if (actions != null) {
                 for (int i = 0; i < actions.size(); i++) {
-					ActionDescriptor ad = (ActionDescriptor) actions.get(i);
+                    ActionDescriptor ad = (ActionDescriptor) actions.get(i);
                     if (menu != null) {
 						contributeMenuAction(ad, menu, menuAppendIfMissing);
 					}
@@ -312,7 +313,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
 			}
 
             // Add the menu
-			try {
+            try {
                 insertAfter(parent, group, newMenu);
             } catch (IllegalArgumentException e) {
                 WorkbenchPlugin
@@ -514,7 +515,7 @@ public abstract class PluginActionBuilder extends RegistryReader {
 		protected void disposeActions() {
             if (actions != null) {
                 for (int i = 0; i < actions.size(); i++) {
-					PluginAction proxy = ((ActionDescriptor) actions.get(i))
+                    PluginAction proxy = ((ActionDescriptor) actions.get(i))
                             .getAction();
 					proxy.dispose();
                 }
