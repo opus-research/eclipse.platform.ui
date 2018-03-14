@@ -132,6 +132,11 @@ public class UnmodifiableObservableListTest extends
 			super(wrappedList, elementType);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.internal.databinding.provisional.observable.list.ObservableList#add(java.lang.Object)
+		 */
 		public boolean add(Object o) {
 			boolean result = wrappedList.add(o);
 			fireListChange(Diffs.createListDiff(Diffs.createListDiffEntry(

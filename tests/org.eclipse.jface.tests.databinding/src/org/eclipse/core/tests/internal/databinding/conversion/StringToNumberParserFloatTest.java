@@ -20,14 +20,23 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class StringToNumberParserFloatTest extends
 		StringToNumberParserTestHarness {
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#assertValid(java.lang.Number)
+	 */
 	protected boolean assertValid(Number number) {
 		return StringToNumberParser.inFloatRange(number);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMax()
+	 */
 	protected Number getValidMax() {
 		return new Float(Float.MAX_VALUE);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMin()
+	 */
 	protected Number getValidMin() {
 		return new Float(-Float.MAX_VALUE);
 	}
