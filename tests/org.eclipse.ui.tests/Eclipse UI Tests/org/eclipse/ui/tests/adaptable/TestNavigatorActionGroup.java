@@ -65,9 +65,8 @@ public class TestNavigatorActionGroup extends ActionGroup {
         menu.add(new Separator());
 
         propertyDialogAction.selectionChanged(selection);
-        if (propertyDialogAction.isApplicableForSelection()) {
-			menu.add(propertyDialogAction);
-		}
+        if (propertyDialogAction.isApplicableForSelection())
+            menu.add(propertyDialogAction);
     }
 
     /*
