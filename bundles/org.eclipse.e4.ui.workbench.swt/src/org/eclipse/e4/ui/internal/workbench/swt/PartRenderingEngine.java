@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 462056
  *******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench.swt;
 
@@ -33,6 +34,7 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.InjectionException;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.di.extensions.EventTopic;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
@@ -46,7 +48,6 @@ import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.css.swt.theme.IThemeManager;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.Policy;
@@ -112,7 +113,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	@Inject
 	@Optional
-	private void subscribeTopicToBeRendered(@UIEventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
+	private void subscribeTopicToBeRendered(@EventTopic(UIEvents.UIElement.TOPIC_TOBERENDERED) Event event) {
 
 		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 		MElementContainer<?> parent = changedElement.getParent();
@@ -159,7 +160,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	@Inject
 	@Optional
-	private void subscribeVisibilityHandler(@UIEventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
+	private void subscribeVisibilityHandler(@EventTopic(UIEvents.UIElement.TOPIC_VISIBLE) Event event) {
 
 		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 		MUIElement parent = changedElement.getParent();
@@ -187,8 +188,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				if (parent instanceof MElementContainer<?>) {
-					renderer.childRendered((MElementContainer<MUIElement>) parent,
-							changedElement);
+					renderer.childRendered((MElementContainer<MUIElement>) parent, changedElement);
 				}
 			}
 		} else {
@@ -211,7 +211,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	@Inject
 	@Optional
-	private void subscribeTrimHandler(@UIEventTopic(UIEvents.TrimmedWindow.TOPIC_TRIMBARS) Event event) {
+	private void subscribeTrimHandler(@EventTopic(UIEvents.TrimmedWindow.TOPIC_TRIMBARS) Event event) {
 
 		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
 		if (!(changedObj instanceof MTrimmedWindow))
@@ -238,7 +238,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	@Inject
 	@Optional
-	private void subscribeChildrenHandler(@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
+	private void subscribeChildrenHandler(@EventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
 
 		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
 		if (!(changedObj instanceof MElementContainer<?>))
@@ -319,9 +319,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	@Inject
 	@Optional
-	private void subscribeWindowsHandler(@UIEventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
-
+	private void subscribeWindowsHandler(@EventTopic(UIEvents.Window.TOPIC_WINDOWS) Event event) {
 		subscribeChildrenHandler(event);
+	}
+
+	@Inject
+	@Optional
+	private void subscribePerspectiveWindowsHandler(@EventTopic(UIEvents.Perspective.TOPIC_WINDOWS) Event event) {
+		subscribeChildrenHandler(event);
+	}
+
+	@Inject
+	@Optional
+	private void subscribeCssThemeChanged(@EventTopic(IThemeEngine.Events.THEME_CHANGED) Event event) {
+		cssThemeChangedHandler.handleEvent(event);
 	}
 
 	private IEclipseContext appContext;
@@ -344,9 +355,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 	@Optional
 	IEventBroker eventBroker;
 
+	private StylingPreferencesHandler cssThemeChangedHandler;
+
 	@Inject
-	public PartRenderingEngine(
-			@Named(E4Workbench.RENDERER_FACTORY_URI) @Optional String factoryUrl) {
+	public PartRenderingEngine(@Named(E4Workbench.RENDERER_FACTORY_URI) @Optional String factoryUrl) {
 		if (factoryUrl == null) {
 			factoryUrl = defaultFactoryUrl;
 		}
@@ -406,18 +418,15 @@ public class PartRenderingEngine implements IPresentationEngine {
 		this.appContext = context;
 
 		// initialize the correct key-binding display formatter
-		KeyFormatterFactory.setDefault(SWTKeySupport
-				.getKeyFormatterForPlatform());
+		KeyFormatterFactory.setDefault(SWTKeySupport.getKeyFormatterForPlatform());
 
 		// Add the renderer to the context
 		context.set(IPresentationEngine.class.getName(), this);
 
 		IRendererFactory factory = null;
-		IContributionFactory contribFactory = context
-				.get(IContributionFactory.class);
+		IContributionFactory contribFactory = context.get(IContributionFactory.class);
 		try {
-			factory = (IRendererFactory) contribFactory.create(factoryUrl,
-					context);
+			factory = (IRendererFactory) contribFactory.create(factoryUrl, context);
 		} catch (Exception e) {
 			logger.warn(e, "Could not create rendering factory");
 		}
@@ -425,28 +434,26 @@ public class PartRenderingEngine implements IPresentationEngine {
 		// Try to load the default one
 		if (factory == null) {
 			try {
-				factory = (IRendererFactory) contribFactory.create(
-						defaultFactoryUrl, context);
+				factory = (IRendererFactory) contribFactory.create(defaultFactoryUrl, context);
 			} catch (Exception e) {
 				logger.error(e, "Could not create default rendering factory");
 			}
 		}
 
 		if (factory == null) {
-			throw new IllegalStateException(
-					"Could not create any rendering factory. Aborting ...");
+			throw new IllegalStateException("Could not create any rendering factory. Aborting ...");
 		}
 
 		curFactory = factory;
 		context.set(IRendererFactory.class, curFactory);
+
+		cssThemeChangedHandler = new StylingPreferencesHandler(context.get(Display.class));
 	}
 
-	private static void populateModelInterfaces(MContext contextModel,
-			IEclipseContext context, Class<?>[] interfaces) {
+	private static void populateModelInterfaces(MContext contextModel, IEclipseContext context, Class<?>[] interfaces) {
 		for (Class<?> intf : interfaces) {
-			Activator.trace(Policy.DEBUG_CONTEXTS,
-					"Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
-							+ contextModel.getClass().getName(), null);
+			Activator.trace(Policy.DEBUG_CONTEXTS, "Adding " + intf.getName() + " for " //$NON-NLS-1$ //$NON-NLS-2$
+					+ contextModel.getClass().getName(), null);
 			context.set(intf.getName(), contextModel);
 
 			populateModelInterfaces(contextModel, context, intf.getInterfaces());
@@ -454,8 +461,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 	}
 
 	private String getContextName(MUIElement element) {
-		StringBuilder builder = new StringBuilder(element.getClass()
-				.getSimpleName());
+		StringBuilder builder = new StringBuilder(element.getClass().getSimpleName());
 		String elementId = element.getElementId();
 		if (elementId != null && elementId.length() != 0) {
 			builder.append(" (").append(elementId).append(") ");
@@ -465,8 +471,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 	}
 
 	@Override
-	public Object createGui(final MUIElement element,
-			final Object parentWidget, final IEclipseContext parentContext) {
+	public Object createGui(final MUIElement element, final Object parentWidget, final IEclipseContext parentContext) {
 		final Object[] gui = { null };
 		// wrap the handling in a SafeRunner so that exceptions do not prevent
 		// the renderer from processing other elements
@@ -492,8 +497,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return gui[0];
 	}
 
-	public Object safeCreateGui(MUIElement element, Object parentWidget,
-			IEclipseContext parentContext) {
+	public Object safeCreateGui(MUIElement element, Object parentWidget, IEclipseContext parentContext) {
 		if (!element.isToBeRendered())
 			return null;
 
@@ -508,8 +512,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				Control control = (Control) currentWidget;
 				// make sure the control is visible
 				MUIElement elementParent = element.getParent();
-				if (!(element instanceof MPlaceholder)
-						|| !(elementParent instanceof MPartStack))
+				if (!(element instanceof MPlaceholder) || !(elementParent instanceof MPartStack))
 					control.setVisible(true);
 
 				if (parentWidget instanceof Composite) {
@@ -537,8 +540,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				if (ctxt != null)
 					ctxt.setParent(parentContext);
 			} else {
-				List<MContext> childContexts = modelService.findElements(
-						element, null, MContext.class, null);
+				List<MContext> childContexts = modelService.findElements(element, null, MContext.class, null);
 				for (MContext c : childContexts) {
 					// Ensure that we only reset the context of our direct
 					// children
@@ -549,8 +551,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					if (!(element instanceof MPlaceholder) && parent != element)
 						continue;
 
-					if (c.getContext() != null
-							&& c.getContext().getParent() != parentContext) {
+					if (c.getContext() != null && c.getContext().getParent() != parentContext) {
 						c.getContext().setParent(parentContext);
 					}
 				}
@@ -558,8 +559,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// Now that we have a widget let the parent (if any) know
 			if (element.getParent() instanceof MUIElement) {
-				MElementContainer<MUIElement> parentElement = element
-						.getParent();
+				MElementContainer<MUIElement> parentElement = element.getParent();
 				AbstractPartRenderer parentRenderer = getRendererFor(parentElement);
 				if (parentRenderer != null)
 					parentRenderer.childRendered(parentElement, element);
@@ -572,10 +572,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 			// Assert.isTrue(ctxt.getContext() == null,
 			// "Before rendering Context should be null");
 			if (ctxt.getContext() == null) {
-				IEclipseContext lclContext = parentContext
-						.createChild(getContextName(element));
-				populateModelInterfaces(ctxt, lclContext, element.getClass()
-						.getInterfaces());
+				IEclipseContext lclContext = parentContext.createChild(getContextName(element));
+				populateModelInterfaces(ctxt, lclContext, element.getClass().getInterfaces());
 				ctxt.setContext(lclContext);
 
 				// System.out.println("New Context: " + lclContext.toString()
@@ -621,8 +619,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 			// Now that we have a widget let the parent (if any) know
 			if (element.getParent() instanceof MUIElement) {
-				MElementContainer<MUIElement> parentElement = element
-						.getParent();
+				MElementContainer<MUIElement> parentElement = element.getParent();
 				AbstractPartRenderer parentRenderer = getRendererFor(parentElement);
 				if (parentRenderer != null)
 					parentRenderer.childRendered(parentElement, element);
@@ -701,8 +698,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (parentContext == null && element.getParent() != null) {
 			parentContext = getContext(element.getParent());
 		} else if (parentContext == null && element.getParent() == null) {
-			parentContext = getContext((MUIElement) ((EObject) element)
-					.eContainer());
+			parentContext = getContext((MUIElement) ((EObject) element).eContainer());
 		}
 
 		return safeCreateGui(element, parent, parentContext);
@@ -717,13 +713,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 	 */
 	@Override
 	public void focusGui(MUIElement element) {
-		AbstractPartRenderer renderer = (AbstractPartRenderer) element
-				.getRenderer();
+		AbstractPartRenderer renderer = (AbstractPartRenderer) element.getRenderer();
 		if (renderer == null || element.getWidget() == null)
 			return;
 
-		Object implementation = element instanceof MContribution ? ((MContribution) element)
-				.getObject() : null;
+		Object implementation = element instanceof MContribution ? ((MContribution) element).getObject() : null;
 
 		// If there is no class to call @Focus on then revert to the default
 		if (implementation == null) {
@@ -734,8 +728,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		try {
 			IEclipseContext context = getContext(element);
 			Object defaultValue = new Object();
-			Object returnValue = ContextInjectionFactory.invoke(implementation,
-					Focus.class, context, defaultValue);
+			Object returnValue = ContextInjectionFactory.invoke(implementation, Focus.class, context, defaultValue);
 			if (returnValue == defaultValue) {
 				// No @Focus method, force the focus
 				renderer.forceFocus(element);
@@ -749,8 +742,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 	}
 
-	private void log(String unidentifiedMessage, String identifiedMessage,
-			String id, Exception e) {
+	private void log(String unidentifiedMessage, String identifiedMessage, String id, Exception e) {
 		if (id == null || id.length() == 0) {
 			logger.error(e, unidentifiedMessage);
 		} else {
@@ -767,8 +759,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			limbo.setLocation(0, 10000);
 
 			limbo.setBackgroundMode(SWT.INHERIT_DEFAULT);
-			limbo.setData(ShellActivationListener.DIALOG_IGNORE_KEY,
-					Boolean.TRUE);
+			limbo.setData(ShellActivationListener.DIALOG_IGNORE_KEY, Boolean.TRUE);
 		}
 		return limbo;
 	}
@@ -808,8 +799,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		// We call 'hideChild' *before* checking if the actual element
 		// has been rendered in order to pick up cases of 'lazy loading'
 		MUIElement parent = element.getParent();
-		AbstractPartRenderer parentRenderer = parent != null ? getRendererFor(parent)
-				: null;
+		AbstractPartRenderer parentRenderer = parent != null ? getRendererFor(parent) : null;
 		if (parentRenderer != null) {
 			parentRenderer.hideChild(element.getParent(), element);
 		}
@@ -830,8 +820,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 					}
 				}
 
-				if (selectedElement != null
-						&& children.contains(selectedElement)) {
+				if (selectedElement != null && children.contains(selectedElement)) {
 					// now remove the selected element
 					removeGui(selectedElement);
 				}
@@ -862,8 +851,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				IEclipseContext parentContext = renderer.getContext(element);
 				if (parentContext != null && client != null) {
 					try {
-						ContextInjectionFactory.invoke(client,
-								PersistState.class, parentContext, null);
+						ContextInjectionFactory.invoke(client, PersistState.class, parentContext, null);
 					} catch (Exception e) {
 						if (logger != null) {
 							logger.error(e);
@@ -906,8 +894,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		IEclipseContext lclContext = ctxt.getContext();
 		if (lclContext != null) {
 			IEclipseContext parentContext = lclContext.getParent();
-			IEclipseContext child = parentContext != null ? parentContext
-					.getActiveChild() : null;
+			IEclipseContext child = parentContext != null ? parentContext.getActiveChild() : null;
 			if (child == lclContext) {
 				child.deactivate();
 			}
@@ -934,21 +921,17 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 	private AbstractPartRenderer getRenderer(MUIElement uiElement, Object parent) {
 		// Is there a custom renderer defined ?
-		String customURI = uiElement.getPersistedState().get(
-				IPresentationEngine.CUSTOM_RENDERER_KEY);
+		String customURI = uiElement.getPersistedState().get(IPresentationEngine.CUSTOM_RENDERER_KEY);
 		if (customURI != null) {
 			if (customRendererMap.get(customURI) instanceof AbstractPartRenderer)
 				return customRendererMap.get(customURI);
 
-			IEclipseContext owningContext = modelService
-					.getContainingContext(uiElement);
+			IEclipseContext owningContext = modelService.getContainingContext(uiElement);
 			IContributionFactory contributionFactory = (IContributionFactory) owningContext
 					.get(IContributionFactory.class.getName());
-			Object customRenderer = contributionFactory.create(customURI,
-					owningContext);
+			Object customRenderer = contributionFactory.create(customURI, owningContext);
 			if (customRenderer instanceof AbstractPartRenderer) {
-				customRendererMap.put(customURI,
-						(AbstractPartRenderer) customRenderer);
+				customRendererMap.put(customURI, (AbstractPartRenderer) customRenderer);
 				return (AbstractPartRenderer) customRenderer;
 			}
 		}
@@ -964,8 +947,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 	@Override
 	@Inject
 	@Optional
-	public Object run(final MApplicationElement uiRoot,
-			final IEclipseContext runContext) {
+	public Object run(final MApplicationElement uiRoot, final IEclipseContext runContext) {
 		final Display display;
 		if (runContext.get(Display.class) != null) {
 			display = runContext.get(Display.class);
@@ -980,12 +962,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 				initializeStyling(display, runContext);
 
 				// Register an SWT resource handler
-				runContext.set(IResourceUtilities.class.getName(),
-						new ResourceUtility());
+				runContext.set(IResourceUtilities.class.getName(), new ResourceUtility());
 
 				// set up the keybinding manager
-				KeyBindingDispatcher dispatcher = (KeyBindingDispatcher) ContextInjectionFactory
-						.make(KeyBindingDispatcher.class, runContext);
+				KeyBindingDispatcher dispatcher = (KeyBindingDispatcher) ContextInjectionFactory.make(
+						KeyBindingDispatcher.class, runContext);
 				runContext.set(KeyBindingDispatcher.class.getName(), dispatcher);
 				keyListener = dispatcher.getKeyDownFilter();
 				display.addFilter(SWT.KeyDown, keyListener);
@@ -1005,8 +986,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				theApp = null;
 				boolean spinOnce = true;
 				if (uiRoot instanceof MApplication) {
-					ShellActivationListener shellDialogListener = new ShellActivationListener(
-							(MApplication) uiRoot);
+					ShellActivationListener shellDialogListener = new ShellActivationListener((MApplication) uiRoot);
 					display.addFilter(SWT.Activate, shellDialogListener);
 					display.addFilter(SWT.Deactivate, shellDialogListener);
 					spinOnce = false; // loop until the app closes
@@ -1030,14 +1010,11 @@ public class PartRenderingEngine implements IPresentationEngine {
 					// System.out.println("Render: " + (endTime - startTime));
 					// tell the app context we are starting so the splash is
 					// torn down
-					IApplicationContext ac = appContext
-							.get(IApplicationContext.class);
+					IApplicationContext ac = appContext.get(IApplicationContext.class);
 					if (ac != null) {
 						ac.applicationRunning();
 						if (eventBroker != null)
-							eventBroker.post(
-									UIEvents.UILifeCycle.APP_STARTUP_COMPLETE,
-									theApp);
+							eventBroker.post(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE, theApp);
 					}
 				} else if (uiRoot instanceof MUIElement) {
 					if (uiRoot instanceof MWindow) {
@@ -1050,22 +1027,17 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				// allow any early startup extensions to run
-				Runnable earlyStartup = (Runnable) runContext
-						.get(EARLY_STARTUP_HOOK);
+				Runnable earlyStartup = (Runnable) runContext.get(EARLY_STARTUP_HOOK);
 				if (earlyStartup != null) {
 					earlyStartup.run();
 				}
 
-				TestableObject testableObject = (TestableObject) runContext
-						.get(TestableObject.class.getName());
+				TestableObject testableObject = (TestableObject) runContext.get(TestableObject.class.getName());
 				if (testableObject instanceof E4Testable) {
-					((E4Testable) testableObject).init(display,
-							(IWorkbench) runContext.get(IWorkbench.class
-									.getName()));
+					((E4Testable) testableObject).init(display, (IWorkbench) runContext.get(IWorkbench.class.getName()));
 				}
 
-				IEventLoopAdvisor advisor = runContext.getActiveLeaf().get(
-						IEventLoopAdvisor.class);
+				IEventLoopAdvisor advisor = runContext.getActiveLeaf().get(IEventLoopAdvisor.class);
 				if (advisor == null) {
 					advisor = new IEventLoopAdvisor() {
 						@Override
@@ -1075,11 +1047,10 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 						@Override
 						public void eventLoopException(Throwable exception) {
-							StatusReporter statusReporter = (StatusReporter) appContext
-									.get(StatusReporter.class.getName());
+							StatusReporter statusReporter = (StatusReporter) appContext.get(StatusReporter.class
+									.getName());
 							if (statusReporter != null) {
-								statusReporter.show(StatusReporter.ERROR,
-										"Internal Error", exception);
+								statusReporter.show(StatusReporter.ERROR, "Internal Error", exception);
 							} else {
 								if (logger != null) {
 									logger.error(exception);
@@ -1189,8 +1160,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 	}
 
-	public static void initializeStyling(Display display,
-			IEclipseContext appContext) {
+	public static void initializeStyling(Display display, IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
 		if ("none".equals(cssTheme)) {
@@ -1215,25 +1185,21 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				@Override
-				public void setClassnameAndId(Object widget, String classname,
-						String id) {
+				public void setClassnameAndId(Object widget, String classname, String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
 				}
 			});
 		} else if (cssTheme != null) {
-			final IThemeEngine themeEngine = createThemeEngine(display,
-					appContext);
-			String cssResourcesURI = (String) appContext
-					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
+			final IThemeEngine themeEngine = createThemeEngine(display, appContext);
+			String cssResourcesURI = (String) appContext.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
 			// Create the OSGi resource locator
 			if (cssResourcesURI != null) {
 				// TODO: Should this be set through an extension as well?
-				themeEngine.registerResourceLocator(new OSGiResourceLocator(
-						cssResourcesURI));
+				themeEngine.registerResourceLocator(new OSGiResourceLocator(cssResourcesURI));
 			}
-			
+
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
@@ -1258,8 +1224,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				@Override
-				public void setClassnameAndId(Object widget, String classname,
-						String id) {
+				public void setClassnameAndId(Object widget, String classname, String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
 					themeEngine.applyStyles(widget, true);
@@ -1269,10 +1234,8 @@ public class PartRenderingEngine implements IPresentationEngine {
 			setCSSTheme(display, themeEngine, cssTheme);
 
 		} else if (cssURI != null) {
-			String cssResourcesURI = (String) appContext
-					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
-			final CSSSWTEngineImpl cssEngine = new CSSSWTEngineImpl(display,
-					true);
+			String cssResourcesURI = (String) appContext.get(IWorkbench.CSS_RESOURCE_URI_ARG);
+			final CSSSWTEngineImpl cssEngine = new CSSSWTEngineImpl(display, true);
 			WidgetElement.setEngine(display, cssEngine);
 			if (cssResourcesURI != null) {
 				cssEngine.getResourcesLocatorManager().registerResourceLocator(
@@ -1300,8 +1263,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 				@Override
 				public CSSStyleDeclaration getStyle(Object widget) {
-					Element e = cssEngine.getCSSElementContext(widget)
-							.getElement();
+					Element e = cssEngine.getCSSElementContext(widget).getElement();
 					if (e == null) {
 						return null;
 					}
@@ -1309,8 +1271,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 				}
 
 				@Override
-				public void setClassnameAndId(Object widget, String classname,
-						String id) {
+				public void setClassnameAndId(Object widget, String classname, String id) {
 					WidgetElement.setCSSClass((Widget) widget, classname);
 					WidgetElement.setID((Widget) widget, id);
 					cssEngine.applyStyles(widget, true);
@@ -1355,15 +1316,13 @@ public class PartRenderingEngine implements IPresentationEngine {
 			}
 		}
 
-		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(
-				CSSRenderingUtils.class, appContext);
+		CSSRenderingUtils cssUtils = ContextInjectionFactory.make(CSSRenderingUtils.class, appContext);
 		appContext.set(CSSRenderingUtils.class, cssUtils);
 	}
 
 	private static IThemeEngine createThemeEngine(Display display, IEclipseContext appContext) {
 		// Store the app context
-		IContributionFactory contribution = (IContributionFactory) appContext
-				.get(IContributionFactory.class.getName());
+		IContributionFactory contribution = (IContributionFactory) appContext.get(IContributionFactory.class.getName());
 		IEclipseContext cssContext = EclipseContextFactory.create();
 		cssContext.set(IContributionFactory.class.getName(), contribution);
 		display.setData("org.eclipse.e4.ui.css.context", cssContext); //$NON-NLS-1$
@@ -1375,8 +1334,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		return themeEngine;
 	}
 
-	private static void setCSSTheme(Display display, IThemeEngine themeEngine,
-			String cssTheme) {
+	private static void setCSSTheme(Display display, IThemeEngine themeEngine, String cssTheme) {
 		if (display.getHighContrast()) {
 			themeEngine.setTheme(cssTheme, false);
 		} else {
@@ -1389,17 +1347,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		public StylingPreferencesHandler(Display display) {
 			if (display != null) {
-				display.addListener(SWT.Dispose,
-						createOnDisplayDisposedListener());
+				display.addListener(SWT.Dispose, createOnDisplayDisposedListener());
 			}
 		}
 
 		protected Listener createOnDisplayDisposedListener() {
 			return new Listener() {
-					@Override
-					public void handleEvent(org.eclipse.swt.widgets.Event event) {
-						resetOverriddenPreferences();
-					}
+				@Override
+				public void handleEvent(org.eclipse.swt.widgets.Event event) {
+					resetOverriddenPreferences();
+				}
 			};
 		}
 
@@ -1415,34 +1372,28 @@ public class PartRenderingEngine implements IPresentationEngine {
 			}
 		}
 
-		protected void resetOverriddenPreferences(
-				IEclipsePreferences preferences) {
+		protected void resetOverriddenPreferences(IEclipsePreferences preferences) {
 			for (String name : getOverriddenPropertyNames(preferences)) {
 				preferences.remove(name);
 			}
 			removeOverriddenPropertyNames(preferences);
 		}
 
-		protected void removeOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
+		protected void removeOverriddenPropertyNames(IEclipsePreferences preferences) {
 			EclipsePreferencesHelper.removeOverriddenPropertyNames(preferences);
 		}
 
-		protected List<String> getOverriddenPropertyNames(
-				IEclipsePreferences preferences) {
-			return EclipsePreferencesHelper
-					.getOverriddenPropertyNames(preferences);
+		protected List<String> getOverriddenPropertyNames(IEclipsePreferences preferences) {
+			return EclipsePreferencesHelper.getOverriddenPropertyNames(preferences);
 		}
 
 		protected Set<IEclipsePreferences> getPreferences() {
 			if (prefs == null) {
 				prefs = new HashSet<IEclipsePreferences>();
-				BundleContext context = WorkbenchSWTActivator.getDefault()
-						.getContext();
+				BundleContext context = WorkbenchSWTActivator.getDefault().getContext();
 				for (Bundle bundle : context.getBundles()) {
 					if (bundle.getSymbolicName() != null) {
-						prefs.add(InstanceScope.INSTANCE.getNode(bundle
-								.getSymbolicName()));
+						prefs.add(InstanceScope.INSTANCE.getNode(bundle.getSymbolicName()));
 					}
 				}
 			}
@@ -1458,8 +1409,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		}
 
 		private IThemeEngine getThemeEngine(Event event) {
-			return (IThemeEngine) event
-					.getProperty(IThemeEngine.Events.THEME_ENGINE);
+			return (IThemeEngine) event.getProperty(IThemeEngine.Events.THEME_ENGINE);
 		}
 	}
 }
