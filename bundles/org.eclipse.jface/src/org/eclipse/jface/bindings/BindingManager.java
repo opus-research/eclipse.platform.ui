@@ -512,7 +512,8 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            computed).
 	 */
 	private final void computeBindings(final Map activeContextTree,
-			final Map bindingsByTrigger, final Map triggersByCommandId, 
+			final Map<TriggerSequence, Object> bindingsByTrigger,
+			final Map triggersByCommandId,
 			final Map conflictsByTrigger) {
 		/*
 		 * FIRST PASS: Remove all of the bindings that are marking deletions.
@@ -523,7 +524,7 @@ public final class BindingManager extends HandleObjectManager implements
 		 * SECOND PASS: Just throw in bindings that match the current state. If
 		 * there is more than one match for a binding, then create a list.
 		 */
-		final Map possibleBindings = new HashMap();
+		final Map<TriggerSequence, Object> possibleBindings = new HashMap<TriggerSequence, Object>();
 		final int length = trimmedBindings.length;
 		for (int i = 0; i < length; i++) {
 			final Binding binding = trimmedBindings[i];
@@ -566,13 +567,13 @@ public final class BindingManager extends HandleObjectManager implements
 			final Object existingMatch = possibleBindings.get(trigger);
 			if (existingMatch instanceof Binding) {
 				possibleBindings.remove(trigger);
-				final Collection matches = new ArrayList();
+				final Collection<Object> matches = new ArrayList<Object>();
 				matches.add(existingMatch);
 				matches.add(binding);
 				possibleBindings.put(trigger, matches);
 
 			} else if (existingMatch instanceof Collection) {
-				final Collection matches = (Collection) existingMatch;
+				final Collection<Object> matches = (Collection<Object>) existingMatch;
 				matches.add(binding);
 
 			} else {
@@ -589,11 +590,11 @@ public final class BindingManager extends HandleObjectManager implements
 		 * further logic to try to resolve them. If the conflict can't be
 		 * resolved, then we log the problem.
 		 */
-		final Iterator possibleBindingItr = possibleBindings.entrySet()
+		final Iterator<Map.Entry<TriggerSequence, Object>> possibleBindingItr = possibleBindings.entrySet()
 				.iterator();
 		while (possibleBindingItr.hasNext()) {
-			final Map.Entry entry = (Map.Entry) possibleBindingItr.next();
-			final TriggerSequence trigger = (TriggerSequence) entry.getKey();
+			final Map.Entry<TriggerSequence, Object> entry = possibleBindingItr.next();
+			final TriggerSequence trigger = entry.getKey();
 			final Object match = entry.getValue();
 			/*
 			 * What we do depends slightly on whether we are trying to build a
@@ -602,7 +603,7 @@ public final class BindingManager extends HandleObjectManager implements
 			 */
 			if (activeContextTree == null) {
 				// We are building the list of all possible bindings.
-				final Collection bindings = new ArrayList();
+				final Collection<Object> bindings = new ArrayList<Object>();
 				if (match instanceof Binding) {
 					bindings.add(match);
 					bindingsByTrigger.put(trigger, bindings);
@@ -613,7 +614,7 @@ public final class BindingManager extends HandleObjectManager implements
 					bindings.addAll((Collection) match);
 					bindingsByTrigger.put(trigger, bindings);
 
-					final Iterator matchItr = bindings.iterator();
+					final Iterator<Object> matchItr = bindings.iterator();
 					while (matchItr.hasNext()) {
 						addReverseLookup(triggersByCommandId,
 								((Binding) matchItr.next())
@@ -748,7 +749,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * @return The tree of contexts to use; may be empty, but never
 	 *         <code>null</code>. The keys and values are both strings.
 	 */
-	private final Map createContextTreeFor(final Set contextIds) {
+	private final Map<String, String> createContextTreeFor(final Set<String> contextIds) {
 		final Map<String, String> contextTree = new HashMap<String, String>();
 
 		final Iterator<String> contextIdItr = contextIds.iterator();
@@ -796,13 +797,13 @@ public final class BindingManager extends HandleObjectManager implements
 	 * @return The tree of contexts to use; may be empty, but never
 	 *         <code>null</code>. The keys and values are both strings.
 	 */
-	private final Map createFilteredContextTreeFor(final Set contextIds) {
+	private final Map<String, String> createFilteredContextTreeFor(final Set<String> contextIds) {
 		// Check to see whether a dialog or window is active.
 		boolean dialog = false;
 		boolean window = false;
-		Iterator contextIdItr = contextIds.iterator();
+		Iterator<String> contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			final String contextId = (String) contextIdItr.next();
+			final String contextId = contextIdItr.next();
 			if (IContextIds.CONTEXT_ID_DIALOG.equals(contextId)) {
 				dialog = true;
 				continue;
@@ -820,7 +821,7 @@ public final class BindingManager extends HandleObjectManager implements
 		 */
 		contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			String contextId = (String) contextIdItr.next();
+			String contextId = contextIdItr.next();
 			Context context = contextManager.getContext(contextId);
 			try {
 				String parentId = context.getParentId();
