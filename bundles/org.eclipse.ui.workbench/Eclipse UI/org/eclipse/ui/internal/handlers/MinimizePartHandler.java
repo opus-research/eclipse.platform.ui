@@ -18,7 +18,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.presentations.IStackPresentationSite;
 
 /**
  * @since 3.4
@@ -40,8 +39,7 @@ public class MinimizePartHandler extends AbstractHandler {
 			if (page != null) {
 				IWorkbenchPartReference partRef = page.getActivePartReference();
 				if (partRef != null) {
-					page.setPartState(partRef,
-							IStackPresentationSite.STATE_MINIMIZED);
+					page.setPartState(partRef, IWorkbenchPage.STATE_MINIMIZED);
 				}
 			}
 		}
