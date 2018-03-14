@@ -153,12 +153,22 @@ public class Hyperlink extends AbstractHyperlink {
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		checkWidget();
 		int innerWidth = wHint;
-		if (innerWidth != SWT.DEFAULT)
+		if (innerWidth != SWT.DEFAULT) {
 			innerWidth -= marginWidth * 2;
-		Point textSize = computeTextSize(innerWidth, hHint);
+			if (innerWidth < 0)
+				innerWidth = 0;
+		}
+		int innerHeight = hHint;
+		if (innerHeight != SWT.DEFAULT) {
+			innerHeight -= marginWidth * 2;
+			if (innerHeight < 0)
+				innerHeight = 0;
+		}
+		Point textSize = computeTextSize(innerWidth, innerHeight);
 		int textWidth = textSize.x + 2 * marginWidth;
 		int textHeight = textSize.y + 2 * marginHeight;
-		return new Point(textWidth, textHeight);
+		Rectangle trim = computeTrim(0, 0, textWidth, textHeight);
+		return new Point(trim.width, trim.height);
 	}
 
 	/**
