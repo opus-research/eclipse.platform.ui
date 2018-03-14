@@ -9,7 +9,6 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - initial API and implementation
  *     Andrea Guarinoni - intial color schema definition
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 466469 based on work from Miguel Cervantes
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 467102
  *******************************************************************************/
 
 /* ############################## Eclipse UI properties ############################## */
@@ -38,6 +37,7 @@ IEclipsePreferences#org-eclipse-ui-editors {
 		'lineNumberColor=101,123,131'
 		'linked.slave.color=66,156,255'
 		'matchingTagIndicationColor=72,72,72'
+		'occurrenceIndicationColor=7,54,66'
 		'overrideIndicatorColor=78,120,117'
 		'printMarginColor=101,123,131'
 		'searchResultHighlighting=false'
