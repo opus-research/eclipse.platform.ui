@@ -216,7 +216,12 @@ public class MenuAdditionCacheEntry {
 						ServiceLocator sl = new ServiceLocator();
 						sl.setContext(context);
 						DynamicMenuContributionItem item = new DynamicMenuContributionItem(
-								MenuHelper.getId(child), sl, child);
+								MenuHelper.getId(child), sl, child) {
+							@Override
+							public boolean isDynamic() {
+								return true;
+							}
+						};
 						return item;
 					}
 				};
