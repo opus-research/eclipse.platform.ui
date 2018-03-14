@@ -159,8 +159,7 @@ public class SearchField {
 			protected void doClose() {
 				text.setText(""); //$NON-NLS-1$
 				resetProviders();
-				dialogHeight = shell.getSize().y;
-				dialogWidth = shell.getSize().x;
+				storeShellSize();
 				shell.setVisible(false);
 				removeAccessibleListener();
 			}
@@ -204,8 +203,10 @@ public class SearchField {
 		shell.addShellListener(new ShellAdapter() {
 			@Override
 			public void shellClosed(ShellEvent e) {
+				e.doit = false; // That would prevent shell from being disposed
+				if (shell == null || shell.isDisposed() || text.isDisposed() || !shell.isVisible())
+					return;
 				quickAccessContents.doClose();
-				e.doit = false;
 			}
 		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
@@ -577,8 +578,18 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		// shell size stored when shell is closed
+	}
+
+	private void storeShellSize() {
+		if (!shell.isDisposed()) {
+			Point size = shell.getSize();
+			dialogHeight = size.y;
+			dialogWidth = size.x;
+			IDialogSettings dialogSettings = getDialogSettings();
+			dialogSettings.put(DIALOG_HEIGHT, size.y);
+			dialogSettings.put(DIALOG_WIDTH, size.x);
+		}
 	}
 
 	private IDialogSettings getDialogSettings() {
