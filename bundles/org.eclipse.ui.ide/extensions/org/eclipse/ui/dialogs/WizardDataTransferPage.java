@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -261,12 +262,12 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
 
         final MessageDialog dialog = new MessageDialog(getContainer()
                 .getShell(), IDEWorkbenchMessages.Question,
-                null, messageString, MessageDialog.QUESTION, new String[] {
+                null, messageString, MessageDialog.QUESTION, 0,
                         IDialogConstants.YES_LABEL,
                         IDialogConstants.YES_TO_ALL_LABEL,
                         IDialogConstants.NO_LABEL,
                         IDialogConstants.NO_TO_ALL_LABEL,
-                        IDialogConstants.CANCEL_LABEL }, 0) {
+                        IDialogConstants.CANCEL_LABEL) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
@@ -295,9 +296,9 @@ public abstract class WizardDataTransferPage extends WizardPage implements Liste
     protected boolean queryYesNoQuestion(String message) {
         MessageDialog dialog = new MessageDialog(getContainer().getShell(),
                 IDEWorkbenchMessages.Question,
-                (Image) null, message, MessageDialog.NONE,
-                new String[] { IDialogConstants.YES_LABEL,
-                        IDialogConstants.NO_LABEL }, 0) {
+                (Image) null, message, MessageDialog.NONE, 0,
+                IDialogConstants.YES_LABEL,
+                IDialogConstants.NO_LABEL) {
         	@Override
 			protected int getShellStyle() {
         		return super.getShellStyle() | SWT.SHEET;
