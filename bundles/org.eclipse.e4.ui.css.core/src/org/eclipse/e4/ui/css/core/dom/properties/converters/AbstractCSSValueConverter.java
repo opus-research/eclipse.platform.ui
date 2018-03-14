@@ -27,12 +27,21 @@ public abstract class AbstractCSSValueConverter implements ICSSValueConverter {
 		this.toType = toType;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverter#getToType()
+	 */
 	public Object getToType() {
 		return toType;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.e4.ui.css.core.dom.properties.converters.ICSSValueConverter#convert(java.lang.Object,
+	 *      org.eclipse.e4.ui.css.core.engine.CSSEngine, java.lang.Object)
+	 */
 	public String convert(Object value, CSSEngine engine, Object context)
 			throws Exception {
 		return convert(value, engine, context, null);
