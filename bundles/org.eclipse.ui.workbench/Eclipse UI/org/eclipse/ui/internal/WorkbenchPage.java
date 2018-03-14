@@ -2868,11 +2868,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private void addActionSet(MPerspective perspective, MPerspective temporary) {
 		List<String> tags = perspective.getTags();
 		List<String> extendedTags = temporary.getTags();
-		String excludedTags = perspective.getPersistedState().get(
-				ModeledPageLayout.HIDDEN_ITEMS_KEY);
 		for (String extendedTag : extendedTags) {
-			if (!tags.contains(extendedTag) && excludedTags != null
-					&& !excludedTags.contains(extendedTag + ",")) { //$NON-NLS-1$
+			if (!tags.contains(extendedTag)) {
 				tags.add(extendedTag);
 			}
 		}
@@ -4102,6 +4099,12 @@ public class WorkbenchPage implements IWorkbenchPage {
              
              IActionSetDescriptor desc = reg.findActionSet(actionSetID);
              if (desc != null) {
+				IActionSetDescriptor[] offActionSets = persp.getAlwaysOffActionSets();
+				for (IActionSetDescriptor off : offActionSets) {
+					if (off.getId().equals(desc.getId())) {
+						return;
+					}
+				}
                  persp.addActionSet(desc);
                  legacyWindow.updateActionSets();
                  legacyWindow.firePerspectiveChanged(this, getPerspective(),
