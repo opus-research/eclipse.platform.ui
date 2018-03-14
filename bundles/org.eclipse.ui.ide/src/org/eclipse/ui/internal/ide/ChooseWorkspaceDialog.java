@@ -316,7 +316,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 		expandableComposite.setClient(panel);
 		RowLayout layout = new RowLayout();
 		layout.type = SWT.VERTICAL;
-		layout.marginLeft = 11;
+		layout.marginLeft = 14;
 		panel.setLayout(layout);
 		recentWorkspacesComposites = new HashMap<>(launchData.getRecentWorkspaces().length);
 		Map<String, String> uniqueWorkspaceNames = createUniqueWorkspaceNameMap();
@@ -342,7 +342,7 @@ public class ChooseWorkspaceDialog extends TitleAreaDialog {
 
 			Menu menu = new Menu(link);
 			MenuItem forgetItem = new MenuItem(menu, SWT.PUSH);
-			forgetItem.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_forgetWorkspace);
+			forgetItem.setText(IDEWorkbenchMessages.ChooseWorkspaceDialog_removeWorkspaceSelection);
 			forgetItem.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
