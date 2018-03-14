@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1050,20 +1049,10 @@ public class TrimStack {
 				}
 
 				// If we haven't found one then use the first
-				// <- is this correct behavior? What if the part was closed?
 				if (partToActivate == null) {
 					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					List<MPart> relevantParts = new ArrayList<MPart>();
-					for (MPart part : parts) {
-						if (part.isToBeRendered() && part.isVisible()
-								&& part.getCurSharedRef() == null
-								|| part.getCurSharedRef() != null
-								&& part.getCurSharedRef().isToBeRendered()
-								&& part.getCurSharedRef().isVisible())
-							relevantParts.add(part);
-					}
-					if (relevantParts.size() > 0)
-						partToActivate = relevantParts.get(0);
+					if (parts.size() > 0)
+						partToActivate = parts.get(0);
 				}
 
 				if (partToActivate != null) {
