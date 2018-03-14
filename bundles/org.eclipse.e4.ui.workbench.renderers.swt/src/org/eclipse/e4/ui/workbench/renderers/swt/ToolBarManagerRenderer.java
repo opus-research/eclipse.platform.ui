@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -49,6 +48,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.services.IServiceConstants;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
@@ -80,6 +80,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private static final Selector ALL_SELECTOR = new Selector() {
 
+		@Override
 		public boolean select(MApplicationElement element) {
 			return true;
 		}
@@ -110,6 +111,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -138,6 +140,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -205,6 +208,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolBarElement
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -220,6 +224,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBarElement))
@@ -235,6 +240,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler childAdditionUpdater = new EventHandler() {
+		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MToolBar))
@@ -270,6 +276,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			} else {
 				s = new Selector() {
 
+					@Override
 					public boolean select(MApplicationElement element) {
 						return v.equals(element.getElementId());
 					}
@@ -336,7 +343,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		Control renderedCtrl = newTB;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
-			element.getTags().add("Draggable"); //$NON-NLS-1$
+			element.getTags().add(IPresentationEngine.DRAGGABLE);
 
 			setCSSInfo(element, newTB);
 
@@ -425,6 +432,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					record.updateVisibility(parentContext.getActiveLeaf());
 					runExternalCode(new Runnable() {
 
+						@Override
 						public void run() {
 							manager.update(false);
 							getUpdater().updateContributionItems(ALL_SELECTOR);
@@ -473,6 +481,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
 		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
 		bar.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
 			}
@@ -624,6 +633,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@Override
 	public Object getUIContainer(MUIElement childElement) {
 		Composite intermediate = (Composite) super.getUIContainer(childElement);
 		if (intermediate == null || intermediate.isDisposed()) {
@@ -787,13 +797,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private void addToManager(ToolBarManager parentManager,
 			MToolBarElement model, IContributionItem ci) {
 		MElementContainer<MUIElement> parent = model.getParent();
-
-		if (Arrays.asList(parentManager.getItems()).contains(ci)) {
-			// The parent manager contributions are already up to date.
-			// This can happen for programmatic contributions.
-			return;
-		}
-
 		// technically this shouldn't happen
 		if (parent == null) {
 			parentManager.add(ci);
@@ -935,6 +938,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
 	}
