@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -280,9 +280,7 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	public void enableUI(IWorkbenchPart[] parts) {
 		for (int i = 0; i < parts.length; i++) {
 			IWorkbenchPart workbenchPart = parts[i];
-			Composite paneComposite = (Composite) ((PartSite) workbenchPart
-.getSite()).getModel()
-					.getWidget();
+			Composite paneComposite = (Composite) ((PartSite) workbenchPart.getSite()).getModel().getWidget();
 			Control[] paneChildren = paneComposite.getChildren();
 			Composite toEnable = ((Composite) paneChildren[0]);
 			paneComposite.setCursor(originalCursor);
@@ -304,7 +302,7 @@ public abstract class Saveable extends InternalSaveable implements IAdaptable {
 	 * @since 3.3
 	 */
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
 }
