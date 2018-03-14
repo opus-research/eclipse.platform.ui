@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2009 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 208332, 194734
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -21,116 +23,138 @@ import org.eclipse.core.databinding.observable.ObservableTracker;
 import org.eclipse.core.databinding.observable.Realm;
 
 /**
- * 
+ *
  * Abstract implementation of {@link IObservableSet}.
- * 
+ *
  * <p>
  * This class is thread safe. All state accessing methods must be invoked from
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
+ * @param <E>
+ *            the type of the elements in this set
+ *
  * @since 1.0
  */
-public abstract class AbstractObservableSet extends AbstractObservable implements
-		IObservableSet {
+public abstract class AbstractObservableSet<E> extends AbstractObservable
+		implements IObservableSet<E> {
 
 	private boolean stale = false;
 
 	protected AbstractObservableSet() {
 		this(Realm.getDefault());
 	}
-	
+
+	@Override
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 	}
 
+	@Override
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 	}
-	
+
 	protected AbstractObservableSet(Realm realm) {
 		super(realm);
 	}
-	
-	public synchronized void addSetChangeListener(ISetChangeListener listener) {
+
+	@Override
+	public synchronized void addSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		addListener(SetChangeEvent.TYPE, listener);
 	}
 
-	public synchronized void removeSetChangeListener(ISetChangeListener listener) {
+	@Override
+	public synchronized void removeSetChangeListener(
+			ISetChangeListener<? super E> listener) {
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected abstract Set getWrappedSet();
-	
-	protected void fireSetChange(SetDiff diff) {
+	protected abstract Set<E> getWrappedSet();
+
+	protected void fireSetChange(SetDiff<E> diff) {
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new SetChangeEvent(this, diff));
+		fireEvent(new SetChangeEvent<>(this, diff));
 	}
-	
+
+	@Override
 	public boolean contains(Object o) {
 		getterCalled();
 		return getWrappedSet().contains(o);
 	}
 
-	public boolean containsAll(Collection c) {
+	@Override
+	public boolean containsAll(Collection<?> c) {
 		getterCalled();
 		return getWrappedSet().containsAll(c);
 	}
 
+	@Override
 	public boolean equals(Object o) {
 		getterCalled();
 		return getWrappedSet().equals(o);
 	}
 
+	@Override
 	public int hashCode() {
 		getterCalled();
 		return getWrappedSet().hashCode();
 	}
 
+	@Override
 	public boolean isEmpty() {
 		getterCalled();
 		return getWrappedSet().isEmpty();
 	}
 
-	public Iterator iterator() {
+	@Override
+	public Iterator<E> iterator() {
 		getterCalled();
-		final Iterator wrappedIterator = getWrappedSet().iterator();
-		return new Iterator() {
+		final Iterator<E> wrappedIterator = getWrappedSet().iterator();
+		return new Iterator<E>() {
 
+			@Override
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
 
+			@Override
 			public boolean hasNext() {
 				ObservableTracker.getterCalled(AbstractObservableSet.this);
 				return wrappedIterator.hasNext();
 			}
 
-			public Object next() {
+			@Override
+			public E next() {
 				ObservableTracker.getterCalled(AbstractObservableSet.this);
 				return wrappedIterator.next();
 			}
 		};
 	}
 
+	@Override
 	public int size() {
 		getterCalled();
 		return getWrappedSet().size();
 	}
 
+	@Override
 	public Object[] toArray() {
 		getterCalled();
 		return getWrappedSet().toArray();
 	}
 
-	public Object[] toArray(Object[] a) {
+	@Override
+	public <T> T[] toArray(T[] a) {
 		getterCalled();
 		return getWrappedSet().toArray(a);
 	}
 
+	@Override
 	public String toString() {
 		getterCalled();
 		return getWrappedSet().toString();
@@ -140,26 +164,32 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 		ObservableTracker.getterCalled(this);
 	}
 
-	public boolean add(Object o) {
+	@Override
+	public boolean add(E o) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean addAll(Collection c) {
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public boolean remove(Object o) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean removeAll(Collection c) {
+	@Override
+	public boolean removeAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean retainAll(Collection c) {
+	@Override
+	public boolean retainAll(Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
@@ -167,6 +197,7 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 	/**
 	 * @return Returns the stale state.
 	 */
+	@Override
 	public boolean isStale() {
 		getterCalled();
 		return stale;
@@ -187,8 +218,9 @@ public abstract class AbstractObservableSet extends AbstractObservable implement
 		}
 	}
 
-
+	@Override
 	protected void fireChange() {
-		throw new RuntimeException("fireChange should not be called, use fireSetChange() instead"); //$NON-NLS-1$
+		throw new RuntimeException(
+				"fireChange should not be called, use fireSetChange() instead"); //$NON-NLS-1$
 	}
 }

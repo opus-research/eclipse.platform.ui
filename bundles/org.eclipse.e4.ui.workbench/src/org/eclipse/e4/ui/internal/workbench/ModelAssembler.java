@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 BestSolution.at and others.
+ * Copyright (c) 2010, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464, 433336
- *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430075, 430080, 431464, 433336, 472654
+ *     René Brandstetter - Bug 419749
  *     Brian de Alwis (MTI) - Bug 433053
  ******************************************************************************/
 
@@ -65,8 +65,8 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	//	private static final String ALWAYS = "always"; //$NON-NLS-1$
-	private static final String INITIAL = "initial"; //$NON-NLS-1$ 
-	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$ 
+	private static final String INITIAL = "initial"; //$NON-NLS-1$
+	private static final String NOTEXISTS = "notexists"; //$NON-NLS-1$
 
 	/**
 	 * Process the model
@@ -75,8 +75,8 @@ public class ModelAssembler {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
 
-		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
-		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
+		List<MApplicationElement> imports = new ArrayList<>();
+		List<MApplicationElement> addedElements = new ArrayList<>();
 
 		// run processors which are marked to run before fragments
 		runProcessors(extensions, initial, false);
@@ -99,7 +99,7 @@ public class ModelAssembler {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName())) { //$NON-NLS-1$
-					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$ 
+					if (initial || !INITIAL.equals(ce.getAttribute("apply"))) { //$NON-NLS-1$
 						processFragment(ce, imports, addedElements, initial);
 					}
 				}
@@ -153,7 +153,7 @@ public class ModelAssembler {
 			logger.warn("Unable to create model extension \"{0}\"", bundleName); //$NON-NLS-1$
 			return;
 		}
-		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$ 
+		boolean checkExist = !initial && NOTEXISTS.equals(ce.getAttribute("apply")); //$NON-NLS-1$
 
 		MModelFragments fragmentsContainer = (MModelFragments) extensionRoot;
 		List<MModelFragment> fragments = fragmentsContainer.getFragments();
@@ -195,7 +195,7 @@ public class ModelAssembler {
 				evalImports = true;
 				addedElements.addAll(merged);
 			} else {
-				logger.info("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
+				logger.debug("Nothing to merge for \"{0}\"", uri); //$NON-NLS-1$
 			}
 		}
 
@@ -268,7 +268,7 @@ public class ModelAssembler {
 		if (imports.isEmpty())
 			return;
 		// now that we have all components loaded, resolve imports
-		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<MApplicationElement, MApplicationElement>();
+		Map<MApplicationElement, MApplicationElement> importMaps = new HashMap<>();
 		for (MApplicationElement importedElement : imports) {
 			MApplicationElement realElement = ModelUtils.findElementById(application,
 					importedElement.getElementId());
@@ -280,7 +280,7 @@ public class ModelAssembler {
 		}
 
 		TreeIterator<EObject> it = EcoreUtil.getAllContents(addedElements);
-		List<Runnable> commands = new ArrayList<Runnable>();
+		List<Runnable> commands = new ArrayList<>();
 
 		// TODO Probably use EcoreUtil.UsageCrossReferencer
 		while (it.hasNext()) {

@@ -30,9 +30,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * <p>
  * Replacement for CloseAllAction
  * </p>
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class CloseAllHandler extends AbstractEvaluationHandler {
 	private Expression enabledWhen;
@@ -53,11 +53,6 @@ public class CloseAllHandler extends AbstractEvaluationHandler {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression()
-	 */
 	@Override
 	protected Expression getEnabledWhenExpression() {
 		if (enabledWhen == null) {
@@ -80,11 +75,6 @@ public class CloseAllHandler extends AbstractEvaluationHandler {
 					return EvaluationResult.FALSE;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
-				 */
 				@Override
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info.addVariableNameAccess(ISources.ACTIVE_PART_NAME);

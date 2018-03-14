@@ -21,13 +21,14 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class PreferencePageSupportTest extends AbstractSWTTestCase {
 	private PreferencePageWithSupport page;
 
 	// private PreferenceDialog dialog;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -40,10 +41,12 @@ public class PreferencePageSupportTest extends AbstractSWTTestCase {
 	}
 
 	public class PreferencePageWithSupport extends PreferencePage {
+		@Override
 		public void setControl(Control newControl) {
 			super.setControl(newControl);
 		}
 
+		@Override
 		public Control createContents(Composite parent) {
 			Composite contents = new Composite(parent, SWT.NONE);
 

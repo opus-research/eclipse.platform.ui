@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *******************************************************************************/
 package org.eclipse.ui.actions;
@@ -45,7 +46,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
  * Clients may declare subclasses that provide additional application-specific
  * contribution item factories.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public abstract class ContributionItemFactory {
@@ -57,7 +58,7 @@ public abstract class ContributionItemFactory {
 
     /**
      * Creates a new workbench contribution item factory with the given id.
-     * 
+     *
      * @param contributionItemId the id of contribution items created by this factory
      */
     protected ContributionItemFactory(String contributionItemId) {
@@ -75,7 +76,7 @@ public abstract class ContributionItemFactory {
      * call IContributionItem#dispose to give the item an
      * opportunity to deregister its listeners and to perform any other cleanup.
      * </p>
-     * 
+     *
      * @param window the workbench window
      * @return the workbench contribution item
      */
@@ -83,7 +84,7 @@ public abstract class ContributionItemFactory {
 
     /**
      * Returns the id of this contribution item factory.
-     * 
+     *
      * @return the id of contribution items created by this factory
      */
     public String getId() {
@@ -98,7 +99,6 @@ public abstract class ContributionItemFactory {
 			"pinEditor") { //$NON-NLS-1$
 		private static final String COMMAND_ID = IWorkbenchCommandConstants.WINDOW_PIN_EDITOR;
 
-		/* (non-javadoc) method declared on ContributionItemFactory */
 		@Override
 		public IContributionItem create(final IWorkbenchWindow window) {
 			if (window == null) {
@@ -122,7 +122,7 @@ public abstract class ContributionItemFactory {
 			return action;
 		}
 	};
-	
+
     /**
      * Workbench contribution item (id "openWindows"): A list of windows
      * currently open in the workbench. Selecting one of the items makes the
@@ -131,7 +131,7 @@ public abstract class ContributionItemFactory {
      */
     public static final ContributionItemFactory OPEN_WINDOWS = new ContributionItemFactory(
             "openWindows") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
@@ -143,14 +143,14 @@ public abstract class ContributionItemFactory {
 
     /**
      * Workbench contribution item (id "viewsShortlist"): A list of views
-     * available to be opened in the window, arranged as a shortlist of 
+     * available to be opened in the window, arranged as a shortlist of
      * promising views and an "Other" subitem. Selecting
      * one of the items opens the corresponding view in the active window.
      * This action dynamically maintains the view shortlist.
      */
     public static final ContributionItemFactory VIEWS_SHORTLIST = new ContributionItemFactory(
             "viewsShortlist") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
@@ -162,20 +162,20 @@ public abstract class ContributionItemFactory {
 
     /**
      * Workbench contribution item (id "viewsShowIn"): A list of views
-     * available to be opened in the window, arranged as a list of 
+     * available to be opened in the window, arranged as a list of
      * alternate views to show the same item currently selected. Selecting
      * one of the items opens the corresponding view in the active window.
      * This action dynamically maintains the view list.
      */
     public static final ContributionItemFactory VIEWS_SHOW_IN = new ContributionItemFactory(
             "viewsShowIn") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
-            
+
             ShowInMenu showInMenu = new ShowInMenu();
             showInMenu.setId(getId());
             showInMenu.initialize(window);
@@ -191,7 +191,7 @@ public abstract class ContributionItemFactory {
      */
     public static final ContributionItemFactory REOPEN_EDITORS = new ContributionItemFactory(
             "reopenEditors") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
@@ -203,16 +203,16 @@ public abstract class ContributionItemFactory {
 
     /**
      * Workbench contribution item (id "perspectivesShortlist"): A list of
-     * perspectives available to be opened, arranged as a shortlist of 
+     * perspectives available to be opened, arranged as a shortlist of
      * promising perspectives and an "Other" subitem. Selecting
-     * one of the items makes the corresponding perspective active. Should a 
+     * one of the items makes the corresponding perspective active. Should a
      * new perspective need to be opened, a workbench user preference controls
      * whether the prespective is opened in the active window or a new window.
      * This action dynamically maintains the perspectives shortlist.
      */
     public static final ContributionItemFactory PERSPECTIVES_SHORTLIST = new ContributionItemFactory(
             "perspectivesShortlist") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
@@ -221,18 +221,18 @@ public abstract class ContributionItemFactory {
             return new ChangeToPerspectiveMenu(window, getId());
         }
     };
-    
+
     /**
      * Workbench contribution item (id "newWizardShortlist"): A list of
-     * new item wizards available to be opened, arranged as a shortlist of 
+     * new item wizards available to be opened, arranged as a shortlist of
      * promising new item wizards and an "Other" subitem. Selecting
-     * one of the items invokes the corresponding new item wizard. 
+     * one of the items invokes the corresponding new item wizard.
      * This action dynamically maintains the new item wizard shortlist.
      * @since 3.1
      */
     public static final ContributionItemFactory NEW_WIZARD_SHORTLIST = new ContributionItemFactory(
             "newWizardShortlist") { //$NON-NLS-1$
-        /* (non-javadoc) method declared on ContributionItemFactory */
+
         @Override
 		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
@@ -241,7 +241,7 @@ public abstract class ContributionItemFactory {
             return new BaseNewWizardMenu(window, getId());
         }
     };
-    
+
     /**
      * Workbench contribution item (id "helpSearch"): An editable field
      * for entering help search queries.
@@ -258,5 +258,5 @@ public abstract class ContributionItemFactory {
         }
     };
 
-    
+
 }

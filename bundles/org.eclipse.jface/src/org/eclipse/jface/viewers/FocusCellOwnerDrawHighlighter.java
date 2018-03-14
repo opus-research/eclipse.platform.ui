@@ -26,18 +26,18 @@ import org.eclipse.swt.widgets.Listener;
  * the control into owner draw mode and highlighting the currently selected
  * cell. To make the use this class you should create the control with the
  * {@link SWT#FULL_SELECTION} bit set
- * 
+ *
  * This class can be subclassed to configure how the coloring of the selected
  * cell.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * Create a new instance which can be passed to a
 	 * {@link TreeViewerFocusCellManager}
-	 * 
+	 *
 	 * @param viewer
 	 *            the viewer
 	 */
@@ -67,7 +67,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 			gc.setBackground(background);
 			gc.setForeground(foreground);
-			
+
 			if (onlyTextHighlighting(cell)) {
 				Rectangle area = event.getBounds();
 				Rectangle rect = cell.getTextBounds();
@@ -78,7 +78,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 			} else {
 				gc.fillRectangle(event.getBounds());
 			}
-			
+
 			event.detail &= ~SWT.SELECTED;
 		}
 	}
@@ -95,28 +95,23 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 	private void hookListener(final ColumnViewer viewer) {
 
-		Listener listener = new Listener() {
+		Listener listener = event -> {
+			if ((event.detail & SWT.SELECTED) > 0) {
+				ViewerCell focusCell = getFocusCell();
+				ViewerRow row = viewer.getViewerRowFromItem(event.item);
 
-			@Override
-			public void handleEvent(Event event) {
-				if ((event.detail & SWT.SELECTED) > 0) {
-					ViewerCell focusCell = getFocusCell();
-					ViewerRow row = viewer.getViewerRowFromItem(event.item);
+				Assert
+						.isNotNull(row,
+								"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
 
-					Assert
-							.isNotNull(row,
-									"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
+				ViewerCell cell = row.getCell(event.index);
 
-					ViewerCell cell = row.getCell(event.index);
-
-					if (focusCell == null || !cell.equals(focusCell)) {
-						removeSelectionInformation(event, cell);
-					} else {
-						markFocusedCell(event, cell);
-					}
+				if (focusCell == null || !cell.equals(focusCell)) {
+					removeSelectionInformation(event, cell);
+				} else {
+					markFocusedCell(event, cell);
 				}
 			}
-
 		};
 		viewer.getControl().addListener(SWT.EraseItem, listener);
 	}
@@ -124,7 +119,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the background of the selected cell when
 	 * the control has the input focus
-	 * 
+	 *
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
@@ -136,7 +131,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the foreground (=text) of the selected
 	 * cell when the control has the input focus
-	 * 
+	 *
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the default
@@ -148,7 +143,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the foreground (=text) of the selected
 	 * cell when the control has <b>no</b> input focus
-	 * 
+	 *
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the same used when
@@ -162,7 +157,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 	/**
 	 * The color to use when rendering the background of the selected cell when
 	 * the control has <b>no</b> input focus
-	 * 
+	 *
 	 * @param cell
 	 *            the cell which is colored
 	 * @return the color or <code>null</code> to use the same used when
@@ -175,7 +170,7 @@ public class FocusCellOwnerDrawHighlighter extends FocusCellHighlighter {
 
 	/**
 	 * Controls whether the whole cell or only the text-area is highlighted
-	 * 
+	 *
 	 * @param cell
 	 *            the cell which is highlighted
 	 * @return <code>true</code> if only the text area should be highlighted

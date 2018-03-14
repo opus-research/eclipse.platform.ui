@@ -22,63 +22,45 @@ import org.eclipse.ui.themes.IThemeManager;
 public class ThemeManagerAdapter extends PropertyMapAdapter {
 
     private IThemeManager manager;
-    
+
     private IPropertyChangeListener listener = new IPropertyChangeListener() {
         @Override
 		public void propertyChange(PropertyChangeEvent event) {
             firePropertyChange(event.getProperty());
         }
     };
-    
+
     public ThemeManagerAdapter(IThemeManager manager) {
         this.manager = manager;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#attachListener()
-     */
+
     @Override
 	protected void attachListener() {
         manager.addPropertyChangeListener(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.PropertyMapAdapter#detachListener()
-     */
     @Override
 	protected void detachListener() {
         manager.removePropertyChangeListener(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.IPropertyMap#keySet()
-     */
     @Override
 	public Set keySet() {
         Set result = ThemeAdapter.getKeySet(manager.getCurrentTheme());
-        
+
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.IPropertyMap#getValue(java.lang.String, java.lang.Class)
-     */
     @Override
 	public Object getValue(String propertyId, Class propertyType) {
         return ThemeAdapter.getValue(manager.getCurrentTheme(), propertyId, propertyType);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.IPropertyMap#propertyExists(java.lang.String)
-     */
     @Override
 	public boolean propertyExists(String propertyId) {
         return keySet().contains(propertyId);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.preferences.IPropertyMap#setValue(java.lang.String, java.lang.Object)
-     */
     @Override
 	public void setValue(String propertyId, Object newValue) {
         throw new UnsupportedOperationException();

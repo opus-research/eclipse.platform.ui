@@ -57,11 +57,7 @@ public class StringToBooleanPrimitiveConverter implements IConverter {
 		return array;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.binding.converter.IConverter#convert(java.lang.Object)
-	 */
+	@Override
 	public Object convert(Object source) {
 		String s = (String) source;
 		s = s.toUpperCase();
@@ -77,10 +73,12 @@ public class StringToBooleanPrimitiveConverter implements IConverter {
 		throw new IllegalArgumentException(s + " is not a legal boolean value"); //$NON-NLS-1$
 	}
 
+	@Override
 	public Object getFromType() {
 		return String.class;
 	}
 
+	@Override
 	public Object getToType() {
 		return Boolean.TYPE;
 	}

@@ -15,7 +15,7 @@ package org.eclipse.ui.internal.views.markers;
  */
 public class MockMarkerEntry extends MarkerEntry{
 	/**
-	 * 
+	 *
 	 */
 	public String name;
 	/**
@@ -25,9 +25,7 @@ public class MockMarkerEntry extends MarkerEntry{
 		super(null);
 		this.name=name;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+	@Override
 	public boolean equals(Object obj) {
 		// TODO Auto-generated method stub
 		return name.equals(((MockMarkerEntry)obj).name);

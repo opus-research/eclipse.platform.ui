@@ -50,13 +50,14 @@ public class DuplicateMenuItemTest extends AbstractNavigatorTest {
 
         MenuItem[] items = menu.getItems();
         HashSet labels = new HashSet();
-        for (int i = 0; i < items.length; i++) {
-            String label = items[i].getText();
+        for (MenuItem item : items) {
+            String label = item.getText();
             System.out.println(label);
             Assert.assertTrue("Duplicate menu entry in: " + menuName + " "
                     + label, !labels.contains(label));
-            if (items[i].getMenu() != null)
-                checkMenu(items[i].getMenu(), label);
+            if (item.getMenu() != null) {
+				checkMenu(item.getMenu(), label);
+			}
         }
 
     }
@@ -77,7 +78,8 @@ public class DuplicateMenuItemTest extends AbstractNavigatorTest {
     /**
      * Sets up the hierarchy.
      */
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         createTestFile();
         showNav();

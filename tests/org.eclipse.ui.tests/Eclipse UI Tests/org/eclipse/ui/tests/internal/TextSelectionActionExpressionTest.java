@@ -36,7 +36,8 @@ public class TextSelectionActionExpressionTest extends UITestCase {
         super(testName);
     }
 
-    protected void doSetUp() throws Exception {
+    @Override
+	protected void doSetUp() throws Exception {
         super.doSetUp();
         fWindow = openTestWindow();
         fPage = fWindow.getActivePage();
@@ -159,8 +160,9 @@ public class TextSelectionActionExpressionTest extends UITestCase {
                 "org.eclipse.ui.tests.internal.TextSelectionMenu");
         while (item instanceof SubContributionItem) {
             item = ((SubContributionItem) item).getInnerItem();
-            if (item instanceof MenuManager)
-                return (MenuManager) item;
+            if (item instanceof MenuManager) {
+				return (MenuManager) item;
+			}
         }
         fail("Unable to find menu manager");
         return null;

@@ -23,9 +23,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Widget;
 
 /**
@@ -59,36 +57,31 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		 * Add the listener for SetData on the table
 		 */
 		private void addTableListener() {
-			getControl().addListener(SWT.SetData, new Listener() {
+			getControl().addListener(SWT.SetData, event -> {
+				Item item = (Item) event.item;
+				final int index = doIndexOf(item);
 
-				@Override
-				public void handleEvent(Event event) {
-					Item item = (Item) event.item;
-					final int index = doIndexOf(item);
-					
-					if (index == -1) {
-						// Should not happen, but the spec for doIndexOf allows returning -1.
-						// See bug 241117.
-						return;
-					}
-					
-					Object element = resolveElement(index);
-					if (element == null) {
-						// Didn't find it so make a request
-						// Keep looking if it is not in the cache.
-						IContentProvider contentProvider = getContentProvider();
-						// If we are building lazily then request lookup now
-						if (contentProvider instanceof ILazyContentProvider) {
-							((ILazyContentProvider) contentProvider)
-									.updateElement(index);
-							return;
-						}
-					}
-
-					associate(element, item);
-					updateItem(item, element);
+				if (index == -1) {
+					// Should not happen, but the spec for doIndexOf allows returning -1.
+					// See bug 241117.
+					return;
 				}
 
+				Object element = resolveElement(index);
+				if (element == null) {
+					// Didn't find it so make a request
+					// Keep looking if it is not in the cache.
+					IContentProvider contentProvider = getContentProvider();
+					// If we are building lazily then request lookup now
+					if (contentProvider instanceof ILazyContentProvider) {
+						((ILazyContentProvider) contentProvider)
+								.updateElement(index);
+						return;
+					}
+				}
+
+				associate(element, item);
+				updateItem(item, element);
 			});
 		}
 
@@ -216,7 +209,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		super.hookControl(control);
 		initializeVirtualManager(getControl().getStyle());
 	}
-	
+
 	@Override
 	protected void handleDispose(DisposeEvent event) {
 		super.handleDispose(event);
@@ -561,12 +554,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	protected void inputChanged(Object input, Object oldInput) {
 		getControl().setRedraw(false);
 		try {
-			preservingSelection(new Runnable() {
-				@Override
-				public void run() {
-					internalRefresh(getRoot());
-				}
-			});
+			preservingSelection(() -> internalRefresh(getRoot()));
 		} finally {
 			getControl().setRedraw(true);
 		}
@@ -795,12 +783,7 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 		if (elements.length == 0) {
 			return;
 		}
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRemove(elements);
-			}
-		});
+		preservingSelection(() -> internalRemove(elements));
 	}
 
 	/**
@@ -1005,11 +988,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Replace the element at the given index with the given element. This
 	 * method will not call the content provider to verify. <strong>Note that
 	 * this method will materialize a TableItem the given index.</strong>.
-	 * 
+	 *
 	 * @param element
 	 * @param index
 	 * @see ILazyContentProvider
-	 * 
+	 *
 	 * @since 3.1
 	 */
 	public void replace(Object element, int index) {
@@ -1239,11 +1222,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Items that are not in the receiver are ignored. If the receiver is single-select and multiple
 	 * items are specified, then all items are ignored.
 	 * </p>
-	 * 
+	 *
 	 * @param items the array of items
-	 * 
+	 *
 	 * @exception IllegalArgumentException - if the array of items is null
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(Item[] items);
@@ -1265,11 +1248,11 @@ public abstract class AbstractTableViewer extends ColumnViewer {
 	 * Indices that are out of range and duplicate indices are ignored. If the receiver is
 	 * single-select and multiple indices are specified, then all indices are ignored.
 	 * </p>
-	 * 
+	 *
 	 * @param indices the indices of the items to select
-	 * 
+	 *
 	 * @exception IllegalArgumentException - if the array of indices is null
-	 * 
+	 *
 	 * @since 3.3
 	 */
 	protected abstract void doSetSelection(int[] indices);

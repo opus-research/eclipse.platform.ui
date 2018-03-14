@@ -25,13 +25,13 @@ import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
 /**
- * A table label provider implementation for showing workbench perspectives 
- * (objects of type <code>IPerspectiveDescriptor</code>) in table- and 
+ * A table label provider implementation for showing workbench perspectives
+ * (objects of type <code>IPerspectiveDescriptor</code>) in table- and
  * tree-structured viewers.
  * <p>
  * Clients may instantiate this class. It is not intended to be subclassed.
  * </p>
- * 
+ *
  * @since 3.0
  */
 public final class PerspectiveLabelProvider extends LabelProvider implements
@@ -57,7 +57,7 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
 
     /**
      * Creates a new label provider for perspectives.
-     * 
+     *
      * @param markDefault <code>true</code> if the default perspective is to be
      * visually marked, and <code>false</code> if the default perspective is
      * not treated as anything special
@@ -67,9 +67,6 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         this.markDefault = markDefault;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider
-     */
     @Override
 	public final Image getImage(Object element) {
         if (element instanceof IPerspectiveDescriptor) {
@@ -89,9 +86,6 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider
-     */
     @Override
 	public final void dispose() {
         for (Iterator i = imageCache.values().iterator(); i.hasNext();) {
@@ -100,9 +94,6 @@ public final class PerspectiveLabelProvider extends LabelProvider implements
         imageCache.clear();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.viewers.ILabelProvider
-     */
     @Override
 	public final String getText(Object element) {
         if (element instanceof IPerspectiveDescriptor) {

@@ -28,9 +28,9 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests various sources keyed off the workbench window.
- * 
+ *
  * @since 3.3
- * 
+ *
  */
 public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 
@@ -43,11 +43,7 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 		super(testName);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		window = (WorkbenchWindow) openTestWindow();
 		processEvents();
@@ -104,7 +100,7 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 			fail(e.getMessage());
 		}
 	}
-	
+
 	public void testIsPerspectiveBarVisible() {
 		IEvaluationService service = (IEvaluationService) window
 				.getService(IEvaluationService.class);
@@ -134,6 +130,7 @@ public class WorkbenchWindowSubordinateSourcesTests extends UITestCase {
 	private static class PerspectiveL implements IPropertyChangeListener {
 		Boolean val = null;
 
+		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			val = (Boolean) event.getNewValue();
 		}

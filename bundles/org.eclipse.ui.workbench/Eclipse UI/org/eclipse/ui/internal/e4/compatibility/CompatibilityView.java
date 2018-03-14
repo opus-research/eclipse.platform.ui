@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,12 +64,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return (IViewPart) getPart();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#getReference()
-	 */
 	@Override
 	public WorkbenchPartReference getReference() {
 		return reference;
@@ -84,13 +78,6 @@ public class CompatibilityView extends CompatibilityPart {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.CompatibilityPart#createPartControl
-	 * (org.eclipse.ui.IWorkbenchPart, org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	protected boolean createPartControl(IWorkbenchPart legacyPart, Composite parent) {
 		clearMenuItems();

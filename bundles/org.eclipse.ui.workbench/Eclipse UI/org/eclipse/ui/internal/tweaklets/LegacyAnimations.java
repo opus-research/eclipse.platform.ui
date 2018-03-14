@@ -17,17 +17,14 @@ import org.eclipse.ui.internal.RectangleAnimationFeedbackBase;
 
 /**
  * Return the default (legacy) animation.
- * 
+ *
  * @since 3.3
  *
  */
 public class LegacyAnimations extends Animations {
 	/** Default c'tor */
 	public LegacyAnimations() {}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.tweaklets.Animations#getFeedback()
-	 */
+
 	@Override
 	public RectangleAnimationFeedbackBase createFeedback(Shell shell) {
 		return new LegacyAnimationFeedback(shell, null, null);

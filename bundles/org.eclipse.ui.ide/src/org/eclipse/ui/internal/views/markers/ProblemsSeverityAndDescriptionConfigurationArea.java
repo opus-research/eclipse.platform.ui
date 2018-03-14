@@ -22,14 +22,12 @@ import org.eclipse.swt.widgets.Composite;
 public class ProblemsSeverityAndDescriptionConfigurationArea extends
 		SeverityAndDescriptionConfigurationArea {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.views.markers.DescriptionConfigurationArea#createContents(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public void createContents(Composite parent) {
-	
+
 		super.createContents(parent);
 		createSeverityGroup(parent);
-	
+
 	}
 
 }

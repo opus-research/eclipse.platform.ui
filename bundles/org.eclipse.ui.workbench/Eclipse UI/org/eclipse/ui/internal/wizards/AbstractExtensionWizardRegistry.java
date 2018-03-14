@@ -26,7 +26,7 @@ import org.eclipse.ui.wizards.IWizardDescriptor;
 
 /**
  * Abstract baseclass for wizard registries that listen to extension changes.
- * 
+ *
  * @since 3.1
  */
 public abstract class AbstractExtensionWizardRegistry extends
@@ -39,9 +39,6 @@ public abstract class AbstractExtensionWizardRegistry extends
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker, org.eclipse.core.runtime.IExtension)
-	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker, IExtension extension) {
 		WizardsRegistryReader reader = new WizardsRegistryReader(getPlugin(),
@@ -74,10 +71,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 				localPrimaryWizards.length, additionalPrimary.length);
 		setPrimaryWizards(newPrimary);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.AbstractWizardRegistry#dispose()
-	 */
+
 	@Override
 	public void dispose() {
 		super.dispose();
@@ -85,14 +79,9 @@ public abstract class AbstractExtensionWizardRegistry extends
 				.unregisterHandler(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.wizards.AbstractWizardRegistry#doInitialize()
-	 */
 	@Override
 	protected void doInitialize() {
-        
+
 		PlatformUI.getWorkbench().getExtensionTracker().registerHandler(this, ExtensionTracker.createExtensionPointFilter(getExtensionPointFilter()));
 
 		WizardsRegistryReader reader = new WizardsRegistryReader(getPlugin(),
@@ -105,7 +94,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 	/**
 	 * Return the extension point id that should be used for extension registry
 	 * queries.
-	 * 
+	 *
 	 * @return the extension point id
 	 */
 	protected abstract String getExtensionPoint();
@@ -117,14 +106,14 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 	/**
 	 * Return the plugin id that should be used for extension registry queries.
-	 * 
+	 *
 	 * @return the plugin id
 	 */
 	protected abstract String getPlugin();
 
 	/**
 	 * Register the object with the workbench tracker.
-	 * 
+	 *
 	 * @param extension
 	 *            the originating extension
 	 * @param object
@@ -137,7 +126,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 	/**
 	 * Register all wizards in the given collection with the extension tracker.
-	 * 
+	 *
 	 * @param collection
 	 *            the collection to register
 	 */
@@ -159,7 +148,7 @@ public abstract class AbstractExtensionWizardRegistry extends
 
 	/**
 	 * Register all wizards in the given array.
-	 * 
+	 *
 	 * @param wizards
 	 *            the wizards to register
 	 */
@@ -170,9 +159,6 @@ public abstract class AbstractExtensionWizardRegistry extends
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-	 */
 	@Override
 	public void removeExtension(IExtension extension, Object[] objects) {
 		if (!extension.getExtensionPointUniqueIdentifier().equals(

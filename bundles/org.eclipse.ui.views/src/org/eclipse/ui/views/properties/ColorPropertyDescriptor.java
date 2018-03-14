@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ColorPropertyDescriptor extends PropertyDescriptor {
     /**
      * Creates an property descriptor with the given id and display name.
-     * 
+     *
      * @param id the id of the property
      * @param displayName the name to display for the property
      */
@@ -40,14 +40,15 @@ public class ColorPropertyDescriptor extends PropertyDescriptor {
     }
 
     /**
-     * The <code>ColorPropertyDescriptor</code> implementation of this 
+     * The <code>ColorPropertyDescriptor</code> implementation of this
      * <code>IPropertyDescriptor</code> method creates and returns a new
      * <code>ColorCellEditor</code>.
      * <p>
      * The editor is configured with the current validator if there is one.
      * </p>
      */
-    public CellEditor createPropertyEditor(Composite parent) {
+    @Override
+	public CellEditor createPropertyEditor(Composite parent) {
         CellEditor editor = new ColorCellEditor(parent);
         if (getValidator() != null) {
 			editor.setValidator(getValidator());

@@ -19,11 +19,11 @@ import org.eclipse.swt.graphics.Image;
  * {@link IPropertySourceProvider}, forwarding requests for text and image to
  * the label provider returned from the property descriptor for the given
  * property id.
- * 
+ *
  * @see IPropertyDescriptor#getLabelProvider()
- * 
+ *
  * @since 3.3
- * 
+ *
  * @see PropertyEditingSupport
  */
 public class PropertyColumnLabelProvider extends ColumnLabelProvider {
@@ -33,7 +33,7 @@ public class PropertyColumnLabelProvider extends ColumnLabelProvider {
 	/**
 	 * Creates a new instance based on the given property source provider and
 	 * property id.
-	 * 
+	 *
 	 * @param propertySourceProvider
 	 *            the property source provider
 	 * @param propertyID
@@ -45,6 +45,7 @@ public class PropertyColumnLabelProvider extends ColumnLabelProvider {
 		this.propertyID = propertyID;
 	}
 
+	@Override
 	public String getText(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);
@@ -60,6 +61,7 @@ public class PropertyColumnLabelProvider extends ColumnLabelProvider {
 		return ""; //$NON-NLS-1$
 	}
 
+	@Override
 	public Image getImage(Object object) {
 		IPropertySource propertySource = propertySourceProvider
 				.getPropertySource(object);

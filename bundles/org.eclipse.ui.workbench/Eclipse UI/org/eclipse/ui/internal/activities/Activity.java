@@ -56,7 +56,7 @@ final class Activity implements IActivity {
     private transient String string;
 
     private String description;
-    
+
     private boolean defaultEnabled;
 
 	private Expression expression;
@@ -188,7 +188,7 @@ final class Activity implements IActivity {
 
         return name;
     }
-    
+
     @Override
 	public Expression getExpression() {
     	return expression;
@@ -321,7 +321,7 @@ final class Activity implements IActivity {
 
         return false;
     }
-    
+
     void setExpression(Expression exp) {
     	expression = exp;
     }
@@ -360,9 +360,6 @@ final class Activity implements IActivity {
         return string;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IActivity#getDescription()
-     */
     @Override
 	public String getDescription() throws NotDefinedException {
         if (!defined) {
@@ -371,15 +368,12 @@ final class Activity implements IActivity {
 
         return description;
     }
-    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.activities.IActivity#isDefaultEnabled()
-     */
+
     @Override
 	public boolean isDefaultEnabled() {
         return defaultEnabled;
     }
-    
+
     boolean setDefaultEnabled(boolean defaultEnabled) {
         if (!Util.equals(defaultEnabled, this.defaultEnabled)) {
             this.defaultEnabled = defaultEnabled;
@@ -388,6 +382,6 @@ final class Activity implements IActivity {
             return true;
         }
 
-        return false;        
+        return false;
     }
 }

@@ -27,6 +27,7 @@ public class NonCommonViewerView extends ViewPart {
 
 	private TreeViewer _viewer;
 
+	@Override
 	public void createPartControl(Composite parent) {
 		_viewer = new TreeViewer(parent);
 
@@ -38,7 +39,7 @@ public class NonCommonViewerView extends ViewPart {
 				true);
 		service.getActivationService().activateExtensions(
 				new String[] { "org.eclipse.ui.navigator.resourceContent" }, false);
-		
+
 		_viewer.setContentProvider(service.createCommonContentProvider());
 		_viewer.setLabelProvider(new DecoratingLabelProvider(service
 				.createCommonLabelProvider(), PlatformUI.getWorkbench()
@@ -48,6 +49,7 @@ public class NonCommonViewerView extends ViewPart {
 
 	}
 
+	@Override
 	public void setFocus() {
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Matthew Hall and others.
+ * Copyright (c) 2009, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 169876)
  *     Elias Volanakis <elias@eclipsesource.com> - bug 271720
+ *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -54,7 +55,7 @@ import org.eclipse.core.runtime.Assert;
  * <p>
  * One use for this class is binding a date-and-time value to two separate user
  * interface elements, one for editing date and one for editing time:
- * 
+ *
  * <pre>
  * DataBindingContext dbc = new DataBindingContext();
  * IObservableValue beanValue = BeansObservables.observeValue(...);
@@ -65,12 +66,12 @@ import org.eclipse.core.runtime.Assert;
  * dbc.bindValue(new DateAndTimeObservableValue(dateObservable, timeObservable),
  * 		beanValue);
  * </pre>
- * 
+ *
  * A second use is editing only the date or time value of a date-and-time value.
  * This can be accomplished by using a widget-specific observable for the
  * editable value and a WritableValue as a container for the fixed value. The
  * example below allows editing the date while preserving the time:
- * 
+ *
  * <pre>
  * DataBindingContext dbc = new DataBindingContext();
  * IObservableValue beanValue = BeansObservables.observeValue(...);
@@ -79,29 +80,32 @@ import org.eclipse.core.runtime.Assert;
  * IObservableValue timeObservable = new WritableValue(dateObservable.getRealm(),
  * 		beanValue.getValue(), Date.class);
  * dbc.bindValue(new DateAndTimeObservableValue(dateObservable, timeObservable), beanValue);
- * 
+ *
  * <pre>
- * 
+ *
  * @since 1.2
  */
-public class DateAndTimeObservableValue extends AbstractObservableValue {
-	private IObservableValue dateObservable;
-	private IObservableValue timeObservable;
+public class DateAndTimeObservableValue extends AbstractObservableValue<Date> {
+	private IObservableValue<Date> dateObservable;
+	private IObservableValue<Date> timeObservable;
 	private PrivateInterface privateInterface;
-	private Object cachedValue;
+	private Date cachedValue;
 	private boolean updating;
 
 	private class PrivateInterface implements IChangeListener, IStaleListener,
 			IDisposeListener {
+		@Override
 		public void handleDispose(DisposeEvent staleEvent) {
 			dispose();
 		}
 
+		@Override
 		public void handleChange(ChangeEvent event) {
 			if (!isDisposed() && !updating)
 				notifyIfChanged();
 		}
 
+		@Override
 		public void handleStale(StaleEvent staleEvent) {
 			if (!isDisposed())
 				fireStale();
@@ -109,8 +113,9 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 	}
 
 	// One calendar per thread to preserve thread-safety
-	private static final ThreadLocal calendar = new ThreadLocal() {
-		protected Object initialValue() {
+	private static final ThreadLocal<Calendar> calendar = new ThreadLocal<Calendar>() {
+		@Override
+		protected Calendar initialValue() {
 			return Calendar.getInstance();
 		}
 	};
@@ -118,7 +123,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 	/**
 	 * Constructs a DateAndTimeObservableValue with the specified constituent
 	 * observables.
-	 * 
+	 *
 	 * @param dateObservable
 	 *            the observable used for the date component (year, month and
 	 *            day) of the constructed observable.
@@ -126,8 +131,8 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 	 *            the observable used for the time component (hour, minute,
 	 *            second and millisecond) of the constructed observable.
 	 */
-	public DateAndTimeObservableValue(IObservableValue dateObservable,
-			IObservableValue timeObservable) {
+	public DateAndTimeObservableValue(IObservableValue<Date> dateObservable,
+			IObservableValue<Date> timeObservable) {
 		super(dateObservable.getRealm());
 		this.dateObservable = dateObservable;
 		this.timeObservable = timeObservable;
@@ -136,14 +141,16 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 				timeObservable.getRealm()));
 
 		privateInterface = new PrivateInterface();
+
 		dateObservable.addDisposeListener(privateInterface);
-		timeObservable.addDisposeListener(privateInterface);
 	}
 
+	@Override
 	public Object getValueType() {
 		return Date.class;
 	}
 
+	@Override
 	protected void firstListenerAdded() {
 		cachedValue = doGetValue();
 
@@ -154,6 +161,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		timeObservable.addStaleListener(privateInterface);
 	}
 
+	@Override
 	protected void lastListenerRemoved() {
 		if (dateObservable != null && !dateObservable.isDisposed()) {
 			dateObservable.removeChangeListener(privateInterface);
@@ -170,21 +178,25 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 
 	private void notifyIfChanged() {
 		if (hasListeners()) {
-			Object oldValue = cachedValue;
-			Object newValue = cachedValue = doGetValue();
+			Date oldValue = cachedValue;
+			Date newValue = cachedValue = doGetValue();
 			if (!Util.equals(oldValue, newValue))
 				fireValueChange(Diffs.createValueDiff(oldValue, newValue));
 		}
 	}
 
-	protected Object doGetValue() {
-		Date dateValue = (Date) dateObservable.getValue();
+	/**
+	 * @since 1.6
+	 */
+	@Override
+	protected Date doGetValue() {
+		Date dateValue = dateObservable.getValue();
 		if (dateValue == null)
 			return null;
 
-		Date timeValue = (Date) timeObservable.getValue();
+		Date timeValue = timeObservable.getValue();
 
-		Calendar cal = (Calendar) calendar.get();
+		Calendar cal = calendar.get();
 
 		cal.setTime(dateValue);
 		int year = cal.get(Calendar.YEAR);
@@ -206,17 +218,19 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		return cal.getTime();
 	}
 
-	protected void doSetValue(Object value) {
-		Date date = (Date) value;
-
+	/**
+	 * @since 1.6
+	 */
+	@Override
+	protected void doSetValue(Date combinedDate) {
 		Date dateValue;
 		Date timeValue;
 
-		Calendar cal = (Calendar) calendar.get();
-		if (date == null)
+		Calendar cal = calendar.get();
+		if (combinedDate == null)
 			cal.clear();
 		else
-			cal.setTime(date);
+			cal.setTime(combinedDate);
 
 		int year = cal.get(Calendar.YEAR);
 		int month = cal.get(Calendar.MONTH);
@@ -226,10 +240,10 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		int second = cal.get(Calendar.SECOND);
 		int millis = cal.get(Calendar.MILLISECOND);
 
-		if (date == null) {
+		if (combinedDate == null) {
 			dateValue = null;
 		} else {
-			dateValue = (Date) dateObservable.getValue();
+			dateValue = dateObservable.getValue();
 			if (dateValue == null)
 				cal.clear();
 			else
@@ -240,7 +254,7 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 			dateValue = cal.getTime();
 		}
 
-		timeValue = (Date) timeObservable.getValue();
+		timeValue = timeObservable.getValue();
 		if (timeValue == null)
 			cal.clear();
 		else
@@ -262,11 +276,13 @@ public class DateAndTimeObservableValue extends AbstractObservableValue {
 		notifyIfChanged();
 	}
 
+	@Override
 	public boolean isStale() {
 		ObservableTracker.getterCalled(this);
 		return dateObservable.isStale() || timeObservable.isStale();
 	}
 
+	@Override
 	public synchronized void dispose() {
 		checkRealm();
 		if (!isDisposed()) {

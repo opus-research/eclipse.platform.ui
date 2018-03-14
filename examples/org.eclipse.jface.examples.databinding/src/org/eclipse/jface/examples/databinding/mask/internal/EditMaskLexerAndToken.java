@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 The Pampered Chef and others.
+ * Copyright (c) 2006, 2015 The Pampered Chef and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,14 +12,15 @@
 package org.eclipse.jface.examples.databinding.mask.internal;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.examples.databinding.mask.EditMaskParseException;
 
 /**
  * Lexical analyzer and token for an input mask.  Since input masks have exactly
- * one token type, we use the same class to be the recognizer and the token 
+ * one token type, we use the same class to be the recognizer and the token
  * itself.
- * 
+ *
  * @since 3.3
  */
 public class EditMaskLexerAndToken {
@@ -27,33 +28,36 @@ public class EditMaskLexerAndToken {
 	/*
 	 * First the literals that represent the types of characters
 	 */
-	private static ArrayList reservedWords = new ArrayList();{
+	private static List<String> reservedWords = new ArrayList<>();
+	{
 		reservedWords.add("#");
 		reservedWords.add("A");
 		reservedWords.add("a");
 		reservedWords.add("n");
 	}
-	
+
 	/*
 	 * ...and their corresponding regular expressions
 	 */
-	private static ArrayList inputRegexes = new ArrayList();{
+	private static List<String> inputRegexes = new ArrayList<>();
+
+	{
 		inputRegexes.add("^[0-9]$");
 		inputRegexes.add("^[A-Z]$");
 		inputRegexes.add("^[a-zA-Z]$");
 		inputRegexes.add("^[0-9a-zA-Z]$");
 	}
-	
+
 	private String charRegex = null;	// A regex for matching input characters or null
 	private String literal = null;		// The literal character if charRegex is null
 	private boolean readOnly;
 	private String input = null;		// The user's input
-	
+
 	private boolean recognizeReservedWord(String inputMask, int position) {
 		String input = inputMask.substring(position, position+1);
 		for (int reservedWord = 0; reservedWord < reservedWords.size(); reservedWord++) {
 			if (input.equals(reservedWords.get(reservedWord))) {
-				charRegex = (String) inputRegexes.get(reservedWord);
+				charRegex = inputRegexes.get(reservedWord);
 				literal = null;
 				input = null;
 				readOnly = false;
@@ -89,9 +93,9 @@ public class EditMaskLexerAndToken {
 	}
 
 	/**
-	 * Initializes itself based on characters in edit mask starting at position; 
+	 * Initializes itself based on characters in edit mask starting at position;
 	 * returns number of chars consumed
-	 * 
+	 *
 	 * @param inputMask The entire edit mask
 	 * @param position The position to begin parsing
 	 * @return The number of characters consumed
@@ -114,8 +118,8 @@ public class EditMaskLexerAndToken {
 
 	/**
 	 * ignores invalid input; stores valid input
-	 * @param inputCharacter 
-	 * @return 
+	 * @param inputCharacter
+	 * @return
 	 */
 	public boolean accept(String inputCharacter) {
 		if (readOnly) {
@@ -142,7 +146,7 @@ public class EditMaskLexerAndToken {
 	public String getInput() {
 		return input;
 	}
-	
+
 	/**
 	 * Clear any accepted input
 	 */
@@ -159,7 +163,7 @@ public class EditMaskLexerAndToken {
 	}
 
 	/**
-	 * @return true if it is a literal or if it has accepted the minimum 
+	 * @return true if it is a literal or if it has accepted the minimum
 	 * required number of characters
 	 */
 	public boolean isComplete() {
@@ -179,7 +183,7 @@ public class EditMaskLexerAndToken {
 	}
 
 	/**
-	 * @return the minimum number of characters this RegexLexer must accept 
+	 * @return the minimum number of characters this RegexLexer must accept
 	 * in order to be complete.  Because we don't yet support quantifiers, this
 	 * is currently always 1.
 	 */

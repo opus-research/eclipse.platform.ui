@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -68,7 +69,7 @@ public class ExportWizard extends Wizard {
     @Override
 	public void addPages() {
         addPage(new SelectionPage(this.theWorkbench, this.selection,
-                getAvailableExportWizards(), WorkbenchMessages.ExportWizard_selectDestination));
+                getAvailableExportWizards(), WorkbenchMessages.ExportWizard_selectWizard));
     }
 
     /**
@@ -85,12 +86,12 @@ public class ExportWizard extends Wizard {
 		if (otherCategory == null) {
 			return new AdaptableList();
 		}
-		return otherCategory.getWizardAdaptableList();    
+		return otherCategory.getWizardAdaptableList();
 	}
 
     /**
      * Initializes the wizard.
-     * 
+     *
      * @param aWorkbench the workbench
      * @param currentSelection the current selectio
      */
@@ -99,14 +100,14 @@ public class ExportWizard extends Wizard {
         this.theWorkbench = aWorkbench;
         this.selection = currentSelection;
 
-        setWindowTitle(WorkbenchMessages.ExportWizard_title); 
+        setWindowTitle(WorkbenchMessages.ExportWizard_title);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_WIZ));
         setNeedsProgressMonitor(true);
     }
 
     /**
-     * Subclasses must implement this <code>IWizard</code> method 
+     * Subclasses must implement this <code>IWizard</code> method
      * to perform any special finish processing for their wizard.
      */
     @Override

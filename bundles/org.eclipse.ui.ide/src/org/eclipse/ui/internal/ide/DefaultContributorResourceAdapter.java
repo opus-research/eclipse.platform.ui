@@ -12,13 +12,14 @@ package org.eclipse.ui.internal.ide;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IContributorResourceAdapter;
 import org.eclipse.ui.ide.IContributorResourceAdapter2;
 
 /**
  * The DefaultContributorResourceAdapter is the default
- * implementation of the IContributorResourceAdapter used for 
+ * implementation of the IContributorResourceAdapter used for
  * one to one resource adaption.
  */
 public class DefaultContributorResourceAdapter implements
@@ -47,12 +48,14 @@ public class DefaultContributorResourceAdapter implements
     /*
      * @see IContributorResourceAdapter#getAdaptedResource(IAdaptable)
      */
-    public IResource getAdaptedResource(IAdaptable adaptable) {
-        return (IResource) adaptable.getAdapter(IResource.class);
+    @Override
+	public IResource getAdaptedResource(IAdaptable adaptable) {
+		return Adapters.adapt(adaptable, IResource.class);
     }
 
-    public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
-        return (ResourceMapping) adaptable.getAdapter(ResourceMapping.class);
+    @Override
+	public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
+		return Adapters.adapt(adaptable, ResourceMapping.class);
     }
 }
 
