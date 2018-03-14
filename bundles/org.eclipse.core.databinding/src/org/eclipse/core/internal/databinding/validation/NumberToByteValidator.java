@@ -33,7 +33,9 @@ public class NumberToByteValidator extends NumberToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.NumberToNumberValidator#inRange(java.lang.Number)
+	 */
 	protected boolean inRange(Number number) {
 		return StringToNumberParser.inByteRange(number);
 	}

@@ -101,8 +101,7 @@ public class ContainerSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared in Window.
      */
-    @Override
-	protected void configureShell(Shell shell) {
+    protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem()
                 .setHelp(shell, IIDEHelpContextIds.CONTAINER_SELECTION_DIALOG);
@@ -111,14 +110,12 @@ public class ContainerSelectionDialog extends SelectionDialog {
     /* (non-Javadoc)
      * Method declared on Dialog.
      */
-    @Override
-	protected Control createDialogArea(Composite parent) {
+    protected Control createDialogArea(Composite parent) {
         // create composite 
         Composite area = (Composite) super.createDialogArea(parent);
 
         Listener listener = new Listener() {
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 if (statusMessage != null && validator != null) {
                     String errorMsg = validator.isValid(group
                             .getContainerFullPath());
@@ -153,8 +150,7 @@ public class ContainerSelectionDialog extends SelectionDialog {
      * <code>Dialog</code> method builds a list of the selected resource containers
      * for later retrieval by the client and closes this dialog.
      */
-    @Override
-	protected void okPressed() {
+    protected void okPressed() {
 
         List chosenContainerPathList = new ArrayList();
         IPath returnValue = group.getContainerFullPath();

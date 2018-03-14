@@ -39,8 +39,7 @@ public class ListElementActionFilter implements IActionFilter {
     /**
      * @see IActionFilter#testAttribute(Object, String, String)
      */
-    @Override
-	public boolean testAttribute(Object target, String name, String value) {
+    public boolean testAttribute(Object target, String name, String value) {
         called = true;
         ListElement le = (ListElement) target;
         if (name.equals(ATTR_NAME)) {

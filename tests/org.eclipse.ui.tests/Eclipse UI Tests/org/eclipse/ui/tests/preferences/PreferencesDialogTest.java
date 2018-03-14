@@ -38,13 +38,11 @@ public class PreferencesDialogTest extends TestCase {
 
 	public Shell shell;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		shell = new Shell();
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		if (shell != null) {
 			shell.dispose();

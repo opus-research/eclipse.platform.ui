@@ -67,7 +67,6 @@ public class Bug108033Test extends TestCase {
 		super(testName);
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		fWorkbench = PlatformUI.getWorkbench();
 

@@ -71,7 +71,6 @@ public class StatusDialogManagerTest extends TestCase {
 	private boolean automatedMode;
 	WorkbenchStatusDialogManager wsdm;
 	
-	@Override
 	protected void setUp() throws Exception {
 		automatedMode = ErrorDialog.AUTOMATED_MODE;
 		wsdm = new WorkbenchStatusDialogManager(null, null);
@@ -109,47 +108,38 @@ public class StatusDialogManagerTest extends TestCase {
 	public void testCheckingForMessageDuplication1() {
 		IStatus status = new IStatus() {
 
-			@Override
 			public IStatus[] getChildren() {
 				return new IStatus[0];
 			}
 
-			@Override
 			public int getCode() {
 				return IStatus.ERROR;
 			}
 
-			@Override
 			public Throwable getException() {
 				return new ArrayIndexOutOfBoundsException();
 			}
 
-			@Override
 			public String getMessage() {
 				return null;
 			}
 
-			@Override
 			public String getPlugin() {
 				return "plugin";
 			}
 
-			@Override
 			public int getSeverity() {
 				return IStatus.ERROR;
 			}
 
-			@Override
 			public boolean isMultiStatus() {
 				return false;
 			}
 
-			@Override
 			public boolean isOK() {
 				return false;
 			}
 
-			@Override
 			public boolean matches(int severityMask) {
 				return true;
 			}
@@ -208,31 +198,25 @@ public class StatusDialogManagerTest extends TestCase {
 		final boolean[] disposed = new boolean[] { false };
 		ITableLabelProvider provider = new ITableLabelProvider() {
 
-			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				return null;
 			}
 
-			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				return "";
 			}
 
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 			}
 
-			@Override
 			public void dispose() {
 				disposed[0] = true;
 			}
 
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 			}
 
@@ -279,32 +263,26 @@ public class StatusDialogManagerTest extends TestCase {
 	public void testWithStatusAdapterAndLabelProvider1(){
 		wsdm.setMessageDecorator(new ILabelDecorator(){
 			
-			@Override
 			public Image decorateImage(Image image, Object element) {
 				return null;
 			}
 			
-			@Override
 			public String decorateText(String text, Object element) {
 				return text.replaceAll("[A-Z][A-Z][A-Z][0-9][0-9]", "");
 			}
 			
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 				
 			}
 			
-			@Override
 			public void dispose() {
 				
 			}
 			
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
 			
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 				
 			}
@@ -383,7 +361,6 @@ public class StatusDialogManagerTest extends TestCase {
 		StatusAdapter statusAdapter = new StatusAdapter(new Status(
 				IStatus.ERROR, "testplugin", message));
 		Job job = new Job("job") {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return null;
 			}
@@ -512,33 +489,27 @@ public class StatusDialogManagerTest extends TestCase {
 			final boolean [] called = new boolean[]{false};
 			wsdm.setStatusListLabelProvider(new ITableLabelProvider(){
 
-				@Override
 				public Image getColumnImage(Object element, int columnIndex) {
 					return null;
 				}
 
-				@Override
 				public String getColumnText(Object element, int columnIndex) {
 					called[0] = true;
 					return "";
 				}
 
-				@Override
 				public void addListener(ILabelProviderListener listener) {
 					
 				}
 
-				@Override
 				public void dispose() {
 					
 				}
 
-				@Override
 				public boolean isLabelProperty(Object element, String property) {
 					return false;
 				}
 
-				@Override
 				public void removeListener(ILabelProviderListener listener) {
 					
 				}
@@ -653,7 +624,6 @@ public class StatusDialogManagerTest extends TestCase {
 				"org.eclipse.ui.tests", "bomb"){
 			int i = 0;
 
-			@Override
 			public String getMessage() {
 				i++;
 				if (i == 1) {
@@ -695,7 +665,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -713,7 +682,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -744,7 +712,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -769,7 +736,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -790,7 +756,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
-			@Override
 			protected void configureStatusDialog(
 					WorkbenchStatusDialogManager statusDialog) {
 				wsdm[0] = statusDialog;
@@ -997,7 +962,6 @@ public class StatusDialogManagerTest extends TestCase {
 		final boolean[] consulted = new boolean[]{false};
 		AbstractStatusAreaProvider customProvider = new AbstractStatusAreaProvider() {
 			
-			@Override
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				//intentionally does nothing as this provider
@@ -1005,7 +969,6 @@ public class StatusDialogManagerTest extends TestCase {
 				return null;
 			}
 
-			@Override
 			public boolean validFor(StatusAdapter statusAdapter) {
 				consulted[0] = true;
 				return false;
@@ -1032,7 +995,6 @@ public class StatusDialogManagerTest extends TestCase {
 	private void setupSupportArea(final StatusAdapter[] passed,
 			final Composite[] support) {
 		Policy.setErrorSupportProvider(new AbstractStatusAreaProvider() {
-			@Override
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				passed[0] = statusAdapter;
@@ -1085,7 +1047,6 @@ public class StatusDialogManagerTest extends TestCase {
 	private void setupDetails(final StatusAdapter[] passed,
 			final Composite[] details) {
 		wsdm.setDetailsAreaProvider(new AbstractStatusAreaProvider() {
-			@Override
 			public Control createSupportArea(Composite parent,
 					StatusAdapter statusAdapter) {
 				passed[0] = statusAdapter;
@@ -1174,7 +1135,6 @@ public class StatusDialogManagerTest extends TestCase {
 			return sa;
 		}
 		Job job = new Job(jobname) {
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				return null;
 			}
@@ -1204,7 +1164,6 @@ public class StatusDialogManagerTest extends TestCase {
 		return sa;
 	}
 
-	@Override
 	protected void tearDown() throws Exception {
 		wsdm = null;
 		Shell shell = StatusDialogUtil.getStatusShell();

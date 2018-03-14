@@ -51,8 +51,7 @@ public class WorkbenchSiteProgressServiceModelTagsTest extends UITestCase {
         super(testName);
     }
     
-    @Override
-	protected void doSetUp() throws Exception {
+    protected void doSetUp() throws Exception {
         super.doSetUp();
         window = openTestWindow();
         page = window.getActivePage();
@@ -68,8 +67,7 @@ public class WorkbenchSiteProgressServiceModelTagsTest extends UITestCase {
     	assertNotNull(context);
     	
     	eventHandler = new EventHandler() {
-        	@Override
-			public void handleEvent(Event event) {
+        	public void handleEvent(Event event) {
         		receivedEvent = event;
 
     		}
@@ -80,8 +78,7 @@ public class WorkbenchSiteProgressServiceModelTagsTest extends UITestCase {
     }
 
 
-    @Override
-	protected void doTearDown() throws Exception {
+    protected void doTearDown() throws Exception {
     	eventBroker.unsubscribe(eventHandler);
     	eventBroker = null;    	
         page.hideView(view);
