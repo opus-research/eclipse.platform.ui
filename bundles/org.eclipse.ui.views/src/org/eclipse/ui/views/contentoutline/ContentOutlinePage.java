@@ -49,7 +49,8 @@ import org.eclipse.ui.part.Page;
  * <code>IContentOutlinePage</code> directly rather than subclassing this class.
  * </p>
  */
-public abstract class ContentOutlinePage extends Page implements IContentOutlinePage, ISelectionChangedListener {
+public abstract class ContentOutlinePage extends Page implements
+        IContentOutlinePage, ISelectionChangedListener {
     private ListenerList selectionChangedListeners = new ListenerList();
 
     private TreeViewer treeViewer;
@@ -147,7 +148,8 @@ public abstract class ContentOutlinePage extends Page implements IContentOutline
     }
 
     @Override
-	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+	public void removeSelectionChangedListener(
+            ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
     }
 
