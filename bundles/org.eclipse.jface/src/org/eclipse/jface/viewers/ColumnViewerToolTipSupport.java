@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,17 +27,11 @@ import org.eclipse.swt.widgets.Event;
  * The ColumnViewerTooltipSupport is the class that provides tool tips for
  * ColumnViewers.
  *
- * @param <E>
- *            Type of an single element of the model
- * @param <I>
- *            Type of the input
- *
  * @since 3.3
  *
  */
-public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
-
-	private ColumnViewer<E,I> viewer;
+public class ColumnViewerToolTipSupport extends DefaultToolTip {
+	private ColumnViewer viewer;
 
 	private static final String VIEWER_CELL_KEY = Policy.JFACE
 			+ "_VIEWER_CELL_KEY"; //$NON-NLS-1$
@@ -60,7 +54,7 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 *            <code>true</code> if the activation is done manually using
 	 *            {@link #show(Point)}
 	 */
-	protected ColumnViewerToolTipSupport(ColumnViewer<E,I> viewer, int style,
+	protected ColumnViewerToolTipSupport(ColumnViewer viewer, int style,
 			boolean manualActivation) {
 		super(viewer.getControl(), style, manualActivation);
 		this.viewer = viewer;
@@ -74,8 +68,8 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 * @param viewer
 	 *            the viewer the support is attached to
 	 */
-	public static <E,I> void enableFor(ColumnViewer<E,I> viewer) {
-		new ColumnViewerToolTipSupport<>(viewer, ToolTip.NO_RECREATE, false);
+	public static void enableFor(ColumnViewer viewer) {
+		new ColumnViewerToolTipSupport(viewer, ToolTip.NO_RECREATE, false);
 	}
 
 	/**
@@ -91,8 +85,8 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 * @see ToolTip#RECREATE
 	 * @see ToolTip#NO_RECREATE
 	 */
-	public static <E,I> void enableFor(ColumnViewer<E,I> viewer, int style) {
-		new ColumnViewerToolTipSupport<>(viewer, style, false);
+	public static void enableFor(ColumnViewer viewer, int style) {
+		new ColumnViewerToolTipSupport(viewer, style, false);
 	}
 
 	@Override
@@ -106,8 +100,7 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 */
 	@Override
 	protected Composite createToolTipContentArea(Event event, Composite parent) {
-		@SuppressWarnings("unchecked")
-		ViewerCell<E> cell = (ViewerCell<E>) getData(VIEWER_CELL_KEY);
+		ViewerCell cell = (ViewerCell) getData(VIEWER_CELL_KEY);
 		setData(VIEWER_CELL_KEY, null);
 
 		return createViewerToolTipContentArea(event, cell, parent);
@@ -134,7 +127,7 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 	 * @since 3.4
 	 */
 	protected Composite createViewerToolTipContentArea(Event event,
-			ViewerCell<E> cell, Composite parent) {
+			ViewerCell cell, Composite parent) {
 		return super.createToolTipContentArea(event, parent);
 	}
 
@@ -146,29 +139,28 @@ public class ColumnViewerToolTipSupport<E,I> extends DefaultToolTip {
 
 		boolean rv = false;
 
-		ViewerRow<E> row = viewer.getViewerRow(new Point(event.x, event.y));
+		ViewerRow row = viewer.getViewerRow(new Point(event.x, event.y));
 
 		viewer.getControl().setToolTipText(""); //$NON-NLS-1$
 		Point point = new Point(event.x, event.y);
 
 		if (row != null) {
-			@SuppressWarnings("unchecked")
-			E element = (E) row.getItem().getData();
+			Object element = row.getItem().getData();
 
-			ViewerCell<E> cell = row.getCell(point);
+			ViewerCell cell = row.getCell(point);
 
 			if( cell == null ) {
 				return false;
 			}
 
-
-			ViewerColumn<E, I> viewPart = viewer.getViewerColumn(cell.getColumnIndex());
+			ViewerColumn viewPart = viewer.getViewerColumn(cell
+					.getColumnIndex());
 
 			if (viewPart == null) {
 				return false;
 			}
 
-			CellLabelProvider<E> labelProvider = viewPart.getLabelProvider();
+			CellLabelProvider labelProvider = viewPart.getLabelProvider();
 			boolean useNative = labelProvider.useNativeToolTip(element);
 
 			String text = labelProvider.getToolTipText(element);
