@@ -12,7 +12,6 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -93,27 +92,45 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
 
         readElements(new IConfigurationElement[] { set.getConfigElement() });
 
+		System.out.println(set.getDesc().getLabel());
+
         if (cache != null) {
             for (int i = 0; i < cache.size(); i++) {
                 ActionSetContribution contribution = (ActionSetContribution) cache
                         .get(i);
                 contribution.contribute(actionSet.getBars(), true, true);
-                if (contribution.isAdjunctContributor()) {
-                    adjunctContributions.add(contribution);
-                }
+				if (contribution.actions != null) {
+					for (Object obj : contribution.actions) {
+						ActionDescriptor ad = (ActionDescriptor) obj;
+						System.out.println(ad.getAction().getText());
+					}
+					if (contribution.isAdjunctContributor()) {
+						adjunctContributions.add(contribution);
+					}
+				}
+				// System.out.println(contribution.actions);
             }
         }
-        for (int i = 0; i < adjunctContributions.size(); i++) {
-            ActionSetContribution contribution = (ActionSetContribution) adjunctContributions
-                    .get(i);
-            ActionSetActionBars bars = actionSet.getBars();
-            for (int j = 0; j < contribution.adjunctActions.size(); j++) {
-                ActionDescriptor adjunctAction = (ActionDescriptor) contribution.adjunctActions
-                        .get(j);
-                contribution
-                        .contributeAdjunctCoolbarAction(adjunctAction, bars);
-            }
-        }
+		for (int i = 0; i < adjunctContributions.size(); i++) {
+			ActionSetContribution contribution = (ActionSetContribution) adjunctContributions
+					.get(i);
+			ActionSetActionBars bars = actionSet.getBars();
+
+			// Contribute coolbar items
+			for (int j = 0; j < contribution.adjunctActions.size(); j++) {
+				ActionDescriptor adjunctAction = (ActionDescriptor) contribution.adjunctActions
+						.get(j);
+				contribution.contributeAdjunctCoolbarAction(adjunctAction, bars);
+			}
+
+			// Contribute menu items
+			for (int j = 0; j < contribution.actions.size(); j++) {
+				ActionDescriptor action = (ActionDescriptor) contribution.actions.get(j);
+				if (action.getMenuPath() != null) {
+					contribution.contributeMenuAction(action, bars.getMenuManager(), true);
+				}
+			}
+		}
         
         registerBinding(set);
     }
@@ -747,6 +764,11 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
 			}
             toolbarMgr.update(true);
         }
+
+		@Override
+		public String toString() {
+			return actionSetId;
+		}
     }
 
 
