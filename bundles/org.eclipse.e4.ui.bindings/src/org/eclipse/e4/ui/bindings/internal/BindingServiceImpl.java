@@ -111,7 +111,6 @@ public class BindingServiceImpl implements EBindingService {
 		return manager.getConflictsFor(contextSet, sequence);
 	}
 
-	@Override
 	public Collection<Binding> getAllConflicts() {
 		return manager.getAllConflicts();
 	}
@@ -142,7 +141,6 @@ public class BindingServiceImpl implements EBindingService {
 		return sequences;
 	}
 
-	@Override
 	public Collection<Binding> getBindingsFor(ParameterizedCommand command) {
 		return manager.getBindingsFor(contextSet, command);
 	}
