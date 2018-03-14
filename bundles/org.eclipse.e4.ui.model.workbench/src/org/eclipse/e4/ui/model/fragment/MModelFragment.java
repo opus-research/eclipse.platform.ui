@@ -8,7 +8,6 @@
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
- *      Steven Spungin <steven@spungin.tv> - Bug 463223
  */
 package org.eclipse.e4.ui.model.fragment;
 
@@ -63,9 +62,6 @@ public interface MModelFragment {
 
 	/**
 	 * <!-- begin-user-doc -->
-	 * Merges an MModelFragment into an MApplication.
-	 * @param application The MApplication to merge into.  Must not be null.
-	 * @return A list of MApplicationElements that were added to the MApplication.  Must not be null.
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
