@@ -25,20 +25,12 @@ public class StyleSheetListImpl implements StyleSheetList {
 
 	private List styleSheets = null;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.w3c.dom.stylesheets.StyleSheetList#getLength()
-	 */
+	@Override
 	public int getLength() {
 		return (styleSheets != null) ? styleSheets.size() : 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.w3c.dom.stylesheets.StyleSheetList#item(int)
-	 */
+	@Override
 	public StyleSheet item(int index) {
 		return (styleSheets != null) ? (StyleSheet) styleSheets.get(index)
 				: null;
@@ -50,8 +42,9 @@ public class StyleSheetListImpl implements StyleSheetList {
 	 * @param styleSheet
 	 */
 	public void addStyleSheet(StyleSheet styleSheet) {
-		if (styleSheets == null)
+		if (styleSheets == null) {
 			styleSheets = new ArrayList();
+		}
 		styleSheets.add(styleSheet);
 	}
 

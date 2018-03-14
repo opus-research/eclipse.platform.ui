@@ -35,7 +35,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
  * registerCSSPropertyHandler method.
  */
 public class CSSPropertyHandlerSimpleProviderImpl extends
-		AbstractCSSPropertyHandlerProvider {
+AbstractCSSPropertyHandlerProvider {
 
 	/**
 	 * Default <code>Map</code> of <code>ICSSPropertyHandler</code> stored
@@ -184,6 +184,7 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 				ICSSPropertyPaddingHandler.class);
 	}
 
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			String property) throws Exception {
 		Class<? extends ICSSPropertyHandler> cl = getCSSPropertyHandlerClass(property);
@@ -223,8 +224,9 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 	 * Merge custom CSS Properties with default CSS properties.
 	 */
 	private void initializeCSSPropertiesIfNeed() {
-		if (isCSSPropertiesInitialized)
+		if (isCSSPropertiesInitialized) {
 			return;
+		}
 		customCSSProperties.putAll(defaultCSSProperties);
 		isCSSPropertiesInitialized = true;
 	}
@@ -234,22 +236,17 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 		return customCSSProperties.keySet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.e4.ui.css.core.dom.properties.providers.AbstractCSSPropertyHandlerProvider#getDefaultCSSStyleDeclaration(org.eclipse.e4.ui.css.core.engine.CSSEngine,
-	 *      org.eclipse.e4.ui.css.core.dom.CSSStylableElement,
-	 *      org.w3c.dom.css.CSSStyleDeclaration, java.lang.String)
-	 */
+	@Override
 	public CSSStyleDeclaration getDefaultCSSStyleDeclaration(CSSEngine engine,
 			CSSStylableElement stylableElement, CSSStyleDeclaration newStyle,
 			String pseudoE) throws Exception {
 		CSSStyleDeclaration defaultStyleDeclaration = stylableElement
 				.getDefaultStyleDeclaration(pseudoE);
-		if (defaultStyleDeclaration != null)
+		if (defaultStyleDeclaration != null) {
 			// default style is already computed for the stylable element ,
 			// return it.
 			return defaultStyleDeclaration;
+		}
 
 		// Default style must be computed.
 		StringBuffer style = null;
@@ -258,8 +255,9 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 			String s = getCSSPropertyStyle(engine, stylableElement,
 					propertyName, pseudoE);
 			if (s != null) {
-				if (style == null)
+				if (style == null) {
 					style = new StringBuffer();
+				}
 				style.append(s);
 			}
 		}
@@ -273,11 +271,13 @@ public class CSSPropertyHandlerSimpleProviderImpl extends
 		return null;
 	}
 
+	@Override
 	public Collection<ICSSPropertyHandler> getCSSPropertyHandlers(
 			Object element, String property) throws Exception {
 		return getCSSPropertyHandlers(property);
 	}
 
+	@Override
 	public Collection<String> getCSSProperties(Object element) {
 		return getAllCSSPropertyNames();
 	}
