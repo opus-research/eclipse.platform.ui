@@ -7,15 +7,11 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *     Jeanderson Candido (http://jeandersonbc.github.io) - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -55,27 +51,26 @@ public class Snippet040TableViewerSorting {
 		}
 	}
 
-	protected abstract class AbstractEditingSupport extends
-			EditingSupport<Person, List<Person>> {
+	protected abstract class AbstractEditingSupport extends EditingSupport {
 		private TextCellEditor editor;
 
-		public AbstractEditingSupport(TableViewer<Person, List<Person>> viewer) {
+		public AbstractEditingSupport(TableViewer viewer) {
 			super(viewer);
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
 
 		@Override
-		protected boolean canEdit(Person element) {
+		protected boolean canEdit(Object element) {
 			return true;
 		}
 
 		@Override
-		protected CellEditor getCellEditor(Person element) {
+		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
 		@Override
-		protected void setValue(Person element, Object value) {
+		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
 			getViewer().update(element, null);
 		}
@@ -84,27 +79,24 @@ public class Snippet040TableViewerSorting {
 	}
 
 	public Snippet040TableViewerSorting(Shell shell) {
+		TableViewer viewer = new TableViewer(shell, SWT.BORDER
+				| SWT.FULL_SELECTION);
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
 
-		TableViewer<Person, List<Person>> viewer = new TableViewer<Person, List<Person>>(
-				shell, SWT.BORDER | SWT.FULL_SELECTION);
-		viewer.setContentProvider(ArrayContentProvider
-				.getInstance(Person.class));
-
-		TableViewerColumn<Person, List<Person>> column = createColumnFor(
-				viewer, "Givenname");
-    column.setLabelProvider(new ColumnLabelProvider<Person>() {
+		TableViewerColumn column = createColumnFor(viewer, "Givenname");
+		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
-			public String getText(Person element) {
-				return element.givenname;
+			public String getText(Object element) {
+				return ((Person) element).givenname;
 			}
 		});
 
 		column.setEditingSupport(new AbstractEditingSupport(viewer) {
 
 			@Override
-			protected Object getValue(Person element) {
-				return element.givenname;
+			protected Object getValue(Object element) {
+				return ((Person) element).givenname;
 			}
 
 			@Override
@@ -117,19 +109,20 @@ public class Snippet040TableViewerSorting {
 		ColumnViewerSorter cSorter = new ColumnViewerSorter(viewer, column) {
 
 			@Override
-			protected int doCompare(Viewer<List<Person>> viewer, Person e1,
-					Person e2) {
-				return e1.givenname.compareToIgnoreCase(e2.givenname);
+			protected int doCompare(Viewer viewer, Object e1, Object e2) {
+				Person p1 = (Person) e1;
+				Person p2 = (Person) e2;
+				return p1.givenname.compareToIgnoreCase(p2.givenname);
 			}
 
 		};
 
 		column = createColumnFor(viewer, "Surname");
-    column.setLabelProvider(new ColumnLabelProvider<Person>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
-			public String getText(Person element) {
-				return element.surname;
+			public String getText(Object element) {
+				return ((Person) element).surname;
 			}
 
 		});
@@ -137,8 +130,8 @@ public class Snippet040TableViewerSorting {
 		column.setEditingSupport(new AbstractEditingSupport(viewer) {
 
 			@Override
-			protected Object getValue(Person element) {
-				return element.surname;
+			protected Object getValue(Object element) {
+				return ((Person) element).surname;
 			}
 
 			@Override
@@ -151,19 +144,20 @@ public class Snippet040TableViewerSorting {
 		new ColumnViewerSorter(viewer, column) {
 
 			@Override
-			protected int doCompare(Viewer<List<Person>> viewer, Person e1,
-					Person e2) {
-				return e1.surname.compareToIgnoreCase(e2.surname);
+			protected int doCompare(Viewer viewer, Object e1, Object e2) {
+				Person p1 = (Person) e1;
+				Person p2 = (Person) e2;
+				return p1.surname.compareToIgnoreCase(p2.surname);
 			}
 
 		};
 
 		column = createColumnFor(viewer, "E-Mail");
-    column.setLabelProvider(new ColumnLabelProvider<Person>() {
+		column.setLabelProvider(new ColumnLabelProvider() {
 
 			@Override
-			public String getText(Person element) {
-				return element.email;
+			public String getText(Object element) {
+				return ((Person) element).email;
 			}
 
 		});
@@ -171,8 +165,8 @@ public class Snippet040TableViewerSorting {
 		column.setEditingSupport(new AbstractEditingSupport(viewer) {
 
 			@Override
-			protected Object getValue(Person element) {
-				return element.email;
+			protected Object getValue(Object element) {
+				return ((Person) element).email;
 			}
 
 			@Override
@@ -185,9 +179,10 @@ public class Snippet040TableViewerSorting {
 		new ColumnViewerSorter(viewer, column) {
 
 			@Override
-			protected int doCompare(Viewer<List<Person>> viewer, Person e1,
-					Person e2) {
-				return e1.email.compareToIgnoreCase(e2.email);
+			protected int doCompare(Viewer viewer, Object e1, Object e2) {
+				Person p1 = (Person) e1;
+				Person p2 = (Person) e2;
+				return p1.email.compareToIgnoreCase(p2.email);
 			}
 
 		};
@@ -198,41 +193,36 @@ public class Snippet040TableViewerSorting {
 		cSorter.setSorter(cSorter, ColumnViewerSorter.ASC);
 	}
 
-	private TableViewerColumn<Person, List<Person>> createColumnFor(
-			TableViewer<Person, List<Person>> viewer, String label) {
-		TableViewerColumn<Person, List<Person>> column = new TableViewerColumn<Person, List<Person>>(
-				viewer, SWT.NONE);
+	private TableViewerColumn createColumnFor(TableViewer viewer, String label) {
+		TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
 		column.getColumn().setWidth(200);
 		column.getColumn().setText(label);
 		column.getColumn().setMoveable(true);
-
 		return column;
 	}
 
-	private List<Person> createModel() {
-		return Arrays.asList(new Person("Tom", "Schindl",
-				"tom.schindl@bestsolution.at"), new Person("Boris", "Bokowski",
-				"Boris_Bokowski@ca.ibm.com"), new Person("Tod", "Creasey",
-				"Tod_Creasey@ca.ibm.com"), new Person("Wayne", "Beaton",
-				"wayne@eclipse.org"), new Person("Jeanderson", "Candido",
-				"jeandersonbc@gmail.com"), new Person("Lars", "Vogel",
-				"Lars.Vogel@gmail.com"), new Person("Hendrik", "Still",
-				"hendrik.still@gammas.de"));
+	private Person[] createModel() {
+		return new Person[] {
+				new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"),
+				new Person("Boris", "Bokowski", "Boris_Bokowski@ca.ibm.com"),
+				new Person("Tod", "Creasey", "Tod_Creasey@ca.ibm.com"),
+				new Person("Wayne", "Beaton", "wayne@eclipse.org"),
+				new Person("Jeanderson", "Candido", "jeandersonbc@gmail.com"),
+				new Person("Lars", "Vogel", "Lars.Vogel@gmail.com"),
+				new Person("Hendrik", "Still", "hendrik.still@gammas.de") };
 	}
 
-	private static abstract class ColumnViewerSorter extends
-			ViewerComparator<Person, List<Person>> {
+	private static abstract class ColumnViewerSorter extends ViewerComparator {
 
 		public static final int ASC = 1;
 		public static final int NONE = 0;
 		public static final int DESC = -1;
 
 		private int direction = 0;
-		private TableViewerColumn<Person, List<Person>> column;
-		private ColumnViewer<Person, List<Person>> viewer;
+		private TableViewerColumn column;
+		private ColumnViewer viewer;
 
-		public ColumnViewerSorter(ColumnViewer<Person, List<Person>> viewer,
-				TableViewerColumn<Person, List<Person>> column) {
+		public ColumnViewerSorter(ColumnViewer viewer, TableViewerColumn column) {
 			this.column = column;
 			this.viewer = viewer;
 			SelectionAdapter selectionAdapter = createSelectionAdapter();
@@ -285,12 +275,11 @@ public class Snippet040TableViewerSorting {
 		}
 
 		@Override
-		public int compare(Viewer<List<Person>> viewer, Person e1, Person e2) {
+		public int compare(Viewer viewer, Object e1, Object e2) {
 			return direction * doCompare(viewer, e1, e2);
 		}
 
-		protected abstract int doCompare(Viewer<List<Person>> viewer,
-				Person e1, Person e2);
+		protected abstract int doCompare(Viewer viewer, Object e1, Object e2);
 	}
 
 	/**

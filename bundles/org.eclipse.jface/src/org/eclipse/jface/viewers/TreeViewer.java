@@ -265,9 +265,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 						TreeItem item = (TreeItem) event.item;
 						TreeItem parentItem = item.getParentItem();
 						int index = event.index;
-						virtualLazyUpdateWidget(
-								parentItem == null ? (Widget) getTree()
-										: parentItem, index);
+						virtualLazyUpdateWidget(parentItem == null ? (Widget) getTree() : parentItem, index);
 					}
 				}
 
@@ -277,7 +275,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 
 	@Override
 	protected ColumnViewerEditor<E,I> createViewerEditor() {
-		return new TreeViewerEditor<E,I>(this,null,new ColumnViewerEditorActivationStrategy<E,I>(this),ColumnViewerEditor.DEFAULT);
+		return new TreeViewerEditor<>(this,null,new ColumnViewerEditorActivationStrategy<>(this),ColumnViewerEditor.DEFAULT);
 	}
 
 	@Override
@@ -429,8 +427,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 	 *
 	 * @since 3.2
 	 */
-	public void replace(final Object parentElementOrTreePath, final int index,
-			final E element) {
+	public void replace(final Object parentElementOrTreePath, final int index, final E element) {
 		if (checkBusy())
 			return;
 		Item[] selectedItems = getSelection(getControl());
@@ -761,7 +758,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 	@Override
 	protected ViewerRow<E> getViewerRowFromItem(Widget item) {
 		if( cachedRow == null ) {
-			cachedRow = new TreeViewerRow<E>((TreeItem) item);
+			cachedRow = new TreeViewerRow<>((TreeItem) item);
 		} else {
 			cachedRow.setItem((TreeItem) item);
 		}
@@ -831,7 +828,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 		if (checkBusy())
 			return;
 		@SuppressWarnings("rawtypes")
-		final List<TreePath> oldSelection = new LinkedList<TreePath>(Arrays
+		final List<TreePath> oldSelection = new LinkedList<>(Arrays
 				.asList(((TreeSelection) getSelection()).getPaths()));
 		preservingSelection(new Runnable() {
 			@Override
@@ -916,7 +913,7 @@ public class TreeViewer<E,I> extends AbstractTreeViewer<E, I> {
 				}
 				@SuppressWarnings("unchecked")
 				E element = (E) event.item.getData();
-				fireTreeExpanded(new TreeExpansionEvent<E,I>(this, element));
+				fireTreeExpanded(new TreeExpansionEvent<>(this, element));
 			}
 			return;
 		}

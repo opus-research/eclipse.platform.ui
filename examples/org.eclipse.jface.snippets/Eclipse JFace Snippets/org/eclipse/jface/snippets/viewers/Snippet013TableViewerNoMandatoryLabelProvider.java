@@ -7,14 +7,10 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -35,8 +31,10 @@ import org.eclipse.swt.widgets.TableColumn;
 /**
  * Example usage of none mandatory interfaces of ITableFontProvider and
  * ITableColorProvider
+ *
  */
 public class Snippet013TableViewerNoMandatoryLabelProvider {
+
 
 	public class MyModel {
 		public int counter;
@@ -51,24 +49,23 @@ public class Snippet013TableViewerNoMandatoryLabelProvider {
 		}
 	}
 
-	public class MyLabelProvider extends LabelProvider<MyModel> implements
-			ITableLabelProvider<MyModel>, ITableFontProvider<MyModel>,
-			ITableColorProvider<MyModel> {
+	public class MyLabelProvider extends LabelProvider implements
+			ITableLabelProvider, ITableFontProvider, ITableColorProvider {
 		FontRegistry registry = new FontRegistry();
 
 		@Override
-		public Image getColumnImage(MyModel element, int columnIndex) {
+		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
 		@Override
-		public String getColumnText(MyModel element, int columnIndex) {
+		public String getColumnText(Object element, int columnIndex) {
 			return "Column " + columnIndex + " => " + element.toString();
 		}
 
 		@Override
-		public Font getFont(MyModel element, int columnIndex) {
-			if (element.counter % 2 == 0) {
+		public Font getFont(Object element, int columnIndex) {
+			if (((MyModel) element).counter % 2 == 0) {
 				return registry.getBold(Display.getCurrent().getSystemFont()
 						.getFontData()[0].getName());
 			}
@@ -76,16 +73,16 @@ public class Snippet013TableViewerNoMandatoryLabelProvider {
 		}
 
 		@Override
-		public Color getBackground(MyModel element, int columnIndex) {
-			if (element.counter % 2 == 0) {
+		public Color getBackground(Object element, int columnIndex) {
+			if (((MyModel) element).counter % 2 == 0) {
 				return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 			}
 			return null;
 		}
 
 		@Override
-		public Color getForeground(MyModel element, int columnIndex) {
-			if (element.counter % 2 == 1) {
+		public Color getForeground(Object element, int columnIndex) {
+			if (((MyModel) element).counter % 2 == 1) {
 				return Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 			}
 			return null;
@@ -94,10 +91,10 @@ public class Snippet013TableViewerNoMandatoryLabelProvider {
 	}
 
 	public Snippet013TableViewerNoMandatoryLabelProvider(Shell shell) {
-		final TableViewer<MyModel, List<MyModel>> v = new TableViewer<MyModel, List<MyModel>>(
-				shell, SWT.BORDER | SWT.FULL_SELECTION);
+		final TableViewer v = new TableViewer(shell, SWT.BORDER
+				| SWT.FULL_SELECTION);
 		v.setLabelProvider(new MyLabelProvider());
-		v.setContentProvider(ArrayContentProvider.getInstance(MyModel.class));
+		v.setContentProvider(ArrayContentProvider.getInstance());
 
 		TableColumn column = new TableColumn(v.getTable(), SWT.NONE);
 		column.setWidth(200);
@@ -107,17 +104,19 @@ public class Snippet013TableViewerNoMandatoryLabelProvider {
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 		v.getTable().setLinesVisible(true);
 		v.getTable().setHeaderVisible(true);
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>(10);
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
+
 		for (int i = 0; i < 10; i++) {
-			elements.add(i, new MyModel(i));
+			elements[i] = new MyModel(i);
 		}
+
 		return elements;
 	}
 

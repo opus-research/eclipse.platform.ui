@@ -23,20 +23,19 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-public class FocusBorderCellHighlighter<E, I> extends
-		FocusCellHighlighter<E, I> {
-	private ViewerCell<?> oldCell;
+public class FocusBorderCellHighlighter extends FocusCellHighlighter {
+	private ViewerCell oldCell;
 
 	/**
 	 * @param viewer
 	 *            the viewer
 	 */
-	public FocusBorderCellHighlighter(ColumnViewer<E, I> viewer) {
+	public FocusBorderCellHighlighter(ColumnViewer viewer) {
 		super(viewer);
 		hookListener(viewer);
 	}
 
-	private void markFocusedCell(Event event, ViewerCell<?> cell) {
+	private void markFocusedCell(Event event, ViewerCell cell) {
 		GC gc = event.gc;
 
 		Rectangle rect = event.getBounds();
@@ -45,24 +44,25 @@ public class FocusBorderCellHighlighter<E, I> extends
 		event.detail &= ~SWT.SELECTED;
 	}
 
-	private void removeSelectionInformation(Event event, ViewerCell<?> cell) {
+	private void removeSelectionInformation(Event event, ViewerCell cell) {
 
 	}
 
-	private void hookListener(final ColumnViewer<E, I> viewer) {
+	private void hookListener(final ColumnViewer viewer) {
 
 		Listener listener = new Listener() {
 
 			@Override
 			public void handleEvent(Event event) {
 				if ((event.detail & SWT.SELECTED) > 0) {
-					ViewerCell<?> focusCell = getFocusCell();
-					ViewerRow<?> row = focusCell.getViewerRow();
+					ViewerCell focusCell = getFocusCell();
+					ViewerRow row = focusCell.getViewerRow();
 
-					Assert.isNotNull(row,
-							"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
+					Assert
+							.isNotNull(row,
+									"Internal structure invalid. Item without associated row is not possible."); //$NON-NLS-1$
 
-					ViewerCell<?> cell = row.getCell(event.index);
+					ViewerCell cell = row.getCell(event.index);
 
 					if (focusCell == null || !cell.equals(focusCell)) {
 						removeSelectionInformation(event, cell);
@@ -81,7 +81,7 @@ public class FocusBorderCellHighlighter<E, I> extends
 	 *            the cell which is colored
 	 * @return the color
 	 */
-	protected Color getSelectedCellBackgroundColor(ViewerCell<?> cell) {
+	protected Color getSelectedCellBackgroundColor(ViewerCell cell) {
 		return null;
 	}
 
@@ -90,12 +90,12 @@ public class FocusBorderCellHighlighter<E, I> extends
 	 *            the cell which is colored
 	 * @return the color
 	 */
-	protected Color getSelectedCellForegroundColor(ViewerCell<?> cell) {
+	protected Color getSelectedCellForegroundColor(ViewerCell cell) {
 		return null;
 	}
 
 	@Override
-	protected void focusCellChanged(ViewerCell<E> cell) {
+	protected void focusCellChanged(ViewerCell cell) {
 		super.focusCellChanged(cell);
 
 		// Redraw new area

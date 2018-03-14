@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Item;
  * @see TreeViewerEditor
  */
 public abstract class ColumnViewerEditor<E,I> {
-	private CellEditor cellEditor;
+	private CellEditor cellEditor;ColumnViewerEditor
 
 	private ICellEditorListener cellEditorListener;
 

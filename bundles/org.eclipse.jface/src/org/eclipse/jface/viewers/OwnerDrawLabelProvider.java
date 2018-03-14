@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 public abstract class OwnerDrawLabelProvider<E> extends CellLabelProvider<E> {
 
 	static class OwnerDrawListener<E> implements Listener {
-		Set<ViewerColumn<E,?>> enabledColumns = new HashSet<ViewerColumn<E,?>>();
+		Set<ViewerColumn<E,?>> enabledColumns = new HashSet<>();
 		int enabledGlobally = 0;
 		private ColumnViewer<E,?> viewer;
 
@@ -95,7 +95,7 @@ public abstract class OwnerDrawLabelProvider<E> extends CellLabelProvider<E> {
 		OwnerDrawListener<E> listener = (OwnerDrawListener<E>) control
 				.getData(OWNER_DRAW_LABEL_PROVIDER_LISTENER);
 		if (listener == null) {
-			listener = new OwnerDrawListener<E>(viewer);
+			listener = new OwnerDrawListener<>(viewer);
 			control.setData(OWNER_DRAW_LABEL_PROVIDER_LISTENER, listener);
 			control.addListener(SWT.MeasureItem, listener);
 			control.addListener(SWT.EraseItem, listener);

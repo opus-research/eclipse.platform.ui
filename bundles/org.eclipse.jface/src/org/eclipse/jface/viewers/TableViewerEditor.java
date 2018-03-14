@@ -82,7 +82,7 @@ public final class TableViewerEditor<E,I> extends ColumnViewerEditor<E,I> {
 			SWTFocusCellManager<E,I> focusCellManager,
 			ColumnViewerEditorActivationStrategy<E,I> editorActivationStrategy,
 			int feature) {
-		TableViewerEditor<E,I> editor = new TableViewerEditor<E,I>(viewer,
+		TableViewerEditor<E,I> editor = new TableViewerEditor<>(viewer,
 				focusCellManager, editorActivationStrategy, feature);
 		viewer.setColumnViewerEditor(editor);
 		if (focusCellManager != null) {

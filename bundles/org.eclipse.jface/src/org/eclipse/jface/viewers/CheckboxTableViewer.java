@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 418190 - Added generics to this viewer CheckboxTableViewer
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 460380
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 418190
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -38,13 +40,15 @@ import org.eclipse.swt.widgets.Widget;
  * configured with a domain-specific content provider, label provider, element
  * filter (optional), and element sorter (optional).
  * </p>
- * 
+ *
  * @param <E>
+ *            Type of an single element of the model
  * @param <I>
+ *            Type of the input
+ *
  * @noextend This class is not intended to be subclassed by clients.
  */
-public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
-		ICheckable<E> {
+public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements ICheckable<E> {
 
 	/**
 	 * List of check state listeners (element type:
@@ -71,7 +75,7 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 *
 	 * @param parent
 	 *            the parent control
-	 * 
+	 *
 	 * @deprecated use newCheckList(Composite, int) or new
 	 *             CheckboxTableViewer(Table) instead (see below for details)
 	 */
@@ -105,12 +109,12 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 * other style bits needed), and use
 	 * <code>new CheckboxTableViewer(Table)</code> rather than this constructor.
 	 * </p>
-	 * 
+	 *
 	 * @param parent
 	 *            the parent control
 	 * @param style
 	 *            SWT style bits
-	 * 
+	 *
 	 * @deprecated use newCheckList(Composite, int) or new
 	 *             CheckboxTableViewer(Table) instead (see above for details)
 	 */
@@ -135,14 +139,14 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 *            the parent control
 	 * @param style
 	 *            SWT style bits
-	 * 
+	 *
 	 * @since 2.0
 	 * @return CheckboxTableViewer
 	 */
 	public static <E, I> CheckboxTableViewer<E, I> newCheckList(
 			Composite parent, int style) {
 		Table table = new Table(parent, SWT.CHECK | style);
-		return new CheckboxTableViewer<E, I>(table);
+		return new CheckboxTableViewer<>(table);
 	}
 
 	/**
@@ -168,7 +172,7 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 * The check state provider will supply the logic for deciding whether the
 	 * check box associated with each item should be checked, grayed or
 	 * unchecked.
-	 * 
+	 *
 	 * @param checkStateProvider
 	 *            The provider.
 	 * @since 3.5
@@ -263,7 +267,7 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 */
 	public Object[] getCheckedElements() {
 		TableItem[] children = getTable().getItems();
-		List<Object> v = new ArrayList<Object>(children.length);
+		List<Object> v = new ArrayList<>(children.length);
 		for (int i = 0; i < children.length; i++) {
 			TableItem item = children[i];
 			Object data = item.getData();
@@ -304,7 +308,7 @@ public class CheckboxTableViewer<E, I> extends TableViewer<E, I> implements
 	 */
 	public Object[] getGrayedElements() {
 		TableItem[] children = getTable().getItems();
-		List<Object> v = new ArrayList<Object>(children.length);
+		List<Object> v = new ArrayList<>(children.length);
 		for (int i = 0; i < children.length; i++) {
 			TableItem item = children[i];
 			Object data = item.getData();

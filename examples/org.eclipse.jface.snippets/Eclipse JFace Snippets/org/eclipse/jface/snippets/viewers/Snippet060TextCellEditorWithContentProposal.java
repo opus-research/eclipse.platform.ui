@@ -1,13 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2008, 2014 Software Competence Center Hagenberg (SCCH) GmbH
+ * Copyright (c) 2008 Mario Winterer
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
- * Contibutors
- *      Lars Vogel (lars.vogel@gmail.com) - Bug 413427
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
+ * Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -59,45 +58,36 @@ public class Snippet060TextCellEditorWithContentProposal {
 		}
 	}
 
-	public static class TextCellEditorWithContentProposal extends
-			TextCellEditor {
+	public static class TextCellEditorWithContentProposal extends TextCellEditor {
 
 		private ContentProposalAdapter contentProposalAdapter;
 		private boolean popupOpen = false; // true, iff popup is currently open
 
-		public TextCellEditorWithContentProposal(Composite parent,
-				IContentProposalProvider contentProposalProvider,
+		public TextCellEditorWithContentProposal(Composite parent, IContentProposalProvider contentProposalProvider,
 				KeyStroke keyStroke, char[] autoActivationCharacters) {
 			super(parent);
 
-			enableContentProposal(contentProposalProvider, keyStroke,
-					autoActivationCharacters);
+			enableContentProposal(contentProposalProvider, keyStroke, autoActivationCharacters);
 		}
 
-		private void enableContentProposal(
-				IContentProposalProvider contentProposalProvider,
-				KeyStroke keyStroke, char[] autoActivationCharacters) {
-			contentProposalAdapter = new ContentProposalAdapter(text,
-					new TextContentAdapter(), contentProposalProvider,
-					keyStroke, autoActivationCharacters);
+		private void enableContentProposal(IContentProposalProvider contentProposalProvider, KeyStroke keyStroke,
+				char[] autoActivationCharacters) {
+			contentProposalAdapter = new ContentProposalAdapter(text, new TextContentAdapter(),
+					contentProposalProvider, keyStroke, autoActivationCharacters);
 
-			// Listen for popup open/close events to be able to handle focus
-			// events correctly
-			contentProposalAdapter
-					.addContentProposalListener(new IContentProposalListener2() {
+			// Listen for popup open/close events to be able to handle focus events correctly
+			contentProposalAdapter.addContentProposalListener(new IContentProposalListener2() {
 
-						@Override
-						public void proposalPopupClosed(
-								ContentProposalAdapter adapter) {
-							popupOpen = false;
-						}
+				@Override
+				public void proposalPopupClosed(ContentProposalAdapter adapter) {
+					popupOpen = false;
+				}
 
-						@Override
-						public void proposalPopupOpened(
-								ContentProposalAdapter adapter) {
-							popupOpen = true;
-						}
-					});
+				@Override
+				public void proposalPopupOpened(ContentProposalAdapter adapter) {
+					popupOpen = true;
+				}
+			});
 		}
 
 		/**
@@ -122,10 +112,8 @@ public class Snippet060TextCellEditorWithContentProposal {
 		@Override
 		protected boolean dependsOnExternalFocusListener() {
 			// Always return false;
-			// Otherwise, the ColumnViewerEditor will install an additional
-			// focus listener
-			// that cancels cell editing on focus lost, even if focus gets lost
-			// due to
+			// Otherwise, the ColumnViewerEditor will install an additional focus listener
+			// that cancels cell editing on focus lost, even if focus gets lost due to
 			// activation of the completion proposal popup. See also bug 58777.
 			return false;
 		}
@@ -137,10 +125,9 @@ public class Snippet060TextCellEditorWithContentProposal {
 		public ColorNameEditingSupport(TableViewer viewer) {
 			super(viewer);
 
-			IContentProposalProvider contentProposalProvider = new SimpleContentProposalProvider(
-					new String[] { "red", "green", "blue" });
-			cellEditor = new TextCellEditorWithContentProposal(
-					viewer.getTable(), contentProposalProvider, null, null);
+			IContentProposalProvider contentProposalProvider = new SimpleContentProposalProvider(new String[] { "red",
+					"green", "blue" });
+			cellEditor = new TextCellEditorWithContentProposal(viewer.getTable(), contentProposalProvider, null, null);
 		}
 
 		@Override
@@ -167,49 +154,40 @@ public class Snippet060TextCellEditorWithContentProposal {
 	}
 
 	public Snippet060TextCellEditorWithContentProposal(Shell shell) {
-		final TableViewer<Color, Object> viewer = new TableViewer<Color, Object>(
-				shell, SWT.BORDER | SWT.FULL_SELECTION);
+		final TableViewer viewer = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
 		final Table table = viewer.getTable();
 		table.setLinesVisible(true);
 		table.setHeaderVisible(true);
 
-		final TableViewerColumn<Color, Object> colorColumn = new TableViewerColumn<Color, Object>(
-				viewer, SWT.LEFT);
+		final TableViewerColumn colorColumn = new TableViewerColumn(viewer, SWT.LEFT);
 		colorColumn.getColumn().setText("Color name");
 		colorColumn.getColumn().setWidth(200);
-    colorColumn.setLabelProvider(new ColumnLabelProvider<Color>());
+		colorColumn.setLabelProvider(new ColumnLabelProvider());
 		colorColumn.setEditingSupport(new ColorNameEditingSupport(viewer));
 
-		viewer.setContentProvider(new ArrayContentProvider<Color>(Color.class));
+		viewer.setContentProvider(new ArrayContentProvider());
 
-		ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(
-				viewer) {
+		ColumnViewerEditorActivationStrategy activationSupport = new ColumnViewerEditorActivationStrategy(viewer) {
 			@Override
-			protected boolean isEditorActivationEvent(
-					ColumnViewerEditorActivationEvent event) {
+			protected boolean isEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
 				return event.eventType == ColumnViewerEditorActivationEvent.TRAVERSAL
 						|| event.eventType == ColumnViewerEditorActivationEvent.MOUSE_DOUBLE_CLICK_SELECTION
 						|| event.eventType == ColumnViewerEditorActivationEvent.PROGRAMMATIC
 						|| (event.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED && event.keyCode == KeyLookupFactory
-								.getDefault().formalKeyLookup(
-										IKeyLookup.ENTER_NAME));
+								.getDefault().formalKeyLookup(IKeyLookup.ENTER_NAME));
 			}
 		};
 		activationSupport.setEnableEditorActivationWithKeyboard(true);
 
 		/*
 		 * Without focus highlighter, keyboard events will not be delivered to
-		 * ColumnViewerEditorActivationStragety#isEditorActivationEvent(...)
-		 * (see above)
+		 * ColumnViewerEditorActivationStragety#isEditorActivationEvent(...) (see above)
 		 */
-		FocusCellHighlighter focusCellHighlighter = new FocusCellOwnerDrawHighlighter(
-				viewer);
-		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(
-				viewer, focusCellHighlighter);
+		FocusCellHighlighter focusCellHighlighter = new FocusCellOwnerDrawHighlighter(viewer);
+		TableViewerFocusCellManager focusCellManager = new TableViewerFocusCellManager(viewer, focusCellHighlighter);
 
-		TableViewerEditor.create(viewer, focusCellManager, activationSupport,
-				ColumnViewerEditor.TABBING_VERTICAL
-						| ColumnViewerEditor.KEYBOARD_ACTIVATION);
+		TableViewerEditor.create(viewer, focusCellManager, activationSupport, ColumnViewerEditor.TABBING_VERTICAL
+				| ColumnViewerEditor.KEYBOARD_ACTIVATION);
 
 		viewer.setInput(createModel());
 	}

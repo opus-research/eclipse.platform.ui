@@ -138,7 +138,7 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 		int index = item.getParent().indexOf(item) - 1;
 
 		if( index >= 0 ) {
-			return new TableViewerRow<E>(item.getParent().getItem(index));
+			return new TableViewerRow<>(item.getParent().getItem(index));
 		}
 
 		return null;
@@ -151,7 +151,7 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 			TableItem tmp = item.getParent().getItem(index);
 			//TODO NULL can happen in case of VIRTUAL => How do we deal with that
 			if( tmp != null ) {
-				return new TableViewerRow<E>(tmp);
+				return new TableViewerRow<>(tmp);
 			}
 		}
 
@@ -162,7 +162,7 @@ public class TableViewerRow<E> extends ViewerRow<E> {
 	public TreePath<E> getTreePath() {
 		@SuppressWarnings("unchecked")
 		E[] segments = (E[]) Array.newInstance(item.getData().getClass(), 1);
-		return new TreePath<E>(segments);
+		return new TreePath<>(segments);
 	}
 
 	@Override

@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -21,8 +22,11 @@ import org.eclipse.swt.widgets.Event;
  * <p>
  * <b>Subclasses can implement their custom navigation algorithms</b>
  * </p>
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
+ *
+ * @param <E>
+ *            Type of an single element of the model
+ * @param <I>
+ *            Type of the input
  *
  * @since 3.3
  *
@@ -62,8 +66,7 @@ public class CellNavigationStrategy<E,I> {
 	 *            the key event
 	 * @return <code>true</code> if this event triggers collapsing of a node
 	 */
-	public boolean isCollapseEvent(ColumnViewer<E,I> viewer,
-			ViewerCell<E> cellToCollapse, Event event) {
+	public boolean isCollapseEvent(ColumnViewer<E, I> viewer, ViewerCell<E> cellToCollapse, Event event) {
 		return false;
 	}
 
@@ -76,8 +79,7 @@ public class CellNavigationStrategy<E,I> {
 	 *            the key event
 	 * @return <code>true</code> if this event triggers expanding of a node
 	 */
-	public boolean isExpandEvent(ColumnViewer<E,I> viewer, ViewerCell<E> cellToExpand,
-			Event event) {
+	public boolean isExpandEvent(ColumnViewer<E, I> viewer, ViewerCell<E> cellToExpand, Event event) {
 		return false;
 	}
 
@@ -101,8 +103,7 @@ public class CellNavigationStrategy<E,I> {
 	 * @param event
 	 *            the event triggering the expansion
 	 */
-	public void collapse(ColumnViewer<E,I> viewer, ViewerCell<E> cellToCollapse,
-			Event event) {
+	public void collapse(ColumnViewer<E, I> viewer, ViewerCell<E> cellToCollapse, Event event) {
 
 	}
 
@@ -117,8 +118,7 @@ public class CellNavigationStrategy<E,I> {
 	 *         default implementation is taken. E.g. it's fairly impossible to
 	 *         react on PAGE_DOWN requests
 	 */
-	public ViewerCell<E> findSelectedCell(ColumnViewer<E,I> viewer,
-			ViewerCell<E> currentSelectedCell, Event event) {
+	public ViewerCell<E> findSelectedCell(ColumnViewer<E, I> viewer, ViewerCell<E> currentSelectedCell, Event event) {
 
 		switch (event.keyCode) {
 		case SWT.ARROW_UP:

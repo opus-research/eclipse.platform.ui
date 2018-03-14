@@ -31,7 +31,7 @@ import org.eclipse.core.runtime.Assert;
  */
 public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Object> {
 
-	private static HashMap<Class<?>,ArrayContentProvider<?>> instanceMap = new HashMap<Class<?>,ArrayContentProvider<?>>();
+	private static HashMap<Class<?>,ArrayContentProvider<?>> instanceMap = new HashMap<>();
 	@SuppressWarnings("rawtypes")
 	private static ArrayContentProvider instance;
 	private Class<E> componentType;
@@ -45,10 +45,8 @@ public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Obj
 	 * Only use this constructor if you are using rawtyped Viewers
 	 * </p>
 	 *
-	 * @deprecated
 	 */
-	@Deprecated
-	public ArrayContentProvider(){
+	public ArrayContentProvider() {
 
 	}
 
@@ -57,7 +55,7 @@ public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Obj
 	 *
 	 * @param componentType
 	 *            The classtype of the used element e.g. MyElement.class
-	 * @since 3.11
+	 * @since 3.12
 	 *
 	 */
 	public ArrayContentProvider(Class<E> componentType) {
@@ -76,9 +74,7 @@ public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Obj
 	 * @return an instance of ArrayContentProvider
 	 *
 	 * @since 3.5
-	 * @deprecated
 	 */
-	@Deprecated
 	@SuppressWarnings("rawtypes")
 	public static ArrayContentProvider getInstance() {
 		synchronized(ArrayContentProvider.class) {
@@ -99,7 +95,7 @@ public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Obj
 	 *
 	 * @return an instance of ArrayContentProvider
 	 *
-	 * @since 3.11
+	 * @since 3.12
 	 */
 	public static <E> ArrayContentProvider<E> getInstance(Class<E> componentType) {
 
@@ -108,7 +104,7 @@ public class ArrayContentProvider<E> implements IStructuredContentProvider<E,Obj
 			ArrayContentProvider<E> arrayContentProvider = (ArrayContentProvider<E>) instanceMap
 					.get(componentType);
 			if (arrayContentProvider == null) {
-				arrayContentProvider = new ArrayContentProvider<E>(
+				arrayContentProvider = new ArrayContentProvider<>(
 						componentType);
 				instanceMap.put(componentType, arrayContentProvider);
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,12 +15,11 @@ package org.eclipse.jface.viewers;
 /**
  * An interface to content providers for tree-structure-oriented viewers that
  * provides content based on the path of elements in the tree viewer.
- * 
+ *
  * @param <E>
  *            Type of an element of the model
  * @param <I>
- *            Type of the input >>>>>>> 92419b3 Bug 402445 - [Viewers] Add
- *            generics to the JFace Viewer framework
+ *            Type of the input
  *
  * @see AbstractTreeViewer
  * @since 3.2

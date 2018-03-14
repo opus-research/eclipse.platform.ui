@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2008 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     											   fix in bug 151295,167325,201905
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402445
  *******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -18,8 +19,10 @@ import org.eclipse.core.runtime.Assert;
 /**
  * EditingSupport is the abstract superclass of the support for cell editing.
  *
- * @param <E> Type of an single element of the model
- * @param <I> Type of the input
+ * @param <E>
+ *            Type of an single element of the model
+ * @param <I>
+ *            Type of the input
  *
  * @since 3.3
  *

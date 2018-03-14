@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430873, 402445
  ******************************************************************************/
 
 package org.eclipse.jface.viewers;
@@ -20,25 +20,29 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Policy;
 
 /**
- * A viewer comparator is used by a {@link StructuredViewer} to
- * reorder the elements provided by its content provider.
+ * A viewer comparator is used by a {@link StructuredViewer} to reorder the
+ * elements provided by its content provider.
  * <p>
  * The default <code>compare</code> method compares elements using two steps.
- * The first step uses the values returned from <code>category</code>.
- * By default, all elements are in the same category.
- * The second level uses strings obtained from the content viewer's label
- * provider via <code>ILabelProvider.getText()</code>.
- * The strings are compared using a comparator from {@link Policy#getComparator()}
- * which by default does a case sensitive string comparison.
+ * The first step uses the values returned from <code>category</code>. By
+ * default, all elements are in the same category. The second level uses strings
+ * obtained from the content viewer's label provider via
+ * <code>ILabelProvider.getText()</code>. The strings are compared using a
+ * comparator from {@link Policy#getComparator()} which by default does a case
+ * sensitive string comparison.
  * </p>
  * <p>
- * Subclasses may implement the <code>isSorterProperty</code> method;
- * they may reimplement the <code>category</code> method to provide
- * categorization; and they may override the <code>compare</code> methods
- * to provide a totally different way of sorting elements.
+ * Subclasses may implement the <code>isSorterProperty</code> method; they may
+ * reimplement the <code>category</code> method to provide categorization; and
+ * they may override the <code>compare</code> methods to provide a totally
+ * different way of sorting elements.
  * </p>
- * @param <E> 
- * @param <I> 
+ *
+ * @param <E>
+ *            Type of an element of the model
+ * @param <I>
+ *            Type of the input
+ *
  * @see IStructuredContentProvider
  * @see StructuredViewer
  *
@@ -134,7 +138,7 @@ public class ViewerComparator<E,I> {
         // use the comparator to compare the strings
         return getComparator().compare(name1, name2);
     }
-    
+
 	private String getLabel(Viewer<I> viewer, E e1) {
 		String name1;
 		if (viewer == null || !(viewer instanceof ContentViewer)) {
@@ -190,7 +194,7 @@ public class ViewerComparator<E,I> {
 	public void sort(final Viewer<I> viewer, E[] elements) {
 		try {
 			Arrays.sort(elements, new Comparator<E>() {
-				
+
 				@Override
 				public int compare(E a, E b) {
 					return ViewerComparator.this.compare(viewer, a, b);

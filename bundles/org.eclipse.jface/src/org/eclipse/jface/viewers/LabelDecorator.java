@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,7 @@ import org.eclipse.swt.graphics.Image;
  *
  */
 public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
-	
+
 	 /**
      * Returns an image that is based on the given image,
      * but decorated with additional information relating to the state
@@ -62,7 +62,7 @@ public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
      * @return the decorated text label, or <code>null</code> if no decoration is to be applied
      */
     public abstract String decorateText(String text, E element, IDecorationContext context);
-    
+
     /**
      * Prepare the element for decoration. If it is already decorated and ready for update
      * return true. If decoration is pending return false.

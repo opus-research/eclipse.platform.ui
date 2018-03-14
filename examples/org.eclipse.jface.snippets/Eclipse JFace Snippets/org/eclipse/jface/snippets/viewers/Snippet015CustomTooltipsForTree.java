@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Hendrik Still <hendrik.still@gammas.de> - bug 417676
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 
@@ -31,14 +30,13 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.3M2
  */
 public class Snippet015CustomTooltipsForTree {
-	private static class MyContentProvider implements
-			ITreeContentProvider<String, Object> {
+	private static class MyContentProvider implements ITreeContentProvider {
 
 		private static final String ROOT = "Root";
 
 		@Override
-		public String[] getElements(Object inputElement) {
-			return new String[] { ROOT };
+		public Object[] getElements(Object inputElement) {
+			return new Object[]{ROOT};
 		}
 
 		@Override
@@ -47,26 +45,25 @@ public class Snippet015CustomTooltipsForTree {
 		}
 
 		@Override
-		public void inputChanged(Viewer<? extends Object> viewer,
-				Object oldInput, Object newInput) {
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+
 
 		}
 
 		@Override
-		public String[] getChildren(String parentElement) {
-			if (parentElement.equals(ROOT))
-				return new String[] { "one", "two", "three", "four", "five",
-						"six", "seven", "eight", "nine", "ten" };
-			return new String[0];
+		public Object[] getChildren(Object parentElement) {
+			if(parentElement.equals(ROOT))
+				return new String[] { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten" };
+			return new Object[0];
 		}
 
 		@Override
-		public String getParent(String element) {
+		public Object getParent(Object element) {
 			return null;
 		}
 
 		@Override
-		public boolean hasChildren(String element) {
+		public boolean hasChildren(Object element) {
 			return element.equals(ROOT);
 		}
 	}
@@ -75,60 +72,60 @@ public class Snippet015CustomTooltipsForTree {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final Display display = new Display();
-		Shell shell = new Shell(display);
-		shell.setLayout(new FillLayout());
+		final Display display = new Display ();
+		Shell shell = new Shell (display);
+	    shell.setLayout(new FillLayout());
 
-		TreeViewer<String, Object> v = new TreeViewer<String, Object>(shell,
-				SWT.FULL_SELECTION);
-		v.getTree().setLinesVisible(true);
-		v.getTree().setHeaderVisible(true);
-		ColumnViewerToolTipSupport.enableFor(v);
+	    TreeViewer v = new TreeViewer(shell,SWT.FULL_SELECTION);
+	    v.getTree().setLinesVisible(true);
+	    v.getTree().setHeaderVisible(true);
+	    ColumnViewerToolTipSupport.enableFor(v);
 
-		v.setContentProvider(new MyContentProvider());
+	    v.setContentProvider(new MyContentProvider());
 
-    CellLabelProvider<String> labelProvider = new CellLabelProvider<String>() {
+	    CellLabelProvider labelProvider = new CellLabelProvider() {
 
 			@Override
-      public String getToolTipText(String element) {
+			public String getToolTipText(Object element) {
 				return "Tooltip (" + element + ")";
 			}
 
 			@Override
-			public Point getToolTipShift(String object) {
-				return new Point(5, 5);
+			public Point getToolTipShift(Object object) {
+				return new Point(5,5);
 			}
 
 			@Override
-			public int getToolTipDisplayDelayTime(String object) {
+			public int getToolTipDisplayDelayTime(Object object) {
 				return 2000;
 			}
 
 			@Override
-			public int getToolTipTimeDisplayed(String object) {
+			public int getToolTipTimeDisplayed(Object object) {
 				return 5000;
 			}
 
 			@Override
-			public void update(ViewerCell<String> cell) {
+			public void update(ViewerCell cell) {
 				cell.setText(cell.getElement().toString());
 
 			}
-		};
+	    };
 
-		v.setLabelProvider(labelProvider);
-		v.setInput("");
 
-		shell.setSize(200, 200);
-		shell.open();
+	    v.setLabelProvider(labelProvider);
+	    v.setInput("");
 
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
+	    shell.setSize(200,200);
+	    shell.open ();
 
-		display.dispose();
+	    while (!shell.isDisposed()) {
+	        if (!display.readAndDispatch ()) {
+	        	display.sleep ();
+	        }
+	    }
+
+	    display.dispose ();
 	}
 
 }
