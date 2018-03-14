@@ -29,7 +29,7 @@ public class NumberToBigDecimalConverter extends NumberToNumberConverter {
 	 * @param numberFormat
 	 * @param fromType
 	 */
-	public NumberToBigDecimalConverter(NumberFormat numberFormat, Class<?> fromType) {
+	public NumberToBigDecimalConverter(NumberFormat numberFormat, Class fromType) {
 		super(numberFormat, fromType, BigDecimal.class);
 	}
 

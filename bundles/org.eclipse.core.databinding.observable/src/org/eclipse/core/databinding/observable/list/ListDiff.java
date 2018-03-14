@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 208858, 251884, 194734, 272651, 301774
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,7 +24,6 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * Object describing a diff between two lists.
  *
  * @param <E>
- *            the type of the elements in this diff
  *
  * @since 1.0
  */
@@ -43,7 +42,39 @@ public abstract class ListDiff<E> implements IDiff {
 	 * @return a ListDiffEntry array representing the differences in the list,
 	 *         in the order they are to be processed.
 	 */
-	public abstract ListDiffEntry<E>[] getDifferences();
+	public abstract ListDiffEntry<?>[] getDifferences();
+
+	/**
+	 * Returns a ListDiffEntry array representing the differences in the list,
+	 * in the order they are to be processed.
+	 * <P>
+	 * This method returns identical results to <code>getDifferences</code>
+	 * except that the results are returned as a <code>List</code> and are
+	 * appropriately typed.
+	 * <P>
+	 * This default implementation returns the list by calling the
+	 * <code>getDifferences</code> method and casting the result in a
+	 * type-unsafe way. Ultimately it is the intention that this method should
+	 * become non-final and replace the getDifferences method, at which point
+	 * the <code>getDifferences</code> method can be deprecated.
+	 *
+	 * @return a ListDiffEntry array representing the differences in the list,
+	 *         in the order they are to be processed, may be an empty list but
+	 *         never null
+	 * @since 1.5
+	 */
+	@SuppressWarnings("unchecked")
+	public final List<ListDiffEntry<E>> getDifferencesAsList() {
+		// Return result using type-unsafe code
+		List<ListDiffEntry<E>> result = new ArrayList<ListDiffEntry<E>>();
+		if (getDifferences() != null) {
+			for (ListDiffEntry<?> entry : getDifferences()) {
+
+				result.add((ListDiffEntry<E>) entry);
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Traverses the {@link #getDifferences()} array, calling the appropriate
@@ -67,15 +98,15 @@ public abstract class ListDiff<E> implements IDiff {
 	 * @since 1.1
 	 */
 	public void accept(ListDiffVisitor<E> visitor) {
-		ListDiffEntry<E>[] differences = getDifferences();
-		for (int i = 0; i < differences.length; i++) {
-			ListDiffEntry<E> entry = differences[i];
+		List<ListDiffEntry<E>> differences = getDifferencesAsList();
+		for (int i = 0; i < differences.size(); i++) {
+			ListDiffEntry<E> entry = differences.get(i);
 			E elem = entry.getElement();
 			int pos = entry.getPosition();
 			boolean add = entry.isAddition();
 
-			if (i + 1 < differences.length) {
-				ListDiffEntry<E> nextEntry = differences[i + 1];
+			if (i + 1 < differences.size()) {
+				ListDiffEntry<E> nextEntry = differences.get(i + 1);
 				if (add != nextEntry.isAddition()) {
 					int addPos;
 					E addElem;
@@ -299,23 +330,23 @@ public abstract class ListDiff<E> implements IDiff {
 	 */
 	@Override
 	public String toString() {
-		ListDiffEntry<E>[] differences = getDifferences();
+		List<ListDiffEntry<E>> differences = getDifferencesAsList();
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(getClass().getName());
 
-		if (differences == null || differences.length == 0) {
+		if (differences == null || differences.size() == 0) {
 			buffer.append("{}"); //$NON-NLS-1$
 		} else {
 			buffer.append("{"); //$NON-NLS-1$
 
-			for (int i = 0; i < differences.length; i++) {
+			for (int i = 0; i < differences.size(); i++) {
 				if (i > 0)
 					buffer.append(", "); //$NON-NLS-1$
 
 				buffer.append("difference[") //$NON-NLS-1$
 						.append(i)
 						.append("] [") //$NON-NLS-1$
-						.append(differences[i] != null ? differences[i]
+						.append(differences.get(i) != null ? differences.get(i)
 								.toString() : "null") //$NON-NLS-1$
 						.append("]"); //$NON-NLS-1$
 			}

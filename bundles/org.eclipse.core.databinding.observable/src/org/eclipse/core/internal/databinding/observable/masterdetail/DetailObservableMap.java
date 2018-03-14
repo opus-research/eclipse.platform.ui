@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 221704)
  *     Matthew Hall - bug 223114, 226289, 247875, 246782, 249526, 268022,
  *                    251424
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable.masterdetail;
@@ -44,7 +42,8 @@ import org.eclipse.core.runtime.Assert;
  * @since 1.1
  *
  */
-public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements IObserving {
+public class DetailObservableMap<M, K, V> extends ObservableMap<K, V> implements
+		IObserving {
 	private boolean updating = false;
 
 	private IObservableValue<M> master;
@@ -57,7 +56,7 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 
 	private IValueChangeListener<M> masterChangeListener = new IValueChangeListener<M>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<? extends M> event) {
+		public void handleValueChange(ValueChangeEvent<M> event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);
@@ -73,9 +72,9 @@ public class DetailObservableMap<M, K, V> extends ObservableMap<K, V>implements 
 
 	private IMapChangeListener<K, V> detailChangeListener = new IMapChangeListener<K, V>() {
 		@Override
-		public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
+		public void handleMapChange(MapChangeEvent<K, V> event) {
 			if (!updating) {
-				fireMapChange(Diffs.unmodifiableDiff(event.diff));
+				fireMapChange(event.diff);
 			}
 		}
 	};

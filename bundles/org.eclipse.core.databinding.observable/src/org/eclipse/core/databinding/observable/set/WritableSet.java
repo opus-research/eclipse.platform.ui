@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006-2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2006-2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221351
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -31,10 +30,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <E>
- *            the type of elements in this set
- *
+ * 
  * @since 1.0
  */
 public class WritableSet<E> extends ObservableSet<E> {
@@ -82,7 +80,8 @@ public class WritableSet<E> extends ObservableSet<E> {
 	 * @param elementType
 	 *            can be <code>null</code>
 	 */
-	public WritableSet(Realm realm, Collection<? extends E> c, Object elementType) {
+	public WritableSet(Realm realm, Collection<? extends E> c,
+			Object elementType) {
 		super(realm, new HashSet<E>(c), elementType);
 		this.elementType = elementType;
 	}
@@ -93,7 +92,8 @@ public class WritableSet<E> extends ObservableSet<E> {
 		boolean added = wrappedSet.add(o);
 		if (added) {
 			Set<E> removals = Collections.emptySet();
-			fireSetChange(Diffs.createSetDiff(Collections.singleton(o), removals));
+			fireSetChange(Diffs.createSetDiff(Collections.singleton(o),
+					removals));
 		}
 		return added;
 	}
@@ -117,7 +117,6 @@ public class WritableSet<E> extends ObservableSet<E> {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean remove(Object o) {
 		getterCalled();
@@ -130,7 +129,6 @@ public class WritableSet<E> extends ObservableSet<E> {
 		return removed;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean removeAll(Collection<?> c) {
 		getterCalled();
@@ -185,6 +183,7 @@ public class WritableSet<E> extends ObservableSet<E> {
 	 * @return new instance with the default realm
 	 */
 	public static WritableSet<?> withElementType(Object elementType) {
-		return new WritableSet<Object>(Realm.getDefault(), new HashSet<Object>(), elementType);
+		return new WritableSet<Object>(Realm.getDefault(),
+				new HashSet<Object>(), elementType);
 	}
 }

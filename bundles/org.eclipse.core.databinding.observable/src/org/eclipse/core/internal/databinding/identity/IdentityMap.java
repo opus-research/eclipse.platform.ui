@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Matthew Hall - bug 228125
  *         (through ViewerElementMap.java)
  *     Matthew Hall - bugs 262269, 303847
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.identity;
@@ -35,9 +34,7 @@ import org.eclipse.core.runtime.Assert;
  * {@link #equals(Object)} when comparing keys.
  *
  * @param <K>
- *            the type of the keys in the map
  * @param <V>
- *            the type of the values in the map
  * @since 1.2
  */
 public class IdentityMap<K, V> implements Map<K, V> {
@@ -47,7 +44,7 @@ public class IdentityMap<K, V> implements Map<K, V> {
 	 * Constructs an IdentityMap.
 	 */
 	public IdentityMap() {
-		this.wrappedMap = new HashMap<>();
+		this.wrappedMap = new HashMap<IdentityWrapper<K>, V>();
 	}
 
 	/**
@@ -122,7 +119,8 @@ public class IdentityMap<K, V> implements Map<K, V> {
 
 			@Override
 			public Iterator<Map.Entry<K, V>> iterator() {
-				final Iterator<Map.Entry<IdentityWrapper<K>, V>> wrappedIterator = wrappedEntrySet.iterator();
+				final Iterator<Map.Entry<IdentityWrapper<K>, V>> wrappedIterator = wrappedEntrySet
+						.iterator();
 				return new Iterator<Map.Entry<K, V>>() {
 					@Override
 					public boolean hasNext() {
@@ -252,15 +250,16 @@ public class IdentityMap<K, V> implements Map<K, V> {
 				return toArray(new Object[size()]);
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public <T> T[] toArray(T[] a) {
 				int size = size();
 				if (a.length < size) {
-					a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+					a = (T[]) Array.newInstance(
+							a.getClass().getComponentType(), size);
 				}
 				int i = 0;
-				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator.hasNext();) {
+				for (Iterator<Map.Entry<K, V>> iterator = iterator(); iterator
+						.hasNext();) {
 					a[i++] = (T) iterator.next();
 				}
 				return a;
@@ -394,13 +393,13 @@ public class IdentityMap<K, V> implements Map<K, V> {
 				return toArray(new Object[wrappedKeySet.size()]);
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public <T> T[] toArray(T[] a) {
 				int size = wrappedKeySet.size();
 				T[] result = a;
 				if (a.length < size) {
-					result = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+					result = (T[]) Array.newInstance(a.getClass()
+							.getComponentType(), size);
 				}
 				int i = 0;
 				for (IdentityWrapper<K> wrapper : wrappedKeySet) {

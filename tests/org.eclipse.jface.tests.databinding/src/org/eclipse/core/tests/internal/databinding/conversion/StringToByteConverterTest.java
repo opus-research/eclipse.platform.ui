@@ -11,12 +11,11 @@
 
 package org.eclipse.core.tests.internal.databinding.conversion;
 
-import org.eclipse.core.databinding.conversion.IConverter;
+import junit.framework.TestCase;
+
 import org.eclipse.core.internal.databinding.conversion.StringToByteConverter;
 
 import com.ibm.icu.text.NumberFormat;
-
-import junit.framework.TestCase;
 
 /**
  * @since 1.1
@@ -25,6 +24,11 @@ public class StringToByteConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private StringToByteConverter converter;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -34,7 +38,7 @@ public class StringToByteConverterTest extends TestCase {
 
 	public void testConvertsToByte() throws Exception {
 		Byte value = new Byte((byte) 1);
-		Byte result = converter.convert(numberFormat.format(value));
+		Byte result = (Byte) converter.convert(numberFormat.format(value));
 
 		assertEquals(value, result);
 	}
@@ -42,7 +46,7 @@ public class StringToByteConverterTest extends TestCase {
 	public void testConvertsToBytePrimitive() throws Exception {
 		converter = StringToByteConverter.toByte(numberFormat, true);
 		Byte value = new Byte((byte) 1);
-		Byte result = converter.convert(numberFormat.format(value));
+		Byte result = (Byte) converter.convert(numberFormat.format(value));
 		assertEquals(value, result);
 	}
 
@@ -63,11 +67,10 @@ public class StringToByteConverterTest extends TestCase {
 		assertNull(converter.convert(""));
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		try {
-			((IConverter<Object, Object>) (Object) converter).convert(new Integer(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

@@ -243,6 +243,9 @@ public class IDEWorkbenchPlugin extends AbstractUIPlugin {
         getDefault().getLog().log(status);
     }
 
+    /* (non-javadoc)
+     * Method declared on AbstractUIPlugin
+     */
     @Override
 	protected void refreshPluginActions() {
         // do nothing

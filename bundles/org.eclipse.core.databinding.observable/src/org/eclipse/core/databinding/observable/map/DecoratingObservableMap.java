@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - but 246626, 226289
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -20,16 +18,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservable;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable map which decorates another observable map.
- *
+ * 
  * @param <K>
- *            type of the keys to the map
  * @param <V>
- *            type of the values in the map
- *
+ * 
  * @since 1.2
  */
 public class DecoratingObservableMap<K, V> extends DecoratingObservable
@@ -53,12 +48,14 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void addMapChangeListener(
+			IMapChangeListener<K, V> listener) {
 		addListener(MapChangeEvent.TYPE, listener);
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(IMapChangeListener<? super K, ? super V> listener) {
+	public synchronized void removeMapChangeListener(
+			IMapChangeListener<K, V> listener) {
 		removeListener(MapChangeEvent.TYPE, listener);
 	}
 
@@ -75,7 +72,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	protected void fireMapChange(MapDiff<K, V> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new MapChangeEvent<>(this, diff));
+		fireEvent(new MapChangeEvent<K, V>(this, diff));
 	}
 
 	@Override
@@ -89,7 +86,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 		if (mapChangeListener == null) {
 			mapChangeListener = new IMapChangeListener<K, V>() {
 				@Override
-				public void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
+				public void handleMapChange(MapChangeEvent<K, V> event) {
 					DecoratingObservableMap.this.handleMapChange(event);
 				}
 			};
@@ -116,8 +113,8 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	 * @param event
 	 *            the change event received from the decorated observable
 	 */
-	protected void handleMapChange(final MapChangeEvent<? extends K, ? extends V> event) {
-		fireMapChange(Diffs.unmodifiableDiff(event.diff));
+	protected void handleMapChange(final MapChangeEvent<K, V> event) {
+		fireMapChange(event.diff);
 	}
 
 	@Override
@@ -270,7 +267,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Set<Entry<K, V>> entrySet() {
 		getterCalled();
 		if (entrySet == null) {
-			entrySet = new BackedSet<>(decorated.entrySet());
+			entrySet = new BackedSet<Entry<K, V>>(decorated.entrySet());
 		}
 		return entrySet;
 	}
@@ -293,7 +290,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Set<K> keySet() {
 		getterCalled();
 		if (keySet == null) {
-			keySet = new BackedSet<>(decorated.keySet());
+			keySet = new BackedSet<K>(decorated.keySet());
 		}
 		return keySet;
 	}
@@ -328,7 +325,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Collection<V> values() {
 		getterCalled();
 		if (values == null) {
-			values = new BackedCollection<>(decorated.values());
+			values = new BackedCollection<V>(decorated.values());
 		}
 		return values;
 	}

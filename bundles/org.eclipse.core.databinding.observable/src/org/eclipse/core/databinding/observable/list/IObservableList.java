@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 167204
  *     Matthew Hall - bugs 208858, 237718
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -23,10 +22,9 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
 
 /**
  * A list whose changes can be tracked by list change listeners.
- *
+ * 
  * @param <E>
- *            the type of elements in this collection
- *
+ * 
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the framework classes
  *              that implement this interface. Note that direct implementers of
@@ -42,10 +40,10 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 
 	/**
 	 * Adds the given list change listener to the list of list change listeners.
-	 *
+	 * 
 	 * @param listener
 	 */
-	public void addListChangeListener(IListChangeListener<? super E> listener);
+	public void addListChangeListener(IListChangeListener<E> listener);
 
 	/**
 	 * Removes the given list change listener from the list of list change
@@ -54,36 +52,36 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	 *
 	 * @param listener
 	 */
-	public void removeListChangeListener(IListChangeListener<? super E> listener);
+	public void removeListChangeListener(IListChangeListener<E> listener);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public int size();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public boolean isEmpty();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public boolean contains(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public Iterator<E> iterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public Object[] toArray();
 
 	/**
@@ -95,25 +93,25 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public boolean add(E o);
 
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public boolean remove(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public boolean containsAll(Collection<?> c);
 
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public boolean addAll(Collection<? extends E> c);
 
 	/**
@@ -131,19 +129,19 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public boolean retainAll(Collection<?> c);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public boolean equals(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public int hashCode();
 
 	/**
@@ -155,7 +153,7 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public E set(int index, E element);
 
 	/**
@@ -187,37 +185,37 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-	@Override
+    	@Override
 	public E remove(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public int indexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public int lastIndexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public ListIterator<E> listIterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public ListIterator<E> listIterator(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-	@Override
+    	@Override
 	public List<E> subList(int fromIndex, int toIndex);
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Brad Reynolds - bug 147515
  *     Matthew Hall - bug 221704, 226289
  *     Ovidio Mallo - bugs 305367
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.masterdetail;
@@ -39,7 +38,7 @@ public class MasterDetailObservables {
 	 * Creates a detail observable value from a master observable value and a
 	 * factory. This can be used to create observable values that represent a
 	 * property of a selected object in a table.
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observable
 	 * @param <T>
@@ -60,7 +59,7 @@ public class MasterDetailObservables {
 			IObservableValue<M> master,
 			IObservableFactory<? super M, IObservableValue<T>> detailFactory,
 			Object detailType) {
-		return new DetailObservableValue<>(master, detailFactory,
+		return new DetailObservableValue<M, T>(master, detailFactory,
 				detailType);
 	}
 
@@ -68,7 +67,7 @@ public class MasterDetailObservables {
 	 * Creates a detail observable list from a master observable value and a
 	 * factory. This can be used to create observable lists that represent a
 	 * list property of a selected object in a table.
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observable
 	 * @param <E>
@@ -89,7 +88,7 @@ public class MasterDetailObservables {
 			IObservableValue<M> master,
 			IObservableFactory<? super M, IObservableList<E>> detailFactory,
 			Object detailElementType) {
-		return new DetailObservableList<>(detailFactory, master,
+		return new DetailObservableList<M, E>(detailFactory, master,
 				detailElementType);
 	}
 
@@ -97,7 +96,7 @@ public class MasterDetailObservables {
 	 * Creates a detail observable set from a master observable value and a
 	 * factory. This can be used to create observable sets that represent a set
 	 * property of a selected object in a table.
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observable
 	 * @param <E>
@@ -118,7 +117,7 @@ public class MasterDetailObservables {
 			IObservableValue<M> master,
 			IObservableFactory<? super M, IObservableSet<E>> detailFactory,
 			Object detailElementType) {
-		return new DetailObservableSet<>(detailFactory, master,
+		return new DetailObservableSet<M, E>(detailFactory, master,
 				detailElementType);
 	}
 
@@ -126,7 +125,7 @@ public class MasterDetailObservables {
 	 * Creates a detail observable map from a master observable value and a
 	 * factory. This can be used to create observable maps that represent a map
 	 * property of a selected object in a table.
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observable
 	 * @param <K>
@@ -153,7 +152,7 @@ public class MasterDetailObservables {
 	 * Creates a detail observable map from a master observable value and a
 	 * factory. This can be used to create observable maps that represent a map
 	 * property of a selected object in a table.
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observable
 	 * @param <K>
@@ -181,7 +180,7 @@ public class MasterDetailObservables {
 			IObservableValue<M> master,
 			IObservableFactory<? super M, IObservableMap<K, V>> detailFactory,
 			Object detailKeyType, Object detailValueType) {
-		return new DetailObservableMap<>(detailFactory, master,
+		return new DetailObservableMap<M, K, V>(detailFactory, master,
 				detailKeyType, detailValueType);
 	}
 
@@ -199,7 +198,7 @@ public class MasterDetailObservables {
 	 * through the returned list are made through the detail observables created
 	 * by the specified observable factory.
 	 * </p>
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observables in the master list
 	 * @param <E>
@@ -218,9 +217,12 @@ public class MasterDetailObservables {
 	 *
 	 * @since 1.4
 	 */
-	public static <M, E> IObservableList<E> detailValues(IObservableList<M> masterList,
-			IObservableFactory<? super M, IObservableValue<E>> detailFactory, Object detailType) {
-		return new ListDetailValueObservableList<>(masterList, detailFactory, detailType);
+	public static <M, E> IObservableList<E> detailValues(
+			IObservableList<M> masterList,
+			IObservableFactory<? super M, IObservableValue<E>> detailFactory,
+			Object detailType) {
+		return new ListDetailValueObservableList<M, E>(masterList,
+				detailFactory, detailType);
 	}
 
 	/**
@@ -241,7 +243,7 @@ public class MasterDetailObservables {
 	 * made through the detail observables created by the specified observable
 	 * factory.
 	 * </p>
-	 *
+	 * 
 	 * @param <M>
 	 *            type of the master observables in the master set
 	 * @param <E>
@@ -265,7 +267,7 @@ public class MasterDetailObservables {
 			IObservableSet<M> masterSet,
 			IObservableFactory<? super M, IObservableValue<E>> detailFactory,
 			Object detailType) {
-		return new SetDetailValueObservableMap<>(masterSet, detailFactory,
+		return new SetDetailValueObservableMap<M, E>(masterSet, detailFactory,
 				detailType);
 	}
 
@@ -287,7 +289,7 @@ public class MasterDetailObservables {
 	 * are made through the detail observables created by the specified
 	 * observable factory.
 	 * </p>
-	 *
+	 * 
 	 * @param <K>
 	 *            type of the keys (the keys to both the given master observable
 	 *            map and the keys to the returned detail map, both of which are
@@ -317,7 +319,7 @@ public class MasterDetailObservables {
 			IObservableMap<K, M> masterMap,
 			IObservableFactory<? super M, IObservableValue<E>> detailFactory,
 			Object detailType) {
-		return new MapDetailValueObservableMap<>(masterMap,
+		return new MapDetailValueObservableMap<K, M, E>(masterMap,
 				detailFactory, detailType);
 	}
 }

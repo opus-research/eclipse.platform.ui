@@ -27,7 +27,7 @@ import org.eclipse.core.internal.databinding.identity.IdentityMap;
  */
 public class StalenessTracker {
 
-	private Map<IObservable, Boolean> staleMap = new IdentityMap<>();
+	private Map<IObservable, Boolean> staleMap = new IdentityMap<IObservable, Boolean>();
 
 	private int staleCount = 0;
 
@@ -88,7 +88,8 @@ public class StalenessTracker {
 	 */
 	private boolean getOldChildStale(IObservable child) {
 		Boolean oldChildValue = staleMap.get(child);
-		boolean oldChildStale = oldChildValue != null && oldChildValue;
+		boolean oldChildStale = oldChildValue == null ? false : oldChildValue
+				.booleanValue();
 		return oldChildStale;
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Cerner Corporation and others.
+ * Copyright (c) 2006, 2009 Cerner Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Matthew Hall - bugs 208332, 212518, 219909, 184830, 237718, 245647,
  *         226289
  *     Marko Topolnik - bug 184830
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -84,10 +83,9 @@ public class Observables {
 	 * <li>This observable does not forward {@link ValueChangingEvent} events
 	 * from a wrapped {@link IVetoableValue}.
 	 * </ul>
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
-	 *
+	 * 
 	 * @param delay
 	 *            the delay in milliseconds
 	 * @param observable
@@ -106,9 +104,9 @@ public class Observables {
 	/**
 	 * Returns an unmodifiable observable value backed by the given observable
 	 * value.
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
+	 * 
 	 * @param value
 	 *            the value to wrap in an unmodifiable value
 	 * @return an unmodifiable observable value backed by the given observable
@@ -123,10 +121,9 @@ public class Observables {
 
 	/**
 	 * Returns an observable value with the given constant value.
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
-	 *
+	 * 
 	 * @param realm
 	 *            the observable's realm
 	 * @param value
@@ -143,9 +140,9 @@ public class Observables {
 
 	/**
 	 * Returns an observable value with the given constant value.
-	 *
+	 * 
 	 * @param <T>
-	 *
+	 * 
 	 * @param realm
 	 *            the observable's realm
 	 * @param value
@@ -160,10 +157,9 @@ public class Observables {
 
 	/**
 	 * Returns an observable value with the given constant value.
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
-	 *
+	 * 
 	 * @param value
 	 *            the observable's constant value
 	 * @param valueType
@@ -178,9 +174,9 @@ public class Observables {
 
 	/**
 	 * Returns an observable value with the given constant value.
-	 *
+	 * 
 	 * @param <T>
-	 *
+	 * 
 	 * @param value
 	 *            the observable's constant value
 	 * @return an immutable observable value with the given constant value
@@ -193,10 +189,9 @@ public class Observables {
 	/**
 	 * Returns an unmodifiable observable list backed by the given observable
 	 * list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the element type
-	 *
+	 * 
 	 * @param list
 	 *            the list to wrap in an unmodifiable list
 	 * @return an unmodifiable observable list backed by the given observable
@@ -214,9 +209,9 @@ public class Observables {
 	/**
 	 * Returns an unmodifiable observable set backed by the given observable
 	 * set.
-	 *
+	 * 
 	 * @param <E>
-	 *
+	 * 
 	 * @param set
 	 *            the set to wrap in an unmodifiable set
 	 * @return an unmodifiable observable set backed by the given observable set
@@ -234,12 +229,10 @@ public class Observables {
 	/**
 	 * Returns an unmodifiable observable map backed by the given observable
 	 * map.
-	 *
+	 * 
 	 * @param <K>
-	 *            map key type
 	 * @param <V>
-	 *            map value type
-	 *
+	 * 
 	 * @param map
 	 *            the map to wrap in an unmodifiable map
 	 * @return an unmodifiable observable map backed by the given observable
@@ -259,12 +252,9 @@ public class Observables {
 	 * Returns an empty observable list. The returned list continues to work
 	 * after it has been disposed of and can be disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the list element type
-	 *
 	 * @return an empty observable list.
 	 */
-	public static <E> IObservableList<E> emptyObservableList() {
+	public static IObservableList<Object> emptyObservableList() {
 		return emptyObservableList(Realm.getDefault(), null);
 	}
 
@@ -273,15 +263,12 @@ public class Observables {
 	 * list continues to work after it has been disposed of and can be disposed
 	 * of multiple times.
 	 *
-	 * @param <E>
-	 *            the list element type
-	 *
 	 * @param elementType
 	 *            the element type of the returned list
 	 * @return an empty observable list
 	 * @since 1.1
 	 */
-	public static <E> IObservableList<E> emptyObservableList(Object elementType) {
+	public static IObservableList<Object> emptyObservableList(Object elementType) {
 		return emptyObservableList(Realm.getDefault(), elementType);
 	}
 
@@ -290,14 +277,11 @@ public class Observables {
 	 * returned list continues to work after it has been disposed of and can be
 	 * disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the list element type
-	 *
 	 * @param realm
 	 *            the realm of the returned list
 	 * @return an empty observable list.
 	 */
-	public static <E> IObservableList<E> emptyObservableList(Realm realm) {
+	public static IObservableList<Object> emptyObservableList(Realm realm) {
 		return emptyObservableList(realm, null);
 	}
 
@@ -306,9 +290,6 @@ public class Observables {
 	 * to the given realm. The returned list continues to work after it has been
 	 * disposed of and can be disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the list element type
-	 *
 	 * @param realm
 	 *            the realm of the returned list
 	 * @param elementType
@@ -316,21 +297,18 @@ public class Observables {
 	 * @return an empty observable list
 	 * @since 1.1
 	 */
-	public static <E> IObservableList<E> emptyObservableList(Realm realm,
+	public static IObservableList<Object> emptyObservableList(Realm realm,
 			Object elementType) {
-		return new EmptyObservableList<E>(realm, elementType);
+		return new EmptyObservableList<Object>(realm, elementType);
 	}
 
 	/**
 	 * Returns an empty observable set. The returned set continues to work after
 	 * it has been disposed of and can be disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the set element type
-	 *
 	 * @return an empty observable set.
 	 */
-	public static <E> IObservableSet<E> emptyObservableSet() {
+	public static IObservableSet<Object> emptyObservableSet() {
 		return emptyObservableSet(Realm.getDefault(), null);
 	}
 
@@ -339,15 +317,12 @@ public class Observables {
 	 * set continues to work after it has been disposed of and can be disposed
 	 * of multiple times.
 	 *
-	 * @param <E>
-	 *            the set element type
-	 *
 	 * @param elementType
 	 *            the element type of the returned set
 	 * @return an empty observable set
 	 * @since 1.1
 	 */
-	public static <E> IObservableSet<E> emptyObservableSet(Object elementType) {
+	public static IObservableSet<Object> emptyObservableSet(Object elementType) {
 		return emptyObservableSet(Realm.getDefault(), elementType);
 	}
 
@@ -356,14 +331,11 @@ public class Observables {
 	 * returned set continues to work after it has been disposed of and can be
 	 * disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the set element type
-	 *
 	 * @param realm
 	 *            the realm of the returned set
 	 * @return an empty observable set.
 	 */
-	public static <E> IObservableSet<E> emptyObservableSet(Realm realm) {
+	public static IObservableSet<Object> emptyObservableSet(Realm realm) {
 		return emptyObservableSet(realm, null);
 	}
 
@@ -372,9 +344,6 @@ public class Observables {
 	 * to the given realm. The returned set continues to work after it has been
 	 * disposed of and can be disposed of multiple times.
 	 *
-	 * @param <E>
-	 *            the set element type
-	 *
 	 * @param realm
 	 *            the realm of the returned set
 	 * @param elementType
@@ -382,17 +351,16 @@ public class Observables {
 	 * @return an empty observable set
 	 * @since 1.1
 	 */
-	public static <E> IObservableSet<E> emptyObservableSet(Realm realm,
+	public static IObservableSet<Object> emptyObservableSet(Realm realm,
 			Object elementType) {
-		return new EmptyObservableSet<E>(realm, elementType);
+		return new EmptyObservableSet<Object>(realm, elementType);
 	}
 
 	/**
 	 * Returns an observable set backed by the given set.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param set
 	 *            the set to wrap in an IObservableSet
 	 * @return an observable set backed by the given set
@@ -404,10 +372,9 @@ public class Observables {
 	/**
 	 * Returns an observable set of the given element type, backed by the given
 	 * set.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param set
 	 *            the set to wrap in an IObservableSet
 	 * @param elementType
@@ -423,9 +390,9 @@ public class Observables {
 	/**
 	 * Returns an observable set belonging to the given realm, backed by the
 	 * given set.
-	 *
+	 * 
 	 * @param <E>
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the returned set
 	 * @param set
@@ -440,10 +407,9 @@ public class Observables {
 	/**
 	 * Returns an observable set of the given element type and belonging to the
 	 * given realm, backed by the given set.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the returned set
 	 * @param set
@@ -456,7 +422,6 @@ public class Observables {
 	public static <E> IObservableSet<E> staticObservableSet(Realm realm,
 			Set<E> set, Object elementType) {
 		return new ObservableSet<E>(realm, set, elementType) {
-			@Override
 			public synchronized void addChangeListener(IChangeListener listener) {
 			}
 
@@ -475,10 +440,9 @@ public class Observables {
 	 * Returns an observable value that contains the same value as the given
 	 * observable, and fires the same events as the given observable, but can be
 	 * disposed of without disposing of the wrapped observable.
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
-	 *
+	 * 
 	 * @param target
 	 *            the observable value to wrap
 	 * @return a disposable proxy for the given observable value.
@@ -493,10 +457,9 @@ public class Observables {
 	 * Returns an observable set that contains the same elements as the given
 	 * set, and fires the same events as the given set, but can be disposed of
 	 * without disposing of the wrapped set.
-	 *
+	 * 
 	 * @param <E>
-	 *            the set element type
-	 *
+	 * 
 	 * @param target
 	 *            the set to wrap
 	 * @return a disposable proxy for the given observable set
@@ -510,10 +473,9 @@ public class Observables {
 	 * Returns an observable list that contains the same elements as the given
 	 * list, and fires the same events as the given list, but can be disposed of
 	 * without disposing of the wrapped list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param target
 	 *            the list to wrap
 	 * @return a disposable proxy for the given observable list
@@ -528,12 +490,10 @@ public class Observables {
 	 * Returns an observable map that contains the same entries as the given
 	 * map, and fires the same events as the given map, but can be disposed of
 	 * without disposing of the wrapped map.
-	 *
+	 * 
 	 * @param <K>
-	 *            the map key type
 	 * @param <V>
-	 *            the map value type
-	 *
+	 * 
 	 * @param target
 	 *            the map to wrap
 	 * @return a disposable proxy for the given observable map
@@ -546,10 +506,9 @@ public class Observables {
 
 	/**
 	 * Returns an observable list backed by the given list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param list
 	 *            the list to wrap in an IObservableList
 	 * @return an observable list backed by the given unchanging list
@@ -561,10 +520,9 @@ public class Observables {
 	/**
 	 * Returns an observable list of the given element type, backed by the given
 	 * list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param list
 	 *            the list to wrap in an IObservableList
 	 * @param elementType
@@ -580,10 +538,9 @@ public class Observables {
 	/**
 	 * Returns an observable list belonging to the given realm, backed by the
 	 * given list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the returned list
 	 * @param list
@@ -598,10 +555,9 @@ public class Observables {
 	/**
 	 * Returns an observable list of the given element type and belonging to the
 	 * given realm, backed by the given list.
-	 *
+	 * 
 	 * @param <E>
-	 *            the list element type
-	 *
+	 * 
 	 * @param realm
 	 *            the realm of the returned list
 	 * @param list
@@ -624,7 +580,7 @@ public class Observables {
 
 			@Override
 			public synchronized void addListChangeListener(
-					IListChangeListener<? super E> listener) {
+					IListChangeListener<E> listener) {
 			}
 		};
 	}
@@ -652,12 +608,11 @@ public class Observables {
 	 * state where the key exists and its value is <code>null</code>. The
 	 * transition between these two states is not considered a value change and
 	 * no event is fired.
-	 *
+	 * 
 	 * @param <K>
-	 *            the map key type
+	 * 
 	 * @param <V>
-	 *            the map value type
-	 *
+	 * 
 	 * @param map
 	 *            the observable map whose entry will be tracked.
 	 * @param key
@@ -679,12 +634,11 @@ public class Observables {
 	 * state where the key exists and its value is <code>null</code>. The
 	 * transition between these two states is not considered a value change and
 	 * no event is fired.
-	 *
+	 * 
 	 * @param <K>
-	 *            the map key type
+	 * 
 	 * @param <V>
-	 *            the map value type
-	 *
+	 * 
 	 * @param map
 	 *            the observable map whose entry will be tracked.
 	 * @param key
@@ -707,11 +661,9 @@ public class Observables {
 	 * Returns a factory for creating observable values tracking the value of
 	 * the {@link IObservableMap observable map} entry identified by a
 	 * particular key.
-	 *
+	 * 
 	 * @param <K>
-	 *            the map key type
 	 * @param <V>
-	 *            the map value type
 	 *
 	 * @param map
 	 *            the observable map whose entry will be tracked.
@@ -735,12 +687,10 @@ public class Observables {
 	/**
 	 * Helper method for <code>MasterDetailObservables.detailValue(master,
 	 * mapEntryValueFactory(map, valueType), valueType)</code>.
-	 *
+	 * 
 	 * @param <K>
-	 *            the map key type
 	 * @param <V>
-	 *            the map value type
-	 *
+	 * 
 	 * @param map
 	 *            the observable map whose entry will be tracked.
 	 * @param master
@@ -767,10 +717,9 @@ public class Observables {
 	 * updates the destination observable accordingly, until the source
 	 * observable is disposed. This method assumes that both observables are on
 	 * the same realm.
-	 *
+	 * 
 	 * @param <T>
-	 *            the value type
-	 *
+	 * 
 	 * @param source
 	 *            the source observable
 	 * @param destination
@@ -782,7 +731,7 @@ public class Observables {
 		destination.setValue(source.getValue());
 		source.addValueChangeListener(new IValueChangeListener<T>() {
 			@Override
-			public void handleValueChange(ValueChangeEvent<? extends T> event) {
+			public void handleValueChange(ValueChangeEvent<T> event) {
 				destination.setValue(event.diff.getNewValue());
 			}
 		});

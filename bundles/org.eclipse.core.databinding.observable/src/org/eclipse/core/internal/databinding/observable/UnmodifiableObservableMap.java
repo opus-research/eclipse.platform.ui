@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - bug 237718
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -24,15 +23,14 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
  * IObservableMap implementation that prevents modification by consumers. Events
  * in the originating wrapped map are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
- *
+ * 
  * @param <K>
- *            the type of the keys in this map
  * @param <V>
- *            the type of the values in this map
- *
+ * 
  * @since 1.0
  */
-public class UnmodifiableObservableMap<K, V> extends DecoratingObservableMap<K, V> {
+public class UnmodifiableObservableMap<K, V> extends
+		DecoratingObservableMap<K, V> {
 	Map<K, V> unmodifiableMap;
 
 	/**

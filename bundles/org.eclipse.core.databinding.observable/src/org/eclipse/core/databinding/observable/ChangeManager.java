@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 118516, 255734
  *     Chris Audley - bug 273265
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable;
@@ -108,7 +107,17 @@ import org.eclipse.core.runtime.ListenerList;
 		return -1;
 	}
 
-	protected void fireEvent(ObservableEvent event) {
+	protected void fireEvent(ObservableEvent<?> event) {
+		/*
+		 * Note: We have a type safety warning here because the compiler cannot
+		 * be sure that we are passing an event only to listeners that can
+		 * accept that event. We could do this in a type-safe manner by
+		 * separating listeners into different lists and keeping a map of
+		 * listenerType to listeners. However that would increase memory usage
+		 * and may not be worthwhile. We would also not be able to use the
+		 * ListenerList class because that is not parameterized.
+		 */
+
 		Object listenerType = event.getListenerType();
 		int listenerTypeIndex = findListenerTypeIndex(listenerType);
 		if (listenerTypeIndex != -1) {

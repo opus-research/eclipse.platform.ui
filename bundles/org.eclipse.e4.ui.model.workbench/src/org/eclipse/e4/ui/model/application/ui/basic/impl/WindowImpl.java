@@ -680,7 +680,6 @@ public class WindowImpl extends ElementContainerImpl<MWindowElement> implements 
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 */
-	@Override
 	public void updateLocalization() {
 		if (eNotificationRequired()) {
 			eNotify(new ENotificationImpl(

@@ -23,17 +23,14 @@ import org.eclipse.core.internal.databinding.BindingMessages;
 /**
  * StringToBooleanPrimitiveConverter.
  */
-public class StringToBooleanPrimitiveConverter implements
-		IConverter<Object, Object> {
+public class StringToBooleanPrimitiveConverter implements IConverter {
 	private static final String[] trueValues;
 
 	private static final String[] falseValues;
 
 	static {
-		String delimiter = BindingMessages
-				.getString(BindingMessages.VALUE_DELIMITER);
-		String values = BindingMessages
-				.getString(BindingMessages.TRUE_STRING_VALUES);
+		String delimiter = BindingMessages.getString(BindingMessages.VALUE_DELIMITER);
+		String values = BindingMessages.getString(BindingMessages.TRUE_STRING_VALUES);
 		trueValues = valuesToSortedArray(delimiter, values);
 
 		values = BindingMessages.getString(BindingMessages.FALSE_STRING_VALUES);
@@ -42,19 +39,19 @@ public class StringToBooleanPrimitiveConverter implements
 
 	/**
 	 * Returns a sorted array with all values converted to upper case.
-	 * 
+	 *
 	 * @param delimiter
 	 * @param values
 	 * @return sorted array of values
 	 */
 	private static String[] valuesToSortedArray(String delimiter, String values) {
-		List<String> list = new LinkedList<String>();
+		List list = new LinkedList();
 		StringTokenizer tokenizer = new StringTokenizer(values, delimiter);
 		while (tokenizer.hasMoreTokens()) {
 			list.add(tokenizer.nextToken().toUpperCase());
 		}
 
-		String[] array = list.toArray(new String[list.size()]);
+		String[] array = (String[]) list.toArray(new String[list.size()]);
 		Arrays.sort(array);
 
 		return array;

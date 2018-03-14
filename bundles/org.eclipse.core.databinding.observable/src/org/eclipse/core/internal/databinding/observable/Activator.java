@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Tom Schindl and others.
+ * Copyright (c) 2007, 2009 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -44,7 +43,8 @@ public class Activator implements BundleActivator {
 
 	@Override
 	public void start(BundleContext context) throws Exception {
-		_frameworkLogTracker = new ServiceTracker<>(context, FrameworkLog.class, null);
+		_frameworkLogTracker = new ServiceTracker<FrameworkLog, FrameworkLog>(
+				context, FrameworkLog.class, null);
 		_frameworkLogTracker.open();
 
 		Policy.setLog(new ILogger() {
@@ -52,12 +52,14 @@ public class Activator implements BundleActivator {
 			@Override
 			public void log(IStatus status) {
 				ServiceTracker<FrameworkLog, FrameworkLog> frameworkLogTracker = _frameworkLogTracker;
-				FrameworkLog log = frameworkLogTracker == null ? null : frameworkLogTracker.getService();
+				FrameworkLog log = frameworkLogTracker == null ? null
+						: frameworkLogTracker.getService();
 				if (log != null) {
 					log.log(createLogEntry(status));
 				} else {
 					// fall back to System.err
-					System.err.println(status.getPlugin() + " - " + status.getCode() + " - " + status.getMessage()); //$NON-NLS-1$//$NON-NLS-2$
+					System.err.println(status.getPlugin()
+							+ " - " + status.getCode() + " - " + status.getMessage()); //$NON-NLS-1$//$NON-NLS-2$
 					if (status.getException() != null) {
 						status.getException().printStackTrace(System.err);
 					}
@@ -71,7 +73,7 @@ public class Activator implements BundleActivator {
 	// hard?
 	FrameworkLogEntry createLogEntry(IStatus status) {
 		Throwable t = status.getException();
-		ArrayList<FrameworkLogEntry> childlist = new ArrayList<>();
+		ArrayList<FrameworkLogEntry> childlist = new ArrayList<FrameworkLogEntry>();
 
 		int stackCode = t instanceof CoreException ? 1 : 0;
 		// ensure a substatus inside a CoreException is properly logged

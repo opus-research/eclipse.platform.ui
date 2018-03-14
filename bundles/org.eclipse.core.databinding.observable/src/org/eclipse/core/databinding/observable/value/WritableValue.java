@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
  *     Brad Reynolds - bug 164653, 147515
  *     Boris Bokowski - bug 256422
  *     Matthew Hall - bug 256422
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -27,9 +26,8 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <T>
- *            the type of value being observed
  * @since 1.0
  */
 public class WritableValue<T> extends AbstractObservableValue<T> {
@@ -113,6 +111,6 @@ public class WritableValue<T> extends AbstractObservableValue<T> {
 	 *         <code>null</code>
 	 */
 	public static <T2> WritableValue<T2> withValueType(Object elementType) {
-		return new WritableValue<>(Realm.getDefault(), null, elementType);
+		return new WritableValue<T2>(Realm.getDefault(), null, elementType);
 	}
 }

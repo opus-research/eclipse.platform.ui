@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Matthew Hall and others.
+ * Copyright (c) 2007, 2008 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 208858)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.list;
@@ -16,10 +15,9 @@ import java.util.List;
 
 /**
  * A visitor for processing differences in a ListDiff.
- *
+ * 
  * @param <E>
- *            the type of the elements in the list
- *
+ * 
  * @see ListDiff#accept(ListDiffVisitor)
  * @since 1.1
  */

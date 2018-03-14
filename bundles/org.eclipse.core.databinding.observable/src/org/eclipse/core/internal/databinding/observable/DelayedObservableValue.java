@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 Matthew Hall and others.
+ * Copyright (c) 2007, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  * 		Boris Bokowski, IBM - initial API and implementation
  * 		Matthew Hall - bugs 212223, 208332, 245647
  *  	Will Horn - bug 215297
- *  	Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.observable;
@@ -40,10 +39,9 @@ import org.eclipse.core.databinding.observable.value.ValueDiff;
  *
  * Note that this class will not forward {@link ValueChangingEvent} events from
  * a wrapped {@link IVetoableValue}.
- *
+ * 
  * @param <T>
- *            the type of the object being observed
- *
+ * 
  * @since 1.2
  */
 public class DelayedObservableValue<T> extends AbstractObservableValue<T>
@@ -95,7 +93,8 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	 * @throws IllegalArgumentException
 	 *             if <code>updateEventType</code> is an incorrect type.
 	 */
-	public DelayedObservableValue(int delayMillis, IObservableValue<T> observable) {
+	public DelayedObservableValue(int delayMillis,
+			IObservableValue<T> observable) {
 		super(observable.getRealm());
 		this.delay = delayMillis;
 		this.observable = observable;
@@ -107,7 +106,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	public void handleValueChange(ValueChangeEvent<? extends T> event) {
+	public void handleValueChange(ValueChangeEvent<T> event) {
 		if (!updating)
 			makeDirty();
 	}

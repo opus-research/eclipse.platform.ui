@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bug 221351, 247875, 246782, 249526, 268022, 251424
  *     Ovidio Mallo - bug 241318
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 package org.eclipse.core.internal.databinding.observable.masterdetail;
 
@@ -42,15 +40,16 @@ import org.eclipse.core.runtime.Assert;
  * @since 3.2
  *
  */
-public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObserving {
+public class DetailObservableSet<M, E> extends ObservableSet<E> implements
+		IObserving {
 
 	private boolean updating = false;
 
 	private ISetChangeListener<E> innerChangeListener = new ISetChangeListener<E>() {
 		@Override
-		public void handleSetChange(SetChangeEvent<? extends E> event) {
+		public void handleSetChange(SetChangeEvent<E> event) {
 			if (!updating) {
-				fireSetChange(Diffs.<E> unmodifiableDiff(event.diff));
+				fireSetChange(event.diff);
 			}
 		}
 	};
@@ -97,12 +96,12 @@ public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObser
 
 	IValueChangeListener<M> outerChangeListener = new IValueChangeListener<M>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<? extends M> event) {
+		public void handleValueChange(ValueChangeEvent<M> event) {
 			if (isDisposed())
 				return;
 			ObservableTracker.setIgnore(true);
 			try {
-				Set<E> oldSet = new HashSet<>(wrappedSet);
+				Set<E> oldSet = new HashSet<E>(wrappedSet);
 				updateInnerObservableSet();
 				fireSetChange(Diffs.computeSetDiff(oldSet, wrappedSet));
 			} finally {
@@ -123,7 +122,8 @@ public class DetailObservableSet<M, E> extends ObservableSet<E>implements IObser
 		} else {
 			ObservableTracker.setIgnore(true);
 			try {
-				innerObservableSet = factory.createObservable(currentOuterValue);
+				innerObservableSet = factory
+						.createObservable(currentOuterValue);
 			} finally {
 				ObservableTracker.setIgnore(false);
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 237703)
  *     Matthew Hall - bug 274081
  *     Abel Hegedus - bug 414297
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.set;
 
@@ -69,12 +68,11 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * </pre>
  *
  * @param <E>
- *            the type of the elements in this set
  *
  * @since 1.2
  */
 public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
-	private Set<E> cachedSet = new HashSet<>();
+	private Set<E> cachedSet = new HashSet<E>();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -240,7 +238,7 @@ privateInterface, privateInterface, null);
 			// bug 414297: moved before makeStale(), as cachedSet may be
 			// overwritten
 			// in makeStale() if a listener calls isStale()
-			final Set<E> oldSet = new HashSet<>(cachedSet);
+			final Set oldSet = new HashSet(cachedSet);
 			makeStale();
 
 			stopListening();

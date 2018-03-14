@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@
  *     Sebastian Fuchs <spacehorst@gmail.com> - bug 243848
  *     Matthew Hall - bugs 208858, 213145, 243848
  *     Ovidio Mallo - bug 332367
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.list;
 
@@ -34,10 +33,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <E>
- *            the type of the elements in this list
- *
+ * 
  * @since 1.0
  */
 public class WritableList<E> extends ObservableList<E> {
@@ -299,7 +297,8 @@ public class WritableList<E> extends ObservableList<E> {
 	 *            can be <code>null</code>
 	 * @return new list with the default realm.
 	 */
-	public static <T> WritableList<T> withElementType(Object elementType) {
-		return new WritableList<T>(Realm.getDefault(), new ArrayList<T>(), elementType);
+	public static WritableList<Object> withElementType(Object elementType) {
+		return new WritableList<Object>(Realm.getDefault(),
+				new ArrayList<Object>(), elementType);
 	}
 }

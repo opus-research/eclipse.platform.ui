@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Brad Reynolds - bug 164653
  *     Matthew Hall - bugs 184830, 233306, 226289, 190881
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -17,6 +16,7 @@ package org.eclipse.core.databinding.observable.map;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +31,9 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <K>
- *            the type of the keys in this map
  * @param <V>
- *            the type of the values in this map
  * @since 1.0
  */
 public class WritableMap<K, V> extends ObservableMap<K, V> {
@@ -135,7 +133,6 @@ public class WritableMap<K, V> extends ObservableMap<K, V> {
 	 * Removes the value with the provide <code>key</code>. Must be invoked from
 	 * the current realm.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public V remove(Object key) {
 		checkRealm();
@@ -154,7 +151,7 @@ public class WritableMap<K, V> extends ObservableMap<K, V> {
 	public void clear() {
 		checkRealm();
 		if (!isEmpty()) {
-			Map<K, V> copy = new HashMap<>(wrappedMap);
+			Map<K, V> copy = new HashMap<K, V>(wrappedMap);
 			wrappedMap.clear();
 			fireMapChange(Diffs.createMapDiffRemoveAll(copy));
 		}
@@ -167,9 +164,11 @@ public class WritableMap<K, V> extends ObservableMap<K, V> {
 	@Override
 	public void putAll(Map<? extends K, ? extends V> map) {
 		checkRealm();
-		Set<K> addedKeys = new HashSet<>(map.size());
-		Map<K, V> changes = new HashMap<>(map.size());
-		for (Map.Entry<? extends K, ? extends V> entry : map.entrySet()) {
+		Set<K> addedKeys = new HashSet<K>(map.size());
+		Map<K, V> changes = new HashMap<K, V>(map.size());
+		for (Iterator<?> it = map.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<? extends K, ? extends V> entry = (Map.Entry<? extends K, ? extends V>) it
+					.next();
 			boolean add = !wrappedMap.containsKey(entry.getKey());
 			V previousValue = wrappedMap.put(entry.getKey(), entry.getValue());
 			if (add) {

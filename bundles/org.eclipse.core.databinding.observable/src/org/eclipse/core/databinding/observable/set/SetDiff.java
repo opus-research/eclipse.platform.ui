@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 251884, 194734, 301774
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -21,11 +20,9 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
- * Describes the difference between two sets
- *
  * @param <E>
- *            the type of elements in this diff
  * @since 1.0
+ *
  */
 public abstract class SetDiff<E> implements IDiff {
 
@@ -77,7 +74,7 @@ public abstract class SetDiff<E> implements IDiff {
 	 * @since 1.3
 	 */
 	public Set<E> simulateOn(Set<E> set) {
-		return new DeltaSet<>(set, this);
+		return new DeltaSet<E>(set, this);
 	}
 
 	private static class DeltaSet<E> extends AbstractSet<E> {
@@ -162,9 +159,11 @@ public abstract class SetDiff<E> implements IDiff {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(getClass().getName())
 				.append("{additions [") //$NON-NLS-1$
-				.append(getAdditions() != null ? getAdditions().toString() : "null") //$NON-NLS-1$
+				.append(getAdditions() != null ? getAdditions().toString()
+						: "null") //$NON-NLS-1$
 				.append("], removals [") //$NON-NLS-1$
-				.append(getRemovals() != null ? getRemovals().toString() : "null") //$NON-NLS-1$
+				.append(getRemovals() != null ? getRemovals().toString()
+						: "null") //$NON-NLS-1$
 				.append("]}"); //$NON-NLS-1$
 
 		return buffer.toString();

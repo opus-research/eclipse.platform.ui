@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *         (through BidirectionalMap.java)
  *     Matthew Hall - bug 233306
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.map;
 
@@ -30,12 +29,10 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- *
+ * 
  * @param <K>
- *            type of the keys in the map
  * @param <V>
- *            type of the values in the map
- *
+ * 
  * @since 1.2
  */
 public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
@@ -44,7 +41,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * is put in this set. This field is null when no listeners are registered
 	 * on this observable.
 	 */
-	private Map<V, K> valuesToSingleKeys;
+	private Map<V, K> valuesToSingleKeys = null;
 
 	/**
 	 * Inverse of wrapped map. When multiple keys map to the same value, they
@@ -52,7 +49,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * single key map is removed. This field is null when no listeners are
 	 * registered on this observable.
 	 */
-	private Map<V, Set<K>> valuesToSetsOfKeys;
+	private Map<V, Set<K>> valuesToSetsOfKeys = null;
 
 	/**
 	 * Constructs a BidirectionalMap tracking the given observable map.
@@ -66,8 +63,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 
 	@Override
 	protected void firstListenerAdded() {
-		valuesToSingleKeys = new HashMap<>();
-		valuesToSetsOfKeys = new HashMap<>();
+		valuesToSingleKeys = new HashMap<V, K>();
+		valuesToSetsOfKeys = new HashMap<V, Set<K>>();
 		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
 			Map.Entry<K, V> entry = it.next();
 			addMapping(entry.getKey(), entry.getValue());
@@ -85,16 +82,19 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	}
 
 	@Override
-	protected void handleMapChange(MapChangeEvent<? extends K, ? extends V> event) {
-		MapDiff<? extends K, ? extends V> diff = event.diff;
-		for (K addedKey : diff.getAddedKeys()) {
+	protected void handleMapChange(MapChangeEvent<K, V> event) {
+		MapDiff<K, V> diff = event.diff;
+		for (Iterator<K> it = diff.getAddedKeys().iterator(); it.hasNext();) {
+			K addedKey = it.next();
 			addMapping(addedKey, diff.getNewValue(addedKey));
 		}
-		for (K changedKey : diff.getChangedKeys()) {
+		for (Iterator<K> it = diff.getChangedKeys().iterator(); it.hasNext();) {
+			K changedKey = it.next();
 			removeMapping(changedKey, diff.getOldValue(changedKey));
 			addMapping(changedKey, diff.getNewValue(changedKey));
 		}
-		for (K removedKey : diff.getRemovedKeys()) {
+		for (Iterator<K> it = diff.getRemovedKeys().iterator(); it.hasNext();) {
+			K removedKey = it.next();
 			removeMapping(removedKey, diff.getOldValue(removedKey));
 		}
 		super.handleMapChange(event);
@@ -105,7 +105,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 		getterCalled();
 		// Faster lookup
 		if (valuesToSingleKeys != null) {
-			return (valuesToSingleKeys.containsKey(value) || valuesToSetsOfKeys.containsKey(value));
+			return (valuesToSingleKeys.containsKey(value) || valuesToSetsOfKeys
+					.containsKey(value));
 		}
 		return super.containsValue(value);
 	}
@@ -122,7 +123,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	private void addMapping(K key, V value) {
 		if (valuesToSingleKeys.containsKey(value)) {
 			K element = valuesToSingleKeys.get(value);
-			Set<K> set = new HashSet<>(Collections.singleton(element));
+			Set<K> set;
+			set = new HashSet<K>(Collections.singleton(element));
 			valuesToSingleKeys.remove(value);
 			valuesToSetsOfKeys.put(value, set);
 			set.add(key);
@@ -188,7 +190,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * @return the set of keys which currently map to the specified value.
 	 */
 	private Set<K> findKeys(Object value) {
-		Set<K> keys = new HashSet<>();
+		Set<K> keys = new HashSet<K>();
 		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
 			Map.Entry<K, V> entry = it.next();
 			if (Util.equals(entry.getValue(), value))

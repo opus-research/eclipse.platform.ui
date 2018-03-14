@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 249992)
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.value;
@@ -26,10 +25,9 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * value of the SelectObservableValue is the value of whichever option's
  * observable has a value of Boolean.TRUE, or null if none of the observable's
  * values are Boolean.TRUE.
- *
+ * 
  * @param <T>
- *            the type of value being observed
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
  *
  * @since 1.2
@@ -54,9 +52,9 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 
 	private IValueChangeListener<Boolean> listener = new IValueChangeListener<Boolean>() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<? extends Boolean> event) {
+		public void handleValueChange(ValueChangeEvent<Boolean> event) {
 			if (!updating) {
-				IObservableValue<? extends Boolean> observable = event
+				IObservableValue<Boolean> observable = event
 						.getObservableValue();
 				if (Boolean.TRUE.equals(observable.getValue())) {
 					notifyIfChanged(indexOfObservable(observable));
@@ -105,7 +103,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 	public SelectObservableValue(Realm realm, Object valueType) {
 		super(realm);
 		this.valueType = valueType;
-		this.options = new ArrayList<>();
+		this.options = new ArrayList<Option>();
 	}
 
 	@Override
@@ -163,14 +161,13 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		}
 	}
 
-	@Override
 	protected T doGetValue() {
 		return hasListeners() ? valueAtIndex(selectionIndex) : getLiveValue();
 	}
 
 	private T getLiveValue() {
 		for (Option option : options) {
-			if (option.observable.getValue())
+			if (Boolean.TRUE.equals(option.observable.getValue()))
 				return option.value;
 		}
 		return null;
@@ -183,7 +180,8 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		try {
 			updating = true;
 			for (int i = 0; i < options.size(); i++) {
-				options.get(i).observable.setValue(i == index);
+				options.get(i).observable.setValue(i == index ? Boolean.TRUE
+						: Boolean.FALSE);
 			}
 		} finally {
 			updating = false;
@@ -205,7 +203,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		return -1;
 	}
 
-	private int indexOfObservable(IObservableValue<? extends Boolean> observable) {
+	private int indexOfObservable(IObservableValue<Boolean> observable) {
 		for (int i = 0; i < options.size(); i++)
 			if (options.get(i).observable == observable)
 				return i;

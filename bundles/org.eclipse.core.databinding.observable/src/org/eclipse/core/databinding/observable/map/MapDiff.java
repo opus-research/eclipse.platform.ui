@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Matthew Hall - bugs 251884, 194734, 301774
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.map;
@@ -53,15 +51,15 @@ public abstract class MapDiff<K, V> implements IDiff {
 	 * @since 1.2
 	 */
 	public void applyTo(Map<K, V> map) {
-		for (Iterator<? extends K> it = getAddedKeys().iterator(); it.hasNext();) {
+		for (Iterator<K> it = getAddedKeys().iterator(); it.hasNext();) {
 			K key = it.next();
 			map.put(key, getNewValue(key));
 		}
-		for (Iterator<? extends K> it = getChangedKeys().iterator(); it.hasNext();) {
+		for (Iterator<K> it = getChangedKeys().iterator(); it.hasNext();) {
 			K key = it.next();
 			map.put(key, getNewValue(key));
 		}
-		for (Iterator<? extends K> it = getRemovedKeys().iterator(); it.hasNext();) {
+		for (Iterator<K> it = getRemovedKeys().iterator(); it.hasNext();) {
 			map.remove(it.next());
 		}
 	}
@@ -145,7 +143,8 @@ public abstract class MapDiff<K, V> implements IDiff {
 
 	}
 
-	private static class DeltaMapEntrySet<K, V> extends AbstractSet<Map.Entry<K, V>> {
+	private static class DeltaMapEntrySet<K, V> extends
+			AbstractSet<Map.Entry<K, V>> {
 
 		private final Map<K, V> map;
 		private final MapDiff<K, V> diff;
@@ -158,8 +157,9 @@ public abstract class MapDiff<K, V> implements IDiff {
 		@Override
 		public Iterator<Map.Entry<K, V>> iterator() {
 			return new Iterator<Map.Entry<K, V>>() {
-				Iterator<Map.Entry<K, V>> origEntries = map.entrySet().iterator();
-				Iterator<? extends K> addedKeys = diff.getAddedKeys().iterator();
+				Iterator<Map.Entry<K, V>> origEntries = map.entrySet()
+						.iterator();
+				Iterator<K> addedKeys = diff.getAddedKeys().iterator();
 
 				boolean haveNext = false;
 				Map.Entry<K, V> next;
@@ -192,14 +192,18 @@ public abstract class MapDiff<K, V> implements IDiff {
 
 							if (diff.getRemovedKeys().contains(candidateKey)) {
 								continue;
-							} else if (diff.getChangedKeys().contains(candidateKey)) {
-								candidateEntry = new DeltaMapEntry<K, V>(candidateKey, diff);
+							} else if (diff.getChangedKeys().contains(
+									candidateKey)) {
+								candidateEntry = new DeltaMapEntry<K, V>(
+										candidateKey, diff);
 							} else {
-								candidateEntry = new MapEntryWrapper<K, V>(candidateEntry);
+								candidateEntry = new MapEntryWrapper<K, V>(
+										candidateEntry);
 							}
 						} else if (addedKeys.hasNext()) {
 							candidateKey = addedKeys.next();
-							candidateEntry = new DeltaMapEntry<K, V>(candidateKey, diff);
+							candidateEntry = new DeltaMapEntry<K, V>(
+									candidateKey, diff);
 						} else {
 							return false;
 						}
@@ -220,12 +224,14 @@ public abstract class MapDiff<K, V> implements IDiff {
 
 		@Override
 		public int size() {
-			return map.size() + diff.getAddedKeys().size() - diff.getRemovedKeys().size();
+			return map.size() + diff.getAddedKeys().size()
+					- diff.getRemovedKeys().size();
 		}
 
 	}
 
-	private abstract static class AbstractMapEntry<K, V> implements Map.Entry<K, V> {
+	private abstract static class AbstractMapEntry<K, V> implements
+			Map.Entry<K, V> {
 		@Override
 		public V setValue(Object arg0) {
 			throw new UnsupportedOperationException();
@@ -236,7 +242,8 @@ public abstract class MapDiff<K, V> implements IDiff {
 			if (!(obj instanceof Map.Entry))
 				return false;
 			Map.Entry<?, ?> that = (Map.Entry<?, ?>) obj;
-			return Util.equals(this.getKey(), that.getKey()) && Util.equals(this.getValue(), that.getValue());
+			return Util.equals(this.getKey(), that.getKey())
+					&& Util.equals(this.getValue(), that.getValue());
 		}
 
 		@Override

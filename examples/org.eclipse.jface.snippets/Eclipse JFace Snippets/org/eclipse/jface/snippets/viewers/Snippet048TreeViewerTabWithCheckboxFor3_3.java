@@ -171,7 +171,7 @@ public class Snippet048TreeViewerTabWithCheckboxFor3_3 {
 
 			@Override
 			protected Object getValue(Object element) {
-				return Boolean.valueOf(((MyModel) element).bool);
+				return new Boolean(((MyModel) element).bool);
 			}
 
 			@Override
