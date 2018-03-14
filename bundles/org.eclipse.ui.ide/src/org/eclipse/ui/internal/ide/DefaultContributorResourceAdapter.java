@@ -12,7 +12,6 @@ package org.eclipse.ui.internal.ide;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.mapping.ResourceMapping;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IContributorResourceAdapter;
 import org.eclipse.ui.ide.IContributorResourceAdapter2;
@@ -50,12 +49,12 @@ public class DefaultContributorResourceAdapter implements
      */
     @Override
 	public IResource getAdaptedResource(IAdaptable adaptable) {
-		return Adapters.adapt(adaptable, IResource.class);
+        return adaptable.getAdapter(IResource.class);
     }
 
     @Override
 	public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
-		return Adapters.adapt(adaptable, ResourceMapping.class);
+        return adaptable.getAdapter(ResourceMapping.class);
     }
 }
 
