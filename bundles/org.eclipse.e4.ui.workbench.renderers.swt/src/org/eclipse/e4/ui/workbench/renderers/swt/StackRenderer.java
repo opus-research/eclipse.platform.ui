@@ -140,7 +140,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	/**
 	 * Default default value for MRU behavior.
 	 */
-	public static final boolean MRU_DEFAULT = false;
+	public static final boolean MRU_DEFAULT = true;
 
 	/*
 	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
@@ -847,7 +847,9 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			part = (MPart) element;
 		else if (element instanceof MPlaceholder) {
 			part = (MPart) ((MPlaceholder) element).getRef();
-			part.setCurSharedRef((MPlaceholder) element);
+			if (part != null) {
+				part.setCurSharedRef((MPlaceholder) element);
+			}
 		}
 
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
