@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Steven Spungin - Bug 441874
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 442920
  *******************************************************************************/
 package org.eclipse.e4.ui.services.internal.events;
 
@@ -104,9 +103,7 @@ public class EventBroker implements IEventBroker {
 	@SuppressWarnings("unchecked")
 	private Event constructEvent(String topic, Object data) {
 		Event event;
-		if (data instanceof Event){
-			event= (Event) data;
-		} else if (data instanceof Dictionary<?,?>) {
+		if (data instanceof Dictionary<?,?>) {
 			event = new Event(topic, (Dictionary<String,?>)data);
 		} else if (data instanceof Map<?,?>) {
 			event = new Event(topic, (Map<String,?>)data);
