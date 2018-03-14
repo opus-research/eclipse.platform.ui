@@ -84,6 +84,7 @@ public class SearchField {
 	private static final String DIALOG_WIDTH = "dialogWidth"; //$NON-NLS-1$
 
 	Shell shell;
+	private Point shellSize;
 	private Text text;
 
 	private QuickAccessContents quickAccessContents;
@@ -208,6 +209,7 @@ public class SearchField {
 				e.doit = false;
 			}
 		});
+		shellSize = shell.getSize();
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
@@ -423,6 +425,10 @@ public class SearchField {
 
 		shell.setBounds(getConstrainedShellBounds(display, new Rectangle(compBounds.x, compBounds.y
 				+ compBounds.height, width, height)));
+		// Keep the x, y coordinates (Point) as member. The storeDialog will
+		// persistently store it *after* the shell is disposed.
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=449485
+		shellSize = shell.getSize();
 		shell.layout();
 	}
 
@@ -577,8 +583,8 @@ public class SearchField {
 		dialogSettings.put(ORDERED_PROVIDERS, orderedProviders);
 		dialogSettings.put(TEXT_ENTRIES, textEntries);
 		dialogSettings.put(TEXT_ARRAY, textArray);
-		dialogSettings.put(DIALOG_HEIGHT, shell.getSize().y);
-		dialogSettings.put(DIALOG_WIDTH, shell.getSize().x);
+		dialogSettings.put(DIALOG_HEIGHT, shellSize.y);
+		dialogSettings.put(DIALOG_WIDTH, shellSize.x);
 	}
 
 	private IDialogSettings getDialogSettings() {
