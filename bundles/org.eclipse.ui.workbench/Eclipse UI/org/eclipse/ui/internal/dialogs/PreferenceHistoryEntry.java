@@ -64,7 +64,6 @@ final class PreferenceHistoryEntry {
 	/*
 	 * @see java.lang.Object#toString()
 	 */
-	@Override
 	public String toString() {
 		if (argument == null) {
 			return id;
@@ -74,7 +73,6 @@ final class PreferenceHistoryEntry {
 	/*
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof PreferenceHistoryEntry) {
 			PreferenceHistoryEntry other= (PreferenceHistoryEntry) obj;
@@ -87,7 +85,6 @@ final class PreferenceHistoryEntry {
 	/*
 	 * @see java.lang.Object#hashCode()
 	 */
-	@Override
 	public int hashCode() {
 		int argHash= argument == null ? 0 : argument.hashCode() & 0x0000ffff;
 		return id.hashCode() << 16 | argHash;

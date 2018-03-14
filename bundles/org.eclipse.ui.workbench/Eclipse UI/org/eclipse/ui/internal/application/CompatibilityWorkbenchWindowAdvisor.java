@@ -41,43 +41,35 @@ public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         this.wbAdvisor = wbAdvisor;
     }
 
-    @Override
-	public void preWindowOpen() {
+    public void preWindowOpen() {
         wbAdvisor.preWindowOpen(getWindowConfigurer());
     }
 
-    @Override
-	public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
+    public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
         return new CompatibilityActionBarAdvisor(wbAdvisor, configurer);
     }
     
-    @Override
-	public void postWindowRestore() throws WorkbenchException {
+    public void postWindowRestore() throws WorkbenchException {
         wbAdvisor.postWindowRestore(getWindowConfigurer());
     }
 
-    @Override
-	public void openIntro() {
+    public void openIntro() {
         wbAdvisor.openIntro(getWindowConfigurer());
     }
 
-    @Override
-	public void postWindowCreate() {
+    public void postWindowCreate() {
         wbAdvisor.postWindowCreate(getWindowConfigurer());
     }
 
-    @Override
-	public void postWindowOpen() {
+    public void postWindowOpen() {
         wbAdvisor.postWindowOpen(getWindowConfigurer());
     }
 
-    @Override
-	public boolean preWindowShellClose() {
+    public boolean preWindowShellClose() {
         return wbAdvisor.preWindowShellClose(getWindowConfigurer());
     }
 
-    @Override
-	public void postWindowClose() {
+    public void postWindowClose() {
         wbAdvisor.postWindowClose(getWindowConfigurer());
     }
 
@@ -89,8 +81,7 @@ public class CompatibilityWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor 
         return wbAdvisor.getDefaultPageInput();
     }
 
-    @Override
-	public void createWindowContents(Shell shell) {
+    public void createWindowContents(Shell shell) {
         wbAdvisor.createWindowContents(getWindowConfigurer(), shell);
     }
 

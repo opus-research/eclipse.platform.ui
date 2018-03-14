@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2013 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,8 +38,7 @@ public abstract class ColorDescriptor extends DeviceResourceDescriptor {
      * original Color's constructor.
      * @return a newly created ColorDescriptor that describes the given Color.
      */
-    @Deprecated
-	public static ColorDescriptor createFrom(Color toCreate, Device originalDevice) {
+    public static ColorDescriptor createFrom(Color toCreate, Device originalDevice) {
         return new RGBColorDescriptor(toCreate);
     }
     
@@ -91,16 +90,14 @@ public abstract class ColorDescriptor extends DeviceResourceDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#createResource(org.eclipse.swt.graphics.Device)
      */
-    @Override
-	public final Object createResource(Device device) throws DeviceResourceException {
+    public final Object createResource(Device device) throws DeviceResourceException {
         return createColor(device);
     }
     
     /* (non-Javadoc)
      * @see org.eclipse.jface.resource.DeviceResourceDescriptor#destroyResource(java.lang.Object)
      */
-    @Override
-	public final void destroyResource(Object previouslyCreatedObject) {
+    public final void destroyResource(Object previouslyCreatedObject) {
         destroyColor((Color)previouslyCreatedObject);
     }
 }

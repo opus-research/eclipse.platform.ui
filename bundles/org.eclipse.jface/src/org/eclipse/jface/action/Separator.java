@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,7 @@ public class Separator extends AbstractGroupMarker {
      * Method declared on IContributionItem.
      * Fills the given menu with a SWT separator MenuItem.
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
         if (index >= 0) {
 			new MenuItem(menu, SWT.SEPARATOR, index);
 		} else {
@@ -63,8 +62,7 @@ public class Separator extends AbstractGroupMarker {
      * Method declared on IContributionItem.
      * Fills the given tool bar with a SWT separator ToolItem.
      */
-    @Override
-	public void fill(ToolBar toolbar, int index) {
+    public void fill(ToolBar toolbar, int index) {
         if (index >= 0) {
 			new ToolItem(toolbar, SWT.SEPARATOR, index);
 		} else {
@@ -76,8 +74,7 @@ public class Separator extends AbstractGroupMarker {
      * The <code>Separator</code> implementation of this <code>IContributionItem</code> 
      * method returns <code>true</code>
      */
-    @Override
-	public boolean isSeparator() {
+    public boolean isSeparator() {
         return true;
     }
 }

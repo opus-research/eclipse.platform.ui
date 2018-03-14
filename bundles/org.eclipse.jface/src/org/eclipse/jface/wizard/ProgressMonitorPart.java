@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,8 +74,7 @@ public class ProgressMonitorPart extends Composite implements
 
     /** the cancel lister attached to the cancel component */
     protected Listener fCancelListener = new Listener() {
-        @Override
-		public void handleEvent(Event e) {
+        public void handleEvent(Event e) {
             setCanceled(true);
             if (fCancelComponent != null) {
 				fCancelComponent.setEnabled(false);
@@ -158,8 +157,11 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
-    @Override
-	public void beginTask(String name, int totalWork) {
+    /**
+     * Implements <code>IProgressMonitor.beginTask</code>.
+     * @see IProgressMonitor#beginTask(java.lang.String, int)
+     */
+    public void beginTask(String name, int totalWork) {
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
@@ -174,8 +176,11 @@ public class ProgressMonitorPart extends Composite implements
         }
     }
 
-    @Override
-	public void done() {
+    /**
+     * Implements <code>IProgressMonitor.done</code>.
+     * @see IProgressMonitor#done()
+     */
+    public void done() {
         fLabel.setText("");//$NON-NLS-1$
         fSubTaskName = ""; //$NON-NLS-1$
         fProgressIndicator.sendRemainingWork();
@@ -261,8 +266,7 @@ public class ProgressMonitorPart extends Composite implements
         	// It would have been nice to use the fCancelListener, but that
         	// listener operates on the fCancelComponent which must be a control.
         	fStopButton.addSelectionListener(new SelectionAdapter() {
-        		@Override
-				public void widgetSelected(SelectionEvent e) {
+        		public void widgetSelected(SelectionEvent e) {
         			setCanceled(true);
         			if (fStopButton != null) {
         				fStopButton.setEnabled(false);
@@ -275,8 +279,7 @@ public class ProgressMonitorPart extends Composite implements
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
         	fStopButton.addDisposeListener(new DisposeListener() {
-        		@Override
-				public void widgetDisposed(DisposeEvent e) {
+        		public void widgetDisposed(DisposeEvent e) {
         			stopImage.dispose();
         			arrowCursor.dispose();
         		}
@@ -286,13 +289,19 @@ public class ProgressMonitorPart extends Composite implements
         }
     }
 
-    @Override
-	public void internalWorked(double work) {
+    /**
+     * Implements <code>IProgressMonitor.internalWorked</code>.
+     * @see IProgressMonitor#internalWorked(double)
+     */
+    public void internalWorked(double work) {
         fProgressIndicator.worked(work);
     }
 
-    @Override
-	public boolean isCanceled() {
+    /**
+     * Implements <code>IProgressMonitor.isCanceled</code>.
+     * @see IProgressMonitor#isCanceled()
+     */
+    public boolean isCanceled() {
         return fIsCanceled;
     }
 
@@ -314,26 +323,37 @@ public class ProgressMonitorPart extends Composite implements
 		}
 	}
 
-    @Override
-	public void setCanceled(boolean b) {
+    /**
+     * Implements <code>IProgressMonitor.setCanceled</code>.
+     * @see IProgressMonitor#setCanceled(boolean)
+     */
+    public void setCanceled(boolean b) {
         fIsCanceled = b;
     }
 
-    @Override
-	public void setFont(Font font) {
+    /**
+     * Sets the progress monitor part's font.
+     */
+    public void setFont(Font font) {
         super.setFont(font);
         fLabel.setFont(font);
         fProgressIndicator.setFont(font);
     }
 
-    @Override
-	public void setTaskName(String name) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+     */
+    public void setTaskName(String name) {
         fTaskName = name;
         updateLabel();
     }
 
-    @Override
-	public void subTask(String name) {
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+     */
+    public void subTask(String name) {
         fSubTaskName = name;
         updateLabel();
     }
@@ -375,20 +395,27 @@ public class ProgressMonitorPart extends Composite implements
     	}
     }
 
-    @Override
-	public void worked(int work) {
+    /**
+     * Implements <code>IProgressMonitor.worked</code>.
+     * @see IProgressMonitor#worked(int)
+     */
+    public void worked(int work) {
         internalWorked(work);
     }
 
-    @Override
-	public void clearBlocked() {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+     */
+    public void clearBlocked() {
         blockedStatus = null;
         updateLabel();
 
     }
 
-    @Override
-	public void setBlocked(IStatus reason) {
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+     */
+    public void setBlocked(IStatus reason) {
         blockedStatus = reason;
         updateLabel();
 

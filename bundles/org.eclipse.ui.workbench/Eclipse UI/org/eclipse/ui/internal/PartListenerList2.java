@@ -66,8 +66,7 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partActivated(ref);
                 }
             }, l, ref, "activated::"); //$NON-NLS-1$
@@ -82,8 +81,7 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partBroughtToTop(ref);
                 }
             }, l, ref, "broughtToTop::"); //$NON-NLS-1$
@@ -98,8 +96,7 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partClosed(ref);
                 }
             }, l, ref, "closed::"); //$NON-NLS-1$
@@ -114,8 +111,7 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partDeactivated(ref);
                 }
             }, l, ref, "deactivated::"); //$NON-NLS-1$
@@ -130,8 +126,7 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partOpened(ref);
                 }
             }, l, ref, "opened::"); //$NON-NLS-1$
@@ -152,8 +147,7 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partHidden(ref);
                 }
             }, l, ref, "hidden::"); //$NON-NLS-1$
@@ -174,8 +168,7 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partVisible(ref);
                 }
             }, l, ref, "visible::"); //$NON-NLS-1$
@@ -196,8 +189,7 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.partInputChanged(ref);
                 }
             }, l, ref, "inputChanged::"); //$NON-NLS-1$
@@ -222,8 +214,7 @@ public class PartListenerList2 extends EventManager {
 			}
 
             SafeRunnable.run(new SafeRunnable() {
-                @Override
-				public void run() {
+                public void run() {
                     l.pageChanged(event);
                 }
             });

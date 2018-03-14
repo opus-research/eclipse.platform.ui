@@ -20,7 +20,6 @@ import org.eclipse.swt.widgets.Display;
 
 public class ProgressMonitorDialogTest extends TestCase {
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

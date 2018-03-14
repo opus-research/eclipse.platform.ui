@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -109,8 +109,7 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
         return (0.4000 * lp) + (0.4000 * mp) + (0.2000 * sp);
     }
 
-    @Override
-	public RGB createColor() {
+    public RGB createColor() {
         /**
          * Determine which pair has a higher contrast by selecting
          * the colour with the furthest distance in lightness.
@@ -154,8 +153,7 @@ public class RGBContrastFactory implements IColorFactory, IExecutableExtension {
      * 
      * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
      */
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
         if (data instanceof Hashtable) {
             Hashtable table = (Hashtable) data;

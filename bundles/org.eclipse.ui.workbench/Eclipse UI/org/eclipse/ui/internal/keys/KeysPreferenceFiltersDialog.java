@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2010 IBM Corporation and others.
+ * Copyright (c) 2007, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -74,7 +74,6 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	 * 
 	 * @see org.eclipse.ui.preferences.ViewSettingsDialog#performDefaults()
 	 */
-	@Override
 	protected void performDefaults() {
 		actionSetFilterCheckBox.setSelection(true);
 		internalFilterCheckBox.setSelection(true);
@@ -87,7 +86,6 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite topComposite = (Composite) super.createDialogArea(parent);
 		GridLayout layout = new GridLayout(1, false);
@@ -116,7 +114,6 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
-	@Override
 	protected void okPressed() {
 		filterActionSet = actionSetFilterCheckBox.getSelection();
 		filterInternal = internalFilterCheckBox.getSelection();
@@ -129,7 +126,6 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	 * 
 	 * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
 	 */
-	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell

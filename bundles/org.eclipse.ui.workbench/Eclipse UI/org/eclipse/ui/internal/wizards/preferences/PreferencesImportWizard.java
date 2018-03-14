@@ -65,8 +65,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public void addPages() {
+    public void addPages() {
         super.addPages();
         mainPage = new WizardPreferencesImportPage1();
         addPage(mainPage);
@@ -75,8 +74,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWorkbenchWizard.
      */
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesImportWizard_import);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_PREF_WIZ));
@@ -86,8 +84,7 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
     /* (non-Javadoc)
      * Method declared on IWizard.
      */
-    @Override
-	public boolean performFinish() {
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }

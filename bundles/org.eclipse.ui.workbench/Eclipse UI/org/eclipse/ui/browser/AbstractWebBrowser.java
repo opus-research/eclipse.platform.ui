@@ -35,7 +35,6 @@ public abstract class AbstractWebBrowser implements IWebBrowser {
 	 * 
 	 * @see org.eclipse.ui.browser.IWebBrowser#getId()
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -45,7 +44,6 @@ public abstract class AbstractWebBrowser implements IWebBrowser {
 	 * 
 	 * @see org.eclipse.ui.browser.IWebBrowser#close()
 	 */
-	@Override
 	public boolean close() {
 		return false;
 	}
