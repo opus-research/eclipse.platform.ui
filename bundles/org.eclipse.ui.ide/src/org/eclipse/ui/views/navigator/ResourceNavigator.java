@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -447,9 +447,7 @@ public class ResourceNavigator extends ViewPart implements ISetSelectionTarget,
     protected void initListeners(final TreeViewer viewer) {
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-            	viewer.getControl().setRedraw(false);
                 handleSelectionChanged(event);
-                viewer.getControl().setRedraw(true);
             }
         });
         viewer.addDoubleClickListener(new IDoubleClickListener() {
