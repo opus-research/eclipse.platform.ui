@@ -111,14 +111,6 @@ public class ApplicationAdapterFactory extends AdapterFactoryImpl {
 				return createStringToObjectMapAdapter();
 			}
 			@Override
-			public Adapter caseLifecycleAware(MLifecycleAware object) {
-				return createLifecycleAwareAdapter();
-			}
-			@Override
-			public Adapter caseLifecycleContribution(MLifecycleContribution object) {
-				return createLifecycleContributionAdapter();
-			}
-			@Override
 			public Adapter caseLocalizable(MLocalizable object) {
 				return createLocalizableAdapter();
 			}
@@ -267,34 +259,6 @@ public class ApplicationAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createStringToObjectMapAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.MLifecycleAware <em>Lifecycle Aware</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.MLifecycleAware
-	 * @generated
-	 */
-	public Adapter createLifecycleAwareAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.e4.ui.model.application.MLifecycleContribution <em>Lifecycle Contribution</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.e4.ui.model.application.MLifecycleContribution
-	 * @generated
-	 */
-	public Adapter createLifecycleContributionAdapter() {
 		return null;
 	}
 
