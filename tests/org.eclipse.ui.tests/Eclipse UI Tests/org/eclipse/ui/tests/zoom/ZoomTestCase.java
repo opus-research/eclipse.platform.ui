@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.zoom;
+
+import junit.framework.Assert;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -130,8 +131,8 @@ public class ZoomTestCase extends UITestCase {
 		}
         page.activate(part);
         page.toggleZoom(page.getReference(part));
-		assertTrue(page.isPageZoomed());
-		assertTrue(isZoomed(part));
+        Assert.assertTrue(page.isPageZoomed());
+        Assert.assertTrue(isZoomed(part));
     }
 
     // open the given file in an editor
@@ -202,12 +203,12 @@ public class ZoomTestCase extends UITestCase {
      */
     protected void assertZoomed(IWorkbenchPart part) {
         if (part == null) {
-			assertFalse("Page should not be zoomed", isZoomed());
+            Assert.assertFalse("Page should not be zoomed", isZoomed());
         } else {
             // Assert that the part is zoomed
-			assertTrue("Expecting " + partName(part) + " to be zoomed", isZoomed(part));
+            Assert.assertTrue("Expecting " + partName(part) + " to be zoomed", isZoomed(part));
             // Assert that the page is zoomed (paranoia check)
-			assertTrue("Page should be zoomed", isZoomed());
+            Assert.assertTrue("Page should be zoomed", isZoomed());
         }
     }
 
@@ -221,7 +222,7 @@ public class ZoomTestCase extends UITestCase {
         IWorkbenchPart activePart = page.getActivePart();
 
         // Assert that the part is active
-		assertTrue("Unexpected active part: expected " + partName(part)
+        Assert.assertTrue("Unexpected active part: expected " + partName(part)
                 + " and found " + partName(activePart), activePart == part);
 
         // If the part is an editor, assert that the editor is active
@@ -240,8 +241,9 @@ public class ZoomTestCase extends UITestCase {
 
     protected void assertActiveEditor(IEditorPart part) {
         IWorkbenchPart activeEditor = page.getActiveEditor();
-		assertTrue("Unexpected active editor: expected " + partName(part)
-                + " and found " + partName(activeEditor), activeEditor == part);        
+
+        Assert.assertTrue("Unexpected active editor: expected " + partName(part)
+                + " and found " + partName(activeEditor), activeEditor == part);
     }
 
     // returns true if the page is not zoomed, false otherwise
