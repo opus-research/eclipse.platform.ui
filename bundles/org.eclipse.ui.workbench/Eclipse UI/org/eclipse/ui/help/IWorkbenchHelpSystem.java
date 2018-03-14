@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2008 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 448674
  *******************************************************************************/
 package org.eclipse.ui.help;
 
 import java.net.URL;
-
 import org.eclipse.help.IContext;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.widgets.Control;
@@ -123,15 +123,15 @@ public interface IWorkbenchHelpSystem {
 	void displayHelpResource(String href);
 
 	/**
-	 * Calls the help support system to display the given help context id.
+	 * Calls the help support system to display the given help id.
 	 * <p>
 	 * May only be called from a UI thread.
 	 * <p>
 	 * 
-	 * @param contextId
+	 * @param helphelpContextId
 	 *            the id of the context to display
 	 */
-	void displayHelp(String contextId);
+	void displayHelp(String helphelpContextId);
 
 	/**
 	 * Displays context-sensitive help for the given context.
@@ -155,44 +155,44 @@ public interface IWorkbenchHelpSystem {
 	boolean isContextHelpDisplayed();
 
 	/**
-	 * Sets the given help context id on the given action.
+	 * Sets the given help id on the given action.
 	 * 
 	 * @param action
-	 *            the action on which to register the context id
-	 * @param contextId
-	 *            the context id to use when F1 help is invoked
+	 *            the action on which to register the id
+	 * @param helpContextId
+	 *            the id to use when F1 help is invoked
 	 */
-	void setHelp(IAction action, String contextId);
+	void setHelp(IAction action, String helpContextId);
 
 	/**
-	 * Sets the given help context id on the given control.
+	 * Sets the given help id on the given control.
 	 * 
 	 * @param control
-	 *            the control on which to register the context id
-	 * @param contextId
-	 *            the context id to use when F1 help is invoked
+	 *            the control on which to register the id
+	 * @param helpContextId
+	 *            the id to use when F1 help is invoked
 	 */
-	void setHelp(Control control, String contextId);
+	void setHelp(Control control, String helpContextId);
 
 	/**
-	 * Sets the given help context id on the given menu.
+	 * Sets the given help id on the given menu.
 	 * 
 	 * @param menu
-	 *            the menu on which to register the context id
-	 * @param contextId
-	 *            the context id to use when F1 help is invoked
+	 *            the menu on which to register the id
+	 * @param helpContextId
+	 *            the id to use when F1 help is invoked
 	 */
-	void setHelp(Menu menu, String contextId);
+	void setHelp(Menu menu, String helpContextId);
 
 	/**
-	 * Sets the given help context id on the given menu item.
+	 * Sets the given help id on the given menu item.
 	 * 
 	 * @param item
-	 *            the menu item on which to register the context id
-	 * @param contextId
-	 *            the context id to use when F1 help is invoked
+	 *            the menu item on which to register the id
+	 * @param helpContextId
+	 *            the id to use when F1 help is invoked
 	 */
-	void setHelp(MenuItem item, String contextId);
+	void setHelp(MenuItem item, String helpContextId);
 
 	/**
 	 * Resolves the help resource href by converting it into a legitimate URL
