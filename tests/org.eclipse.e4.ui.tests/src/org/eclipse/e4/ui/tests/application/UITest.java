@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 IBM Corporation and others.
+ * Copyright (c) 2012, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,22 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.application;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
+import org.junit.After;
+import org.junit.Before;
 
-public class UITest extends TestCase {
+public class UITest {
 
 	final static private String engineURI = "bundleclass://org.eclipse.e4.ui.tests/org.eclipse.e4.ui.tests.application.HeadlessContextPresentationEngine"; //$NON-NLS-1$
 
@@ -27,9 +31,8 @@ public class UITest extends TestCase {
 
 	private IPresentationEngine engine;
 
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() {
 
 		application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		applicationContext = E4Application.createDefaultContext();
@@ -39,10 +42,9 @@ public class UITest extends TestCase {
 		E4Application.initializeServices(application);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		applicationContext.dispose(); // used by the tests to dispose GUI?
-		super.tearDown();
 	}
 
 	protected IPresentationEngine getEngine() {

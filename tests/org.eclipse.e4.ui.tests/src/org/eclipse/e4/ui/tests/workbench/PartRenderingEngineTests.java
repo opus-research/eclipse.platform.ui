@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
@@ -46,16 +52,20 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
 import org.osgi.service.log.LogService;
 
-public class PartRenderingEngineTests extends TestCase {
+public class PartRenderingEngineTests {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
 	private LogListener listener = new LogListener() {
+		@Override
 		public void logged(LogEntry entry) {
 			if (!logged) {
 				logged = entry.getLevel() == LogService.LOG_ERROR;
@@ -64,8 +74,8 @@ public class PartRenderingEngineTests extends TestCase {
 	};
 	private boolean logged = false;
 
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		logged = false;
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
@@ -75,8 +85,8 @@ public class PartRenderingEngineTests extends TestCase {
 		logReaderService.addLogListener(listener);
 	}
 
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		LogReaderService logReaderService = appContext
 				.get(LogReaderService.class);
 		logReaderService.removeLogListener(listener);
@@ -102,6 +112,7 @@ public class PartRenderingEngineTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testCreateViewBug298415() {
 		final MWindow window = createWindowWithOneView("Part Name");
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
@@ -128,7 +139,8 @@ public class PartRenderingEngineTests extends TestCase {
 		}
 	}
 
-	public void testAddWindowBug299219() throws Exception {
+	@Test
+	public void testAddWindowBug299219() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -149,7 +161,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(window2.getWidget());
 	}
 
-	public void testPartStack_SetActiveChildBug299379() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChildBug299379() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -186,7 +199,8 @@ public class PartRenderingEngineTests extends TestCase {
 				1, tabFolder.getSelectionIndex());
 	}
 
-	public void testPartStack_SetActiveChild2Bug299379() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChild2Bug299379() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -223,7 +237,8 @@ public class PartRenderingEngineTests extends TestCase {
 				1, tabFolder.getSelectionIndex());
 	}
 
-	public void testPartStack_SetActiveChild3Bug299379() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChild3Bug299379() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -260,7 +275,8 @@ public class PartRenderingEngineTests extends TestCase {
 				stack.getSelectedElement());
 	}
 
-	public void testPartStack_SetActiveChild4Bug299379() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChild4Bug299379() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -295,7 +311,8 @@ public class PartRenderingEngineTests extends TestCase {
 				1, tabFolder.getSelectionIndex());
 	}
 
-	public void testPartStack_SetActiveChild5Bug295250() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChild5Bug295250() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -327,7 +344,8 @@ public class PartRenderingEngineTests extends TestCase {
 				partB.getObject());
 	}
 
-	public void testPartStack_SetActiveChild6Bug298797() throws Exception {
+	@Test
+	public void testPartStack_SetActiveChild6Bug298797() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -362,7 +380,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(partB, stack.getSelectedElement());
 	}
 
-	public void testCreateGuiBug301021() throws Exception {
+	@Test
+	public void testCreateGuiBug301021() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -420,6 +439,7 @@ public class PartRenderingEngineTests extends TestCase {
 			;
 	}
 
+	@Test
 	public void testPart_ToBeRendered() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -461,7 +481,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(partA, stack.getSelectedElement());
 	}
 
-	public void testPart_ToBeRendered2() throws Exception {
+	@Test
+	public void testPart_ToBeRendered2() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -502,6 +523,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(partB.getObject());
 	}
 
+	@Test
 	public void testClientObjectUnsetWhenNotRenderedBug301439() {
 		final MWindow window = createWindowWithOneView("");
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
@@ -532,6 +554,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(0, tabFolder.getItemCount());
 	}
 
+	@Test
 	public void testCTabItem_SetControl_Bug304211() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -588,6 +611,7 @@ public class PartRenderingEngineTests extends TestCase {
 				partB.getWidget(), item2.getControl());
 	}
 
+	@Test
 	public void testToBeRenderedCausesSelectionChanges() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -630,6 +654,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(partB, stack.getSelectedElement());
 	}
 
+	@Test
 	public void testSetSelectedElement() {
 		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 
@@ -667,6 +692,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue("Exception should have been thrown", causedException);
 	}
 
+	@Test
 	public void testSelectedElementNullingTBR() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -716,6 +742,7 @@ public class PartRenderingEngineTests extends TestCase {
 				container.getSelectedElement() == null);
 	}
 
+	@Test
 	public void testSelectedElementNullingParentChange() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -765,6 +792,7 @@ public class PartRenderingEngineTests extends TestCase {
 				container.getSelectedElement() == null);
 	}
 
+	@Test
 	public void testCreateGuiBug301950() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -791,6 +819,7 @@ public class PartRenderingEngineTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testRemoveGuiBug307578() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -838,7 +867,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(1, folder.getItemCount());
 	}
 
-	public void testRemoveGuiBug324033() throws Exception {
+	@Test
+	public void testRemoveGuiBug324033() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -883,6 +913,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(partB.getObject());
 	}
 
+	@Test
 	public void testRemoveGuiBug323496() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -924,7 +955,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(part.getObject());
 	}
 
-	public void testBug324839() throws Exception {
+	@Test
+	public void testBug324839() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		application.setContext(appContext);
@@ -962,6 +994,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(partB.getObject());
 	}
 
+	@Test
 	public void testBug317591_NonSharedPart() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -991,6 +1024,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(partA.getObject());
 	}
 
+	@Test
 	public void testBug317591_SharedPart() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1036,6 +1070,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(partA.getObject());
 	}
 
+	@Test
 	public void testRemoveGuiBug324228_1() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1093,6 +1128,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(perspectiveA.getContext(), part.getContext().getParent());
 	}
 
+	@Test
 	public void testRemoveGuiBug324228_2() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1149,6 +1185,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(perspectiveA.getContext(), part.getContext().getParent());
 	}
 
+	@Test
 	public void testRemoveGuiBug324228_3() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1208,6 +1245,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(perspectiveA.getContext(), part.getContext().getParent());
 	}
 
+	@Test
 	public void testRemoveGuiBug324228_4() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1268,6 +1306,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(perspectiveA.getContext(), part.getContext().getParent());
 	}
 
+	@Test
 	public void testRemoveGuiBug324230() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1298,6 +1337,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(sashContainer.getWidget());
 	}
 
+	@Test
 	public void testBug317849() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1336,6 +1376,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(sashContainer.getWidget());
 	}
 
+	@Test
 	public void testBug326087() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1378,6 +1419,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(partB, partStack.getSelectedElement());
 	}
 
+	@Test
 	public void testBug327701() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1440,6 +1482,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(perspectiveA.getContext(), part2.getContext().getParent());
 	}
 
+	@Test
 	public void testBug326699() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1507,6 +1550,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(view2.nullParentContext);
 	}
 
+	@Test
 	public void testBug327807() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1537,6 +1581,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(part1, partStack.getSelectedElement());
 	}
 
+	@Test
 	public void testBug328629() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1558,6 +1603,7 @@ public class PartRenderingEngineTests extends TestCase {
 		partSashContainer.setToBeRendered(true);
 	}
 
+	@Test
 	public void test331685() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1583,6 +1629,7 @@ public class PartRenderingEngineTests extends TestCase {
 		engine.removeGui(part);
 	}
 
+	@Test
 	public void testBug331795_1() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1613,6 +1660,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(part.getContext());
 	}
 
+	@Test
 	public void testBug331795_2() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1643,6 +1691,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(part.getContext());
 	}
 
+	@Test
 	public void testBug329079() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1661,6 +1710,7 @@ public class PartRenderingEngineTests extends TestCase {
 		wb.createAndRunUI(window);
 	}
 
+	@Test
 	public void testRemoveGui_Bug332163() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1729,6 +1779,7 @@ public class PartRenderingEngineTests extends TestCase {
 				perspectiveContext2.getActiveChild());
 	}
 
+	@Test
 	public void testBug334644_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1756,6 +1807,7 @@ public class PartRenderingEngineTests extends TestCase {
 				window.getContext());
 	}
 
+	@Test
 	public void testBug334644_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1783,6 +1835,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull("No context for an unrendered window", window.getContext());
 	}
 
+	@Test
 	public void testRemoveGui_Bug334577_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1819,6 +1872,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(detachedWindow.getWidget());
 	}
 
+	@Test
 	public void testRemoveGui_Bug334577_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1849,6 +1903,7 @@ public class PartRenderingEngineTests extends TestCase {
 	 * Test to ensure that we don't get an exception while rendering a child of
 	 * an MTrimBar that doesn't have its element id set.
 	 */
+	@Test
 	public void testBug336139() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1872,6 +1927,7 @@ public class PartRenderingEngineTests extends TestCase {
 		wb.createAndRunUI(window);
 	}
 
+	@Test
 	public void testBut336225() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1902,6 +1958,7 @@ public class PartRenderingEngineTests extends TestCase {
 				impl.shellEagerlyDestroyed);
 	}
 
+	@Test
 	public void testBug330662() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1974,6 +2031,7 @@ public class PartRenderingEngineTests extends TestCase {
 	 * Ensure that adding a detached window to a window will cause it to get
 	 * rendered automatically.
 	 */
+	@Test
 	public void testBug335444_A() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -1999,6 +2057,7 @@ public class PartRenderingEngineTests extends TestCase {
 	 * Ensure that adding a detached window to a perspective will cause it to
 	 * get rendered automatically.
 	 */
+	@Test
 	public void testBug335444_B() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2034,6 +2093,7 @@ public class PartRenderingEngineTests extends TestCase {
 	 * Ensure that switching the state of the 'toBeRendered' flag of a detached
 	 * window of a window will cause it to be rendered.
 	 */
+	@Test
 	public void testBug335444_C() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2062,6 +2122,7 @@ public class PartRenderingEngineTests extends TestCase {
 	 * Ensure that switching the state of the 'toBeRendered' flag of a detached
 	 * window of a perspective will cause it to be rendered.
 	 */
+	@Test
 	public void testBug335444_D() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2096,7 +2157,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(detachedWindow.getRenderer());
 	}
 
-	public void testBug326175(boolean visible) {
+	private void testBug326175(boolean visible) {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -2127,14 +2188,17 @@ public class PartRenderingEngineTests extends TestCase {
 		}
 	}
 
-	public void TODOtestBug326175_True() {
+	@Test
+	public void testBug326175_True() {
 		testBug326175(true);
 	}
 
+	@Test
 	public void testBug326175_False() {
 		testBug326175(false);
 	}
 
+	@Test
 	public void testCreateGui_Bug319004() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2159,6 +2223,7 @@ public class PartRenderingEngineTests extends TestCase {
 		engine.createGui(toolBar);
 	}
 
+	@Test
 	public void testBug339286() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2210,6 +2275,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(widgetB.isDisposed());
 	}
 
+	@Test
 	public void testBug334580_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2291,6 +2357,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(toolBar.getWidget());
 	}
 
+	@Test
 	public void testBug334580_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2352,6 +2419,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(controlB.isDisposed());
 	}
 
+	@Test
 	public void testBug334580_03() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2387,6 +2455,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(logged);
 	}
 
+	@Test
 	public void testBug342439_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2427,6 +2496,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(partA.getWidget());
 	}
 
+	@Test
 	public void testBug342439_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2465,7 +2535,8 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(1, folder.getItemCount());
 	}
 
-	public void testBug342366() throws Exception {
+	@Test
+	public void testBug342366() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
@@ -2501,6 +2572,7 @@ public class PartRenderingEngineTests extends TestCase {
 		checkLog();
 	}
 
+	@Test
 	public void testBug343305() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2571,6 +2643,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(parent, stackIntermediate.getParent());
 	}
 
+	@Test
 	public void testBug343442() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2622,6 +2695,7 @@ public class PartRenderingEngineTests extends TestCase {
 				.getParent().getParent());
 	}
 
+	@Test
 	public void testBug343524() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2649,6 +2723,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(trimBar.getWidget());
 	}
 
+	@Test
 	public void testBug332463() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2708,6 +2783,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(area.isToBeRendered());
 	}
 
+	@Test
 	public void testBug348215_PartOnlyContextReparent() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2740,6 +2816,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(part.getContext().getParent() == window.getContext());
 	}
 
+	@Test
 	public void testBug348215_PartContextReparent() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2776,6 +2853,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(part.getContext().getParent() == window.getContext());
 	}
 
+	@Test
 	public void testBug348215_PartPlaceholderContextReparent() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2816,6 +2894,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(part.getContext().getParent() == window.getContext());
 	}
 
+	@Test
 	public void testBug349076() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2861,6 +2940,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(part.getContext().getParent() == detachedWindow.getContext());
 	}
 
+	@Test
 	public void testBug369229() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -2897,6 +2977,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNotNull(partB.getWidget());
 	}
 
+	@Test
 	public void testBug348069_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2924,6 +3005,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(application.getChildren().contains(window));
 	}
 
+	@Test
 	public void testBug348069_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2968,6 +3050,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(application.getChildren().contains(windowA));
 	}
 
+	@Test
 	public void testBug348069_DetachedWindow_01() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -2998,6 +3081,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(window.getWindows().contains(detachedWindow));
 	}
 
+	@Test
 	public void testBug348069_DetachedWindow_02() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -3032,6 +3116,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(window.getWindows().contains(detachedWindow));
 	}
 
+	@Test
 	public void testBug348069_DetachedWindow_03() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -3120,10 +3205,12 @@ public class PartRenderingEngineTests extends TestCase {
 		assertTrue(perspective.getWindows().contains(detachedWindow));
 	}
 
+	@Test
 	public void testBug348069_DetachedPerspectiveWindow_01_TRUE() {
 		testBug348069_DetachedPerspectiveWindow_01(true);
 	}
 
+	@Test
 	public void testBug348069_DetachedPerspectiveWindow_01_FALSE() {
 		testBug348069_DetachedPerspectiveWindow_01(false);
 	}
@@ -3196,14 +3283,17 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(perspective.getWindows().contains(detachedWindow));
 	}
 
+	@Test
 	public void testBug348069_DetachedPerspectiveWindow_02_TRUE() {
 		testBug348069_DetachedPerspectiveWindow_02(true);
 	}
 
+	@Test
 	public void testBug348069_DetachedPerspectiveWindow_02_FALSE() {
 		testBug348069_DetachedPerspectiveWindow_02(false);
 	}
 
+	@Test
 	public void testBug371100() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -3228,6 +3318,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(logged);
 	}
 
+	@Test
 	public void testBug372226() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -3254,6 +3345,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertEquals(subShell, control.getParent());
 	}
 
+	@Test
 	public void testBug374326() {
 		MTrimmedWindow window = BasicFactoryImpl.eINSTANCE
 				.createTrimmedWindow();
@@ -3306,6 +3398,7 @@ public class PartRenderingEngineTests extends TestCase {
 		return window;
 	}
 
+	@Test
 	public void test369434() {
 		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 
@@ -3331,6 +3424,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertFalse(logged);
 	}
 
+	@Test
 	public void test_persistState_371087() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -3362,6 +3456,7 @@ public class PartRenderingEngineTests extends TestCase {
 		assertNull(part.getContext());
 	}
 
+	@Test
 	public void test_persistState_371087_1() {
 		MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
