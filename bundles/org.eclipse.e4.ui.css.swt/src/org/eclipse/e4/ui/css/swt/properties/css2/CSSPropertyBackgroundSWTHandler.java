@@ -11,6 +11,7 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.css2;
 
+import java.lang.reflect.Method;
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.AbstractCSSPropertyBackgroundHandler;
 import org.eclipse.e4.ui.css.core.dom.properties.css2.ICSSPropertyBackgroundHandler;
@@ -27,6 +28,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.css.CSSValue;
 
@@ -71,6 +73,18 @@ AbstractCSSPropertyBackgroundHandler {
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = (Widget) ((WidgetElement) element).getNativeWidget();
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
+
+			// SWT currently only supports native transparency for Button and Label widgets
+			if ("transparent".equals(value.getCssText())) {
+				if ((widget instanceof Button) || (widget instanceof Label)) {
+					Control control = (Control) widget;
+					control.setBackground(null);
+					control.setBackgroundImage(null);
+				}
+
+				return;
+			}
+
 			Color newColor = (Color) engine.convert(value, Color.class, widget
 					.getDisplay());
 			if (widget instanceof CTabItem) {
@@ -157,6 +171,22 @@ AbstractCSSPropertyBackgroundHandler {
 						.getSelectionBackground();
 			} else {
 				color = ((CTabItem) widget).getParent().getBackground();
+			}
+		} else if ((widget instanceof Button) || widget instanceof Label) {
+			color = ((Control) widget).getBackground();
+			// special handling: Buttons and Labels with no background color and
+			// no background image are transparent. Unfortunately,
+			// getBackground()
+			// will return the default color, if it is set to null, so we have
+			// to
+			// get the transparency property via reflection here :(
+			Method drawsBackgroundMethod = widget.getClass().getDeclaredMethod(
+					"drawsBackground");
+			drawsBackgroundMethod.setAccessible(true);
+			Boolean drawsBackground = (Boolean) drawsBackgroundMethod
+					.invoke(widget);
+			if (!drawsBackground) {
+				return "transparent";
 			}
 		} else if (widget instanceof Control) {
 			color = ((Control) widget).getBackground();
