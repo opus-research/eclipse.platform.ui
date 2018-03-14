@@ -641,10 +641,7 @@ public final class ContributionsAnalyzer {
 					continue;
 				}
 				Object[] array = item.getChildren().toArray();
-				int idx = getIndex(toContribute, item.getPositionInParent());
-				if (idx == -1) {
-					idx = 0;
-				}
+				int idx = 0;
 				for (int c = 0; c < array.length; c++) {
 					MMenuElement me = (MMenuElement) array[c];
 					if (!containsMatching(toContribute.getChildren(), me)) {

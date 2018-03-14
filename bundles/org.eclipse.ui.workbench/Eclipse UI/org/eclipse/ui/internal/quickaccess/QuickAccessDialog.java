@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
  *     René Brandstetter - Bug 433778
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 436101
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
@@ -19,7 +18,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.jface.bindings.TriggerSequence;
@@ -88,16 +86,13 @@ public class QuickAccessDialog extends PopupDialog {
 
 					@Override
 					public void run() {
-						final CommandProvider commandProvider = new CommandProvider();
-						commandProvider.setSnapshot(new ExpressionContext(model.getContext()
-								.getActiveLeaf()));
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
 								new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
-								new PerspectiveProvider(), commandProvider, new ActionProvider(),
-								new WizardProvider(), new PreferenceProvider(),
-								new PropertiesProvider() };
+								new PerspectiveProvider(),
+								new CommandProvider(), new ActionProvider(), new WizardProvider(),
+								new PreferenceProvider(), new PropertiesProvider() };
 						providerMap = new HashMap();
 						for (int i = 0; i < providers.length; i++) {
 							providerMap.put(providers[i].getId(), providers[i]);
@@ -259,7 +254,6 @@ public class QuickAccessDialog extends PopupDialog {
 				.applyTo(filterText);
 
 		contents.hookFilterText(filterText);
-		filterText.addKeyListener(getKeyAdapter());
 
 		return filterText;
 	}
@@ -333,7 +327,7 @@ public class QuickAccessDialog extends PopupDialog {
 
 	@Override
 	protected Point getDefaultSize() {
-		return new Point(600, 420);
+		return new Point(350, 420);
 	}
 
 	@Override
