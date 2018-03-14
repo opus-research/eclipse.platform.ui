@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Benjamin Muskalla -	Bug 29633 [EditorMgmt] "Open" menu should
  *     						have Open With-->Other
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485 
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -210,9 +209,11 @@ public class OpenWithMenu extends ContributionItem {
                 case SWT.Selection:
                    	EditorSelectionDialog dialog = new EditorSelectionDialog(
 							menu.getShell());
-					String fileName = fileResource.getName();
-					dialog.setFileName(fileName);
-					dialog.setMessage(NLS.bind(IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription, fileName));
+					dialog
+							.setMessage(NLS
+									.bind(
+											IDEWorkbenchMessages.OpenWithMenu_OtherDialogDescription,
+											fileResource.getName()));
 					if (dialog.open() == Window.OK) {
 						IEditorDescriptor editor = dialog.getSelectedEditor();
 						if (editor != null) {
@@ -302,8 +303,7 @@ public class OpenWithMenu extends ContributionItem {
         if (this.file instanceof IFile) {
             return (IFile) this.file;
         }
-        IResource resource = this.file
-                .getAdapter(IResource.class);
+        IResource resource = this.file.getAdapter(IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
