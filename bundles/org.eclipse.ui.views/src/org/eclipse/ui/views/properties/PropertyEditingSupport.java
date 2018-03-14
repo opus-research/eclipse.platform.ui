@@ -57,7 +57,8 @@ public class PropertyEditingSupport extends EditingSupport {
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
+		for (int i = 0; i < propertyDescriptors.length; i++) {
+			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return true;
 			}
@@ -71,7 +72,8 @@ public class PropertyEditingSupport extends EditingSupport {
 				.getPropertySource(object);
 		IPropertyDescriptor[] propertyDescriptors = propertySource
 				.getPropertyDescriptors();
-		for (IPropertyDescriptor propertyDescriptor : propertyDescriptors) {
+		for (int i = 0; i < propertyDescriptors.length; i++) {
+			IPropertyDescriptor propertyDescriptor = propertyDescriptors[i];
 			if (propertyID.equals(propertyDescriptor.getId())) {
 				return propertyDescriptor
 						.createPropertyEditor((Composite) getViewer()
