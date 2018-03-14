@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -153,9 +154,12 @@ public abstract class WorkspaceAction extends SelectionListenerAction {
 		subMonitor.setTaskName(getOperationMessage());
 		for (IResource resource : resources) {
 			try {
-				invokeOperation(resource, subMonitor.split(1));
+				invokeOperation(resource, subMonitor.newChild(1));
 			} catch (CoreException e) {
 				errors = recordError(errors, e);
+			}
+			if (subMonitor.isCanceled()) {
+				throw new OperationCanceledException();
 			}
 		}
 		return errors == null ? Status.OK_STATUS : errors;

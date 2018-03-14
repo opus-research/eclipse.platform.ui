@@ -109,7 +109,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		// this will trigger style()
 		String id = me.getElementId();
 		if (id != null) {
-			id = id.replace('.', '-');
+			id = id.replace(".", "-"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		engine.setClassnameAndId(widget, cssClassStr, id);
 	}
