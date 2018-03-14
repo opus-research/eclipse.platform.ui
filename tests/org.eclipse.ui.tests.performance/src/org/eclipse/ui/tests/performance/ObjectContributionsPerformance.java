@@ -62,7 +62,7 @@ public class ObjectContributionsPerformance extends BasicPerformanceTest {
 	
 	protected static IStructuredSelection generateAdaptableSelection(int seed, int size) {
 		Random rand = new Random(seed);
-		List selection = new ArrayList();
+		List<Object> selection = new ArrayList<Object>();
 		for (int i = 0; i < size; i++) {
 			switch ((int) Math.round(rand.nextDouble() * 5)) {
 				case 0 :

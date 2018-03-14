@@ -94,7 +94,7 @@ public class FilteredTestSuite extends TestSuite {
     }
 
     private void addFilteredTestSuite(TestSuite testSuite) {
-		for(Enumeration allTests = testSuite.tests(); allTests.hasMoreElements(); ) {
+		for(Enumeration<Test> allTests = testSuite.tests(); allTests.hasMoreElements(); ) {
 			Object subTest = allTests.nextElement();
 			
 			if (subTest instanceof TestSuite) {
@@ -106,7 +106,7 @@ public class FilteredTestSuite extends TestSuite {
 				continue;
 
 			if (filterTestClassName != null) {
-				Class testClass = subTest.getClass();
+				Class<? extends Object> testClass = subTest.getClass();
 				String subTestQualName = testClass.getName(); // qualified class name
 				if (subTestQualName == null)
 					subTestQualName = "";
