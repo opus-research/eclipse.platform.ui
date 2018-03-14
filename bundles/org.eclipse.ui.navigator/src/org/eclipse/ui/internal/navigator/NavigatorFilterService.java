@@ -47,13 +47,13 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	private final NavigatorContentService contentService;
 
 	/* Map of (ICommonFilterDescriptor, ViewerFilter)-pairs */
-	private final Map<ICommonFilterDescriptor, ViewerFilter> declaredViewerFilters = new HashMap<ICommonFilterDescriptor, ViewerFilter>();
+	private final Map declaredViewerFilters = new HashMap();
 
 	/* Set of ViewerFilters enforced from visible/active content extensions */
 	private final Set enforcedViewerFilters = new HashSet();
 
 	/* A set of active filter String ids */
-	private final Set<String> activeFilters = new HashSet<String>();
+	private final Set activeFilters = new HashSet();
 
 	/**
 	 * @param aContentService
@@ -106,7 +106,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			 */
 			StringBuffer activatedFiltersPreferenceValue = new StringBuffer(DELIM);
 
-			for (Iterator<String> activeItr = activeFilters.iterator(); activeItr.hasNext();) {
+			for (Iterator activeItr = activeFilters.iterator(); activeItr.hasNext();) {
 				String id = activeItr.next().toString();
 				if (!dm.getFilterById(id).isVisibleInUi())
 					continue;
@@ -145,7 +145,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		CommonFilterDescriptor[] descriptors = CommonFilterDescriptorManager
 				.getInstance().findVisibleFilters(contentService);
 
-		List<ViewerFilter> filters = new ArrayList<ViewerFilter>();
+		List filters = new ArrayList();
 
 		ViewerFilter instance;
 		for (int i = 0; i < descriptors.length; i++) {
@@ -163,7 +163,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 		if (filters.size() == 0) {
 			return NO_FILTERS;
 		}
-		return filters
+		return (ViewerFilter[]) filters
 				.toArray(new ViewerFilter[filters.size()]);
 	}
 
@@ -176,7 +176,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 	public ViewerFilter getViewerFilter(ICommonFilterDescriptor descriptor) {
 		ViewerFilter filter = null;
 		synchronized (declaredViewerFilters) {
-			filter = declaredViewerFilters.get(descriptor);
+			filter = (ViewerFilter) declaredViewerFilters.get(descriptor);
 			if (filter == null) {
 				declaredViewerFilters.put(descriptor,
 						(filter = ((CommonFilterDescriptor) descriptor)
@@ -237,7 +237,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 
 		int indexofFilterIdToBeActivated;
 
-		List<String> nonUiVisible = null;
+		List nonUiVisible = null;
 		
 		/* is there a delta? */
 		for (int i = 0; i < visibleFilterDescriptors.length; i++) {
@@ -254,7 +254,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			// We don't turn of non-UI visible filters here, they have to be manipulated explicitly
 			if (!visibleFilterDescriptors[i].isVisibleInUi()) {
 				if (nonUiVisible == null)
-					nonUiVisible = new ArrayList<String>();
+					nonUiVisible = new ArrayList();
 				nonUiVisible.add(visibleFilterDescriptors[i].getId());
 			}
 		}
@@ -264,7 +264,7 @@ public class NavigatorFilterService implements INavigatorFilterService {
 			if (nonUiVisible != null) {
 				for (int i = 0; i < filterIdsToActivate.length; i++)
 					nonUiVisible.add(filterIdsToActivate[i]);
-				filterIdsToActivate = nonUiVisible.toArray(new String[]{});
+				filterIdsToActivate = (String[]) nonUiVisible.toArray(new String[]{});
 			}
 			
 			setActiveFilterIds(filterIdsToActivate);
