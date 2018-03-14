@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,12 +19,8 @@ import org.eclipse.swt.widgets.Control;
 public class ProgressViewerLabelProvider extends LabelProvider {
     private Control control;
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
-     */
-    public String getText(Object element) {
+    @Override
+	public String getText(Object element) {
         JobTreeElement info = (JobTreeElement) element;
         return ProgressManagerUtil.shortenText(
                 info.getCondensedDisplayString(), control);
