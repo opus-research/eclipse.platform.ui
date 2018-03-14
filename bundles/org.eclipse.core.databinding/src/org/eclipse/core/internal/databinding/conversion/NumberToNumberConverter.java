@@ -23,7 +23,7 @@ import com.ibm.icu.text.NumberFormat;
  *
  * @since 1.0
  */
-public abstract class NumberToNumberConverter extends Converter<Object, Object> {
+public abstract class NumberToNumberConverter extends Converter {
 	private NumberFormat numberFormat;
 
 	private boolean primitive;
@@ -31,7 +31,7 @@ public abstract class NumberToNumberConverter extends Converter<Object, Object> 
 	private String outOfRangeMessage;
 
 	protected NumberToNumberConverter(NumberFormat numberFormat,
-			Class<?> fromType, Class<?> toType) {
+			Class fromType, Class toType) {
 		super(fromType, toType);
 		this.numberFormat = numberFormat;
 		this.primitive = toType.isPrimitive();

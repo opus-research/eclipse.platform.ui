@@ -24,33 +24,30 @@ import org.eclipse.core.databinding.property.list.ListProperty;
  * @since 3.3
  *
  */
-public final class DataBindingContextBindingsProperty extends
-		ListProperty<DataBindingContext, Binding<?, ?>> {
+public final class DataBindingContextBindingsProperty extends ListProperty {
 	@Override
 	public Object getElementType() {
 		return Binding.class;
 	}
 
 	@Override
-	protected List<Binding<?, ?>> doGetList(DataBindingContext source) {
-		return source.getBindings();
+	protected List doGetList(Object source) {
+		return ((DataBindingContext) source).getBindings();
 	}
 
 	@Override
-	protected void doSetList(DataBindingContext source, List<Binding<?, ?>> list) {
+	protected void doSetList(Object source, List list) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
 	@Override
-	protected void doUpdateList(DataBindingContext source,
-			ListDiff<Binding<?, ?>> diff) {
+	protected void doUpdateList(Object source, ListDiff diff) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
 	@Override
-	public IObservableList<Binding<?, ?>> observe(Realm realm,
-			DataBindingContext source) {
-		return source.getBindings();
+	public IObservableList observe(Realm realm, Object source) {
+		return ((DataBindingContext) source).getBindings();
 	}
 
 	@Override

@@ -18,12 +18,11 @@ import org.eclipse.core.runtime.IStatus;
  * String2IntValidator would only accept source Strings that can successfully be
  * converted to an integer value, and a PositiveIntegerValidator would only
  * accept positive integers.
- * 
- * @param <T>
- *            type of object being validated
+ *
  * @since 1.0
+ *
  */
-public interface IValidator<T> {
+public interface IValidator {
 
 	/**
 	 * Determines if the given value is valid.
@@ -33,6 +32,6 @@ public interface IValidator<T> {
 	 * @return a status object indicating whether the validation succeeded
 	 *         {@link IStatus#isOK()} or not. Never null.
 	 */
-	public IStatus validate(T value);
+	public IStatus validate(Object value);
 
 }

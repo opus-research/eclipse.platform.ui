@@ -17,13 +17,13 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * List change event describing an incremental change of an
  * {@link IObservableSet} object.
- * 
+ *
  * @param <E>
- * 
+ *
  * @since 1.0
  *
  */
-public class SetChangeEvent<E> extends ObservableEvent<SetChangeEvent<E>> {
+public class SetChangeEvent<E> extends ObservableEvent {
 
 	/**
 	 *

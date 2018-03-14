@@ -97,7 +97,7 @@ public class Properties {
 	 *            domain set
 	 * @return an list of observable maps where each map observes the
 	 *         corresponding value property of the given domain set
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public static <S, E> List<IObservableMap<E, ?>> observeEach(
 			IObservableSet<E> domainSet,
@@ -125,7 +125,7 @@ public class Properties {
 	 *         corresponding value property on all elements in the given domain
 	 *         map's {@link Map#values() values} collection, for each property
 	 *         in the given array
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public static <K, V> List<IObservableMap<K, ?>> observeEach(
 			IObservableMap<K, V> domainMap,
@@ -212,7 +212,8 @@ public class Properties {
 	 * @return a value property which observes the value of an
 	 *         {@link IObservableValue}.
 	 */
-	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(Object valueType) {
+	public static <T> IValueProperty<IObservableValue<T>, T> observableValue(
+			Object valueType) {
 		return new ObservableValueProperty<T>(valueType);
 	}
 }

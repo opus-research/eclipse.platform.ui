@@ -15,15 +15,15 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 import org.eclipse.core.databinding.observable.ObservableEvent;
 
 /**
- * Value change event describing a change of an {@link IObservableValue} 
+ * Value change event describing a change of an {@link IObservableValue}
  * object's current value.
- * 
+ *
  * @param <T>
- * 
+ *
  * @since 1.0
  *
  */
-public class ValueChangeEvent<T> extends ObservableEvent<ValueChangeEvent<T>> {
+public class ValueChangeEvent<T> extends ObservableEvent {
 
 	/**
 	 *

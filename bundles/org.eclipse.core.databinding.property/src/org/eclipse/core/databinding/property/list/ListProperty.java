@@ -29,7 +29,7 @@ import org.eclipse.core.internal.databinding.property.ListPropertyDetailValuesLi
 
 /**
  * Abstract implementation of IListProperty.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <E>
@@ -67,7 +67,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	 *            the property source
 	 * @return a List with the current contents of the source's list property
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	protected List<E> doGetList(S source) {
 		IObservableList<E> observable = observe(source);
@@ -95,7 +95,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	 *            the property source
 	 * @param list
 	 *            the new list
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doSetList(S source, List<E> list) {
@@ -138,6 +138,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	@Override
 	public IObservableFactory<S, IObservableList<E>> listFactory() {
 		return new IObservableFactory<S, IObservableList<E>>() {
+			@Override
 			public IObservableList<E> createObservable(S target) {
 				return observe(target);
 			}
@@ -148,6 +149,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	public IObservableFactory<S, IObservableList<E>> listFactory(
 			final Realm realm) {
 		return new IObservableFactory<S, IObservableList<E>>() {
+			@Override
 			public IObservableList<E> createObservable(S target) {
 				return observe(realm, target);
 			}

@@ -17,7 +17,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * Map change event describing an incremental change of an
  * {@link IObservableMap} object.
- * 
+ *
  * @param <K>
  *            type of the keys to the map
  * @param <V>
@@ -25,7 +25,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * @since 1.0
  *
  */
-public class MapChangeEvent<K, V> extends ObservableEvent<MapChangeEvent<K, V>> {
+public class MapChangeEvent<K, V> extends ObservableEvent {
 
 	/**
 	 *

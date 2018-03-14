@@ -39,7 +39,7 @@ import org.eclipse.core.internal.databinding.property.list.SimplePropertyObserva
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <E>
@@ -69,7 +69,7 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public final void setList(S source, List<E> list, ListDiff<E> diff) {
 		if (source != null && !diff.isEmpty()) {

@@ -107,7 +107,7 @@ import org.eclipse.core.runtime.ListenerList;
 		return -1;
 	}
 
-	protected void fireEvent(ObservableEvent<?> event) {
+	protected void fireEvent(ObservableEvent event) {
 		/*
 		 * Note: We have a type safety warning here because the compiler cannot
 		 * be sure that we are passing an event only to listeners that can

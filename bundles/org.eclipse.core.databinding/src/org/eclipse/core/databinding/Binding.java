@@ -26,28 +26,23 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * This abstract class represents a binding between a model and a target. Newly
  * created instances need to be added to a data binding context using
  * {@link #init(DataBindingContext)}.
- * 
- * @param <M>
- * @param <T>
+ *
  * @since 1.0
  */
-public abstract class Binding<M extends IObservable, T extends IObservable>
-		extends ValidationStatusProvider {
+public abstract class Binding extends ValidationStatusProvider {
 
 	protected DataBindingContext context;
-	private T target;
-	private M model;
+	private IObservable target;
+	private IObservable model;
 	private IDisposeListener disposeListener;
 
 	/**
 	 * Creates a new binding.
 	 *
-	 * @param target
-	 *            target observable
-	 * @param model
-	 *            model observable
+	 * @param target target observable
+	 * @param model model observable
 	 */
-	public Binding(T target, M model) {
+	public Binding(IObservable target, IObservable model) {
 		this.target = target;
 		this.model = model;
 	}
@@ -118,22 +113,21 @@ public abstract class Binding<M extends IObservable, T extends IObservable>
 	public abstract void updateModelToTarget();
 
 	/**
-	 * Validates the target's state at the next reasonable opportunity. There is
-	 * no guarantee that the validation status will have been updated by the
-	 * time this call returns.
+	 * Validates the target's state at the next reasonable
+	 * opportunity. There is no guarantee that the validation status will have been updated
+	 * by the time this call returns.
 	 */
 	public abstract void validateTargetToModel();
 
 	/**
-	 * Validates the model's state at the next reasonable opportunity. There is
-	 * no guarantee that the validation status will have been updated by the
-	 * time this call returns.
+	 * Validates the model's state at the next reasonable
+	 * opportunity. There is no guarantee that the validation status will have been updated
+	 * by the time this call returns.
 	 */
 	public abstract void validateModelToTarget();
 
 	/**
-	 * Disposes of this Binding. Subclasses may extend, but must call
-	 * super.dispose().
+	 * Disposes of this Binding. Subclasses may extend, but must call super.dispose().
 	 */
 	@Override
 	public void dispose() {
@@ -158,7 +152,7 @@ public abstract class Binding<M extends IObservable, T extends IObservable>
 	/**
 	 * @param context
 	 */
-	/* package */void setDataBindingContext(DataBindingContext context) {
+	/* package */ void setDataBindingContext(DataBindingContext context) {
 		this.context = context;
 	}
 
@@ -167,14 +161,14 @@ public abstract class Binding<M extends IObservable, T extends IObservable>
 	 *
 	 * @return the target observable
 	 */
-	public T getTarget() {
+	public IObservable getTarget() {
 		return target;
 	}
 
 	@Override
-	public IObservableList<IObservable> getTargets() {
+	public IObservableList getTargets() {
 		return Observables.staticObservableList(context.getValidationRealm(),
-				Collections.<IObservable> singletonList(target));
+				Collections.singletonList(target));
 	}
 
 	/**
@@ -182,13 +176,13 @@ public abstract class Binding<M extends IObservable, T extends IObservable>
 	 *
 	 * @return the model observable
 	 */
-	public M getModel() {
+	public IObservable getModel() {
 		return model;
 	}
 
 	@Override
 	public IObservableList getModels() {
 		return Observables.staticObservableList(context.getValidationRealm(),
-				Collections.<IObservable> singletonList(model));
+				Collections.singletonList(model));
 	}
 }

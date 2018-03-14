@@ -17,12 +17,12 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
 /**
  * List change event describing an incremental change of an
  * {@link IObservableList} object.
- * 
+ *
  * @param <E>
- * 
+ *
  * @since 1.0
  */
-public class ListChangeEvent<E> extends ObservableEvent<ListChangeEvent<E>> {
+public class ListChangeEvent<E> extends ObservableEvent {
 
 	/**
 	 *

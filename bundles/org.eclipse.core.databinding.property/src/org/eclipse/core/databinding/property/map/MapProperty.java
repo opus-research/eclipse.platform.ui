@@ -29,7 +29,7 @@ import org.eclipse.core.internal.databinding.property.MapPropertyDetailValuesMap
 
 /**
  * Abstract implementation of IMapProperty
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <K>
@@ -68,7 +68,7 @@ public abstract class MapProperty<S, K, V> implements IMapProperty<S, K, V> {
 	 * @param source
 	 *            the property source
 	 * @return a Map with the current contents of the source's map property
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected Map<K, V> doGetMap(S source) {
@@ -97,7 +97,7 @@ public abstract class MapProperty<S, K, V> implements IMapProperty<S, K, V> {
 	 *            the property source
 	 * @param map
 	 *            the new map
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doSetMap(S source, Map<K, V> map) {
@@ -122,7 +122,7 @@ public abstract class MapProperty<S, K, V> implements IMapProperty<S, K, V> {
 	 *            the property source
 	 * @param diff
 	 *            a diff describing the change
-	 * @since 1.5
+	 * @since 1.6
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
 	protected void doUpdateMap(S source, MapDiff<K, V> diff) {
