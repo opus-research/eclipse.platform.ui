@@ -86,10 +86,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                 IPreferenceFilter[] matches = service.matches(prefs, filters);
                 PreferenceTransferElement[] returnTransfers = new PreferenceTransferElement[matches.length];
                 int index = 0;
-                for (int i = 0; i < matches.length; i++) {
-                    IPreferenceFilter filter = matches[i];
-                    for (int j = 0; j < transfers.length; j++) {
-                        PreferenceTransferElement element = transfers[j];
+                for (IPreferenceFilter filter : matches) {
+                    for (PreferenceTransferElement element : transfers) {
                         if (element.getFilter().equals(filter)) {
 							returnTransfers[index++] = element;
 						}
@@ -168,8 +166,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                     fis = new FileInputStream(importFile);
                 } catch (FileNotFoundException e) {
                     WorkbenchPlugin.log(e.getMessage(), e);
-					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
+					MessageDialog.open(MessageDialog.ERROR, getControl().getShell(), "", //$NON-NLS-1$
+							e.getLocalizedMessage(),
 							SWT.SHEET);
                     return false;
                 }
@@ -181,7 +179,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                 } catch (CoreException e) {
                     WorkbenchPlugin.log(e.getMessage(), e);
 					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
+							.getShell(), "", e.getLocalizedMessage(), //$NON-NLS-1$
 							SWT.SHEET);
                     return false;
                 }
@@ -193,7 +191,7 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
                 } catch (IOException e) {
                 	WorkbenchPlugin.log(e.getMessage(), e);
 					MessageDialog.open(MessageDialog.ERROR, getControl()
-							.getShell(), new String(), e.getLocalizedMessage(),
+							.getShell(), "", e.getLocalizedMessage(), //$NON-NLS-1$
 							SWT.SHEET);
                 }
 			}

@@ -97,6 +97,8 @@ public class WizardArchiveFileResourceExportPage1 extends
         compressContentsCheckbox.setText(DataTransferMessages.ZipExport_compressContents);
         compressContentsCheckbox.setFont(font);
 
+		createResolveLinkedResources(left, font);
+
         Composite right = new Composite(optionsGroup, SWT.NONE);
         right.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
         right.setLayout(new GridLayout(1, true));
@@ -196,6 +198,7 @@ public class WizardArchiveFileResourceExportPage1 extends
         op.setCreateLeadupStructure(createDirectoryStructureButton
                 .getSelection());
         op.setUseCompression(compressContentsCheckbox.getSelection());
+        op.setIncludeLinkedResources(resolveLinkedResourcesCheckbox.getSelection());
         op.setUseTarFormat(targzFormatButton.getSelection());
 
         try {
@@ -362,8 +365,8 @@ public class WizardArchiveFileResourceExportPage1 extends
 
             // destination
             setDestinationValue(directoryNames[0]);
-            for (int i = 0; i < directoryNames.length; i++) {
-				addDestinationItem(directoryNames[i]);
+            for (String directoryName : directoryNames) {
+				addDestinationItem(directoryName);
 			}
 
             boolean setStructure = settings

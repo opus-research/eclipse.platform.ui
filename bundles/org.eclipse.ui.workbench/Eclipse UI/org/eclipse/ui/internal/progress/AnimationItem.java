@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -19,13 +17,13 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.internal.WorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindow;
 
 /**
  * The AnimationItem is the class that manages the animation for the progress.
  */
 public abstract class AnimationItem {
-    WorkbenchWindow window;
+	IWorkbenchWindow window;
 
     interface IAnimationContainer {
         /**
@@ -58,7 +56,7 @@ public abstract class AnimationItem {
      * @param workbenchWindow
      *            the window being created
      */
-    public AnimationItem(WorkbenchWindow workbenchWindow) {
+	public AnimationItem(IWorkbenchWindow workbenchWindow) {
         this.window = workbenchWindow;
     }
 
@@ -87,12 +85,7 @@ public abstract class AnimationItem {
                 //Do nothing
             }
         });
-        animationItem.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
-                AnimationManager.getInstance().removeItem(AnimationItem.this);
-            }
-        });
+        animationItem.addDisposeListener(e -> AnimationManager.getInstance().removeItem(AnimationItem.this));
         AnimationManager.getInstance().addItem(this);
     }
 
@@ -158,7 +151,7 @@ public abstract class AnimationItem {
 	/**
 	 * @return Returns the window.
 	 */
-	public WorkbenchWindow getWindow() {
+	public IWorkbenchWindow getWindow() {
 		return window;
 	}
 }

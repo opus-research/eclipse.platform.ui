@@ -198,13 +198,6 @@ public interface IIDEActionConstants {
     public static final String GROUP_FILE = "group.file"; //$NON-NLS-1$
 
     /**
-     * Pop-up menu and cool bar: name of group for Edit actions (value <code>"group.edit"</code>).
-     * 
-     * @since 4.6
-     */
-    public static final String GROUP_EDIT = "group.edit"; //$NON-NLS-1$
-
-    /**
      * Coolbar: name of group for Navigate actions (value <code>"group.nav"</code>).
      */
     public static final String GROUP_NAV = "group.nav"; //$NON-NLS-1$

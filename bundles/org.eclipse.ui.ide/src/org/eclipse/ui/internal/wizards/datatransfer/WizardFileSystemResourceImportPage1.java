@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -198,7 +199,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         GridData buttonData = new GridData(GridData.FILL_HORIZONTAL);
         button.setLayoutData(buttonData);
 
-        button.setData(new Integer(id));
+        button.setData(id);
         button.setText(label);
 
         if (defaultButton) {
@@ -956,8 +957,8 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 			}
 
             // set filenames history
-            for (int i = 0; i < sourceNames.length; i++) {
-				sourceNameField.add(sourceNames[i]);
+            for (String sourceName : sourceNames) {
+				sourceNameField.add(sourceName);
 			}
 
             // radio buttons and checkboxes
@@ -1120,11 +1121,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 if (files == null) {
                     throw new InterruptedException();
                 }
-                for (int i = 0; i < files.length; i++) {
+                for (Object file : files) {
                     if (monitor.isCanceled()) {
 						throw new InterruptedException();
 					}
-                    checkFile(files[i]);
+                    checkFile(file);
                 }
             }
 

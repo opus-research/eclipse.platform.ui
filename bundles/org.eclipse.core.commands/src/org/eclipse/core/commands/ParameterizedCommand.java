@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.internal.commands.util.Util;
@@ -188,7 +189,7 @@ public final class ParameterizedCommand implements Comparable {
 			// This is it, so just return the current parameterizations.
 			for (int i = 0; i < parameterizationCount; i++) {
 				final Parameterization parameterization = (Parameterization) parameterizations.get(i);
-				final List<Parameterization> combination = new ArrayList<Parameterization>(1);
+				final List<Parameterization> combination = new ArrayList<>(1);
 				combination.add(parameterization);
 				parameterizations.set(i, combination);
 			}
@@ -204,7 +205,7 @@ public final class ParameterizedCommand implements Comparable {
 			// This is it, so just return the current parameterizations.
 			for (int i = 0; i < parameterizationCount; i++) {
 				final Parameterization parameterization = (Parameterization) parameterizations.get(i);
-				final List<Parameterization> combination = new ArrayList<Parameterization>(1);
+				final List<Parameterization> combination = new ArrayList<>(1);
 				combination.add(parameterization);
 				parameterizations.set(i, combination);
 			}
@@ -299,12 +300,9 @@ public final class ParameterizedCommand implements Comparable {
 		}
 
 		try {
-			ArrayList<Parameterization> parms = new ArrayList<Parameterization>();
-			Iterator<?> i = parameters.keySet().iterator();
-
-			// iterate over given parameters
-			while (i.hasNext()) {
-				String key = (String) i.next();
+			ArrayList<Parameterization> parms = new ArrayList<>();
+			for (Entry<?, ?> entry : ((Map<?, ?>) parameters).entrySet()) {
+				String key = (String) entry.getKey();
 				IParameter parameter = null;
 				// get the parameter from the command
 				parameter = command.getParameter(key);
@@ -315,16 +313,15 @@ public final class ParameterizedCommand implements Comparable {
 				}
 				ParameterType parameterType = command.getParameterType(key);
 				if (parameterType == null) {
-					parms.add(new Parameterization(parameter,
-							(String) parameters.get(key)));
+					parms.add(new Parameterization(parameter, (String) entry.getValue()));
 				} else {
 					AbstractParameterValueConverter valueConverter = parameterType
 							.getValueConverter();
 					if (valueConverter != null) {
-						String val = valueConverter.convertToString(parameters.get(key));
+						String val = valueConverter.convertToString(entry.getValue());
 						parms.add(new Parameterization(parameter, val));
 					} else {
-						parms.add(new Parameterization(parameter, (String) parameters.get(key)));
+						parms.add(new Parameterization(parameter, (String) entry.getValue()));
 					}
 				}
 			}
@@ -385,10 +382,9 @@ public final class ParameterizedCommand implements Comparable {
 		if (parameterizations != null && parameterizations.length>0 && parms != null) {
 			int parmIndex = 0;
 			Parameterization[] params = new Parameterization[parameterizations.length];
-			for (int j = 0; j < parms.length; j++) {
-				for (int i = 0; i < parameterizations.length; i++) {
-					Parameterization pm = parameterizations[i];
-					if (parms[j].equals(pm.getParameter())) {
+			for (IParameter parm : parms) {
+				for (Parameterization pm : parameterizations) {
+					if (parm.equals(pm.getParameter())) {
 						params[parmIndex++] = pm;
 					}
 				}
@@ -594,9 +590,8 @@ public final class ParameterizedCommand implements Comparable {
 			return Collections.EMPTY_MAP;
 		}
 
-		final Map<String, String> parameterMap = new HashMap<String, String>();
-		for (int i = 0; i < parameterizations.length; i++) {
-			final Parameterization parameterization = parameterizations[i];
+		final Map<String, String> parameterMap = new HashMap<>();
+		for (final Parameterization parameterization : parameterizations) {
 			parameterMap.put(parameterization.getParameter().getId(), parameterization.getValue());
 		}
 		return parameterMap;
@@ -608,8 +603,8 @@ public final class ParameterizedCommand implements Comparable {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(command);
 			hashCode = hashCode * HASH_FACTOR;
 			if (parameterizations != null) {
-				for (int i = 0; i < parameterizations.length; i++) {
-					hashCode += Util.hashCode(parameterizations[i]);
+				for (Parameterization parameterization : parameterizations) {
+					hashCode += Util.hashCode(parameterization);
 				}
 			}
 			if (hashCode == HASH_CODE_NOT_COMPUTED) {

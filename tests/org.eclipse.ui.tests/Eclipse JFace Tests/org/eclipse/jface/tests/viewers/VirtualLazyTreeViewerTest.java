@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,8 +15,6 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 
 public class VirtualLazyTreeViewerTest extends TreeViewerTest {
@@ -30,12 +28,7 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
     @Override
 	protected StructuredViewer createViewer(Composite parent) {
     	Tree tree = new Tree(parent, SWT.VIRTUAL);
-    	tree.addListener(SWT.SetData, new Listener(){
-
-			@Override
-			public void handleEvent(Event event) {
-				setDataCalls++;
-			}});
+		tree.addListener(SWT.SetData, event -> setDataCalls++);
         fTreeViewer = new TreeViewer(tree);
         fTreeViewer.setContentProvider(new TestModelLazyTreeContentProvider((TreeViewer) fTreeViewer));
         return fTreeViewer;
@@ -172,6 +165,10 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 		if (disableTestsBug347491) {
 			return;
 		}
+		if (disableTestsBug493357) {
+			System.out.println(getName() + " disabled due to Bug 493357");
+			return;
+		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
@@ -182,6 +179,10 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
     @Override
 	public void testInsertSiblings() {
 		if (disableTestsBug347491) {
+			return;
+		}
+		if (disableTestsBug493357) {
+			System.out.println(getName() + " disabled due to Bug 493357");
 			return;
 		}
 		if (setDataCalls == 0) {
@@ -208,6 +209,10 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 		if (disableTestsBug347491) {
 			return;
 		}
+		if (disableTestsBug493357) {
+			System.out.println(getName() + " disabled due to Bug 493357");
+			return;
+		}
 		if (setDataCalls == 0) {
 			System.err.println("SWT.SetData is not received. Cancelled test " + getName());
 			return;
@@ -218,6 +223,10 @@ public class VirtualLazyTreeViewerTest extends TreeViewerTest {
 	@Override
 	public void testWorldChanged() {
 		if (disableTestsBug347491) {
+			return;
+		}
+		if (disableTestsBug493357) {
+			System.out.println(getName() + " disabled due to Bug 493357");
 			return;
 		}
 		if (setDataCalls == 0) {

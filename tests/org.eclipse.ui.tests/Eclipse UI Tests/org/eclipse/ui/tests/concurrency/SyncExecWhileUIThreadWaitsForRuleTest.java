@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
+ * Copyright (c) 2009, 2017 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,12 +11,13 @@
 
 package org.eclipse.ui.tests.concurrency;
 
-import junit.framework.TestCase;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
+
+import junit.framework.TestCase;
 
 /**
  * This tests the simple traditional deadlock of a thread holding a scheduling rule trying
@@ -49,33 +50,29 @@ public class SyncExecWhileUIThreadWaitsForRuleTest extends TestCase {
 					//first make sure this background thread owns the lock
 					Job.getJobManager().beginRule(rule, null);
 					//spawn an asyncExec that will cause the UI thread to be blocked
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							blocked[0] = true;
+					Display.getDefault().asyncExec(() -> {
+						blocked[0] = true;
+						try {
 							Job.getJobManager().beginRule(rule, beginRuleMonitor);
+						} finally {
 							Job.getJobManager().endRule(rule);
-							blocked[0] = false;
 						}
+						blocked[0] = false;
 					});
 					//wait until the UI thread is blocked waiting for the lock
 					while (!blocked[0]) {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
-							e.printStackTrace();
 						}
 					}
 					//now attempt to do a syncExec that also acquires the lock
 					//this should succeed even while the above asyncExec is blocked, thanks to UISynchronizer
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							//use a timeout to avoid deadlock in case of regression
-							Job.getJobManager().beginRule(rule, null);
-							lockAcquired[0] = true;
-							Job.getJobManager().endRule(rule);
-						}
+					Display.getDefault().syncExec(() -> {
+						// use a timeout to avoid deadlock in case of regression
+						Job.getJobManager().beginRule(rule, null);
+						lockAcquired[0] = true;
+						Job.getJobManager().endRule(rule);
 					});
 				} finally {
 					Job.getJobManager().endRule(rule);
@@ -112,5 +109,10 @@ public class SyncExecWhileUIThreadWaitsForRuleTest extends TestCase {
 		}
 		//if the monitor was canceled then we got a deadlock
 		assertFalse("deadlock occurred", beginRuleMonitor.isCanceled());
+		// if we get here, the test succeeded
+		if (Thread.interrupted()) {
+			// TODO: re-enable this check after bug 505920 is fixed
+			// fail("Thread was interrupted at end of test");
+		}
 	}
 }

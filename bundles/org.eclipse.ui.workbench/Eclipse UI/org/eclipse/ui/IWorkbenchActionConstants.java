@@ -537,13 +537,6 @@ public interface IWorkbenchActionConstants {
     public static final String TOOLBAR_FILE = "org.eclipse.ui.workbench.file"; //$NON-NLS-1$
 
     /**
-     * Workbench toolbar id for edit toolbar group.
-     *
-     * @since 4.6
-     */
-    public static final String TOOLBAR_EDIT = "org.eclipse.ui.workbench.edit"; //$NON-NLS-1$
-
-    /**
      * Workbench toolbar id for navigate toolbar group.
      *
      * @since 2.1
@@ -589,17 +582,10 @@ public interface IWorkbenchActionConstants {
     public static final String SAVE_GROUP = "save.group"; //$NON-NLS-1$
 
     /**
-	 * Group id for build group.
-	 *
-	 * @since 4.6
-	 */
-	public static final String EDIT_GROUP = "edit.group"; //$NON-NLS-1$
-
-	/**
-	 * Group id for build group.
-	 *
-	 * @since 2.1
-	 */
+     * Group id for build group.
+     *
+     * @since 2.1
+     */
     public static final String BUILD_GROUP = "build.group"; //$NON-NLS-1$
 
     // Pop-up menu groups:

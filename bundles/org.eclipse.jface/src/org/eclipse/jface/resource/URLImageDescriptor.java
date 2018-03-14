@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 483465
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -38,34 +39,42 @@ import org.eclipse.swt.graphics.ImageFileNameProvider;
 class URLImageDescriptor extends ImageDescriptor {
 
 	private static class URLImageFileNameProvider implements ImageFileNameProvider {
-		private URL url;
+		private String url;
 
-		public URLImageFileNameProvider(URL url) {
+		public URLImageFileNameProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public String getImagePath(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
-				return null;
-			return getFilePath(xUrl, zoom == 100); // can be null!
+			URL tempURL = getURL(url);
+			if (tempURL != null) {
+				URL xUrl = getxURL(tempURL, zoom);
+				if (xUrl != null) {
+					return getFilePath(xUrl, zoom == 100);
+				}
+			}
+			return null;
 		}
 	}
 
 	private static class URLImageDataProvider implements ImageDataProvider {
-		private URL url;
+		private String url;
 
-		public URLImageDataProvider(URL url) {
+		public URLImageDataProvider(String url) {
 			this.url = url;
 		}
 
 		@Override
 		public ImageData getImageData(int zoom) {
-			URL xUrl = getxURL(url, zoom);
-			if (xUrl == null)
-				return null;
-			return URLImageDescriptor.getImageData(xUrl);
+			URL tempURL = getURL(url);
+			if (tempURL != null) {
+				URL xUrl = getxURL(tempURL, zoom);
+				if (xUrl != null) {
+					return URLImageDescriptor.getImageData(xUrl);
+				}
+			}
+			return null;
 		}
 	}
 
@@ -75,7 +84,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * Constant for the file protocol for optimized loading
 	 */
 	private static final String FILE_PROTOCOL = "file";  //$NON-NLS-1$
-	private URL url;
+	private String url;
 
 	/**
 	 * Creates a new URLImageDescriptor.
@@ -84,7 +93,7 @@ class URLImageDescriptor extends ImageDescriptor {
 	 *            The URL to load the image from. Must be non-null.
 	 */
 	URLImageDescriptor(URL url) {
-		this.url = url;
+		this.url = url.toExternalForm();
 	}
 
 	@Override
@@ -92,34 +101,33 @@ class URLImageDescriptor extends ImageDescriptor {
 		if (!(o instanceof URLImageDescriptor)) {
 			return false;
 		}
-		return ((URLImageDescriptor) o).url.toExternalForm().equals(this.url.toExternalForm());
+		return ((URLImageDescriptor) o).url.equals(this.url);
+	}
+
+	@Deprecated
+	@Override
+	public ImageData getImageData() {
+		return getImageData(getURL(url));
 	}
 
 	@Override
-	public ImageData getImageData() {
-		return getImageData(url);
+	public ImageData getImageData(int zoom) {
+		return new URLImageDataProvider(url).getImageData(zoom);
 	}
 
 	private static ImageData getImageData(URL url) {
 		ImageData result = null;
-		InputStream in = getStream(url);
-		if (in != null) {
-			try {
+		try (InputStream in = getStream(url)) {
+			if (in != null) {
 				result = new ImageData(in);
-			} catch (SWTException e) {
-				if (e.code != SWT.ERROR_INVALID_IMAGE) {
-					throw e;
-					// fall through otherwise
-				}
-			} finally {
-				try {
-					in.close();
-				} catch (IOException e) {
-					Policy.getLog().log(
-							new Status(IStatus.ERROR, Policy.JFACE, e
-									.getLocalizedMessage(), e));
-				}
 			}
+		} catch (SWTException e) {
+			if (e.code != SWT.ERROR_INVALID_IMAGE) {
+				throw e;
+				// fall through otherwise
+			}
+		} catch (IOException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
 		}
 		return result;
 	}
@@ -131,10 +139,14 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * @return the stream for loading the data
 	 */
 	protected InputStream getStream() {
-		return getStream(url);
+		return getStream(getURL(url));
 	}
 
 	private static InputStream getStream(URL url) {
+		if (url == null) {
+			return null;
+		}
+
 		try {
 			if (InternalPolicy.OSGI_AVAILABLE) {
 				URL platformURL = FileLocator.find(url);
@@ -157,7 +169,7 @@ class URLImageDescriptor extends ImageDescriptor {
 
 	@Override
 	public int hashCode() {
-		return url.toExternalForm().hashCode();
+		return url.hashCode();
 	}
 
 	/**
@@ -204,7 +216,6 @@ class URLImageDescriptor extends ImageDescriptor {
 	 * @return {@link String} or <code>null</code> if the file cannot be found
 	 */
 	private static String getFilePath(URL url, boolean logIOException) {
-
 		try {
 			if (!InternalPolicy.OSGI_AVAILABLE) {
 				if (FILE_PROTOCOL.equalsIgnoreCase(url.getProtocol()))
@@ -280,16 +291,19 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 
 			// Try to see if we can optimize using SWTs file based image support.
-			String path = getFilePath(url, true);
-			if (path != null) {
-				try {
-					return new Image(device, path);
-				} catch (SWTException exception) {
-					// If we fail fall back to the slower input stream method.
+			URL pathURL = getURL(url);
+			if (pathURL != null) {
+				String path = getFilePath(pathURL, true);
+				if (path != null) {
+					try {
+						return new Image(device, path);
+					} catch (SWTException exception) {
+						// If we fail fall back to the slower input stream
+						// method.
+					}
 				}
 			}
 			return super.createImage(returnMissingImageOnError, device);
-
 		} finally {
 			if (InternalPolicy.DEBUG_TRACE_URL_IMAGE_DESCRIPTOR) {
 				long time = System.nanoTime() - start;
@@ -299,4 +313,13 @@ class URLImageDescriptor extends ImageDescriptor {
 		}
 	}
 
+	private static URL getURL(String urlString) {
+		URL result = null;
+		try {
+			result = new URL(urlString);
+		} catch (MalformedURLException e) {
+			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
+		}
+		return result;
+	}
 }

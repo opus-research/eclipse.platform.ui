@@ -129,14 +129,7 @@ import org.eclipse.ui.part.ViewPart;
  * @since 3.2
  */
 public class CommonNavigator extends ViewPart implements ISetSelectionTarget, ISaveablePart, ISaveablesSource, IShowInTarget {
-
 	private static final String PERF_CREATE_PART_CONTROL= "org.eclipse.ui.navigator/perf/explorer/createPartControl"; //$NON-NLS-1$
-
-
-	private static final Class INAVIGATOR_CONTENT_SERVICE = INavigatorContentService.class;
-	private static final Class COMMON_VIEWER_CLASS = CommonViewer.class;
-	private static final Class ISHOW_IN_SOURCE_CLASS = IShowInSource.class;
-	private static final Class ISHOW_IN_TARGET_CLASS = IShowInTarget.class;
 
 	private static final String HELP_CONTEXT =  NavigatorPlugin.PLUGIN_ID + ".common_navigator"; //$NON-NLS-1$
 
@@ -163,7 +156,7 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	 */
 	protected IMemento memento;
 
-	private boolean isLinkingEnabled = false;
+	private boolean isLinkingEnabled;
 
 	private String LINKING_ENABLED = "CommonNavigator.LINKING_ENABLED"; //$NON-NLS-1$
 
@@ -200,8 +193,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	        INavigatorFilterService filterService = commonViewer
 					.getNavigatorContentService().getFilterService();
 			ViewerFilter[] visibleFilters = filterService.getVisibleFilters(true);
-			for (int i = 0; i < visibleFilters.length; i++) {
-				commonViewer.addFilter(visibleFilters[i]);
+			for (ViewerFilter visibleFilter : visibleFilters) {
+				commonViewer.addFilter(visibleFilter);
 			}
 
 			commonViewer.setSorter(new CommonViewerSorter());
@@ -233,9 +226,12 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 
 		commonActionGroup = createCommonActionGroup();
 		commonActionGroup.fillActionBars(getViewSite().getActionBars());
+		if (memento != null && commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).restoreState(memento);
+		}
 
 		ISaveablesLifecycleListener saveablesLifecycleListener = new ISaveablesLifecycleListener() {
-			ISaveablesLifecycleListener siteSaveablesLifecycleListener = (ISaveablesLifecycleListener) getSite()
+			ISaveablesLifecycleListener siteSaveablesLifecycleListener = getSite()
 					.getService(ISaveablesLifecycleListener.class);
 
 			@Override
@@ -342,7 +338,6 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 					.intValue() == 1
 					: false));
 		}
-
 	}
 
 	/**
@@ -360,6 +355,9 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 		super.saveState(aMemento);
 		commonManager.saveState(aMemento);
 		commonViewer.getNavigatorContentService().saveState(aMemento);
+		if (commonActionGroup instanceof IMementoAware) {
+			((IMementoAware) commonActionGroup).saveState(aMemento);
+		}
 	}
 
 	/**
@@ -449,15 +447,16 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	 *    have an adapter for the given class
 	 */
 	@Override
-	public Object getAdapter(Class adapter) {
-		if (adapter == COMMON_VIEWER_CLASS) {
-			return getCommonViewer();
-		} else if (adapter == INAVIGATOR_CONTENT_SERVICE) {
-			return getCommonViewer().getNavigatorContentService();
-		} else if (adapter == ISHOW_IN_TARGET_CLASS) {
-			return this;
-		} else if (adapter == ISHOW_IN_SOURCE_CLASS) {
-            return getShowInSource();
+	@SuppressWarnings("unchecked")
+	public <T> T getAdapter(Class<T> adapter) {
+		if (adapter == CommonViewer.class) {
+			return (T) getCommonViewer();
+		} else if (adapter == INavigatorContentService.class) {
+			return (T) getCommonViewer().getNavigatorContentService();
+		} else if (adapter == IShowInTarget.class) {
+			return (T) this;
+		} else if (adapter == IShowInSource.class) {
+			return (T) getShowInSource();
         }
 		return super.getAdapter(adapter);
 	}
@@ -652,8 +651,8 @@ public class CommonNavigator extends ViewPart implements ISetSelectionTarget, IS
 	@Override
 	public boolean isDirty() {
 		Saveable[] saveables = getSaveables();
-		for (int i = 0; i < saveables.length; i++) {
-			if(saveables[i].isDirty()) {
+		for (Saveable saveable : saveables) {
+			if(saveable.isDirty()) {
 				return true;
 			}
 		}

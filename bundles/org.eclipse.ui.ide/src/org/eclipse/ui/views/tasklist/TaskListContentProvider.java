@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.tasklist;
@@ -97,8 +98,8 @@ class TaskListContentProvider implements IStructuredContentProvider,
             return ""; //$NON-NLS-1$
         }
 
-        return NLS.bind(TaskListMessages.TaskList_statusSummaryVisible,new Integer(sum(visibleMarkerCounts)),
-		getStatusSummaryBreakdown(visibleMarkerCounts));
+        return NLS.bind(TaskListMessages.TaskList_statusSummaryVisible, sum(visibleMarkerCounts),
+        getStatusSummaryBreakdown(visibleMarkerCounts));
     }
 
     /**
@@ -109,7 +110,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
      */
     public String getStatusSummarySelected(IStructuredSelection selection) {
         int[] selectedMarkerCounts = getMarkerCounts(selection.toList());
-        return NLS.bind(TaskListMessages.TaskList_statusSummarySelected, new Integer(sum(selectedMarkerCounts)),
+        return NLS.bind(TaskListMessages.TaskList_statusSummarySelected, sum(selectedMarkerCounts),
 		getStatusSummaryBreakdown(selectedMarkerCounts) );
     }
 
@@ -120,11 +121,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
     private String getStatusSummaryBreakdown(int[] counts) {
         return NLS.bind(
 				TaskListMessages.TaskList_statusSummaryBreakdown,
-				new Object []{
-						new Integer(counts[TASKS]),
-						new Integer(counts[ERRORS]),
-						new Integer(counts[WARNINGS]),
-						new Integer(counts[INFOS])});
+				new Object[] { counts[TASKS], counts[ERRORS], counts[WARNINGS], counts[INFOS] });
     }
 
     /**
@@ -140,10 +137,9 @@ class TaskListContentProvider implements IStructuredContentProvider,
         TasksFilter filter = taskList.getFilter();
 
         if (filter.isShowingAll()) {
-            return NLS.bind(TaskListMessages.TaskList_titleSummaryUnfiltered, new Integer(visibleMarkerCount));
+            return NLS.bind(TaskListMessages.TaskList_titleSummaryUnfiltered, visibleMarkerCount);
         }
-		return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, new Integer(visibleMarkerCount),
-				new Integer(getTotalMarkerCount()));
+		return NLS.bind(TaskListMessages.TaskList_titleSummaryFiltered, visibleMarkerCount, getTotalMarkerCount());
     }
 
     /**
@@ -152,8 +148,8 @@ class TaskListContentProvider implements IStructuredContentProvider,
     private int sum(int[] counts) {
         int sum = 0;
 
-        for (int i = 0, l = counts.length; i < l; ++i) {
-            sum += counts[i];
+        for (int count : counts) {
+            sum += count;
         }
 
         return sum;
@@ -173,8 +169,8 @@ class TaskListContentProvider implements IStructuredContentProvider,
                 IMarker[] markers = root.findMarkers(null, true,
                         IResource.DEPTH_INFINITE);
 
-                for (int i = 0; i < markers.length; ++i) {
-                    if (isRootType(markers[i])) {
+                for (IMarker marker : markers) {
+                    if (isRootType(marker)) {
                         ++totalMarkerCount;
                     }
                 }
@@ -192,8 +188,8 @@ class TaskListContentProvider implements IStructuredContentProvider,
     private boolean isRootType(IMarker marker) {
         String[] rootTypes = TasksFilter.ROOT_TYPES;
 
-        for (int i = 0, l = rootTypes.length; i < l; ++i) {
-            if (MarkerUtil.isMarkerType(marker, rootTypes[i])) {
+        for (String rootType : rootTypes) {
+            if (MarkerUtil.isMarkerType(marker, rootType)) {
                 return true;
             }
         }
@@ -254,9 +250,7 @@ class TaskListContentProvider implements IStructuredContentProvider,
             if (resource != null) {
                 IMarker[] markers = resource.findMarkers(null, true, depth);
 
-                for (int j = 0; j < markers.length; ++j) {
-                    IMarker marker = markers[j];
-
+                for (IMarker marker : markers) {
                     if (filter.select(marker)) {
                         set.add(marker);
                     }
@@ -447,17 +441,15 @@ class TaskListContentProvider implements IStructuredContentProvider,
         final List removals = new ArrayList();
         final List changes = new ArrayList();
 
-        for (int i = 0; i < markerDeltas.length; i++) {
-            IMarkerDelta markerDelta = markerDeltas[i];
-
+        for (IMarkerDelta markerDelta : markerDeltas) {
             if (markerDelta == null) {
 				continue;
 			}
 
             int iKind = markerDelta.getKind();
 
-            for (int j = 0; j < TasksFilter.ROOT_TYPES.length; j++) {
-                if (markerDelta.isSubtypeOf(TasksFilter.ROOT_TYPES[j])) {
+            for (String rootType : TasksFilter.ROOT_TYPES) {
+                if (markerDelta.isSubtypeOf(rootType)) {
 
                     /*
                      * Updates the total count of markers given the applicable

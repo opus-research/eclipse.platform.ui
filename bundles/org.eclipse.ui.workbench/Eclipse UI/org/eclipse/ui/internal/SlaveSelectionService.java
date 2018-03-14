@@ -12,9 +12,8 @@
 package org.eclipse.ui.internal;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-
+import java.util.Map.Entry;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
@@ -27,10 +26,10 @@ import org.eclipse.ui.services.IDisposable;
  */
 public class SlaveSelectionService implements ISelectionService, IDisposable {
 
-	private ListenerList postListeners = new ListenerList(ListenerList.IDENTITY);
-	private ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
-	private Map listenersToPartId = new HashMap();
-	private Map postListenersToPartId = new HashMap();
+	private ListenerList<ISelectionListener> postListeners = new ListenerList<>(ListenerList.IDENTITY);
+	private ListenerList<ISelectionListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
+	private Map<ISelectionListener, String> listenersToPartId = new HashMap<>();
+	private Map<ISelectionListener, String> postListenersToPartId = new HashMap<>();
 
 	private ISelectionService parentSelectionService;
 
@@ -108,36 +107,23 @@ public class SlaveSelectionService implements ISelectionService, IDisposable {
 
 	@Override
 	public void dispose() {
-		Object list[] = listeners.getListeners();
-
-		for (int i = 0; i < list.length; i++) {
-			parentSelectionService
-					.removeSelectionListener((ISelectionListener) list[i]);
+		for (Object listener : listeners.getListeners()) {
+			parentSelectionService.removeSelectionListener((ISelectionListener) listener);
 		}
 		listeners.clear();
 
-		list = postListeners.getListeners();
-		for (int i = 0; i < list.length; i++) {
-			parentSelectionService
-					.removePostSelectionListener((ISelectionListener) list[i]);
+		for (Object listener : postListeners.getListeners()) {
+			parentSelectionService.removePostSelectionListener((ISelectionListener) listener);
 		}
 		postListeners.clear();
 
-		Iterator i = listenersToPartId.keySet().iterator();
-		while (i.hasNext()) {
-			Object listener = i.next();
-			parentSelectionService.removeSelectionListener(
-					(String) listenersToPartId.get(listener),
-					(ISelectionListener) listener);
+		for (Entry<ISelectionListener, String> entry : listenersToPartId.entrySet()) {
+			parentSelectionService.removeSelectionListener(entry.getValue(), entry.getKey());
 		}
 		listenersToPartId.clear();
 
-		i = postListenersToPartId.keySet().iterator();
-		while (i.hasNext()) {
-			Object listener = i.next();
-			parentSelectionService.removePostSelectionListener(
-					(String) postListenersToPartId.get(listener),
-					(ISelectionListener) listener);
+		for (Entry<ISelectionListener, String> entry : postListenersToPartId.entrySet()) {
+			parentSelectionService.removePostSelectionListener(entry.getValue(), entry.getKey());
 		}
 		postListenersToPartId.clear();
 	}

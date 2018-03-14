@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.bookmarkexplorer;
@@ -445,13 +446,11 @@ public class BookmarkNavigator extends ViewPart {
      */
     void performDragSetData(DragSourceEvent event) {
         if (MarkerTransfer.getInstance().isSupportedType(event.dataType)) {
-            event.data = ((IStructuredSelection) viewer.getSelection())
-                    .toArray();
+			event.data = viewer.getStructuredSelection().toArray();
             return;
         }
         if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-            Object[] markers = ((IStructuredSelection) viewer.getSelection())
-                    .toArray();
+			Object[] markers = viewer.getStructuredSelection().toArray();
             if (markers != null) {
                 StringBuffer buffer = new StringBuffer();
                 ILabelProvider provider = (ILabelProvider) getViewer()
@@ -476,12 +475,10 @@ public class BookmarkNavigator extends ViewPart {
         IMemento selectionMem = memento.getChild(TAG_SELECTION);
         if (selectionMem != null) {
             ArrayList selectionList = new ArrayList();
-            IMemento markerMems[] = selectionMem.getChildren(TAG_MARKER);
-            for (int i = 0; i < markerMems.length; i++) {
+			for (IMemento markerMem : selectionMem.getChildren(TAG_MARKER)) {
                 try {
-                    long id = new Long(markerMems[i].getString(TAG_ID))
-                            .longValue();
-                    IResource resource = root.findMember(markerMems[i]
+                    long id = Long.parseLong(markerMem.getString(TAG_ID));
+                    IResource resource = root.findMember(markerMem
                             .getString(TAG_RESOURCE));
                     if (resource != null) {
                         IMarker marker = resource.findMarker(id);
@@ -502,7 +499,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_VERTICAL_POSITION);
                 int position;
-                position = new Integer(posStr).intValue();
+                position = Integer.parseInt(posStr);
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -512,7 +509,7 @@ public class BookmarkNavigator extends ViewPart {
             try {
                 String posStr = memento.getString(TAG_HORIZONTAL_POSITION);
                 int position;
-                position = new Integer(posStr).intValue();
+                position = Integer.parseInt(posStr);
                 bar.setSelection(position);
             } catch (NumberFormatException e) {
             }
@@ -532,15 +529,13 @@ public class BookmarkNavigator extends ViewPart {
         }
 
         Scrollable scrollable = (Scrollable) viewer.getControl();
-        Object markers[] = ((IStructuredSelection) viewer.getSelection())
-                .toArray();
+		Object markers[] = viewer.getStructuredSelection().toArray();
         if (markers.length > 0) {
             IMemento selectionMem = memento.createChild(TAG_SELECTION);
-            for (int i = 0; i < markers.length; i++) {
+            for (Object currentMarker : markers) {
                 IMemento elementMem = selectionMem.createChild(TAG_MARKER);
-                IMarker marker = (IMarker) markers[i];
-                elementMem.putString(TAG_RESOURCE, marker.getResource()
-                        .getFullPath().toString());
+                IMarker marker = (IMarker) currentMarker;
+				elementMem.putString(TAG_RESOURCE, marker.getResource().getFullPath().toString());
                 elementMem.putString(TAG_ID, String.valueOf(marker.getId()));
             }
         }
@@ -702,9 +697,9 @@ public class BookmarkNavigator extends ViewPart {
         IMarker[] markerData = (IMarker[]) getClipboard().getContents(transfer);
         boolean canPaste = false;
         if (markerData != null) {
-            for (int i = 0; i < markerData.length; i++) {
+            for (IMarker marker : markerData) {
                 try {
-                    if (markerData[i].getType().equals(IMarker.BOOKMARK)) {
+                    if (marker.getType().equals(IMarker.BOOKMARK)) {
                         canPaste = true;
                         break;
                     }

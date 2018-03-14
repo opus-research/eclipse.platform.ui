@@ -72,8 +72,9 @@ class DragHost {
 	private MWindow getWindow() {
 		MUIElement pe = originalParent;
 		while (pe != null && !(pe instanceof MApplication)) {
-			if (((Object) pe) instanceof MWindow)
+			if (pe instanceof MWindow) {
 				return (MWindow) pe;
+			}
 			pe = pe.getParent();
 		}
 
@@ -85,7 +86,6 @@ class DragHost {
 		((Shell) baseWindow.getWidget()).getDisplay().update();
 		dragWindow = MBasicFactory.INSTANCE.createWindow();
 		dragWindow.getTags().add(DragHostId);
-		formatModel(dragWindow);
 
 		// define the initial location and size for the window
 		Point cp = ((Shell) baseWindow.getWidget()).getDisplay()
@@ -112,16 +112,15 @@ class DragHost {
 		getShell().setVisible(true);
 	}
 
-	private void formatModel(MWindow dragWindow) {
-	}
-
 	public void drop(MElementContainer<MUIElement> newContainer, int itemIndex) {
-		if (dragElement.getParent() != null)
+		if (dragElement.getParent() != null) {
 			dragElement.getParent().getChildren().remove(dragElement);
-		if (itemIndex >= 0)
+		}
+		if (itemIndex >= 0) {
 			newContainer.getChildren().add(itemIndex, dragElement);
-		else
+		} else {
 			newContainer.getChildren().add(dragElement);
+		}
 
 		newContainer.setSelectedElement(dragElement);
 		if (dragElement.getWidget() instanceof ToolItem) {
@@ -132,12 +131,13 @@ class DragHost {
 					.layout(new Control[] { tb }, SWT.CHANGED | SWT.DEFER);
 		}
 
-		baseWindow.getChildren().remove(dragWindow);
+		baseWindow.getWindows().remove(dragWindow);
 
 		newContainer.setSelectedElement(dragElement);
 
-		if (getShell() != null)
+		if (getShell() != null) {
 			getShell().dispose();
+		}
 	}
 
 	public void cancel() {

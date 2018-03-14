@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.osgi.util.NLS;
@@ -51,7 +52,7 @@ public class DeferredTreeContentManager {
 
 	IWorkbenchSiteProgressService progressService;
 
-	private ListenerList updateCompleteListenerList;
+	private ListenerList<IJobChangeListener> updateCompleteListenerList;
 
 	/**
 	 * The DeferredContentFamily is a class used to keep track of a
@@ -385,13 +386,15 @@ public class DeferredTreeContentManager {
 		clearJob.setSystem(true);
 
 		if (updateCompleteListenerList != null) {
-			Object[] listeners = updateCompleteListenerList.getListeners();
-			for (int i = 0; i < listeners.length; i++) {
-				clearJob
-						.addJobChangeListener((IJobChangeListener) listeners[i]);
+			for (IJobChangeListener listener : updateCompleteListenerList) {
+				clearJob.addJobChangeListener(listener);
 			}
 		}
-		clearJob.schedule();
+		// See bug 470554 if IElementCollector.done() is called immediately
+		// after IElementCollector.add(), SWT/GTK seem to be confused.
+		// Delay tree element deletion to avoid race conditions with GTK code
+		long timeout = Util.isGtk() ? 100 : 0;
+		clearJob.schedule(timeout);
 	}
 
 	/**
@@ -466,7 +469,7 @@ public class DeferredTreeContentManager {
 			}
 		} else {
 			if (updateCompleteListenerList == null) {
-				updateCompleteListenerList = new ListenerList();
+				updateCompleteListenerList = new ListenerList<>();
 			}
 			updateCompleteListenerList.add(listener);
 		}
