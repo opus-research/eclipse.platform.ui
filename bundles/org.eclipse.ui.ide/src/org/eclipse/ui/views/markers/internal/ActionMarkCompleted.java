@@ -23,13 +23,13 @@ import org.eclipse.ui.ide.undo.UpdateMarkersOperation;
 
 /**
  * ActionMarkCompleted is the action for marking task completion.
- * 
+ *
  */
 public class ActionMarkCompleted extends MarkerSelectionProviderAction {
 
 	/**
 	 * Create a new instance of the reciever.
-	 * 
+	 *
 	 * @param provider
 	 */
 	public ActionMarkCompleted(ISelectionProvider provider) {
@@ -39,9 +39,10 @@ public class ActionMarkCompleted extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.action.Action#run()
 	 */
+	@Override
 	public void run() {
 		IMarker[] markers = getSelectedMarkers();
 		Map attrs = new HashMap();
@@ -54,9 +55,10 @@ public class ActionMarkCompleted extends MarkerSelectionProviderAction {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.actions.SelectionProviderAction#selectionChanged(org.eclipse.jface.viewers.IStructuredSelection)
 	 */
+	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		setEnabled(false);
 		if (selection == null || selection.isEmpty()) {

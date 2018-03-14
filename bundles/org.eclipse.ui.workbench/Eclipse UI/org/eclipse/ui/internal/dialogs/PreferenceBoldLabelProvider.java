@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import org.eclipse.jface.preference.PreferenceLabelProvider;
+import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -18,7 +20,7 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * This PreferenceBoldLabelProvider will bold those elements which really match
  * the search contents
  */
-public class PreferenceBoldLabelProvider extends PreferenceLabelProviderWithTooltip {
+public class PreferenceBoldLabelProvider extends PreferenceLabelProvider implements IFontProvider {
 
 	private FilteredTree filterTree;
 
@@ -29,6 +31,7 @@ public class PreferenceBoldLabelProvider extends PreferenceLabelProviderWithTool
 		this.filterForBoldElements= filterTree.getPatternFilter();
 	}
 
+	@Override
 	public Font getFont(Object element) {
 		return FilteredTree.getBoldFont(element, filterTree,
 				filterForBoldElements);

@@ -57,7 +57,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 
 	private CommonDragAdapterAssistant setDataAssistant;
 	
-	private List assistantsToUse;
+	private List<CommonDragAdapterAssistant> assistantsToUse;
 	
 	/**
 	 * Create a DragAdapter that drives the configuration of the drag data.
@@ -73,7 +73,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 		super();
 		contentService = aContentService;
 		provider = aProvider;
-		assistantsToUse = new ArrayList();
+		assistantsToUse = new ArrayList<CommonDragAdapterAssistant>();
 	}
 
 	/**
@@ -91,7 +91,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 		CommonDragAdapterAssistant[] assistants = contentService
 				.getDnDService().getCommonDragAssistants();
 
-		Set supportedTypes = new LinkedHashSet();
+		Set<Transfer> supportedTypes = new LinkedHashSet<Transfer>();
 		supportedTypes.add(PluginTransfer.getInstance());
 		supportedTypes.add(LocalSelectionTransfer.getTransfer());
 		Transfer[] transferTypes = null;
@@ -104,21 +104,18 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 			}
 		}
 		
-		Transfer[] transfers = (Transfer[]) supportedTypes
+		Transfer[] transfers = supportedTypes
 				.toArray(new Transfer[supportedTypes.size()]);
 		return transfers;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragStart(org.eclipse.swt.dnd.DragSourceEvent)
-	 */
+	@Override
 	public void dragStart(final DragSourceEvent event) {
 		if (Policy.DEBUG_DND) {
 			System.out.println("CommonDragAdapter.dragStart (begin): " + event); //$NON-NLS-1$
 		}
 		SafeRunner.run(new NavigatorSafeRunnable() {
+			@Override
 			public void run() throws Exception {
 				DragSource dragSource = (DragSource) event.widget;
 				if (Policy.DEBUG_DND) {
@@ -170,11 +167,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragSetData(org.eclipse.swt.dnd.DragSourceEvent)
-	 */
+	@Override
 	public void dragSetData(final DragSourceEvent event) {
 
 		final ISelection selection = LocalSelectionTransfer.getTransfer()
@@ -207,7 +200,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 			}
 
 			for (int i = 0, len = assistantsToUse.size(); i < len; i++) {
-				final CommonDragAdapterAssistant assistant = (CommonDragAdapterAssistant) assistantsToUse.get(i); 
+				final CommonDragAdapterAssistant assistant = assistantsToUse.get(i); 
 				if (Policy.DEBUG_DND) {
 					System.out
 							.println("CommonDragAdapter.dragSetData assistant: " + assistant); //$NON-NLS-1$
@@ -219,6 +212,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 				for (int j = 0; j < supportedTransferTypes.length; j++) {
 					if (supportedTransferTypes[j].isSupportedType(event.dataType)) {
 						SafeRunner.run(new NavigatorSafeRunnable() {
+							@Override
 							public void run() throws Exception {
 								if (Policy.DEBUG_DND) {
 									System.out
@@ -255,11 +249,7 @@ public final class CommonDragAdapter extends DragSourceAdapter {
 		}
 	}
 	 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.dnd.DragSourceAdapter#dragFinished(org.eclipse.swt.dnd.DragSourceEvent)
-	 */
+	@Override
 	public void dragFinished(DragSourceEvent event) {
 
 		if (Policy.DEBUG_DND) {

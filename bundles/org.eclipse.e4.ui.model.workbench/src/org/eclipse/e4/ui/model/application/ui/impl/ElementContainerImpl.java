@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,12 +161,8 @@ public abstract class ElementContainerImpl<T extends MUIElement> extends UIEleme
 		
 		// Ensure that the new candidate is visible in the UI
 		if (newSelectedElement != null && !newSelectedElement.isToBeRendered()) {
-			// Ensure that either the container is non-TBR or has a null selected element
-			if (!isToBeRendered()) {
-				newSelectedElement.setToBeRendered(true);
-			} else {
-				newSelectedElement = null;
-			}
+			throw new IllegalArgumentException("The selected element " 
+					+ newSelectedElement + " must be visible in the UI presentation");
 		}
 		
 		T oldSelectedElement = selectedElement;

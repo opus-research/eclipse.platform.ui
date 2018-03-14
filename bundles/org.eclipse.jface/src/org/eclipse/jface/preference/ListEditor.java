@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,9 +10,9 @@
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -114,10 +114,8 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    protected void adjustForNumColumns(int numColumns) {
+    @Override
+	protected void adjustForNumColumns(int numColumns) {
         Control control = getLabelControl();
         ((GridData) control.getLayoutData()).horizontalSpan = numColumns;
         ((GridData) list.getLayoutData()).horizontalSpan = numColumns - 1;
@@ -174,7 +172,8 @@ public abstract class ListEditor extends FieldEditor {
      */
     public void createSelectionListener() {
         selectionListener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 Widget widget = event.widget;
                 if (widget == addButton) {
                     addPressed();
@@ -191,10 +190,8 @@ public abstract class ListEditor extends FieldEditor {
         };
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    protected void doFillIntoGrid(Composite parent, int numColumns) {
+    @Override
+	protected void doFillIntoGrid(Composite parent, int numColumns) {
         Control control = getLabelControl(parent);
         GridData gd = new GridData();
         gd.horizontalSpan = numColumns;
@@ -213,10 +210,8 @@ public abstract class ListEditor extends FieldEditor {
         buttonBox.setLayoutData(gd);
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    protected void doLoad() {
+    @Override
+	protected void doLoad() {
         if (list != null) {
             String s = getPreferenceStore().getString(getPreferenceName());
             String[] array = parseString(s);
@@ -226,10 +221,8 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    protected void doLoadDefault() {
+    @Override
+	protected void doLoadDefault() {
         if (list != null) {
             list.removeAll();
             String s = getPreferenceStore().getDefaultString(
@@ -241,10 +234,8 @@ public abstract class ListEditor extends FieldEditor {
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    protected void doStore() {
+    @Override
+	protected void doStore() {
         String s = createList(list.getItems());
         if (s != null) {
 			getPreferenceStore().setValue(getPreferenceName(), s);
@@ -273,7 +264,8 @@ public abstract class ListEditor extends FieldEditor {
             buttonBox.setLayout(layout);
             createButtons(buttonBox);
             buttonBox.addDisposeListener(new DisposeListener() {
-                public void widgetDisposed(DisposeEvent event) {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
                     addButton = null;
                     removeButton = null;
                     upButton = null;
@@ -303,7 +295,8 @@ public abstract class ListEditor extends FieldEditor {
             list.setFont(parent.getFont());
             list.addSelectionListener(getSelectionListener());
             list.addDisposeListener(new DisposeListener() {
-                public void widgetDisposed(DisposeEvent event) {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
                     list = null;
                 }
             });
@@ -323,10 +316,8 @@ public abstract class ListEditor extends FieldEditor {
      */
     protected abstract String getNewInputObject();
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    public int getNumberOfControls() {
+    @Override
+	public int getNumberOfControls() {
         return 2;
     }
 
@@ -380,6 +371,7 @@ public abstract class ListEditor extends FieldEditor {
         int index = list.getSelectionIndex();
         if (index >= 0) {
             list.remove(index);
+			list.select(index >= list.getItemCount() ? index - 1 : index);
             selectionChanged();
         }
     }
@@ -409,10 +401,8 @@ public abstract class ListEditor extends FieldEditor {
         downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
     }
 
-    /* (non-Javadoc)
-     * Method declared on FieldEditor.
-     */
-    public void setFocus() {
+    @Override
+	public void setFocus() {
         if (list != null) {
             list.setFocus();
         }
@@ -449,7 +439,8 @@ public abstract class ListEditor extends FieldEditor {
     /*
      * @see FieldEditor.setEnabled(boolean,Composite).
      */
-    public void setEnabled(boolean enabled, Composite parent) {
+    @Override
+	public void setEnabled(boolean enabled, Composite parent) {
         super.setEnabled(enabled, parent);
         getListControl(parent).setEnabled(enabled);
         addButton.setEnabled(enabled);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2005 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,8 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Control)
          */
-        public Menu getMenu(Control parent) {
+        @Override
+		public Menu getMenu(Control parent) {
             createDropDownMenuMgr();
             return dropDownMenuMgr.createContextMenu(parent);
         }
@@ -77,7 +78,8 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
          */
-        public Menu getMenu(Menu parent) {
+        @Override
+		public Menu getMenu(Menu parent) {
             createDropDownMenuMgr();
             Menu menu = new Menu(parent);
             IContributionItem[] items = dropDownMenuMgr.getItems();
@@ -96,11 +98,21 @@ public class NewWizardDropDownAction extends Action implements
         /* (non-Javadoc)
          * @see org.eclipse.jface.action.IMenuCreator#dispose()
          */
-        public void dispose() {
-            if (dropDownMenuMgr != null) {
-                dropDownMenuMgr.dispose();
-                dropDownMenuMgr = null;
-            }
+        @Override
+		public void dispose() {
+			if (dropDownMenuMgr != null) {
+				// remove the wizard menu before disposing the menu manager, the
+				// wizard menu is a workbench action and it should only be
+				// disposed when the workbench window itself is disposed,
+				// IMenuCreators will be disposed when the action is disposed,
+				// we do not want this, the menu's disposal will be handled when
+				// the owning action (NewWizardDropDownAction) is disposed, see
+				// bug 309716
+				dropDownMenuMgr.remove(newWizardMenu);
+
+				dropDownMenuMgr.dispose();
+				dropDownMenuMgr = null;
+			}
         }
     };
 
@@ -151,7 +163,8 @@ public class NewWizardDropDownAction extends Action implements
     /* (non-Javadoc)
      * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (workbenchWindow == null) {
             // action has already been disposed
             return;
@@ -166,7 +179,8 @@ public class NewWizardDropDownAction extends Action implements
     /**
      * Runs the action, which opens the New wizard dialog.
      */
-    public void run() {
+    @Override
+	public void run() {
         if (workbenchWindow == null) {
             // action has been disposed
             return;

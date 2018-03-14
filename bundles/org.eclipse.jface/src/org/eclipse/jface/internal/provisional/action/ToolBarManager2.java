@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,23 +71,17 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		super(toolbar);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IToolBarManager2#createControl2(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	public Control createControl2(Composite parent) {
 		return createControl(parent);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IToolBarManager2#getControl2()
-	 */
+	@Override
 	public Control getControl2() {
 		return getControl();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IToolBarManager2#getItemCount()
-	 */
+	@Override
 	public int getItemCount() {
 		ToolBar toolBar = getControl();
 		if (toolBar == null || toolBar.isDisposed()) {
@@ -96,9 +90,7 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		return toolBar.getItemCount();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IToolBarManager2#addPropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
+	@Override
 	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		if (listenerList == null) {
 			listenerList = new ListenerList(ListenerList.IDENTITY);
@@ -107,9 +99,7 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		listenerList.add(listener);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.IToolBarManager2#removePropertyChangeListener(org.eclipse.jface.util.IPropertyChangeListener)
-	 */
+	@Override
 	public void removePropertyChangeListener(IPropertyChangeListener listener) {
 		if (listenerList != null) {
 			listenerList.remove(listener);
@@ -160,9 +150,7 @@ public class ToolBarManager2 extends ToolBarManager implements IToolBarManager2 
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.action.ToolBarManager#relayout(org.eclipse.swt.widgets.ToolBar, int, int)
-	 */
+	@Override
 	protected void relayout(ToolBar layoutBar, int oldCount, int newCount) {
 		super.relayout(layoutBar, oldCount, newCount);
 		firePropertyChange(PROP_LAYOUT, new Integer(oldCount), new Integer(newCount));

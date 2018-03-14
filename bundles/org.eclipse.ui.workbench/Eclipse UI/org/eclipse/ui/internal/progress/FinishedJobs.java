@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2008 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,24 +68,30 @@ public class FinishedJobs extends EventManager {
 
 	private FinishedJobs() {
 		listener = new IJobProgressManagerListener() {
+			@Override
 			public void addJob(JobInfo info) {
 				checkForDuplicates(info);
 			}
 
+			@Override
 			public void addGroup(GroupInfo info) {
 				checkForDuplicates(info);
 			}
 
+			@Override
 			public void refreshJobInfo(JobInfo info) {
 				checkTasks(info);
 			}
 
+			@Override
 			public void refreshGroup(GroupInfo info) {
 			}
 
+			@Override
 			public void refreshAll() {
 			}
 
+			@Override
 			public void removeJob(JobInfo info) {
 				if (keep(info)) {
 					checkForDuplicates(info);
@@ -93,9 +99,11 @@ public class FinishedJobs extends EventManager {
 				}
 			}
 
+			@Override
 			public void removeGroup(GroupInfo group) {
 			}
 
+			@Override
 			public boolean showsDebug() {
 				return false;
 			}

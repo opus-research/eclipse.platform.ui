@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
@@ -33,19 +32,12 @@ import org.eclipse.ui.internal.registry.ViewDescriptor;
 public class ViewReference extends WorkbenchPartReference implements IViewReference {
 
 	private ViewDescriptor descriptor;
-	private ViewSite viewSite;
 	private IMemento memento;
 
 	public ViewReference(IEclipseContext windowContext, IWorkbenchPage page, MPart part,
 			ViewDescriptor descriptor) {
 		super(windowContext, page, part);
 		this.descriptor = descriptor;
-
-		if (descriptor == null) {
-			setImageDescriptor(ImageDescriptor.getMissingImageDescriptor());
-		} else {
-			setImageDescriptor(descriptor.getImageDescriptor());
-		}
 
 		String mementoString = getModel().getPersistedState().get(MEMENTO_KEY);
 		if (mementoString != null) {
@@ -72,10 +64,12 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		}
 	}
 
+	@Override
 	public String getPartName() {
 		return descriptor.getLabel();
 	}
 
+	@Override
 	public String getSecondaryId() {
 		MPart part = getModel();
 
@@ -86,22 +80,17 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return part.getElementId().substring(colonIndex + 1);
 	}
 
+	@Override
 	public IViewPart getView(boolean restore) {
 		return (IViewPart) getPart(restore);
 	}
 
+	@Override
 	public boolean isFastView() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#createPart
-	 * ()
-	 */
 	@Override
 	public IWorkbenchPart createPart() throws PartInitException {
 		try {
@@ -129,16 +118,9 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 		return new ErrorViewPart(status);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.e4.compatibility.WorkbenchPartReference#initialize
-	 * (org.eclipse.ui.IWorkbenchPart)
-	 */
 	@Override
 	public void initialize(IWorkbenchPart part) throws PartInitException {
-		viewSite = new ViewSite(getModel(), part, this, descriptor == null ? null
+		ViewSite viewSite = new ViewSite(getModel(), part, this, descriptor == null ? null
 				: descriptor.getConfigurationElement());
 		IViewPart view = (IViewPart) part;
 		view.init(viewSite, memento);
@@ -154,6 +136,13 @@ public class ViewReference extends WorkbenchPartReference implements IViewRefere
 
 	@Override
 	public PartSite getSite() {
-		return viewSite;
+		if (legacyPart != null) {
+			return (PartSite) legacyPart.getSite();
+		}
+		return null;
+	}
+
+	public ViewDescriptor getDescriptor() {
+		return descriptor;
 	}
 }

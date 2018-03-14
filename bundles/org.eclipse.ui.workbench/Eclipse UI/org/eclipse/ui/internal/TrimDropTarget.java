@@ -337,10 +337,8 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
             dock(initialAreaId, initialInsertBefore);
         }
         
-		/* (non-Javadoc)
-         * @see org.eclipse.ui.internal.dnd.IDropTarget#drop()
-         */
-        public void drop() {
+        @Override
+		public void drop() {
         	// If we aren't docked then restore the initial location
         	if (dockedArea == SWT.NONE) {
 				redock();
@@ -389,10 +387,8 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
            	dockedArea = areaId;
         }
         	
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.internal.dnd.IDropTarget#getCursor()
-         */
-        public Cursor getCursor() {
+        @Override
+		public Cursor getCursor() {
         	// If the trim isn't docked then show the 'no smoking' sign
         	if (cursorAreaId == SWT.NONE) {
 				return windowComposite.getDisplay().getSystemCursor(SWT.CURSOR_NO);
@@ -402,18 +398,14 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
         	return windowComposite.getDisplay().getSystemCursor(SWT.CURSOR_SIZEALL);
         }
 
-        /* (non-Javadoc)
-         * @see org.eclipse.ui.internal.dnd.IDropTarget#getSnapRectangle()
-         */
-        public Rectangle getSnapRectangle() {
+        @Override
+		public Rectangle getSnapRectangle() {
         	// TODO: KLUDGE!! We don't want to show -any- snap rect
         	// but Tracker won't allow that so place it where it won't be visible
         	return new Rectangle(100000, 0,0,0);
         }
 
-		/* (non-Javadoc)
-		 * @see org.eclipse.ui.internal.dnd.IDropTarget2#dragFinished(boolean)
-		 */
+		@Override
 		public void dragFinished(boolean dropPerformed) {
 			// If we didn't perform a drop then restore the original position
 			if (!dropPerformed && dockedArea == SWT.NONE) {
@@ -447,10 +439,8 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
         dropTarget = new ActualTrimDropTarget();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.dnd.IDragOverListener#drag(org.eclipse.swt.widgets.Control, java.lang.Object, org.eclipse.swt.graphics.Point, org.eclipse.swt.graphics.Rectangle)
-     */
-    public IDropTarget drag(Control currentControl, Object draggedObject,
+    @Override
+	public IDropTarget drag(Control currentControl, Object draggedObject,
             Point position, final Rectangle dragRectangle) {
     	
     	// Have to be dragging trim

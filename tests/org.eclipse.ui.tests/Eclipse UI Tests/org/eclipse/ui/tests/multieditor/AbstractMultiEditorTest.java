@@ -107,7 +107,7 @@ public class AbstractMultiEditorTest extends UITestCase {
 
 	/**
 	 * Set up to catch any editor initialization exceptions.
-	 * 
+	 *
 	 */
 	private void setupErrorListener() {
 		final ILog log = WorkbenchPlugin.getDefault().getLog();
@@ -130,7 +130,7 @@ public class AbstractMultiEditorTest extends UITestCase {
 	 * Create the multi editor input in the given project. Creates the files in
 	 * the project from template files in the classpath if they don't already
 	 * exist.
-	 * 
+	 *
 	 * @param simpleFiles
 	 *            the array of filenames to copy over
 	 * @param testProject
@@ -157,7 +157,7 @@ public class AbstractMultiEditorTest extends UITestCase {
 
 	/**
 	 * Create the project to work in. If it already exists, just open it.
-	 * 
+	 *
 	 * @param projectName
 	 *            the name of the project to create
 	 * @return the newly opened project
@@ -188,6 +188,7 @@ public class AbstractMultiEditorTest extends UITestCase {
 	/**
 	 * Close any editors at the beginner of a test, so the test can be clean.
 	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		IWorkbenchPage page = fWorkbench.getActiveWorkbenchWindow()
@@ -199,14 +200,15 @@ public class AbstractMultiEditorTest extends UITestCase {
 	 * Listens for the standard message that indicates the MultiEditor failed
 	 * ... usually caused by incorrect framework initialization that doesn't set
 	 * the innerChildren.
-	 * 
+	 *
 	 * @since 3.1
-	 * 
+	 *
 	 */
 	public static class EditorErrorListener implements ILogListener {
 
 		public ArrayList messages = new ArrayList();
 
+		@Override
 		public void logging(IStatus status, String plugin) {
 			String msg = status.getMessage();
 			Throwable ex = status.getException();

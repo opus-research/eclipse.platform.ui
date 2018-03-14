@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2008 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -682,6 +682,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * This method completes in <code>O(1)</code>.
 	 * </p>
 	 */
+	@Override
 	public final void contextManagerChanged(
 			final ContextManagerEvent contextManagerEvent) {
 		if (contextManagerEvent.isActiveContextsChanged()) {
@@ -2113,6 +2114,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 * @param schemeEvent
 	 *            An event describing the change in the scheme.
 	 */
+	@Override
 	public final void schemeChanged(final SchemeEvent schemeEvent) {
 		if (schemeEvent.isDefinedChanged()) {
 			final Scheme scheme = schemeEvent.getScheme();

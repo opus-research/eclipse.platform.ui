@@ -60,29 +60,23 @@ public class PreferencesExportWizard extends Wizard implements IExportWizard {
         setDialogSettings(section);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizard.
-     */
-    public void addPages() {
+    @Override
+	public void addPages() {
         super.addPages();
         mainPage = new WizardPreferencesExportPage1();
         addPage(mainPage);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchWizard.
-     */
-    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    @Override
+	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesExportWizard_export);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_EXPORT_PREF_WIZ));
         setNeedsProgressMonitor(true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizard.
-     */
-    public boolean performFinish() {
+    @Override
+	public boolean performFinish() {
         return mainPage.finish();
     }
     

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,8 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * The action handler has changed.  Update self.
      */
-    protected void propagateChange(PropertyChangeEvent event) {
+    @Override
+	protected void propagateChange(PropertyChangeEvent event) {
         super.propagateChange(event);
         String prop = event.getProperty();
         if (prop.equals(IAction.TEXT)) {
@@ -86,7 +87,8 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action handler.  Update self.
      */
-    protected void setActionHandler(IAction handler) {
+    @Override
+	protected void setActionHandler(IAction handler) {
         // Run the default behavior.
         super.setActionHandler(handler);
 
@@ -109,7 +111,8 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    public void setDisabledImageDescriptor(ImageDescriptor image) {
+    @Override
+	public void setDisabledImageDescriptor(ImageDescriptor image) {
         super.setDisabledImageDescriptor(image);
         defaultDisabledImage = image;
     }
@@ -117,7 +120,8 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    public void setHoverImageDescriptor(ImageDescriptor image) {
+    @Override
+	public void setHoverImageDescriptor(ImageDescriptor image) {
         super.setHoverImageDescriptor(image);
         defaultHoverImage = image;
     }
@@ -125,7 +129,8 @@ public class LabelRetargetAction extends RetargetAction {
     /* (non-Javadoc)
      * Method declared on IAction.
      */
-    public void setImageDescriptor(ImageDescriptor image) {
+    @Override
+	public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);
         defaultImage = image;
     }
@@ -133,7 +138,8 @@ public class LabelRetargetAction extends RetargetAction {
     /**
      * Sets the action's label text to the given value.
      */
-    public void setText(String text) {
+    @Override
+	public void setText(String text) {
         super.setText(text);
         acceleratorText = LegacyActionTools.extractAcceleratorText(text);
         defaultText = text;
@@ -143,7 +149,8 @@ public class LabelRetargetAction extends RetargetAction {
      * Sets the tooltip text to the given text.
      * The value <code>null</code> clears the tooltip text.
      */
-    public void setToolTipText(String text) {
+    @Override
+	public void setToolTipText(String text) {
         super.setToolTipText(text);
         defaultToolTipText = text;
     }
@@ -161,7 +168,9 @@ public class LabelRetargetAction extends RetargetAction {
         String str = removeAcceleratorText(newText);
         // Append our accelerator
         if (acceleratorText != null) {
-			str = str + acceleratorText;
+			str = str + '\t' + acceleratorText;
+		} else if (str != newText) {
+			str = str + '\t';
 		}
         return str;
     }

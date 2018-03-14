@@ -47,18 +47,12 @@ public class UISynchronizer extends Synchronizer {
 	 */
 	public static final ThreadLocal startupThread = new ThreadLocal() {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.ThreadLocal#initialValue()
-		 */
+		@Override
 		protected Object initialValue() {
 			return Boolean.FALSE;
 		}
 		
-		/* (non-Javadoc)
-		 * @see java.lang.ThreadLocal#set(java.lang.Object)
-		 */
+		@Override
 		public void set(Object value) {
 			if (value != Boolean.TRUE && value != Boolean.FALSE)
 				throw new IllegalArgumentException();
@@ -67,9 +61,11 @@ public class UISynchronizer extends Synchronizer {
 	};
 	
 	public static final ThreadLocal overrideThread = new ThreadLocal() {
+		@Override
 		protected Object initialValue() {
 			return Boolean.FALSE;
 		}
+		@Override
 		public void set(Object value) {
 			if (value != Boolean.TRUE && value != Boolean.FALSE)
 				throw new IllegalArgumentException();
@@ -109,10 +105,8 @@ public class UISynchronizer extends Synchronizer {
     	}    	
     }
     
-    /* (non-Javadoc)
-     * @see org.eclipse.swt.widgets.Synchronizer#asyncExec(java.lang.Runnable)
-     */
-    protected void asyncExec(Runnable runnable) {
+    @Override
+	protected void asyncExec(Runnable runnable) {
     	// the following block should not be invoked if we're using 3.2 threading.
     	if (runnable != null && !use32Threading) {
 			synchronized (this) {
@@ -129,6 +123,7 @@ public class UISynchronizer extends Synchronizer {
     	super.asyncExec(runnable);
     }
 
+	@Override
 	public void syncExec(Runnable runnable) {
 		
 		synchronized (this) {
@@ -154,7 +149,8 @@ public class UISynchronizer extends Synchronizer {
         work.setOperationThread(Thread.currentThread());
         lockListener.addPendingWork(work);
         asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 lockListener.doPendingWork();
             }
         });

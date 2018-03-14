@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -141,15 +141,18 @@ public class ConfigureColumns {
 			this.moveableColumnsFound = createColumnObjects();
 		}
 
+		@Override
 		protected boolean isResizable() {
 			return true;
 		}
 
+		@Override
 		public void create() {
 			super.create();
 			getShell().setText(JFaceResources.getString("ConfigureColumnsDialog_Title")); //$NON-NLS-1$
 		}
 
+		@Override
 		protected void initializeBounds() {
 			super.initializeBounds();
 			table.setSelection(0);
@@ -229,6 +232,7 @@ public class ConfigureColumns {
 			return false;
 		}
 
+		@Override
 		protected Control createDialogArea(Composite parent) {
 			Composite composite = (Composite) super.createDialogArea(parent);
 
@@ -250,6 +254,7 @@ public class ConfigureColumns {
 				upButton = new Button(composite, SWT.PUSH);
 				upButton.setText(JFaceResources.getString("ConfigureColumnsDialog_up")); //$NON-NLS-1$
 				upButton.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event event) {
 						handleMove(table, true);
 					}
@@ -259,6 +264,7 @@ public class ConfigureColumns {
 				downButton.setText(JFaceResources
 						.getString("ConfigureColumnsDialog_down")); //$NON-NLS-1$
 				downButton.addListener(SWT.Selection, new Listener() {
+					@Override
 					public void handleEvent(Event event) {
 						handleMove(table, false);
 					}
@@ -287,11 +293,13 @@ public class ConfigureColumns {
 			GridLayoutFactory.swtDefaults().numColumns(numColumns).applyTo(composite);
 
 			table.addListener(SWT.Selection, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					handleSelectionChanged(table.indexOf((TableItem) event.item));
 				}
 			});
 			text.addListener(SWT.Modify, new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					ColumnObject columnObject = columnObjects[table.getSelectionIndex()];
 					if (!columnObject.resizable) {
@@ -393,6 +401,7 @@ public class ConfigureColumns {
 			}
 		}
 
+		@Override
 		protected void okPressed() {
 			int[] columnOrder = new int[columnObjects.length];
 			for (int i = 0; i < columnObjects.length; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006-2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Matthieu Wipliez <matthieu.wipliez@synflow.com> (Synflow SAS) - [CommonNavigator] Implementation of Binding isVisibleExtension not excluding as expected - http://bugs.eclipse.org/425867 
  ******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.extensions;
@@ -27,37 +28,42 @@ import org.eclipse.ui.internal.navigator.Policy;
 
 class Binding {
 
-	private final Set rootPatterns = new HashSet();
+	private final Set<Pattern> rootPatterns = new HashSet<Pattern>();
 
-	private final Set includePatterns = new HashSet();
+	private final Set<Pattern> includePatterns = new HashSet<Pattern>();
 
-	private final Set excludePatterns = new HashSet();
+	private final Set<Pattern> excludePatterns = new HashSet<Pattern>();
 
 	private final String TAG_EXTENSION;
 
-	private final Map knownIds = new HashMap();
-	private final Map knownRootIds = new HashMap();
+	private final Map<String, Boolean> knownIds = new HashMap<String, Boolean>();
+	private final Map<String, Boolean> knownRootIds = new HashMap<String, Boolean>();
 
 	protected Binding(String tagExtension) {
 		TAG_EXTENSION = tagExtension;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isVisibleExtension(java.lang.String)
-	 */
 	boolean isVisibleExtension(String anExtensionId) {
-		
-
 		// Have we seen this pattern before?
 		if (knownIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
-			return ((Boolean) knownIds.get(anExtensionId)).booleanValue();
+			return knownIds.get(anExtensionId).booleanValue();
 		}
-		
-		for (Iterator itr = includePatterns.iterator(); itr.hasNext();) {
-			Pattern pattern = (Pattern) itr.next();
+
+		for (Iterator<Pattern> itr = excludePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = itr.next();
+			if (pattern.matcher(anExtensionId).matches()) {
+				knownIds.put(anExtensionId, Boolean.FALSE);
+				if (Policy.DEBUG_RESOLUTION) {
+					System.out.println("Viewer Binding: EXCLUDED: " + TAG_EXTENSION +//$NON-NLS-1$
+							" to: " + anExtensionId); //$NON-NLS-1$
+				}
+				return false;
+			}
+		}
+
+		for (Iterator<Pattern> itr = includePatterns.iterator(); itr.hasNext();) {
+			Pattern pattern = itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				// keep track of the result for next time
 				knownIds.put(anExtensionId, Boolean.TRUE);
@@ -69,18 +75,6 @@ class Binding {
 			}
 		}
 
-		for (Iterator itr = excludePatterns.iterator(); itr.hasNext();) {
-			Pattern pattern = (Pattern) itr.next();
-			if (pattern.matcher(anExtensionId).matches()) {
-				knownIds.put(anExtensionId, Boolean.FALSE);
-				if (Policy.DEBUG_RESOLUTION) {
-					System.out.println("Viewer Binding: EXCLUDED: " + TAG_EXTENSION +//$NON-NLS-1$
-							" to: " + anExtensionId); //$NON-NLS-1$
-				}
-				return false;
-			}
-		}
-
 		if (Policy.DEBUG_RESOLUTION) {
 			System.out.println("Viewer Binding: NOT FOUND: " + TAG_EXTENSION +//$NON-NLS-1$
 					" to: " + anExtensionId); //$NON-NLS-1$
@@ -89,11 +83,6 @@ class Binding {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isRootExtension(java.lang.String)
-	 */
 	boolean isRootExtension(String anExtensionId) {
 		if (rootPatterns.size() == 0) {
 			return false;
@@ -101,11 +90,11 @@ class Binding {
 		// Have we seen this pattern before?
 		if (knownRootIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
-			return ((Boolean) knownRootIds.get(anExtensionId)).booleanValue();
+			return knownRootIds.get(anExtensionId).booleanValue();
 		}
 		Pattern pattern = null;
-		for (Iterator itr = rootPatterns.iterator(); itr.hasNext();) {
-			pattern = (Pattern) itr.next();
+		for (Iterator<Pattern> itr = rootPatterns.iterator(); itr.hasNext();) {
+			pattern = itr.next();
 			if (pattern.matcher(anExtensionId).matches()) {
 				knownRootIds.put(anExtensionId, Boolean.TRUE);
 				return true;
@@ -115,11 +104,6 @@ class Binding {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#hasOverriddenRootExtensions()
-	 */
 	boolean hasOverriddenRootExtensions() {
 		return rootPatterns.size() > 0;
 	}

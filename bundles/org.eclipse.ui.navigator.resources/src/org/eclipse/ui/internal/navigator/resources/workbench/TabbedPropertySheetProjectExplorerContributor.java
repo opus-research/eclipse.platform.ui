@@ -28,9 +28,7 @@ public class TabbedPropertySheetProjectExplorerContributor implements
 		contributorId = aCommonNavigator.getViewSite().getId();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
-	 */
+	@Override
 	public String getContributorId() { 
 		return contributorId;
 	}

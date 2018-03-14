@@ -551,10 +551,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 		return adaptableContributors == null ? Collections.EMPTY_LIST : adaptableContributors;
 	}
 	
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-     */
-    public void removeExtension(IExtension source, Object[] objects) {
+    @Override
+	public void removeExtension(IExtension source, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] instanceof ContributorRecord) {
                 ContributorRecord contributorRecord = (ContributorRecord) objects[i];

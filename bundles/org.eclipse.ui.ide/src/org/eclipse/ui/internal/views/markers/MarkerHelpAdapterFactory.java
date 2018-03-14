@@ -27,6 +27,7 @@ public class MarkerHelpAdapterFactory implements IAdapterFactory {
 
 	private static final Class[] classes = new Class[] {IContextProvider.class};
 
+	@Override
 	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (!(adaptableObject instanceof ExtendedMarkersView))
 			return null;
@@ -35,10 +36,12 @@ public class MarkerHelpAdapterFactory implements IAdapterFactory {
 
 		return new IContextProvider(){
 
+			@Override
 			public int getContextChangeMask() {
 				return SELECTION;
 			}
 
+			@Override
 			public IContext getContext(Object target) {
 				String contextId = null;
 				// See if there is a context registered for the current selection
@@ -49,29 +52,31 @@ public class MarkerHelpAdapterFactory implements IAdapterFactory {
 				}
 
 				//TODO this needs to be migrated to the ide plug-in
-				if (contextId == null) 
+				if (contextId == null)
 					contextId = PlatformUI.PLUGIN_ID + ".problem_view_context";//$NON-NLS-1$
-				
+
 				return HelpSystem.getContext(contextId);
 			}
 
-			
+
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.help.IContextProvider#getSearchExpression(java.lang.Object)
 			 */
+			@Override
 			public String getSearchExpression(Object target) {
 				return null;
 			}
-		
+
 		};
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
 	 */
+	@Override
 	public Class[] getAdapterList() {
 		return classes;
 	}

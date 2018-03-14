@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,11 +42,13 @@ import java.util.NoSuchElementException;
     }
 
     private static final class EmptyEnumerator implements Enumeration {
-        public boolean hasMoreElements() {
+        @Override
+		public boolean hasMoreElements() {
             return false;
         }
 
-        public Object nextElement() {
+        @Override
+		public Object nextElement() {
             throw new NoSuchElementException();
         }
     }
@@ -63,7 +65,8 @@ import java.util.NoSuchElementException;
             start = firstSlot;
         }
 
-        public boolean hasMoreElements() {
+        @Override
+		public boolean hasMoreElements() {
             if (entry != null) {
 				return true;
 			}
@@ -76,7 +79,8 @@ import java.util.NoSuchElementException;
             return false;
         }
 
-        public Object nextElement() {
+        @Override
+		public Object nextElement() {
             if (hasMoreElements()) {
                 Object result = key ? entry.key : entry.value;
                 entry = entry.next;
@@ -402,12 +406,8 @@ import java.util.NoSuchElementException;
         return elementCount;
     }
 
-    /**
-     * Answers the string representation of this Hashtable.
-     *
-     * @return		the string representation of this Hashtable
-     */
-    public String toString() {
+    @Override
+	public String toString() {
         if (size() == 0) {
 			return "{}"; //$NON-NLS-1$
 		}

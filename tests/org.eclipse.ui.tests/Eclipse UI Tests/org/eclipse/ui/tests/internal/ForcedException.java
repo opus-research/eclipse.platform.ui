@@ -25,18 +25,20 @@ public class ForcedException extends RuntimeException {
 
 	 /**
 	  * Creates a <code>ForcedException</code> with the given message.
-	  *  
+	  *
 	  * @param message the message
 	  */
 	 public ForcedException(String message) {
 		 super(message);
 	 }
-	 
-	 public void printStackTrace(PrintStream s) {
+
+	 @Override
+	public void printStackTrace(PrintStream s) {
 	 		 s.println("!FORCED BY TEST: this entry is intentional: " + getMessage());
 	 }
-	 		 		 
-	 public void printStackTrace(PrintWriter s) {
+
+	 @Override
+	public void printStackTrace(PrintWriter s) {
 	 		 s.println("!FORCED BY TEST: this entry is intentional:" + getMessage());
 	 }
 }

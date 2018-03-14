@@ -57,10 +57,8 @@ public class PerspectiveBarContributionItem extends ContributionItem {
         this.workbenchPage = workbenchPage;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.ContributionItem#dispose()
-     */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
         if (image != null && !image.isDisposed()) {
             image.dispose();
@@ -72,7 +70,8 @@ public class PerspectiveBarContributionItem extends ContributionItem {
 
     }
 
-    public void fill(ToolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
         if (toolItem == null && parent != null && !parent.isDisposed()) {
 
             if (index >= 0) {
@@ -89,7 +88,8 @@ public class PerspectiveBarContributionItem extends ContributionItem {
             toolItem.setToolTipText(NLS.bind(WorkbenchMessages.PerspectiveBarContributionItem_toolTip, perspective.getLabel()));
             toolItem.addSelectionListener(new SelectionAdapter() {
 
-                public void widgetSelected(SelectionEvent event) {
+                @Override
+				public void widgetSelected(SelectionEvent event) {
                     select();
                 }
             });
@@ -127,7 +127,8 @@ public class PerspectiveBarContributionItem extends ContributionItem {
 		}
     }
 
-    public void update() {
+    @Override
+	public void update() {
         if (toolItem != null && !toolItem.isDisposed()) {
             toolItem
                     .setSelection(workbenchPage.getPerspective() == perspective);

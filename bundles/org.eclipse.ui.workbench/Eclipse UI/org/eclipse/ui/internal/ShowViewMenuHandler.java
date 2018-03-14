@@ -58,13 +58,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 		registerEnablement();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands
-	 * .ExecutionEvent)
-	 */
+	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchPart part = HandlerUtil.getActivePart(event);
 		if (part != null) {
@@ -117,6 +111,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 			if (menu != null) {
 				final Menu tmpMenu = menu;
 				partContainer.addDisposeListener(new DisposeListener() {
+					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						tmpMenu.dispose();
 					}
@@ -140,17 +135,12 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.ui.internal.AbstractEvaluationHandler#getEnabledWhenExpression
-	 * ()
-	 */
+	@Override
 	protected Expression getEnabledWhenExpression() {
 		// TODO Auto-generated method stub
 		if (enabledWhen == null) {
 			enabledWhen = new Expression() {
+				@Override
 				public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 					// IWorkbenchPart part = InternalHandlerUtil
 					// .getActivePart(context);
@@ -164,13 +154,7 @@ public class ShowViewMenuHandler extends AbstractEvaluationHandler {
 					// return EvaluationResult.FALSE;
 				}
 
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see
-				 * org.eclipse.core.expressions.Expression#collectExpressionInfo
-				 * (org.eclipse.core.expressions.ExpressionInfo)
-				 */
+				@Override
 				public void collectExpressionInfo(ExpressionInfo info) {
 					info.addVariableNameAccess(ISources.ACTIVE_PART_NAME);
 				}

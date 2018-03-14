@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2009 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,10 +22,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.internal.StartupThreading;
+import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.UISynchronizer;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindowConfigurer;
-import org.eclipse.ui.internal.StartupThreading.StartupRunnable;
 import org.eclipse.ui.internal.application.CompatibilityWorkbenchWindowAdvisor;
 import org.eclipse.ui.internal.util.PrefUtil;
 import org.eclipse.ui.model.ContributionComparator;
@@ -123,6 +123,7 @@ public abstract class WorkbenchAdvisor {
 	 * 
 	 * @deprecated use {@link ActionBarAdvisor#FILL_PROXY instead}
 	 */
+	@Deprecated
 	public static final int FILL_PROXY = ActionBarAdvisor.FILL_PROXY;
 
 	/**
@@ -132,6 +133,7 @@ public abstract class WorkbenchAdvisor {
 	 * 
 	 * @deprecated use {@link ActionBarAdvisor#FILL_MENU_BAR instead}
 	 */
+	@Deprecated
 	public static final int FILL_MENU_BAR = ActionBarAdvisor.FILL_MENU_BAR;
 
 	/**
@@ -141,6 +143,7 @@ public abstract class WorkbenchAdvisor {
 	 * 
 	 * @deprecated use {@link ActionBarAdvisor#FILL_COOL_BAR instead}
 	 */
+	@Deprecated
 	public static final int FILL_COOL_BAR = ActionBarAdvisor.FILL_COOL_BAR;
 
 	/**
@@ -150,6 +153,7 @@ public abstract class WorkbenchAdvisor {
 	 * 
 	 * @deprecated use {@link ActionBarAdvisor#FILL_STATUS_LINE instead}
 	 */
+	@Deprecated
 	public static final int FILL_STATUS_LINE = ActionBarAdvisor.FILL_STATUS_LINE;
 
 	/**
@@ -406,6 +410,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#preWindowOpen()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void preWindowOpen(IWorkbenchWindowConfigurer configurer) {
 		// do nothing
 	}
@@ -456,6 +461,7 @@ public abstract class WorkbenchAdvisor {
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 * @see WorkbenchWindowAdvisor#createActionBarAdvisor(IActionBarConfigurer)
 	 */
+	@Deprecated
 	public void fillActionBars(IWorkbenchWindow window,
 			IActionBarConfigurer configurer, int flags) {
 		// do nothing by default
@@ -482,6 +488,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#postWindowRestore()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void postWindowRestore(IWorkbenchWindowConfigurer configurer)
 			throws WorkbenchException {
 		// do nothing
@@ -508,6 +515,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#openIntro()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void openIntro(IWorkbenchWindowConfigurer configurer) {
 		if (introOpened) {
 			return;
@@ -552,6 +560,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#postWindowCreate()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void postWindowCreate(IWorkbenchWindowConfigurer configurer) {
 		// do nothing
 	}
@@ -575,6 +584,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#postWindowOpen()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void postWindowOpen(IWorkbenchWindowConfigurer configurer) {
 		// do nothing
 	}
@@ -605,6 +615,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#preWindowShellClose()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public boolean preWindowShellClose(IWorkbenchWindowConfigurer configurer) {
 		// do nothing, but allow the close() to proceed
 		return true;
@@ -628,6 +639,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link WorkbenchWindowAdvisor#postWindowClose()} instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void postWindowClose(IWorkbenchWindowConfigurer configurer) {
 		// do nothing
 	}
@@ -652,6 +664,7 @@ public abstract class WorkbenchAdvisor {
 	 *             {@link ActionBarAdvisor#isApplicationMenu(String)} instead
 	 * @see WorkbenchWindowAdvisor#createActionBarAdvisor(IActionBarConfigurer)
 	 */
+	@Deprecated
 	public boolean isApplicationMenu(IWorkbenchWindowConfigurer configurer,
 			String menuId) {
 		// default: not an application menu
@@ -736,10 +749,13 @@ public abstract class WorkbenchAdvisor {
 	 *             instead
 	 * @see #createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer)
 	 */
+	@Deprecated
 	public void createWindowContents(IWorkbenchWindowConfigurer configurer,
 			Shell shell) {
 		((WorkbenchWindowConfigurer) configurer).createDefaultContents(shell);
 	}
+
+	private volatile boolean initDone = false;
 
 	/**
 	 * Opens the workbench windows on startup. The default implementation tries
@@ -760,12 +776,13 @@ public abstract class WorkbenchAdvisor {
 		// the UI thread but it could take enough time to disrupt progress reporting.
 		// spawn a new thread to do the grunt work of this initialization and spin the event loop 
 		// ourselves just like it's done in Workbench.
-		final boolean[] initDone = new boolean[]{false};
+
 		final Throwable [] error = new Throwable[1];
 		Thread initThread = new Thread() {
 			/* (non-Javadoc)
 			 * @see java.lang.Thread#run()
 			 */
+			@Override
 			public void run() {
 				try {
 					//declare us to be a startup thread so that our syncs will be executed 
@@ -773,6 +790,7 @@ public abstract class WorkbenchAdvisor {
 					final IWorkbenchConfigurer [] myConfigurer = new IWorkbenchConfigurer[1];
 					StartupThreading.runWithoutExceptions(new StartupRunnable() {
 	
+						@Override
 						public void runWithException() throws Throwable {
 							myConfigurer[0] = getWorkbenchConfigurer();
 							
@@ -793,20 +811,26 @@ public abstract class WorkbenchAdvisor {
 					error[0] = e;
 				}
 				finally {
-					initDone[0] = true;
+					initDone = true;
+					yield();
+					try {
+						Thread.sleep(5);
+					} catch (InterruptedException e) {
+						// this is a no-op in this case.
+					}
 					display.wake();
 				}
 			}};
 			initThread.start();
 
-			while (true) {
-				if (!display.readAndDispatch()) {
-					if (initDone[0])
-						break;
-					display.sleep();
-				}
-				
+		while (true) {
+			if (!display.readAndDispatch()) {
+				if (initDone)
+					break;
+				display.sleep();
 			}
+
+		}
 			
 			// can only be a runtime or error
 			if (error[0] instanceof Error)

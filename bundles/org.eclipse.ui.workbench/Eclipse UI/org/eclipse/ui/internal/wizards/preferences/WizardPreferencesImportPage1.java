@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,25 +51,19 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
         this("preferencesImportPage1");//$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getAllButtonText()
-     */
-    protected String getAllButtonText() {
+    @Override
+	protected String getAllButtonText() {
         return PreferencesMessages.WizardPreferencesImportPage1_all;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getChooseButtonText()
-     */
-    protected String getChooseButtonText() {
+    @Override
+	protected String getChooseButtonText() {
         return PreferencesMessages.WizardPreferencesImportPage1_choose;
     }
 
    
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getTransfers()
-     */
-    protected PreferenceTransferElement[] getTransfers() {
+    @Override
+	protected PreferenceTransferElement[] getTransfers() {
         if (validFromFile()) {
             FileInputStream fis;
 
@@ -130,7 +124,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
         return fromFile.exists() && !fromFile.isDirectory();
     }
 
-    protected void setPreferenceTransfers() {
+    @Override
+	protected void setPreferenceTransfers() {
     	super.setPreferenceTransfers();	
     	
 		if (validFromFile()
@@ -142,10 +137,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
 		}
 	}
   
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#createTransferArea(org.eclipse.swt.widgets.Composite)
-     */
-    protected void createTransferArea(Composite composite) {
+    @Override
+	protected void createTransferArea(Composite composite) {
         createDestinationGroup(composite);
         createTransfersList(composite);
     }
@@ -155,7 +148,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
      * 
      * @return java.lang.String
      */
-    protected String getDestinationLabel() {
+    @Override
+	protected String getDestinationLabel() {
         return PreferencesMessages.WizardPreferencesImportPage1_file;
     }
 
@@ -164,7 +158,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
      * @return <code>true</code> if the transfer was succesful, and
      *         <code>false</code> otherwise
      */
-    protected boolean transfer(IPreferenceFilter[] filters) {
+    @Override
+	protected boolean transfer(IPreferenceFilter[] filters) {
         File importFile = new File(getDestinationValue());
         FileInputStream fis = null;
         try {
@@ -212,7 +207,8 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
      * @param e
      *            Event
      */
-    public void handleEvent(Event e) {
+    @Override
+	public void handleEvent(Event e) {
         if (e.widget == destinationNameField) {
 			setPreferenceTransfers();
 		}
@@ -220,40 +216,27 @@ public class WizardPreferencesImportPage1 extends WizardPreferencesPage {
         super.handleEvent(e);
     }
 	
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getFileDialogTitle()
-     */
-    protected String getFileDialogTitle(){
+    @Override
+	protected String getFileDialogTitle(){
 		return PreferencesMessages.WizardPreferencesImportPage1_title;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getFileDialogStyle()
-	 */
+	@Override
 	protected int getFileDialogStyle() {
 		return SWT.OPEN | SWT.SHEET;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#validDestination()
-	 */
+	@Override
 	protected boolean validDestination() {
 		return super.validDestination() && validFromFile();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#getInvalidDestinationMessage()
-	 */
+	@Override
 	protected String getInvalidDestinationMessage() {
 		return PreferencesMessages.WizardPreferencesImportPage1_invalidPrefFile;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.ui.internal.wizards.preferences.WizardPreferencesPage#
-	 * shouldSaveTransferAll()
-	 */
+	@Override
 	protected boolean shouldSaveTransferAll() {
 		return false;
 	}

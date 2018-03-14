@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2012 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  * IBM - Initial API and implementation
  * Sebastian Davids - bug 128529
  * Semion Chichelnitsky (semion@il.ibm.com) - bug 278064
+ * Tristan Hume - <trishume@gmail.com> -
+ * 		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
+ * 		Implemented workbench auto-save to correctly restore state in case of crash.
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -23,9 +26,9 @@ public class WorkbenchMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.messages";//$NON-NLS-1$
 
 
-	public static String ThemeChangeWarningText;
+	public static String ThemingDisabled;
 
-	public static String ThemeChangeWarningTitle;
+	public static String ThemeChangeWarningText;
 
 	public static String BundleSigningTray_Cant_Find_Service;
 
@@ -85,6 +88,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SaveAll_toolTip;
 	public static String Workbench_revert;
 	public static String Workbench_revertToolTip;
+	public static String Workbench_missingPropertyMessage;
 	public static String Workbench_move;
 
 	public static String Workbench_moveToolTip;
@@ -323,6 +327,7 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutPluginsDialog_columns;
 	public static String AboutPluginsDialog_errorTitle;
 	public static String AboutPluginsDialog_unableToOpenFile;
+	public static String AboutPluginsDialog_filterTextMessage;
 	public static String AboutFeaturesDialog_shellTitle;
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
@@ -357,6 +362,7 @@ public class WorkbenchMessages extends NLS {
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
+	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
 	public static String WorkbenchWindow_searchCombo_text;
 
@@ -470,9 +476,9 @@ public class WorkbenchMessages extends NLS {
 	// public static String ViewsPreference_perspectiveBar_topLeft;
 	// public static String ViewsPreference_perspectiveBar_left;
 	// public static String ViewsPreference_traditionalTabs;
-	// public static String ViewsPreference_currentTheme;
-	// public static String ViewsPreference_currentThemeDescription;
-	// public static String ViewsPreference_currentThemeFormat;
+	public static String ViewsPreference_currentTheme;
+	public static String ViewsPreference_currentThemeDescription;
+	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
@@ -518,13 +524,6 @@ public class WorkbenchMessages extends NLS {
 	public static String OpenPerspectiveMode_sameWindow;
 	public static String OpenPerspectiveMode_newWindow;
 
-	public static String FastViewsGroup_title;
-	public static String OpenViewMode_title;
-	public static String OpenViewMode_embed;
-	public static String OpenViewMode_fast;
-
-	public static String FastViewBar_hide;
-
 	public static String PerspectivesPreference_MakeDefault;
 	public static String PerspectivesPreference_MakeDefaultTip;
 	public static String PerspectivesPreference_Reset;
@@ -551,6 +550,17 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_noEffectOnAllViews;
 	public static String WorkbenchPreference_HeapStatusButton;
 	public static String WorkbenchPreference_HeapStatusButtonToolTip;
+
+	// --- Globalization -----
+	public static String GlobalizationPreference_nlExtensions;
+	public static String GlobalizationPreference_layoutDirection;
+	public static String GlobalizationPreference_bidiSupport;
+	public static String GlobalizationPreference_textDirection;
+	public static String GlobalizationPreference_defaultDirection;
+	public static String GlobalizationPreference_ltrDirection;
+	public static String GlobalizationPreference_autoDirection;
+	public static String GlobalizationPreference_rtlDirection;
+	public static String GlobalizationPreference_restartWidget;
 
 	// --- Fonts ---
 	public static String FontsPreference_useSystemFont;
@@ -634,6 +644,7 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_create_element_returned_null;
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
+	public static String EditorManager_largeDocumentWarning;
     
 	public static String EditorPane_pinEditor;
 
@@ -683,7 +694,6 @@ public class WorkbenchMessages extends NLS {
 	public static String StandardSystemToolbar_Restore;
 
 	public static String EditorArea_Tooltip;
-	public static String ViewPane_fastView;
 	public static String ViewPane_minimizeView;
 	public static String ViewPane_moveView;
 	public static String ViewPane_moveFolder;
@@ -806,6 +816,8 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_reuseEditorsThresholdError;
 	public static String WorkbenchPreference_recentFiles;
 	public static String WorkbenchPreference_recentFilesError;
+	public static String WorkbenchPreference_workbenchSaveInterval;
+	public static String WorkbenchPreference_workbenchSaveIntervalError;
 	public static String WorkbenchEditorsAction_label;
 	public static String WorkbookEditorsAction_label;
 
@@ -930,12 +942,6 @@ public class WorkbenchMessages extends NLS {
 	public static String PerspectiveSwitcher_topLeft;
 	public static String PerspectiveSwitcher_left;
 
-
-	public static String FastViewBar_view_orientation;
-	public static String FastViewBar_horizontal;
-	public static String FastViewBar_vertical;
-	public static String FastViewBar_0;
-
 	public static String WorkbenchPlugin_extension;
 
 	public static String EventLoopProgressMonitor_OpenDialogJobName;
@@ -1007,6 +1013,12 @@ public class WorkbenchMessages extends NLS {
 //	public static String ShowKyrsoftViewAction_ErrorShowingKyrsoftView;
 
 
+	public static String SplitValues_Horizontal;
+
+
+	public static String SplitValues_Vertical;
+
+
     // ==============================================================================
     // Content Types preference page
     // ==============================================================================
@@ -1054,7 +1066,6 @@ public class WorkbenchMessages extends NLS {
     // Trim area Display Names
     public static String TrimCommon_Main_TrimName;
     public static String TrimCommon_PerspectiveSwitcher_TrimName;
-    public static String TrimCommon_FastView_TrimName;
     public static String TrimCommon_HeapStatus_TrimName;
     public static String TrimCommon_IntroBar_TrimName;
     public static String TrimCommon_Progress_TrimName;
@@ -1093,8 +1104,6 @@ public class WorkbenchMessages extends NLS {
 	}
 
 
-    public static String FastViewBar_show_view;
-    
     // Content assist support
     public static String ContentAssist_Cue_Description_Key;
 	

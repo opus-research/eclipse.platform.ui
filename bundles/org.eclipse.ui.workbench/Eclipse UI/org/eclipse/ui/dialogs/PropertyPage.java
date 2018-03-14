@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,11 +56,8 @@ public abstract class PropertyPage extends PreferencePage implements IWorkbenchP
     public PropertyPage() {
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPropertyPage#getElement()
-     */
-    public IAdaptable getElement() {
+    @Override
+	public IAdaptable getElement() {
         return element;
     }
 
@@ -70,7 +67,8 @@ public abstract class PropertyPage extends PreferencePage implements IWorkbenchP
      * @param element
      *            the element
      */
-    public void setElement(IAdaptable element) {
+    @Override
+	public void setElement(IAdaptable element) {
         this.element = element;
     }
 }

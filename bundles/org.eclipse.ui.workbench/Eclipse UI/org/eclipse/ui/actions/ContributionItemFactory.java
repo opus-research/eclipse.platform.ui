@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -28,6 +29,7 @@ import org.eclipse.ui.internal.ShowInMenu;
 import org.eclipse.ui.internal.ShowViewMenu;
 import org.eclipse.ui.internal.SwitchToWindowMenu;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.actions.HelpSearchContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
@@ -104,6 +106,7 @@ public abstract class ContributionItemFactory {
 		private static final String COMMAND_ID = IWorkbenchCommandConstants.WINDOW_PIN_EDITOR;
 
 		/* (non-javadoc) method declared on ContributionItemFactory */
+		@Override
 		public IContributionItem create(final IWorkbenchWindow window) {
 			if (window == null) {
 				throw new IllegalArgumentException();
@@ -118,36 +121,42 @@ public abstract class ContributionItemFactory {
 							.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_PIN_EDITOR),
 					WorkbenchImages
 							.getImageDescriptor(IWorkbenchGraphicConstants.IMG_ETOOL_PIN_EDITOR_DISABLED),
-					null, null, null, null,
+					null, null, null, WorkbenchMessages.PinEditorAction_toolTip, // Local workaround for http://bugs.eclipse.org/387583
 					CommandContributionItem.STYLE_CHECK, null, false);
 			final IPropertyChangeListener[] perfs = new IPropertyChangeListener[1];
 			final IPartListener partListener = new IPartListener() {
 
+				@Override
 				public void partOpened(IWorkbenchPart part) {
 				}
 
+				@Override
 				public void partDeactivated(IWorkbenchPart part) {
 				}
 
+				@Override
 				public void partClosed(IWorkbenchPart part) {
 				}
 
+				@Override
 				public void partBroughtToTop(IWorkbenchPart part) {
 					if (!(part instanceof IEditorPart)) {
 						return;
 					}
-					ICommandService commandService = (ICommandService) window
+					ICommandService commandService = window
 							.getService(ICommandService.class);
 
 					commandService.refreshElements(COMMAND_ID, null);
 				}
 
+				@Override
 				public void partActivated(IWorkbenchPart part) {
 				}
 			};
 			window.getPartService().addPartListener(partListener);
 			final CommandContributionItem action = new CommandContributionItem(
 					parameter) {
+				@Override
 				public void dispose() {
 					WorkbenchPlugin.getDefault().getPreferenceStore()
 							.removePropertyChangeListener(perfs[0]);
@@ -157,6 +166,7 @@ public abstract class ContributionItemFactory {
 			};
 
 			perfs[0] = new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty().equals(
 							IPreferenceConstants.REUSE_EDITORS_BOOLEAN)) {
@@ -173,6 +183,7 @@ public abstract class ContributionItemFactory {
 								// from a non-ui thread
 								window.getShell().getDisplay().syncExec(
 										new Runnable() {
+											@Override
 											public void run() {
 												action.getParent()
 														.update(false);
@@ -201,7 +212,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory OPEN_WINDOWS = new ContributionItemFactory(
             "openWindows") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -219,7 +231,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory VIEWS_SHORTLIST = new ContributionItemFactory(
             "viewsShortlist") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -237,7 +250,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory VIEWS_SHOW_IN = new ContributionItemFactory(
             "viewsShowIn") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -258,7 +272,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory REOPEN_EDITORS = new ContributionItemFactory(
             "reopenEditors") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -278,7 +293,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory PERSPECTIVES_SHORTLIST = new ContributionItemFactory(
             "perspectivesShortlist") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -297,7 +313,8 @@ public abstract class ContributionItemFactory {
     public static final ContributionItemFactory NEW_WIZARD_SHORTLIST = new ContributionItemFactory(
             "newWizardShortlist") { //$NON-NLS-1$
         /* (non-javadoc) method declared on ContributionItemFactory */
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }
@@ -312,7 +329,8 @@ public abstract class ContributionItemFactory {
      */
     public static final ContributionItemFactory HELP_SEARCH = new ContributionItemFactory(
             "helpSearch") {//$NON-NLS-1$
-        public IContributionItem create(IWorkbenchWindow window) {
+        @Override
+		public IContributionItem create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
             }

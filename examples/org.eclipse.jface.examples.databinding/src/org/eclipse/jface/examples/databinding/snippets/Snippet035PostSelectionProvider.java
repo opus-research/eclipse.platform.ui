@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Ovidio Mallo and others.
+ * Copyright (c) 2009, 2014 Ovidio Mallo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,15 @@
  *
  * Contributors:
  *     Ovidio Mallo - initial API and implementation (bug 270494)
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 434283
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.IViewerObservableValue;
 import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -46,7 +48,8 @@ public class Snippet035PostSelectionProvider {
 	public static void main(String[] args) {
 		Display display = new Display();
 
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				Shell shell = new Snippet035PostSelectionProvider()
 						.createShell();
@@ -101,14 +104,14 @@ public class Snippet035PostSelectionProvider {
 		Label selectionLabel = createLabelField(section, "Selection:");
 		IViewerObservableValue selectionObservable = ViewerProperties
 				.singleSelection().observe(listViewer);
-		dbc.bindValue(SWTObservables.observeText(selectionLabel),
+		dbc.bindValue(WidgetProperties.text().observe(selectionLabel),
 				selectionObservable);
 
 		// post selection
 		Label postSelectionLabel = createLabelField(section, "Post selection:");
 		IViewerObservableValue postSelectionObservable = ViewerProperties
 				.singlePostSelection().observe(listViewer);
-		dbc.bindValue(SWTObservables.observeText(postSelectionLabel),
+		dbc.bindValue(WidgetProperties.text().observe(postSelectionLabel),
 				postSelectionObservable);
 	}
 

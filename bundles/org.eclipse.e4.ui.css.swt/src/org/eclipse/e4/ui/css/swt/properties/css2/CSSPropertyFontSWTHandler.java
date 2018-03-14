@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
+ *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.swt.properties.css2;
 
@@ -25,6 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
@@ -34,7 +37,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
 import org.w3c.dom.css.CSSValue;
 
 public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
-		implements ICSSPropertyHandler2 {
+implements ICSSPropertyHandler2 {
 
 	public final static ICSSPropertyFontHandler INSTANCE = new CSSPropertyFontSWTHandler();
 
@@ -45,13 +48,37 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 	private static final String CSS_CTABITEM_SELECTED_FONT_LISTENER_KEY = "CSS_CTABFOLDER_SELECTED_FONT_LISTENER_KEY"; //$NON-NLS-1$
 
 	private static void setFont(Widget widget, Font font) {
+
 		if (widget instanceof CTabItem) {
-			((CTabItem) widget).setFont(font);
+			CTabItem item = (CTabItem) widget;
+			CSSSWTFontHelper.setFont(item, font);
+		} else if (widget instanceof CTabFolder) {
+			CTabFolder folder = (CTabFolder) widget;
+			CSSSWTFontHelper.setFont(folder, font);
+			updateChildrenFonts(folder, font);
 		} else if (widget instanceof Control) {
-			((Control) widget).setFont(font);
+			Control control = (Control)widget;
+			final boolean isLayoutDeferred = (control instanceof Composite) && ((Composite)control).isLayoutDeferred();
+			if (isLayoutDeferred) {
+				control.setRedraw(false);
+			}
+			try {
+				CSSSWTFontHelper.setFont(control, font);
+			} finally {
+				if (isLayoutDeferred) {
+					control.setRedraw(true);
+				}
+			}
 		}
 	}
 
+	private static void updateChildrenFonts(CTabFolder folder, Font font) {
+		for (CTabItem item : folder.getItems()) {
+			CSSSWTFontHelper.setFont(item, font);
+		}
+	}
+
+	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -65,7 +92,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 				if (widget instanceof CTabItem) {
 					Control parent = CTabETabHelper.getParent(widget);
 					FontSelectionListener listener = (FontSelectionListener) parent.getData(
-									CSS_CTABITEM_SELECTED_FONT_LISTENER_KEY);
+							CSS_CTABITEM_SELECTED_FONT_LISTENER_KEY);
 					if (listener == null) {
 						listener = new FontSelectionListener(engine);
 						parent.addListener(SWT.Paint, listener);
@@ -83,70 +110,75 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		} else {
 			if (element instanceof CSS2FontProperties) {
 				super
-						.applyCSSProperty(element, property, value, pseudo,
-								engine);
+				.applyCSSProperty(element, property, value, pseudo,
+						engine);
 				return true;
 			}
 		}
 		return false;
 	}
 
+	@Override
 	public void applyCSSPropertyFontFamily(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
-		.getCSS2FontProperties(widget, engine
-				.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
-			applyCSSPropertyFontFamily((CSS2FontProperties) fontProperties, value,
+				.getCSS2FontProperties(widget, engine
+						.getCSSElementContext(widget));
+		if (fontProperties != null) {
+			applyCSSPropertyFontFamily(fontProperties, value,
 					pseudo, engine);
 			return;
 		}
 		throw new UnsupportedPropertyException("font-family");
 	}
-	
+
+	@Override
 	public void applyCSSPropertyFontSize(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
-		.getCSS2FontProperties(widget, engine
-				.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
-			applyCSSPropertyFontSize((CSS2FontProperties) fontProperties, value,
+				.getCSS2FontProperties(widget, engine
+						.getCSSElementContext(widget));
+		if (fontProperties != null) {
+			applyCSSPropertyFontSize(fontProperties, value,
 					pseudo, engine);
 			return;
 		}
 		throw new UnsupportedPropertyException("font-size");
 	}
 
+	@Override
 	public void applyCSSPropertyFontWeight(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
-		.getCSS2FontProperties(widget, engine
-				.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
-			applyCSSPropertyFontWeight((CSS2FontProperties) fontProperties, value,
+				.getCSS2FontProperties(widget, engine
+						.getCSSElementContext(widget));
+		if (fontProperties != null) {
+			applyCSSPropertyFontWeight(fontProperties, value,
 					pseudo, engine);
 			return;
 		}
 		throw new UnsupportedPropertyException("font-weight");
 	}
-	
+
+	@Override
 	public void applyCSSPropertyFontStyle(Object element, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
-		.getCSS2FontProperties(widget, engine
-				.getCSSElementContext(widget));
-		if (fontProperties instanceof CSS2FontProperties) {
-			applyCSSPropertyFontStyle((CSS2FontProperties) fontProperties, value,
+				.getCSS2FontProperties(widget, engine
+						.getCSSElementContext(widget));
+		if (fontProperties != null) {
+			applyCSSPropertyFontStyle(fontProperties, value,
 					pseudo, engine);
 			return;
 		}
 		throw new UnsupportedPropertyException("font-style");
 	}
-	
+
+	@Override
 	public String retrieveCSSProperty(Object element, String property,
 			String pseudo, CSSEngine engine) throws Exception {
 		Widget widget = SWTElementHelpers.getWidget(element);
@@ -156,28 +188,33 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontAdjust(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontFamily(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontFamily(widget);
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontSize(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontSize(widget);
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontStretch(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontStyle(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
@@ -185,27 +222,32 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontVariant(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		return null;
 	}
 
+	@Override
 	public String retrieveCSSPropertyFontWeight(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		Widget widget = (Widget) element;
 		return CSSSWTFontHelper.getFontWeight(widget);
 	}
 
+	@Override
 	public void onAllCSSPropertiesApplyed(Object element, CSSEngine engine)
 			throws Exception {
 		final Widget widget = SWTElementHelpers.getWidget(element);
-		if (widget == null || widget instanceof CTabItem)
+		if (widget == null || widget instanceof CTabItem) {
 			return;
+		}
 		CSS2FontProperties fontProperties = CSSSWTFontHelper
 				.getCSS2FontProperties(widget, engine
 						.getCSSElementContext(widget));
-		if (fontProperties == null)
+		if (fontProperties == null) {
 			return;
+		}
 		Font font = (Font) engine.convert(fontProperties, Font.class, widget);
 		setFont(widget, font);
 	}
@@ -219,7 +261,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		 */
 		private String[] fontAttributes = { "font", "font-family", "font-size",
 				"font-adjust", "font-stretch", "font-style", "font-variant",
-				"font-weight" };
+		"font-weight" };
 
 		private CSSEngine engine;
 
@@ -245,7 +287,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		 * is running, it is not desirable to restyle the items unless there is
 		 * a need. This method can be used to force the next paint event to be
 		 * processed as a restyling request.
-		 * 
+		 *
 		 * @param shouldStyle
 		 *            whether the tab items should be restyled on the next paint
 		 *            event or not
@@ -257,7 +299,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		/**
 		 * Applies the styles defined in the provided declaration onto the item.
 		 * Pseudo classes will be considered if one has been specified.
-		 * 
+		 *
 		 * @param styleDeclaration
 		 *            the style declaration to be used to style the specified
 		 *            item
@@ -278,14 +320,14 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 				// reset ourselves to prevent the stacking of properties
 				reset(fontProperties);
 
-				for (int j = 0; j < fontAttributes.length; j++) {
+				for (String fontAttribute : fontAttributes) {
 					CSSValue value = styleDeclaration
-							.getPropertyCSSValue(fontAttributes[j]);
+							.getPropertyCSSValue(fontAttribute);
 					if (value != null) {
 						try {
 							// we have a value, so apply it to the properties
 							CSSPropertyFontSWTHandler.super.applyCSSProperty(
-									itemElement, fontAttributes[j], value,
+									itemElement, fontAttribute, value,
 									pseudo, engine);
 						} catch (Exception e) {
 							engine.handleExceptions(e);
@@ -306,19 +348,19 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 
 		/**
 		 * Applies the regular unselected styles to the specified items.
-		 * 
+		 *
 		 * @param items
 		 *            the items to style
 		 */
 		private void styleUnselected(Item[] items) {
-			for (int i = 0; i < items.length; i++) {
+			for (Item item : items) {
 				CSSStyleDeclaration unselectedStyle = engine.getViewCSS()
-						.getComputedStyle(engine.getElement(items[i]), null);
+						.getComputedStyle(engine.getElement(item), null);
 				if (unselectedStyle == null) {
 					// no styles defined, just reset the font
-					setFont(items[i], null);
+					setFont(item, null);
 				} else {
-					applyStyles(unselectedStyle, null, items[i]);
+					applyStyles(unselectedStyle, null, item);
 				}
 			}
 		}
@@ -326,7 +368,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 		/**
 		 * Applies the style declaration for selected items to the specified
 		 * item if one has been defined.
-		 * 
+		 *
 		 * @param selection
 		 *            the item to style
 		 */
@@ -351,6 +393,7 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 			properties.setStretch(null);
 		}
 
+		@Override
 		public void handleEvent(Event e) {
 			if (e.widget instanceof CTabFolder) {
 				Item[] items;
@@ -358,14 +401,14 @@ public class CSSPropertyFontSWTHandler extends AbstractCSSPropertyFontHandler
 				CTabFolder folder = (CTabFolder) e.widget;
 				selection = folder.getSelection();
 				items = folder.getItems();
-				
+
 				// only style if the selection has changed
 				if (!shouldStyle && this.selection == selection) {
-					return;	
-				}			
+					return;
+				}
 				// style individual items
 				styleUnselected(items);
-	
+
 				if (selection != null && !styleSelected(selection)) {
 					setFont(selection, null);
 				}

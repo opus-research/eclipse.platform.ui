@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2011 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 package org.eclipse.ui.internal.progress;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.util.Arrays;
+import java.util.Comparator;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.Job;
@@ -45,6 +48,48 @@ import org.eclipse.ui.views.IViewDescriptor;
  */
 
 public class ProgressManagerUtil {
+
+	@SuppressWarnings("unchecked")
+	static class ProgressViewerComparator extends ViewerComparator {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public int compare(Viewer testViewer, Object e1, Object e2) {
+			return ((Comparable) e1).compareTo(e2);
+		}
+
+		@Override
+		public void sort(final Viewer viewer, Object[] elements) {
+			/*
+			 * https://bugs.eclipse.org/371354
+			 * 
+			 * This ordering is inherently unstable, since it relies on
+			 * modifiable properties of the elements: E.g. the default
+			 * implementation in JobTreeElement compares getDisplayString(),
+			 * many of whose implementations use getPercentDone().
+			 * 
+			 * JavaSE 7+'s TimSort introduced a breaking change: It now throws a
+			 * new IllegalArgumentException for bad comparators. Workaround is
+			 * to retry a few times.
+			 */
+			for (int retries = 3; retries > 0; retries--) {
+				try {
+					Arrays.sort(elements, new Comparator<Object>() {
+						@Override
+						public int compare(Object a, Object b) {
+							return ProgressViewerComparator.this.compare(viewer, a, b);
+						}
+					});
+					return; // success
+				} catch (IllegalArgumentException e) {
+					// retry
+				}
+			}
+
+			// One last try that will log and throw TimSort's IAE if it happens:
+			super.sort(viewer, elements);
+		}
+	}
+
 	/**
 	 * A constant used by the progress support to determine if an operation is
 	 * too short to show progress.
@@ -97,17 +142,7 @@ public class ProgressManagerUtil {
 	 * @return ViewerComparator
 	 */
 	static ViewerComparator getProgressViewerComparator() {
-		return new ViewerComparator() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
-			public int compare(Viewer testViewer, Object e1, Object e2) {
-				return ((Comparable) e1).compareTo(e2);
-			}
-		};
+		return new ProgressViewerComparator();
 	}
 
 	/**
@@ -330,11 +365,12 @@ public class ProgressManagerUtil {
 	 
 	/**
 	 * Utility method to get the best parenting possible for a dialog. If there
-	 * is a modal shell create it so as to avoid two modal dialogs. If not then
-	 * return the shell of the active workbench window. If neither can be found
-	 * return null.
+	 * is a modal shell return it so as to avoid two modal dialogs. If not then
+	 * return the shell of the active workbench window. If that shell is
+	 * <code>null</code> or not visible, then return the splash shell if still
+	 * visible. Otherwise return the shell of the active workbench window.
 	 * 
-	 * @return Shell or <code>null</code>
+	 * @return the best parent shell or <code>null</code>
 	 */
 	public static Shell getDefaultParent() {
 		Shell modal = getModalShellExcluding(null);
@@ -342,7 +378,22 @@ public class ProgressManagerUtil {
 			return modal;
 		}
 
-		return getNonModalShell();
+		Shell nonModalShell = getNonModalShell();
+		if (nonModalShell != null && nonModalShell.isVisible())
+			return nonModalShell;
+
+		try {
+			Shell splashShell = WorkbenchPlugin.getSplashShell(PlatformUI.getWorkbench().getDisplay());
+			if (splashShell != null && splashShell.isVisible()) {
+				return splashShell;
+			}
+		} catch (IllegalAccessException e) {
+			// Use non-modal shell
+		} catch (InvocationTargetException e) {
+			// Use non-modal shell
+		}
+
+		return nonModalShell;
 	}
 
 	/**
@@ -445,6 +496,7 @@ public class ProgressManagerUtil {
 			 * 
 			 * @see org.eclipse.jface.window.IShellProvider#getShell()
 			 */
+			@Override
 			public Shell getShell() {
 				return getDefaultParent();
 			}
@@ -468,7 +520,7 @@ public class ProgressManagerUtil {
 	 */
 	public static URL getProgressSpinnerLocation() {
 		try {
-			return new URL(getIconsRoot(), "progress_spinner.gif");//$NON-NLS-1$
+			return new URL(getIconsRoot(), "progress_spinner.png");//$NON-NLS-1$
 		} catch (MalformedURLException e) {
 			return null;
 		}

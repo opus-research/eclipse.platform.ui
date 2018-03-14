@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -111,7 +111,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * @see #getNextPage
      * @see #isPageComplete()
      */
-    public boolean canFlipToNextPage() {
+    @Override
+	public boolean canFlipToNextPage() {
         return isPageComplete() && getNextPage() != null;
     }
 
@@ -141,10 +142,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
         return wizard.getDialogSettings();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
-    public Image getImage() {
+    @Override
+	public Image getImage() {
         Image result = super.getImage();
 
         if (result == null && wizard != null) {
@@ -154,30 +153,21 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
         return result;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     */
-    public String getName() {
+    @Override
+	public String getName() {
         return name;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     * The default behavior is to ask the wizard for the next page.
-     */
-    public IWizardPage getNextPage() {
+    @Override
+	public IWizardPage getNextPage() {
         if (wizard == null) {
 			return null;
 		}
         return wizard.getNextPage(this);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     * The default behavior is return the cached previous back or,
-     * lacking that, to ask the wizard for the previous page.
-     */
-    public IWizardPage getPreviousPage() {
+    @Override
+	public IWizardPage getPreviousPage() {
         if (previousPage != null) {
 			return previousPage;
 		}
@@ -196,7 +186,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * once the container is created even though this page's control may not 
      * yet be created.
      */
-    public Shell getShell() {
+    @Override
+	public Shell getShell() {
 
         IWizardContainer container = getContainer();
         if (container == null) {
@@ -207,10 +198,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
         return container.getShell();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     */
-    public IWizard getWizard() {
+    @Override
+	public IWizard getWizard() {
         return wizard;
     }
 
@@ -230,7 +219,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * returns the value of an internal state variable set by
      * <code>setPageComplete</code>. Subclasses may extend.
      */
-    public boolean isPageComplete() {
+    @Override
+	public boolean isPageComplete() {
         return isPageComplete;
     }
 
@@ -239,7 +229,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * method extends the <code>DialogPage</code> implementation to update
      * the wizard container title bar. Subclasses may extend.
      */
-    public void setDescription(String description) {
+    @Override
+	public void setDescription(String description) {
         super.setDescription(description);
         if (isCurrentPage()) {
 			getContainer().updateTitleBar();
@@ -251,7 +242,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this is the current page.
      */
-    public void setErrorMessage(String newMessage) {
+    @Override
+	public void setErrorMessage(String newMessage) {
         super.setErrorMessage(newMessage);
         if (isCurrentPage()) {
             getContainer().updateMessage();
@@ -263,7 +255,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this page is the current page.
      */
-    public void setImageDescriptor(ImageDescriptor image) {
+    @Override
+	public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);
         if (isCurrentPage()) {
 			getContainer().updateTitleBar();
@@ -275,7 +268,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * declared on <code>DialogPage</code> updates the container
      * if this is the current page.
      */
-    public void setMessage(String newMessage, int newType) {
+    @Override
+	public void setMessage(String newMessage, int newType) {
         super.setMessage(newMessage, newType);
         if (isCurrentPage()) {
 			getContainer().updateMessage();
@@ -300,10 +294,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
 		}
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     */
-    public void setPreviousPage(IWizardPage page) {
+    @Override
+	public void setPreviousPage(IWizardPage page) {
         previousPage = page;
     }
 
@@ -312,17 +304,16 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * method extends the <code>DialogPage</code> implementation to update
      * the wizard container title bar. Subclasses may extend.
      */
-    public void setTitle(String title) {
+    @Override
+	public void setTitle(String title) {
         super.setTitle(title);
         if (isCurrentPage()) {
             getContainer().updateTitleBar();
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWizardPage.
-     */
-    public void setWizard(IWizard newWizard) {
+    @Override
+	public void setWizard(IWizard newWizard) {
         wizard = newWizard;
     }
 
@@ -330,7 +321,8 @@ public abstract class WizardPage extends DialogPage implements IWizardPage {
      * Returns a printable representation of this wizard page suitable
      * only for debug purposes.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return name;
     }
 }

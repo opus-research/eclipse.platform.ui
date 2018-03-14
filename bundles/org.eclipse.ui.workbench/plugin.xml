@@ -22,6 +22,10 @@
               beforefragment="true"
               class="org.eclipse.ui.internal.BindingToModelProcessor">
         </processor>
+         <processor
+               beforefragment="true"
+               class="org.eclipse.ui.internal.ModelMigrationProcessor">
+         </processor>
      </extension>
    <extension
          point="org.eclipse.e4.ui.css.core.propertyHandler">
@@ -37,5 +41,10 @@
                deprecated="renamed as eclipse-perspective-keyline-color">
          </property-name>
       </handler>
+   </extension>
+   <extension point="org.eclipse.ui.themes">
+      <themeElementCategory
+         id="org.eclipse.ui.themes.CssTheme"
+         label="%Other.defined.by.css.label"/>
    </extension>
 </plugin>

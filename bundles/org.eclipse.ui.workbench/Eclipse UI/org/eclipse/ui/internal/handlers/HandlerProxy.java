@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -214,6 +215,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 				enabledWhenExpression, getEnablementListener(), PROP_ENABLED);
 	}
 
+	@Override
 	public void setEnabled(Object evaluationContext) {
 		if (!(evaluationContext instanceof IEvaluationContext)) {
 			return;
@@ -245,6 +247,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	private IPropertyChangeListener getEnablementListener() {
 		if (enablementListener == null) {
 			enablementListener = new IPropertyChangeListener() {
+				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					if (event.getProperty() == PROP_ENABLED) {
 						setProxyEnabled(event.getNewValue() == null ? false
@@ -262,6 +265,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/**
 	 * Passes the dipose on to the proxied handler, if it has been loaded.
 	 */
+	@Override
 	public final void dispose() {
 		if (handler != null) {
 			if (handlerListener != null) {
@@ -278,6 +282,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		}
 	}
 
+	@Override
 	public final Object execute(final ExecutionEvent event)
 			throws ExecutionException {
 		if (loadHandler()) {
@@ -296,6 +301,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		return null;
 	}
 
+	@Override
 	public final boolean isEnabled() {
 		if (enabledWhenExpression != null) {
 			// proxyEnabled reflects the enabledWhen clause
@@ -319,6 +325,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		return true;
 	}
 
+	@Override
 	public final boolean isHandled() {
 		if (configurationElement != null && handler == null) {
 			return true;
@@ -378,6 +385,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	private IHandlerListener getHandlerListener() {
 		if (handlerListener == null) {
 			handlerListener = new IHandlerListener() {
+				@Override
 				public void handlerChanged(HandlerEvent handlerEvent) {
 					fireHandlerChanged(new HandlerEvent(HandlerProxy.this,
 							handlerEvent.isEnabledChanged(), handlerEvent
@@ -388,6 +396,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 		return handlerListener;
 	}
 
+	@Override
 	public final String toString() {
 		if (handler == null) {
 			if (configurationElement != null) {
@@ -443,6 +452,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	 * @see org.eclipse.ui.commands.IElementUpdater#updateElement(org.eclipse.ui.menus.UIElement,
 	 *      java.util.Map)
 	 */
+	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		if (checkedState != null) {
 			Boolean value = (Boolean) checkedState.getValue();
@@ -462,7 +472,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 				&& (checkedState == null && radioState == null)) {
 			return;
 		}
-		ICommandService cs = (ICommandService) PlatformUI.getWorkbench()
+		ICommandService cs = PlatformUI.getWorkbench()
 				.getService(ICommandService.class);
 		cs.refreshElements(commandId, null);
 	}
@@ -470,6 +480,7 @@ public final class HandlerProxy extends AbstractHandlerWithState implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.commands.IStateListener#handleStateChange(org.eclipse.core.commands.State, java.lang.Object)
 	 */
+	@Override
 	public void handleStateChange(State state, Object oldValue) {
 		if (state.getId().equals(RegistryToggleState.STATE_ID)) {
 			checkedState = state;

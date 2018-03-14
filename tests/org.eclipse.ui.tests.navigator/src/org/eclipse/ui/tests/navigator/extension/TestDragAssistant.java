@@ -32,13 +32,15 @@ public class TestDragAssistant extends ResourceDragAdapterAssistant {
 		_finishedEvent = null;
 		_finishedSelection = null;
 	}
-	
+
+	@Override
 	public void dragStart(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 		super.dragStart(anEvent, aSelection);
 		anEvent.doit = _doit;
 	}
 
+	@Override
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 		super.setDragData(anEvent, aSelection);
@@ -46,6 +48,7 @@ public class TestDragAssistant extends ResourceDragAdapterAssistant {
 		return true;
 	}
 
+	@Override
 	public void dragFinished(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {
 

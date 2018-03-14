@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,19 +12,17 @@
 
 package org.eclipse.e4.ui.css.core.impl.dom;
 
-import java.io.Serializable;
-
 import org.w3c.css.sac.LexicalUnit;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.RGBColor;
 
-public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable {
+public class RGBColorImpl extends CSSValueImpl implements RGBColor {
 
 	private CSSPrimitiveValue red;
 	private CSSPrimitiveValue green;
 	private CSSPrimitiveValue blue;
-	
+
 	public RGBColorImpl(LexicalUnit lexicalUnit) {
 		LexicalUnit nextUnit = lexicalUnit.getParameters();
 		red = new Measure(nextUnit);
@@ -38,6 +36,7 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.RGBColor#getRed()
 	 */
+	@Override
 	public CSSPrimitiveValue getRed() {
 		return red;
 	}
@@ -46,6 +45,7 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.RGBColor#getGreen()
 	 */
+	@Override
 	public CSSPrimitiveValue getGreen() {
 		return green;
 	}
@@ -54,6 +54,7 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.RGBColor#getBlue()
 	 */
+	@Override
 	public CSSPrimitiveValue getBlue() {
 		return blue;
 	}
@@ -62,6 +63,7 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSValue#getRGBColorValue()
 	 */
+	@Override
 	public RGBColor getRGBColorValue() throws DOMException {
 		return this;
 	}
@@ -70,14 +72,16 @@ public class RGBColorImpl extends CSSValueImpl implements RGBColor, Serializable
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSValue#getPrimitiveType()
 	 */
+	@Override
 	public short getPrimitiveType() {
 		return CSS_RGBCOLOR;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.w3c.dom.css.CSSValue#getCssText()
 	 */
+	@Override
 	public String getCssText() {
 		return "rgb(" + red.getCssText() + ", " + green.getCssText() + ", "
 				+ blue.getCssText() + ")";

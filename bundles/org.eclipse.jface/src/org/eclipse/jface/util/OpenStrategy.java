@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,8 @@ public class OpenStrategy {
      * 
      * @deprecated
      */
-    public static final int NO_TIMER = SINGLE_CLICK;
+    @Deprecated
+	public static final int NO_TIMER = SINGLE_CLICK;
 
     /** A single click will generate an open
      * event and key arrows will generate an open event after a
@@ -76,14 +77,16 @@ public class OpenStrategy {
      * 
      * @deprecated
      */
-    public static final int FILE_EXPLORER = SINGLE_CLICK | ARROW_KEYS_OPEN;
+    @Deprecated
+	public static final int FILE_EXPLORER = SINGLE_CLICK | ARROW_KEYS_OPEN;
 
     /** Pointing to an item will change the selection
      * and a single click will gererate an open event
      * 
      * @deprecated
      */
-    public static final int ACTIVE_DESKTOP = SINGLE_CLICK | SELECT_ON_HOVER;
+    @Deprecated
+	public static final int ACTIVE_DESKTOP = SINGLE_CLICK | SELECT_ON_HOVER;
 
     // Time used in FILE_EXPLORER and ACTIVE_DESKTOP
     // Not declared final, see bug 246209
@@ -301,7 +304,8 @@ public class OpenStrategy {
 
             boolean expandOccurred = false;
 
-            public void handleEvent(final Event e) {
+            @Override
+			public void handleEvent(final Event e) {
                 if (e.type == SWT.DefaultSelection) {
                     SelectionEvent event = new SelectionEvent(e);
                     fireDefaultSelectionEvent(event);
@@ -339,7 +343,8 @@ public class OpenStrategy {
                     mouseMoveEvent = e;
                     final Runnable runnable[] = new Runnable[1];
                     runnable[0] = new Runnable() {
-                        public void run() {
+                        @Override
+						public void run() {
                             long time = System.currentTimeMillis();
                             int diff = (int) (time - startTime);
                             if (diff <= TIME) {
@@ -414,11 +419,13 @@ public class OpenStrategy {
                     // handles the case where the user presses arrowDown/Up successively.
                     // We only want to open an editor for the last selected item.
                     display.asyncExec(new Runnable() {
-                        public void run() {
+                        @Override
+						public void run() {
                             if (arrowKeyDown) {
                                 display.timerExec(TIME, new Runnable() {
 
-                                    public void run() {
+                                    @Override
+									public void run() {
                                         if (id == count[0]) {
                                             firePostSelectionEvent(new SelectionEvent(
                                                     e));

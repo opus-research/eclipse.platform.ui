@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 428050
+ *     Brian de Alwis - Fix size computation to account for trim
  ******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -24,20 +26,22 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
-import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.accessibility.ACC;
+import org.eclipse.swt.accessibility.AccessibleAdapter;
+import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.FocusAdapter;
@@ -49,6 +53,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridLayout;
@@ -58,14 +63,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.handlers.IHandlerService;
-import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
-import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.swt.IFocusService;
+
 
 public class SearchField {
 
@@ -82,6 +87,7 @@ public class SearchField {
 	private Text text;
 
 	private QuickAccessContents quickAccessContents;
+
 	private MWindow window;
 
 	private Map<String, QuickAccessProvider> providerMap = new HashMap<String, QuickAccessProvider>();
@@ -97,6 +103,13 @@ public class SearchField {
 
 	@Inject
 	private EPartService partService;
+	private Table table;
+
+	private String selectedString = ""; //$NON-NLS-1$
+	private AccessibleAdapter accessibleListener;
+
+	// private Object invokingCommandKeySequences;
+	// private Object invokingCommand;
 
 	@PostConstruct
 	void createWidget(final Composite parent, MApplication application, MWindow window) {
@@ -104,15 +117,15 @@ public class SearchField {
 		// borderColor = new Color(parent.getDisplay(), 170, 176, 191);
 		final Composite comp = new Composite(parent, SWT.NONE);
 		comp.setLayout(new GridLayout());
-		text = new Text(comp, SWT.SEARCH | SWT.ICON_SEARCH);
-		GridDataFactory.fillDefaults().hint(130, SWT.DEFAULT).applyTo(text);
-		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
+		text = createText(comp);
 
 		parent.getShell().addControlListener(new ControlListener() {
+			@Override
 			public void controlResized(ControlEvent e) {
 				closeDropDown();
 			}
 
+			@Override
 			public void controlMoved(ControlEvent e) {
 				closeDropDown();
 			}
@@ -120,17 +133,15 @@ public class SearchField {
 			private void closeDropDown() {
 				if (shell == null || shell.isDisposed() || text.isDisposed() || !shell.isVisible())
 					return;
-
 				quickAccessContents.doClose();
-				text.setText(""); //$NON-NLS-1$
-				quickAccessContents.resetProviders();
 			}
 		});
 
 		hookUpSelectAll();
 
 		final CommandProvider commandProvider = new CommandProvider();
-		QuickAccessProvider[] providers = new QuickAccessProvider[] { new PreviousPicksProvider(),
+		QuickAccessProvider[] providers = new QuickAccessProvider[] {
+				new PreviousPicksProvider(previousPicksList),
 				new EditorProvider(), new ViewProvider(application, window),
 				new PerspectiveProvider(), commandProvider, new ActionProvider(),
 				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
@@ -140,20 +151,27 @@ public class SearchField {
 		restoreDialog();
 
 		quickAccessContents = new QuickAccessContents(providers) {
-			void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
+			@Override
+			protected void updateFeedback(boolean filterTextEmpty, boolean showAllMatches) {
 			}
 
-			void doClose() {
+			@Override
+			protected void doClose() {
+				text.setText(""); //$NON-NLS-1$
+				resetProviders();
 				dialogHeight = shell.getSize().y;
 				dialogWidth = shell.getSize().x;
 				shell.setVisible(false);
+				removeAccessibleListener();
 			}
 
-			QuickAccessElement getPerfectMatch(String filter) {
+			@Override
+			protected QuickAccessElement getPerfectMatch(String filter) {
 				return elementMap.get(filter);
 			}
 
-			void handleElementSelected(String string, Object selectedElement) {
+			@Override
+			protected void handleElementSelected(String string, Object selectedElement) {
 				if (selectedElement instanceof QuickAccessElement) {
 					QuickAccessElement element = (QuickAccessElement) selectedElement;
 					addPreviousPick(string, element);
@@ -171,8 +189,9 @@ public class SearchField {
 					if (text.isFocusControl()) {
 						MPart activePart = partService.getActivePart();
 						if (activePart != null) {
-							ContextInjectionFactory.invoke(activePart.getObject(), Focus.class,
-									activePart.getContext(), null);
+							IPresentationEngine pe = activePart.getContext().get(
+									IPresentationEngine.class);
+							pe.focusGui(activePart);
 						}
 					}
 				}
@@ -181,26 +200,29 @@ public class SearchField {
 		quickAccessContents.hookFilterText(text);
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
 		shell.addShellListener(new ShellAdapter() {
 			@Override
 			public void shellClosed(ShellEvent e) {
 				quickAccessContents.doClose();
-				text.setText(""); //$NON-NLS-1$
 				e.doit = false;
 			}
 		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
-		final Table table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
+		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
+			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close the shell
 				table.getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						checkFocusLost(table, text);
 					}
 				});
 			}
 
+			@Override
 			public void focusGained(FocusEvent e) {
 				IHandlerService hs = SearchField.this.window.getContext()
 						.get(IHandlerService.class);
@@ -213,10 +235,12 @@ public class SearchField {
 			
 		});
 		table.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent e) {
 				// Once the focus event is complete, check if we should close
 				// the shell
 				table.getDisplay().asyncExec(new Runnable() {
+					@Override
 					public void run() {
 						checkFocusLost(table, text);
 					}
@@ -224,11 +248,20 @@ public class SearchField {
 			}
 		});
 		text.addModifyListener(new ModifyListener() {
+			@Override
 			public void modifyText(ModifyEvent e) {
 				boolean wasVisible = shell.getVisible();
 				boolean nowVisible = text.getText().length() > 0;
 				if (!wasVisible && nowVisible) {
 					layoutShell();
+					addAccessibleListener();
+					quickAccessContents.preOpen();
+				}
+				if (wasVisible && !nowVisible) {
+					removeAccessibleListener();
+				}
+				if (nowVisible) {
+					notifyAccessibleTextChanged();
 				}
 				shell.setVisible(nowVisible);
 			}
@@ -247,24 +280,27 @@ public class SearchField {
 				} else if (e.keyCode == SWT.ARROW_DOWN) {
 					e.doit = false;
 				}
+				if (e.doit == false) {
+					// arrow key pressed
+					notifyAccessibleTextChanged();
+				}
 			}
 		});
+		quickAccessContents.createInfoLabel(shell);
 	}
 
-	public Table getTable() {
-		return quickAccessContents.getTable();
-	}
+	private Text createText(Composite parent) {
+		Text text = new Text(parent, SWT.SEARCH);
+		text.setMessage(QuickAccessMessages.QuickAccess_EnterSearch);
 
-	public Text getFilterText() {
+		GC gc = new GC(text);
+		Point p = gc.textExtent(QuickAccessMessages.QuickAccess_EnterSearch);
+		Rectangle r = text.computeTrim(0, 0, p.x, p.y);
+		gc.dispose();
+
+		// computeTrim() may result in r.x < 0
+		GridDataFactory.fillDefaults().hint(r.width - r.x, SWT.DEFAULT).applyTo(text);
 		return text;
-	}
-
-	public void close() {
-		shell.setVisible(false);
-	}
-
-	public void toggleShowAllMatches() {
-		quickAccessContents.toggleShowAllMatches();
 	}
 
 	private void hookUpSelectAll() {
@@ -288,24 +324,28 @@ public class SearchField {
 		IHandlerService whService = windowContext.get(IHandlerService.class);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_SELECT_ALL,
 				new AbstractHandler() {
+					@Override
 					public Object execute(ExecutionEvent event) {
 						text.selectAll();
 						return null;
 					}
 				}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_CUT, new AbstractHandler() {
+			@Override
 			public Object execute(ExecutionEvent event) {
 				text.cut();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_COPY, new AbstractHandler() {
+			@Override
 			public Object execute(ExecutionEvent event) {
 				text.copy();
 				return null;
 			}
 		}, focusExpr);
 		whService.activateHandler(IWorkbenchCommandConstants.EDIT_PASTE, new AbstractHandler() {
+			@Override
 			public Object execute(ExecutionEvent event) {
 				text.paste();
 				return null;
@@ -390,8 +430,12 @@ public class SearchField {
 		this.previousFocusControl = previousFocusControl;
 		if (!shell.isVisible()) {
 			layoutShell();
+			quickAccessContents.preOpen();
 			shell.setVisible(true);
+			addAccessibleListener();
 			quickAccessContents.refresh(text.getText().toLowerCase());
+		} else {
+			quickAccessContents.setShowAllMatches(!quickAccessContents.getShowAllMatches());
 		}
 	}
 
@@ -414,10 +458,53 @@ public class SearchField {
 			if (!shell.isFocusControl() && !table.isFocusControl()
 					&& !text.isFocusControl()) {
 				quickAccessContents.doClose();
-				text.setText(""); //$NON-NLS-1$
-				quickAccessContents.resetProviders();
 			}
 		}
+	}
+
+	/**
+	 * Adds a listener to the
+	 * <code>org.eclipse.swt.accessibility.Accessible</code> object assigned to
+	 * the Quick Access search box. The listener sets a name of a selected
+	 * element in the search result list as a text to read for a screen reader.
+	 */
+	private void addAccessibleListener() {
+		if (accessibleListener == null) {
+			accessibleListener = new AccessibleAdapter() {
+				@Override
+				public void getName(AccessibleEvent e) {
+					e.result = selectedString;
+				}
+			};
+			text.getAccessible().addAccessibleListener(accessibleListener);
+		}
+	}
+
+	/**
+	 * Removes a listener from the
+	 * <code>org.eclipse.swt.accessibility.Accessible</code> object assigned to
+	 * the Quick Access search box.
+	 */
+	private void removeAccessibleListener() {
+		if (accessibleListener != null) {
+			text.getAccessible().removeAccessibleListener(accessibleListener);
+			accessibleListener = null;
+		}
+		selectedString = ""; //$NON-NLS-1$
+	}
+
+	/**
+	 * Notifies <code>org.eclipse.swt.accessibility.Accessible<code> object
+	 * that selected item has been changed.
+	 */
+	private void notifyAccessibleTextChanged() {
+		if (table.getSelection().length == 0) {
+			return;
+		}
+		TableItem item = table.getSelection()[0];
+		selectedString = NLS.bind(QuickAccessMessages.QuickAccess_SelectedString, item.getText(0),
+				item.getText(1));
+		text.getAccessible().sendEvent(ACC.EVENT_NAME_CHANGED, null);
 	}
 
 	private void restoreDialog() {
@@ -568,39 +655,33 @@ public class SearchField {
 		}
 	}
 
-	private class PreviousPicksProvider extends QuickAccessProvider {
-
-		public QuickAccessElement getElementForId(String id) {
-			return null;
-		}
-
-		public QuickAccessElement[] getElements() {
-			return previousPicksList.toArray(new QuickAccessElement[previousPicksList.size()]);
-		}
-
-		public QuickAccessElement[] getElementsSorted() {
-			return getElements();
-		}
-
-		public String getId() {
-			return "org.eclipse.ui.previousPicks"; //$NON-NLS-1$
-		}
-
-		public ImageDescriptor getImageDescriptor() {
-			return WorkbenchImages.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
-		}
-
-		public String getName() {
-			return QuickAccessMessages.QuickAccess_Previous;
-		}
-
-		protected void doReset() {
-			// operation not applicable for this provider
-		}
-
-		public boolean isAlwaysPresent() {
-			return true;
-		}
+	/**
+	 * Returns the quick access shell for testing. Should not be referenced
+	 * outside of the tests.
+	 * 
+	 * @return the current quick access shell or <code>null</code>
+	 */
+	public Shell getQuickAccessShell() {
+		return shell;
 	}
 
+	/**
+	 * Returns the quick access search text for testing. Should not be
+	 * referenced outside of the tests.
+	 * 
+	 * @return the search text in the workbench window or <code>null</code>
+	 */
+	public Text getQuickAccessSearchText() {
+		return text;
+	}
+
+	/**
+	 * Returns the table in the shell for testing. Should not be referenced
+	 * outside of the tests.
+	 * 
+	 * @return the table created in the shell or <code>null</code>
+	 */
+	public Table getQuickAccessTable(){
+		return table;
+	}
 }

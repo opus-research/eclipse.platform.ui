@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,28 +10,7 @@
  */
 package org.eclipse.e4.ui.model.application.ui.menu.impl;
 
-import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuFactory;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
-import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.*;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EObject;
@@ -62,7 +41,7 @@ public class MenuFactoryImpl extends EFactoryImpl implements MMenuFactory {
 	 */
 	public static MenuFactoryImpl init() {
 		try {
-			MenuFactoryImpl theMenuFactory = (MenuFactoryImpl)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/ui/2010/UIModel/application/ui/menu"); //$NON-NLS-1$ 
+			MenuFactoryImpl theMenuFactory = (MenuFactoryImpl)EPackage.Registry.INSTANCE.getEFactory(MenuPackageImpl.eNS_URI);
 			if (theMenuFactory != null) {
 				return theMenuFactory;
 			}
@@ -102,15 +81,9 @@ public class MenuFactoryImpl extends EFactoryImpl implements MMenuFactory {
 			case MenuPackageImpl.HANDLED_TOOL_ITEM: return (EObject)createHandledToolItem();
 			case MenuPackageImpl.DIRECT_TOOL_ITEM: return (EObject)createDirectToolItem();
 			case MenuPackageImpl.TOOL_BAR_SEPARATOR: return (EObject)createToolBarSeparator();
-			case MenuPackageImpl.RENDERED_MENU: return (EObject)createRenderedMenu();
-			case MenuPackageImpl.RENDERED_TOOL_BAR: return (EObject)createRenderedToolBar();
 			case MenuPackageImpl.TOOL_BAR_CONTRIBUTION: return (EObject)createToolBarContribution();
 			case MenuPackageImpl.TRIM_CONTRIBUTION: return (EObject)createTrimContribution();
-			case MenuPackageImpl.RENDERED_MENU_ITEM: return (EObject)createRenderedMenuItem();
-			case MenuPackageImpl.OPAQUE_TOOL_ITEM: return (EObject)createOpaqueToolItem();
-			case MenuPackageImpl.OPAQUE_MENU_ITEM: return (EObject)createOpaqueMenuItem();
-			case MenuPackageImpl.OPAQUE_MENU_SEPARATOR: return (EObject)createOpaqueMenuSeparator();
-			case MenuPackageImpl.OPAQUE_MENU: return (EObject)createOpaqueMenu();
+			case MenuPackageImpl.DYNAMIC_MENU_CONTRIBUTION: return (EObject)createDynamicMenuContribution();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -261,26 +234,6 @@ public class MenuFactoryImpl extends EFactoryImpl implements MMenuFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public MRenderedMenu createRenderedMenu() {
-		RenderedMenuImpl renderedMenu = new RenderedMenuImpl();
-		return renderedMenu;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MRenderedToolBar createRenderedToolBar() {
-		RenderedToolBarImpl renderedToolBar = new RenderedToolBarImpl();
-		return renderedToolBar;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public MToolBarContribution createToolBarContribution() {
 		ToolBarContributionImpl toolBarContribution = new ToolBarContributionImpl();
 		return toolBarContribution;
@@ -301,49 +254,9 @@ public class MenuFactoryImpl extends EFactoryImpl implements MMenuFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public MRenderedMenuItem createRenderedMenuItem() {
-		RenderedMenuItemImpl renderedMenuItem = new RenderedMenuItemImpl();
-		return renderedMenuItem;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MOpaqueToolItem createOpaqueToolItem() {
-		OpaqueToolItemImpl opaqueToolItem = new OpaqueToolItemImpl();
-		return opaqueToolItem;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MOpaqueMenuItem createOpaqueMenuItem() {
-		OpaqueMenuItemImpl opaqueMenuItem = new OpaqueMenuItemImpl();
-		return opaqueMenuItem;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MOpaqueMenuSeparator createOpaqueMenuSeparator() {
-		OpaqueMenuSeparatorImpl opaqueMenuSeparator = new OpaqueMenuSeparatorImpl();
-		return opaqueMenuSeparator;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public MOpaqueMenu createOpaqueMenu() {
-		OpaqueMenuImpl opaqueMenu = new OpaqueMenuImpl();
-		return opaqueMenu;
+	public MDynamicMenuContribution createDynamicMenuContribution() {
+		DynamicMenuContributionImpl dynamicMenuContribution = new DynamicMenuContributionImpl();
+		return dynamicMenuContribution;
 	}
 
 	/**

@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.util.SafeRunnable;
@@ -52,7 +52,7 @@ public class PartListenerList2 extends EventManager {
     		label = string + ref.getTitle();
     		UIStats.start(UIStats.NOTIFY_PART_LISTENERS, label);
     	}
-    	Platform.run(runnable);
+    	SafeRunner.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PART_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PART_LISTENERS, listener, label);
 		}
@@ -66,7 +66,8 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partActivated(ref);
                 }
             }, l, ref, "activated::"); //$NON-NLS-1$
@@ -81,7 +82,8 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partBroughtToTop(ref);
                 }
             }, l, ref, "broughtToTop::"); //$NON-NLS-1$
@@ -96,7 +98,8 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partClosed(ref);
                 }
             }, l, ref, "closed::"); //$NON-NLS-1$
@@ -111,7 +114,8 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partDeactivated(ref);
                 }
             }, l, ref, "deactivated::"); //$NON-NLS-1$
@@ -126,7 +130,8 @@ public class PartListenerList2 extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPartListener2 l = (IPartListener2) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partOpened(ref);
                 }
             }, l, ref, "opened::"); //$NON-NLS-1$
@@ -147,7 +152,8 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partHidden(ref);
                 }
             }, l, ref, "hidden::"); //$NON-NLS-1$
@@ -168,7 +174,8 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partVisible(ref);
                 }
             }, l, ref, "visible::"); //$NON-NLS-1$
@@ -189,7 +196,8 @@ public class PartListenerList2 extends EventManager {
 			}
 
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.partInputChanged(ref);
                 }
             }, l, ref, "inputChanged::"); //$NON-NLS-1$
@@ -214,7 +222,8 @@ public class PartListenerList2 extends EventManager {
 			}
 
             SafeRunnable.run(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.pageChanged(event);
                 }
             });

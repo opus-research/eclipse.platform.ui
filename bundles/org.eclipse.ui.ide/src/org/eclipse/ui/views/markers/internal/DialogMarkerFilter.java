@@ -88,20 +88,22 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
 		 *      int)
 		 */
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			return null;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
 		 *      int)
 		 */
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			return ((AbstractNode) element).getName();
 		}
@@ -119,7 +121,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Creates the working set filter selection widgets.
-		 * 
+		 *
 		 * @param parent
 		 *            the parent composite of the working set widgets
 		 */
@@ -144,7 +146,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Returns wether or not a working set filter should be used
-		 * 
+		 *
 		 * @return true=a working set filter should be used false=a working set
 		 *         filter should not be used
 		 */
@@ -154,7 +156,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Returns the selected working set filter or null if none is selected.
-		 * 
+		 *
 		 * @return the selected working set filter or null if none is selected.
 		 */
 		IWorkingSet getWorkingSet() {
@@ -163,7 +165,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Sets the working set filter selection.
-		 * 
+		 *
 		 * @param selected
 		 *            true=a working set filter should be used false=no working
 		 *            set filter should be used
@@ -206,7 +208,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Sets the specified working set.
-		 * 
+		 *
 		 * @param workingSet
 		 *            the working set
 		 */
@@ -230,41 +232,41 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 	/**
 	 * AbstractNode is the abstract superclass of the node elements for
 	 * MarkerTypes.
-	 * 
+	 *
 	 */
 	private abstract class AbstractNode {
 
 		/**
 		 * Get the parent element of the receiver.
-		 * 
+		 *
 		 * @return Object
 		 */
 		public abstract Object getParent();
 
 		/**
 		 * Get the name of the receiver.
-		 * 
+		 *
 		 * @return String
 		 */
 		public abstract String getName();
 
 		/**
 		 * Return whether or not the receiver has children.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public abstract boolean hasChildren();
 
 		/**
 		 * Get the children of the receiver.
-		 * 
+		 *
 		 * @return Object[]
 		 */
 		public abstract Object[] getChildren();
 
 		/**
 		 * Return whether or not this is a category node.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public abstract boolean isCategory();
@@ -273,7 +275,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * MarkerTypeNode is the wrapper for marker types.
-	 * 
+	 *
 	 */
 	private class MarkerTypeNode extends AbstractNode {
 
@@ -283,7 +285,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Create an instance of the receiver wrapping markerType.
-		 * 
+		 *
 		 * @param markerType
 		 */
 		public MarkerTypeNode(MarkerType markerType) {
@@ -293,7 +295,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Set the category of the receiver.
-		 * 
+		 *
 		 * @param category
 		 */
 		public void setCategory(MarkerCategory category) {
@@ -302,52 +304,57 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getChildren()
 		 */
+		@Override
 		public Object[] getChildren() {
 			return new Object[0];
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getParent()
 		 */
+		@Override
 		public Object getParent() {
 			return category;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#hasChildren()
 		 */
+		@Override
 		public boolean hasChildren() {
 			return false;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getName()
 		 */
+		@Override
 		public String getName() {
 			return type.getLabel();
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#isCategory()
 		 */
+		@Override
 		public boolean isCategory() {
 			return false;
 		}
 
 		/**
 		 * Return the marker type this is wrapping
-		 * 
+		 *
 		 * @return Object
 		 */
 		public Object getMarkerType() {
@@ -358,7 +365,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 	/**
 	 * The MarkerCategory is a data type to represent the categories in the tree
 	 * view.
-	 * 
+	 *
 	 */
 	private class MarkerCategory extends AbstractNode {
 
@@ -368,7 +375,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Create a new instance of the receiver with name categoryName.
-		 * 
+		 *
 		 * @param categoryName
 		 */
 		public MarkerCategory(String categoryName) {
@@ -377,16 +384,17 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getName()
 		 */
+		@Override
 		public String getName() {
 			return name;
 		}
 
 		/**
 		 * Add markerType to the list of types.
-		 * 
+		 *
 		 * @param markerType
 		 */
 		public void add(MarkerTypeNode markerType) {
@@ -396,7 +404,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/**
 		 * Return the marker types contained in the receiver.
-		 * 
+		 *
 		 * @return Object[]
 		 */
 		public Object[] getMarkerTypes() {
@@ -405,36 +413,40 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getChildren()
 		 */
+		@Override
 		public Object[] getChildren() {
 			return getMarkerTypes();
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#getParent()
 		 */
+		@Override
 		public Object getParent() {
 			return null;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#hasChildren()
 		 */
+		@Override
 		public boolean hasChildren() {
 			return true;
 		}
 
 		/*
 		 * (non-Javadoc)
-		 * 
+		 *
 		 * @see org.eclipse.ui.views.markers.internal.DialogMarkerFilter.AbstractNode#isCategory()
 		 */
+		@Override
 		public boolean isCategory() {
 			return true;
 		}
@@ -471,7 +483,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create a new instance of the receiver.
-	 * 
+	 *
 	 * @param parentShell
 	 * @param filtersList
 	 */
@@ -482,7 +494,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Set the filters in the filtersList by copying them.
-	 * 
+	 *
 	 * @param initialFilters
 	 */
 	private void setFilters(MarkerFilter[] initialFilters) {
@@ -509,6 +521,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 	/*
 	 * (non-Javadoc) Method declared on Dialog.
 	 */
+	@Override
 	protected void buttonPressed(int buttonId) {
 
 		switch (buttonId) {
@@ -548,12 +561,13 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 			Object element = items[i].getData();
 			typesViewer.setSubtreeChecked(element, checked);
 		}
-		
+
 	}
 
 	/**
 	 * Method declared on Window.
 	 */
+	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(MarkerMessages.filtersDialog_title);
@@ -566,6 +580,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		reset.setData(new Integer(RESET_ID));
 
 		reset.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent event) {
 				buttonPressed(((Integer) event.widget.getData()).intValue());
 			}
@@ -581,7 +596,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates a check box button with the given parent and text.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param text
@@ -600,6 +615,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		}
 		button.setText(text);
 		button.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateForSelection();
 			}
@@ -610,7 +626,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates a combo box with the given parent, items, and selection
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param items
@@ -627,6 +643,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		combo.setItems(items);
 		combo.select(selectionIndex);
 		combo.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateForSelection();
 			}
@@ -637,6 +654,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 	/**
 	 * Method declared on Dialog.
 	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 
@@ -660,7 +678,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create the list in the receiver.
-	 * 
+	 *
 	 * @param dialogArea
 	 */
 	/**
@@ -678,7 +696,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create the area for the user to select thier filters.
-	 * 
+	 *
 	 * @param listArea
 	 */
 	void createUserFiltersArea(Composite listArea) {
@@ -699,28 +717,31 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		filtersList.setContentProvider(new IStructuredContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return filters;
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
+			@Override
 			public void dispose() {
 				// Do nothing
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 				// Do nothing
@@ -730,9 +751,10 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		filtersList.setLabelProvider(new LabelProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 			 */
+			@Override
 			public String getText(Object element) {
 				return ((MarkerFilter) element).getName();
 			}
@@ -746,9 +768,10 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 					/*
 					 * (non-Javadoc)
-					 * 
+					 *
 					 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 					 */
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						updateFilterFromUI();
 						setSelectedFilter(event);
@@ -776,6 +799,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		Button addNew = new Button(buttons, SWT.PUSH);
 		addNew.setText(MarkerMessages.MarkerFilter_addFilterName);
 		addNew.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				InputDialog newDialog = new InputDialog(getShell(),
 						MarkerMessages.MarkerFilterDialog_title,
@@ -784,9 +808,10 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 						new IInputValidator() {
 							/*
 							 * (non-Javadoc)
-							 * 
+							 *
 							 * @see org.eclipse.jface.dialogs.IInputValidator#isValid(java.lang.String)
 							 */
+							@Override
 							public String isValid(String newText) {
 								if (newText.length() == 0)
 									return MarkerMessages.MarkerFilterDialog_emptyMessage;
@@ -813,6 +838,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		Button remove = new Button(buttons, SWT.PUSH);
 		remove.setText(MarkerMessages.MarkerFilter_deleteSelectedName);
 		remove.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				removeFilters(filtersList.getSelection());
 			}
@@ -822,7 +848,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Set the selected filter from event.
-	 * 
+	 *
 	 * @param event
 	 */
 	protected void setSelectedFilter(SelectionChangedEvent event) {
@@ -843,7 +869,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Remove the filters in selection.
-	 * 
+	 *
 	 * @param selection
 	 */
 	protected void removeFilters(ISelection selection) {
@@ -868,7 +894,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create a new filter called newName.
-	 * 
+	 *
 	 * @param newName
 	 */
 	private void createNewFilter(String newName) {
@@ -884,7 +910,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Crate a newFilter called newName
-	 * 
+	 *
 	 * @param newName
 	 * @return MarkerFilter
 	 */
@@ -892,7 +918,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create the area for the selected filter.
-	 * 
+	 *
 	 * @param composite
 	 */
 	Composite createSelectedFilterArea(Composite composite) {
@@ -918,7 +944,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates a separator line above the OK/Cancel buttons bar
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -932,7 +958,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates a radio button with the given parent and text.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param text
@@ -946,9 +972,10 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		button.addSelectionListener(new SelectionAdapter() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateForSelection();
 			}
@@ -958,7 +985,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates the area showing which resources should be considered.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -982,7 +1009,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Creates the area showing which marker types should be included.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 */
@@ -1016,6 +1043,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		typesViewer.setLabelProvider(getLabelProvider());
 		typesViewer.setComparator(getComparator());
 		typesViewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				markDirty();
 				Object element = event.getElement();
@@ -1038,7 +1066,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Get the currently selected marker filter if there is only one selection.
-	 * 
+	 *
 	 * @return MarkerFilter or <code>null</code>.
 	 */
 	protected MarkerFilter getSelectedFilter() {
@@ -1051,16 +1079,17 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Get the content provider for the receiver.
-	 * 
+	 *
 	 * @return ITreeContentProvider
 	 */
 	private ITreeContentProvider getTypesContentProvider() {
 		return new ITreeContentProvider() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				MarkerFilter selected = getSelectedFilter();
 				if (selected == null) {
@@ -1072,45 +1101,50 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
+			@Override
 			public void dispose() {
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
 			 */
+			@Override
 			public Object[] getChildren(Object parentElement) {
 				return ((AbstractNode) parentElement).getChildren();
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
 			 */
+			@Override
 			public Object getParent(Object element) {
 				return ((AbstractNode) element).getParent();
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
 			 */
+			@Override
 			public boolean hasChildren(Object element) {
 				return ((AbstractNode) element).hasChildren();
 			}
@@ -1121,7 +1155,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 	 * This method is intended to be overridden by subclasses of FiltersDialog.
 	 * The attributes area will be created just above the Restore Defaults
 	 * button.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent Composite
 	 */
@@ -1133,7 +1167,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Returns the selected marker types.
-	 * 
+	 *
 	 * @return List the selected marker types
 	 */
 	protected List getSelectedTypes() {
@@ -1151,17 +1185,18 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Return the sorter for the receiver.
-	 * 
+	 *
 	 * @return ViewerSorter
 	 */
 	protected ViewerComparator getComparator() {
 		return new ViewerComparator() {
 			/*
 			 * (non-Javadoc)
-			 * 
+			 *
 			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
+			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return getComparator().compare(((AbstractNode) e1).getName(),
 						((AbstractNode) e2).getName());
@@ -1171,9 +1206,10 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
+	@Override
 	protected void okPressed() {
 		/**
 		 * Updates the filter from the UI state. Must be done here rather than
@@ -1209,7 +1245,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Sets the selected marker types.
-	 * 
+	 *
 	 * @param markerTypes
 	 */
 	void setSelectedTypes(List markerTypes) {
@@ -1264,7 +1300,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Update the selected filter from the UI.
-	 * 
+	 *
 	 * @param filter
 	 */
 	protected void updateFilterFromUI(MarkerFilter filter) {
@@ -1303,7 +1339,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Update the UI with the contents of filter.
-	 * 
+	 *
 	 * @param filter
 	 */
 	protected void updateUIWithFilter(MarkerFilter filter) {
@@ -1340,7 +1376,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Set the marker filter.
-	 * 
+	 *
 	 * @param newFilter
 	 */
 	public void setFilter(MarkerFilter newFilter) {
@@ -1357,7 +1393,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * A selection has occured on one of the checkboxes or combos. Update.
-	 * 
+	 *
 	 */
 	protected void updateForSelection() {
 		updateEnabledState(true);
@@ -1366,7 +1402,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Get all of the marker types avilable for the filter
-	 * 
+	 *
 	 * @param selected
 	 * @return Object[]
 	 */
@@ -1384,7 +1420,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Build the list of types and categories from the supplied object
-	 * 
+	 *
 	 * @param elements
 	 * @param obj
 	 * @param categories
@@ -1421,7 +1457,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Grey check the parent if required
-	 * 
+	 *
 	 * @param element
 	 * @param checked
 	 */
@@ -1460,7 +1496,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Set the check state of the children of element to checked.
-	 * 
+	 *
 	 * @param element
 	 * @param checked
 	 */
@@ -1475,7 +1511,7 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 
 	/**
 	 * Create the buttons for selecting the filters.
-	 * 
+	 *
 	 * @param listArea
 	 */
 	protected void createFilterSelectButtons(Composite listArea) {
@@ -1489,12 +1525,13 @@ public abstract class DialogMarkerFilter extends TrayDialog {
 		createButton(buttons, DESELECT_ALL_FILTERS_ID,
 				MarkerMessages.filtersDialog_deselectAll, false);
 	}
-	
+
     /*
      * (non-Javadoc)
      * @see org.eclipse.jface.dialogs.Dialog#isResizable()
      */
-    protected boolean isResizable() {
+    @Override
+	protected boolean isResizable() {
     	return true;
     }
 }

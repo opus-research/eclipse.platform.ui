@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,8 @@ import java.lang.reflect.Field;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.e4.ui.model.application.ui.menu.MHandledItem;
+import org.eclipse.e4.ui.workbench.renderers.swt.HandledContributionItem;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -48,13 +50,13 @@ import org.eclipse.ui.views.markers.internal.MarkerSupportRegistry;
 
 /**
  * @since 3.3
- * 
+ *
  */
 public class MenuPopulationTest extends MenuTestCase {
-	private static final String ICONS_ANYTHING_GIF = "/anything.gif)";
-	private static final String ICONS_BINARY_GIF = "/binary_co.gif)";
-	private static final String ICONS_MOCK_GIF = "/mockeditorpart1.gif)";
-	private static final String ICONS_VIEW_GIF = "/view.gif)";
+	private static final String ICONS_ANYTHING_GIF = "/anything.gif";
+	private static final String ICONS_BINARY_GIF = "/binary_co.gif";
+	private static final String ICONS_MOCK_GIF = "/mockeditorpart1.gif";
+	private static final String ICONS_VIEW_GIF = "/view.gif";
 
 	private static final String FIELD_ICON = "icon";
 	public static final String ID_DEFAULT = "org.eclipse.ui.tests.menus.iconsDefault";
@@ -67,6 +69,7 @@ public class MenuPopulationTest extends MenuTestCase {
 
 	private static final String ITEM_ID = "my.id";
 	private static final String MENU_LOCATION = "menu:local.menu.test";
+	private Field iconField;
 
 	/**
 	 * @param testName
@@ -74,23 +77,24 @@ public class MenuPopulationTest extends MenuTestCase {
 	public MenuPopulationTest(String testName) {
 		super(testName);
 	}
-	
+
 	public void testMenuServicePopupContribution() throws Exception {
 
 		PopupMenuExtender popupMenuExtender = null;
 		try {
 
 			window.getActivePage().showView(IPageLayout.ID_PROBLEM_VIEW);
-			
+
 			processEventsUntil(new Condition() {
 
+				@Override
 				public boolean compute() {
 					return window.getActivePage().getActivePart() != null;
 				}
-				
+
 			}, 10000);
-			
-			
+
+
 			IWorkbenchPart problemsView = window.getActivePage().getActivePart();
 			assertNotNull(problemsView);
 
@@ -105,7 +109,7 @@ public class MenuPopulationTest extends MenuTestCase {
 							.getSite().getSelectionProvider(), problemsView,
 					((PartSite) problemsView.getSite()).getContext(), false);
 			popupMenuExtender.addMenuId(MarkerSupportRegistry.MARKERS_ID);
-			
+
 			contextMenu.notifyListeners(SWT.Show, new Event());
 			contextMenu.notifyListeners(SWT.Hide, new Event());
 
@@ -113,17 +117,19 @@ public class MenuPopulationTest extends MenuTestCase {
 			contextMenu.notifyListeners(SWT.Hide, new Event());
 
 			assertFalse(errorLogged[0]);
-			
+
 		}finally {
-			if(popupMenuExtender != null)
+			if(popupMenuExtender != null) {
 				popupMenuExtender.dispose();
+			}
 		}
 	}
 
-	
+
 	public void testMenuServiceContribution() {
-		IMenuService ms = (IMenuService) PlatformUI.getWorkbench().getService(IMenuService.class);
+		IMenuService ms = PlatformUI.getWorkbench().getService(IMenuService.class);
 		AbstractContributionFactory factory = new AbstractContributionFactory("menu:org.eclipse.ui.main.menu?after=file", "205747") {
+			@Override
 			public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 				MenuManager manager = new MenuManager("&LoFile", "lofile");
 				CommandContributionItem cci = new CommandContributionItem(new CommandContributionItemParameter(serviceLocator, "my.about",
@@ -132,17 +138,17 @@ public class MenuPopulationTest extends MenuTestCase {
 				additions.addContributionItem(manager, null);
 			}
 		};
-		
+
 		final boolean[] errorLogged = addLogger();
-		
+
 		assertContributions(false);
 		ms.addContributionFactory(factory);
 		assertFalse(errorLogged[0]);
-		
+
 		assertContributions(true);
 		ms.removeContributionFactory(factory);
 		assertContributions(false);
-		
+
 	}
 
 	/**
@@ -151,9 +157,10 @@ public class MenuPopulationTest extends MenuTestCase {
 	private boolean[] addLogger() {
 		final boolean []errorLogged = new boolean[] {false};
 		Platform.addLogListener(new ILogListener() {
-			
+
+			@Override
 			public void logging(IStatus status, String plugin) {
-				if("org.eclipse.ui.workbench".equals(status.getPlugin()) 
+				if("org.eclipse.ui.workbench".equals(status.getPlugin())
 						&& status.getSeverity() == IStatus.ERROR
 						&& status.getException() instanceof IndexOutOfBoundsException) {
 					errorLogged[0] = true;
@@ -165,13 +172,13 @@ public class MenuPopulationTest extends MenuTestCase {
 
 
 	private void assertContributions(boolean added) {
-		
+
 		MenuManager menuManager = ((WorkbenchWindow)PlatformUI.getWorkbench().getActiveWorkbenchWindow()).getMenuManager();
 		IContributionItem[] items = menuManager.getItems();
 		boolean found = false;
-		for (int i = 0; i < items.length; i++) {
-			if(items[i] instanceof MenuManager) {
-				MenuManager aManager = (MenuManager) items[i];
+		for (IContributionItem item : items) {
+			if(item instanceof MenuManager) {
+				MenuManager aManager = (MenuManager) item;
 				if(aManager.getId().equals("lofile")) {
 					found = true;
 					break;
@@ -181,15 +188,14 @@ public class MenuPopulationTest extends MenuTestCase {
 		assertEquals(found, added);
 	}
 
-	
+
 	public void testViewPopulation() throws Exception {
 		MenuManager manager = new MenuManager(null, TEST_CONTRIBUTIONS_CACHE_ID);
 		menuService.populateContributionManager(manager, "menu:"
 				+ TEST_CONTRIBUTIONS_CACHE_ID);
 		IContributionItem[] items = manager.getItems();
 		IContributionItem itemX1 = null;
-		for (int i = 0; i < items.length; i++) {
-			IContributionItem item = items[i];
+		for (IContributionItem item : items) {
 			if ("MenuTest.ItemX1".equals(item.getId())) {
 				itemX1 = item;
 			}
@@ -200,94 +206,103 @@ public class MenuPopulationTest extends MenuTestCase {
 		activeContext = contextService
 				.activateContext(MenuContributionHarness.CONTEXT_TEST1_ID);
 
+		final Menu menu = manager.createContextMenu(window.getShell());
+		menu.notifyListeners(SWT.Show, new Event());
 		assertTrue(itemX1.isVisible());
+		menu.notifyListeners(SWT.Hide, new Event());
 
 		contextService.deactivateContext(activeContext);
+		menu.notifyListeners(SWT.Show, new Event());
 
 		assertFalse(itemX1.isVisible());
+		menu.notifyListeners(SWT.Hide, new Event());
 
 		activeContext = contextService
 				.activateContext(MenuContributionHarness.CONTEXT_TEST1_ID);
+		menu.notifyListeners(SWT.Show, new Event());
 
 		assertTrue(itemX1.isVisible());
+		menu.notifyListeners(SWT.Hide, new Event());
 
 		menuService.releaseContributions(manager);
 		manager.dispose();
 	}
 
 	public void testMenuIcons() throws Exception {
-		Field iconField = CommandContributionItem.class
-				.getDeclaredField(FIELD_ICON);
-		iconField.setAccessible(true);
 
 		MenuManager manager = new MenuManager(null, TEST_CONTRIBUTIONS_CACHE_ID);
 		menuService.populateContributionManager(manager, "menu:"
 				+ TEST_CONTRIBUTIONS_CACHE_ID);
 
 		IContributionItem ici = manager.find(ID_DEFAULT);
-		assertTrue(ici instanceof CommandContributionItem);
-		CommandContributionItem cmd = (CommandContributionItem) ici;
-
-		ImageDescriptor icon = (ImageDescriptor) iconField.get(cmd);
-		assertNotNull(icon);
-		String iconString = icon.toString();
-		assertEquals(ICONS_ANYTHING_GIF, iconString.substring(iconString
-				.lastIndexOf('/')));
+		if (ici instanceof CommandContributionItem) {
+			CommandContributionItem cmd = (CommandContributionItem) ici;
+			assertIcon(cmd, ICONS_ANYTHING_GIF);
+		} else if (ici instanceof HandledContributionItem) {
+			assertIcon((HandledContributionItem)ici, ICONS_ANYTHING_GIF);
+		} else {
+			fail("Failed to find correct contribution item: " + ID_DEFAULT + ": " + ici);
+		}
 
 		ici = manager.find(ID_ALL);
-		assertTrue(ici instanceof CommandContributionItem);
-		cmd = (CommandContributionItem) ici;
-		icon = (ImageDescriptor) iconField.get(cmd);
-		assertNotNull(icon);
-		iconString = icon.toString();
-		assertEquals(ICONS_BINARY_GIF, iconString.substring(iconString
-				.lastIndexOf('/')));
+		if (ici instanceof CommandContributionItem) {
+			assertIcon((CommandContributionItem)ici, ICONS_BINARY_GIF);
+		} else if (ici instanceof HandledContributionItem) {
+			assertIcon((HandledContributionItem)ici, ICONS_BINARY_GIF);
+		} else {
+			fail("Failed to find correct contribution item: " + ID_ALL + ": " + ici);
+		}
+
 
 		ici = manager.find(ID_TOOLBAR);
-		assertTrue(ici instanceof CommandContributionItem);
-		cmd = (CommandContributionItem) ici;
-		icon = (ImageDescriptor) iconField.get(cmd);
-		assertNull(icon);
+		if (ici instanceof CommandContributionItem) {
+			CommandContributionItem cmd = (CommandContributionItem) ici;
+			ImageDescriptor icon = (ImageDescriptor) iconField.get(cmd);
+			assertNull(icon);
+		} else if (ici instanceof HandledContributionItem) {
+			final MHandledItem model = ((HandledContributionItem)ici).getModel();
+			String iconString = model.getIconURI();
+			assertTrue(iconString, iconString==null || iconString.length()==0);
+		}
 
 		manager.dispose();
 	}
 
 	public void testToolBarItems() throws Exception {
-		Field iconField = CommandContributionItem.class
-				.getDeclaredField(FIELD_ICON);
-		iconField.setAccessible(true);
-
 		ToolBarManager manager = new ToolBarManager();
 		menuService.populateContributionManager(manager, "toolbar:"
 				+ TEST_CONTRIBUTIONS_CACHE_ID);
 
 		IContributionItem ici = manager.find(ID_DEFAULT);
-		assertTrue(ici instanceof CommandContributionItem);
-		CommandContributionItem cmd = (CommandContributionItem) ici;
+		if (ici instanceof CommandContributionItem) {
+			CommandContributionItem cmd = (CommandContributionItem) ici;
+			assertIcon(cmd, ICONS_ANYTHING_GIF);
+		} else if (ici instanceof HandledContributionItem) {
+			assertIcon((HandledContributionItem)ici, ICONS_ANYTHING_GIF);
+		} else {
+			fail("Failed to find correct contribution item: " + ID_DEFAULT + ": " + ici);
+		}
 
-		ImageDescriptor icon = (ImageDescriptor) iconField.get(cmd);
-		assertNotNull(icon);
-		String iconString = icon.toString();
-		assertEquals(ICONS_ANYTHING_GIF, iconString.substring(iconString
-				.lastIndexOf('/')));
 
 		ici = manager.find(ID_ALL);
-		assertTrue(ici instanceof CommandContributionItem);
-		cmd = (CommandContributionItem) ici;
-		icon = (ImageDescriptor) iconField.get(cmd);
-		assertNotNull(icon);
-		iconString = icon.toString();
-		assertEquals(ICONS_MOCK_GIF, iconString.substring(iconString
-				.lastIndexOf('/')));
+		if (ici instanceof CommandContributionItem) {
+			assertIcon((CommandContributionItem)ici, ICONS_MOCK_GIF);
+		} else if (ici instanceof HandledContributionItem) {
+			assertIcon((HandledContributionItem)ici, ICONS_MOCK_GIF);
+		} else {
+			fail("Failed to find correct contribution item: " + ID_ALL + ": " + ici);
+		}
+
+
 
 		ici = manager.find(ID_TOOLBAR);
-		assertTrue(ici instanceof CommandContributionItem);
-		cmd = (CommandContributionItem) ici;
-		icon = (ImageDescriptor) iconField.get(cmd);
-		assertNotNull(icon);
-		iconString = icon.toString();
-		assertEquals(ICONS_VIEW_GIF, iconString.substring(iconString
-				.lastIndexOf('/')));
+		if (ici instanceof CommandContributionItem) {
+			assertIcon((CommandContributionItem)ici, ICONS_VIEW_GIF);
+		} else if (ici instanceof HandledContributionItem) {
+			assertIcon((HandledContributionItem)ici, ICONS_VIEW_GIF);
+		} else {
+			fail("Failed to find correct contribution item: " + ID_TOOLBAR + ": " + ici);
+		}
 
 		manager.dispose();
 	}
@@ -301,6 +316,7 @@ public class MenuPopulationTest extends MenuTestCase {
 			};
 		}
 
+		@Override
 		public void createContributionItems(IServiceLocator serviceLocator,
 				IContributionRoot additions) {
 			additions.addContributionItem(localContribution, null);
@@ -391,6 +407,7 @@ public class MenuPopulationTest extends MenuTestCase {
 				"menu:the.population.menu?after=additions",
 				"org.eclipse.ui.tests") {
 
+			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				final MenuManager manager = new MenuManager("menu.id");
@@ -404,7 +421,7 @@ public class MenuPopulationTest extends MenuTestCase {
 		IViewPart view = window.getActivePage()
 				.showView(IPageLayout.ID_OUTLINE);
 		assertNotNull(view);
-		IMenuService service = (IMenuService) view.getSite().getService(
+		IMenuService service = view.getSite().getService(
 				IMenuService.class);
 		service.populateContributionManager(testManager,
 				"menu:the.population.menu");
@@ -533,15 +550,12 @@ public class MenuPopulationTest extends MenuTestCase {
 		assertEquals("endof.insert", manager.getItems()[3].getId());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.menus.MenuTestCase#doSetUp()
-	 */
+	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		afterOne = new AbstractContributionFactory(
 				"menu:after.menu?after=after.one", "org.eclipse.ui.tests") {
+			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				additions.addContributionItem(new GroupMarker("after.insert"),
@@ -552,6 +566,7 @@ public class MenuPopulationTest extends MenuTestCase {
 
 		beforeOne = new AbstractContributionFactory(
 				"menu:before.menu?before=before.one", "org.eclipse.ui.tests") {
+			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				additions.addContributionItem(new GroupMarker("before.insert"),
@@ -562,6 +577,7 @@ public class MenuPopulationTest extends MenuTestCase {
 
 		endofOne = new AbstractContributionFactory(
 				"menu:endof.menu?endof=endof.one", "org.eclipse.ui.tests") {
+			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				additions.addContributionItem(new GroupMarker("endof.insert"),
@@ -572,13 +588,12 @@ public class MenuPopulationTest extends MenuTestCase {
 		usefulContribution = new CommandContributionItem(
 				new CommandContributionItemParameter(window, null,
 						IWorkbenchCommandConstants.HELP_ABOUT, 0));
+		iconField = CommandContributionItem.class
+				.getDeclaredField(FIELD_ICON);
+		iconField.setAccessible(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.tests.menus.MenuTestCase#doTearDown()
-	 */
+	@Override
 	protected void doTearDown() throws Exception {
 		menuService.removeContributionFactory(afterOne);
 		menuService.removeContributionFactory(beforeOne);
@@ -587,24 +602,25 @@ public class MenuPopulationTest extends MenuTestCase {
 		usefulContribution = null;
 		super.doTearDown();
 	}
-		
+
 		public void testPrivatePopup()throws Exception {
-			
+
 			PopupMenuExtender popupMenuExtender = null;
 			MenuManager manager = null;
 			Menu contextMenu = null;
 			try {
-	
+
 				window.getActivePage().showView("org.eclipse.ui.tests.workbenchpart.EmptyView");
-				
+
 				processEventsUntil(new Condition() {
-	
+
+					@Override
 					public boolean compute() {
 						return window.getActivePage().getActivePart() != null;
 					}
-					
+
 				}, 10000);
-	
+
 				IWorkbenchPart activePart = window.getActivePage().getActivePart();
 				assertNotNull(activePart);
 
@@ -613,7 +629,7 @@ public class MenuPopulationTest extends MenuTestCase {
 			popupMenuExtender = new PopupMenuExtender(activePart.getSite()
 					.getId(), manager, null, activePart,
 					((PartSite) activePart.getSite()).getContext());
-				
+
 				Shell windowShell = window.getShell();
 				contextMenu = manager.createContextMenu(windowShell);
 
@@ -628,49 +644,64 @@ public class MenuPopulationTest extends MenuTestCase {
 				hideEvent.type = SWT.Hide;
 
 				contextMenu.notifyListeners(SWT.Hide, hideEvent);
-				
+
 				assertPrivatePopups(manager);
-				
+
 				manager.removeAll();
 				manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-				
+
 				contextMenu.notifyListeners(SWT.Show, showEvent);
 				contextMenu.notifyListeners(SWT.Hide, hideEvent);
 
 				assertPrivatePopups(manager);
-				
+
 			}finally {
-				if(popupMenuExtender != null)
+				if(popupMenuExtender != null) {
 					popupMenuExtender.dispose();
+				}
 				if (contextMenu!=null) {
 					contextMenu.dispose();
 				}
-				if(manager != null)
+				if(manager != null) {
 					manager.dispose();
+				}
 			}
 		}
-	
+
 		private void assertPrivatePopups(final MenuManager manager) {
 			boolean cmd1Found = false;
 			boolean cmd2Found = false;
 			boolean cmd3Found = false;
 			IContributionItem[] items = manager.getItems();
-			for (int i = 0; i < items.length; i++) {
-				if("org.eclipse.ui.tests.anypopup.command1".equals(items[i].getId())) {
+			for (IContributionItem item : items) {
+				if("org.eclipse.ui.tests.anypopup.command1".equals(item.getId())) {
 					cmd1Found = true;
-				}else if("org.eclipse.ui.tests.anypopup.command2".equals(items[i].getId())) {
+				}else if("org.eclipse.ui.tests.anypopup.command2".equals(item.getId())) {
 					cmd2Found = true;
-				}else if("org.eclipse.ui.tests.anypopup.command3".equals(items[i].getId())) {
+				}else if("org.eclipse.ui.tests.anypopup.command3".equals(item.getId())) {
 					cmd3Found = true;
 				}
 			}
-			
+
 			boolean hasAdditions = manager.indexOf(IWorkbenchActionConstants.MB_ADDITIONS) != -1;
-			assertTrue("no allPopups attribute for cmd1. Should show always", cmd1Found); 
+			assertTrue("no allPopups attribute for cmd1. Should show always", cmd1Found);
 			assertTrue("allPopups = true for cmd2. Should always show", cmd2Found);
 			assertTrue("allPopups = false for cmd3. Should show only if additions present", hasAdditions == cmd3Found); // allPopups = false. Should show only if additions is available
 		}
-		
-	 
 
+
+
+	private void assertIcon(CommandContributionItem cmd, String targetIcon) throws IllegalArgumentException, IllegalAccessException {
+		ImageDescriptor icon = (ImageDescriptor) iconField.get(cmd);
+		assertNotNull(icon);
+		String iconString = icon.toString();
+		assertEquals(targetIcon+')', iconString.substring(iconString
+				.lastIndexOf('/')));
+	}
+	private void assertIcon(HandledContributionItem item, String targetIcon) {
+		final MHandledItem model = item.getModel();
+		String iconString = model.getIconURI();
+		assertEquals(targetIcon, iconString.substring(iconString
+				.lastIndexOf('/')));
+	}
 }

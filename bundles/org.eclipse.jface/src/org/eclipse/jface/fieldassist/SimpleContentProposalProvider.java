@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,9 +64,10 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 	 * @return the array of Objects that represent valid proposals for the field
 	 *         given its current content.
 	 */
+	@Override
 	public IContentProposal[] getProposals(String contents, int position) {
 		if (filterProposals) {
-			ArrayList list = new ArrayList();
+			ArrayList<ContentProposal> list = new ArrayList<ContentProposal>();
 			for (int i = 0; i < proposals.length; i++) {
 				if (proposals[i].length() >= contents.length()
 						&& proposals[i].substring(0, contents.length())
@@ -74,7 +75,7 @@ public class SimpleContentProposalProvider implements IContentProposalProvider {
 					list.add(new ContentProposal(proposals[i]));
 				}
 			}
-			return (IContentProposal[]) list.toArray(new IContentProposal[list
+			return list.toArray(new IContentProposal[list
 					.size()]);
 		}
 		if (contentProposals == null) {

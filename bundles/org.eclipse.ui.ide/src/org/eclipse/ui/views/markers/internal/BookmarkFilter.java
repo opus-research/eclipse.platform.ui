@@ -31,7 +31,7 @@ public class BookmarkFilter extends MarkerFilter {
 
 	/**
 	 * Create a new instance of the recevier with the default name.
-	 * 
+	 *
 	 */
 	public BookmarkFilter() {
 		this(MarkerMessages.MarkerFilter_defaultFilterName);
@@ -39,7 +39,7 @@ public class BookmarkFilter extends MarkerFilter {
 
 	/**
 	 * Create a new instance of the recevier with the filterName
-	 * 
+	 *
 	 * @param filterName
 	 */
 	public BookmarkFilter(String filterName) {
@@ -49,6 +49,7 @@ public class BookmarkFilter extends MarkerFilter {
 	/**
 	 * Returns true iff the given marker is accepted by this filter
 	 */
+	@Override
 	public boolean selectMarker(ConcreteMarker marker) {
 		return !isEnabled()
 				|| (super.selectMarker(marker) && selectByDescription(marker));
@@ -82,9 +83,10 @@ public class BookmarkFilter extends MarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#resetState()
 	 */
+	@Override
 	void resetState() {
 		super.resetState();
 		contains = DEFAULT_CONTAINS;
@@ -93,9 +95,10 @@ public class BookmarkFilter extends MarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.jface.dialogs.IDialogSettings)
 	 */
+	@Override
 	public void restoreFilterSettings(IDialogSettings settings) {
 
 		super.restoreFilterSettings(settings);
@@ -117,6 +120,7 @@ public class BookmarkFilter extends MarkerFilter {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.ui.IMemento)
 	 */
+	@Override
 	protected void restoreFilterSettings(IMemento memento) {
 		super.restoreFilterSettings(memento);
 
@@ -136,9 +140,10 @@ public class BookmarkFilter extends MarkerFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#saveFilterSettings(org.eclipse.ui.IMemento)
 	 */
+	@Override
 	public void saveFilterSettings(IMemento memento) {
 		super.saveFilterSettings(memento);
 		memento.putString(TAG_CONTAINS, String.valueOf(contains));

@@ -56,17 +56,16 @@ public abstract class Page implements IPageBookViewPage {
     protected Page() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPage.
-     */
-    public abstract void createControl(Composite parent);
+    @Override
+	public abstract void createControl(Composite parent);
 
     /**
      * The <code>Page</code> implementation of this <code>IPage</code> method 
      * disposes of this page's control (if it has one and it has not already
      * been disposed). Subclasses may extend.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         Control ctrl = getControl();
         if (ctrl != null && !ctrl.isDisposed()) {
 			ctrl.dispose();
@@ -77,21 +76,24 @@ public abstract class Page implements IPageBookViewPage {
      * The <code>Page</code> implementation of this <code>IPage</code> method returns
      * <code>null</code>. Subclasses must reimplement.
      */
-    public abstract Control getControl();
+    @Override
+	public abstract Control getControl();
 
-    /* (non-Javadoc)
-     * This method exists for backward compatibility.
-     * Subclasses should reimplement <code>init</code>.
-     */
+	/**
+	 * This method exists for backward compatibility. Subclasses should
+	 * reimplement <code>init</code>.
+	 */
     public void makeContributions(IMenuManager menuManager,
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
     }
 
-    /* (non-Javadoc)
-     * This method exists for backward compatibility.
-     * Subclasses should reimplement <code>init</code>.
-     */
-    public void setActionBars(IActionBars actionBars) {
+
+	/**
+	 * This method exists for backward compatibility. Subclasses should
+	 * reimplement <code>init</code>.
+	 */
+    @Override
+	public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
                 .getToolBarManager(), actionBars.getStatusLineManager());
     }
@@ -106,7 +108,8 @@ public abstract class Page implements IPageBookViewPage {
      * 
      * @since 2.0
      */
-    public void init(IPageSite pageSite) {
+    @Override
+	public void init(IPageSite pageSite) {
         site = pageSite;
     }
 
@@ -115,7 +118,8 @@ public abstract class Page implements IPageBookViewPage {
      * 
      * @return the site which contains this page
      */
-    public IPageSite getSite() {
+    @Override
+	public IPageSite getSite() {
         return site;
     }
 
@@ -123,5 +127,6 @@ public abstract class Page implements IPageBookViewPage {
      * The <code>Page</code> implementation of this <code>IPage</code> method
      * does nothing. Subclasses must implement.
      */
-    public abstract void setFocus();
+    @Override
+	public abstract void setFocus();
 }

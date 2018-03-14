@@ -24,6 +24,7 @@ import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
  *             to subclass the regular ListSelectionDialog, which uses
  *             OK/Cancel, and provide a separate checkbox if necessary.
  */
+@Deprecated
 public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
     /**
      * 
@@ -36,7 +37,8 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
      * @param message
      * @deprecated see class comment
      */
-    public YesNoCancelListSelectionDialog(
+    @Deprecated
+	public YesNoCancelListSelectionDialog(
             org.eclipse.swt.widgets.Shell parentShell,
             Object input,
             org.eclipse.jface.viewers.IStructuredContentProvider contentProvider,
@@ -45,10 +47,8 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
         super(parentShell, input, contentProvider, labelProvider, message);
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
-    protected void buttonPressed(int buttonId) {
+    @Override
+	protected void buttonPressed(int buttonId) {
         switch (buttonId) {
         case IDialogConstants.YES_ID: {
             yesPressed();
@@ -65,19 +65,15 @@ public class YesNoCancelListSelectionDialog extends ListSelectionDialog {
         }
     }
 
-    /*
-     * (non-Javadoc) Method declared in Window.
-     */
-    protected void configureShell(Shell shell) {
+    @Override
+	protected void configureShell(Shell shell) {
         super.configureShell(shell);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
                 IWorkbenchHelpContextIds.YES_NO_CANCEL_LIST_SELECTION_DIALOG);
     }
 
-    /*
-     * (non-Javadoc) Method declared on Dialog.
-     */
-    protected void createButtonsForButtonBar(Composite parent) {
+    @Override
+	protected void createButtonsForButtonBar(Composite parent) {
         createButton(parent, IDialogConstants.YES_ID,
                 IDialogConstants.YES_LABEL, true);
         createButton(parent, IDialogConstants.NO_ID, IDialogConstants.NO_LABEL,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,9 +52,11 @@ public abstract class FocusCellHighlighter {
 	 * extend.
 	 *
 	 * @param cell
-	 *            the new focus cell
+	 *            the new focus cell or <code>null</code> if no new cell
+	 *            receives the focus
 	 * @deprecated use {@link #focusCellChanged(ViewerCell, ViewerCell)} instead
 	 */
+	@Deprecated
 	protected void focusCellChanged(ViewerCell cell) {
 	}
 

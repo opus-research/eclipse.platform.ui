@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 Siemens AG and others.
+ * Copyright (c) 2009, 2012 Siemens AG and others.
  * 
  * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
@@ -35,9 +35,7 @@ import org.eclipse.e4.demo.contacts.BundleActivatorImpl;
 import org.eclipse.e4.demo.contacts.model.Contact;
 import org.eclipse.e4.demo.contacts.model.IContactsRepository;
 import org.eclipse.osgi.internal.signedcontent.Base64;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
 @SuppressWarnings("restriction")

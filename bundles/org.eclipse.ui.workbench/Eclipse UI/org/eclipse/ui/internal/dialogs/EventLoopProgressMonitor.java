@@ -60,23 +60,23 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /** 
      * @see IProgressMonitor#beginTask
      */
-    public void beginTask(String name, int totalWork) {
+    @Override
+	public void beginTask(String name, int totalWork) {
         super.beginTask(name, totalWork);
         taskName = name;
         runEventLoop();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
-     */
-    public void clearBlocked() {
+    @Override
+	public void clearBlocked() {
         Dialog.getBlockedHandler().clearBlocked();
     }
 
     /**
      * @see IProgressMonitor#done
      */
-    public void done() {
+    @Override
+	public void done() {
         super.done();
         taskName = null;
         runEventLoop();
@@ -85,7 +85,8 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /**
      * @see IProgressMonitor#internalWorked
      */
-    public void internalWorked(double work) {
+    @Override
+	public void internalWorked(double work) {
         super.internalWorked(work);
         runEventLoop();
     }
@@ -93,7 +94,8 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /**
      * @see IProgressMonitor#isCanceled
      */
-    public boolean isCanceled() {
+    @Override
+	public boolean isCanceled() {
         runEventLoop();
         return super.isCanceled();
     }
@@ -137,17 +139,16 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
-     */
-    public void setBlocked(IStatus reason) {
+    @Override
+	public void setBlocked(IStatus reason) {
         Dialog.getBlockedHandler().showBlocked(this, reason, taskName);
     }
 
     /**
      * @see IProgressMonitor#setCanceled
      */
-    public void setCanceled(boolean b) {
+    @Override
+	public void setCanceled(boolean b) {
         super.setCanceled(b);
         taskName = null;
         runEventLoop();
@@ -156,7 +157,8 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /**
      * @see IProgressMonitor#setTaskName
      */
-    public void setTaskName(String name) {
+    @Override
+	public void setTaskName(String name) {
         super.setTaskName(name);
         taskName = name;
         runEventLoop();
@@ -165,7 +167,8 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /**
      * @see IProgressMonitor#subTask
      */
-    public void subTask(String name) {
+    @Override
+	public void subTask(String name) {
         //Be prepared in case the first task was null
         if (taskName == null) {
 			taskName = name;
@@ -177,7 +180,8 @@ public class EventLoopProgressMonitor extends ProgressMonitorWrapper implements
     /**
      * @see IProgressMonitor#worked
      */
-    public void worked(int work) {
+    @Override
+	public void worked(int work) {
         super.worked(work);
         runEventLoop();
     }

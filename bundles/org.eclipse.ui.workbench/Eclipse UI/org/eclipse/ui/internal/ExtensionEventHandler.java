@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -49,7 +49,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         this.workbench = workbench;
     }
 
-    public void registryChanged(IRegistryChangeEvent event) {
+    @Override
+	public void registryChanged(IRegistryChangeEvent event) {
         try {
             IExtensionDelta delta[] = event
                     .getExtensionDeltas(WorkbenchPlugin.PI_WORKBENCH);
@@ -127,7 +128,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
     private void asyncAppear(Display display, final IExtensionPoint extpt,
             final IExtension ext) {
         Runnable run = new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 appear(extpt, ext);
             }
         };
@@ -211,7 +213,8 @@ class ExtensionEventHandler implements IRegistryChangeListener {
         message.append(ExtensionEventHandlerMessages.ExtensionEventHandler_need_to_reset);
 
         display.asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 Shell parentShell = null;
                 IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
                 if (window == null) {

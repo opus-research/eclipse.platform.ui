@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,13 +48,7 @@ public class BindingServiceImpl implements EBindingService {
 
 	private ContextSet contextSet = ContextSet.EMPTY;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.bindings.EBindingService#createBinding(org.eclipse.jface.bindings.
-	 * TriggerSequence, org.eclipse.core.commands.ParameterizedCommand, java.lang.String,
-	 * java.lang.String, java.util.Map)
-	 */
+	@Override
 	public Binding createBinding(TriggerSequence sequence, ParameterizedCommand command,
 			String contextId, Map<String, String> attributes) {
 
@@ -81,13 +75,7 @@ public class BindingServiceImpl implements EBindingService {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.bindings.EBindingService#activateBinding(org.eclipse.jface.bindings.Binding
-	 * )
-	 */
+	@Override
 	public void activateBinding(Binding binding) {
 		String contextId = binding.getContextId();
 		BindingTable table = manager.getTable(contextId);
@@ -97,13 +85,7 @@ public class BindingServiceImpl implements EBindingService {
 		table.addBinding(binding);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.bindings.EBindingService#deactivateBinding(org.eclipse.jface.bindings.Binding
-	 * )
-	 */
+	@Override
 	public void deactivateBinding(Binding binding) {
 		String contextId = binding.getContextId();
 		BindingTable table = manager.getTable(contextId);
@@ -114,11 +96,7 @@ public class BindingServiceImpl implements EBindingService {
 		table.removeBinding(binding);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.bindings.EBindingService#createSequence(java.lang.String)
-	 */
+	@Override
 	public TriggerSequence createSequence(String sequence) {
 		try {
 			return KeySequence.getInstance(sequence);
@@ -128,57 +106,33 @@ public class BindingServiceImpl implements EBindingService {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#getConflictsFor(org.eclipse.e4.ui.bindings.
-	 * TriggerSequence)
-	 */
+	@Override
 	public Collection<Binding> getConflictsFor(TriggerSequence sequence) {
 		return manager.getConflictsFor(contextSet, sequence);
 	}
 
+	@Override
 	public Collection<Binding> getAllConflicts() {
 		return manager.getAllConflicts();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#getPerfectMatch(org.eclipse.e4.ui.bindings.
-	 * TriggerSequence)
-	 */
+	@Override
 	public Binding getPerfectMatch(TriggerSequence trigger) {
 		return manager.getPerfectMatch(contextSet, trigger);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#isPartialMatch(org.eclipse.e4.ui.bindings.
-	 * TriggerSequence)
-	 */
+	@Override
 	public boolean isPartialMatch(TriggerSequence keySequence) {
 		return manager.isPartialMatch(contextSet, keySequence);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#getBestSequenceFor(org.eclipse.core.commands.
-	 * ParameterizedCommand)
-	 */
+	@Override
 	public TriggerSequence getBestSequenceFor(ParameterizedCommand command) {
 		Binding binding = manager.getBestSequenceFor(contextSet, command);
 		return binding == null ? null : binding.getTriggerSequence();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#getSequencesFor(org.eclipse.core.commands.
-	 * ParameterizedCommand)
-	 */
+	@Override
 	public Collection<TriggerSequence> getSequencesFor(ParameterizedCommand command) {
 		Collection<Binding> bindings = manager.getSequencesFor(contextSet, command);
 		ArrayList<TriggerSequence> sequences = new ArrayList<TriggerSequence>(bindings.size());
@@ -188,26 +142,17 @@ public class BindingServiceImpl implements EBindingService {
 		return sequences;
 	}
 
+	@Override
 	public Collection<Binding> getBindingsFor(ParameterizedCommand command) {
 		return manager.getBindingsFor(contextSet, command);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#isPerfectMatch(org.eclipse.e4.ui.bindings.
-	 * TriggerSequence)
-	 */
+	@Override
 	public boolean isPerfectMatch(TriggerSequence sequence) {
 		return getPerfectMatch(sequence) != null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.eclipse.e4.ui.bindings.EBindingService#getPartialMatches(org.eclipse.e4.ui.bindings.
-	 * TriggerSequence)
-	 */
+	@Override
 	public Collection<Binding> getPartialMatches(TriggerSequence sequence) {
 		return manager.getPartialMatches(contextSet, sequence);
 	}
@@ -232,6 +177,7 @@ public class BindingServiceImpl implements EBindingService {
 		contextSet = manager.createContextSet(contexts);
 	}
 
+	@Override
 	public Collection<Binding> getActiveBindings() {
 		return manager.getActiveBindings();
 	}
