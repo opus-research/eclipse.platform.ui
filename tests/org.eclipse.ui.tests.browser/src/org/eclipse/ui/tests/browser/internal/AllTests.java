@@ -27,7 +27,6 @@ public class AllTests {
 		suite.addTestSuite(PreferencesTestCase.class);
 		suite.addTestSuite(ToolbarBrowserTestCase.class);
 		suite.addTestSuite(WebBrowserUtilTestCase.class);
-		suite.addTestSuite(TestInput.class);
 		//$JUnit-END$
 		return suite;
 	}
