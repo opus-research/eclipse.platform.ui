@@ -124,7 +124,7 @@ public class URIHelper {
 	 */
 	public static boolean isBundleClassUri(String uri) {
 		if (uri != null && uri.startsWith(BUNDLECLASS_SCHEMA)) {
-			String[] split = uri.substring(14).split("/"); //$NON-NLS-1$
+			String[] split = uri.substring(BUNDLECLASS_SCHEMA.length()).split("/"); //$NON-NLS-1$
 			// valid bundleclass uri should have two segments:
 			// first one for the bundle-symbolic-name
 			// second one for the full qualified classname
