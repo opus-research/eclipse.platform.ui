@@ -76,7 +76,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	protected Map<String, List<IObjectContributor>> contributors;
 
     /** Cache of object class contributor search paths; <code>null</code> if none. */
-    protected Map objectLookup;
+	protected Map<Class<?>, List<IObjectContributor>> objectLookup;
 
     /** Cache of resource adapter class contributor search paths; <code>null</code> if none. */
 	protected Map<Class<?>, List<IObjectContributor>> resourceAdapterLookup;
@@ -84,14 +84,14 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /** Cache of adaptable class contributor search paths; <code>null</code> if none. */
 	protected Map<String, List<IObjectContributor>> adaptableLookup;
     
-    protected Set contributorRecordSet;
+	protected Set<ContributorRecord> contributorRecordSet;
 
     /** 
      * Constructs a new contributor manager.
      */
     public ObjectContributorManager() {
-    	contributors = new Hashtable(5);
-        contributorRecordSet = new HashSet(5);
+		contributors = new Hashtable<String, List<IObjectContributor>>(5);
+		contributorRecordSet = new HashSet<ContributorRecord>(5);
         objectLookup = null;
         resourceAdapterLookup = null;
         adaptableLookup = null;
@@ -121,10 +121,10 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	/**
      * Adds contributors for the given types to the result list.
      */
-    private void addContributorsFor(List types, List result) {
-        for (Iterator classes = types.iterator(); classes.hasNext();) {
-            Class clazz = (Class) classes.next();
-            List contributorList = (List) contributors.get(clazz.getName());
+	private void addContributorsFor(List<Class<?>> types, List<IObjectContributor> result) {
+		for (Iterator<Class<?>> classes = types.iterator(); classes.hasNext();) {
+			Class<?> clazz = classes.next();
+			List<IObjectContributor> contributorList = contributors.get(clazz.getName());
             if (contributorList != null) {
 				result.addAll(contributorList);
 			}
@@ -176,7 +176,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Cache the real adapter class contributor search path.
      */
-    private void cacheResourceAdapterLookup(Class adapterClass, List results) {
+	private void cacheResourceAdapterLookup(Class<?> adapterClass, List results) {
         if (resourceAdapterLookup == null) {
 			resourceAdapterLookup = new HashMap();
 		}
@@ -186,9 +186,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Cache the real adapter class contributor search path.
      */
-    private void cacheAdaptableLookup(String adapterClass, List results) {
+	private void cacheAdaptableLookup(String adapterClass, List<IObjectContributor> results) {
         if (adaptableLookup == null) {
-			adaptableLookup = new HashMap();
+			adaptableLookup = new HashMap<String, List<IObjectContributor>>();
 		}
         adaptableLookup.put(adapterClass, results);
     }
@@ -196,7 +196,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Cache the object class contributor search path.
      */
-    private void cacheObjectLookup(Class objectClass, List results) {
+	private void cacheObjectLookup(Class<?> objectClass, List results) {
         if (objectLookup == null) {
 			objectLookup = new HashMap();
 		}
@@ -220,7 +220,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      */
 	protected List<IObjectContributor> addContributorsFor(Class<?> objectClass) {
 
-        List classList = computeClassOrder(objectClass);
+		List<Class<?>> classList = computeClassOrder(objectClass);
 		List<IObjectContributor> result = new ArrayList<IObjectContributor>();
         addContributorsFor(classList, result);
         classList = computeInterfaceOrder(classList); // interfaces
@@ -380,7 +380,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     	// Fetch the unique adapters
 		List<String> adapters = new ArrayList<String>(Arrays.asList(Platform.getAdapterManager()
 				.computeAdapterTypes(object.getClass())));
-    	removeCommonAdapters(adapters, Arrays.asList(new Class[] {object.getClass()}));
+		removeCommonAdapters(adapters, Arrays.asList(new Class<?>[] { object.getClass() }));
 
 		List<IObjectContributor> contributors = new ArrayList<IObjectContributor>();
         
@@ -413,16 +413,16 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * 
      * @since 3.1
      */
-    protected List getObjectContributors(Class objectClass) {
-		List objectList = null;
+	protected List<IObjectContributor> getObjectContributors(Class<?> objectClass) {
+		List<IObjectContributor> objectList = null;
 		// Lookup the results in the cache first.
 		if (objectLookup != null) {
-			objectList = (List) objectLookup.get(objectClass);
+			objectList = objectLookup.get(objectClass);
 		}
 		if (objectList == null) {
 			objectList = addContributorsFor(objectClass);
 			if (objectList.size() == 0) {
-				objectList = Collections.EMPTY_LIST;
+				objectList = Collections.emptyList();
 			}
 			else {
 				objectList = Collections.unmodifiableList(objectList);
@@ -451,7 +451,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 		if (resourceList == null) {
 			resourceList = addContributorsFor(resourceClass);
 			if (resourceList.size() == 0) {
-				resourceList = Collections.EMPTY_LIST;
+				resourceList = Collections.emptyList();
 			} else {
 				resourceList = Collections.unmodifiableList(filterOnlyAdaptableContributors(resourceList));
 			}
@@ -503,12 +503,12 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	 * @param results
 	 * @since 3.1
 	 */
-	protected void removeCommonAdapters(List adapters, List results) {
-    	for (Iterator it = results.iterator(); it.hasNext();) {
-			Class clazz = ((Class) it.next());
-			List commonTypes = computeCombinedOrder(clazz);
-			for (Iterator it2 = commonTypes.iterator(); it2.hasNext();) {
-				Class type = (Class) it2.next();
+	protected void removeCommonAdapters(List adapters, List<Class<?>> results) {
+		for (Iterator<Class<?>> it = results.iterator(); it.hasNext();) {
+			Class<?> clazz = it.next();
+			List<Class<?>> commonTypes = computeCombinedOrder(clazz);
+			for (Iterator<Class<?>> it2 = commonTypes.iterator(); it2.hasNext();) {
+				Class<?> type = it2.next();
 				adapters.remove(type.getName());	
 			}				
 		}
@@ -518,14 +518,14 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the class search order starting with <code>extensibleClass</code>.
      * The search order is defined in this class' comment.
      */
-    protected List computeCombinedOrder(Class inputClass) {
-        List result = new ArrayList(4);
-        Class clazz = inputClass;
+	protected List<Class<?>> computeCombinedOrder(Class<?> inputClass) {
+		List<Class<?>> result = new ArrayList<Class<?>>(4);
+		Class<?> clazz = inputClass;
         while (clazz != null) {
             // add the class
             result.add(clazz);
             // add all the interfaces it implements
-            Class[] interfaces = clazz.getInterfaces();
+			Class<?>[] interfaces = clazz.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 result.add(interfaces[i]);
             }
