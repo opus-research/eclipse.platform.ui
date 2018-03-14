@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.zoom;
+
+import junit.framework.Assert;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -46,7 +47,7 @@ public class ZoomTestCase extends UITestCase {
     protected IProject project;
 
     protected IFile file1, file2;
-
+    
     protected IEditorPart editor1, editor2, editor3;
 
     protected IViewPart stackedView1;
@@ -59,7 +60,7 @@ public class ZoomTestCase extends UITestCase {
     // Remember the actual value of the 'useMinMax' state
     // so that 'tearDown' can restore it
 	private boolean oldMinMaxState;
-
+    
     public ZoomTestCase(String name) {
         super(name);
     }
@@ -68,20 +69,20 @@ public class ZoomTestCase extends UITestCase {
 	protected void doTearDown() throws Exception {
     	// Ensure that the model is sane
         // page.testInvariants();
-
+        
         super.doTearDown();
 
         IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
         apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, oldMinMaxState);
     }
-
+    
     @Override
 	protected void doSetUp() throws Exception {
 		// These tests are hard-wired to the pre-3.3 zoom behaviour
 		// Run them anyway to ensure that we preserve the 3.0 mechanism
         IPreferenceStore apiStore = PrefUtil.getAPIPreferenceStore();
         oldMinMaxState = apiStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
-
+        
         super.doSetUp();
 
         window = (WorkbenchWindow) openTestWindow(ZoomPerspectiveFactory.PERSP_ID);
@@ -92,13 +93,13 @@ public class ZoomTestCase extends UITestCase {
         apiStore.setValue(
                 IWorkbenchPreferenceConstants.ENABLE_ANIMATIONS,
                 false);
-
+        
 		// These tests are hard-wired to the pre-3.3 zoom behaviour
 		// Run them anyway to ensure that we preserve the 3.0 mechanism
         oldMinMaxState = apiStore.getBoolean(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX);
-
+        
         apiStore.setValue(IWorkbenchPreferenceConstants.ENABLE_NEW_MIN_MAX, false);
-
+		
         try {
             project = FileUtil.createProject("IEditorPartTest"); //$NON-NLS-1$
             file1 = FileUtil.createFile("Test1.txt", project); //$NON-NLS-1$
@@ -116,7 +117,7 @@ public class ZoomTestCase extends UITestCase {
         } catch (PartInitException e) {
         } catch (CoreException e) {
         }
-
+        
         stackedView1 = findView(ZoomPerspectiveFactory.STACK1_VIEW1);
         stackedView2 = findView(ZoomPerspectiveFactory.STACK1_VIEW2);
         unstackedView = findView(ZoomPerspectiveFactory.UNSTACKED_VIEW1);
@@ -125,28 +126,25 @@ public class ZoomTestCase extends UITestCase {
 
     // zooms the given part
     protected void zoom(IWorkbenchPart part) {
-        if (part == null) {
-			throw new NullPointerException();
-		}
+        if (part == null)
+            throw new NullPointerException();
         page.activate(part);
         page.toggleZoom(page.getReference(part));
-		assertTrue(page.isPageZoomed());
-		assertTrue(isZoomed(part));
+        Assert.assertTrue(page.isPageZoomed());
+        Assert.assertTrue(isZoomed(part));
     }
 
     // open the given file in an editor
     protected void openEditor(IFile file, boolean activate) {
         try {
-            if (file == file1) {
-				editor1 = IDE.openEditor(page, file, activate);
-			}
-            if (file == file2) {
-				editor2 = IDE.openEditor(page, file, activate);
-			}
+            if (file == file1)
+                editor1 = IDE.openEditor(page, file, activate);
+            if (file == file2)
+                editor2 = IDE.openEditor(page, file, activate);
         } catch (PartInitException e) {
         }
     }
-
+    
     // show the given view as a regular view
     protected IViewPart showRegularView(String id, int mode) {
         try {
@@ -167,88 +165,86 @@ public class ZoomTestCase extends UITestCase {
         PartSite site = (PartSite) part.getSite();
         return site.getModel();
     }
-
+    
     protected MUIElement getPartParent(IWorkbenchPart part) {
         MPart partModel = getPartModel(part);
-
+        
         MUIElement partParent = partModel.getParent();
-        if (partParent == null && partModel.getCurSharedRef() != null) {
-			partParent = partModel.getCurSharedRef().getParent();
-		}
-
+        if (partParent == null && partModel.getCurSharedRef() != null)
+        	partParent = partModel.getCurSharedRef().getParent();
+        
         return partParent;
     }
-
+    
     // returns whether this part is zoomed
     protected boolean isZoomed(IWorkbenchPart part) {
-    	if (part == null) {
-			return false;
-		}
-
+    	if (part == null)
+    		return false;
+    	
     	MUIElement toTest = page.getActiveElement(page.getReference(part));
-    	if (toTest == null) {
-			return false;
-		}
-
+    	if (toTest == null)
+    		return false;
+    	
     	return toTest.getTags().contains(IPresentationEngine.MAXIMIZED);
     }
-
+    
     /**
      * Asserts that the given part is zoomed. If the part is null, asserts
      * that no parts are zoomed.
-     *
+     * 
      * @param part
      * @since 3.1
      */
     protected void assertZoomed(IWorkbenchPart part) {
         if (part == null) {
-			assertFalse("Page should not be zoomed", isZoomed());
+            Assert.assertFalse("Page should not be zoomed", isZoomed());
         } else {
             // Assert that the part is zoomed
-			assertTrue("Expecting " + partName(part) + " to be zoomed", isZoomed(part));
+            Assert.assertTrue("Expecting " + partName(part) + " to be zoomed", isZoomed(part));
             // Assert that the page is zoomed (paranoia check)
-			assertTrue("Page should be zoomed", isZoomed());
+            Assert.assertTrue("Page should be zoomed", isZoomed());
         }
     }
 
     /**
      * Asserts that the given part is active.
-     *
+     * 
      * @param part
      * @since 3.1
      */
     protected void assertActive(IWorkbenchPart part) {
         IWorkbenchPart activePart = page.getActivePart();
-
+        
         // Assert that the part is active
-		assertTrue("Unexpected active part: expected " + partName(part)
+        Assert.assertTrue("Unexpected active part: expected " + partName(part) 
                 + " and found " + partName(activePart), activePart == part);
-
+        
         // If the part is an editor, assert that the editor is active
         if (part instanceof IEditorPart) {
             assertActiveEditor((IEditorPart)part);
         }
     }
-
+    
     protected String partName(IWorkbenchPart part) {
         if (part == null) {
             return "null";
         }
-
+        
         return Util.safeString(part.getTitle());
     }
-
+    
     protected void assertActiveEditor(IEditorPart part) {
         IWorkbenchPart activeEditor = page.getActiveEditor();
-		assertTrue("Unexpected active editor: expected " + partName(part)
+        
+        Assert.assertTrue("Unexpected active editor: expected " + partName(part) 
                 + " and found " + partName(activeEditor), activeEditor == part);        
     }
-
+    
     // returns true if the page is not zoomed, false otherwise
     protected boolean isZoomed() {
         return page.isPageZoomed();
     }
-
+    
     public void close(IWorkbenchPart part) {
         if (part instanceof IViewPart) {
             page.hideView((IViewPart)part);

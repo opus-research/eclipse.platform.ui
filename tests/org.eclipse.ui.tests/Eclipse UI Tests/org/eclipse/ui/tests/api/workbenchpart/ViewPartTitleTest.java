@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api.workbenchpart;
+
+import junit.framework.Assert;
 
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -21,7 +22,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests bug 56822 -- NPE thrown when setTitle(null) is called.
- *
+ * 
  * @since 3.0
  */
 public class ViewPartTitleTest extends UITestCase {
@@ -88,18 +89,18 @@ public class ViewPartTitleTest extends UITestCase {
     private void verifySettings(IWorkbenchPart2 part, String expectedTitle,
             String expectedPartName, String expectedContentDescription)
             throws Exception {
-		assertEquals("Incorrect view title", expectedTitle, part
+        Assert.assertEquals("Incorrect view title", expectedTitle, part
                 .getTitle());
-		assertEquals("Incorrect part name", expectedPartName, part
+        Assert.assertEquals("Incorrect part name", expectedPartName, part
                 .getPartName());
-		assertEquals("Incorrect content description",
+        Assert.assertEquals("Incorrect content description",
                 expectedContentDescription, part.getContentDescription());
 
-		assertEquals("Incorrect title in view reference", expectedTitle,
+        Assert.assertEquals("Incorrect title in view reference", expectedTitle,
                 ref.getTitle());
-		assertEquals("Incorrect part name in view reference",
+        Assert.assertEquals("Incorrect part name in view reference",
                 expectedPartName, ref.getPartName());
-		assertEquals("Incorrect content description in view reference",
+        Assert.assertEquals("Incorrect content description in view reference",
                 expectedContentDescription, ref.getContentDescription());
     }
 
@@ -111,7 +112,7 @@ public class ViewPartTitleTest extends UITestCase {
 
     /**
      * Ensure that we've received the given property change events since the start of the test
-     *
+     * 
      * @param titleEvent PROP_TITLE
      * @param nameEvent PROP_PART_NAME
      * @param descriptionEvent PROP_CONTENT_DESCRIPTION
@@ -119,15 +120,15 @@ public class ViewPartTitleTest extends UITestCase {
     private void verifyEvents(boolean titleEvent, boolean nameEvent,
             boolean descriptionEvent) {
         if (titleEvent) {
-			assertEquals("Missing title change event", titleEvent,
+            Assert.assertEquals("Missing title change event", titleEvent,
                     titleChangeEvent);
         }
         if (nameEvent) {
-			assertEquals("Missing name change event", nameEvent,
+            Assert.assertEquals("Missing name change event", nameEvent,
                     nameChangeEvent);
         }
         if (descriptionEvent) {
-			assertEquals("Missing content description event",
+            Assert.assertEquals("Missing content description event",
                     descriptionEvent, contentChangeEvent);
         }
     }
@@ -140,7 +141,7 @@ public class ViewPartTitleTest extends UITestCase {
     /**
      * Ensures that we can call ViewPart.setTitle(null) without throwing
      * any exceptions
-     *
+     * 
      * @throws Throwable
      */
     public void testNullTitle() throws Throwable {

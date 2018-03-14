@@ -716,6 +716,10 @@ public class PathVariableDialog extends TitleAreaDialog {
         variableValue = userEditableString;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
     	return true;

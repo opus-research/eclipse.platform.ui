@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,13 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.decorators;
 
+import junit.framework.Assert;
+
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.ui.tests.menus.ObjectContributionClasses;
-import org.junit.Assert;
 
 /**
  * Decorator for testing adaptability. This class is used to test
@@ -24,7 +24,7 @@ public class TestAdaptableDecoratorContributor extends TestLightweightDecoratorC
 
     public static final String SUFFIX = "ICommon.1";
     public static final String ID = "org.eclipse.ui.tests.decorators.generalAdaptabilityOn";
-
+    
     private Class clazz;
     private String suffix;
 
@@ -34,13 +34,13 @@ public class TestAdaptableDecoratorContributor extends TestLightweightDecoratorC
     }
 
     protected void setSuffix(String suffix) {
-        this.suffix = suffix;
+        this.suffix = suffix;    
     }
 
     protected void setExpectedElementType(Class clazz) {
-        this.clazz = clazz;
+        this.clazz = clazz;    
     }
-
+    
     @Override
 	public void decorate(Object element, IDecoration decoration) {
         Assert.assertTrue(clazz.isInstance(element));

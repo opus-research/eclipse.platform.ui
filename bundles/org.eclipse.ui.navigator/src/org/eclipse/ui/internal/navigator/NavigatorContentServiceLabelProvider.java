@@ -142,6 +142,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return text;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider#getStyledText(java.lang.Object)
+	 */
 	@Override
 	public StyledString getStyledText(Object anElement) {
 		Collection extensions = contentService.findPossibleLabelExtensions(anElement);
@@ -201,6 +204,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return image;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+	 */
 	@Override
 	public Font getFont(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
@@ -217,6 +223,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
 	@Override
 	public Color getForeground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
@@ -233,6 +242,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
 	@Override
 	public Color getBackground(Object anElement) {
 		ILabelProvider[] labelProviders = contentService.findRelevantLabelProviders(anElement);
@@ -344,6 +356,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
         }
     }
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ITreePathLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel, org.eclipse.jface.viewers.TreePath)
+	 */
 	@Override
 	public void updateLabel(ViewerLabel label, TreePath elementPath) { 
 		 
@@ -372,6 +387,9 @@ public class NavigatorContentServiceLabelProvider extends EventManager
 		}
 	}
  
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelProviderListener#labelProviderChanged(org.eclipse.jface.viewers.LabelProviderChangedEvent)
+	 */
 	@Override
 	public void labelProviderChanged(LabelProviderChangedEvent event) { 
 		fireLabelProviderChanged(event);		

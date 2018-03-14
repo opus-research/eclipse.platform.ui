@@ -35,8 +35,8 @@ public class ActiveActionSetExpression extends Expression {
 
 	@Override
 	public void collectExpressionInfo(ExpressionInfo info) {
-		for (String element : expressionInfo) {
-			info.addVariableNameAccess(element);
+		for (int i = 0; i < expressionInfo.length; i++) {
+			info.addVariableNameAccess(expressionInfo[i]);
 		}
 	}
 
