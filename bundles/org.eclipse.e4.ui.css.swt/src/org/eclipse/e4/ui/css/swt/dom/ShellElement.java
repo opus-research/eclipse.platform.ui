@@ -31,27 +31,22 @@ public class ShellElement extends CompositeElement {
 	// Create SWT Shell Listener
 	private ShellListener shellListener = new ShellListener() {
 
-		@Override
 		public void shellActivated(ShellEvent e) {
 			ShellElement.this.isActive = true;
 			doApplyStyles();
 		}
 
-		@Override
 		public void shellDeactivated(ShellEvent e) {
 			ShellElement.this.isActive = false;
 			doApplyStyles();
 		}
 
-		@Override
 		public void shellDeiconified(ShellEvent e) {
 		}
 
-		@Override
 		public void shellIconified(ShellEvent e) {
 		}
 
-		@Override
 		public void shellClosed(ShellEvent e) {
 			ShellElement.this.dispose();
 		}
@@ -141,7 +136,7 @@ public class ShellElement extends CompositeElement {
 
 	@Override
 	public void reset() {
-		CSSSWTImageHelper.restoreDefaultImage(getShell());
 		super.reset();
+		CSSSWTImageHelper.restoreDefaultImage(getShell());
 	}
 }

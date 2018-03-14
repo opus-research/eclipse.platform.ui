@@ -37,7 +37,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -315,8 +314,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 		for (int i = 0; i < colorsAndFontsThemes.size(); i++) {
 			if (colorsAndFontsThemes.get(i).getId().equals(colorAndFontThemeId)) {
-				ISelection selection = new StructuredSelection(colorsAndFontsThemes.get(i));
-				colorsAndFontsThemeCombo.setSelection(selection);
+				colorsAndFontsThemeCombo.getCombo().select(i);
 				break;
 			}
 		}
