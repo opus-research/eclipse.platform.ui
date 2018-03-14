@@ -57,13 +57,6 @@ public class ActionSetMenuManager extends SubMenuManager {
         return item;
     }
 
-	/**
-	 * @return Returns the actionSetId.
-	 */
-	public String getActionSetId() {
-		return actionSetId;
-	}
-
     @Override
 	public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
