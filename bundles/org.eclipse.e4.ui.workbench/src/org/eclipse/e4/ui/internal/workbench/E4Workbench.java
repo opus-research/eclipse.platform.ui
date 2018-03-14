@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 BestSolution.at and others.
+ * Copyright (c) 2008, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,7 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
- *     Christian Georgi (SAP) - Bug 432480
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     Christian Georgi (SAP)                   - Bug 432480
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -130,7 +129,7 @@ public class E4Workbench implements IWorkbench {
 		uiEventPublisher = new UIEventPublisher(appContext);
 		appContext.set(UIEventPublisher.class, uiEventPublisher);
 		((Notifier) uiRoot).eAdapters().add(uiEventPublisher);
-		Hashtable<String, Object> properties = new Hashtable<>();
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put("id", getId()); //$NON-NLS-1$
 
 		osgiRegistration = Activator.getDefault().getContext()
