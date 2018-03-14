@@ -8,7 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
+<<<<<<< Upstream, based on origin/master
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+=======
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440975
+>>>>>>> 31aa725 Bug 440975 - Remove unused coolbarPopupMenuManager from WorkbenchActionBuilder
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -68,7 +72,6 @@ import org.eclipse.ui.internal.ide.actions.RetargetActionWithDefault;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
-import org.eclipse.ui.menus.IMenuService;
 
 /**
  * Adds actions to a workbench window.
@@ -229,12 +232,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private boolean isDisposed = false;
 
     /**
-     * The coolbar context menu manager.
-     * @since 3.3
-     */
-	private MenuManager coolbarPopupMenuManager;
-
-    /**
      * Constructs a new action builder which contributes actions
      * to the given window.
      * 
@@ -348,6 +345,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     protected void fillCoolBar(ICoolBarManager coolBar) {
 
     	IActionBarConfigurer2 actionBarConfigurer = (IActionBarConfigurer2) getActionBarConfigurer();
+<<<<<<< Upstream, based on origin/master
         { // Set up the context Menu
             coolbarPopupMenuManager = new MenuManager();
 			coolbarPopupMenuManager.add(new ActionContributionItem(lockToolBarAction));
@@ -356,6 +354,8 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             IMenuService menuService = window.getService(IMenuService.class);
             menuService.populateContributionManager(coolbarPopupMenuManager, "popup:windowCoolbarContextMenu"); //$NON-NLS-1$
         }
+=======
+>>>>>>> 31aa725 Bug 440975 - Remove unused coolbarPopupMenuManager from WorkbenchActionBuilder
         coolBar.add(new GroupMarker(IIDEActionConstants.GROUP_FILE));
         { // File Group
             IToolBarManager fileToolBar = actionBarConfigurer.createToolBarManager();
@@ -787,11 +787,16 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
 			return;
 		}
     	isDisposed = true;
+<<<<<<< Upstream, based on origin/master
     	IMenuService menuService = window.getService(IMenuService.class);
         menuService.releaseContributions(coolbarPopupMenuManager);
         coolbarPopupMenuManager.dispose();
         
         getActionBarConfigurer().getStatusLineManager().remove(statusLineItem);
+=======
+
+    	getActionBarConfigurer().getStatusLineManager().remove(statusLineItem);
+>>>>>>> 31aa725 Bug 440975 - Remove unused coolbarPopupMenuManager from WorkbenchActionBuilder
         if (pageListener != null) {
             window.removePageListener(pageListener);
             pageListener = null;
