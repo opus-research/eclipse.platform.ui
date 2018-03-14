@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 432463
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -278,11 +277,6 @@ public class UIEvents {
 		 * Sent when an MPart is activated
 		 */
 		public static final String ACTIVATE = TOPIC + TOPIC_SEP + "activate"; //$NON-NLS-1$
-
-		/**
-		 * Sent just before an MPart is disposed
-		 */
-		public static final String DISPOSING = TOPIC + TOPIC_SEP + "disposing"; //$NON-NLS-1$
 
 		/**
 		 * Sent when a perspective is saved
