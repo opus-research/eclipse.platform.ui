@@ -109,6 +109,11 @@ public class WorkbenchMessages extends NLS {
 	public static String ExportResourcesAction_toolTip;
 	public static String ImportResourcesAction_text;
 	public static String ImportResourcesAction_toolTip;
+	public static String OpenBrowserHandler_NoInfoDialogMessage;
+
+
+	public static String OpenBrowserHandler_NoInfoDialogTitle;
+
 
 	public static String OpenRecent_errorTitle;
 	public static String OpenRecent_unableToOpen;
@@ -173,6 +178,7 @@ public class WorkbenchMessages extends NLS {
 
     public static String ShowView_title;
 	public static String ShowView_shellTitle;
+	public static String ShowView_errorTitle;
 	public static String ShowView_selectViewHelp;
 	public static String ShowView_noDesc;
 
@@ -180,6 +186,7 @@ public class WorkbenchMessages extends NLS {
 	public static String ToggleEditor_showEditors;
 	public static String ToggleEditor_toolTip;
 
+	public static String LockToolBarAction_text;
 	public static String LockToolBarAction_toolTip;
 
 	public static String EditActionSetsAction_text;
@@ -281,7 +288,9 @@ public class WorkbenchMessages extends NLS {
 	public static String CyclePerspectiveAction_header;
 	public static String ActivateEditorAction_text;
 	public static String ActivateEditorAction_toolTip;
+	public static String MaximizePartAction_text;
 	public static String MaximizePartAction_toolTip;
+	public static String MinimizePartAction_text;
 	public static String MinimizePartAction_toolTip;
 
 
@@ -327,6 +336,7 @@ public class WorkbenchMessages extends NLS {
 	public static String AboutFeaturesDialog_featureName;
 	public static String AboutFeaturesDialog_featureId;
 	public static String AboutFeaturesDialog_version;
+	public static String AboutFeaturesDialog_signed;
 	public static String AboutFeaturesDialog_provider;
 	public static String AboutFeaturesDialog_moreInfo;
 	public static String AboutFeaturesDialog_pluginsInfo;
@@ -362,7 +372,9 @@ public class WorkbenchMessages extends NLS {
 
 
 	public static String WorkbenchWindow_close;
+	public static String WorkbenchPage_PerspectiveFormat;
 	public static String WorkbenchPage_ErrorCreatingPerspective;
+	public static String WorkbenchPage_UndefinedPerspective;
 
 	public static String SelectWorkingSetAction_text;
 	public static String SelectWorkingSetAction_toolTip;
@@ -434,6 +446,7 @@ public class WorkbenchMessages extends NLS {
 	// ==============================================================================
 	// Preference Pages
 	// ==============================================================================
+	public static String PreferenceNode_errorTitle;
 	public static String PreferenceNode_errorMessage;
     public static String PreferenceNode_NotFound;
 	public static String Preference_note;
@@ -443,12 +456,30 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_allowInplaceEditingButton;
 	public static String WorkbenchPreference_useIPersistableEditorButton;
 	public static String WorkbenchPreference_promptWhenStillOpenButton;
+	public static String WorkbenchPreference_showTextOnPerspectiveBar;
 	public static String WorkbenchPreference_stickyCycleButton;
 	public static String WorkbenchPreference_RunInBackgroundButton;
 	public static String WorkbenchPreference_RunInBackgroundToolTip;
 
 	// --- Appearance ---
 	public static String ViewsPreferencePage_Theme;
+	// public static String ViewsPreference_currentPresentation;
+	// public static String ViewsPreference_currentPresentationFormat;
+	// public static String ViewsPreference_presentationConfirm_title;
+	// public static String ViewsPreference_presentationConfirm_message;
+	// public static String ViewsPreference_presentationConfirm_yes;
+	// public static String ViewsPreference_presentationConfirm_no;
+	// public static String ViewsPreference_editors;
+	// public static String ViewsPreference_editors_top;
+	// public static String ViewsPreference_editors_bottom;
+	// public static String ViewsPreference_views;
+	// public static String ViewsPreference_views_top;
+	// public static String ViewsPreference_views_bottom;
+	// public static String ViewsPreference_perspectiveBar;
+	// public static String ViewsPreference_perspectiveBar_topRight;
+	// public static String ViewsPreference_perspectiveBar_topLeft;
+	// public static String ViewsPreference_perspectiveBar_left;
+	// public static String ViewsPreference_traditionalTabs;
 	public static String ViewsPreference_currentTheme;
 	public static String ViewsPreference_currentThemeDescription;
 	public static String ViewsPreference_currentThemeFormat;
@@ -456,6 +487,8 @@ public class WorkbenchMessages extends NLS {
 	public static String ViewsPreference_visibleTabs_description;
 	public static String ViewsPreference_enableMRU;
 	public static String ViewsPreference_useColoredLabels;
+	// public static String ViewsPreference_override;
+	// public static String ViewsPreference_restartRequestJobName;
 
 	// --- File Editors ---
 	public static String FileEditorPreference_fileTypes;
@@ -558,6 +591,7 @@ public class WorkbenchMessages extends NLS {
 	public static String PropertyDialog_messageTitle;
 	public static String PropertyDialog_noPropertyMessage;
 	public static String PropertyDialog_propertyMessage;
+	public static String PropertyPageNode_errorTitle;
 	public static String PropertyPageNode_errorMessage;
 
 	public static String SystemInPlaceDescription_name;
@@ -595,16 +629,23 @@ public class WorkbenchMessages extends NLS {
 	public static String EditorManager_saveResourcesMessage;
 	public static String EditorManager_saveResourcesOptionallyMessage;
 	public static String EditorManager_saveResourcesTitle;
+	public static String EditorManager_exceptionRestoringEditor;
+	public static String EditorManager_unableToCreateEditor;
 	public static String EditorManager_systemEditorError;
+	public static String EditorManager_invalidDescriptor;
+	public static String EditorManager_instantiationError;
+    public static String EditorManager_errorInInit;
 	public static String EditorManager_siteIncorrect;
 	public static String EditorManager_unknownEditorIDMessage;
 	public static String EditorManager_errorOpeningExternalEditor;
+	public static String EditorManager_unableToOpenExternalEditor;
 	public static String EditorManager_operationFailed;
 	public static String EditorManager_saveChangesQuestion;
 	public static String EditorManager_closeWithoutPromptingOption;
 	public static String EditorManager_saveChangesOptionallyQuestion;
     public static String EditorManager_missing_editor_descriptor;
     public static String EditorManager_no_in_place_support;
+    public static String EditorManager_invalid_editor_descriptor;
     public static String EditorManager_no_persisted_state;
     public static String EditorManager_no_input_factory_ID;
     public static String EditorManager_bad_element_factory;
@@ -612,6 +653,8 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
 	public static String EditorManager_largeDocumentWarning;
+
+	public static String EditorPane_pinEditor;
 
 	public static String ExternalEditor_errorMessage;
 	public static String Save;
@@ -632,16 +675,45 @@ public class WorkbenchMessages extends NLS {
 	public static String OpenPerspectiveMenu_pageProblemsTitle;
 	public static String OpenPerspectiveMenu_errorUnknownInput;
 
+	public static String Perspective_oneError;
+	public static String Perspective_multipleErrors;
+
+	public static String Perspective_problemRestoringTitle;
+	public static String Perspective_errorReadingState;
+	public static String Perspective_localCopyLabel;
+	public static String Perspective_problemLoadingTitle;
+	public static String WorkbenchPage_problemRestoringTitle;
+	public static String WorkbenchPage_errorReadingState;
+
+	public static String Perspective_problemSavingTitle;
+	public static String Perspective_problemSavingMessage;
+
+	public static String Perspective_unableToLoad;
+	public static String Perspective_couldNotFind;
 
 	// ==============================================================================
 	// Views Framework
 	// ==============================================================================
+	public static String Menu;
+	public static String ViewMenu;
+
+	public static String StandardSystemToolbar_Minimize;
+	public static String StandardSystemToolbar_Maximize;
+	public static String StandardSystemToolbar_Restore;
+
+	public static String ViewPane_minimizeView;
+	public static String ViewPane_moveView;
+	public static String ViewPane_moveFolder;
+
+	public static String EditorPane_moveEditor;
 
 	public static String ViewLabel_unknown;
 
 	public static String ViewFactory_initException;
 	public static String ViewFactory_siteException;
 	public static String ViewFactory_couldNotCreate;
+	public static String ViewFactory_noMultiple;
+	public static String ViewFactory_couldNotSave;
 	// ==============================================================================
 	// Workbench
 	// ==============================================================================
@@ -651,10 +723,24 @@ public class WorkbenchMessages extends NLS {
 
 	public static String WorkbenchPage_UnknownLabel;
 
+	public static String WorkbenchPage_editorAlreadyOpenedMsg;
 
 	// These four keys are marked as unused by the NLS search, but they are indirectly used
 	// and should be removed.
+	public static String PartPane_sizeLeft;
+	public static String PartPane_sizeRight;
+	public static String PartPane_sizeTop;
+	public static String PartPane_sizeBottom;
 
+	public static String PartPane_detach;
+	public static String PartPane_restore;
+	public static String PartPane_move;
+	public static String PartPane_size;
+	public static String PartPane_maximize;
+	public static String PartPane_close;
+	public static String PartPane_closeOthers;
+	public static String PartPane_closeAll;
+	public static String PartPane_newEditor;
 	public static String PluginAction_operationNotAvailableMessage;
 	public static String PluginAction_disabledMessage;
 	public static String ActionDescriptor_invalidLabel;
@@ -670,9 +756,12 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPage_IllegalSecondaryId;
 	public static String WorkbenchPage_IllegalViewMode;
 	public static String WorkbenchPart_AutoTitleFormat;
+	public static String EditorPart_AutoTitleFormat;
+	public static String Abnormal_Workbench_Conditi;
 
 
 	public static String AbstractWorkingSetManager_updatersActivating;
+	public static String WorkbenchPage_ErrorActivatingView;
 	public static String DecoratorManager_ErrorActivatingDecorator;
 
 	public static String EditorRegistry_errorTitle;
@@ -681,12 +770,27 @@ public class WorkbenchMessages extends NLS {
 	public static String ErrorClosing;
 	public static String ErrorClosingNoArg;
 	public static String ErrorClosingOneArg;
+	public static String ErrorReadingState;
+
+	public static String Invalid_workbench_state_ve;
+	public static String Workbench_incompatibleUIState;
+	public static String Workbench_incompatibleSavedStateVersion;
+	public static String ProblemSavingState;
 	public static String SavingProblem;
 
 	public static String Problems_Opening_Page;
+	public static String Restoring_Problems;
+
+	public static String Workspace_problemsTitle;
+
+	public static String Workbench_problemsRestoringMsg;
 	public static String Workbench_problemsSavingMsg;
 	public static String Workbench_problemsRestoring;
 	public static String Workbench_problemsSaving;
+	public static String WorkbenchWindow_problemsRestoringWindow;
+	public static String WorkbenchWindow_problemsSavingWindow;
+	public static String EditorManager_problemsRestoringEditors;
+	public static String EditorManager_problemsSavingEditors;
 	public static String RootLayoutContainer_problemsRestoringPerspective;
 	public static String RootLayoutContainer_problemsSavingPerspective;
 	public static String ViewFactory_problemsSavingViews;
