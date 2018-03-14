@@ -10,7 +10,6 @@
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 436247
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440136, 472654
  *     Robert Roth <robert.roth.off@gmail.com> - Bugs 274005, 456291
- *     Mickael Istria (Red Hat Inc.) - Theme and fontregistry rather than pref
  *******************************************************************************/
 package org.eclipse.ui.internal.themes;
 
@@ -1559,12 +1558,10 @@ getPreferenceStore(),
 		for (Map.Entry<FontDefinition, FontData[]> entry : fontPreferencesToSet.entrySet()) {
 			String key = createPreferenceKey(entry.getKey());
 			String fdString = PreferenceConverter.getStoredRepresentation(entry.getValue());
-			String storeString = PreferenceConverter
-					.getStoredRepresentation(currentTheme.getFontRegistry().getFontData(entry.getKey().getId()));
+            String storeString = getPreferenceStore().getString(key);
 
-			if (!fdString.equals(storeString)) {
+            if (!fdString.equals(storeString))
                 getPreferenceStore().setValue(key, fdString);
-			}
         }
 
         fontValuesToSet.clear();
