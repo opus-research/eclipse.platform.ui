@@ -40,7 +40,6 @@ public class CSSSWTEngineImpl extends AbstractCSSSWTEngineImpl {
 
 	private void init() {
 		disposeListener = new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				handleWidgetDisposed(e.widget);
 			}
@@ -61,7 +60,6 @@ public class CSSSWTEngineImpl extends AbstractCSSSWTEngineImpl {
 				RegistryFactory.getRegistry()));
 	}
 
-	@Override
 	public void reapply() {
 		Shell[] shells = display.getShells();
 		for (Shell s : shells) {

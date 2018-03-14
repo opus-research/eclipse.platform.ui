@@ -31,7 +31,6 @@ public abstract class AbstractCSSPropertyBorderCompositeHandler extends
 	private static final String[] BORDER_CSSPROPERTIES = { "border-width",
 			"border-style", "border-color" };
 
-	@Override
 	public void applyCSSProperty(Object element, CSSValue value, String pseudo,
 			CSSEngine engine) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -60,12 +59,10 @@ public abstract class AbstractCSSPropertyBorderCompositeHandler extends
 		}
 	}
 
-	@Override
 	public boolean isCSSPropertyComposite(String property) {
 		return "border".equals(property);
 	}
 
-	@Override
 	public String[] getCSSPropertiesNames(String property) {
 		if ("border".equals(property))
 			return BORDER_CSSPROPERTIES;
