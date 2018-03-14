@@ -35,7 +35,7 @@ public class ToolControlContribution extends ControlContribution {
 	private IContributionFactory contribFactory;
 
 	@Inject
-	private EModelService modelService;
+	EModelService modelService;
 
 	// private IEclipseContext parentContext;
 
