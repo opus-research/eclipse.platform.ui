@@ -15,15 +15,6 @@
             </message_arguments>
         </filter>
     </resource>
-    <resource path="src/org/eclipse/e4/ui/workbench/IPresentationEngine.java" type="org.eclipse.e4.ui.workbench.IPresentationEngine">
-        <filter id="1209008130">
-            <message_arguments>
-                <message_argument value="1.2"/>
-                <message_argument value="1.3"/>
-                <message_argument value="ACTIVE"/>
-            </message_arguments>
-        </filter>
-    </resource>
     <resource path="src/org/eclipse/e4/ui/workbench/UIEvents.java" type="org.eclipse.e4.ui.workbench.UIEvents$Application">
         <filter comment="New dialogs field in MApplication" id="403767336">
             <message_arguments>
