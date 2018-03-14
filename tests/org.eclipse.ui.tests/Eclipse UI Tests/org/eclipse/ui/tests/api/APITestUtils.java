@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2015 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Denis Zygann <d.zygann@web.de> - Bug 457390
  ******************************************************************************/
 
 package org.eclipse.ui.tests.api;
@@ -15,19 +14,24 @@ package org.eclipse.ui.tests.api;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.MUIElement;
+import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
 import org.eclipse.ui.ISaveablePart2;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.SaveableHelper;
 import org.eclipse.ui.internal.Workbench;
+import org.eclipse.ui.internal.WorkbenchPartReference;
 
 public class APITestUtils {
 	private static Map<IEclipseContext, ISaveHandler> originalHandlers = new HashMap<IEclipseContext, ISaveHandler>();
@@ -61,16 +65,23 @@ public class APITestUtils {
 		}
 
 	}
-    /**
-     * not supported anymore
-     * @param ref
-     * @return <code>false</code>
-     * @deprecated discontinued support for fast views
-     */
-    @Deprecated
-    public static boolean isFastView(IViewReference ref) {
-        return false;
-    }
+
+	public static boolean isFastView(IViewReference ref) {
+		MPart part = ((WorkbenchPartReference) ref).getModel();
+		MUIElement parent = part.getParent();
+		if (parent == null) {
+			MPlaceholder placeholder = part.getCurSharedRef();
+			if (placeholder != null) {
+				parent = placeholder.getParent();
+			}
+		}
+
+		if (parent != null) {
+			List<String> tags = parent.getTags();
+			return tags.contains(IPresentationEngine.MINIMIZED) || tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM);
+		}
+		return false;
+	}
 
 	public static void saveableHelperSetAutomatedResponse(final int response) {
 		SaveableHelper.testSetAutomatedResponse(response);
