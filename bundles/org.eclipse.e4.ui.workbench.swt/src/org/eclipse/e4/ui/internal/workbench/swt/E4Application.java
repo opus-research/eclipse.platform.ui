@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -294,19 +294,13 @@ public class E4Application implements IApplication {
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
+		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
 				false);
 		if (cssURI != null) {
 			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
-
-		String themeId = getArgValue(E4Application.THEME_ID,
-				applicationContext, false);
-		if (themeId == null && cssURI == null) {
-			themeId = DEFAULT_THEME_ID;
-		}
-		appContext.set(E4Application.THEME_ID, themeId);
 
 		// Temporary to support old property as well
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
@@ -462,6 +456,13 @@ public class E4Application implements IApplication {
 		serviceContext.set(IExceptionHandler.class, exceptionHandler);
 		serviceContext.set(IExtensionRegistry.class, registry);
 
+		// translation
+		String locale = Locale.getDefault().toString();
+		serviceContext.set(TranslationService.LOCALE, locale);
+		TranslationService bundleTranslationProvider = TranslationProviderFactory
+				.bundleTranslationService(serviceContext);
+		serviceContext.set(TranslationService.class, bundleTranslationProvider);
+
 		serviceContext.set(Adapter.class, ContextInjectionFactory.make(
 				EclipseAdapter.class, serviceContext));
 
@@ -514,13 +515,6 @@ public class E4Application implements IApplication {
 					String id) {
 			}
 		});
-
-		// translation
-		String locale = Locale.getDefault().toString();
-		appContext.set(TranslationService.LOCALE, locale);
-		TranslationService bundleTranslationProvider = TranslationProviderFactory
-				.bundleTranslationService(appContext);
-		appContext.set(TranslationService.class, bundleTranslationProvider);
 
 		return appContext;
 	}
@@ -668,6 +662,11 @@ public class E4Application implements IApplication {
 		mbox.setText(title);
 		mbox.setMessage(message);
 		return mbox.open() == SWT.OK;
+	}
+
+	private String getThemeId(IApplicationContext appContext) {
+		String themeId = getArgValue(E4Application.THEME_ID, appContext, false);
+		return themeId != null ? themeId : DEFAULT_THEME_ID;
 	}
 
 	/**
