@@ -19,7 +19,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.internal.databinding.beans.BeanObservableSetDecorator;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -37,8 +37,8 @@ public class BeanObservableSetDecoratorTest extends TestCase {
 
 		bean = new Bean();
 		propertyDescriptor = new PropertyDescriptor("set", Bean.class);
-		observableSet = BeansObservables.observeSet(SWTObservables
-				.getRealm(Display.getDefault()), bean, "set");
+		observableSet = BeansObservables.observeSet(
+				DisplayRealm.getRealm(Display.getDefault()), bean, "set");
 		decorator = new BeanObservableSetDecorator(observableSet,
 				propertyDescriptor);
 	}
