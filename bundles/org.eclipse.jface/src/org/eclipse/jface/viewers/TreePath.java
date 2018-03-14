@@ -42,8 +42,8 @@ public final class TreePath {
 	 */
 	public TreePath(Object[] segments) {
 		Assert.isNotNull(segments);
-		for (int i = 0; i < segments.length; i++) {
-			Assert.isNotNull(segments[i]);
+		for (Object segment : segments) {
+			Assert.isNotNull(segment);
 		}
 		this.segments = segments;
 	}
@@ -121,11 +121,11 @@ public final class TreePath {
 	 */
 	public int hashCode(IElementComparer comparer) {
 		int result = 0;
-		for (int i = 0; i < segments.length; i++) {
+		for (Object segment : segments) {
 			if (comparer == null) {
-				result += segments[i].hashCode();
+				result += segment.hashCode();
 			} else {
-				result += comparer.hashCode(segments[i]);
+				result += comparer.hashCode(segment);
 			}
 		}
 		return result;

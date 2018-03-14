@@ -184,8 +184,8 @@ public class TreeSelection extends StructuredSelection implements ITreeSelection
 	public int hashCode() {
 		int code = getClass().hashCode();
 		if (paths != null) {
-			for (int i = 0; i < paths.length; i++) {
-				code = code * 17 + paths[i].hashCode(getElementComparer());
+			for (TreePath path : paths) {
+				code = code * 17 + path.hashCode(getElementComparer());
 			}
 		}
 		return code;
