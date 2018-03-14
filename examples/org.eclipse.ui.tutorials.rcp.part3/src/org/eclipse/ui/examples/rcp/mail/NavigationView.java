@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.ui.tutorials.rcp.part3;
+package org.eclipse.ui.examples.rcp.mail;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package org.eclipse.ui.tutorials.rcp.part2;
+package org.eclipse.ui.examples.rcp.mail;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.application.ActionBarAdvisor;
@@ -18,9 +18,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     
     public void preWindowOpen() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
-        configurer.setInitialSize(new Point(400, 300));
-        configurer.setShowCoolBar(false);
+        configurer.setInitialSize(new Point(600, 400));
+        configurer.setShowCoolBar(true);
         configurer.setShowStatusLine(false);
-        configurer.setTitle("Hello RCP");
     }
+    
 }

@@ -1,4 +1,4 @@
-package org.eclipse.ui.tutorials.rcp.part3;
+package org.eclipse.ui.examples.rcp.mail;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -21,7 +21,7 @@ public class OpenViewAction extends Action {
 		setId(ICommandIds.CMD_OPEN);
         // Associate the action with a pre-defined command, to allow key bindings.
 		setActionDefinitionId(ICommandIds.CMD_OPEN);
-		setImageDescriptor(org.eclipse.ui.tutorials.rcp.part3.Part3Plugin.getImageDescriptor("/icons/sample2.gif"));
+		setImageDescriptor(org.eclipse.ui.examples.rcp.mail.Part3Plugin.getImageDescriptor("/icons/sample2.gif"));
 	}
 	
 	public void run() {
