@@ -9,10 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 431992
- *     Erik Chou <ekchou@ymail.com> - Bug 378849
- *     Paul Webster <pwebster@ca.ibm.com> - Bug 378849
- *     Andrey Loskutov <loskutov@gmx.de> - Cleaned up and moved code to extra package,
- *     		Bug 404348, 421178, 420956 - Fix perspective customization on 4.x
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
