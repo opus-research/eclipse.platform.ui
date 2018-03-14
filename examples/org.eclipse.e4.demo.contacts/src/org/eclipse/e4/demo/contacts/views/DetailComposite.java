@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Siemens AG and others.
- *
- * All rights reserved. This program and the accompanying materials
+ * Copyright (c) 2009, 2012 Siemens AG and others.
+ * 
+ * All rights reserved. This program and the accompanying materials 
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html.
- *
+ * 
  * Contributors:
  *     Kai Tödter - initial implementation
- *     Stephan Hackstedt <stephan.hackstedt@googlemail.com> - Bug 465449
  ******************************************************************************/
 
 package org.eclipse.e4.demo.contacts.views;
@@ -17,7 +16,7 @@ import java.net.URL;
 import javax.inject.Inject;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.PojoProperties;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -29,7 +28,7 @@ import org.eclipse.e4.demo.contacts.databinding.AggregateNameObservableValue;
 import org.eclipse.e4.demo.contacts.model.Contact;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -72,8 +71,9 @@ public class DetailComposite extends Composite {
 
 		dbc = new DataBindingContext();
 
-		URL url = FileLocator.find(Platform.getBundle("org.eclipse.e4.demo.contacts"), new Path("images/dummy.png"),
-				null);
+		URL url = FileLocator.find(Platform
+				.getBundle("org.eclipse.e4.demo.contacts"), new Path(
+				"images/dummy.png"), null);
 		ImageDescriptor imageDescriptor = ImageDescriptor.createFromURL(url);
 		if (imageDescriptor != null) {
 			dummyPortrait = imageDescriptor.getImageData();
@@ -120,8 +120,8 @@ public class DetailComposite extends Composite {
 		createVerticalSpace(composite);
 
 		// Bind the image
-		final IObservableValue imageObservableValue = PojoProperties
-				.value((Class<?>) contactValue.getValue(), "image", ImageData.class).observeDetail(contactValue);
+		final IObservableValue imageObservableValue = PojoObservables
+				.observeDetailValue(contactValue, "image", ImageData.class);
 
 		this.scaledImage = new ComputedValue() {
 			private Image currentImage;
@@ -155,11 +155,10 @@ public class DetailComposite extends Composite {
 
 		};
 
-		dbc.bindValue(WidgetProperties.image().observe(imageLabel), scaledImage,
+		dbc.bindValue(SWTObservables.observeImage(imageLabel), scaledImage,
 				new UpdateValueStrategy(UpdateValueStrategy.POLICY_NEVER), null);
 
 		addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				scaledImage.dispose();
 			}
@@ -173,7 +172,8 @@ public class DetailComposite extends Composite {
 	}
 
 	public boolean checkEmptyString(Object testString) {
-		if (testString == null || !(testString instanceof String) || ((String) testString).trim().length() == 0) {
+		if (testString == null || !(testString instanceof String)
+				|| ((String) testString).trim().length() == 0) {
 			return false;
 		}
 		return true;
@@ -209,12 +209,14 @@ public class DetailComposite extends Composite {
 
 	private static Composite createComposite(final Composite parent) {
 		final Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		composite
+				.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		composite.setLayout(new GridLayout(3, false));
 		return composite;
 	}
 
-	private Text createText(final Composite parent, final String labelText, final String property) {
+	private Text createText(final Composite parent, final String labelText,
+			final String property) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(labelText + "   "); // the extra space is due to a bug in
 		// font formatting when using css
@@ -243,17 +245,16 @@ public class DetailComposite extends Composite {
 
 		if (property != null) {
 			if (property.equals("name")) {
-				dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(text),
+				dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
 						new AggregateNameObservableValue(contactValue));
 			} else {
-				dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(text),
-						PojoProperties.value((Class<?>) contactValue.getValueType(), property, String.class)
-						.observeDetail(contactValue));
+				dbc.bindValue(SWTObservables.observeText(text, SWT.Modify),
+						PojoObservables.observeDetailValue(contactValue,
+								property, String.class));
 			}
 		}
 
 		text.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
 				if (commitChanges) {
 					setDirty(true);

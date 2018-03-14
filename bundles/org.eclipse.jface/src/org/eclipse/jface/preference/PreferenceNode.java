@@ -13,8 +13,8 @@ package org.eclipse.jface.preference;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -63,7 +63,7 @@ public class PreferenceNode implements IPreferenceNode {
     /**
      * Creates a new preference node with the given id. The new node has no
      * subnodes.
-     *
+     * 
      * @param id
      *            the node id
      */
@@ -77,7 +77,7 @@ public class PreferenceNode implements IPreferenceNode {
      * lazily-loaded preference page. The preference node assumes (sole)
      * responsibility for disposing of the image; this will happen when the node
      * is disposed.
-     *
+     * 
      * @param id
      *            the node id
      * @param label
@@ -103,7 +103,7 @@ public class PreferenceNode implements IPreferenceNode {
      * Creates a preference node with the given id and preference page. The
      * title of the preference page is used for the node label. The node will
      * not have an image.
-     *
+     * 
      * @param id
      *            the node id
      * @param preferencePage
@@ -125,7 +125,7 @@ public class PreferenceNode implements IPreferenceNode {
 
     /**
      * Creates a new instance of the given class <code>className</code>.
-     *
+     * 
      * @param className
      * @return new Object or <code>null</code> in case of failures.
      */
@@ -157,6 +157,9 @@ public class PreferenceNode implements IPreferenceNode {
         page.setTitle(label);
     }
 
+    /**
+     * (non-Javadoc) Method declared on IPreferenceNode.
+     */
     @Override
 	public void disposeResources() {
         if (image != null) {
@@ -193,7 +196,7 @@ public class PreferenceNode implements IPreferenceNode {
 
     /**
      * Returns the image descriptor for this node.
-     *
+     * 
      * @return the image descriptor
      */
     protected ImageDescriptor getImageDescriptor() {
@@ -249,7 +252,7 @@ public class PreferenceNode implements IPreferenceNode {
 
     /**
      * Set the current page to be newPage.
-     *
+     * 
      * @param newPage
      */
     public void setPage(IPreferencePage newPage) {

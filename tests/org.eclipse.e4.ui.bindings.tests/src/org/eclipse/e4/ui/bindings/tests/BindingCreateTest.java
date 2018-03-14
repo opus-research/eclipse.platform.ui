@@ -67,12 +67,12 @@ public class BindingCreateTest {
 		emptySeq = bs.createSequence("");
 		seq = bs.createSequence("CTRL+5 T");
 
-		emptyAttrs = new HashMap<>();
+		emptyAttrs = new HashMap<String,String>();
 
-		schemeOnly = new HashMap<>();
+		schemeOnly = new HashMap<String,String>();
 		schemeOnly.put(EBindingService.SCHEME_ID_ATTR_TAG, DEFAULT_SCHEME_ID);
 
-		schemeAndTypeAttrs = new HashMap<>();;
+		schemeAndTypeAttrs = new HashMap<String,String>();;
 		schemeAndTypeAttrs.put(EBindingService.SCHEME_ID_ATTR_TAG, DEFAULT_SCHEME_ID);
 		schemeAndTypeAttrs.put(EBindingService.TYPE_ATTR_TAG, "user");
 	}
@@ -165,5 +165,5 @@ public class BindingCreateTest {
 		assertNull(b.getPlatform());
 		assertTrue(b.getType() == Binding.USER);
 	}
-
+	
 }

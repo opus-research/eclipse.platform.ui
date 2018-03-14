@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,12 +60,12 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * The marker being shown, or <code>null</code> for a new marker
 	 */
-	private IMarker marker;
+	private IMarker marker = null;
 
 	/**
 	 * The resource on which to create a new marker
 	 */
-	private IResource resource;
+	private IResource resource = null;
 
 	/**
 	 * The type of marker to be created
@@ -75,7 +75,7 @@ public class DialogMarkerProperties extends TrayDialog {
 	/**
 	 * The initial attributes to use when creating a new marker
 	 */
-	private Map<String, Object> initialAttributes;
+	private Map initialAttributes = null;
 
 	/**
 	 * The text control for the Description field.
@@ -242,7 +242,7 @@ public class DialogMarkerProperties extends TrayDialog {
      *
      * @since 3.3
 	 */
-	protected void setInitialAttributes(Map<String, Object> initialAttributes) {
+	protected void setInitialAttributes(Map initialAttributes) {
 		this.initialAttributes = initialAttributes;
 	}
 
@@ -258,9 +258,9 @@ public class DialogMarkerProperties extends TrayDialog {
      *
      * @since 3.3
 	 */
-	protected Map<String, Object> getInitialAttributes() {
+	protected Map getInitialAttributes() {
 		if (initialAttributes == null) {
-			initialAttributes = new HashMap<>();
+			initialAttributes = new HashMap();
 		}
 		return initialAttributes;
 	}
@@ -338,7 +338,8 @@ public class DialogMarkerProperties extends TrayDialog {
 	 */
 	private void createCreationTimeArea(Composite parent) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(MarkerMessages.propertiesDialog_creationTime_text);
+        label.setText(MarkerMessages
+                .propertiesDialog_creationTime_text);
 
         creationTime = new Text(parent, SWT.SINGLE | SWT.READ_ONLY);
 	}
@@ -348,8 +349,10 @@ public class DialogMarkerProperties extends TrayDialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,	true);
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+				true);
+		createButton(parent, IDialogConstants.CANCEL_ID,
+				IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	/**
@@ -387,19 +390,22 @@ public class DialogMarkerProperties extends TrayDialog {
 	private void createResourceArea(Composite parent) {
         Label resourceLabel = new Label(parent, SWT.NONE);
 		resourceLabel.setText(MarkerMessages.propertiesDialog_resource_text);
-        resourceText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY | SWT.BORDER);
+        resourceText = new Text(parent, SWT.SINGLE | SWT.WRAP
+				| SWT.READ_ONLY | SWT.BORDER);
         GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		resourceText.setLayoutData(gridData);
 
         Label folderLabel = new Label(parent, SWT.NONE);
 		folderLabel.setText(MarkerMessages.propertiesDialog_folder_text);
-        folderText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY	| SWT.BORDER);
+        folderText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY
+				| SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		folderText.setLayoutData(gridData);
 
         Label locationLabel = new Label(parent, SWT.NONE);
 		locationLabel.setText(MarkerMessages.propertiesDialog_location_text);
-        locationText = new Text(parent, SWT.SINGLE | SWT.WRAP | SWT.READ_ONLY | SWT.BORDER);
+        locationText = new Text(parent, SWT.SINGLE | SWT.WRAP
+				| SWT.READ_ONLY | SWT.BORDER);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		locationText.setLayoutData(gridData);
 	}
@@ -472,7 +478,8 @@ public class DialogMarkerProperties extends TrayDialog {
 
             Object line = initialAttributes.get(IMarker.LINE_NUMBER);
             if (line != null && line instanceof Integer && locationText != null) {
-				locationText.setText(NLS.bind(MarkerMessages.label_lineNumber, line));
+				locationText.setText(
+                    NLS.bind(MarkerMessages.label_lineNumber, line));
 			}
         }
     }
@@ -511,16 +518,17 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * needed. Updates the existing marker only if there have been changes.
 	 */
 	private void saveChanges() {
-		Map<String, Object> attrs = getMarkerAttributes();
+		Map attrs = getMarkerAttributes();
 		IUndoableOperation op = null;
 		if (marker == null) {
-			if (resource == null) {
+			if (resource == null)
 				return;
-			}
-			op = new CreateMarkersOperation(type, attrs, resource, getCreateOperationTitle());
+			op = new CreateMarkersOperation(type, attrs,
+					resource, getCreateOperationTitle());
 		} else {
 			if (isDirty()) {
-				op = new UpdateMarkersOperation(marker, attrs, getModifyOperationTitle(), true);
+				op = new UpdateMarkersOperation(marker, attrs,
+						getModifyOperationTitle(), true);
 			}
 		}
 		if (op != null) {
@@ -534,9 +542,8 @@ public class DialogMarkerProperties extends TrayDialog {
 					ErrorDialog.openError(
 	                        getShell(),
 	                        MarkerMessages.Error, null, ((CoreException)e.getCause()).getStatus());
-				} else {
+				} else
 					IDEWorkbenchPlugin.log(e.getMessage(), e);
-				}
 			}
 		}
 	}
@@ -545,8 +552,8 @@ public class DialogMarkerProperties extends TrayDialog {
 	 * Returns the marker attributes to save back to the marker, based on the
 	 * current dialog fields.
 	 */
-	protected Map<String, Object> getMarkerAttributes() {
-		Map<String, Object> attrs = getInitialAttributes();
+	protected Map getMarkerAttributes() {
+		Map attrs = getInitialAttributes();
 		attrs.put(IMarker.MESSAGE, descriptionText.getText());
 		return attrs;
 	}
@@ -586,6 +593,11 @@ public class DialogMarkerProperties extends TrayDialog {
 		this.type = type;
 	}
 
+	/* (non-Javadoc)
+     * @see org.eclipse.jface.window.Dialog#getDialogBoundsSettings()
+     *
+     * @since 3.2
+     */
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
         IDialogSettings settings = IDEWorkbenchPlugin.getDefault().getDialogSettings();
@@ -627,6 +639,10 @@ public class DialogMarkerProperties extends TrayDialog {
 
 	}
 
+    /*
+     * (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+     */
     @Override
 	protected boolean isResizable() {
     	return true;

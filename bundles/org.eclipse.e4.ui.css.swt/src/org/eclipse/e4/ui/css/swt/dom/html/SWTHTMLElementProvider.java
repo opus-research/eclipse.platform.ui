@@ -20,15 +20,20 @@ import org.w3c.dom.Element;
 /**
  * {@link IElementProvider} SWT implementation to retrieve w3c Element
  * {@link SWTHTMLElement} linked to SWT widget.
- *
+ * 
  * @version 1.0.0
  * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
- *
+ * 
  */
 public class SWTHTMLElementProvider extends SWTElementProvider {
 
 	public static final IElementProvider INSTANCE = new SWTHTMLElementProvider();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.core.css.dom.IElementProvider#getElement(java.lang.Object)
+	 */
 	@Override
 	public Element getElement(Object element, CSSEngine engine) {
 		if (element instanceof Widget) {
