@@ -399,10 +399,8 @@ public class ModeledPageLayout implements IPageLayout {
 			ph.setToBeRendered(visible);
 
 			MPart part = (MPart) (ph.getRef());
-			// as a shared part, this should be true, actual un/rendering
-			// will be dependent on any placeholders that are referencing
-			// this part
-			part.setToBeRendered(true);
+			part.setToBeRendered(visible);
+			part.setVisible(visible);
 
 			// there should only be view references for 3.x views that are
 			// visible to the end user, that is, the tab items are being
