@@ -38,10 +38,8 @@ public class DirtyStateContribution extends ControlContribution implements
         super("DirtyState"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * Method declared on ControlContribution
-     */
-    protected Control createControl(Composite parent) {
+    @Override
+	protected Control createControl(Composite parent) {
         // If the composite is good just return it.
         if (composite != null && !composite.isDisposed())
             return composite;
@@ -74,10 +72,8 @@ public class DirtyStateContribution extends ControlContribution implements
         updateState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPropertyListener
-     */
-    public void propertyChanged(Object source, int propID) {
+    @Override
+	public void propertyChanged(Object source, int propID) {
         if (source instanceof IEditorPart)
             updateState();
     }

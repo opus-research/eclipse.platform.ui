@@ -30,17 +30,14 @@ import org.eclipse.ui.part.FileEditorInput;
  * A resolution which inserts a sentence into the readme file 
  */
 public class AddSentenceResolution implements IMarkerResolution {
-    /* (non-Javadoc)
-     * Method declared on IMarkerResolution.
-     */
-    public String getLabel() {
+
+	@Override
+	public String getLabel() {
         return MessageUtil.getString("Add_Sentence"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * Method declared on IMarkerResolution.
-     */
-    public void run(IMarker marker) {
+    @Override
+	public void run(IMarker marker) {
         // Se if there is an open editor on the file containing the marker
         IWorkbenchWindow w = PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow();
