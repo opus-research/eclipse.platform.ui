@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 207858)
  *     Matthew Hall - bugs 226765, 239015, 222991, 263693, 263956, 226292,
  *                    266038
- *     Steven Spungin <steven@spungin.tv> - Bug 432440
  ******************************************************************************/
 
 package org.eclipse.jface.internal.databinding.viewers;
@@ -142,23 +141,9 @@ public abstract class ObservableCollectionTreeContentProvider implements
 
 		setViewer(viewer);
 
-		// This method is called by the viewer during handlerDispose.
-		// ObservableTracker.getterCalled was throwing an
-		// unchecked exception (assert)
-		//
-		// If Set.clear implementations are patched to not throw, this check may not be
-		// necessary
-		try {
-			knownElements.clear();
-		} catch (Exception e) {
-		}
-
-		// see comment above concerning unchecked exception
-		try {
-			if (realizedElements != null)
-				realizedElements.clear();
-		} catch (Exception e) {
-		}
+		knownElements.clear();
+		if (realizedElements != null)
+			realizedElements.clear();
 	}
 
 	private void setViewer(Viewer viewer) {
