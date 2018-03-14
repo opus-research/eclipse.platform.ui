@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - Initial API and implementation
+ *     Snjezana Peco - [448933] - Opening new browser shows outdated content
  *******************************************************************************/
 package org.eclipse.ui.internal.browser;
 
@@ -17,10 +18,11 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -77,7 +79,21 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 			style += BrowserViewer.BUTTON_BAR;
 		}
 		webBrowser = new BrowserViewer(parent, style);
-		
+
+		webBrowser.getBrowser().addProgressListener(new ProgressListener() {
+
+			public void completed(ProgressEvent event) {
+				webBrowser.getBrowser().removeProgressListener(this);
+				String url = webBrowser.getURL();
+				if (url != null && url.startsWith("http")) { //$NON-NLS-1$
+					webBrowser.refresh();
+				}
+			}
+
+			public void changed(ProgressEvent event) {
+			}
+		});
+
 		webBrowser.setURL(initialURL);
 		webBrowser.setContainer(this);
 		
@@ -174,15 +190,12 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 		Trace.trace(Trace.FINEST, "Opening browser: " + input); //$NON-NLS-1$
 		if (input instanceof IPathEditorInput) {
 			IPathEditorInput pei = (IPathEditorInput) input;
-			final IPath path= pei.getPath();
+			IPath path = pei.getPath();
 			URL url = null;
 			try {
-				if (path != null) {
-					setPartName(path.lastSegment());
+				if (path != null)
 					url = path.toFile().toURI().toURL();
-				}
-				if (url != null)
-					initialURL= url.toExternalForm();
+				initialURL = url.toExternalForm();
 			} catch (Exception e) {
 				Trace.trace(Trace.SEVERE, "Error getting URL to file"); //$NON-NLS-1$
 			}
@@ -192,6 +205,7 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 				site.getWorkbenchWindow().getActivePage().activate(this);
 			}
 			
+			setPartName(path.lastSegment());
 			if (url != null)
 				setTitleToolTip(url.getFile());
 
@@ -225,7 +239,7 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 			if (oldImage != null && !oldImage.isDisposed())
 				oldImage.dispose();
 		} else {
-			IPathEditorInput pinput = input.getAdapter(IPathEditorInput.class);
+		    IPathEditorInput pinput = (IPathEditorInput) input.getAdapter(IPathEditorInput.class);
 			if (pinput != null) {
 				init(site, pinput);
 			} else {
