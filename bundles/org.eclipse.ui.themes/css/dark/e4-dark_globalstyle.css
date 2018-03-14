@@ -10,7 +10,6 @@
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
  *     Stefan Winkler <stefan@winklerweb.net> - Bug 430848
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 431635
- *     Fabio Zadrozny <fabiofz@gmail.com> - Bug 434309
  *******************************************************************************/
 
 /*******************************************************************************
@@ -441,21 +440,4 @@ Label#org-eclipse-ui-buildid-text {
 
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
 	background-color: #e1e1e1;
-}
-
-/* See Bug 434309: Customize the tree/table selection to work properly
- * with the dark theme.
- */
-Tree {
-	swt-selection-background-color: #363636;
-	swt-hot-background-color: #2F2F2F;
-	swt-selection-border-color: #6B6B6B;
-	swt-hot-border-color: #545454;
-}
-
-Table {
-	swt-selection-background-color: #363636;
-	swt-hot-background-color: #2F2F2F;
-	swt-selection-border-color: #6B6B6B;
-	swt-hot-border-color: #545454;
 }
