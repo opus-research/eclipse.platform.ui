@@ -68,11 +68,12 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * </pre>
  *
  * @param <E>
+ *            the type of the elements in this set
  *
  * @since 1.2
  */
 public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
-	private Set<E> cachedSet = new HashSet<E>();
+	private Set<E> cachedSet = new HashSet<>();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -238,7 +239,7 @@ privateInterface, privateInterface, null);
 			// bug 414297: moved before makeStale(), as cachedSet may be
 			// overwritten
 			// in makeStale() if a listener calls isStale()
-			final Set oldSet = new HashSet(cachedSet);
+			final Set<E> oldSet = new HashSet<>(cachedSet);
 			makeStale();
 
 			stopListening();

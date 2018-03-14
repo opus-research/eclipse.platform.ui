@@ -50,14 +50,14 @@ abstract class DelegatingCache<S, K extends S, V> {
 			this.delegate = delegate;
 			ObservableTracker.setIgnore(true);
 			try {
-				this.masterElements = new IdentityObservableSet<K>(realm, elements
+				this.masterElements = new IdentityObservableSet<>(realm, elements
 						.getElementType());
 				this.masterElementValues = delegate
 						.observeDetail(masterElements);
 			} finally {
 				ObservableTracker.setIgnore(false);
 			}
-			this.cachedValues = new IdentityMap<K, V>();
+			this.cachedValues = new IdentityMap<>();
 
 			masterElementValues.addMapChangeListener(this);
 		}
@@ -129,12 +129,12 @@ abstract class DelegatingCache<S, K extends S, V> {
 
 		ObservableTracker.setIgnore(true);
 		try {
-			this.elements = new IdentityObservableSet<K>(realm, null);
+			this.elements = new IdentityObservableSet<>(realm, null);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
 
-		this.delegateCaches = new IdentityMap<IValueProperty<S, V>, DelegateCache>();
+		this.delegateCaches = new IdentityMap<>();
 
 		elements.addSetChangeListener(new ISetChangeListener<K>() {
 			@Override

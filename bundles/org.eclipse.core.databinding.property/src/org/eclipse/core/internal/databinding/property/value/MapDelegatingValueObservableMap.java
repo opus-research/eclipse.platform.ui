@@ -159,8 +159,8 @@ public class MapDelegatingValueObservableMap<S, K, I extends S, V> extends
 		}
 
 		private MapDiff<K, V> convertDiff(MapDiff<K, I> diff) {
-			Map<K, V> oldValues = new HashMap<K, V>();
-			Map<K, V> newValues = new HashMap<K, V>();
+			Map<K, V> oldValues = new HashMap<>();
+			Map<K, V> newValues = new HashMap<>();
 
 			Set<K> addedKeys = diff.getAddedKeys();
 			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
@@ -178,7 +178,7 @@ public class MapDelegatingValueObservableMap<S, K, I extends S, V> extends
 				oldValues.put(key, oldValue);
 			}
 
-			Set<K> changedKeys = new HashSet<K>(diff.getChangedKeys());
+			Set<K> changedKeys = new HashSet<>(diff.getChangedKeys());
 			for (Iterator<K> it = changedKeys.iterator(); it.hasNext();) {
 				K key = it.next();
 
@@ -283,7 +283,7 @@ public class MapDelegatingValueObservableMap<S, K, I extends S, V> extends
 	}
 
 	private Set<K> keysFor(I masterValue) {
-		Set<K> keys = new HashSet<K>();
+		Set<K> keys = new HashSet<>();
 
 		for (Map.Entry<K, I> entry : masterMap.entrySet()) {
 			if (entry.getValue() == masterValue) {

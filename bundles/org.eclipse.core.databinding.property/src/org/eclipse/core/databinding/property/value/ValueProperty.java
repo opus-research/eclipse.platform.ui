@@ -30,7 +30,7 @@ import org.eclipse.core.internal.databinding.property.ValuePropertyDetailValue;
 
 /**
  * Abstract implementation of IValueProperty
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <T>
@@ -116,6 +116,7 @@ public abstract class ValueProperty<S, T> implements IValueProperty<S, T> {
 	@Override
 	public IObservableFactory<S, IObservableValue<T>> valueFactory() {
 		return new IObservableFactory<S, IObservableValue<T>>() {
+			@Override
 			public IObservableValue<T> createObservable(S target) {
 				return observe(target);
 			}
@@ -126,6 +127,7 @@ public abstract class ValueProperty<S, T> implements IValueProperty<S, T> {
 	public IObservableFactory<S, IObservableValue<T>> valueFactory(
 			final Realm realm) {
 		return new IObservableFactory<S, IObservableValue<T>>() {
+			@Override
 			public IObservableValue<T> createObservable(S target) {
 				return observe(realm, target);
 			}
@@ -172,23 +174,23 @@ public abstract class ValueProperty<S, T> implements IValueProperty<S, T> {
 	@Override
 	public final <U> IValueProperty<S, U> value(
 			IValueProperty<? super T, U> detailValue) {
-		return new ValuePropertyDetailValue<S, T, U>(this, detailValue);
+		return new ValuePropertyDetailValue<>(this, detailValue);
 	}
 
 	@Override
 	public final <E> IListProperty<S, E> list(
 			IListProperty<? super T, E> detailList) {
-		return new ValuePropertyDetailList<S, T, E>(this, detailList);
+		return new ValuePropertyDetailList<>(this, detailList);
 	}
 
 	@Override
 	public final <E> ISetProperty<S, E> set(ISetProperty<? super T, E> detailSet) {
-		return new ValuePropertyDetailSet<S, T, E>(this, detailSet);
+		return new ValuePropertyDetailSet<>(this, detailSet);
 	}
 
 	@Override
 	public final <K, V> IMapProperty<S, K, V> map(
 			IMapProperty<? super T, K, V> detailMap) {
-		return new ValuePropertyDetailMap<S, T, K, V>(this, detailMap);
+		return new ValuePropertyDetailMap<>(this, detailMap);
 	}
 }

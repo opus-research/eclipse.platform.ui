@@ -16,9 +16,10 @@ import org.eclipse.core.databinding.observable.DecoratingObservable;
 
 /**
  * An observable value which decorates another observable value.
- * 
+ *
  * @param <T>
- * 
+ *            the type of value being observed
+ *
  * @since 1.2
  */
 public class DecoratingObservableValue<T> extends DecoratingObservable
@@ -56,7 +57,7 @@ public class DecoratingObservableValue<T> extends DecoratingObservable
 	protected void fireValueChange(ValueDiff<T> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent<T>(this, diff));
+		fireEvent(new ValueChangeEvent<>(this, diff));
 	}
 
 	@Override

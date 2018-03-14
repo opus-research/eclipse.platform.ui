@@ -62,9 +62,9 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 	private Set<Map.Entry<K, E>> entrySet;
 
-	private IdentityHashMap<K, IObservableValue<E>> keyDetailMap = new IdentityHashMap<K, IObservableValue<E>>();
+	private IdentityHashMap<K, IObservableValue<E>> keyDetailMap = new IdentityHashMap<>();
 
-	private IdentitySet<IObservableValue<E>> staleDetailObservables = new IdentitySet<IObservableValue<E>>();
+	private IdentitySet<IObservableValue<E>> staleDetailObservables = new IdentitySet<>();
 
 	private IMapChangeListener<K, M> masterMapListener = new IMapChangeListener<K, M>() {
 		@Override
@@ -81,9 +81,10 @@ public class MapDetailValueObservableMap<K, M, E> extends
 	};
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
+		@SuppressWarnings("unchecked")
 		@Override
 		public void handleStale(StaleEvent staleEvent) {
-			addStaleDetailObservable((IObservableValue) staleEvent
+			addStaleDetailObservable((IObservableValue<E>) staleEvent
 					.getObservable());
 		}
 	};
@@ -121,8 +122,8 @@ public class MapDetailValueObservableMap<K, M, E> extends
 
 	private void handleMasterMapChange(MapDiff<K, M> diff) {
 		// Collect the detail values for the master values in the input diff.
-		IdentityMap<K, E> oldValues = new IdentityMap<K, E>();
-		IdentityMap<K, E> newValues = new IdentityMap<K, E>();
+		IdentityMap<K, E> oldValues = new IdentityMap<>();
+		IdentityMap<K, E> newValues = new IdentityMap<>();
 
 		// Handle added master values.
 		Set<K> addedKeys = diff.getAddedKeys();

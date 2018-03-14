@@ -72,6 +72,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * </pre>
  *
  * @param <E>
+ *            the list element type
  *
  * @since 1.1
  */

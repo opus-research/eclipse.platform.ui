@@ -68,6 +68,7 @@ public class ListPropertyDetailValuesList<S, T, E> extends ListProperty<S, E> {
 	protected void doUpdateList(S source, ListDiff<E> diff) {
 		final List<T> masterList = masterProperty.getList(source);
 		diff.accept(new ListDiffVisitor<E>() {
+			@Override
 			public void handleAdd(int index, E element) {
 				throw new UnsupportedOperationException();
 			}

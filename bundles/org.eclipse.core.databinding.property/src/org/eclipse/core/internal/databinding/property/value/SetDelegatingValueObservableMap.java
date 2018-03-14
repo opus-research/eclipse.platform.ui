@@ -153,8 +153,8 @@ public class SetDelegatingValueObservableMap<S, K extends S, V> extends
 
 		private MapDiff<K, V> convertDiff(SetDiff<K> diff) {
 			// Convert diff to detail value
-			Map<K, V> oldValues = new HashMap<K, V>();
-			Map<K, V> newValues = new HashMap<K, V>();
+			Map<K, V> oldValues = new HashMap<>();
+			Map<K, V> newValues = new HashMap<>();
 
 			for (Iterator<K> it = diff.getRemovals().iterator(); it.hasNext();) {
 				K masterElement = it.next();

@@ -58,9 +58,10 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  * addends.add(new Integer(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
- * 
+ *
  * @param <T>
- * 
+ *            the type of value being observed
+ *
  * @since 1.0
  */
 public abstract class ComputedValue<T> extends AbstractObservableValue<T> {

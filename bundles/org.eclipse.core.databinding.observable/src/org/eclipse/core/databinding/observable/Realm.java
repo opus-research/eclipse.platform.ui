@@ -79,7 +79,7 @@ import org.eclipse.core.runtime.Status;
  */
 public abstract class Realm {
 
-	private static ThreadLocal<Realm> defaultRealm = new ThreadLocal<Realm>();
+	private static ThreadLocal<Realm> defaultRealm = new ThreadLocal<>();
 
 	/**
 	 * Returns the default realm for the calling thread, or <code>null</code> if

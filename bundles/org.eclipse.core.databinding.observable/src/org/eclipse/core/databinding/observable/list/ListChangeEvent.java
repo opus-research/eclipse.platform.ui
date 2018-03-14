@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * {@link IObservableList} object.
  *
  * @param <E>
+ *            the type of the elements in this change event
  *
  * @since 1.0
  */
@@ -66,6 +67,7 @@ public class ListChangeEvent<E> extends ObservableEvent {
 		return typedSource;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IListChangeListener<E>) listener).handleListChange(this);

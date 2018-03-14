@@ -31,8 +31,9 @@ import org.eclipse.core.databinding.observable.list.ListDiffEntry;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <E>
+ *            the type of elements in the collection
  * @since 1.0
  *
  */
@@ -44,8 +45,8 @@ public class ListToSetAdapter<E> extends ObservableSet<E> {
 
 		@Override
 		public void handleListChange(ListChangeEvent<E> event) {
-			Set<E> added = new HashSet<E>();
-			Set<E> removed = new HashSet<E>();
+			Set<E> added = new HashSet<>();
+			Set<E> removed = new HashSet<>();
 			List<ListDiffEntry<E>> differences = event.diff
 					.getDifferencesAsList();
 			for (ListDiffEntry<E> entry : differences) {

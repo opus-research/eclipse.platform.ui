@@ -26,7 +26,7 @@ import org.eclipse.core.internal.databinding.property.PropertyObservableUtil;
 /**
  * A list property for observing multiple list properties in sequence in a
  * combined list.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <E>
@@ -70,7 +70,7 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 
 	@Override
 	protected List<E> doGetList(S source) {
-		List<E> list = new ArrayList<E>();
+		List<E> list = new ArrayList<>();
 		for (int i = 0; i < properties.length; i++)
 			list.addAll(properties[i].getList(source));
 		return list;
@@ -96,8 +96,7 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 					List<E> subList = properties[i].getList(source);
 					if (index - offset < subList.size()) {
 						int subListIndex = index - offset;
-						List<ListDiffEntry<E>> entries = new ArrayList<ListDiffEntry<E>>(
-								2);
+						List<ListDiffEntry<E>> entries = new ArrayList<>(2);
 						entries.add(Diffs.createListDiffEntry(subListIndex,
 								false, oldElement));
 						entries.add(Diffs.createListDiffEntry(subListIndex,
@@ -135,12 +134,11 @@ public class MultiListProperty<S, E> extends ListProperty<S, E> {
 
 	@Override
 	public IObservableList<E> observe(Realm realm, S source) {
-		List<IObservableList<E>> lists = new ArrayList<IObservableList<E>>(
-				properties.length);
+		List<IObservableList<E>> lists = new ArrayList<>(properties.length);
 		for (int i = 0; i < properties.length; i++) {
 			lists.add(properties[i].observe(realm, source));
 		}
-		IObservableList<E> multiList = new MultiList<E>(lists, elementType);
+		IObservableList<E> multiList = new MultiList<>(lists, elementType);
 
 		for (IObservableList<E> list : lists) {
 			PropertyObservableUtil.cascadeDispose(multiList, list);

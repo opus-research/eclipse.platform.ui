@@ -15,9 +15,10 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for changes to observable sets.
- * 
+ *
  * @param <E>
- * 
+ *            the type of elements in the set being observed
+ *
  * @since 1.0
  *
  */

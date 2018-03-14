@@ -15,7 +15,7 @@ import org.eclipse.core.databinding.observable.IDiff;
 
 /**
  * Abstract INativePropertyListener implementation
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <D>

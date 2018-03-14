@@ -16,13 +16,12 @@ import java.util.Iterator;
 
 /**
  * An observable collection which decorates another observable collection
- * 
+ *
  * @param <E>
- * 
+ *
  * @since 1.2
  */
-public class DecoratingObservableCollection<E> extends DecoratingObservable
-		implements IObservableCollection<E> {
+public class DecoratingObservableCollection<E> extends DecoratingObservable implements IObservableCollection<E> {
 	private IObservableCollection<E> decorated;
 
 	/**

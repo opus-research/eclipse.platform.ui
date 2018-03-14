@@ -40,6 +40,7 @@ public class Diffs {
 	 * old and new list states.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param oldList
 	 *            the old list state
@@ -49,8 +50,8 @@ public class Diffs {
 	 */
 	public static <E> ListDiff<E> computeListDiff(List<E> oldList,
 			List<E> newList) {
-		List<ListDiffEntry<E>> diffEntries = new ArrayList<ListDiffEntry<E>>();
-		createListDiffs(new ArrayList<E>(oldList), newList, diffEntries);
+		List<ListDiffEntry<E>> diffEntries = new ArrayList<>();
+		createListDiffs(new ArrayList<>(oldList), newList, diffEntries);
 		ListDiff<E> listDiff = createListDiff(diffEntries);
 		return listDiff;
 	}
@@ -60,6 +61,7 @@ public class Diffs {
 	 * the specified old and new list states.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param oldList
 	 *            the old list state
@@ -198,6 +200,7 @@ public class Diffs {
 	 * and new set states.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param oldSet
 	 *            the old set state
@@ -219,6 +222,7 @@ public class Diffs {
 	 * the specified old and new set states.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param oldSet
 	 *            the old set state
@@ -386,7 +390,10 @@ public class Diffs {
 	}
 
 	/**
+	 * Creates a diff between two values
+	 *
 	 * @param <T>
+	 *            the value type
 	 * @param oldValue
 	 * @param newValue
 	 * @return a value diff
@@ -409,6 +416,7 @@ public class Diffs {
 
 	/**
 	 * @param <E>
+	 *            the set element type
 	 * @param additions
 	 * @param removals
 	 * @return a set diff
@@ -434,6 +442,7 @@ public class Diffs {
 
 	/**
 	 * @param <E>
+	 *            the list element type
 	 * @param difference
 	 * @return a list diff with one differing entry
 	 */
@@ -443,29 +452,33 @@ public class Diffs {
 
 	/**
 	 * @param <E>
+	 *            the list element type
 	 * @param difference1
 	 * @param difference2
 	 * @return a list diff with two differing entries
 	 */
 	public static <E> ListDiff<E> createListDiff(ListDiffEntry<E> difference1,
 			ListDiffEntry<E> difference2) {
-		List<ListDiffEntry<E>> differences = new ArrayList<ListDiffEntry<E>>(2);
+		List<ListDiffEntry<E>> differences = new ArrayList<>(2);
 		differences.add(difference1);
 		differences.add(difference2);
 		return createListDiff(differences);
 	}
 
 	/**
+	 * Creates a new ListDiff object given its constituent ListDiffEntry
+	 * objects.
+	 * <p>
 	 * This form cannot be used in a type-safe manner because it is not possible
-	 * to construct an array of generic types in a type-safe manner. The form
-	 * below which takes a properly parameterized List is recommended.
+	 * to construct an array of generic types in a type-safe manner. Use the
+	 * form below which takes a properly parameterized List.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 * @param differences
 	 * @return a list diff with the given entries
 	 */
-	public static <E> ListDiff<E> createListDiff(
-			final ListDiffEntry<E>[] differences) {
+	public static <E> ListDiff<E> createListDiff(final ListDiffEntry<E>[] differences) {
 		return new ListDiff<E>() {
 			@Override
 			public ListDiffEntry<?>[] getDifferences() {
@@ -475,7 +488,11 @@ public class Diffs {
 	}
 
 	/**
+	 * Creates a new ListDiff object given its constituent ListDiffEntry
+	 * objects.
+	 *
 	 * @param <E>
+	 *            the list element type
 	 * @param differences
 	 * @return a list diff with the given entries
 	 * @since 1.6
@@ -494,6 +511,7 @@ public class Diffs {
 
 	/**
 	 * @param <E>
+	 *            the list element type
 	 * @param position
 	 * @param isAddition
 	 * @param element
@@ -521,6 +539,8 @@ public class Diffs {
 	}
 
 	/**
+	 * Creates a MapDiff representing the addition of a single added key
+	 *
 	 * @param <K>
 	 *            the type of keys maintained by this map
 	 * @param <V>

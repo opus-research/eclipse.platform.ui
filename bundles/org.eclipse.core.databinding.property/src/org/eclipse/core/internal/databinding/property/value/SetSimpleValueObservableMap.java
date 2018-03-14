@@ -91,8 +91,8 @@ public class SetSimpleValueObservableMap<S, K extends S, V> extends
 						}
 					});
 		}
-		cachedValues = new IdentityMap<K, V>();
-		staleKeys = new IdentitySet<K>();
+		cachedValues = new IdentityMap<>();
+		staleKeys = new IdentitySet<>();
 		super.firstListenerAdded();
 	}
 

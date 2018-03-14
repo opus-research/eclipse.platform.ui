@@ -108,16 +108,6 @@ import org.eclipse.core.runtime.ListenerList;
 	}
 
 	protected void fireEvent(ObservableEvent event) {
-		/*
-		 * Note: We have a type safety warning here because the compiler cannot
-		 * be sure that we are passing an event only to listeners that can
-		 * accept that event. We could do this in a type-safe manner by
-		 * separating listeners into different lists and keeping a map of
-		 * listenerType to listeners. However that would increase memory usage
-		 * and may not be worthwhile. We would also not be able to use the
-		 * ListenerList class because that is not parameterized.
-		 */
-
 		Object listenerType = event.getListenerType();
 		int listenerTypeIndex = findListenerTypeIndex(listenerType);
 		if (listenerTypeIndex != -1) {

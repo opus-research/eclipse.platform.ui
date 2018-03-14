@@ -26,9 +26,10 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
  * ObservableList implementation that prevents modification by consumers. Events
  * in the originating wrapped list are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
- * 
+ *
  * @param <E>
- * 
+ *            the type of the elements in this set
+ *
  * @since 1.1
  */
 public class UnmodifiableObservableSet<E> extends DecoratingObservableSet<E> {

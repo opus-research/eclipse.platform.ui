@@ -73,7 +73,7 @@ public abstract class SetProperty<S, E> implements ISetProperty<S, E> {
 	protected Set<E> doGetSet(S source) {
 		IObservableSet<E> observable = observe(source);
 		try {
-			return new IdentitySet<E>(observable);
+			return new IdentitySet<>(observable);
 		} finally {
 			observable.dispose();
 		}

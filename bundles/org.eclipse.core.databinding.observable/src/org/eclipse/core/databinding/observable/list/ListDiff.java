@@ -24,6 +24,7 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * Object describing a diff between two lists.
  *
  * @param <E>
+ *            the type of the elements in this diff
  *
  * @since 1.0
  */

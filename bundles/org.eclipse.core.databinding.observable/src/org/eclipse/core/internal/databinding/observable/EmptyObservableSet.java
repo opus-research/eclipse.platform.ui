@@ -28,8 +28,9 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * Singleton empty set
- * 
+ *
  * @param <E>
+ *            the type of the object in this collection
  */
 public class EmptyObservableSet<E> implements IObservableSet<E> {
 

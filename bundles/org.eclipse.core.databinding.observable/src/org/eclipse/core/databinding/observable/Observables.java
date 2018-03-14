@@ -85,6 +85,7 @@ public class Observables {
 	 * </ul>
 	 *
 	 * @param <T>
+	 *            the value type
 	 *
 	 * @param delay
 	 *            the delay in milliseconds
@@ -106,7 +107,7 @@ public class Observables {
 	 * value.
 	 *
 	 * @param <T>
-	 *
+	 *            the value type
 	 * @param value
 	 *            the value to wrap in an unmodifiable value
 	 * @return an unmodifiable observable value backed by the given observable
@@ -123,6 +124,7 @@ public class Observables {
 	 * Returns an observable value with the given constant value.
 	 *
 	 * @param <T>
+	 *            the value type
 	 *
 	 * @param realm
 	 *            the observable's realm
@@ -159,6 +161,7 @@ public class Observables {
 	 * Returns an observable value with the given constant value.
 	 *
 	 * @param <T>
+	 *            the value type
 	 *
 	 * @param value
 	 *            the observable's constant value
@@ -191,6 +194,7 @@ public class Observables {
 	 * list.
 	 *
 	 * @param <E>
+	 *            the element type
 	 *
 	 * @param list
 	 *            the list to wrap in an unmodifiable list
@@ -231,7 +235,9 @@ public class Observables {
 	 * map.
 	 *
 	 * @param <K>
+	 *            map key type
 	 * @param <V>
+	 *            map value type
 	 *
 	 * @param map
 	 *            the map to wrap in an unmodifiable map
@@ -252,6 +258,9 @@ public class Observables {
 	 * Returns an empty observable list. The returned list continues to work
 	 * after it has been disposed of and can be disposed of multiple times.
 	 *
+	 * @param <E>
+	 *            the list element type
+	 *
 	 * @return an empty observable list.
 	 */
 	public static <E> IObservableList<E> emptyObservableList() {
@@ -262,6 +271,9 @@ public class Observables {
 	 * Returns an empty observable list of the given element type. The returned
 	 * list continues to work after it has been disposed of and can be disposed
 	 * of multiple times.
+	 *
+	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param elementType
 	 *            the element type of the returned list
@@ -277,6 +289,9 @@ public class Observables {
 	 * returned list continues to work after it has been disposed of and can be
 	 * disposed of multiple times.
 	 *
+	 * @param <E>
+	 *            the list element type
+	 *
 	 * @param realm
 	 *            the realm of the returned list
 	 * @return an empty observable list.
@@ -289,6 +304,9 @@ public class Observables {
 	 * Returns an empty observable list of the given element type and belonging
 	 * to the given realm. The returned list continues to work after it has been
 	 * disposed of and can be disposed of multiple times.
+	 *
+	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param realm
 	 *            the realm of the returned list
@@ -306,6 +324,9 @@ public class Observables {
 	 * Returns an empty observable set. The returned set continues to work after
 	 * it has been disposed of and can be disposed of multiple times.
 	 *
+	 * @param <E>
+	 *            the set element type
+	 *
 	 * @return an empty observable set.
 	 */
 	public static <E> IObservableSet<E> emptyObservableSet() {
@@ -316,6 +337,9 @@ public class Observables {
 	 * Returns an empty observable set of the given element type. The returned
 	 * set continues to work after it has been disposed of and can be disposed
 	 * of multiple times.
+	 *
+	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param elementType
 	 *            the element type of the returned set
@@ -331,6 +355,9 @@ public class Observables {
 	 * returned set continues to work after it has been disposed of and can be
 	 * disposed of multiple times.
 	 *
+	 * @param <E>
+	 *            the set element type
+	 *
 	 * @param realm
 	 *            the realm of the returned set
 	 * @return an empty observable set.
@@ -343,6 +370,9 @@ public class Observables {
 	 * Returns an empty observable set of the given element type and belonging
 	 * to the given realm. The returned set continues to work after it has been
 	 * disposed of and can be disposed of multiple times.
+	 *
+	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param realm
 	 *            the realm of the returned set
@@ -360,6 +390,7 @@ public class Observables {
 	 * Returns an observable set backed by the given set.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param set
 	 *            the set to wrap in an IObservableSet
@@ -374,6 +405,7 @@ public class Observables {
 	 * set.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param set
 	 *            the set to wrap in an IObservableSet
@@ -409,6 +441,7 @@ public class Observables {
 	 * given realm, backed by the given set.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param realm
 	 *            the realm of the returned set
@@ -443,6 +476,7 @@ public class Observables {
 	 * disposed of without disposing of the wrapped observable.
 	 *
 	 * @param <T>
+	 *            the value type
 	 *
 	 * @param target
 	 *            the observable value to wrap
@@ -460,6 +494,7 @@ public class Observables {
 	 * without disposing of the wrapped set.
 	 *
 	 * @param <E>
+	 *            the set element type
 	 *
 	 * @param target
 	 *            the set to wrap
@@ -476,6 +511,7 @@ public class Observables {
 	 * without disposing of the wrapped list.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param target
 	 *            the list to wrap
@@ -493,7 +529,9 @@ public class Observables {
 	 * without disposing of the wrapped map.
 	 *
 	 * @param <K>
+	 *            the map key type
 	 * @param <V>
+	 *            the map value type
 	 *
 	 * @param target
 	 *            the map to wrap
@@ -509,6 +547,7 @@ public class Observables {
 	 * Returns an observable list backed by the given list.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param list
 	 *            the list to wrap in an IObservableList
@@ -523,6 +562,7 @@ public class Observables {
 	 * list.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param list
 	 *            the list to wrap in an IObservableList
@@ -541,6 +581,7 @@ public class Observables {
 	 * given list.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param realm
 	 *            the realm of the returned list
@@ -558,6 +599,7 @@ public class Observables {
 	 * given realm, backed by the given list.
 	 *
 	 * @param <E>
+	 *            the list element type
 	 *
 	 * @param realm
 	 *            the realm of the returned list
@@ -611,8 +653,9 @@ public class Observables {
 	 * no event is fired.
 	 *
 	 * @param <K>
-	 *
+	 *            the map key type
 	 * @param <V>
+	 *            the map value type
 	 *
 	 * @param map
 	 *            the observable map whose entry will be tracked.
@@ -637,8 +680,9 @@ public class Observables {
 	 * no event is fired.
 	 *
 	 * @param <K>
-	 *
+	 *            the map key type
 	 * @param <V>
+	 *            the map value type
 	 *
 	 * @param map
 	 *            the observable map whose entry will be tracked.
@@ -664,7 +708,9 @@ public class Observables {
 	 * particular key.
 	 *
 	 * @param <K>
+	 *            the map key type
 	 * @param <V>
+	 *            the map value type
 	 *
 	 * @param map
 	 *            the observable map whose entry will be tracked.
@@ -690,7 +736,9 @@ public class Observables {
 	 * mapEntryValueFactory(map, valueType), valueType)</code>.
 	 *
 	 * @param <K>
+	 *            the map key type
 	 * @param <V>
+	 *            the map value type
 	 *
 	 * @param map
 	 *            the observable map whose entry will be tracked.
@@ -720,6 +768,7 @@ public class Observables {
 	 * the same realm.
 	 *
 	 * @param <T>
+	 *            the value type
 	 *
 	 * @param source
 	 *            the source observable

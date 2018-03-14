@@ -16,9 +16,10 @@ import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
 
 /**
  * An observable set which decorates another observable set.
- * 
+ *
  * @param <E>
- * 
+ *            the type of the elements in this set
+ *
  * @since 1.2
  */
 public class DecoratingObservableSet<E> extends
@@ -63,7 +64,7 @@ public class DecoratingObservableSet<E> extends
 	protected void fireSetChange(SetDiff<E> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new SetChangeEvent<E>(this, diff));
+		fireEvent(new SetChangeEvent<>(this, diff));
 	}
 
 	@Override

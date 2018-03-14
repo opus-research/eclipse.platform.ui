@@ -22,6 +22,7 @@ import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
  * An observable list which decorates another observable list.
  *
  * @param <E>
+ *            the list element type
  *
  * @since 1.2
  */

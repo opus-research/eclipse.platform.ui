@@ -24,6 +24,7 @@ import org.eclipse.core.internal.databinding.observable.Util;
 
 /**
  * @param <T>
+ *            the type of value being observed
  * @since 1.2
  */
 public abstract class DuplexingObservableValue<T> extends

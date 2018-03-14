@@ -17,6 +17,7 @@ import org.eclipse.core.databinding.observable.IDiff;
 
 /**
  * @param <T>
+ *            the type of value being observed
  * @since 1.0
  *
  */

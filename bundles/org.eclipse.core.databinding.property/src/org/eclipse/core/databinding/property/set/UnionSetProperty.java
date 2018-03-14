@@ -57,7 +57,7 @@ public class UnionSetProperty<S, E> extends SetProperty<S, E> {
 
 	@Override
 	protected Set<E> doGetSet(S source) {
-		Set<E> set = new HashSet<E>();
+		Set<E> set = new HashSet<>();
 		for (int i = 0; i < properties.length; i++)
 			set.addAll(properties[i].getSet(source));
 		return set;
@@ -80,7 +80,7 @@ public class UnionSetProperty<S, E> extends SetProperty<S, E> {
 		for (ISetProperty<S, E> property : properties) {
 			sets.add(property.observe(realm, source));
 		}
-		IObservableSet<E> unionSet = new UnionSet<E>(sets, elementType);
+		IObservableSet<E> unionSet = new UnionSet<>(sets, elementType);
 
 		for (IObservableSet<? extends E> set : sets) {
 			PropertyObservableUtil.cascadeDispose(unionSet, set);

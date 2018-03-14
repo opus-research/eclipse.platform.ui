@@ -77,7 +77,7 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends
 		}
 
 		private void updateKnownElements() {
-			Set<M> identityKnownElements = new IdentitySet<M>(masterList);
+			Set<M> identityKnownElements = new IdentitySet<>(masterList);
 			knownMasterElements.retainAll(identityKnownElements);
 			knownMasterElements.addAll(identityKnownElements);
 		}
@@ -85,8 +85,7 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends
 		private ListDiff<T> convertDiff(ListDiff<M> diff) {
 			// Convert diff to detail value
 			List<ListDiffEntry<M>> masterEntries = diff.getDifferencesAsList();
-			List<ListDiffEntry<T>> detailEntries = new ArrayList<ListDiffEntry<T>>(
-					masterEntries.size());
+			List<ListDiffEntry<T>> detailEntries = new ArrayList<>(masterEntries.size());
 			for (ListDiffEntry<M> masterDifference : masterEntries) {
 				int index = masterDifference.getPosition();
 				boolean addition = masterDifference.isAddition();
@@ -153,9 +152,10 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends
 			ObservableTracker.setIgnore(false);
 		}
 
-		cachedValues = new IdentityMap<M, T>();
-		staleElements = new IdentitySet<M>();
+		cachedValues = new IdentityMap<>();
+		staleElements = new IdentitySet<>();
 		knownMasterElements.addSetChangeListener(new ISetChangeListener<M>() {
+			@Override
 			public void handleSetChange(SetChangeEvent<M> event) {
 				for (Iterator<M> it = event.diff.getRemovals().iterator(); it
 						.hasNext();) {
@@ -451,7 +451,7 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends
 	}
 
 	private int[] indicesOf(Object masterElement) {
-		List<Integer> indices = new ArrayList<Integer>();
+		List<Integer> indices = new ArrayList<>();
 
 		for (ListIterator<M> it = ListSimpleValueObservableList.this.masterList
 				.listIterator(); it.hasNext();) {
@@ -467,8 +467,7 @@ public class ListSimpleValueObservableList<S, M extends S, T> extends
 	}
 
 	private void fireListChange(int[] indices, T oldValue, T newValue) {
-		List<ListDiffEntry<T>> differences = new ArrayList<ListDiffEntry<T>>(
-				indices.length * 2);
+		List<ListDiffEntry<T>> differences = new ArrayList<>(indices.length * 2);
 		for (int index : indices) {
 			differences.add(Diffs.createListDiffEntry(index, false, oldValue));
 			differences.add(Diffs.createListDiffEntry(index, true, newValue));

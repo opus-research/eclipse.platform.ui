@@ -22,9 +22,10 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
 
 /**
  * A list whose changes can be tracked by list change listeners.
- * 
+ *
  * @param <E>
- * 
+ *            the type of elements in this collection
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the framework classes
  *              that implement this interface. Note that direct implementers of
@@ -40,7 +41,7 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 
 	/**
 	 * Adds the given list change listener to the list of list change listeners.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public void addListChangeListener(IListChangeListener<E> listener);
@@ -57,31 +58,31 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public int size();
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public boolean isEmpty();
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public boolean contains(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public Iterator<E> iterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public Object[] toArray();
 
 	/**
@@ -93,25 +94,25 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public boolean add(E o);
 
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public boolean remove(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public boolean containsAll(Collection<?> c);
 
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public boolean addAll(Collection<? extends E> c);
 
 	/**
@@ -129,19 +130,19 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public boolean retainAll(Collection<?> c);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public boolean equals(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public int hashCode();
 
 	/**
@@ -153,7 +154,7 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public E set(int index, E element);
 
 	/**
@@ -185,37 +186,37 @@ public interface IObservableList<E> extends List<E>, IObservableCollection<E> {
 	/**
 	 *
 	 */
-    	@Override
+	@Override
 	public E remove(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public int indexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public int lastIndexOf(Object o);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public ListIterator<E> listIterator();
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public ListIterator<E> listIterator(int index);
 
 	/**
 	 * @TrackedGetter
 	 */
-    	@Override
+	@Override
 	public List<E> subList(int fromIndex, int toIndex);
 
 	/**

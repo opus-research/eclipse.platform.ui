@@ -29,9 +29,10 @@ import org.eclipse.core.runtime.Assert;
  * supports all removal methods (including {@link #clear()}), as well as the
  * {@link #set(int, Object)} method. All other mutator methods (addition methods
  * and {@link #move(int, int)}) throw an {@link UnsupportedOperationException}.
- * 
+ *
  * @param <E>
- * 
+ *            the type of the elements in the list
+ *
  * @since 1.2
  */
 public class MultiList<E> extends AbstractObservableList<E> {
@@ -58,10 +59,10 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	/**
 	 * Constructs a MultiList in the default realm, and backed by the given
 	 * observable lists.
-	 * 
+	 *
 	 * @param lists
 	 *            the array of observable lists backing this MultiList.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public MultiList(List<IObservableList<E>> lists) {
 		this(Realm.getDefault(), lists, null);
@@ -85,12 +86,12 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	/**
 	 * Constructs a MultiList in the default realm backed by the given
 	 * observable lists.
-	 * 
+	 *
 	 * @param lists
 	 *            the array of observable lists backing this MultiList.
 	 * @param elementType
 	 *            element type of the constructed list.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public MultiList(List<IObservableList<E>> lists, Object elementType) {
 		this(Realm.getDefault(), lists, elementType);
@@ -140,14 +141,14 @@ public class MultiList<E> extends AbstractObservableList<E> {
 	/**
 	 * Constructs a MultiList belonging to the given realm, and backed by the
 	 * given observable lists.
-	 * 
+	 *
 	 * @param realm
 	 *            the observable's realm
 	 * @param lists
 	 *            the array of observable lists backing this MultiList
 	 * @param elementType
 	 *            element type of the constructed list.
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public MultiList(Realm realm, List<IObservableList<E>> lists,
 			Object elementType) {

@@ -94,7 +94,7 @@ public class SimplePropertyObservableSet<S, E> extends AbstractObservableSet<E>
 			getRealm().exec(new Runnable() {
 				@Override
 				public void run() {
-					cachedSet = new HashSet<E>(getSet());
+					cachedSet = new HashSet<>(getSet());
 					stale = false;
 
 					if (listener != null)

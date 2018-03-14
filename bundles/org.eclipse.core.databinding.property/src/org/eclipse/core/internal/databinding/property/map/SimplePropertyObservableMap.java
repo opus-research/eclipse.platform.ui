@@ -115,7 +115,7 @@ public class SimplePropertyObservableMap<S, K, V> extends
 			getRealm().exec(new Runnable() {
 				@Override
 				public void run() {
-					cachedMap = new HashMap<K, V>(getMap());
+					cachedMap = new HashMap<>(getMap());
 					stale = false;
 
 					if (listener != null)

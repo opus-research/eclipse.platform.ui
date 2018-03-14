@@ -23,8 +23,9 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <T>
+ *            the type of value being observed
  * @since 1.0
  *
  */
@@ -90,7 +91,7 @@ public abstract class AbstractVetoableValue<T> extends
 	protected boolean fireValueChanging(ValueDiff<T> diff) {
 		checkRealm();
 
-		ValueChangingEvent<T> event = new ValueChangingEvent<T>(this, diff);
+		ValueChangingEvent<T> event = new ValueChangingEvent<>(this, diff);
 		fireEvent(event);
 		return !event.veto;
 	}

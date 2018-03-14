@@ -72,7 +72,7 @@ public abstract class ListProperty<S, E> implements IListProperty<S, E> {
 	protected List<E> doGetList(S source) {
 		IObservableList<E> observable = observe(source);
 		try {
-			return new ArrayList<E>(observable);
+			return new ArrayList<>(observable);
 		} finally {
 			observable.dispose();
 		}

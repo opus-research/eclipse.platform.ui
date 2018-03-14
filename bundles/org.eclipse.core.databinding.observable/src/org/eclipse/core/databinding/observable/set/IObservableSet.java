@@ -20,9 +20,10 @@ import org.eclipse.core.databinding.observable.IObservableCollection;
 
 /**
  * A set whose changes can be tracked by set change listeners.
- * 
+ *
  * @param <E>
- * 
+ *            the type of the elements in this set
+ *
  * @noimplement This interface is not intended to be implemented by clients.
  *              Clients should instead subclass one of the classes that
  *              implement this interface. Note that direct implementers of this

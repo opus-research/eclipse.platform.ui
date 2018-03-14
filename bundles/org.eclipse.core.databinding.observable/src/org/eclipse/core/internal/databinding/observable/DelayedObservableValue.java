@@ -39,9 +39,10 @@ import org.eclipse.core.databinding.observable.value.ValueDiff;
  *
  * Note that this class will not forward {@link ValueChangingEvent} events from
  * a wrapped {@link IVetoableValue}.
- * 
+ *
  * @param <T>
- * 
+ *            the type of the object being observed
+ *
  * @since 1.2
  */
 public class DelayedObservableValue<T> extends AbstractObservableValue<T>

@@ -37,41 +37,43 @@ import org.eclipse.core.runtime.Assert;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <K>
+ *            the type of the keys in this map
  * @param <I>
  *            the type of the intermediate values
  * @param <V>
- * 
+ *            the type of the values in this map
+ *
  * @since 1.1
  *
  */
 public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 	// adds that need to go through the second map and thus will be picked up by
 	// secondMapListener.
-	private Set<I> pendingAdds = new HashSet<I>();
+	private Set<I> pendingAdds = new HashSet<>();
 
 	// Removes that need to go through the second map and thus will be picked up
 	// by secondMapListener. Maps from value being removed to key being removed.
-	private Map<I, K> pendingRemoves = new HashMap<I, K>();
+	private Map<I, K> pendingRemoves = new HashMap<>();
 
 	// Changes that need to go through the second map and thus will be picked up
 	// by secondMapListener. Maps from old value to new value and new value to
 	// old
 	// value.
-	private Map<I, I> pendingChanges = new HashMap<I, I>();
+	private Map<I, I> pendingChanges = new HashMap<>();
 
 	private IMapChangeListener<K, I> firstMapListener = new IMapChangeListener<K, I>() {
 
 		@Override
 		public void handleMapChange(MapChangeEvent<K, I> event) {
 			MapDiff<K, I> diff = event.diff;
-			Set<I> rangeSetAdditions = new HashSet<I>();
-			Set<I> rangeSetRemovals = new HashSet<I>();
-			final Set<K> adds = new HashSet<K>();
-			final Set<K> changes = new HashSet<K>();
-			final Set<K> removes = new HashSet<K>();
-			final Map<K, V> oldValues = new HashMap<K, V>();
+			Set<I> rangeSetAdditions = new HashSet<>();
+			Set<I> rangeSetRemovals = new HashSet<>();
+			final Set<K> adds = new HashSet<>();
+			final Set<K> changes = new HashSet<>();
+			final Set<K> removes = new HashSet<>();
+			final Map<K, V> oldValues = new HashMap<>();
 
 			for (Iterator<K> it = diff.getAddedKeys().iterator(); it.hasNext();) {
 				K addedKey = it.next();
@@ -163,11 +165,11 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 		@Override
 		public void handleMapChange(MapChangeEvent<I, V> event) {
 			MapDiff<I, V> diff = event.diff;
-			final Set<K> adds = new HashSet<K>();
-			final Set<K> changes = new HashSet<K>();
-			final Set<K> removes = new HashSet<K>();
-			final Map<K, V> oldValues = new HashMap<K, V>();
-			final Map<K, V> newValues = new HashMap<K, V>();
+			final Set<K> adds = new HashSet<>();
+			final Set<K> changes = new HashSet<>();
+			final Set<K> removes = new HashSet<>();
+			final Map<K, V> oldValues = new HashMap<>();
+			final Map<K, V> newValues = new HashMap<>();
 			Set<I> addedKeys = new HashSet<I>(diff.getAddedKeys());
 			Set<I> removedKeys = new HashSet<I>(diff.getRemovedKeys());
 
@@ -285,7 +287,7 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 		}
 	}
 
-	private WritableSetPlus<I> rangeSet = new WritableSetPlus<I>();
+	private WritableSetPlus<I> rangeSet = new WritableSetPlus<>();
 
 	/**
 	 * Creates a new composite map. Because the key set of the second map is
@@ -303,7 +305,7 @@ public class CompositeMap<K, I, V> extends ObservableMap<K, V> {
 	public CompositeMap(IObservableMap<K, I> firstMap,
 			IObservableFactory<Set<I>, IObservableMap<I, V>> secondMapFactory) {
 		super(firstMap.getRealm(), new HashMap<K, V>());
-		this.firstMap = new BidiObservableMap<K, I>(firstMap);
+		this.firstMap = new BidiObservableMap<>(firstMap);
 		this.firstMap.addMapChangeListener(firstMapListener);
 		rangeSet.addAll(this.firstMap.values());
 		this.secondMap = secondMapFactory.createObservable(rangeSet);

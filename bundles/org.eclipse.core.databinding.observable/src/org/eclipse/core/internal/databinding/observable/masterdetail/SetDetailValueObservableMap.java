@@ -38,9 +38,9 @@ public class SetDetailValueObservableMap<M, E> extends
 
 	private IObservableFactory<? super M, IObservableValue<E>> observableValueFactory;
 
-	private Map<M, IObservableValue<E>> detailObservableValueMap = new HashMap<M, IObservableValue<E>>();
+	private Map<M, IObservableValue<E>> detailObservableValueMap = new HashMap<>();
 
-	private IdentitySet<IObservableValue<?>> staleDetailObservables = new IdentitySet<IObservableValue<?>>();
+	private IdentitySet<IObservableValue<?>> staleDetailObservables = new IdentitySet<>();
 
 	private IStaleListener detailStaleListener = new IStaleListener() {
 		@Override
@@ -154,6 +154,7 @@ public class SetDetailValueObservableMap<M, E> extends
 			return null;
 		}
 
+		@SuppressWarnings("unchecked")
 		IObservableValue<E> detailValue = getDetailObservableValue((M) key);
 		E oldValue = detailValue.getValue();
 

@@ -62,9 +62,9 @@ public class ListDetailValueObservableList<M, E> extends
 	// Maps every master to a DetailEntry containing the detail observable. This
 	// map is used to avoid that multiple detail observables are created for the
 	// same master.
-	private IdentityMap<M, DetailEntry<E>> masterDetailMap = new IdentityMap<M, DetailEntry<E>>();
+	private IdentityMap<M, DetailEntry<E>> masterDetailMap = new IdentityMap<>();
 
-	private IdentitySet<IObservable> staleDetailObservables = new IdentitySet<IObservable>();
+	private IdentitySet<IObservable> staleDetailObservables = new IdentitySet<>();
 
 	private IListChangeListener<M> masterListListener = new IListChangeListener<M>() {
 		@Override
@@ -114,7 +114,7 @@ public class ListDetailValueObservableList<M, E> extends
 		this.masterList = masterList;
 		this.detailFactory = detailFactory;
 		this.detailType = detailType;
-		this.detailList = new ArrayList<IObservableValue<E>>();
+		this.detailList = new ArrayList<>();
 
 		// Add change/stale/dispose listeners on the master list.
 		masterList.addListChangeListener(masterListListener);
@@ -164,8 +164,7 @@ public class ListDetailValueObservableList<M, E> extends
 		boolean hasListeners = hasListeners();
 		List<ListDiffEntry<M>> masterEntries = masterListDiff
 				.getDifferencesAsList();
-		List<ListDiffEntry<E>> detailEntries = new ArrayList<ListDiffEntry<E>>(
-				masterEntries.size());
+		List<ListDiffEntry<E>> detailEntries = new ArrayList<>(masterEntries.size());
 		for (int i = 0; i < masterEntries.size(); i++) {
 			ListDiffEntry<M> masterEntry = masterEntries.get(i);
 			int index = masterEntry.getPosition();
@@ -208,7 +207,7 @@ public class ListDetailValueObservableList<M, E> extends
 		}
 
 		IObservableValue<E> detail = createDetailObservable(masterElement);
-		masterDetailMap.put(masterElement, new DetailEntry<E>(detail));
+		masterDetailMap.put(masterElement, new DetailEntry<>(detail));
 
 		detailList.add(index, detail);
 
@@ -256,7 +255,7 @@ public class ListDetailValueObservableList<M, E> extends
 		// Create the diff for every found position.
 		E oldValue = event.diff.getOldValue();
 		E newValue = event.diff.getNewValue();
-		List<ListDiffEntry<E>> diffEntries = new ArrayList<ListDiffEntry<E>>(
+		List<ListDiffEntry<E>> diffEntries = new ArrayList<>(
 				2 * detailIndexes.cardinality());
 		for (int b = detailIndexes.nextSetBit(0); b != -1; b = detailIndexes
 				.nextSetBit(b + 1)) {

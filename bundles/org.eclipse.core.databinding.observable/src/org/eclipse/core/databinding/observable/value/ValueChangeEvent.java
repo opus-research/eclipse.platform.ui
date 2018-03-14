@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * object's current value.
  *
  * @param <T>
+ *            the type of value being observed
  *
  * @since 1.0
  *
@@ -67,6 +68,7 @@ public class ValueChangeEvent<T> extends ObservableEvent {
 		return typedSource;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IValueChangeListener<T>) listener).handleValueChange(this);

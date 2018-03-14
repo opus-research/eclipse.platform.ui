@@ -18,9 +18,10 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 
 /**
  * An unmodifiable wrapper class for IObservableValue instances.
- * 
+ *
  * @param <T>
- * 
+ *            the type of the value being observed
+ *
  * @since 1.1
  */
 public class UnmodifiableObservableValue<T> extends

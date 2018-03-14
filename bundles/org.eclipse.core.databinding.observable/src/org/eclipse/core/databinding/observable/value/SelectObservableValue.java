@@ -25,9 +25,10 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * value of the SelectObservableValue is the value of whichever option's
  * observable has a value of Boolean.TRUE, or null if none of the observable's
  * values are Boolean.TRUE.
- * 
+ *
  * @param <T>
- * 
+ *            the type of value being observed
+ *
  * @noextend This class is not intended to be subclassed by clients.
  *
  * @since 1.2
@@ -103,7 +104,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 	public SelectObservableValue(Realm realm, Object valueType) {
 		super(realm);
 		this.valueType = valueType;
-		this.options = new ArrayList<Option>();
+		this.options = new ArrayList<>();
 	}
 
 	@Override
@@ -161,6 +162,7 @@ public class SelectObservableValue<T> extends AbstractObservableValue<T> {
 		}
 	}
 
+	@Override
 	protected T doGetValue() {
 		return hasListeners() ? valueAtIndex(selectionIndex) : getLiveValue();
 	}

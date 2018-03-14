@@ -28,10 +28,12 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <K>
+ *            the type of the keys in this map
  * @param <V>
- * 
+ *            the type of the values in this map
+ *
  * @since 1.0
  */
 public class ObservableMap<K, V> extends AbstractObservable implements
@@ -95,7 +97,7 @@ public class ObservableMap<K, V> extends AbstractObservable implements
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new MapChangeEvent<K, V>(this, diff));
+		fireEvent(new MapChangeEvent<>(this, diff));
 	}
 
 	@Override

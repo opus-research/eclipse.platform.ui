@@ -19,6 +19,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * {@link IObservableSet} object.
  *
  * @param <E>
+ *            the type of elements in the change event
  *
  * @since 1.0
  *

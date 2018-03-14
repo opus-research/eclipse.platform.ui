@@ -26,8 +26,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <T>
+ *            the type of value being observed
  * @since 1.0
  */
 public class WritableValue<T> extends AbstractObservableValue<T> {
@@ -111,6 +112,6 @@ public class WritableValue<T> extends AbstractObservableValue<T> {
 	 *         <code>null</code>
 	 */
 	public static <T2> WritableValue<T2> withValueType(Object elementType) {
-		return new WritableValue<T2>(Realm.getDefault(), null, elementType);
+		return new WritableValue<>(Realm.getDefault(), null, elementType);
 	}
 }

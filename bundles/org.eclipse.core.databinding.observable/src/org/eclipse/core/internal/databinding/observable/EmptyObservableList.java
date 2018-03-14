@@ -29,8 +29,9 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * Singleton empty list
- * 
+ *
  * @param <E>
+ *            the type of element in the list
  */
 public class EmptyObservableList<E> implements IObservableList<E> {
 

@@ -14,9 +14,10 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for pre-change events for observable values.
- * 
+ *
  * @param <T>
- * 
+ *            the type of value being observed
+ *
  * @since 1.0
  *
  */

@@ -74,7 +74,7 @@ public abstract class MapProperty<S, K, V> implements IMapProperty<S, K, V> {
 	protected Map<K, V> doGetMap(S source) {
 		IObservableMap<K, V> observable = observe(source);
 		try {
-			return new IdentityMap<K, V>(observable);
+			return new IdentityMap<>(observable);
 		} finally {
 			observable.dispose();
 		}

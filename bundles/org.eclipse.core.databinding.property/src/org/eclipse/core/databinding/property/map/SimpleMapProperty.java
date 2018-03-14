@@ -100,7 +100,7 @@ public abstract class SimpleMapProperty<S, K, V> extends MapProperty<S, K, V> {
 
 	@Override
 	protected void doUpdateMap(S source, MapDiff<K, V> diff) {
-		Map<K, V> map = new HashMap<K, V>(doGetMap(source));
+		Map<K, V> map = new HashMap<>(doGetMap(source));
 		diff.applyTo(map);
 		doSetMap(source, map, diff);
 	}

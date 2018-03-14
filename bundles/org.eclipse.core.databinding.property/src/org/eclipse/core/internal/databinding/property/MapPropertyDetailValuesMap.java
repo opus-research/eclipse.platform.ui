@@ -74,6 +74,7 @@ public class MapPropertyDetailValuesMap<S, K, V, T> extends
 		return detailMap;
 	}
 
+	@Override
 	protected void doUpdateMap(S source, MapDiff<K, T> diff) {
 		if (!diff.getAddedKeys().isEmpty())
 			throw new UnsupportedOperationException(toString()

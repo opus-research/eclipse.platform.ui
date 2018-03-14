@@ -36,7 +36,7 @@ import org.eclipse.core.internal.databinding.observable.StalenessTracker;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <E>
  *            type of the elements in the union set
  * @since 1.0
@@ -68,7 +68,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 
 	/**
 	 * @param childSets
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public UnionSet(Set<IObservableSet<? extends E>> childSets) {
 		this(childSets, childSets.iterator().next().getElementType());
@@ -88,7 +88,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	/**
 	 * @param childSets
 	 * @param elementType
-	 * @since 1.5
+	 * @since 1.6
 	 */
 	public UnionSet(Set<IObservableSet<? extends E>> childSets,
 			Object elementType) {
@@ -135,8 +135,8 @@ public final class UnionSet<E> extends ObservableSet<E> {
 
 	private void processAddsAndRemoves(Set<? extends E> adds,
 			Set<? extends E> removes) {
-		Set<E> addsToFire = new HashSet<E>();
-		Set<E> removesToFire = new HashSet<E>();
+		Set<E> addsToFire = new HashSet<>();
+		Set<E> removesToFire = new HashSet<>();
 
 		for (Iterator<? extends E> iter = adds.iterator(); iter.hasNext();) {
 			E added = iter.next();
@@ -180,7 +180,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 
-		refCounts = new HashMap<E, Integer>();
+		refCounts = new HashMap<>();
 		for (IObservableSet<? extends E> childSet : childSets) {
 			childSet.addSetChangeListener(childSetChangeListener);
 			incrementRefCounts(childSet);
@@ -204,7 +204,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	}
 
 	private ArrayList<E> incrementRefCounts(Collection<? extends E> added) {
-		ArrayList<E> adds = new ArrayList<E>();
+		ArrayList<E> adds = new ArrayList<>();
 
 		for (Iterator<? extends E> iter = added.iterator(); iter.hasNext();) {
 			E next = iter.next();
@@ -234,7 +234,7 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	private Set<E> computeElements() {
 		// If there is no cached value, compute the union from scratch
 		if (refCounts == null) {
-			Set<E> result = new HashSet<E>();
+			Set<E> result = new HashSet<>();
 			for (IObservableSet<? extends E> childSet : childSets) {
 				result.addAll(childSet);
 			}

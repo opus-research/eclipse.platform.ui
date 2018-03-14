@@ -30,9 +30,10 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <E>
- * 
+ *            the type of elements in this set
+ *
  * @since 1.0
  */
 public class WritableSet<E> extends ObservableSet<E> {

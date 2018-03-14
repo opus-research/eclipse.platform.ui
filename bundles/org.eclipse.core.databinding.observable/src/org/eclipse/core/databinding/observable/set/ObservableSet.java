@@ -29,9 +29,10 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <E>
- * 
+ *            the type of elements in this collection
+ *
  * @since 1.0
  *
  */
@@ -70,7 +71,7 @@ public abstract class ObservableSet<E> extends AbstractObservable implements
 		// fire general change event first
 		super.fireChange();
 
-		fireEvent(new SetChangeEvent<E>(this, diff));
+		fireEvent(new SetChangeEvent<>(this, diff));
 	}
 
 	@Override

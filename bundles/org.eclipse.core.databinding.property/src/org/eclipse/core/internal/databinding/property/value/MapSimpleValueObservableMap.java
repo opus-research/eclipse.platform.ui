@@ -77,14 +77,14 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 
 		private void updateKnownValues() {
-			Set<I> knownValues = new IdentitySet<I>(masterMap.values());
+			Set<I> knownValues = new IdentitySet<>(masterMap.values());
 			knownMasterValues.retainAll(knownValues);
 			knownMasterValues.addAll(knownValues);
 		}
 
 		private MapDiff<K, V> convertDiff(MapDiff<K, I> diff) {
-			Map<K, V> oldValues = new IdentityMap<K, V>();
-			Map<K, V> newValues = new IdentityMap<K, V>();
+			Map<K, V> oldValues = new IdentityMap<>();
+			Map<K, V> newValues = new IdentityMap<>();
 
 			Set<K> addedKeys = diff.getAddedKeys();
 			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
@@ -102,7 +102,7 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 				oldValues.put(key, oldValue);
 			}
 
-			Set<K> changedKeys = new IdentitySet<K>(diff.getChangedKeys());
+			Set<K> changedKeys = new IdentitySet<>(diff.getChangedKeys());
 			for (Iterator<K> it = changedKeys.iterator(); it.hasNext();) {
 				K key = it.next();
 
@@ -185,13 +185,13 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 	protected void firstListenerAdded() {
 		ObservableTracker.setIgnore(true);
 		try {
-			knownMasterValues = new IdentityObservableSet<I>(getRealm(), null);
+			knownMasterValues = new IdentityObservableSet<>(getRealm(), null);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
 
-		cachedValues = new IdentityMap<I, V>();
-		staleMasterValues = new IdentitySet<I>();
+		cachedValues = new IdentityMap<>();
+		staleMasterValues = new IdentitySet<>();
 		knownMasterValues.addSetChangeListener(new ISetChangeListener<I>() {
 			@Override
 			public void handleSetChange(SetChangeEvent<I> event) {

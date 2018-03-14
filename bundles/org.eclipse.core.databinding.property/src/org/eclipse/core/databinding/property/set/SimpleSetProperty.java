@@ -49,7 +49,7 @@ import org.eclipse.core.internal.databinding.property.set.SimplePropertyObservab
 public abstract class SimpleSetProperty<S, E> extends SetProperty<S, E> {
 	@Override
 	public IObservableSet<E> observe(Realm realm, S source) {
-		return new SimplePropertyObservableSet<S, E>(realm, source, this);
+		return new SimplePropertyObservableSet<>(realm, source, this);
 	}
 
 	// Accessors

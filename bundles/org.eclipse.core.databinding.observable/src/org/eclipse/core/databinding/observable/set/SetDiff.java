@@ -20,9 +20,11 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.IDiff;
 
 /**
- * @param <E>
- * @since 1.0
+ * Describes the difference between two sets
  *
+ * @param <E>
+ *            the type of elements in this diff
+ * @since 1.0
  */
 public abstract class SetDiff<E> implements IDiff {
 
@@ -74,7 +76,7 @@ public abstract class SetDiff<E> implements IDiff {
 	 * @since 1.3
 	 */
 	public Set<E> simulateOn(Set<E> set) {
-		return new DeltaSet<E>(set, this);
+		return new DeltaSet<>(set, this);
 	}
 
 	private static class DeltaSet<E> extends AbstractSet<E> {

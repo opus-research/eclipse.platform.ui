@@ -15,9 +15,10 @@ import org.eclipse.core.databinding.observable.IObservablesListener;
 
 /**
  * Listener for changes to observable lists.
- * 
+ *
  * @param <E>
- * 
+ *            the type of elements in this collection
+ *
  * @since 1.0
  */
 public interface IListChangeListener<E> extends IObservablesListener {

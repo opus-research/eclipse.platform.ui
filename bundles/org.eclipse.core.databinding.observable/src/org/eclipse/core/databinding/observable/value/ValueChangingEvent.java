@@ -20,6 +20,7 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * pending change by setting {@link #veto} to <code>true</code>.
  *
  * @param <T>
+ *            the type of value being observed
  *
  * @since 1.0
  *
@@ -65,6 +66,7 @@ public class ValueChangingEvent<T> extends ObservableEvent {
 		return (IObservableValue<?>) source;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void dispatch(IObservablesListener listener) {
 		((IValueChangingListener<T>) listener).handleValueChanging(this);

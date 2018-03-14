@@ -25,10 +25,12 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 /**
  * An {@link IObservableValue} that tracks the value of an entry in an
  * {@link IObservableMap}, identified by the entry's key.
- * 
+ *
  * @param <K>
+ *            the type of the keys in this map
  * @param <V>
- * 
+ *            the type of the values in this map
+ *
  * @since 1.1
  */
 public class MapEntryObservableValue<K, V> extends AbstractObservableValue<V> {

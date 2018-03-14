@@ -65,15 +65,15 @@ public class ObservableTracker {
 	 * changes the current value, it remembers the old value as a local variable
 	 * and restores the old value when the method exits.
 	 */
-	private static ThreadLocal<IChangeListener> currentChangeListener = new ThreadLocal<IChangeListener>();
+	private static ThreadLocal<IChangeListener> currentChangeListener = new ThreadLocal<>();
 
-	private static ThreadLocal<IStaleListener> currentStaleListener = new ThreadLocal<IStaleListener>();
+	private static ThreadLocal<IStaleListener> currentStaleListener = new ThreadLocal<>();
 
-	private static ThreadLocal<Set<IObservable>> currentGetterCalledSet = new ThreadLocal<Set<IObservable>>();
+	private static ThreadLocal<Set<IObservable>> currentGetterCalledSet = new ThreadLocal<>();
 
-	private static ThreadLocal<Set<IObservable>> currentObservableCreatedSet = new ThreadLocal<Set<IObservable>>();
+	private static ThreadLocal<Set<IObservable>> currentObservableCreatedSet = new ThreadLocal<>();
 
-	private static ThreadLocal<Integer> currentIgnoreCount = new ThreadLocal<Integer>();
+	private static ThreadLocal<Integer> currentIgnoreCount = new ThreadLocal<>();
 
 	/**
 	 * Invokes the given runnable, and returns the set of IObservables that were
@@ -98,7 +98,7 @@ public class ObservableTracker {
 		IStaleListener lastStaleListener = currentStaleListener.get();
 		Integer lastIgnore = currentIgnoreCount.get();
 
-		Set<IObservable> observableSet = new IdentitySet<IObservable>();
+		Set<IObservable> observableSet = new IdentitySet<>();
 		// Push the new listeners to the top of the stack
 		currentGetterCalledSet.set(observableSet);
 		currentChangeListener.set(changeListener);
@@ -140,7 +140,7 @@ public class ObservableTracker {
 				.get();
 		Integer lastIgnore = currentIgnoreCount.get();
 
-		Set<IObservable> observableSet = new IdentitySet<IObservable>();
+		Set<IObservable> observableSet = new IdentitySet<>();
 		// Push the new listeners to the top of the stack
 		currentObservableCreatedSet.set(observableSet);
 		currentIgnoreCount.set(null);

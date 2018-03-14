@@ -24,8 +24,9 @@ import org.eclipse.core.databinding.observable.Realm;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <T>
+ *            the type of value being observed
  * @since 1.0
  *
  */
@@ -76,7 +77,7 @@ abstract public class AbstractObservableValue<T> extends AbstractObservable
 	protected void fireValueChange(ValueDiff<T> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new ValueChangeEvent<T>(this, diff));
+		fireEvent(new ValueChangeEvent<>(this, diff));
 	}
 
 	@Override

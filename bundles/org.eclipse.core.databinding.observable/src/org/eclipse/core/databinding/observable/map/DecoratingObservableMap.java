@@ -21,10 +21,12 @@ import org.eclipse.core.databinding.observable.DecoratingObservable;
 
 /**
  * An observable map which decorates another observable map.
- * 
+ *
  * @param <K>
+ *            type of the keys to the map
  * @param <V>
- * 
+ *            type of the values in the map
+ *
  * @since 1.2
  */
 public class DecoratingObservableMap<K, V> extends DecoratingObservable
@@ -72,7 +74,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	protected void fireMapChange(MapDiff<K, V> diff) {
 		// fire general change event first
 		super.fireChange();
-		fireEvent(new MapChangeEvent<K, V>(this, diff));
+		fireEvent(new MapChangeEvent<>(this, diff));
 	}
 
 	@Override
@@ -267,7 +269,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Set<Entry<K, V>> entrySet() {
 		getterCalled();
 		if (entrySet == null) {
-			entrySet = new BackedSet<Entry<K, V>>(decorated.entrySet());
+			entrySet = new BackedSet<>(decorated.entrySet());
 		}
 		return entrySet;
 	}
@@ -290,7 +292,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Set<K> keySet() {
 		getterCalled();
 		if (keySet == null) {
-			keySet = new BackedSet<K>(decorated.keySet());
+			keySet = new BackedSet<>(decorated.keySet());
 		}
 		return keySet;
 	}
@@ -325,7 +327,7 @@ public class DecoratingObservableMap<K, V> extends DecoratingObservable
 	public Collection<V> values() {
 		getterCalled();
 		if (values == null) {
-			values = new BackedCollection<V>(decorated.values());
+			values = new BackedCollection<>(decorated.values());
 		}
 		return values;
 	}

@@ -23,9 +23,10 @@ import org.eclipse.core.runtime.Assert;
 
 /**
  * An immutable {@link IObservableValue}.
- * 
+ *
  * @param <T>
- * 
+ *            the type of the value being observed
+ *
  * @see WritableValue
  */
 public class ConstantObservableValue<T> implements IObservableValue<T> {

@@ -27,7 +27,7 @@ import org.eclipse.core.internal.databinding.identity.IdentityMap;
  */
 public class StalenessTracker {
 
-	private Map<IObservable, Boolean> staleMap = new IdentityMap<IObservable, Boolean>();
+	private Map<IObservable, Boolean> staleMap = new IdentityMap<>();
 
 	private int staleCount = 0;
 

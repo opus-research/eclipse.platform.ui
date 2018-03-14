@@ -38,9 +38,10 @@ import org.eclipse.core.runtime.AssertionFailedException;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <E>
- * 
+ *            the list element type
+ *
  * @since 1.0
  *
  */

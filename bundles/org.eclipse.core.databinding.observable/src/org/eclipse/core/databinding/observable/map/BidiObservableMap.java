@@ -29,10 +29,12 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
+ *
  * @param <K>
+ *            type of the keys in the map
  * @param <V>
- * 
+ *            type of the values in the map
+ *
  * @since 1.2
  */
 public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
@@ -63,8 +65,8 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 
 	@Override
 	protected void firstListenerAdded() {
-		valuesToSingleKeys = new HashMap<V, K>();
-		valuesToSetsOfKeys = new HashMap<V, Set<K>>();
+		valuesToSingleKeys = new HashMap<>();
+		valuesToSetsOfKeys = new HashMap<>();
 		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
 			Map.Entry<K, V> entry = it.next();
 			addMapping(entry.getKey(), entry.getValue());
@@ -123,8 +125,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	private void addMapping(K key, V value) {
 		if (valuesToSingleKeys.containsKey(value)) {
 			K element = valuesToSingleKeys.get(value);
-			Set<K> set;
-			set = new HashSet<K>(Collections.singleton(element));
+			Set<K> set = new HashSet<>(Collections.singleton(element));
 			valuesToSingleKeys.remove(value);
 			valuesToSetsOfKeys.put(value, set);
 			set.add(key);
@@ -190,7 +191,7 @@ public class BidiObservableMap<K, V> extends DecoratingObservableMap<K, V> {
 	 * @return the set of keys which currently map to the specified value.
 	 */
 	private Set<K> findKeys(Object value) {
-		Set<K> keys = new HashSet<K>();
+		Set<K> keys = new HashSet<>();
 		for (Iterator<Entry<K, V>> it = entrySet().iterator(); it.hasNext();) {
 			Map.Entry<K, V> entry = it.next();
 			if (Util.equals(entry.getValue(), value))

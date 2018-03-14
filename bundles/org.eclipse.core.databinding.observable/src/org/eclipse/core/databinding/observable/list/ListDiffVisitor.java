@@ -15,9 +15,10 @@ import java.util.List;
 
 /**
  * A visitor for processing differences in a ListDiff.
- * 
+ *
  * @param <E>
- * 
+ *            the type of the elements in the list
+ *
  * @see ListDiff#accept(ListDiffVisitor)
  * @since 1.1
  */

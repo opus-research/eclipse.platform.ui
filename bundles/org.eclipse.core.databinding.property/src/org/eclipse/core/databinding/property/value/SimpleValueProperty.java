@@ -40,7 +40,7 @@ import org.eclipse.core.internal.databinding.property.value.SimplePropertyObserv
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- * 
+ *
  * @param <S>
  *            type of the source object
  * @param <T>
@@ -75,24 +75,24 @@ public abstract class SimpleValueProperty<S, T> extends ValueProperty<S, T> {
 
 	@Override
 	public IObservableValue<T> observe(Realm realm, S source) {
-		return new SimplePropertyObservableValue<S, T>(realm, source, this);
+		return new SimplePropertyObservableValue<>(realm, source, this);
 	}
 
 	@Override
 	public <U extends S> IObservableList<T> observeDetail(
 			IObservableList<U> master) {
-		return new ListSimpleValueObservableList<S, U, T>(master, this);
+		return new ListSimpleValueObservableList<>(master, this);
 	}
 
 	@Override
 	public <U extends S> IObservableMap<U, T> observeDetail(
 			IObservableSet<U> master) {
-		return new SetSimpleValueObservableMap<S, U, T>(master, this);
+		return new SetSimpleValueObservableMap<>(master, this);
 	}
 
 	@Override
 	public <K, V extends S> IObservableMap<K, T> observeDetail(
 			IObservableMap<K, V> master) {
-		return new MapSimpleValueObservableMap<S, K, V, T>(master, this);
+		return new MapSimpleValueObservableMap<>(master, this);
 	}
 }
