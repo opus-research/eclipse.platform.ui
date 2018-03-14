@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -87,7 +86,7 @@ class PropertySheetViewer extends Viewer {
 	 * corresponding TreeItem. This is used in 'findItem' to
 	 * greatly increase the performance.
 	 */
-	private HashMap<Object, TreeItem> entryToItemMap = new HashMap<>();
+	private HashMap entryToItemMap = new HashMap();
 
 	private TreeEditor treeEditor;
 
@@ -285,7 +284,7 @@ class PropertySheetViewer extends Viewer {
 
 		// get the children and create their tree items
 		Object node = widget.getData();
-		List<?> children = getChildren(node);
+		List children = getChildren(node);
 		if (children.isEmpty()) {
 			// this item does't actually have any children
 			return;
@@ -359,7 +358,7 @@ class PropertySheetViewer extends Viewer {
 	 * its user data field, and adds a listener to the node if it is an entry.
 	 *
 	 * @param node
-	 *			the entry or category associated with this item
+	 *          the entry or category associated with this item
 	 * @param parent
 	 *			the parent widget
 	 * @param index
@@ -393,8 +392,7 @@ class PropertySheetViewer extends Viewer {
 
 		// add our listener
 		if (node instanceof IPropertySheetEntry) {
-			((IPropertySheetEntry) node)
-					.addPropertySheetEntryListener(entryListener);
+			((IPropertySheetEntry) node).addPropertySheetEntryListener(entryListener);
 		}
 
 		// update the visual presentation
@@ -426,8 +424,7 @@ class PropertySheetViewer extends Viewer {
 	 * listeners.
 	 */
 	private void entrySelectionChanged() {
-		SelectionChangedEvent changeEvent = new SelectionChangedEvent(this,
-				getSelection());
+		SelectionChangedEvent changeEvent = new SelectionChangedEvent(this, getSelection());
 		fireSelectionChanged(changeEvent);
 	}
 
@@ -444,7 +441,8 @@ class PropertySheetViewer extends Viewer {
 	private TreeItem findItem(IPropertySheetEntry entry) {
 		// Iterate through treeItems to find item
 		TreeItem[] items = tree.getItems();
-		for (TreeItem item : items) {
+		for (int i = 0; i < items.length; i++) {
+			TreeItem item = items[i];
 			TreeItem findItem = findItem(entry, item);
 			if (findItem != null) {
 				return findItem;
@@ -478,7 +476,8 @@ class PropertySheetViewer extends Viewer {
 
 		// recurse over children
 		TreeItem[] items = item.getItems();
-		for (TreeItem childItem : items) {
+		for (int i = 0; i < items.length; i++) {
+			TreeItem childItem = items[i];
 			TreeItem findItem = findItem(entry, childItem);
 			if (findItem != null) {
 				return findItem;
@@ -496,8 +495,8 @@ class PropertySheetViewer extends Viewer {
 	 */
 	private void fireCellEditorActivated(CellEditor activatedCellEditor) {
 		Object[] listeners = activationListeners.getListeners();
-		for (Object listener : listeners) {
-			((ICellEditorActivationListener) listener)
+		for (int i = 0; i < listeners.length; ++i) {
+			((ICellEditorActivationListener) listeners[i])
 					.cellEditorActivated(activatedCellEditor);
 		}
 	}
@@ -511,8 +510,8 @@ class PropertySheetViewer extends Viewer {
 	 */
 	private void fireCellEditorDeactivated(CellEditor activatedCellEditor) {
 		Object[] listeners = activationListeners.getListeners();
-		for (Object listener : listeners) {
-			((ICellEditorActivationListener) listener)
+		for (int i = 0; i < listeners.length; ++i) {
+			((ICellEditorActivationListener) listeners[i])
 					.cellEditorDeactivated(activatedCellEditor);
 		}
 	}
@@ -546,7 +545,7 @@ class PropertySheetViewer extends Viewer {
 	 *  (element type <code>IPropertySheetEntry</code> or
 	 *  <code>PropertySheetCategory</code>)
 	 */
-	private List<Object> getChildren(Object node) {
+	private List getChildren(Object node) {
 		// cast the entry or category
 		IPropertySheetEntry entry = null;
 		PropertySheetCategory category = null;
@@ -557,7 +556,7 @@ class PropertySheetViewer extends Viewer {
 		}
 
 		// get the child entries or categories
-		List<Object> children;
+		List children;
 		if (category == null) {
 			children = getChildren(entry);
 		} else {
@@ -574,7 +573,7 @@ class PropertySheetViewer extends Viewer {
 	 * @return the children of the given entry (element type
 	 *		 <code>IPropertySheetEntry</code>)
 	 */
-	private List<Object> getChildren(IPropertySheetEntry entry) {
+	private List getChildren(IPropertySheetEntry entry) {
 		// if the entry is the root and we are showing categories, and we have
 		// more than the
 		// defualt category, return the categories
@@ -583,7 +582,7 @@ class PropertySheetViewer extends Viewer {
 					|| (categories.length == 1 && !categories[0]
 							.getCategoryName().equals(
 									MISCELLANEOUS_CATEGORY_NAME))) {
-				return Arrays.asList((Object[]) categories);
+				return Arrays.asList(categories);
 			}
 		}
 
@@ -599,7 +598,7 @@ class PropertySheetViewer extends Viewer {
 	 * @return the children of the given category (element type
 	 *		 <code>IPropertySheetEntry</code>)
 	 */
-	private List<Object> getChildren(PropertySheetCategory category) {
+	private List getChildren(PropertySheetCategory category) {
 		return getSortedEntries(getFilteredEntries(category.getChildEntries()));
 	}
 
@@ -615,21 +614,22 @@ class PropertySheetViewer extends Viewer {
 	 * @return the entries which match the current filter
 	 *  (element type <code>IPropertySheetEntry</code>)
 	 */
-	private List<IPropertySheetEntry> getFilteredEntries(IPropertySheetEntry[] entries) {
+	private List getFilteredEntries(IPropertySheetEntry[] entries) {
 		// if no filter just return all entries
 		if (isShowingExpertProperties) {
 			return Arrays.asList(entries);
 		}
 
 		// check each entry for the filter
-		List<IPropertySheetEntry> filteredEntries = new ArrayList<>(entries.length);
-		for (IPropertySheetEntry entry : entries) {
+		List filteredEntries = new ArrayList(entries.length);
+		for (int i = 0; i < entries.length; i++) {
+			IPropertySheetEntry entry = entries[i];
 			if (entry != null) {
 				String[] filters = entry.getFilters();
 				boolean expert = false;
 				if (filters != null) {
-					for (String filter : filters) {
-						if (filter.equals(IPropertySheetEntry.FILTER_ID_EXPERT)) {
+					for (int j = 0; j < filters.length; j++) {
+						if (filters[j].equals(IPropertySheetEntry.FILTER_ID_EXPERT)) {
 							expert = true;
 							break;
 						}
@@ -650,11 +650,11 @@ class PropertySheetViewer extends Viewer {
 	 *			unsorted list of <code>IPropertySheetEntry</code>
 	 * @return a sorted list of the specified entries
 	 */
-	private List<Object> getSortedEntries(List<IPropertySheetEntry> unsortedEntries) {
-		IPropertySheetEntry[] propertySheetEntries = unsortedEntries
+	private List getSortedEntries(List unsortedEntries) {
+		IPropertySheetEntry[] propertySheetEntries = (IPropertySheetEntry[]) unsortedEntries
 				.toArray(new IPropertySheetEntry[unsortedEntries.size()]);
 		sorter.sort(propertySheetEntries);
-		return Arrays.asList((Object[]) propertySheetEntries);
+		return Arrays.asList(propertySheetEntries);
 	}
 
 
@@ -694,11 +694,12 @@ class PropertySheetViewer extends Viewer {
 			return StructuredSelection.EMPTY;
 		}
 		TreeItem[] sel = tree.getSelection();
-		List<IPropertySheetEntry> entries = new ArrayList<>(sel.length);
-		for (TreeItem ti : sel) {
+		List entries = new ArrayList(sel.length);
+		for (int i = 0; i < sel.length; i++) {
+			TreeItem ti = sel[i];
 			Object data = ti.getData();
 			if (data instanceof IPropertySheetEntry) {
-				entries.add((IPropertySheetEntry) data);
+				entries.add(data);
 			}
 		}
 		return new StructuredSelection(entries);
@@ -936,7 +937,7 @@ class PropertySheetViewer extends Viewer {
 		IStructuredSelection selection = (IStructuredSelection) getSelection();
 
 		// Iterate over entries and reset them
-		Iterator<Object> itr = selection.iterator();
+		Iterator itr = selection.iterator();
 		while (itr.hasNext()) {
 			((IPropertySheetEntry) itr.next()).resetPropertyValue();
 		}
@@ -1090,7 +1091,7 @@ class PropertySheetViewer extends Viewer {
 		}
 
 		// get all the filtered child entries of the root
-		List<IPropertySheetEntry> childEntries = getFilteredEntries(rootEntry.getChildEntries());
+		List childEntries = getFilteredEntries(rootEntry.getChildEntries());
 
 		// if the list is empty, just set an empty categories array
 		if (childEntries.size() == 0) {
@@ -1099,17 +1100,17 @@ class PropertySheetViewer extends Viewer {
 		}
 
 		// cache old categories by their descriptor name
-		Map<String, PropertySheetCategory> categoryCache = new HashMap<>(categories.length * 2 + 1);
-		for (PropertySheetCategory categorie : categories) {
-			categorie.removeAllEntries();
-			categoryCache.put(categorie.getCategoryName(), categorie);
+		Map categoryCache = new HashMap(categories.length * 2 + 1);
+		for (int i = 0; i < categories.length; i++) {
+			categories[i].removeAllEntries();
+			categoryCache.put(categories[i].getCategoryName(), categories[i]);
 		}
 
 		// create a list of categories to get rid of
-		List<PropertySheetCategory> categoriesToRemove = new ArrayList<>(Arrays.asList(categories));
+		List categoriesToRemove = new ArrayList(Arrays.asList(categories));
 
 		// Determine the categories
-		PropertySheetCategory misc = categoryCache
+		PropertySheetCategory misc = (PropertySheetCategory) categoryCache
 				.get(MISCELLANEOUS_CATEGORY_NAME);
 		if (misc == null) {
 			misc = new PropertySheetCategory(MISCELLANEOUS_CATEGORY_NAME);
@@ -1117,14 +1118,15 @@ class PropertySheetViewer extends Viewer {
 		boolean addMisc = false;
 
 		for (int i = 0; i < childEntries.size(); i++) {
-			IPropertySheetEntry childEntry = childEntries.get(i);
+			IPropertySheetEntry childEntry = (IPropertySheetEntry) childEntries
+					.get(i);
 			String categoryName = childEntry.getCategory();
 			if (categoryName == null) {
 				misc.addEntry(childEntry);
 				addMisc = true;
 				categoriesToRemove.remove(misc);
 			} else {
-				PropertySheetCategory category = categoryCache
+				PropertySheetCategory category = (PropertySheetCategory) categoryCache
 						.get(categoryName);
 				if (category == null) {
 					category = new PropertySheetCategory(categoryName);
@@ -1144,15 +1146,16 @@ class PropertySheetViewer extends Viewer {
 		// Sort the categories.
 		// Rather than just sorting categoryCache.values(), we'd like the original order to be preserved
 		// (with misc added at the end, if needed) before passing to the sorter.
-		List<PropertySheetCategory> categoryList = new ArrayList<>();
-		Set<String> seen = new HashSet<>(childEntries.size());
+		ArrayList categoryList = new ArrayList();
+		Set seen = new HashSet(childEntries.size());
 		for (int i = 0; i < childEntries.size(); i++) {
-			IPropertySheetEntry childEntry = childEntries
+			IPropertySheetEntry childEntry = (IPropertySheetEntry) childEntries
 					.get(i);
 			String categoryName = childEntry.getCategory();
 			if (categoryName != null && !seen.contains(categoryName)) {
 				seen.add(categoryName);
-				PropertySheetCategory category = categoryCache.get(categoryName);
+				PropertySheetCategory category = (PropertySheetCategory) categoryCache
+						.get(categoryName);
 				if (category != null) {
 					categoryList.add(category);
 				}
@@ -1162,7 +1165,8 @@ class PropertySheetViewer extends Viewer {
 			categoryList.add(misc);
 		}
 
-		PropertySheetCategory[] categoryArray = categoryList.toArray(new PropertySheetCategory[categoryList.size()]);
+		PropertySheetCategory[] categoryArray = (PropertySheetCategory[]) categoryList
+			.toArray(new PropertySheetCategory[categoryList.size()]);
 		sorter.sort(categoryArray);
 		categories = categoryArray;
 	}
@@ -1232,9 +1236,9 @@ class PropertySheetViewer extends Viewer {
 		}
 		if (item != null && !item.getExpanded()) {
 			// remove all children
-			for (TreeItem childItem : childItems) {
-				if (childItem.getData() != null) {
-					removeItem(childItem);
+			for (int i = 0; i < childItems.length; i++) {
+				if (childItems[i].getData() != null) {
+					removeItem(childItems[i]);
 				}
 			}
 
@@ -1260,23 +1264,23 @@ class PropertySheetViewer extends Viewer {
 			// update the categories
 			updateCategories();
 		}
-		List<Object> children = getChildren(node);
+		List children = getChildren(node);
 
 		// remove items
-		Set<Object> set = new HashSet<>(childItems.length * 2 + 1);
+		Set set = new HashSet(childItems.length * 2 + 1);
 
-		for (TreeItem childItem : childItems) {
-			Object data = childItem.getData();
+		for (int i = 0; i < childItems.length; i++) {
+			Object data = childItems[i].getData();
 			if (data != null) {
 				Object e = data;
 				int ix = children.indexOf(e);
 				if (ix < 0) { // not found
-					removeItem(childItem);
+					removeItem(childItems[i]);
 				} else { // found
 					set.add(e);
 				}
 			} else if (data == null) { // the dummy
-				childItem.dispose();
+				childItems[i].dispose();
 			}
 		}
 
@@ -1399,8 +1403,8 @@ class PropertySheetViewer extends Viewer {
 		if (removeAll) {
 			// remove all children
 			TreeItem[] items = item.getItems();
-			for (TreeItem item2 : items) {
-				removeItem(item2);
+			for (int i = 0; i < items.length; i++) {
+				removeItem(items[i]);
 			}
 		}
 
