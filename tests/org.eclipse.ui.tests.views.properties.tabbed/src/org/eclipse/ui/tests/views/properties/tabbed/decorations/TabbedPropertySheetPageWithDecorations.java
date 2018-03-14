@@ -41,7 +41,6 @@ public class TabbedPropertySheetPageWithDecorations extends
 		super(tabbedPropertySheetPageContributor);
 	}
 
-	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (selection.equals(getCurrentSelection())) {
 			return;
@@ -120,7 +119,6 @@ public class TabbedPropertySheetPageWithDecorations extends
 		}
 	}
 
-	@Override
 	protected void updateTabs(ITabDescriptor[] descriptors) {
 		super.updateTabs(descriptors);
 		if (useDecorations) {
