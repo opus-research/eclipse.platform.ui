@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2006 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -238,7 +238,7 @@ public final class ActionHandler extends AbstractHandler {
         }
         map.put(ATTRIBUTE_HANDLED, handled ? Boolean.TRUE : Boolean.FALSE);
         map.put(ATTRIBUTE_ID, action.getId());
-        map.put(ATTRIBUTE_STYLE, new Integer(action.getStyle()));
+		map.put(ATTRIBUTE_STYLE, Integer.valueOf(action.getStyle()));
         return Collections.unmodifiableMap(map);
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2016 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bug 195222, 247997, 261843, 264307
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 488364
  ******************************************************************************/
 
 package org.eclipse.core.databinding.beans;
@@ -100,8 +101,7 @@ public class BeanProperties {
 	 * @return a value property for the given property name of the given bean
 	 *         class.
 	 */
-	public static IBeanValueProperty value(Class beanClass,
-			String propertyName, Class valueType) {
+	public static IBeanValueProperty value(Class beanClass, String propertyName, Class valueType) {
 		String[] propertyNames = split(propertyName);
 		if (propertyNames.length > 1)
 			valueType = null;
@@ -147,12 +147,11 @@ public class BeanProperties {
 	 * @param beanClass
 	 *            the bean class
 	 * @param propertyNames
-	 *            array of property names. May be nested e.g. "parent.name"
+	 *            defines the property names. May be nested e.g. "parent.name"
 	 * @return a value property array for the given property names of the given
 	 *         bean class.
 	 */
-	public static IBeanValueProperty[] values(Class beanClass,
-			String[] propertyNames) {
+	public static IBeanValueProperty[] values(Class beanClass, String... propertyNames) {
 		IBeanValueProperty[] properties = new IBeanValueProperty[propertyNames.length];
 		for (int i = 0; i < properties.length; i++)
 			properties[i] = value(beanClass, propertyNames[i], null);
@@ -164,11 +163,11 @@ public class BeanProperties {
 	 * arbitrary bean class.
 	 *
 	 * @param propertyNames
-	 *            array of property names. May be nested e.g. "parent.name"
+	 *            defines the property names. May be nested e.g. "parent.name"
 	 * @return a value property array for the given property names of the given
 	 *         bean class.
 	 */
-	public static IBeanValueProperty[] values(String[] propertyNames) {
+	public static IBeanValueProperty[] values(String... propertyNames) {
 		return values(null, propertyNames);
 	}
 
@@ -346,8 +345,7 @@ public class BeanProperties {
 	 * @return a map property for the given property name of an arbitrary bean
 	 *         class.
 	 */
-	public static IBeanMapProperty map(String propertyName, Class keyType,
-			Class valueType) {
+	public static IBeanMapProperty map(String propertyName, Class keyType, Class valueType) {
 		return map(null, propertyName, keyType, valueType);
 	}
 
@@ -381,8 +379,7 @@ public class BeanProperties {
 	 * @return a map property for the given property name of the given bean
 	 *         class.
 	 */
-	public static IBeanMapProperty map(Class beanClass, String propertyName,
-			Class keyType, Class valueType) {
+	public static IBeanMapProperty map(Class beanClass, String propertyName, Class keyType, Class valueType) {
 		PropertyDescriptor propertyDescriptor;
 		IMapProperty property;
 		if (beanClass == null) {
