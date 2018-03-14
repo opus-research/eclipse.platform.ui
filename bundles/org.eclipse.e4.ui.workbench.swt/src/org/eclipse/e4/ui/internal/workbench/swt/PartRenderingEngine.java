@@ -1250,6 +1250,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 			IEclipseContext appContext) {
 		String cssTheme = (String) appContext.get(E4Application.THEME_ID);
 		String cssURI = (String) appContext.get(IWorkbench.CSS_URI_ARG);
+		IThemeEngine themeEngineForEvent = null;
 		if ("none".equals(cssTheme)) {
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
@@ -1281,6 +1282,7 @@ public class PartRenderingEngine implements IPresentationEngine {
 		} else if (cssTheme != null) {
 			final IThemeEngine themeEngine = createThemeEngine(display,
 					appContext);
+			themeEngineForEvent = themeEngine;
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
 
@@ -1290,7 +1292,9 @@ public class PartRenderingEngine implements IPresentationEngine {
 				themeEngine.registerResourceLocator(new OSGiResourceLocator(
 						cssResourcesURI));
 			}
-			
+
+			themeEngine.restore(cssTheme);
+
 			appContext.set(IStylingEngine.SERVICE_NAME, new IStylingEngine() {
 				@Override
 				public void setClassname(Object widget, String classname) {
@@ -1322,9 +1326,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 					themeEngine.applyStyles(widget, true);
 				}
 			});
-
-			themeEngine.restore(cssTheme);
-
 		} else if (cssURI != null) {
 			String cssResourcesURI = (String) appContext
 					.get(IWorkbench.CSS_RESOURCE_URI_ARG);
@@ -1418,6 +1419,16 @@ public class PartRenderingEngine implements IPresentationEngine {
 
 		IEventBroker broker = appContext.get(IEventBroker.class);
 		if (broker != null) {
+			Map<String, Object> data = null;
+			if (themeEngineForEvent != null) {
+				data = new HashMap<String, Object>();
+				data.put(IThemeEngine.Events.THEME_ENGINE, themeEngineForEvent);
+				data.put(IThemeEngine.Events.THEME,
+						themeEngineForEvent.getActiveTheme());
+				data.put(IThemeEngine.Events.DEVICE, display);
+				data.put(IThemeEngine.Events.RESTORE, false);
+			}
+			broker.send(IThemeEngine.Events.THEME_CHANGED, data);
 			broker.send(UIEvents.UILifeCycle.THEME_CHANGED, null);
 		}
 	}
