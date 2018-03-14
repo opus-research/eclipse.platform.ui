@@ -2501,18 +2501,24 @@ public class WorkbenchPage implements IWorkbenchPage {
 			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPart part : parts) {
-					if (reference.getModel().getElementId().equals(part.getElementId())
-							&& (isStickyView(reference.getModel().getElementId()) || partService
-									.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
-						// only rendered placeholders are valid view references
-						visibleReferences.add(reference);
-					}
-				}
+				addVisibleReferences(perspective, parts, reference, visibleReferences);
 			}
 			return visibleReferences.toArray(new IViewReference[visibleReferences.size()]);
 		}
 		return new IViewReference[0];
+	}
+
+	private void addVisibleReferences(MPerspective perspective, Collection<MPart> parts, ViewReference reference,
+			Collection<IViewReference> visibleReferences) {
+		for (MPart part : parts) {
+			if (reference.getModel().getElementId().equals(part.getElementId())
+					&& (isStickyView(reference.getModel().getElementId()) || partService
+							.isPartOrPlaceholderInPerspective(part.getElementId(), perspective))) {
+				// only rendered parts are valid view references
+				visibleReferences.add(reference);
+				return;
+			}
+		}
 	}
 
     /**
