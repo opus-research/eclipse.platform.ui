@@ -62,7 +62,7 @@ public class CopyProjectOperation {
 	/**
 	 * Validates that the copy of the project will not have undesirable side
 	 * effects.
-	 *
+	 * 
 	 * @param shell
 	 *            a shell
 	 * @param project
@@ -77,7 +77,6 @@ public class CopyProjectOperation {
 	 * @deprecated As of 3.3, validation is performed in the undoable operation
 	 *             executed by this operation.
 	 */
-	@Deprecated
 	protected static boolean validateCopy(Shell shell, IProject project,
 			String newName, String[] modelProviderIds) {
 		IResourceChangeDescriptionFactory factory = ResourceChangeValidator
@@ -92,7 +91,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Create a new operation initialized with a shell.
-	 *
+	 * 
 	 * @param shell
 	 *            parent shell for error dialogs
 	 */
@@ -102,7 +101,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Paste a copy of the project on the clipboard to the workspace.
-	 *
+	 * 
 	 * @param project
 	 *            The project that is beign copied.
 	 */
@@ -142,7 +141,7 @@ public class CopyProjectOperation {
 
 	/**
 	 * Copies the project to the new values.
-	 *
+	 * 
 	 * @param project
 	 *            the project to copy
 	 * @param projectName
@@ -155,7 +154,6 @@ public class CopyProjectOperation {
 	private boolean performProjectCopy(final IProject project,
 			final String projectName, final URI newLocation) {
 		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				org.eclipse.ui.ide.undo.CopyProjectOperation op = new org.eclipse.ui.ide.undo.CopyProjectOperation(
 						project, projectName, newLocation,
@@ -185,7 +183,6 @@ public class CopyProjectOperation {
 		} catch (InvocationTargetException e) {
 			final String message = e.getTargetException().getMessage();
 			parentShell.getDisplay().syncExec(new Runnable() {
-				@Override
 				public void run() {
 					MessageDialog
 							.openError(
@@ -225,7 +222,7 @@ public class CopyProjectOperation {
     /**
      * Returns the model provider ids that are known to the client
      * that instantiated this operation.
-     *
+     * 
      * @return the model provider ids that are known to the client
      * that instantiated this operation.
 	 * @since 3.2
@@ -238,7 +235,7 @@ public class CopyProjectOperation {
 	 * Sets the model provider ids that are known to the client that
 	 * instantiated this operation. Any potential side effects reported by these
 	 * models during validation will be ignored.
-	 *
+	 * 
 	 * @param modelProviderIds
 	 *            the model providers known to the client who is using this
 	 *            operation.

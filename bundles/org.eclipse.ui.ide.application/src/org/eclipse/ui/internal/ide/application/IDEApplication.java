@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Helmut J. Haigermoser -  Bug 359838 - The "Workspace Unavailable" error
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422954
  *     Christian Georgi (SAP) - Bug 423882 - Warn user if workspace is newer than IDE
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 427393, 455162
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.application;
 
@@ -29,13 +28,10 @@ import org.eclipse.core.runtime.IExecutableExtension;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
@@ -46,17 +42,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceData;
 import org.eclipse.ui.internal.ide.ChooseWorkspaceDialog;
-import org.eclipse.ui.internal.ide.IDEInternalPreferences;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
  * The "main program" for the Eclipse IDE.
- *
+ * 
  * @since 3.0
  */
 public class IDEApplication implements IApplication, IExecutableExtension {
@@ -93,7 +87,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * show an error dialog if the workspace is locked.
      */
     private static final Integer EXIT_WORKSPACE_LOCKED = new Integer(15);
-
+    
     /**
      * The ID of the application plug-in
      */
@@ -106,8 +100,10 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         // There is nothing to do for IDEApplication
     }
 
-    @Override
-	public Object start(IApplicationContext appContext) throws Exception {
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext context)
+     */
+    public Object start(IApplicationContext appContext) throws Exception {
         Display display = createDisplay();
         // processor must be created before we start event loop
         DelayedEventsProcessor processor = new DelayedEventsProcessor(display);
@@ -117,14 +113,14 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         	// look and see if there's a splash shell we can parent off of
         	Shell shell = WorkbenchPlugin.getSplashShell(display);
         	if (shell != null) {
-        		// should should set the icon and message for this shell to be the
+        		// should should set the icon and message for this shell to be the 
         		// same as the chooser dialog - this will be the guy that lives in
-        		// the task bar and without these calls you'd have the default icon
+        		// the task bar and without these calls you'd have the default icon 
         		// with no message.
         		shell.setText(ChooseWorkspaceDialog.getWindowTitle());
         		shell.setImages(Window.getDefaultImages());
         	}
-
+           
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
@@ -162,15 +158,17 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     /**
      * Creates the display used by the application.
-     *
+     * 
      * @return the display used by the application
      */
     protected Display createDisplay() {
         return PlatformUI.createDisplay();
     }
 
-    @Override
-	public void setInitializationData(IConfigurationElement config,
+    /* (non-Javadoc)
+     * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement, java.lang.String, java.lang.Object)
+     */
+    public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) {
         // There is nothing to do for IDEApplication
     }
@@ -178,13 +176,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
     /**
      * Return <code>null</code> if a valid workspace path has been set and an exit code otherwise.
      * Prompt for and set the path if possible and required.
-     *
+     * 
      * @param applicationArguments the command line arguments
      * @return <code>null</code> if a valid instance location has been set and an exit code
      *         otherwise
      */
-    @SuppressWarnings("rawtypes")
-	private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
+    private Object checkInstanceLocation(Shell shell, Map applicationArguments) {
         // -data @none was specified but an ide requires workspace
         Location instanceLoc = Platform.getInstanceLocation();
         if (instanceLoc == null) {
@@ -211,8 +208,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                     writeWorkspaceVersion();
                     return null;
                 }
-
-                // we failed to create the directory.
+                
+                // we failed to create the directory.  
                 // Two possibilities:
                 // 1. directory is already in use
                 // 2. directory could not be created
@@ -227,19 +224,19 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 	                        NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceCannotLockMessage, workspaceDirectory.getAbsolutePath()));
                 } else {
                 	MessageDialog.openError(
-                			shell,
+                			shell, 
                 			IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetTitle,
                 			IDEWorkbenchMessages.IDEApplication_workspaceCannotBeSetMessage);
                 }
             } catch (IOException e) {
                 IDEWorkbenchPlugin.log("Could not obtain lock for workspace location", //$NON-NLS-1$
-                        e);
+                        e);            	
                 MessageDialog
                 .openError(
                         shell,
                         IDEWorkbenchMessages.InternalError,
-                        e.getMessage());
-            }
+                        e.getMessage());                
+            }            
             return EXIT_OK;
         }
 
@@ -248,16 +245,6 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 .getDefault());
 
         boolean force = false;
-
-		boolean parentShellVisible = false;
-		if (isValidShell(shell)) {
-			parentShellVisible = shell.getVisible();
-			// bug 455162, bug 427393: hide the splash if the workspace
-			// prompt dialog should be opened
-			if (parentShellVisible && launchData.getShowDialog()) {
-				shell.setVisible(false);
-			}
-		}
         while (true) {
             URL workspaceUrl = promptForWorkspace(shell, launchData, force);
             if (workspaceUrl == null) {
@@ -274,13 +261,6 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 if (instanceLoc.set(workspaceUrl, true)) {
                     launchData.writePersistedData();
                     writeWorkspaceVersion();
-
-					// bug 455162, bug 427393: unhide the splash after the
-					// workspace was selected to show the progress bar
-					if (parentShellVisible && isValidShell(shell)) {
-						shell.setVisible(true);
-						shell.forceActive();
-					}
                     return null;
                 }
             } catch (IllegalStateException e) {
@@ -300,25 +280,24 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
             // by this point it has been determined that the workspace is
             // already in use -- force the user to choose again
-            MessageDialog.openError(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle,
+            MessageDialog.openError(shell, IDEWorkbenchMessages.IDEApplication_workspaceInUseTitle, 
                     NLS.bind(IDEWorkbenchMessages.IDEApplication_workspaceInUseMessage, workspaceUrl.getFile()));
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private static boolean isDevLaunchMode(Map args) {
+	private static boolean isDevLaunchMode(Map args) {
 		// see org.eclipse.pde.internal.core.PluginPathFinder.isDevLaunchMode()
 		if (Boolean.getBoolean("eclipse.pde.launch")) //$NON-NLS-1$
 			return true;
 		return args.containsKey("-pdelaunch"); //$NON-NLS-1$
 	}
-
+	
     /**
      * Open a workspace selection dialog on the argument shell, populating the
      * argument data with the user's selection. Perform first level validation
      * on the selection by comparing the version information. This method does
      * not examine the runtime state (e.g., is the workspace already locked?).
-     *
+     * 
      * @param shell
      * @param launchData
      * @param force
@@ -327,21 +306,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * @return An URL storing the selected workspace or null if the user has
      *         canceled the launch operation.
      */
-	private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
+    private URL promptForWorkspace(Shell shell, ChooseWorkspaceData launchData,
 			boolean force) {
         URL url = null;
-
         do {
-			new ChooseWorkspaceDialog(shell, launchData, false, true) {
-				@Override
-				protected Shell getParentShell() {
-					// Bug 429308: Make workspace selection dialog visible
-					// in the task manager of the OS
-					return null;
-				}
-
-			}.prompt(force);
-
+        	// okay to use the shell now - this is the splash shell
+            new ChooseWorkspaceDialog(shell, launchData, false, true).prompt(force);
             String instancePath = launchData.getSelection();
             if (instancePath == null) {
 				return null;
@@ -370,7 +340,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
             try {
                 // Don't use File.toURL() since it adds a leading slash that Platform does not
-                // handle properly.  See bug 54081 for more details.
+                // handle properly.  See bug 54081 for more details.  
                 String path = workspace.getAbsolutePath().replace(
                         File.separatorChar, '/');
                 url = new URL("file", null, path); //$NON-NLS-1$
@@ -387,19 +357,12 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return url;
     }
 
-	/**
-	 * @return true if the shell is not <code>null</code> and not disposed
-	 */
-	static boolean isValidShell(Shell shell) {
-		return shell != null && !shell.isDisposed();
-	}
-
     /**
      * Return true if the argument directory is ok to use as a workspace and
      * false otherwise. A version check will be performed, and a confirmation
      * box may be displayed on the argument shell if an older version is
      * detected.
-     *
+     * 
      * @return true if the argument URL is ok to use as a workspace and false
      *         otherwise.
      */
@@ -452,26 +415,10 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_newerWorkspace, url.getFile());
 		}
 
-		IPersistentPreferenceStore prefStore = new ScopedPreferenceStore(ConfigurationScope.INSTANCE, IDEWorkbenchPlugin.IDE_WORKBENCH);
-		boolean keepOnWarning = prefStore.getBoolean(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY);
-		if (keepOnWarning) {
-			MessageDialogWithToggle dialog = new MessageDialogWithToggle(shell, title, null, message, severity,
-					new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0,
-					IDEWorkbenchMessages.IDEApplication_version_doNotWarnAgain, false);
-			if (dialog.open() != Window.OK) {
-				return false;
-			}
-			keepOnWarning = !dialog.getToggleState();
-			try {
-				prefStore.setValue(IDEInternalPreferences.WARN_ABOUT_WORKSPACE_INCOMPATIBILITY, keepOnWarning);
-				prefStore.save();
-			} catch (IOException e) {
-				IDEWorkbenchPlugin.log("Error writing to configuration preferences", //$NON-NLS-1$
-					new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, e.getMessage(), e));
-			}
-		}
-		return true;
-	}
+		MessageDialog dialog = new MessageDialog(shell, title, null, message, severity,
+				new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0);
+		return dialog.open() == Window.OK;
+    }
 
     /**
      * Look at the argument URL for the workspace's version information. Return
@@ -573,7 +520,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
      * The version file is stored in the metadata area of the workspace. This
      * method returns an URL to the file or null if the directory or file does
      * not exist (and the create parameter is false).
-     *
+     * 
      * @param create
      *            If the directory and file does not exist this parameter
      *            controls whether it will be created.
@@ -613,14 +560,15 @@ public class IDEApplication implements IApplication, IExecutableExtension {
         return new Version(version.getMajor(), version.getMinor(), 0);
     }
 
-	@Override
+    /* (non-Javadoc)
+     * @see org.eclipse.equinox.app.IApplication#stop()
+     */
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();

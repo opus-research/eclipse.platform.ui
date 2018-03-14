@@ -21,6 +21,7 @@
 package org.eclipse.e4.ui.css.core.impl.sac;
 
 import java.util.Set;
+
 import org.eclipse.e4.ui.css.core.dom.CSSStylableElement;
 import org.w3c.dom.Element;
 
@@ -93,12 +94,10 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 		String id = null;
 		if (e instanceof CSSStylableElement) {
 			id = ((CSSStylableElement) e).getCSSId();
-		} else {
+		} else
 			id = e.getAttribute("id");
-		}
-		if (id == null) {
+		if (id == null)
 			return false;
-		}
 		return id.equals(getValue());
 		// return super.match(e, pseudoE);
 	}
@@ -107,7 +106,7 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	 * Fills the given set with the attribute names found in this selector.
 	 */
 	@Override
-	public void fillAttributeSet(Set<String> attrSet) {
+	public void fillAttributeSet(Set attrSet) {
 		attrSet.add(localName);
 	}
 

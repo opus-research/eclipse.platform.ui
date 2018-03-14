@@ -51,8 +51,7 @@ public class FileEditorInputFactory implements IElementFactory {
     /* (non-Javadoc)
      * Method declared on IElementFactory.
      */
-    @Override
-	public IAdaptable createElement(IMemento memento) {
+    public IAdaptable createElement(IMemento memento) {
         // Get the file name.
         String fileName = memento.getString(TAG_PATH);
         if (fileName == null) {
@@ -71,7 +70,7 @@ public class FileEditorInputFactory implements IElementFactory {
 
     /**
      * Returns the element factory id for this class.
-     *
+     * 
      * @return the element factory id
      */
     public static String getFactoryId() {

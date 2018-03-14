@@ -17,7 +17,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 /**
  * Validates that a string is of the appropriate format and is in the range of
  * an integer.
- *
+ * 
  * @since 1.0
  */
 public class StringToIntegerValidator extends AbstractStringToNumberValidator {
@@ -31,7 +31,9 @@ public class StringToIntegerValidator extends AbstractStringToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.AbstractStringToNumberValidator#inRange(java.lang.Number)
+	 */
 	protected boolean isInRange(Number number) {
 		return StringToNumberParser.inIntegerRange(number);
 	}

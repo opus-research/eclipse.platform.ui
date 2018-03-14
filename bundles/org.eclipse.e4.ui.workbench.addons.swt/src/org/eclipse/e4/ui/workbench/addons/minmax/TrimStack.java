@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars.Vogel@vogella.com - Bug 454712
- *     dirk.fauth@googlemail.com - Bug 446095
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.minmax;
 
@@ -215,7 +213,7 @@ public class TrimStack {
 	/**
 	 * This is the new way to handle UIEvents (as opposed to subscring and unsubscribing them with
 	 * the event broker.
-	 *
+	 * 
 	 * The method is described in detail at http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
 	 */
 	@SuppressWarnings("unchecked")
@@ -227,10 +225,7 @@ public class TrimStack {
 		if (trimStackTB == null || trimStackTB.isDisposed() || minimizedElement.getWidget() == null)
 			return;
 
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
-		if (!(changedElement instanceof MUIElement)) {
-			return;
-		}
+		MUIElement changedElement = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
 
 		String key;
 		if (UIEvents.isREMOVE(event)) {
@@ -242,11 +237,11 @@ public class TrimStack {
 		}
 
 		if (key.equals(IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setImage(getImage((MUILabel) toolItem.getData()));
 		} else if (key.equals(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY)) {
-			ToolItem toolItem = getChangedToolItem((MUIElement) changedElement);
+			ToolItem toolItem = getChangedToolItem(changedElement);
 			if (toolItem != null)
 				toolItem.setToolTipText(getLabelText((MUILabel) toolItem.getData()));
 		}
@@ -298,7 +293,7 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-
+	
 	// Close any open stacks before shutting down
 	private EventHandler shutdownHandler = new EventHandler() {
 		@Override
@@ -678,7 +673,7 @@ public class TrimStack {
 	 * layout tags on the {@link #minimizedElement}. The restore item will remove the minimized tag.
 	 * The close item is not available on the editor stack, but will ask the part service to hide
 	 * the part.
-	 *
+	 * 
 	 * @param selectedPart
 	 *            the part from the data of the selected tool item
 	 */
@@ -801,14 +796,7 @@ public class TrimStack {
 			int index = toolControlId.indexOf('(');
 			String stackId = toolControlId.substring(0, index);
 			String perspId = toolControlId.substring(index + 1, toolControlId.length() - 1);
-
-			MPerspective persp = null;
-			List<MPerspective> perspectives = modelService.findElements(ps.get(0), perspId,
-					MPerspective.class, null);
-			if (perspectives != null && !perspectives.isEmpty()) {
-				persp = perspectives.get(0);
-			}
-
+			MPerspective persp = (MPerspective) modelService.find(perspId, ps.get(0));
 			if (persp != null) {
 				result = modelService.find(stackId, persp);
 			} else {
@@ -889,37 +877,31 @@ public class TrimStack {
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
 
 			// check to see if this stack has any valid elements
-			boolean hasRenderedElements = false;
+			boolean check = false;
 			for (MUIElement stackElement : theStack.getChildren()) {
 				if (stackElement.isToBeRendered()) {
-					hasRenderedElements = true;
+					check = true;
 					break;
 				}
 			}
 
-			if (hasRenderedElements) {
-				for (MUIElement stackElement : theStack.getChildren()) {
-					if (!stackElement.isToBeRendered()) {
-						continue;
-					}
-
-					MUILabel labelElement = getLabelElement(stackElement);
-					ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
-					newItem.setData(labelElement);
-					newItem.setImage(getImage(labelElement));
-					newItem.setToolTipText(getLabelText(labelElement));
-					newItem.addSelectionListener(toolItemSelectionListener);
-				}
-			} else if (theStack.getTags().contains(IPresentationEngine.NO_AUTO_COLLAPSE)) {
-				// OK to be empty and still minimized
-				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
-				ti.setToolTipText(Messages.TrimStack_EmptyStackTooltip);
-				ti.setImage(getLayoutImage());
-				ti.addSelectionListener(toolItemSelectionListener);
-			} else {
+			if (!check) {
 				// doesn't have any children that's showing, place it back in the presentation
 				restoreStack();
 				return;
+			}
+
+			for (MUIElement stackElement : theStack.getChildren()) {
+				if (!stackElement.isToBeRendered()) {
+					continue;
+				}
+
+				MUILabel labelElement = getLabelElement(stackElement);
+				ToolItem newItem = new ToolItem(trimStackTB, SWT.CHECK);
+				newItem.setData(labelElement);
+				newItem.setImage(getImage(labelElement));
+				newItem.setToolTipText(getLabelText(labelElement));
+				newItem.addSelectionListener(toolItemSelectionListener);
 			}
 		}
 
@@ -932,20 +914,6 @@ public class TrimStack {
 
 		minimizedElement.setVisible(true);
 		minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
-
-		// Activate the part that is being brought up...
-		if (minimizedElement instanceof MPartStack) {
-			MPartStack theStack = (MPartStack) minimizedElement;
-			MStackElement curSel = theStack.getSelectedElement();
-			Control ctrl = (Control) minimizedElement.getWidget();
-
-			// Hack for elems that are lazy initialized
-			if (ctrl instanceof CTabFolder && ((CTabFolder) ctrl).getSelection() == null) {
-				theStack.setSelectedElement(null);
-				theStack.setSelectedElement(curSel);
-			}
-		}
-
 		toolControl.setToBeRendered(false);
 
 		if (hostPane != null && !hostPane.isDisposed())
@@ -955,13 +923,12 @@ public class TrimStack {
 
 	/**
 	 * Sets whether this stack should be visible or hidden
-	 *
+	 * 
 	 * @param show
 	 *            whether the stack should be visible
 	 */
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
-		CTabFolder ctf = ctrl instanceof CTabFolder? (CTabFolder) ctrl: null;
 
 		Composite clientAreaComposite = getCAComposite();
 		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
@@ -975,7 +942,8 @@ public class TrimStack {
 
 				// Hack ! Force a resize of the CTF to make sure the hosted
 				// view is the correct size...see bug 434062 for details
-				if (ctf != null) {
+				if (ctrl instanceof CTabFolder) {
+					CTabFolder ctf = (CTabFolder) ctrl;
 					Rectangle bb = ctf.getBounds();
 					bb.width--;
 					ctf.setBounds(bb);
@@ -1011,13 +979,6 @@ public class TrimStack {
 			if (minimizedElement instanceof MPartStack) {
 				MPartStack theStack = (MPartStack) minimizedElement;
 				MStackElement curSel = theStack.getSelectedElement();
-
-				// Hack for elems that are lazy initialized
-				if (ctf != null && ctf.getSelection() == null) {
-					theStack.setSelectedElement(null);
-					theStack.setSelectedElement(curSel);
-				}
-
 				if (curSel instanceof MPart) {
 					partService.activate((MPart) curSel);
 				} else if (curSel instanceof MPlaceholder) {
@@ -1044,19 +1005,15 @@ public class TrimStack {
 						}
 					} else if (selectedElement instanceof MElementContainer<?>) {
 						MElementContainer<?> container = (MElementContainer<?>) selectedElement;
-						selectedElement = container.getSelectedElement();
+						selectedElement = (MElementContainer<?>) container.getSelectedElement();
 					}
 				}
 
 				// If we haven't found one then use the first
 				if (partToActivate == null) {
 					List<MPart> parts = modelService.findElements(area, null, MPart.class, null);
-					for (MPart part : parts) {
-						if (partService.isPartVisible(part)) {
-							partToActivate = part;
-							break;
-						}
-					}
+					if (parts.size() > 0)
+						partToActivate = parts.get(0);
 				}
 
 				if (partToActivate != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,11 +30,11 @@ import org.eclipse.ui.services.IServiceLocator;
  * It currently supports placement in menus.
  * </p>
  * <p>
- *
+ * 
  * @author Prakash G.R.
- *
+ * 
  * @since 3.5
- *
+ * 
  */
 public class DynamicMenuContributionItem extends ContributionItem {
 
@@ -45,14 +45,14 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/**
 	 * Creates a DynamicMenuContributionItem
-	 *
+	 * 
 	 * @param id
 	 *            - Id of the menu item
 	 * @param locator
 	 *            - The Service Locator
 	 * @param dynamicAddition
 	 *            - The Configuration Element defined in the plugin.xml
-	 *
+	 * 
 	 */
 	public DynamicMenuContributionItem(String id, IServiceLocator locator,
 			IConfigurationElement dynamicAddition) {
@@ -64,7 +64,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#isDynamic()
 	 */
 	@Override
@@ -77,7 +77,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#isDirty()
 	 */
 	@Override
@@ -90,85 +90,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#isEnabled()
-	 */
-	@Override
-	public boolean isEnabled() {
-		if (loadedDynamicContribution != null) {
-			return loadedDynamicContribution.isEnabled();
-		}
-		return super.isEnabled();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#isGroupMarker()
-	 */
-	@Override
-	public boolean isGroupMarker() {
-		if (loadedDynamicContribution != null) {
-			return loadedDynamicContribution.isGroupMarker();
-		}
-		return super.isGroupMarker();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#isSeparator()
-	 */
-	@Override
-	public boolean isSeparator() {
-		if (loadedDynamicContribution != null) {
-			return loadedDynamicContribution.isSeparator();
-		}
-		return super.isSeparator();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#isVisible()
-	 */
-	@Override
-	public boolean isVisible() {
-		if (loadedDynamicContribution != null) {
-			return loadedDynamicContribution.isVisible();
-		}
-		return super.isVisible();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#saveWidgetState()
-	 */
-	@Override
-	public void saveWidgetState() {
-		if (loadedDynamicContribution != null) {
-			loadedDynamicContribution.saveWidgetState();
-		}
-		super.saveWidgetState();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#setVisible(boolean)
-	 */
-	@Override
-	public void setVisible(boolean visible) {
-		if (loadedDynamicContribution != null) {
-			loadedDynamicContribution.setVisible(visible);
-		}
-		super.setVisible(visible);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .Composite)
@@ -182,7 +104,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .CoolBar, int)
@@ -196,7 +118,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .Menu, int)
@@ -210,7 +132,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
 	 * .ToolBar, int)
@@ -250,7 +172,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#dispose()
 	 */
 	@Override
@@ -264,7 +186,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.action.ContributionItem#update()
 	 */
 	@Override
@@ -283,7 +205,7 @@ public class DynamicMenuContributionItem extends ContributionItem {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface
 	 * .action.IContributionManager)

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 Dirk Fauth and others.
+ * Copyright (c) 2013 Dirk Fauth and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *    Dirk Fauth <dirk.fauth@googlemail.com> - initial API and implementation
- *    Fabian Miehe - Bug 440435
  *******************************************************************************/
 package org.eclipse.e4.ui.internal;
 
@@ -24,21 +23,17 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MLocalizable;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
-import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
-import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.osgi.service.log.LogService;
 
 /**
  * Default implementation of {@link ILocaleChangeService} that changes the {@link Locale} in the
  * specified {@link IEclipseContext} and additionally fires an event on the event bus.
- *
+ * 
  * @author Dirk Fauth
- *
+ * 
  */
 @SuppressWarnings("restriction")
 public class LocaleChangeServiceImpl implements ILocaleChangeService {
@@ -52,7 +47,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 
 	/**
 	 * Create a new {@link LocaleChangeServiceImpl} for the given {@link IEclipseContext}.
-	 *
+	 * 
 	 * @param application
 	 *            The application to retrieve the context from.
 	 */
@@ -66,7 +61,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 
 		// the TranslationService.LOCALE context parameter is specified as String
 		// so we put the String representation of the given Locale to the context
-		this.application.getContext().set(TranslationService.LOCALE, locale);
+		this.application.getContext().set(TranslationService.LOCALE, locale.toString());
 
 		// update model
 		updateLocalization(this.application.getChildren());
@@ -83,7 +78,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 			// set the locale to the application context
 			// use the resolved locale instead of the given locale string to avoid invalid locales
 			// in context
-			this.application.getContext().set(TranslationService.LOCALE, locale);
+			this.application.getContext().set(TranslationService.LOCALE, locale.toString());
 
 			// update model
 			updateLocalization(this.application.getChildren());
@@ -102,11 +97,11 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 	/**
 	 * Will iterate over the given list of {@link MUIElement}s and inform them about the Locale
 	 * change if necessary.
-	 *
+	 * 
 	 * @param children
 	 *            The list of {@link MUIElement}s that should be checked for Locale updates.
 	 */
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	protected void updateLocalization(List<? extends MUIElement> children) {
 		for (MUIElement element : children) {
 			if (element instanceof MElementContainer) {
@@ -114,33 +109,14 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 			}
 
 			if (element instanceof MWindow) {
-				MWindow window = (MWindow) element;
-				MMenu mainMenu = window.getMainMenu();
-				if (mainMenu != null) {
-					mainMenu.updateLocalization();
-					updateLocalization(mainMenu.getChildren());
-				}
-				updateLocalization(window.getSharedElements());
-				updateLocalization(window.getWindows());
+				((MWindow) element).getMainMenu().updateLocalization();
+				updateLocalization(((MWindow) element).getMainMenu().getChildren());
 			}
 
 			if (element instanceof MTrimmedWindow) {
 				for (MTrimBar trimBar : ((MTrimmedWindow) element).getTrimBars()) {
 					trimBar.updateLocalization();
 					updateLocalization(trimBar.getChildren());
-				}
-			}
-
-			if (element instanceof MPerspective) {
-				updateLocalization(((MPerspective) element).getWindows());
-			}
-
-			if (element instanceof MPart) {
-				MPart mPart = (MPart) element;
-				MToolBar toolbar = mPart.getToolbar();
-				if (toolbar != null && toolbar.getChildren() != null) {
-					toolbar.updateLocalization();
-					updateLocalization(toolbar.getChildren());
 				}
 			}
 

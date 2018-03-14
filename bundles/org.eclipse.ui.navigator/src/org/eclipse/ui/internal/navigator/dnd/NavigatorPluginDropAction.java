@@ -20,10 +20,10 @@ import org.eclipse.ui.part.IDropActionDelegate;
 import org.eclipse.ui.part.PluginTransferData;
 
 /**
- *
- *
+ * 
+ * 
  * @since 3.2
- *
+ * 
  */
 public class NavigatorPluginDropAction implements IDropActionDelegate {
 
@@ -37,7 +37,12 @@ public class NavigatorPluginDropAction implements IDropActionDelegate {
 		super();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.IDropActionDelegate#run(java.lang.Object,
+	 *      java.lang.Object)
+	 */
 	public boolean run(Object sourceData, Object target) {
 
 		if (Policy.DEBUG_DND) {
@@ -58,7 +63,7 @@ public class NavigatorPluginDropAction implements IDropActionDelegate {
 		try {
 			CommonDropAdapterAssistant[] assistants = contentService
 					.getDnDService().findCommonDropAdapterAssistants(target,
-							selection);
+							selection); 
 
 			IStatus valid = null;
 			for (int i = 0; i < assistants.length; i++) {
@@ -81,7 +86,7 @@ public class NavigatorPluginDropAction implements IDropActionDelegate {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param aContentService
 	 *            The associated content service that is the source of the drag
 	 * @return A PluginTransferData properly configured to call the Common

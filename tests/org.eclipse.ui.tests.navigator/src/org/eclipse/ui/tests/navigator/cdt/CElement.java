@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Oakland Software Incorporated and others.
+ * Copyright (c) 2009 Oakland Software Incorporated and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Oakland Software Incorporated - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  ******************************************************************************/
 
 package org.eclipse.ui.tests.navigator.cdt;
@@ -31,7 +30,7 @@ public class CElement implements IAdaptable {
 	protected List _children;
 
 	protected CNavigatorContentProvider _cp;
-
+	
 	public CElement(CNavigatorContentProvider cp, IResource resource, CElement parent) {
 		_cp = cp;
 		_resource = resource;
@@ -86,14 +85,12 @@ public class CElement implements IAdaptable {
 			_children.add(child);
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (adapter == IResource.class)
-			return adapter.cast(_resource);
+			return _resource;
 		return null;
 	}
 
-	@Override
 	public String toString() {
 		return getClass().getName() + ": " + _resource;
 	}

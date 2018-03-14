@@ -15,13 +15,16 @@ import org.eclipse.jface.viewers.Viewer;
 
 /**
  * Provides a tree model for <code>PreferenceManager</code> content.
- *
+ * 
  * @since 3.0
  */
 public class PreferenceContentProvider implements ITreeContentProvider {
 
     private PreferenceManager manager;
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
     @Override
 	public void dispose() {
         manager = null;
@@ -30,7 +33,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
     /**
      * Find the parent of the provided node.  Will search recursivly through the
      * preference tree.
-     *
+     * 
      * @param parent the possible parent node.
      * @param target the target child node.
      * @return the parent node of the child node.
@@ -58,16 +61,28 @@ public class PreferenceContentProvider implements ITreeContentProvider {
         return null;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+     */
     @Override
 	public Object[] getChildren(Object parentElement) {//must be an instance of <code>IPreferenceNode</code>.
         return ((IPreferenceNode) parentElement).getSubNodes();
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
     @Override
 	public Object[] getElements(Object inputElement) {// must be an instance of <code>PreferenceManager</code>.
         return getChildren(((PreferenceManager) inputElement).getRoot());
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+     */
     @Override
 	public Object getParent(Object element) {//must be an instance of <code>IPreferenceNode</code>.
         IPreferenceNode targetNode = (IPreferenceNode) element;
@@ -75,11 +90,17 @@ public class PreferenceContentProvider implements ITreeContentProvider {
         return findParent(root, targetNode);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+     */
     @Override
 	public boolean hasChildren(Object element) {
         return getChildren(element).length > 0;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         manager = (PreferenceManager) newInput;
@@ -87,7 +108,7 @@ public class PreferenceContentProvider implements ITreeContentProvider {
 	/**
 	 * Set the manager for the preferences.
 	 * @param manager The manager to set.
-	 *
+	 * 
 	 * @since 3.1
 	 */
 	protected void setManager(PreferenceManager manager) {

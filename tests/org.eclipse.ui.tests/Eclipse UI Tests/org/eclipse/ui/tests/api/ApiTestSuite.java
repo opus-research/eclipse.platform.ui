@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,16 +10,15 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.eclipse.ui.tests.api.workbenchpart.ArbitraryPropertyTest;
 import org.eclipse.ui.tests.api.workbenchpart.LifecycleViewTest;
 import org.eclipse.ui.tests.api.workbenchpart.OverriddenTitleTest;
 import org.eclipse.ui.tests.api.workbenchpart.RawIViewPartTest;
 import org.eclipse.ui.tests.api.workbenchpart.ViewPartTitleTest;
 import org.eclipse.ui.tests.ide.api.FileEditorInputTest;
-import org.eclipse.ui.tests.ide.api.IDETest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Test all areas of the UI API.
@@ -46,7 +45,6 @@ public class ApiTestSuite extends TestSuite {
         addTest(new TestSuite(IDeprecatedWorkbenchPageTest.class));
         addTest(new TestSuite(IActionFilterTest.class));
         addTest(new TestSuite(IPageListenerTest.class));
-        addTest(new TestSuite(IAggregateWorkingSetTest.class));
         addTest(new TestSuite(IPageServiceTest.class));
         addTest(new TestSuite(IPerspectiveRegistryTest.class));
         addTest(new TestSuite(IPerspectiveDescriptorTest.class));
@@ -67,6 +65,7 @@ public class ApiTestSuite extends TestSuite {
         addTest(new TestSuite(IWorkingSetTest.class));
         addTest(new TestSuite(IWorkingSetManagerTest.class));
         addTest(new TestSuite(IWorkingSetElementAdapterTests.class));
+        addTest(new TestSuite(IAggregateWorkingSetTest.class));
         addTest(new TestSuite(MockWorkingSetTest.class));
         addTest(new TestSuite(Bug42616Test.class));
         addTest(new TestSuite(StickyViewTest.class));
@@ -77,7 +76,6 @@ public class ApiTestSuite extends TestSuite {
         addTest(new TestSuite(UIJobTest.class));
         addTest(new TestSuite(Bug75118Test.class));
         addTest(new TestSuite(FileEditorInputTest.class));
-		addTest(new TestSuite(IDETest.class));
         addTest(new TestSuite(IEditorMatchingStrategyTest.class));
         addTest(new TestSuite(XMLMementoTest.class));
         //addTest(new TestSuite(IWorkbenchPartTestableTests.class));

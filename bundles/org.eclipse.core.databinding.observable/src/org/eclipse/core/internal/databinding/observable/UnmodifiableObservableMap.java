@@ -23,7 +23,7 @@ import org.eclipse.core.databinding.observable.map.IObservableMap;
  * IObservableMap implementation that prevents modification by consumers. Events
  * in the originating wrapped map are propagated and thrown from this instance
  * when appropriate. All mutators throw an UnsupportedOperationException.
- *
+ * 
  * @since 1.0
  */
 public class UnmodifiableObservableMap extends DecoratingObservableMap {
@@ -37,45 +37,37 @@ public class UnmodifiableObservableMap extends DecoratingObservableMap {
 		this.unmodifiableMap = Collections.unmodifiableMap(decorated);
 	}
 
-	@Override
 	public void clear() {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public Set entrySet() {
 		getterCalled();
 		return unmodifiableMap.entrySet();
 	}
 
-	@Override
 	public Set keySet() {
 		getterCalled();
 		return unmodifiableMap.keySet();
 	}
 
-	@Override
 	public Object put(Object key, Object value) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public void putAll(Map m) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public Object remove(Object key) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
 	public Collection values() {
 		getterCalled();
 		return unmodifiableMap.values();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		unmodifiableMap = null;
 		super.dispose();

@@ -30,7 +30,7 @@ import org.eclipse.core.internal.databinding.property.ListPropertyDetailValuesLi
 
 /**
  * Abstract implementation of IListProperty.
- *
+ * 
  * @since 1.2
  */
 public abstract class ListProperty implements IListProperty {
@@ -39,17 +39,16 @@ public abstract class ListProperty implements IListProperty {
 	 * By default, this method returns <code>Collections.EMPTY_LIST</code> in
 	 * case the source object is <code>null</code>. Otherwise, this method
 	 * delegates to {@link #doGetList(Object)}.
-	 *
+	 * 
 	 * <p>
 	 * Clients may override this method if they e.g. want to return a specific
 	 * default list in case the source object is <code>null</code>.
 	 * </p>
-	 *
+	 * 
 	 * @see #doGetList(Object)
-	 *
+	 * 
 	 * @since 1.3
 	 */
-	@Override
 	public List getList(Object source) {
 		if (source == null) {
 			return Collections.EMPTY_LIST;
@@ -59,7 +58,7 @@ public abstract class ListProperty implements IListProperty {
 
 	/**
 	 * Returns a List with the current contents of the source's list property
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @return a List with the current contents of the source's list property
@@ -78,7 +77,6 @@ public abstract class ListProperty implements IListProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void setList(Object source, List list) {
 		if (source != null) {
 			doSetList(source, list);
@@ -87,7 +85,7 @@ public abstract class ListProperty implements IListProperty {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param list
@@ -102,7 +100,6 @@ public abstract class ListProperty implements IListProperty {
 	/**
 	 * @since 1.3
 	 */
-	@Override
 	public final void updateList(Object source, ListDiff diff) {
 		if (source != null) {
 			doUpdateList(source, diff);
@@ -111,7 +108,7 @@ public abstract class ListProperty implements IListProperty {
 
 	/**
 	 * Updates the property on the source with the specified change
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param diff
@@ -127,38 +124,31 @@ public abstract class ListProperty implements IListProperty {
 		}
 	}
 
-	@Override
 	public IObservableList observe(Object source) {
 		return observe(Realm.getDefault(), source);
 	}
 
-	@Override
 	public IObservableFactory listFactory() {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableFactory listFactory(final Realm realm) {
 		return new IObservableFactory() {
-			@Override
 			public IObservable createObservable(Object target) {
 				return observe(realm, target);
 			}
 		};
 	}
 
-	@Override
 	public IObservableList observeDetail(IObservableValue master) {
 		return MasterDetailObservables.detailList(master,
 				listFactory(master.getRealm()), getElementType());
 	}
 
-	@Override
 	public final IListProperty values(IValueProperty detailValue) {
 		return new ListPropertyDetailValuesList(this, detailValue);
 	}

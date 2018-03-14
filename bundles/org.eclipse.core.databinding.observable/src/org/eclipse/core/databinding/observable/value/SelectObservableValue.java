@@ -22,9 +22,9 @@ import org.eclipse.core.internal.databinding.observable.Util;
  * value of the SelectObservableValue is the value of whichever option's
  * observable has a value of Boolean.TRUE, or null if none of the observable's
  * values are Boolean.TRUE.
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
- *
+ * 
  * @since 1.2
  */
 public class SelectObservableValue extends AbstractObservableValue {
@@ -46,7 +46,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 	private boolean updating = false;
 
 	private IValueChangeListener listener = new IValueChangeListener() {
-		@Override
 		public void handleValueChange(ValueChangeEvent event) {
 			if (!updating) {
 				IObservableValue observable = event.getObservableValue();
@@ -66,7 +65,7 @@ public class SelectObservableValue extends AbstractObservableValue {
 
 	/**
 	 * Constructs a SelectObservableValue on the specified realm.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm
 	 */
@@ -77,7 +76,7 @@ public class SelectObservableValue extends AbstractObservableValue {
 	/**
 	 * Constructs a SelectObservableValue on the default realm, with the given
 	 * value type.
-	 *
+	 * 
 	 * @param valueType
 	 *            the value type
 	 */
@@ -88,7 +87,7 @@ public class SelectObservableValue extends AbstractObservableValue {
 	/**
 	 * Constructs a SelectObservableValue on the given realm, with the given
 	 * value type.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm
 	 * @param valueType
@@ -100,7 +99,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 		this.options = new Option[0];
 	}
 
-	@Override
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 		selectionIndex = indexOfValue(getLiveValue());
@@ -109,7 +107,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 		}
 	}
 
-	@Override
 	protected void lastListenerRemoved() {
 		for (int i = 0; i < options.length; i++) {
 			options[i].observable.removeValueChangeListener(listener);
@@ -118,7 +115,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 		super.lastListenerRemoved();
 	}
 
-	@Override
 	public Object getValueType() {
 		return valueType;
 	}
@@ -135,7 +131,7 @@ public class SelectObservableValue extends AbstractObservableValue {
 	/**
 	 * Adds an option to this SelectObservableValue. If the observable contains
 	 * Boolean.TRUE then the selection changes immediately to the given value.
-	 *
+	 * 
 	 * @param value
 	 *            The value associated with the provided observable
 	 * @param observable
@@ -162,7 +158,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 		options = newOptions;
 	}
 
-	@Override
 	protected Object doGetValue() {
 		return hasListeners() ? valueAtIndex(selectionIndex) : getLiveValue();
 	}
@@ -175,7 +170,6 @@ public class SelectObservableValue extends AbstractObservableValue {
 		return null;
 	}
 
-	@Override
 	protected void doSetValue(Object value) {
 		int index = indexOfValue(value);
 
