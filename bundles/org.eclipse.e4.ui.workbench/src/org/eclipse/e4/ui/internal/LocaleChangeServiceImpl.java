@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Dirk Fauth and others.
+ * Copyright (c) 2013, 2014 Dirk Fauth and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,16 +76,18 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 			Locale locale = ResourceBundleHelper.toLocale(localeString);
 
 			// set the locale to the application context
-			this.application.getContext().set(TranslationService.LOCALE, localeString);
+			// use the resolved locale instead of the given locale string to avoid invalid locales
+			// in context
+			this.application.getContext().set(TranslationService.LOCALE, locale.toString());
 
 			// update model
 			updateLocalization(this.application.getChildren());
 
 			// fire event
 			broker.post(LOCALE_CHANGE, locale);
-		} catch (IllegalArgumentException e) {
-			// parsing the locale String to a Locale failed because of invalid
-			// String - there is no locale change performed
+		} catch (Exception e) {
+			// performing a locale update failed
+			// there is no locale change performed
 			if (logService != null)
 				logService.log(LogService.LOG_ERROR, e.getMessage()
 						+ " - No Locale change will be performed."); //$NON-NLS-1$
@@ -106,7 +108,7 @@ public class LocaleChangeServiceImpl implements ILocaleChangeService {
 				updateLocalization(((MElementContainer) element).getChildren());
 			}
 
-			if (element instanceof MWindow) {
+			if (element instanceof MWindow && ((MWindow) element).getMainMenu() != null) {
 				((MWindow) element).getMainMenu().updateLocalization();
 				updateLocalization(((MWindow) element).getMainMenu().getChildren());
 			}
