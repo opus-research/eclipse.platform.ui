@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 BestSolution.at and others.
+ * Copyright (c) 2008, 2015 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *     IBM Corporation - initial API and implementation
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
@@ -112,5 +113,4 @@ public interface IWorkbench {
 	 * @return <code>false</code> if the restart is aborted
 	 */
 	public boolean restart();
-
 }

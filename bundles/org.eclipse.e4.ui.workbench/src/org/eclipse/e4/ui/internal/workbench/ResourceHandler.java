@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Terry Parker <tparker@google.com> - Bug 416673
+ *     Bartosz Popiela <bartoszpop@gmail.com> - Bug 434108
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -276,8 +277,17 @@ public class ResourceHandler implements IModelResourceHandler {
 
 	@Override
 	public void save() throws IOException {
-		if (saveAndRestore)
+		if (isSaveAllowed()) {
 			resource.save(null);
+		} else {
+			logger.error(new Exception(), // log a stack trace for debugging
+					"Attempted to save a workbench model that had no top-level windows! " //$NON-NLS-1$
+							+ "Skipped saving the model to avoid corruption."); //$NON-NLS-1$
+		}
+	}
+
+	private boolean isSaveAllowed() {
+		return saveAndRestore && hasTopLevelWindows();
 	}
 
 	/**
