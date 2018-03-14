@@ -15,6 +15,7 @@
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
@@ -389,7 +390,7 @@ public class Snippet061FakedNativeCellEditor {
 
 	public class File {
 		public File parent;
-		public ArrayList<File> child = new ArrayList<File>();
+		public List<File> child = new ArrayList<File>();
 		public int counter;
 
 		public boolean read;

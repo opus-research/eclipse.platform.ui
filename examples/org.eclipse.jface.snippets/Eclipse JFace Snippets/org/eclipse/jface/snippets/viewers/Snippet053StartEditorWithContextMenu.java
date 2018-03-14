@@ -12,6 +12,7 @@
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
@@ -80,7 +81,7 @@ public class Snippet053StartEditorWithContextMenu implements SelectionListener {
 
 	public class MyModel {
 		public MyModel parent;
-		public ArrayList<MyModel> child = new ArrayList<MyModel>();
+		public List<MyModel> child = new ArrayList<MyModel>();
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {

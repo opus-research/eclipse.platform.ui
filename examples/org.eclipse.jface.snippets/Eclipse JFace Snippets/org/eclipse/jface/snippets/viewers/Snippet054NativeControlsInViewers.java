@@ -12,6 +12,9 @@
 
 package org.eclipse.jface.snippets.viewers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -76,8 +79,7 @@ public class Snippet054NativeControlsInViewers {
 		column = createColumnFor(viewer, "Column 2");
 		column.setLabelProvider(createCellLabelProvider());
 
-		MyModel[] model = createModel(10);
-		viewer.setInput(model);
+		viewer.setInput(createModel(10));
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
 
@@ -170,11 +172,11 @@ public class Snippet054NativeControlsInViewers {
 		return column;
 	}
 
-	private MyModel[] createModel(int amount) {
-		MyModel[] elements = new MyModel[amount];
+	private List<MyModel> createModel(int amount) {
+		List<MyModel> elements = new ArrayList<MyModel>();
 
 		for (int i = 0; i < amount; i++) {
-			elements[i] = new MyModel(i);
+			elements.add(new MyModel(i));
 		}
 		return elements;
 	}
