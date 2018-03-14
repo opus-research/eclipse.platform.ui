@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
+import junit.framework.Assert;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.ContributionItem;
@@ -31,7 +33,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.internal.WorkbenchImages;
-import org.junit.Assert;
 
 public class MockViewPart extends MockWorkbenchPart implements IViewPart {
 	public static String ID = "org.eclipse.ui.tests.api.MockViewPart";
