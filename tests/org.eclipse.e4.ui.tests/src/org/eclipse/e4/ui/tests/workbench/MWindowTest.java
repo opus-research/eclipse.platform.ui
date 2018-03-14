@@ -11,7 +11,12 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.eclipse.e4.core.commands.CommandServiceAddon;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -41,40 +46,35 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  *
  */
-public class MWindowTest extends TestCase {
+public class MWindowTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
+	@Test
 	public void testCreateWindow() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -95,6 +95,7 @@ public class MWindowTest extends TestCase {
 		assertEquals(topWidget, appContext.get(IServiceConstants.ACTIVE_SHELL));
 	}
 
+	@Test
 	public void testWindowVisibility() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -122,6 +123,7 @@ public class MWindowTest extends TestCase {
 		assertTrue(shell.getVisible() == true);
 	}
 
+	@Test
 	public void testWindowInvisibleCreate() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("MyWindow");
@@ -144,6 +146,7 @@ public class MWindowTest extends TestCase {
 		assertTrue(shell.getVisible() == false);
 	}
 
+	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView();
 
@@ -169,6 +172,7 @@ public class MWindowTest extends TestCase {
 		assertTrue(viewPart[0] instanceof Tree);
 	}
 
+	@Test
 	public void testContextChildren() {
 		final MWindow window = createWindowWithOneView();
 
@@ -219,6 +223,7 @@ public class MWindowTest extends TestCase {
 		assertEquals(window, contextPart.getParent().getParent().getParent());
 	}
 
+	@Test
 	public void testCreateMenu() {
 		final MWindow window = createWindowWithOneViewAndMenu();
 
@@ -262,6 +267,7 @@ public class MWindowTest extends TestCase {
 		fileMenu.notifyListeners(SWT.Hide, null);
 	}
 
+	@Test
 	public void testWindow_Name() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setLabel("windowName");
@@ -289,6 +295,8 @@ public class MWindowTest extends TestCase {
 		assertEquals("windowName2", shell.getText());
 	}
 
+	@Ignore
+	@Test
 	public void TODOtestWindow_X() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -326,6 +334,8 @@ public class MWindowTest extends TestCase {
 		assertEquals(300, bounds.x);
 	}
 
+	@Ignore
+	@Test
 	public void TODOtestWindow_Y() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -363,6 +373,7 @@ public class MWindowTest extends TestCase {
 		assertEquals(300, bounds.y);
 	}
 
+	@Test
 	public void testWindow_Width() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
@@ -397,6 +408,7 @@ public class MWindowTest extends TestCase {
 		assertEquals(300, shell.getBounds().width);
 	}
 
+	@Test
 	public void testWindow_Height() {
 		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setX(200);
