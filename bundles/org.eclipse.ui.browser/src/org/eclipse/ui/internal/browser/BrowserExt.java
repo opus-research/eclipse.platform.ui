@@ -145,6 +145,7 @@ public class BrowserExt implements IBrowserExt {
 	 *
 	 * @return java.lang.String
 	 */
+	@Override
 	public String toString() {
 		String s = "BrowserExt: " + getId() + ", " + getName() + ", " + getOS()  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 				+ ", " + getExecutable() + ", " + getParameters() + ", ";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$

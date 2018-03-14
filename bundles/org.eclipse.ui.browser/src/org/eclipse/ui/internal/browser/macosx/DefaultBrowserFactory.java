@@ -17,6 +17,7 @@ public class DefaultBrowserFactory extends BrowserFactory {
 	/*
 	 * @see BrowserFactory#createBrowser()
 	 */
+	@Override
 	public IWebBrowser createBrowser(String id, String location, String parameters) {
 		return new DefaultBrowser(id);
 	}

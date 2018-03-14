@@ -186,6 +186,7 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 * editor.
 	 * @return true if the url and browser id are equal and the style bits are compatible
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
@@ -367,10 +368,12 @@ public class WebBrowserEditorInput implements IEditorInput,
 	 *
 	 * @return java.lang.String
 	 */
+	@Override
 	public String toString() {
 		return "WebBrowserEditorInput[" + url + " " + style + " " + id + "]";  //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
+	@Override
 	public int hashCode() {
 		int result = 0;
 		if (url != null) {

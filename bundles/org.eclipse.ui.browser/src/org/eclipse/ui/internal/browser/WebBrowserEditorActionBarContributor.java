@@ -44,6 +44,7 @@ public class WebBrowserEditorActionBarContributor extends EditorActionBarContrib
 	/*
 	 * Sets the active editor for the contributor.
 	 */
+	@Override
 	public void setActiveEditor(IEditorPart targetEditor) {
 		if (targetEditor instanceof WebBrowserEditor) {
 			editor = (WebBrowserEditor) targetEditor;
@@ -61,7 +62,8 @@ public class WebBrowserEditorActionBarContributor extends EditorActionBarContrib
 	/*
     * Contributes to the given tool bar.
     */
-   public void contributeToToolBar(IToolBarManager toolBarManager) {
+   @Override
+public void contributeToToolBar(IToolBarManager toolBarManager) {
    	if (editor == null)
    		return;
    	/*WebBrowserEditorInput input = editor.getWebBrowserEditorInput();

@@ -81,6 +81,7 @@ public class MozillaFactory extends BrowserFactory {
 	/*
 	 * @see BrowserFactory#createBrowser()
 	 */
+	@Override
 	public IWebBrowser createBrowser(String id, String location, String parameters) {
 		// Create single browser for all clients
 		if (browserInstance == null || !browserInstance.getExecutable().equals(location)) {

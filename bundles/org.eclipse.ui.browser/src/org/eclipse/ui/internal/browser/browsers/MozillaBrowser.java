@@ -163,6 +163,7 @@ public class MozillaBrowser extends AbstractWebBrowser {
 			return false;
 		}
 
+		@Override
 		public void run() {
 			// if browser is opening, wait until it fully opens
 			waitForBrowser();

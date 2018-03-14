@@ -128,6 +128,7 @@ public class TextAction extends Action {
 	/**
 	 * Implementation of method defined on <code>IAction</code>.
 	 */
+	@Override
 	public void run() {
 		if (browser == null || browser.combo == null)
 			return;

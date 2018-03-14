@@ -48,6 +48,7 @@ public class BusyIndicator extends Canvas {
 		image = images[0];
 	}
 
+	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		return new Point(25, 25);
 	}
@@ -62,6 +63,7 @@ public class BusyIndicator extends Canvas {
 		stop = false;
 		busyThread = new Thread() {
 			protected int count;
+			@Override
 			public void run() {
 				try {
 					count = 1;
@@ -85,6 +87,7 @@ public class BusyIndicator extends Canvas {
 					}
 					if (busyThread == null)
 						Display.getDefault().syncExec(new Thread() {
+							@Override
 							public void run() {
 								setImage(images[0]);
 							}
@@ -100,6 +103,7 @@ public class BusyIndicator extends Canvas {
 		busyThread.start();
 	}
 
+	@Override
 	public void dispose() {
 		stop = true;
 		busyThread = null;

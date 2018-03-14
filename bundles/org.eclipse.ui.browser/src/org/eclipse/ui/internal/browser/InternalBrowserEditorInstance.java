@@ -52,6 +52,7 @@ public class InternalBrowserEditorInstance extends InternalBrowserInstance {
 		}
 	}
 
+	@Override
 	public boolean close() {
 		try {
 			return ((WebBrowserEditor)part).close();

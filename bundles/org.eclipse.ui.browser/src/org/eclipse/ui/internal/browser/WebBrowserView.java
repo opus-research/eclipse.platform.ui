@@ -43,6 +43,7 @@ public class WebBrowserView extends ViewPart implements
 
 	protected ISelectionListener listener;
 
+	@Override
 	public void createPartControl(Composite parent) {
 		int style = WebBrowserUtil.decodeStyle(getViewSite().getSecondaryId());
 		viewer = new BrowserViewer(parent, style);
@@ -59,6 +60,7 @@ public class WebBrowserView extends ViewPart implements
 		initDragAndDrop();
 	}
 
+	@Override
 	public void dispose() {
 		if (viewer!=null)
 			viewer.setContainer(null);
@@ -71,6 +73,7 @@ public class WebBrowserView extends ViewPart implements
 			viewer.setURL(url);
 	}
 
+	@Override
 	public void setFocus() {
 		viewer.setFocus();
 	}

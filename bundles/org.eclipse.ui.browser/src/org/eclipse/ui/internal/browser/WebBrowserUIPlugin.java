@@ -55,6 +55,7 @@ public class WebBrowserUIPlugin extends AbstractUIPlugin {
 	 *
 	 * @exception Exception
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
 		BrowserManager.safeDispose();

@@ -697,7 +697,8 @@ public class BrowserViewer extends Composite {
     /**
      *
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         super.dispose();
 
         showToolbar = false;
@@ -721,7 +722,8 @@ public class BrowserViewer extends Composite {
         updateHistory();
 
         combo.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent we) {
+            @Override
+			public void widgetSelected(SelectionEvent we) {
                 try {
                     if (combo.getSelectionIndex() != -1 && !combo.getListVisible()) {
                         setURL(combo.getItem(combo.getSelectionIndex()));
@@ -746,7 +748,8 @@ public class BrowserViewer extends Composite {
                 .getImage(ImageResource.IMG_DLCL_NAV_GO));
         go.setToolTipText(Messages.actionWebBrowserGo);
         go.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 setURL(combo.getText());
             }
         });
@@ -767,7 +770,8 @@ public class BrowserViewer extends Composite {
                 .getImage(ImageResource.IMG_DLCL_NAV_BACKWARD));
         back.setToolTipText(Messages.actionWebBrowserBack);
         back.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 back();
             }
         });
@@ -781,7 +785,8 @@ public class BrowserViewer extends Composite {
                 .getImage(ImageResource.IMG_DLCL_NAV_FORWARD));
         forward.setToolTipText(Messages.actionWebBrowserForward);
         forward.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 forward();
             }
         });
@@ -795,7 +800,8 @@ public class BrowserViewer extends Composite {
                 .getImage(ImageResource.IMG_DLCL_NAV_STOP));
         stop.setToolTipText(Messages.actionWebBrowserStop);
         stop.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 stop();
             }
         });
@@ -809,7 +815,8 @@ public class BrowserViewer extends Composite {
                 .getImage(ImageResource.IMG_DLCL_NAV_REFRESH));
         refresh.setToolTipText(Messages.actionWebBrowserRefresh);
         refresh.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 refresh();
             }
         });
@@ -838,7 +845,8 @@ public class BrowserViewer extends Composite {
         return text.getUrl();
     }
 
-    public boolean setFocus() {
+    @Override
+	public boolean setFocus() {
         if (browser!=null) {
             browser.setFocus();
             updateHistory();
@@ -889,7 +897,8 @@ public class BrowserViewer extends Composite {
    		 return;
 
    	 fileListenerThread = new Thread("Browser file synchronization") { //$NON-NLS-1$
-   		 public void run() {
+   		 @Override
+		public void run() {
    			 while (fileListenerThread != null) {
    				 try {
    					 Thread.sleep(2000);

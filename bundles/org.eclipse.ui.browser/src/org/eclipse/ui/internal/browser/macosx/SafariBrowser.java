@@ -30,6 +30,7 @@ public class SafariBrowser extends DefaultBrowser {
 	 * @param url
 	 * @return String[]
 	 */
+	@Override
 	protected String[] prepareCommand(String path, String url) {
 		if (url != null && url.toLowerCase().startsWith("file:")) { //$NON-NLS-1$
 			url = url.substring(5);

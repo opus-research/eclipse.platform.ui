@@ -59,7 +59,8 @@ public class BrowserText {
             super(parent, style);
         }
 
-        public void reflow(boolean flushCache) {
+        @Override
+		public void reflow(boolean flushCache) {
             updateWidth(this);
             super.reflow(flushCache);
         }
@@ -92,7 +93,8 @@ public class BrowserText {
         link.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         link.setToolTipText(Messages.BrowserText_tooltip);
         link.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 BusyIndicator.showWhile(link.getDisplay(), new Runnable() {
                     public void run() {
                         doOpenExternal();
@@ -115,7 +117,8 @@ public class BrowserText {
         button = new Button(parent, SWT.PUSH);
         updateButtonText();
         button.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 toggleException();
             }
         });

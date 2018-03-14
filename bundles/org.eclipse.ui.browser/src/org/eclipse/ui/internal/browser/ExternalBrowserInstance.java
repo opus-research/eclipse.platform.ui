@@ -95,6 +95,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 					Messages.errorCouldNotLaunchWebBrowser, urlText));
 		}
 		Thread thread = new Thread() {
+			@Override
 			public void run() {
 				try {
 					process.waitFor();
@@ -137,6 +138,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 	}
 
 
+	@Override
 	public boolean close() {
 		try {
 			process.destroy();

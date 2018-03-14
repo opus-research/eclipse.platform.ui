@@ -35,6 +35,7 @@ public class SystemBrowserDescriptor implements IBrowserDescriptor {
 		return null;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		return obj instanceof SystemBrowserDescriptor;
 	}

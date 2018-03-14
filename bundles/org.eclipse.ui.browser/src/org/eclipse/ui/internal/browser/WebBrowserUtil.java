@@ -363,6 +363,7 @@ public class WebBrowserUtil {
 	 * @deprecated Please use {@link #createParameterArray(String, String)}
 	 *             instead.
 	 */
+	@Deprecated
 	public static String createParameterString(String parameters, String urlText) {
 		String params = parameters;
 		String url = urlText;

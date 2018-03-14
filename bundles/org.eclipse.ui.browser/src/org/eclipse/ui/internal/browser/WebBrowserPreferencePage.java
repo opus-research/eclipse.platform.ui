@@ -156,6 +156,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 	 *            org.eclipse.swt.widgets.Composite
 	 * @return org.eclipse.swt.widgets.Control
 	 */
+	@Override
 	protected Control createContents(Composite parent) {
 		initializeDialogUnits(parent);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
@@ -335,6 +336,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		final Button add = SWTUtil.createButton(buttonComp, Messages.add);
 		add.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				BrowserDescriptorDialog dialog = new BrowserDescriptorDialog(
 						getShell());
@@ -348,6 +350,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		edit = SWTUtil.createButton(buttonComp, Messages.edit);
 		edit.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IStructuredSelection sel = ((IStructuredSelection) tableViewer
 						.getSelection());
@@ -368,6 +371,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 
 		remove = SWTUtil.createButton(buttonComp, Messages.remove);
 		remove.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				IStructuredSelection sel = ((IStructuredSelection) tableViewer
 						.getSelection());
@@ -400,6 +404,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		data = (GridData) search.getLayoutData();
 		data.verticalIndent = 9;
 		search.addSelectionListener(new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				final List<IBrowserDescriptorWorkingCopy> foundBrowsers = new ArrayList<IBrowserDescriptorWorkingCopy>();
 				final List<String> existingPaths = WebBrowserUtil
@@ -510,6 +515,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 	/**
 	 *
 	 */
+	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible)
@@ -586,6 +592,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 	 * Performs special processing when this page's Defaults button has been
 	 * pressed.
 	 */
+	@Override
 	protected void performDefaults() {
 		internal.setSelection(WebBrowserPreference
 				.isDefaultUseInternalBrowser());
@@ -606,6 +613,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 	/**
 	 * Method declared on IPreferencePage. Subclasses should override
 	 */
+	@Override
 	public boolean performOk() {
 		int choice;
 		if (internal.getSelection())
@@ -622,6 +630,7 @@ public class WebBrowserPreferencePage extends PreferencePage implements
 		return true;
 	}
 
+	@Override
 	public boolean performCancel() {
 		BrowserManager.getInstance().loadBrowsers();
 		return super.performCancel();

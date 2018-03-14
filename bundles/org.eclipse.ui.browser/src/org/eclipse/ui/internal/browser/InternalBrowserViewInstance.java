@@ -48,6 +48,7 @@ public class InternalBrowserViewInstance extends InternalBrowserInstance {
         }
 	}
 
+	@Override
 	public boolean close() {
         return ((WebBrowserView)part).close();
 	}
