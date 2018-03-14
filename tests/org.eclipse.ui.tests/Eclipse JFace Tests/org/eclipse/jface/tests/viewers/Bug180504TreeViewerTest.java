@@ -7,21 +7,20 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  ******************************************************************************/
 
 package org.eclipse.jface.tests.viewers;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -44,6 +43,7 @@ public class Bug180504TreeViewerTest extends ViewerTestCase {
 			this.counter = counter;
 		}
 
+		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
@@ -63,28 +63,34 @@ public class Bug180504TreeViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TreeViewer treeViewer = new TreeViewer(parent, SWT.FULL_SELECTION);
 
 		treeViewer.setContentProvider(new ITreeContentProvider() {
 
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return ((MyModel) inputElement).child.toArray();
 			}
 
+			@Override
 			public void dispose() {
 
 			}
 
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
 			}
 
+			@Override
 			public Object[] getChildren(Object parentElement) {
 				return getElements(parentElement);
 			}
 
+			@Override
 			public Object getParent(Object element) {
 				if (element == null) {
 					return null;
@@ -93,39 +99,48 @@ public class Bug180504TreeViewerTest extends ViewerTestCase {
 				return ((MyModel) element).parent;
 			}
 
+			@Override
 			public boolean hasChildren(Object element) {
 				return ((MyModel) element).child.size() > 0;
 			}
 		});
 
-		treeViewer.setCellEditors(new CellEditor[] { new TextCellEditor(
-				treeViewer.getTree()) });
-		treeViewer.setColumnProperties(new String[] { "0" });
-		treeViewer.setCellModifier(new ICellModifier() {
-			public boolean canModify(Object element, String property) {
-				return true;
-			}
+		TreeColumn column = new TreeColumn(treeViewer.getTree(), SWT.NONE);
+		column.setWidth(200);
 
-			public Object getValue(Object element, String property) {
-				return "";
-			}
+		TreeViewerColumn tableViewerColumn = new TreeViewerColumn(treeViewer, column);
+		tableViewerColumn.setEditingSupport(new EditingSupport(treeViewer) {
 
-			public void modify(Object element, String property, Object value) {
+			@Override
+			protected void setValue(Object element, Object value) {
 				treeViewer.getControl().dispose();
 			}
 
+			@Override
+			protected Object getValue(Object element) {
+				return "";
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return new TextCellEditor(treeViewer.getTree());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
 		});
-
-		new TreeColumn(treeViewer.getTree(), SWT.NONE).setWidth(200);
-
 		return treeViewer;
 	}
 
+	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
+	@Override
 	protected void setInput() {
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;
@@ -148,27 +163,7 @@ public class Bug180504TreeViewerTest extends ViewerTestCase {
 
 	public void testBug201002() {
 		getTreeViewer().editElement(((MyModel)((MyModel)getTreeViewer().getInput()).child.get(90)).child.get(10), 0);
-		Method m;
-		try {
-			m = ColumnViewer.class.getDeclaredMethod("applyEditorValue", new Class[0]);
-			m.setAccessible(true);
-			m.invoke(getTreeViewer(), new Object[0]);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		getTreeViewer().applyEditorValue();
 	}
 
 	public void testBug180504CancleEditor() {

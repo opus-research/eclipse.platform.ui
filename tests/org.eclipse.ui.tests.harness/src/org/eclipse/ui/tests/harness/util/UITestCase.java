@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -14,7 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -34,22 +34,22 @@ import org.eclipse.ui.WorkbenchException;
 
 /**
  * <code>UITestCase</code> is a useful super class for most
- * UI tests cases.  It contains methods to create new windows 
- * and pages.  It will also automatically close the test 
+ * UI tests cases.  It contains methods to create new windows
+ * and pages.  It will also automatically close the test
  * windows when the tearDown method is called.
  */
 public abstract class UITestCase extends TestCase {
 
 	/**
 	 * Returns the workbench page input to use for newly created windows.
-	 *  
+	 *
 	 * @return the page input to use for newly created windows
 	 * @since 3.1
 	 */
 	public static IAdaptable getPageInput() {
 		return ResourcesPlugin.getWorkspace().getRoot();
 	}
-	
+
 	class TestWindowListener implements IWindowListener {
         private boolean enabled = true;
 
@@ -57,20 +57,24 @@ public abstract class UITestCase extends TestCase {
             this.enabled = enabled;
         }
 
-        public void windowActivated(IWorkbenchWindow window) {
+        @Override
+		public void windowActivated(IWorkbenchWindow window) {
             // do nothing
         }
 
-        public void windowDeactivated(IWorkbenchWindow window) {
+        @Override
+		public void windowDeactivated(IWorkbenchWindow window) {
             // do nothing
         }
 
-        public void windowClosed(IWorkbenchWindow window) {
+        @Override
+		public void windowClosed(IWorkbenchWindow window) {
             if (enabled)
                 testWindows.remove(window);
         }
 
-        public void windowOpened(IWorkbenchWindow window) {
+        @Override
+		public void windowOpened(IWorkbenchWindow window) {
             if (enabled)
                 testWindows.add(window);
         }
@@ -78,14 +82,14 @@ public abstract class UITestCase extends TestCase {
 
     protected IWorkbench fWorkbench;
 
-    private List testWindows;
+    private List<IWorkbenchWindow> testWindows;
 
     private TestWindowListener windowListener;
 
     public UITestCase(String testName) {
         super(testName);
         //		ErrorDialog.NO_UI = true;
-        testWindows = new ArrayList(3);
+        testWindows = new ArrayList<IWorkbenchWindow>(3);
     }
 
 	/**
@@ -148,7 +152,7 @@ public abstract class UITestCase extends TestCase {
     }
 
     /**
-     * Removes the listener added by <code>addWindowListener</code>. 
+     * Removes the listener added by <code>addWindowListener</code>.
      */
     private void removeWindowListener() {
         if (windowListener != null) {
@@ -159,7 +163,7 @@ public abstract class UITestCase extends TestCase {
     /**
      * Outputs a trace message to the trace output device, if enabled.
      * By default, trace messages are sent to <code>System.out</code>.
-     * 
+     *
      * @param msg the trace message
      */
     protected void trace(String msg) {
@@ -167,18 +171,19 @@ public abstract class UITestCase extends TestCase {
     }
 
     /**
-     * Simple implementation of setUp. Subclasses are prevented 
+     * Simple implementation of setUp. Subclasses are prevented
      * from overriding this method to maintain logging consistency.
      * doSetUp() should be overriden instead.
      */
-    protected final void setUp() throws Exception {
+    @Override
+	protected final void setUp() throws Exception {
     	super.setUp();
 		fWorkbench = PlatformUI.getWorkbench();
     	trace("----- " + this.getName()); //$NON-NLS-1$
         trace(this.getName() + ": setUp..."); //$NON-NLS-1$
         addWindowListener();
         doSetUp();
-       
+
     }
 
     /**
@@ -192,11 +197,12 @@ public abstract class UITestCase extends TestCase {
     }
 
     /**
-     * Simple implementation of tearDown.  Subclasses are prevented 
+     * Simple implementation of tearDown.  Subclasses are prevented
      * from overriding this method to maintain logging consistency.
      * doTearDown() should be overriden instead.
      */
-    protected final void tearDown() throws Exception {
+    @Override
+	protected final void tearDown() throws Exception {
         super.tearDown();
         trace(this.getName() + ": tearDown...\n"); //$NON-NLS-1$
         removeWindowListener();
@@ -227,9 +233,9 @@ public abstract class UITestCase extends TestCase {
     protected static interface Condition {
     	public boolean compute();
     }
-    
+
 	/**
-	 * 
+	 *
 	 * @param condition
 	 *            , or null if this should only wait
 	 * @param timeout
@@ -255,8 +261,8 @@ public abstract class UITestCase extends TestCase {
 		}
 		return true;
 	}
-    
-    /** 
+
+    /**
      * Open a test window with the empty perspective.
      */
     public IWorkbenchWindow openTestWindow() {
@@ -281,7 +287,7 @@ public abstract class UITestCase extends TestCase {
     /**
 	 * Try and process events until the new shell is the active shell. This may
 	 * never happen, so time out after a suitable period.
-	 * 
+	 *
 	 * @param shell
 	 *            the shell to wait on
 	 * @since 3.2
@@ -301,12 +307,11 @@ public abstract class UITestCase extends TestCase {
 	 * Close all test windows.
 	 */
     public void closeAllTestWindows() {
-        Iterator iter = new ArrayList(testWindows).iterator();
-        while (iter.hasNext()) {
-            IWorkbenchWindow win = (IWorkbenchWindow) iter.next();
-            win.close();
+		List<IWorkbenchWindow> testWindowsCopy = new ArrayList<IWorkbenchWindow>(testWindows);
+		for (IWorkbenchWindow testWindow : testWindowsCopy) {
+			testWindow.close();
         }
-        testWindows.clear();
+		testWindows.clear();
     }
 
     /**
@@ -353,10 +358,10 @@ public abstract class UITestCase extends TestCase {
     protected void manageWindows(boolean manage) {
         windowListener.setEnabled(manage);
     }
-    
+
     /**
      * Returns the workbench.
-     * 
+     *
      * @return the workbench
      * @since 3.1
      */

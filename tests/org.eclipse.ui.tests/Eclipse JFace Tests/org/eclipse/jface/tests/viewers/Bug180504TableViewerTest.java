@@ -7,19 +7,17 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 242231
  ******************************************************************************/
 
 package org.eclipse.jface.tests.viewers;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -39,37 +37,46 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		final TableViewer tableViewer = new TableViewer(parent, SWT.FULL_SELECTION);
 		tableViewer.setContentProvider(new ArrayContentProvider());
-		tableViewer.setCellEditors(new CellEditor[] { new TextCellEditor(
-				tableViewer.getTable()) });
-		tableViewer.setColumnProperties(new String[] { "0" });
-		tableViewer.setCellModifier(new ICellModifier() {
-			public boolean canModify(Object element, String property) {
-				return true;
-			}
+		TableColumn column = new TableColumn(tableViewer.getTable(), SWT.NONE);
+		column.setWidth(200);
 
-			public Object getValue(Object element, String property) {
-				return "";
-			}
+		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, column);
+		tableViewerColumn.setEditingSupport(new EditingSupport(tableViewer) {
 
-			public void modify(Object element, String property, Object value) {
+			@Override
+			protected void setValue(Object element, Object value) {
 				tableViewer.getControl().dispose();
 			}
 
+			@Override
+			protected Object getValue(Object element) {
+				return "";
+			}
+
+			@Override
+			protected CellEditor getCellEditor(Object element) {
+				return new TextCellEditor(tableViewer.getTable());
+			}
+
+			@Override
+			protected boolean canEdit(Object element) {
+				return true;
+			}
 		});
-
-	    new TableColumn(tableViewer.getTable(), SWT.NONE).setWidth(200);
-
 		return tableViewer;
 	}
 
+	@Override
 	protected void setUpModel() {
 		// don't do anything here - we are not using the normal fModel and
 		// fRootElement
 	}
 
+	@Override
 	protected void setInput() {
 		String[] ar = new String[100];
 		for( int i = 0; i < ar.length; i++ ) {
@@ -84,28 +91,7 @@ public class Bug180504TableViewerTest extends ViewerTestCase {
 
 	public void testBug180504ApplyEditor() {
 		getTableViewer().editElement(getTableViewer().getElementAt(0), 0);
-		Method m;
-		try {
-			m = ColumnViewer.class.getDeclaredMethod("applyEditorValue", new Class[0]);
-			m.setAccessible(true);
-			m.invoke(getTableViewer(), new Object[0]);
-		} catch (SecurityException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-
-		}
+		getTableViewer().applyEditorValue();
 	}
 
 	public void testBug180504CancleEditor() {
