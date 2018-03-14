@@ -6,16 +6,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *	   Marcus Eng (Google) - initial API and implementation
- *	   Sergey Prigogin (Google)
+ *     Marcus Eng (Google) - initial API and implementation
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import java.lang.management.ThreadInfo;
-import java.util.Arrays;
-
 import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
+
+import java.lang.management.ThreadInfo;
+import java.util.Arrays;
 
 /**
  * Checks if the {@link UiFreezeEvent} matches any defined filters.
@@ -66,16 +65,13 @@ public class FilterHandler {
 	}
 
 	/**
-	 * Returns {@code true} if the stack samples do not contain filtered stack frames.
-	 *
-	 * @param stackSamples stack trace samples for the currently stalled event
-	 * @param numSamples the number of valid stack trace samples in the stackSamples array
-	 * @param displayThreadId the ID of the display thread
+	 * Returns {@code true} if the {@link UiFreezeEvent} can be logged after checking the
+	 * contained {@link StackSample}s against the defined filters.
 	 */
-	public boolean shouldLogEvent(StackSample[] stackSamples, int numSamples,
-			long displayThreadId) {
-		for (int i = 0; i < numSamples; i++) {
-			if (hasFilteredTraces(stackSamples[i].getStackTraces(), displayThreadId)) {
+	public boolean shouldLogEvent(UiFreezeEvent event, long displayThreadId) {
+		for (int i = 0; i < event.getSampleCount(); i++) {
+			StackSample sample = event.getStackTraceSamples()[i];
+			if (hasFilteredTraces(sample.getStackTraces(), displayThreadId)) {
 				return false;
 			}
 		}
@@ -83,8 +79,7 @@ public class FilterHandler {
 	}
 
 	/**
-	 * Checks if the stack trace contains fully qualified names of the methods that should be
-	 * ignored.
+	 * Checks if the stack trace contains fully qualified methods that were specified to be ignored.
 	 */
 	private boolean hasFilteredTraces(ThreadInfo[] stackTraces, long displayThreadId) {
 		for (ThreadInfo threadInfo : stackTraces) {

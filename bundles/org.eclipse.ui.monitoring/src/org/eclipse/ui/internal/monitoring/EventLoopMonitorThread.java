@@ -8,18 +8,8 @@
  * Contributors:
  *     Steve Foreman (Google) - initial API and implementation
  *     Marcus Eng (Google)
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -36,48 +26,54 @@ import org.eclipse.ui.monitoring.IUiFreezeEventLogger;
 import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
- * Event loop monitoring thread. Detects events that take long time to process, collects stack
- * traces of the UI thread during processing of those events, and logs the long events to the error
- * log.
+ * SWT long event monitoring thread. Can be used to report freezes on the UI thread.
  */
 public class EventLoopMonitorThread extends Thread implements Listener {
 	private static final String EXTENSION_ID = "org.eclipse.ui.monitoring.logger"; //$NON-NLS-1$
 	private static final String NEW_LINE_AND_BULLET = "\n* "; //$NON-NLS-1$
 
 	/* NOTE: All time-related values in this class are in milliseconds. */
-
 	/**
-	 * Helper object for passing preference-based arguments by name to the constructor, making
-	 * the code more readable compared to a large parameter list of integers and booleans.
+	 * Helper object for passing preference-based arguments by name to the constructor, making the
+	 * code more readable than a large parameter list of ints and bools.
 	 */
 	public static class Parameters {
 		/** Milliseconds after which a long event should get logged */
-		public int longEventThreshold;
+		public int loggingThreshold;
+		/** Milliseconds to wait before collecting the first sample */
+		public int samplingThreshold;
 		/**
-		 * Milliseconds at which stack traces should be sampled. Down-sampling of a long event may
-		 * extend the sampling interval for that event.
-		 */
-		public int sampleInterval;
-		/** Milliseconds to wait before collecting the first sample. */
-		public int initialSampleDelay;
-		/** Maximum number of stack samples to log */
-		public int maxStackSamples;
-		/** Milliseconds after which an ongoing long event should logged as a deadlock */
-		public long deadlockThreshold;
-		/**
-		 * If true, includes call stacks of all threads into the logged message. Otherwise, only
-		 * the stack of the watched thread is included.
+		 * If true, includes call stacks of all threads into the logged message. Otherwise, only the
+		 * stack of the watched thread is included.
 		 */
 		public boolean dumpAllThreads;
 		/**
+		 * Milliseconds at which stack traces should be sampled. Down-sampling of a long event may
+		 * extend the polling delay for that event.
+		 */
+		public int minimumPollingDelay;
+		/** Maximum number of stack samples to log */
+		public int loggedTraceCount;
+		/** Milliseconds after which a long event should logged as a deadlock */
+		public long deadlockDelta;
+		/**
 		 * If true, log freeze events to the Eclipse error log on the local machine.
 		 */
-		public boolean logToErrorLog;
+		public boolean logLocally;
 		/**
 		 * Contains the list of fully qualified methods to filter out.
 		 */
 		public String filterTraces;
+
 
 		/**
 		 * Checks if parameters for plug-in are valid before startup.
@@ -85,92 +81,73 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 		 * @throws IllegalArgumentException if the parameter values are invalid or inconsistent.
 		 */
 		public void checkParameters() throws IllegalArgumentException {
-			StringBuilder problems = new StringBuilder();
-			if (!(longEventThreshold > 0)) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_logging_threshold_error_1,
-								longEventThreshold));
+			StringBuilder error = new StringBuilder();
+			if (!(this.loggingThreshold > 0)) {
+				error.append(NEW_LINE_AND_BULLET + NLS.bind(
+						Messages.EventLoopMonitorThread_logging_threshold_error_1, this.loggingThreshold));
 			}
-			if (sampleInterval <= 0) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_sample_interval_error_1,
-								sampleInterval));
-			} else if (sampleInterval >= longEventThreshold) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_sample_interval_too_high_error_2,
-								sampleInterval, longEventThreshold));
+			if (!(this.minimumPollingDelay > 0)) {
+				error.append(NEW_LINE_AND_BULLET + NLS.bind(
+						Messages.EventLoopMonitorThread_sample_interval_error_1, this.minimumPollingDelay));
 			}
-			if (maxStackSamples <= 0) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_max_log_count_error_1,
-								maxStackSamples));
+			if (!(this.loggedTraceCount > 0)) {
+				error.append(NEW_LINE_AND_BULLET + NLS.bind(
+						Messages.EventLoopMonitorThread_max_log_count_error_1, this.loggedTraceCount));
 			}
-			if (initialSampleDelay <= 0) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_sample_interval_error_1,
-								initialSampleDelay));
-			} else if (initialSampleDelay >= longEventThreshold) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_initial_sample_delay_too_high_error_2,
-								initialSampleDelay, longEventThreshold));
+			if (!(this.samplingThreshold > 0)) {
+				error.append(NEW_LINE_AND_BULLET + NLS.bind(
+						Messages.EventLoopMonitorThread_capture_threshold_error_1, this.samplingThreshold));
 			}
-			if (deadlockThreshold <= 0) {
-				problems.append(NEW_LINE_AND_BULLET
-						+ NLS.bind(Messages.EventLoopMonitorThread_deadlock_error_1,
-								deadlockThreshold));
-			} else if (deadlockThreshold <= longEventThreshold) {
-				problems.append(NEW_LINE_AND_BULLET +
-						NLS.bind(Messages.EventLoopMonitorThread_deadlock_threshold_too_low_error_2,
-								deadlockThreshold, longEventThreshold));
+			if (this.loggingThreshold < this.samplingThreshold) {
+				error.append(NEW_LINE_AND_BULLET + Messages.EventLoopMonitorThread_invalid_threshold_error);
+			}
+			if (!(this.deadlockDelta > 0)) {
+				error.append(NEW_LINE_AND_BULLET
+						+ NLS.bind(Messages.EventLoopMonitorThread_deadlock_error_1, this.deadlockDelta));
 			}
 
-			if (problems.length() != 0) {
+			String errorString = error.toString();
+			if (!errorString.isEmpty()) {
 				throw new IllegalArgumentException(
-						NLS.bind(Messages.EventLoopMonitorThread_invalid_argument_error_1,
-								problems.toString()));
+						Messages.EventLoopMonitorThread_invalid_argument_error + errorString);
 			}
 		}
 	}
 
 	/*
 	 * Tracks when the current event was started, or if the event has nested {@link Event#sendEvent}
-	 * calls, then the time when the most recent nested call returns and the current event is
-	 * resumed.
+	 * calls, then the time when the most recent nested call returns and the current event is resumed.
 	 *
 	 * Accessed by both the UI and monitoring threads. Updated by the UI thread and read by the
 	 * polling thread. Changing this in the UI thread causes the polling thread to reset its stalled
-	 * event state. The UI thread sets this value to zero to indicate a sleep state and to
-	 * a positive value to represent a dispatched state. (Using zero as an invalid event start time
-	 * will be wrong for a 1 millisecond window when the 32-bit system clock rolls over in 2038,
-	 * but we can live with skipping any events that fall in that window).
+	 * event state. The UI thread sets this value to zero to indicate a sleep state and to a positive
+	 * value to represent a dispatched state. (Using zero as an invalid event start time will be wrong
+	 * for a 1 millisecond window when the 32-bit system clock rolls over in 2038, but we can live
+	 * with skipping any events that fall in that window).
 	 */
 	private volatile long eventStartOrResumeTime;
 
 	// Accessed by both the UI and monitoring threads.
-	private final int longEventThreshold;
+	private final int loggingThreshold;
 	private final AtomicBoolean cancelled = new AtomicBoolean(false);
 	private final AtomicReference<LongEventInfo> publishEvent =
 			new AtomicReference<LongEventInfo>(null);
 
-	// Accessed only on the UI thread.
-	private boolean eventLoopIsIdle;
-
 	// Accessed only on the polling thread.
-	private final List<IUiFreezeEventLogger> externalLoggers =
-			new ArrayList<IUiFreezeEventLogger>();
+	private ArrayList<IUiFreezeEventLogger> externalLoggers;
 	private final DefaultUiFreezeEventLogger defaultLogger;
-	private final Tracer tracer;
+	private final Tracer localTraceLog;
 	private final Display display;
 	private final FilterHandler filterHandler;
-	private final long initialSampleDelay;
-	private final long sampleInterval;
-	private final int maxStackSamples;
-	private final int maxLoggedStackSamples;
-	private final long deadlockThreshold;
+	private final long samplingThreshold;
+	private final long minimumPollingDelay;
+	private final int maxTraceCount;
+	private final int loggedTraceCount;
+	private final long deadlockDelta;
 	private final long uiThreadId;
 	private final Object sleepMonitor;
 	private final boolean dumpAllThreads;
-	private final boolean logToErrorLog;
+	private final boolean logLocally;
 
 	/**
 	 * A helper class to track and report potential deadlocks.
@@ -178,29 +155,25 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 	private class DeadlockTracker {
 		private boolean haveAlreadyLoggedPossibleDeadlock;
 
-		// The last time a state transition between events or sleep/wake was seen. May be set to
-		// zero to indicate that deadlocks should not be tracked.
+		// The last time a state transition between events or sleep/wake was seen. May be set to zero
+		// to indicate that deadlocks should not be tracked.
 		private long lastActive;
 
 		/**
-		 * Logs a possible deadlock to the remote log. {@code lastActive} is zero if the interval is
-		 * for a sleep, in which case we don't log a deadlock.
+		 * Logs a possible deadlock to the remote log. {@code lastActive} is zero if the interval is for
+		 * a sleep, in which case we don't log a deadlock.
 		 *
 		 * @param currTime the current time
-		 * @param stackSamples stack trace samples for the currently stalled event
-		 * @param numStacks the number of valid stack trace samples in the stackSamples array
+		 * @param stackTraces stack traces for the currently stalled event
+		 * @param numStacks the number of valid traces for the currently stalled event
 		 */
-		public void logPossibleDeadlock(long currTime, StackSample[] stackSamples, int numStacks) {
+		public void logPossibleDeadlock(long currTime, StackSample[] stackTraces, int numStacks) {
 			long totalDuration = currTime - lastActive;
 
-			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 &&
-					totalDuration > deadlockThreshold &&
-					filterHandler.shouldLogEvent(stackSamples, numStacks, uiThreadId)) {
-				stackSamples = Arrays.copyOf(stackSamples, numStacks);
-				logEvent(new UiFreezeEvent(lastActive, totalDuration,
-						Arrays.copyOf(stackSamples, numStacks), true));
+			if (!haveAlreadyLoggedPossibleDeadlock && lastActive > 0 && totalDuration > deadlockDelta) {
+				logEvent(new UiFreezeEvent(lastActive, totalDuration, stackTraces, numStacks, true));
 				haveAlreadyLoggedPossibleDeadlock = true;
-				Arrays.fill(stackSamples, null);
+				Arrays.fill(stackTraces, null);
 			}
 		}
 
@@ -222,31 +195,30 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 	public EventLoopMonitorThread(Parameters args) throws IllegalArgumentException {
 		super("Event Loop Monitor"); //$NON-NLS-1$
 
-		tracer = MonitoringPlugin.getTracer();
-
 		Assert.isNotNull(args);
 
 		args.checkParameters();
 
 		setDaemon(true);
 		setPriority(NORM_PRIORITY + 1);
-		display = getDisplay();
-		uiThreadId = this.display.getThread().getId();
-		this.longEventThreshold = args.longEventThreshold;
-		this.maxLoggedStackSamples = args.maxStackSamples;
-		this.maxStackSamples = 2 * (args.maxStackSamples - 1);
-		this.sampleInterval = args.sampleInterval;
-		this.initialSampleDelay = args.initialSampleDelay;
+		this.display = getDisplay();
+		this.uiThreadId = this.display.getThread().getId();
+		this.filterHandler = new FilterHandler(args.filterTraces);
+		this.samplingThreshold = args.samplingThreshold;
+		this.minimumPollingDelay = args.minimumPollingDelay;
+		this.loggedTraceCount = args.loggedTraceCount;
+		this.maxTraceCount = 2 * (args.loggedTraceCount - 1);
+		this.loggingThreshold = args.loggingThreshold;
 		this.dumpAllThreads = args.dumpAllThreads;
-		this.deadlockThreshold = args.deadlockThreshold;
-		this.logToErrorLog = args.logToErrorLog;
-		filterHandler = new FilterHandler(args.filterTraces);
+		this.localTraceLog = getTracer();
+		this.deadlockDelta = args.deadlockDelta;
+		this.logLocally = args.logLocally;
+		this.sleepMonitor = new Object();
 		defaultLogger = new DefaultUiFreezeEventLogger();
-		sleepMonitor = new Object();
 
 		loadLoggerExtensions();
 
-		if (!logToErrorLog && externalLoggers.isEmpty()) {
+		if (!logLocally && externalLoggers.isEmpty()) {
 			MonitoringPlugin.logWarning(Messages.EventLoopMonitorThread_logging_disabled_error);
 		}
 	}
@@ -270,22 +242,22 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 		/*
 		 * Freeze monitoring involves seeing long intervals between BeginEvent/EndEvent messages,
 		 * regardless of the level of event nesting. For example:
-		 * 1) Log if a top-level or nested dispatch takes too long (interval is between BeginEvent
-		 *    and EndEvent).
+		 * 1) Log if a top-level or nested dispatch takes too long (interval is between BeginEvent and
+		 *    EndEvent).
 		 * 2) Log if preparation before popping up a dialog takes too long (interval is between two
 		 *    BeginEvent messages).
 		 * 3) Log if processing after dismissing a dialog takes too long (interval is between two
 		 *    EndEvent messages).
 		 * 4) Log if there is a long delay between nested calls (interval is between EndEvent and
-		 *    BeginEvent). This could happen after a dialog is dismissed, does too much processing
-		 *    on the UI thread, and then pops up a notification dialog.
+		 *    BeginEvent). This could happen after a dialog is dismissed, does too much processing on
+		 *    the UI thread, and then pops up a notification dialog.
 		 * 5) Don't log for long delays between top-level events (interval is between EndEvent and
 		 *    BeginEvent at the top level), which should involve sleeping.
 		 *
 		 * Calls to Display.sleep() make the UI responsive, whether or not events are actually
-		 * dispatched, so items 1-4 above assume that there are no intervening calls to sleep()
-		 * between the event transitions. Treating the BeginSleep event as an event transition lets
-		 * us accurately capture true freeze intervals.
+		 * dispatched, so items 1-4 above assume that there are no intervening calls to sleep() between
+		 * the event transitions. Treating the BeginSleep event as an event transition lets us
+		 * accurately capture true freeze intervals.
 		 *
 		 * Correct management of BeginSleep/EndSleep events allow us to handle items 4 and 5 above
 		 * since we can tell if a long delay between an EndEvent and a BeginEvent are due to an idle
@@ -315,94 +287,80 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 	// Called on the UI thread!
 	// VisibleForTesting
 	public void beginEvent() {
-		if (tracer != null) {
-			tracer.trace("Begin event");
-		}
-		if (!eventLoopIsIdle) {
-			handleEventTransition(true, false);  // Log a long interval, not entering sleep.
-		}
+		// Log a long interval, not entering sleep
+		handleEventTransition(true, false);
 	}
 
 	// Called on the UI thread!
 	// VisibleForTesting
 	public void endEvent() {
-		if (tracer != null) {
-			tracer.trace("End event");
-		}
-		if (!eventLoopIsIdle) {
-			handleEventTransition(true, false);  // Log a long interval, not entering sleep.
-		}
+		// Log a long interval, not entering sleep
+		handleEventTransition(true, false);
 	}
 
 	// Called on the UI thread!
 	// VisibleForTesting
 	public void beginSleep() {
-		if (tracer != null) {
-			tracer.trace("Begin sleep");
-		}
-		eventLoopIsIdle = true;
-		handleEventTransition(true, true);  // Log a long interval, entering sleep.
+		// Log a long interval, entering sleep
+		handleEventTransition(true, true);
 	}
 
 	// Called on the UI thread!
 	// VisibleForTesting
 	public void endSleep() {
-		if (tracer != null) {
-			tracer.trace("End sleep");
-		}
-		eventLoopIsIdle = false;
-		handleEventTransition(false, false);  // Don't log a long interval, not entering sleep.
+		// Don't log the long sleep interval, not entering sleep
+		handleEventTransition(false, false);
 	}
 
 	// Called on the UI thread!
 	private void handleEventTransition(boolean attemptToLogLongDelay, boolean isEnteringSleep) {
 		/*
-		 * On transition between events or sleeping/wake up, we need to reset the delay tracking
-		 * state and possibly publish a long delay message. Updating eventStartOrResumeTime causes
-		 * the polling thread to reset its stack traces, so it should always be changed *after*
-		 * the event is published. The indeterminacy of threading may cause the polling thread to
-		 * see both changes or only the (first) publishEvent change, but the only difference is
-		 * a small window where if an additional stack trace was scheduled to be sampled, a bogus
-		 * stack trace sample will be appended to the end of the samples. Analysis code needs to be
-		 * aware that the last sample may not be relevant to the issue which caused the freeze.
+		 * On transition between events or sleeping/wake up, we need to reset the delay tracking state
+		 * and possibly publish a long delay message. Updating eventStartOrResumeTime causes the polling
+		 * thread to reset its stack traces, so it should always be changed *after* the event is
+		 * published. The indeterminacy of threading may cause the polling thread to see both changes or
+		 * only the (first) publishEvent change, but the only difference is a small window where if an
+		 * additional stack trace was scheduled to be sampled, a bogus stack trace sample will be
+		 * appended to the end of the samples. Analysis code needs to be aware that the last sample may
+		 * not be relevant to the issue which caused the freeze.
 		 */
 		long currTime = getTimestamp();
 		if (attemptToLogLongDelay) {
 			long startTime = eventStartOrResumeTime;
 			if (startTime != 0) {
 				int duration = (int) (currTime - startTime);
-				if (duration >= longEventThreshold) {
+				if (duration >= loggingThreshold) {
 					LongEventInfo info = new LongEventInfo(startTime, duration);
 					publishEvent.set(info);
 					wakeUp();
 				}
 			}
 		}
-		// Using zero as an invalid event time will be wrong for a 1 millisecond window when
-		// the system clock rolls over in 2038, but we can live with that.
+		// Using zero as an invalid event time will be wrong for a 1 millisecond window when the system
+		// clock rolls over in 2038, but we can live with that.
 		eventStartOrResumeTime = !isEnteringSleep ? currTime : 0;
 	}
 
 	@Override
 	public void run() {
 		/*
-		 * If this event loop starts in the middle of a UI freeze, it will succeed in capturing
-		 * the portion of that UI freeze that it sees.
+		 * If this event loop starts in the middle of a UI freeze, it will succeed in capturing the
+		 * portion of that UI freeze that it sees.
 		 *
-		 * Our timer resolution is, at best, 1 millisecond so we can never try to catch events of
-		 * a duration less than that.
+		 * Our timer resolution is, at best, 1 millisecond so we can never try to catch events of a
+		 * duration less than that.
 		 */
 		boolean resetStalledEventState = true;
 
 		DeadlockTracker deadlockTracker = new DeadlockTracker();
 
-		final long pollingNyquistDelay = sampleInterval / 2;
-		long pollingDelay = 0; // Immediately updated by resetStalledEventState.
-		long grabStackSampleAt = 0; // Immediately updated by resetStalledEventState.
-		long lastEventStartOrResumeTime = 0; // Immediately updated by resetStalledEventState.
+		final long pollingNyquistDelay = minimumPollingDelay / 2;
+		long pollingDelay = 0; // immediately updated by resetStalledEventState
+		long grabStackTraceAt = 0; // immediately updated by resetStalledEventState
+		long lastEventStartOrResumeTime = 0; // immediately updated by resetStalledEventState
 
-		StackSample[] stackSamples = new StackSample[maxStackSamples];
-		int numSamples = 0;
+		StackSample[] stackTraces = new StackSample[maxTraceCount];
+		int numStacks = 0;
 
 		ThreadMXBean jvmThreadManager = ManagementFactory.getThreadMXBean();
 		boolean dumpLockedMonitors = jvmThreadManager.isObjectMonitorUsageSupported();
@@ -429,63 +387,63 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 				if (eventTime == 0) {
 					eventTime = currTime;
 				}
-				grabStackSampleAt = eventTime + initialSampleDelay;
-				numSamples = 0;
-				pollingDelay = sampleInterval;
+				grabStackTraceAt = eventTime + samplingThreshold;
+				numStacks = 0;
+				pollingDelay = minimumPollingDelay;
 				sleepFor = pollingNyquistDelay;
 				resetStalledEventState = false;
 			} else if (lastEventStartOrResumeTime == 0) {
 				sleepFor = pollingNyquistDelay;
 			} else {
-				sleepFor = Math.min(pollingNyquistDelay, Math.max(1, grabStackSampleAt - currTime));
+				sleepFor = Math.min(pollingNyquistDelay, Math.max(1, grabStackTraceAt - currTime));
 			}
 
 			// This is the top of the polling loop.
 			long sleepAt = getTimestamp();
 
 			/*
-			 * Check for starvation outside of sleeping. If we sleep or process much longer than
-			 * expected (e.g. > threshold/2 longer), then the polling thread has been starved and
-			 * it's very likely that the UI thread has been as well. Starvation freezes do not have
-			 * useful information, so don't log them.
+			 * Check for starvation outside of sleeping. If we sleep or process much longer than expected
+			 * (e.g. > threshold/2 longer), then the polling thread has been starved and it's very likely
+			 * that the UI thread has been as well. Starvation freezes do not have useful information, so
+			 * don't log them.
 			 */
 			long awakeDuration = currTime - sleepAt;
-			boolean starvedAwake = awakeDuration > (sleepFor + longEventThreshold / 2);
+			boolean starvedAwake = awakeDuration > (sleepFor + loggingThreshold / 2);
 			sleepForMillis(sleepFor);
 			currTime = getTimestamp();
 			long currEventStartOrResumeTime = eventStartOrResumeTime;
 			long sleepDuration = currTime - sleepAt;
-			boolean starvedSleep = sleepDuration > (sleepFor + longEventThreshold / 2);
+			boolean starvedSleep = sleepDuration > (sleepFor + loggingThreshold / 2);
 			boolean starved = starvedSleep || starvedAwake;
 
 			/*
-			 * If after sleeping we see that a new event has been dispatched, mark that we should
-			 * update the stalled event state. Otherwise, check if we have surpassed our threshold
-			 * and collect a stack trace.
+			 * If after sleeping we see that a new event has been dispatched, mark that we should update
+			 * the stalled event state. Otherwise, check if we have surpassed our threshold and collect a
+			 * stack trace.
 			 */
 			if (lastEventStartOrResumeTime != currEventStartOrResumeTime || starved) {
 				resetStalledEventState = true;
-				if (tracer != null && starved) {
+				if (localTraceLog != null && starved) {
 					if (starvedAwake) {
-						tracer.trace(String.format(
+						localTraceLog.trace(String.format(
 								"Starvation detected! Polling loop took a significant amount of threshold: %dms", //$NON-NLS-1$
 								awakeDuration));
 					}
 
 					if (starvedSleep) {
-						tracer.trace(String.format(
+						localTraceLog.trace(String.format(
 								"Starvation detected! Expected a sleep of %dms but actually slept for %dms", //$NON-NLS-1$
 								sleepFor, sleepDuration));
 					}
 				}
 			} else if (lastEventStartOrResumeTime != 0) {
-				deadlockTracker.logPossibleDeadlock(currTime, stackSamples, numSamples);
+				deadlockTracker.logPossibleDeadlock(currTime, stackTraces, numStacks);
 
 				// Collect additional stack traces if enough time has elapsed.
-				if (maxStackSamples > 0 && currTime - grabStackSampleAt > 0) {
-					if (numSamples == maxStackSamples) {
-						numSamples = maxStackSamples / 2;
-						decimate(stackSamples, maxStackSamples, numSamples, 0);
+				if (maxTraceCount > 0 && currTime - grabStackTraceAt > 0) {
+					if (numStacks == maxTraceCount) {
+						numStacks = maxTraceCount / 2;
+						decimate(stackTraces, maxTraceCount, numStacks, 0);
 						pollingDelay *= 2;
 					}
 
@@ -505,11 +463,10 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 							for (int i = 0; i < rawThreadStacks.length; i++) {
 								ThreadInfo currentThread = rawThreadStacks[i];
 
-								// Skip the stack trace of the event loop monitoring thread.
+								// Skip if stack trace is from the current (UI monitoring) thread.
 								if (!isCurrentThread(currentThread.getThreadId())) {
 									if (currentThread.getThreadId() == uiThreadId && i > 0) {
-										// Swap main thread to first slot in array if it is not
-										// there already.
+										// Swap main thread to first slot in array if it is not already.
 										currentThread = threadStacks[0];
 										threadStacks[0] = rawThreadStacks[i];
 									}
@@ -518,43 +475,40 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 							}
 						}
 
-						stackSamples[numSamples++] = new StackSample(getTimestamp(), threadStacks);
-						grabStackSampleAt += pollingDelay;
+						stackTraces[numStacks++] = new StackSample(getTimestamp(), threadStacks);
+						grabStackTraceAt += pollingDelay;
 					} catch (SWTException e) {
-						// Display is disposed so start terminating.
+						// Display is disposed so start terminating
 						cancelled.set(true);
 						resetStalledEventState = true;
 					}
 				}
 			}
 
-			// If a stalled event has finished, publish it and mark that the information should
-			// be reset.
+			// If a stalled event has finished, publish it and mark that the information should be reset.
 			LongEventInfo eventSnapshot = publishEvent.getAndSet(null);
 			if (starved || eventSnapshot != null) {
 				if (eventSnapshot != null) {
 					// Trim last stack trace if it is too close to the end of the event.
 					int trimLast = 0;
-					if (numSamples - 1 > maxLoggedStackSamples) {
+					if (numStacks - 1 > loggedTraceCount) {
 						long eventEnd = eventSnapshot.start + eventSnapshot.duration;
-						if (eventEnd - stackSamples[numSamples - 1].getTimestamp() < sampleInterval) {
+						if (eventEnd - stackTraces[numStacks - 1].getTimestamp() < minimumPollingDelay) {
 							trimLast = 1;
 						}
 					}
 
-					if (numSamples > maxLoggedStackSamples) {
-						decimate(stackSamples, numSamples, maxLoggedStackSamples, trimLast);
-						numSamples = maxLoggedStackSamples;
+					if (numStacks > loggedTraceCount) {
+						decimate(stackTraces, numStacks, loggedTraceCount, trimLast);
+						numStacks = loggedTraceCount;
 					}
 
-					if (filterHandler.shouldLogEvent(stackSamples, numSamples, uiThreadId)) {
-						logEvent(new UiFreezeEvent(eventSnapshot.start, eventSnapshot.duration,
-								Arrays.copyOf(stackSamples, numSamples), false));
-					}
+					logEvent(new UiFreezeEvent(eventSnapshot.start, eventSnapshot.duration, stackTraces,
+							numStacks, false));
 				}
 
 				resetStalledEventState = true;
-				Arrays.fill(stackSamples, null);  // Allow the stack traces to be garbage collected.
+				Arrays.fill(stackTraces, null);
 			}
 
 			lastEventStartOrResumeTime = currEventStartOrResumeTime;
@@ -594,7 +548,12 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 		}
 	}
 
+	private Tracer getTracer() {
+		return MonitoringPlugin.getTracer();
+	}
+
 	private void loadLoggerExtensions() {
+		externalLoggers = new ArrayList<IUiFreezeEventLogger>();
 		IConfigurationElement[] configElements =
 				Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_ID);
 
@@ -606,8 +565,7 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 				} else {
 					MonitoringPlugin.logWarning(String.format(
 							Messages.EventLoopMonitorThread_invalid_logger_type_error_4,
-							object.getClass().getName(),
-							IUiFreezeEventLogger.class.getClass().getSimpleName(),
+							object.getClass().getName(), IUiFreezeEventLogger.class.getClass().getSimpleName(),
 							EXTENSION_ID, element.getContributor().getName()));
 				}
 			} catch (CoreException e) {
@@ -648,11 +606,11 @@ public class EventLoopMonitorThread extends Thread implements Listener {
 	 * Writes the snapshot and stack captures to the workspace log.
 	 */
 	private void logEvent(UiFreezeEvent event) {
-		if (tracer != null) {
-			tracer.trace("Logging " + event);;
+		if (!filterHandler.shouldLogEvent(event, uiThreadId)) {
+			return;
 		}
 
-		if (logToErrorLog) {
+		if (logLocally) {
 			defaultLogger.log(event);
 		}
 
