@@ -10,9 +10,6 @@
  */
 package org.eclipse.e4.ui.model.application.ui.basic;
 
-import org.eclipse.e4.ui.model.application.ui.MElementContainer;
-import org.eclipse.e4.ui.model.application.ui.MUILabel;
-
 
 /**
  * <!-- begin-user-doc -->
@@ -32,5 +29,5 @@ import org.eclipse.e4.ui.model.application.ui.MUILabel;
  * @model
  * @generated
  */
-public interface MDialog extends MElementContainer<MDialogElement>, MUILabel {
+public interface MDialog extends MWindow {
 } // MDialog
