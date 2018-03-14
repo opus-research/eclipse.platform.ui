@@ -16,12 +16,11 @@ import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.eclipse.core.databinding.conversion.IConverter;
+import junit.framework.TestCase;
+
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 
 import com.ibm.icu.text.NumberFormat;
-
-import junit.framework.TestCase;
 
 /**
  * @since 1.1
@@ -216,12 +215,11 @@ public class StringToNumberConverterTest extends TestCase {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testThrowsIllegalArgumentExceptionIfAskedToConvertNonString()
 			throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
 		try {
-			((IConverter<Object, Object>) (Object) converter).convert(new Integer(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

@@ -28,32 +28,31 @@ import org.eclipse.core.runtime.Status;
  * @since 1.0
  *
  */
-class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T>> {
-	private final UpdateValueStrategy<T, M> targetToModel;
-	private final UpdateValueStrategy<M, T> modelToTarget;
-	private WritableValue<IStatus> validationStatusObservable;
-	private IObservableValue<T> target;
-	private IObservableValue<M> model;
+class ValueBinding extends Binding {
+	private final UpdateValueStrategy targetToModel;
+	private final UpdateValueStrategy modelToTarget;
+	private WritableValue validationStatusObservable;
+	private IObservableValue target;
+	private IObservableValue model;
 
 	private boolean updatingTarget;
 	private boolean updatingModel;
-	private IValueChangeListener<T> targetChangeListener = new IValueChangeListener<T>() {
+	private IValueChangeListener targetChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<T> event) {
+		public void handleValueChange(ValueChangeEvent event) {
 			if (!updatingTarget
-					&& !Util.equals(event.diff.getOldValue(),
-							event.diff.getNewValue())) {
+					&& !Util.equals(event.diff.getOldValue(), event.diff
+							.getNewValue())) {
 				doUpdate(target, model, targetToModel, false, false);
 			}
 		}
 	};
-
-	private IValueChangeListener<M> modelChangeListener = new IValueChangeListener<M>() {
+	private IValueChangeListener modelChangeListener = new IValueChangeListener() {
 		@Override
-		public void handleValueChange(ValueChangeEvent<M> event) {
+		public void handleValueChange(ValueChangeEvent event) {
 			if (!updatingModel
-					&& !Util.equals(event.diff.getOldValue(),
-							event.diff.getNewValue())) {
+					&& !Util.equals(event.diff.getOldValue(), event.diff
+							.getNewValue())) {
 				doUpdate(model, target, modelToTarget, false, false);
 			}
 		}
@@ -65,10 +64,9 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 	 * @param targetToModel
 	 * @param modelToTarget
 	 */
-	public ValueBinding(IObservableValue<T> targetObservableValue,
-			IObservableValue<M> modelObservableValue,
-			UpdateValueStrategy<T, M> targetToModel,
-			UpdateValueStrategy<M, T> modelToTarget) {
+	public ValueBinding(IObservableValue targetObservableValue,
+			IObservableValue modelObservableValue,
+			UpdateValueStrategy targetToModel, UpdateValueStrategy modelToTarget) {
 		super(targetObservableValue, modelObservableValue);
 		this.target = targetObservableValue;
 		this.model = modelObservableValue;
@@ -90,9 +88,8 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
-			validationStatusObservable = new WritableValue<>(
-					context.getValidationRealm(), Status.OK_STATUS,
-					IStatus.class);
+			validationStatusObservable = new WritableValue(context
+					.getValidationRealm(), Status.OK_STATUS, IStatus.class);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
@@ -112,7 +109,7 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 	}
 
 	@Override
-	public IObservableValue<IStatus> getValidationStatus() {
+	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
@@ -147,9 +144,9 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 	 * need more control over how the source value is copied to the destination
 	 * observable.
 	 */
-	private <S, D> void doUpdate(final IObservableValue<S> source,
-			final IObservableValue<D> destination,
-			final UpdateValueStrategy<S, D> updateValueStrategy,
+	private void doUpdate(final IObservableValue source,
+			final IObservableValue destination,
+			final UpdateValueStrategy updateValueStrategy,
 			final boolean explicit, final boolean validateOnly) {
 
 		final int policy = updateValueStrategy.getUpdatePolicy();
@@ -165,7 +162,7 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 				final MultiStatus multiStatus = BindingStatus.ok();
 				try {
 					// Get value
-					S value = source.getValue();
+					Object value = source.getValue();
 
 					// Validate after get
 					IStatus status = updateValueStrategy
@@ -174,7 +171,8 @@ class ValueBinding<M, T> extends Binding<IObservableValue<M>, IObservableValue<T
 						return;
 
 					// Convert value
-					final D convertedValue = updateValueStrategy.convert(value);
+					final Object convertedValue = updateValueStrategy
+							.convert(value);
 
 					// Validate after convert
 					status = updateValueStrategy

@@ -11,7 +11,6 @@
 
 package org.eclipse.core.internal.databinding;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.databinding.ValidationStatusProvider;
@@ -25,34 +24,30 @@ import org.eclipse.core.databinding.property.list.ListProperty;
  * @since 3.3
  *
  */
-public class ValidationStatusProviderTargetsProperty extends
-		ListProperty<ValidationStatusProvider, IObservable> {
+public class ValidationStatusProviderTargetsProperty extends ListProperty {
 	@Override
 	public Object getElementType() {
 		return IObservable.class;
 	}
 
 	@Override
-	protected List<IObservable> doGetList(ValidationStatusProvider source) {
-		return Collections.unmodifiableList(source.getTargets());
+	protected List doGetList(Object source) {
+		return ((ValidationStatusProvider) source).getTargets();
 	}
 
 	@Override
-	protected void doSetList(ValidationStatusProvider source,
-			List<IObservable> list) {
+	protected void doSetList(Object source, List list) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
 	@Override
-	protected void doUpdateList(ValidationStatusProvider source,
-			ListDiff<IObservable> diff) {
+	protected void doUpdateList(Object source, ListDiff diff) {
 		throw new UnsupportedOperationException(toString() + " is unmodifiable"); //$NON-NLS-1$
 	}
 
 	@Override
-	public IObservableList<IObservable> observe(Realm realm,
-			ValidationStatusProvider source) {
-		return source.getTargets();
+	public IObservableList observe(Realm realm, Object source) {
+		return ((ValidationStatusProvider) source).getTargets();
 	}
 
 	@Override

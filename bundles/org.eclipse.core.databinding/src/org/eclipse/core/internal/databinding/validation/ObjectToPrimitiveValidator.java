@@ -20,13 +20,13 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * @since 3.2
- * 
+ *
  */
-public class ObjectToPrimitiveValidator implements IValidator<Object> {
+public class ObjectToPrimitiveValidator implements IValidator {
 
-	private Class<?> toType;
+	private Class toType;
 
-	private Class<?>[][] primitiveMap = new Class[][] {
+	private Class[][] primitiveMap = new Class[][] {
 			{ Integer.TYPE, Integer.class }, { Short.TYPE, Short.class },
 			{ Long.TYPE, Long.class }, { Double.TYPE, Double.class },
 			{ Byte.TYPE, Byte.class }, { Float.TYPE, Float.class },
@@ -36,11 +36,11 @@ public class ObjectToPrimitiveValidator implements IValidator<Object> {
 	/**
 	 * @param toType
 	 */
-	public ObjectToPrimitiveValidator(Class<?> toType) {
+	public ObjectToPrimitiveValidator(Class toType) {
 		this.toType = toType;
 	}
 
-	protected Class<?> getToType() {
+	protected Class getToType() {
 		return this.toType;
 	}
 
@@ -59,7 +59,7 @@ public class ObjectToPrimitiveValidator implements IValidator<Object> {
 		return ValidationStatus.error(getNullHint());
 	}
 
-	private boolean mapContainsValues(Class<?> toType, Class<?> fromType) {
+	private boolean mapContainsValues(Class toType, Class fromType) {
 		for (int i = 0; i < primitiveMap.length; i++) {
 			if ((primitiveMap[i][0].equals(toType))
 					&& (primitiveMap[i][1].equals(fromType))) {
@@ -73,8 +73,7 @@ public class ObjectToPrimitiveValidator implements IValidator<Object> {
 	 * @return a hint string
 	 */
 	public String getNullHint() {
-		return BindingMessages
-				.getString(BindingMessages.VALIDATE_CONVERSION_TO_PRIMITIVE);
+		return BindingMessages.getString(BindingMessages.VALIDATE_CONVERSION_TO_PRIMITIVE);
 	}
 
 	/**
