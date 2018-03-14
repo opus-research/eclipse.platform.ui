@@ -10,7 +10,6 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -181,6 +180,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			if (ici == null) {
 				return;
 			}
+			ici.setVisible(itemModel.isVisible());
 
 			ToolBarManager parent = null;
 			if (ici instanceof MenuManager) {
@@ -189,31 +189,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				parent = (ToolBarManager) ((ContributionItem) ici).getParent();
 			}
 
-			if (parent == null) {
-				ici.setVisible(itemModel.isVisible());
-				return;
-			}
-
-			IContributionManagerOverrides ov = parent.getOverrides();
-			// partial fix for bug 383569: only change state if there are no
-			// extra override mechanics controlling element visibility
-			if (ov == null) {
-				ici.setVisible(itemModel.isVisible());
-			} else {
-				Boolean visible = ov.getVisible(ici);
-				if (visible == null) {
-					// same as above: only change state if there are no extra
-					// override mechanics controlling element visibility
-					ici.setVisible(itemModel.isVisible());
+			if (parent != null) {
+				parent.markDirty();
+				parent.update(true);
+				ToolBar tb = parent.getControl();
+				if (tb != null && !tb.isDisposed()) {
+					tb.pack(true);
+					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 				}
-			}
-
-			parent.markDirty();
-			parent.update(true);
-			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
-				tb.pack(true);
-				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
 	}
@@ -522,16 +505,16 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	protected void cleanUp(MToolBar toolbarModel) {
 		Collection<ToolBarContributionRecord> vals = modelContributionToRecord.values();
 		for (ToolBarContributionRecord record : vals.toArray(new ToolBarContributionRecord[vals.size()])) {
-			if (record.toolbarModel == toolbarModel) {
+			if (record.getToolbarModel() == toolbarModel) {
 				record.dispose();
-				for (MToolBarElement copy : record.generatedElements) {
+				for (MToolBarElement copy : record.getGeneratedElements()) {
 					cleanUpCopy(record, copy);
 				}
-				for (MToolBarElement copy : record.sharedElements) {
+				for (MToolBarElement copy : record.getSharedElements()) {
 					cleanUpCopy(record, copy);
 				}
-				record.generatedElements.clear();
-				record.sharedElements.clear();
+				record.getGeneratedElements().clear();
+				record.getSharedElements().clear();
 			}
 		}
 	}
