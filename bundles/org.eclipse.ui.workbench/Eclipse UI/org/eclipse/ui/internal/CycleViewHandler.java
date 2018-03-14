@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
- *     Conrad Groth <info@conrad-groth.de> - Bug 472748
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -17,6 +16,7 @@ package org.eclipse.ui.internal;
 import java.util.List;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -25,6 +25,7 @@ import org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPart;
@@ -61,10 +62,11 @@ public class CycleViewHandler extends CycleBaseHandler {
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor) {
 					IEditorPart activeEditor = page.getActiveEditor();
+					IEditorDescriptor editorDescriptor = Adapters.adapt(activeEditor, IEditorDescriptor.class);
 					TableItem item = new TableItem(table, SWT.NONE);
 					item.setText(WorkbenchMessages.CyclePartAction_editor);
 					item.setImage(activeEditor.getTitleImage());
-					item.setData(activeEditor);
+					item.setData(editorDescriptor);
 					includeEditor = false;
 				}
 			} else {
