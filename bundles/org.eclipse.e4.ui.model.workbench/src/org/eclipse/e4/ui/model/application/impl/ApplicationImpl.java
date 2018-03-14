@@ -258,7 +258,7 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	protected EList<MDialog> dialogs;
 
 	protected Map<String, MCommand> elementIdToCommandMap;
-	
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
