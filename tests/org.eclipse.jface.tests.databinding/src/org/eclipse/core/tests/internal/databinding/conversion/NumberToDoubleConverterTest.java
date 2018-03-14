@@ -25,7 +25,6 @@ public class NumberToDoubleConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
 	 */
-	@Override
 	protected Number doGetOutOfRangeNumber() {
 		return new BigDecimal(Double.MAX_VALUE).add(new BigDecimal(Double.MAX_VALUE));
 	}
@@ -33,7 +32,6 @@ public class NumberToDoubleConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, false);
 	}
@@ -41,7 +39,6 @@ public class NumberToDoubleConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
 	 */
-	@Override
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return new NumberToDoubleConverter(NumberFormat.getInstance(), fromType, true);
 	}
@@ -49,7 +46,6 @@ public class NumberToDoubleConverterTest extends NumberToNumberTestHarness {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType(boolean)
 	 */
-	@Override
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? Double.TYPE : Double.class;
 	}
