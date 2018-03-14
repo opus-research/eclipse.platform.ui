@@ -14,9 +14,6 @@
 
 package org.eclipse.ui.internal;
 
-import org.eclipse.e4.ui.model.internal.PositionInfo;
-
-import org.eclipse.e4.ui.model.internal.Position;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -327,9 +324,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	static final int BAR_SIZE = 23;
 
-	/** Marks the beginning of a tag which contains positioning information. */
-	static final String MOVE_TAG = "move_"; //$NON-NLS-1$
-
 	/**
 	 * Coolbar visibility change property.
 	 * 
@@ -608,10 +602,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		modelService.getTrim(model, SideValue.LEFT);
 		modelService.getTrim(model, SideValue.RIGHT);
 
-		// move the QuickAccess ToolControl to the correct position (only if it
-		// exists)
-		positionQuickAccess();
-
 		Shell shell = (Shell) model.getWidget();
 		if (model.getMainMenu() == null) {
 			final MMenu mainMenu = MenuFactoryImpl.eINSTANCE.createMenu();
@@ -758,17 +748,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		final MTrimBar trimBar = getTopTrim();
 		// TODO why aren't these added as trim contributions
 		// that would remove everything from this method except the fill(*)
-		/*
-		 * Reason Why: The setup() method which calls this method also calls the
-		 * ActionBarAdvisor to fill the TopTrim-Bar. Both this and the
-		 * ActionBarAdvisor fill method will be called after the entire
-		 * application model and all its fragments have been build already. This
-		 * leads to the effect that all the elements contributed via the
-		 * application model would be placed in front of the elements
-		 * contributed by the setup() method. (Means all the "Save", "Save All",
-		 * and so on, buttons which are normally placed at the beginning of the
-		 * trimbar (left) would be moved to the end of it (right).)
-		 */
 		MToolControl spacerControl = (MToolControl) modelService.find("PerspectiveSpacer", model); //$NON-NLS-1$
 		if (spacerControl == null) {
 			spacerControl = MenuFactoryImpl.eINSTANCE.createToolControl();
@@ -777,6 +756,35 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
 			spacerControl.getTags().add(TrimBarLayout.SPACER);
 			trimBar.getChildren().add(spacerControl);
+		}
+
+		MToolControl spacerGlueControl = (MToolControl) modelService.find("Spacer Glue", model); //$NON-NLS-1$
+		if (spacerGlueControl == null) {
+			spacerGlueControl = MenuFactoryImpl.eINSTANCE.createToolControl();
+			spacerGlueControl.setElementId("Spacer Glue"); //$NON-NLS-1$
+			spacerGlueControl
+					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
+			spacerGlueControl.getTags().add(TrimBarLayout.GLUE);
+			trimBar.getChildren().add(spacerGlueControl);
+		}
+
+		MToolControl searchControl = (MToolControl) modelService.find("SearchField", model); //$NON-NLS-1$
+		if (searchControl == null) {
+			searchControl = MenuFactoryImpl.eINSTANCE.createToolControl();
+			searchControl.setElementId("SearchField"); //$NON-NLS-1$
+			searchControl
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.quickaccess.SearchField"); //$NON-NLS-1$
+			trimBar.getChildren().add(searchControl);
+		}
+
+		MToolControl glueControl = (MToolControl) modelService.find("Search-PS Glue", model); //$NON-NLS-1$
+		if (glueControl == null) {
+			glueControl = MenuFactoryImpl.eINSTANCE.createToolControl();
+			glueControl.setElementId("Search-PS Glue"); //$NON-NLS-1$
+			glueControl
+					.setContributionURI("bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl"); //$NON-NLS-1$
+			glueControl.getTags().add(TrimBarLayout.GLUE);
+			trimBar.getChildren().add(glueControl);
 		}
 
 		MToolControl switcherControl = (MToolControl) modelService.find(
@@ -794,159 +802,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		// render now after everything has been added so contributions can be
 		// inserted in the right place
 		updateLayoutDataForContents();
-	}
-
-	/**
-	 * Moves the QucickAccess related fields to the wanted position.
-	 * <p>
-	 * If the elements "Spacer Glue", "SearchField" and "Search-PS Glue" are
-	 * available in the model this method will move them to the correct place if
-	 * required. The movement can be influenced by a tag which begins with
-	 * {@value #MOVE_TAG} followed by the normal positioning information (e.g.:
-	 * move_after:PerspectiveSpacer). For more information about positioning
-	 * have a look at: {@link PositionInfo#parse(String)}.
-	 * </p>
-	 */
-	private void positionQuickAccess() {
-		/*
-		 * The following elements are optional elements provided via an e4xmi
-		 * application model fragment. The method checks if they should be moved
-		 * to a special position. This behavior is required because nearly all
-		 * elements in the legacy workbench are not provided via e4xmi
-		 * application model. They are provided programmatically after the e4xmi
-		 * application model and the corresponding fragment models are already
-		 * processed.
-		 */
-		MToolControl spacerGlueControl = (MToolControl) modelService.find("Spacer Glue", model); //$NON-NLS-1$
-		if (spacerGlueControl != null) {
-			moveControl(spacerGlueControl.getParent(), spacerGlueControl);
-		}
-
-		MToolControl searchControl = (MToolControl) modelService.find("SearchField", model); //$NON-NLS-1$
-		if (searchControl != null) {
-			moveControl(searchControl.getParent(), searchControl);
-		}
-
-		MToolControl glueControl = (MToolControl) modelService.find("Search-PS Glue", model); //$NON-NLS-1$
-		if (glueControl != null) {
-			moveControl(glueControl.getParent(), glueControl);
-		}
-
-	}
-
-	/**
-	 * Moves the given element from its current position to the position
-	 * mentioned in one of its tags.
-	 * 
-	 * @param elementContainer
-	 *            the list of elements in which the element should be moved
-	 * @param element
-	 *            the element to move
-	 */
-	private void moveControl(MElementContainer<MUIElement> elementContainer, MUIElement element) {
-		if (element == null || elementContainer == null)
-			return;
-
-		PositionInfo positionInfo = findMovePositionInfo(element);
-
-		// does the element has a tag with a "move_" position info
-		if (positionInfo != null) {
-			List<MUIElement> elements = elementContainer.getChildren();
-
-			if (elements.remove(element)) {
-				// reposition only if the element was in the list
-
-				switch (positionInfo.getPosition()) {
-				case LAST:
-					elements.add(element);
-					break;
-
-				case FIRST:
-					elements.add(0, element);
-					break;
-
-				case INDEX:
-					int index = positionInfo.getPositionReferenceAsInteger();
-					if (index >= 0 && index < elements.size()) {
-						elements.add(index, element);
-					} else {
-						elements.add(element);
-					}
-					break;
-
-				case BEFORE:
-				case AFTER:
-					int idx = indexOfElementWithID(elements, positionInfo.getPositionReference());
-					if (idx < 0) {
-						// element no found
-						elements.add(element);
-					} else {
-						if (positionInfo.getPosition() == Position.AFTER) {
-							idx++;
-						}
-
-						if (idx < elements.size()) {
-							elements.add(idx, element);
-						} else {
-							elements.add(element);
-						}
-					}
-					break;
-
-				default:
-					throw new IllegalArgumentException(
-							"Unknown position: " + positionInfo.getPosition()); //$NON-NLS-1$
-				}
-			}
-		}
-	}
-
-	/**
-	 * Find the element with the given id in the given list of
-	 * {@link MUIElement}s.
-	 * 
-	 * @param elements
-	 *            the list of {@link MUIElement}s to search
-	 * @param id
-	 *            the id of the {@link MUIElement} to find
-	 * @return the index of the {@link MUIElement} in the given list or -1 if
-	 *         element wasn't found
-	 */
-	private int indexOfElementWithID(List<MUIElement> elements, String id) {
-		if (elements == null || id == null)
-			return -1;
-
-		int index = 0;
-		for (MUIElement element : elements) {
-			if (id.equals(element.getElementId())) {
-				return index;
-			}
-			index++;
-		}
-
-		return -1;
-	}
-
-	/**
-	 * Checks if the {@link MUIElement} has a tag starting with
-	 * {@value #MOVE_TAG} and if so it will extract the {@link PositionInfo} out
-	 * of it.
-	 * 
-	 * @param element
-	 *            the element to check
-	 * @return the found {@link PositionInfo} on the given {@link MUIElement},
-	 *         or <code>null</code> if none was found
-	 */
-	private PositionInfo findMovePositionInfo(MUIElement element) {
-		if (element != null) {
-			for (String tag : element.getTags()) {
-				if (tag.startsWith(MOVE_TAG)) {
-					return PositionInfo.parse(tag.substring(5));
-				}
-			}
-		}
-
-		return null;
 	}
 
 	private void populateStandardTrim(MTrimBar bottomTrim) {
