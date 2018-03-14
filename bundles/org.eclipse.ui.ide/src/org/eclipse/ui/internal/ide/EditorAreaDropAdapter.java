@@ -133,7 +133,7 @@ public class EditorAreaDropAdapter extends DropTargetAdapter {
             for (int i = 0; i < paths.length; i++) {
             	IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(paths[i]));
             	try {
-					IDE.openInternalEditorOnFileStore(page, fileStore);
+					IDE.openEditorOnFileStore(page, fileStore);
 				} catch (PartInitException e) {
 					// silently ignore problems opening the editor
 				}
