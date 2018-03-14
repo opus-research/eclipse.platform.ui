@@ -66,6 +66,12 @@ import org.eclipse.swt.widgets.ToolItem;
 	/** Progress bar creation is delayed by this ms */
 	public static final int DELAY_PROGRESS = 500;
 
+	/**
+	 * Amount of time the progress monitor can remain inactive before it is
+	 * automatically hidden
+	 */
+	private static final int AUTOHIDE_INACTIVITY_TIMER_MS = 5000;
+
 	/** visibility state of the progressbar */
 	protected boolean fProgressIsVisible = false;
 
@@ -118,6 +124,16 @@ import org.eclipse.swt.widgets.ToolItem;
 			.createFromFile(StatusLine.class, "images/stop.png");//$NON-NLS-1$
 
 	private MenuItem copyMenuItem;
+
+	/**
+	 * True iff the Runnable for triggering auto-hide is currently scheduled
+	 * with the Display.
+	 */
+	private boolean fAutoHideScheduled;
+
+	/** Timestamp at which work was most recently reported */
+	private long fLastWorkReported;
+
 	static {
 		JFaceResources.getImageRegistry().put(
 				"org.eclipse.jface.parts.StatusLine.stopImage", fgStopImage);//$NON-NLS-1$
@@ -361,6 +377,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	public void beginTask(String name, int totalWork) {
 		final long timestamp = System.currentTimeMillis();
 		fStartTime = timestamp;
+		fLastWorkReported = timestamp;
 		final boolean animated = (totalWork == UNKNOWN || totalWork == 0);
 		// make sure the progress bar is made visible while
 		// the task is running. Fixes bug 32198 for the non-animated case.
@@ -396,8 +413,6 @@ import org.eclipse.swt.widgets.ToolItem;
 			fProgressBar.done();
 		}
 		setMessage(null);
-
-		hideProgress();
 	}
 
 	/**
@@ -428,8 +443,9 @@ import org.eclipse.swt.widgets.ToolItem;
 	 *
 	 */
 	protected void hideProgress() {
-
 		if (fProgressIsVisible && !isDisposed()) {
+			// DO NOT SUBMIT!
+			System.out.println("hideProgress"); //$NON-NLS-1$
 			fProgressIsVisible = false;
 			fCancelEnabled = false;
 			fCancelButtonIsVisible = false;
@@ -449,14 +465,41 @@ import org.eclipse.swt.widgets.ToolItem;
 	 */
 	@Override
 	public void internalWorked(double work) {
+		fLastWorkReported = System.currentTimeMillis();
 		if (!fProgressIsVisible) {
-			if (System.currentTimeMillis() - fStartTime > DELAY_PROGRESS) {
+			if (fLastWorkReported - fStartTime > DELAY_PROGRESS) {
 				showProgress();
 			}
 		}
 
 		if (fProgressBar != null) {
 			fProgressBar.worked(work);
+		}
+	}
+
+	/**
+	 *
+	 */
+	private void scheduleAutoHide() {
+		if (!fAutoHideScheduled) {
+			fAutoHideScheduled = true;
+			int timeUntilNextUpdate = Math
+					.max(AUTOHIDE_INACTIVITY_TIMER_MS - (int) (System.currentTimeMillis() - fLastWorkReported), 0);
+			getDisplay().timerExec(timeUntilNextUpdate, new Runnable() {
+				@Override
+				public void run() {
+					if (isDisposed()) {
+						return;
+					}
+					fAutoHideScheduled = false;
+					long timeSinceLastUpdate = System.currentTimeMillis() - fLastWorkReported;
+					if (timeSinceLastUpdate >= AUTOHIDE_INACTIVITY_TIMER_MS) {
+						hideProgress();
+					} else {
+						scheduleAutoHide();
+					}
+				}
+			});
 		}
 	}
 
@@ -605,6 +648,7 @@ import org.eclipse.swt.widgets.ToolItem;
 	protected void showProgress() {
 		if (!fProgressIsVisible && !isDisposed()) {
 			fProgressIsVisible = true;
+			scheduleAutoHide();
 			if (fCancelEnabled) {
 				showButton();
 			}
