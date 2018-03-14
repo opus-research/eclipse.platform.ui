@@ -58,7 +58,6 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
-	@Deprecated
 	public static final int INDEX_PARAMETER_ID = 0;
 
 	/**
@@ -67,7 +66,6 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
-	@Deprecated
 	public static final int INDEX_PARAMETER_NAME = 1;
 
 	/**
@@ -76,7 +74,6 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
-	@Deprecated
 	public static final int INDEX_PARAMETER_VALUE_NAME = 2;
 
 	/**
@@ -84,7 +81,6 @@ public final class ParameterizedCommand implements Comparable {
 	 *
 	 * @deprecated no longer used
 	 */
-	@Deprecated
 	public static final int INDEX_PARAMETER_VALUE_VALUE = 3;
 
 	/**
@@ -457,7 +453,6 @@ public final class ParameterizedCommand implements Comparable {
 	 * @deprecated Please use {@link #executeWithChecks(Object, Object)}
 	 *             instead.
 	 */
-	@Deprecated
 	public final Object execute(final Object trigger, final Object applicationContext)
 			throws ExecutionException, NotHandledException {
 		return command.execute(new ExecutionEvent(command, getParameterMap(), trigger, applicationContext));
