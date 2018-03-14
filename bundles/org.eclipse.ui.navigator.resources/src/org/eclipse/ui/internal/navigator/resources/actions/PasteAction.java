@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.actions;
 
@@ -27,8 +26,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.CopyFilesAndFoldersOperation;
 import org.eclipse.ui.actions.CopyProjectOperation;
 import org.eclipse.ui.actions.SelectionListenerAction;
-import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 import org.eclipse.ui.part.ResourceTransfer;
+import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMessages;
 
 /**
  * Standard action for pasting resources on the clipboard to the selected resource's location.
@@ -80,7 +79,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * @return the actual target of the paste action
      */
     private IResource getTarget() {
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
 
         for (IResource resource : selectedResources) {
             if (resource instanceof IProject && !((IProject) resource).isOpen()) {
@@ -159,7 +158,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * Returns the container to hold the pasted resources.
      */
     private IContainer getContainer() {
-		List<? extends IResource> selection = getSelectedResources();
+        List<IResource> selection = getSelectedResources();
         if (selection.get(0) instanceof IFile) {
 			return ((IFile) selection.get(0)).getParent();
 		}
@@ -222,7 +221,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 
         // can paste files and folders to a single selection (file, folder,
         // open project) or multiple file selection with the same parent
-		List<? extends IResource> selectedResources = getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
         if (selectedResources.size() > 1) {
             for (IResource resource : selectedResources) {
                 if (resource.getType() != IResource.FILE) {
