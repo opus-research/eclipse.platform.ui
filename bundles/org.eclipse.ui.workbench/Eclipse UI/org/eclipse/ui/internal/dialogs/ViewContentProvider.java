@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 20014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,22 +7,18 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430603
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
-import org.eclipse.e4.ui.model.application.MApplication;
-import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
-import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.intro.IIntroConstants;
+import org.eclipse.ui.views.IViewCategory;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
 
@@ -31,148 +27,119 @@ import org.eclipse.ui.views.IViewRegistry;
  */
 public class ViewContentProvider implements ITreeContentProvider {
 
-	final private static String CATEGORY_TAG = "categoryTag:"; //$NON-NLS-1$
-	final private static int CATEGORY_TAG_LENGTH = CATEGORY_TAG.length();
-
-	/**
+    /**
 	 * Child cache. Map from Object->Object[]. Our hasChildren() method is
 	 * expensive so it's better to cache the results of getChildren().
 	 */
-	private Map<Object, Object[]> childMap = new HashMap<Object, Object[]>();
+    private Map<Object, Object[]> childMap = new HashMap<Object, Object[]>();
 
-	private MApplication application;
-	private IViewRegistry viewRegistry;
+    /**
+     * Create a new instance of the ViewContentProvider.
+     */
+    public ViewContentProvider() {
+        //no-op
+    }
 
-	public ViewContentProvider(MApplication application) {
-		this.application = application;
-		viewRegistry = WorkbenchPlugin.getDefault().getViewRegistry();
-	}
-
-	@Override
+    @Override
 	public void dispose() {
-		childMap.clear();
-	}
+        childMap.clear();
+    }
 
-	@Override
-	public Object getParent(Object element) {
-		return null;
-	}
-
-	@Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		childMap.clear();
-		application = (MApplication) newInput;
-	}
-
-	@Override
-	public Object[] getElements(Object element) {
-		return getChildren(element);
-	}
-
-	@Override
-	public boolean hasChildren(Object element) {
-		if (element instanceof MApplication) {
-			return true;
-		} else if (element instanceof String) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
+    @Override
 	public Object[] getChildren(Object element) {
-		Object[] children = childMap.get(element);
-		if (children == null) {
-			children = createChildren(element);
-			childMap.put(element, children);
-		}
-		return children;
-	}
+        Object[] children = childMap.get(element);
+        if (children == null) {
+            children = createChildren(element);
+            childMap.put(element, children);
+        }
+        return children;
+    }
 
-	/**
-	 * Determines the categories and views
-	 *
-	 * Views are identified as PartDescriptors which have the tag "View"
-	 *
+    /**
+	 * Does the actual work of getChildren.
 	 */
-	private Object[] createChildren(Object element) {
-		if (element instanceof MApplication) {
-			List<MPartDescriptor> descriptors = ((MApplication) element).getDescriptors();
-			Set<String> categoryTags = new HashSet<String>();
-			Set<MPartDescriptor> visibleViews = new HashSet<MPartDescriptor>();
-			for (MPartDescriptor descriptor : descriptors) {
-				// hide views which are filtered by activities
-				if (isFilteredByActivity(descriptor.getElementId())) {
+    private Object[] createChildren(Object element) {
+        if (element instanceof IViewRegistry) {
+            IViewRegistry reg = (IViewRegistry) element;
+            IViewCategory [] categories = reg.getCategories();
+
+			ArrayList<IViewCategory> filtered = new ArrayList<IViewCategory>();
+            for (int i = 0; i < categories.length; i++) {
+                if (!hasChildren(categories[i])) {
 					continue;
 				}
-				List<String> tags = descriptor.getTags();
-				String category = null;
-				boolean isView = false;
-				for (String tag : tags) {
-					if (tag.equals("View")) //$NON-NLS-1$
-						isView = true;
-					else if (tag.startsWith(CATEGORY_TAG)) {
-						category = tag.substring(CATEGORY_TAG_LENGTH);
-					}
-				}
 
-				if (isView) {
-					if (category != null) {
-						categoryTags.add(category);
-					} else {
-						visibleViews.add(descriptor);
-					}
-				}
-			}
+                filtered.add(categories[i]);
+            }
+			categories = filtered.toArray(new IViewCategory[filtered
+                    .size()]);
 
-			Set<Object> combinedTopElements = new HashSet<Object>();
-			combinedTopElements.addAll(categoryTags);
-			combinedTopElements.addAll(visibleViews);
-			return combinedTopElements.toArray();
-		} else if (element instanceof String) {
-			List<MPartDescriptor> descriptors = application.getDescriptors();
-			Set<MPartDescriptor> categoryDescriptors = new HashSet<MPartDescriptor>();
-			for (MPartDescriptor descriptor : descriptors) {
-				if (isFilteredByActivity(descriptor.getElementId())
-						|| isIntroView(descriptor.getElementId())) {
-					continue;
-				}
-				List<String> tags = descriptor.getTags();
-				for (String tag : tags) {
-					if (!tag.startsWith(CATEGORY_TAG))
+            // if there is only one category, return it's children directly
+            if (categories.length == 1) {
+                return getChildren(categories[0]);
+            }
+            return categories;
+        } else if (element instanceof IViewCategory) {
+            IViewDescriptor [] views = ((IViewCategory) element).getViews();
+            if (views != null) {
+                ArrayList<Object> filtered = new ArrayList<Object>();
+                for (int i = 0; i < views.length; i++) {
+                    Object o = views[i];
+                    if (WorkbenchActivityHelper.filterItem(o)) {
 						continue;
-					String categoryTag = tag.substring(CATEGORY_TAG_LENGTH);
-					if (element.equals(categoryTag))
-						categoryDescriptors.add(descriptor);
-				}
-			}
-			return categoryDescriptors.toArray();
-		}
-		return new Object[0];
-	}
+					}
+                    filtered.add(o);
+                }
+                return removeIntroView(filtered).toArray();
+            }
+        }
 
-	/**
-	 * Remove Eclipse introview from this list, as it opened via the Help ->
-	 * Welcome menu
-	 */
-	private boolean isIntroView(String id) {
-		return (id.equals(IIntroConstants.INTRO_VIEW_ID));
-	}
+        return new Object[0];
+    }
 
-	/**
-	 * Evaluates if the view is filtered by an activity
+    /**
+	 * Removes the temporary intro view from the list so that it cannot be
+	 * activated except through the introduction command.
 	 *
-	 * @param elementId
-	 * @return result of the check
+	 * @param list
+	 *            the list of view descriptors
+	 * @return the modified list.
+	 * @since 3.0
 	 */
-	private boolean isFilteredByActivity(String elementId) {
-		IViewDescriptor[] views = viewRegistry.getViews();
-		for (IViewDescriptor descriptor : views) {
-			if (descriptor.getId().equals(elementId)
-					&& WorkbenchActivityHelper.filterItem(descriptor)) {
+    private ArrayList<Object> removeIntroView(ArrayList<Object> list) {
+        for (Iterator<Object> i = list.iterator(); i.hasNext();) {
+            IViewDescriptor view = (IViewDescriptor) i.next();
+            if (view.getId().equals(IIntroConstants.INTRO_VIEW_ID)) {
+                i.remove();
+            }
+        }
+        return list;
+    }
+
+    @Override
+	public Object[] getElements(Object element) {
+        return getChildren(element);
+    }
+
+    @Override
+	public Object getParent(Object element) {
+        return null;
+    }
+
+    @Override
+	public boolean hasChildren(java.lang.Object element) {
+        if (element instanceof IViewRegistry) {
+			return true;
+		} else if (element instanceof IViewCategory) {
+            if (getChildren(element).length > 0) {
 				return true;
 			}
-		}
-		return false;
-	}
+        }
+        return false;
+    }
+
+    @Override
+	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        childMap.clear();
+    }
 }
