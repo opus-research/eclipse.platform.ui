@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440893
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 436344
  *******************************************************************************/
 package org.eclipse.e4.ui.bindings.tests;
 
@@ -109,6 +110,7 @@ public class BindingTableTests extends TestCase {
 						BINDINGS[i + 2], null, null, null, Binding.SYSTEM));
 			}
 		}
+		System.out.println("Made setup");
 	}
 
 	public void testOneTable() throws Exception {
