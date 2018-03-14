@@ -11,6 +11,8 @@
 
 package org.eclipse.ui.internal.quickaccess;
 
+import org.eclipse.ui.quickaccess.IQuickAccessProvider;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.eclipse.e4.ui.model.LocalizationHelper;
@@ -37,7 +39,7 @@ public class ViewElement extends QuickAccessElement {
 	private MPartDescriptor viewDescriptor;
 	private ImageDescriptor imageDescriptor;
 
-	public ViewElement(QuickAccessProvider provider, MWindow window, MPartDescriptor descriptor) {
+	public ViewElement(IQuickAccessProvider provider, MWindow window, MPartDescriptor descriptor) {
 		super(provider);
 		this.window = window;
 		this.viewDescriptor = descriptor;

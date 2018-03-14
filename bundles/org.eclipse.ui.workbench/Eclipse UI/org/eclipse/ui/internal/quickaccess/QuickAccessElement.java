@@ -13,89 +13,82 @@ package org.eclipse.ui.internal.quickaccess;
 
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
+import org.eclipse.ui.quickaccess.IQuickAccessProvider;
+import org.eclipse.ui.quickaccess.QuickAccessMatch;
 
 /**
  * @since 3.3
  * 
  */
-public abstract class QuickAccessElement {
+public abstract class QuickAccessElement implements IQuickAccessElement {
 
 	static final String separator = " - "; //$NON-NLS-1$
 
 	private static final int[][] EMPTY_INDICES = new int[0][0];
-	private QuickAccessProvider provider;
+	private IQuickAccessProvider provider;
 
 	/**
 	 * @param provider
 	 */
-	public QuickAccessElement(QuickAccessProvider provider) {
+	public QuickAccessElement(IQuickAccessProvider provider) {
 		super();
 		this.provider = provider;
 	}
 
-	/**
-	 * Returns the label to be displayed to the user.
-	 * 
-	 * @return the label
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getLabel()
 	 */
+	@Override
 	public abstract String getLabel();
 
-	/**
-	 * Returns the image descriptor for this element.
-	 * 
-	 * @return an image descriptor, or null if no image is available
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getImageDescriptor()
 	 */
+	@Override
 	public abstract ImageDescriptor getImageDescriptor();
 
-	/**
-	 * Returns the id for this element. The id has to be unique within the
-	 * QuickAccessProvider that provided this element.
-	 * 
-	 * @return the id
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getId()
 	 */
+	@Override
 	public abstract String getId();
 
-	/**
-	 * Executes the associated action for this element.
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#execute()
 	 */
+	@Override
 	public abstract void execute();
 
-	/**
-	 * Return the label to be used for sorting elements.
-	 * 
-	 * @return the sort label
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getSortLabel()
 	 */
+	@Override
 	public String getSortLabel() {
 		return getLabel();
 	}
 
-	/**
-	 * @return Returns the provider.
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getProvider()
 	 */
-	public QuickAccessProvider getProvider() {
+	@Override
+	public IQuickAccessProvider getProvider() {
 		return provider;
 	}
 
-	/**
-	 * If this element is a match (partial, complete, camel case, etc) to the
-	 * given filter, returns a {@link QuickAccessEntry}. Otherwise returns
-	 * <code>null</code>;
-	 * 
-	 * @param filter
-	 *            filter for matching
-	 * @param providerForMatching
-	 *            the provider that will own the entry
-	 * @return a quick access entry or <code>null</code>
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#match(java.lang.String, org.eclipse.ui.quickaccess.IQuickAccessProvider)
 	 */
-	public QuickAccessEntry match(String filter,
-			QuickAccessProvider providerForMatching) {
+	@Override
+	public QuickAccessMatch match(String filter,
+			IQuickAccessProvider providerForMatching) {
 		String sortLabel = getLabel();
 		int index = sortLabel.toLowerCase().indexOf(filter);
 		if (index != -1) {
-			int quality = sortLabel.toLowerCase().equals(filter) ? QuickAccessEntry.MATCH_PERFECT
-					: (sortLabel.toLowerCase().startsWith(filter) ? QuickAccessEntry.MATCH_EXCELLENT
-							: QuickAccessEntry.MATCH_GOOD);
-			return new QuickAccessEntry(this, providerForMatching,
+			int quality = sortLabel.toLowerCase().equals(filter) ? QuickAccessMatch.MATCH_PERFECT : (sortLabel
+					.toLowerCase().startsWith(filter) ? QuickAccessMatch.MATCH_EXCELLENT
+ : QuickAccessMatch.MATCH_GOOD);
+			return new QuickAccessMatch(this, providerForMatching,
 					new int[][] { { index, index + filter.length() - 1 } },
  EMPTY_INDICES, quality);
 		}
@@ -105,23 +98,23 @@ public abstract class QuickAccessElement {
 			int lengthOfElementMatch = index + filter.length()
 					- providerForMatching.getName().length() - 1;
 			if (lengthOfElementMatch > 0) {
-				return new QuickAccessEntry(this, providerForMatching,
+				return new QuickAccessMatch(this, providerForMatching,
 						new int[][] { { 0, lengthOfElementMatch - 1 } },
  new int[][] { { index,
-						index + filter.length() - 1 } }, QuickAccessEntry.MATCH_GOOD);
+ index + filter.length() - 1 } }, QuickAccessMatch.MATCH_GOOD);
 			}
-			return new QuickAccessEntry(this, providerForMatching,
+			return new QuickAccessMatch(this, providerForMatching,
 					EMPTY_INDICES, new int[][] { { index,
- index + filter.length() - 1 } }, QuickAccessEntry.MATCH_GOOD);
+					index + filter.length() - 1 } }, QuickAccessMatch.MATCH_GOOD);
 		}
 		String camelCase = CamelUtil.getCamelCase(sortLabel);
 		index = camelCase.indexOf(filter);
 		if (index != -1) {
 			int[][] indices = CamelUtil.getCamelCaseIndices(sortLabel, index, filter
 					.length());
-			return new QuickAccessEntry(this, providerForMatching, indices,
+			return new QuickAccessMatch(this, providerForMatching, indices,
  EMPTY_INDICES,
-					QuickAccessEntry.MATCH_GOOD);
+ QuickAccessMatch.MATCH_GOOD);
 		}
 		String combinedCamelCase = CamelUtil.getCamelCase(combinedLabel);
 		index = combinedCamelCase.indexOf(filter);
@@ -131,19 +124,19 @@ public abstract class QuickAccessElement {
 			int lengthOfElementMatch = index + filter.length()
 					- providerCamelCase.length();
 			if (lengthOfElementMatch > 0) {
-				return new QuickAccessEntry(
+				return new QuickAccessMatch(
 						this,
 						providerForMatching,
 						CamelUtil.getCamelCaseIndices(sortLabel, 0, lengthOfElementMatch),
 						CamelUtil.getCamelCaseIndices(providerForMatching.getName(),
  index,
 								filter.length() - lengthOfElementMatch),
-						QuickAccessEntry.MATCH_GOOD);
+ QuickAccessMatch.MATCH_GOOD);
 			}
-			return new QuickAccessEntry(this, providerForMatching,
+			return new QuickAccessMatch(this, providerForMatching,
 					EMPTY_INDICES, CamelUtil.getCamelCaseIndices(providerForMatching
 .getName(), index,
-							filter.length()), QuickAccessEntry.MATCH_GOOD);
+ filter.length()), QuickAccessMatch.MATCH_GOOD);
 		}
 		return null;
 	}

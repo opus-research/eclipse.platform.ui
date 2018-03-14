@@ -19,6 +19,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -29,19 +30,19 @@ public class EditorProvider extends QuickAccessProvider {
 	private Map idToElement;
 
 	@Override
-	public QuickAccessElement getElementForId(String id) {
+	public IQuickAccessElement getElementForId(String id) {
 		getElements();
 		return (EditorElement) idToElement.get(id);
 	}
 
 	@Override
-	public QuickAccessElement[] getElements() {
+	public IQuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
 			IWorkbenchPage activePage = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
 			if (activePage == null) {
-				return new QuickAccessElement[0];
+				return new IQuickAccessElement[0];
 			}
 			IEditorReference[] editors = activePage.getEditorReferences();
 			for (int i = 0; i < editors.length; i++) {
@@ -50,8 +51,8 @@ public class EditorProvider extends QuickAccessProvider {
 				idToElement.put(editorElement.getId(), editorElement);
 			}
 		}
-		return (QuickAccessElement[]) idToElement.values().toArray(
-				new QuickAccessElement[idToElement.values().size()]);
+		return (IQuickAccessElement[]) idToElement.values().toArray(
+				new IQuickAccessElement[idToElement.values().size()]);
 	}
 
 	@Override

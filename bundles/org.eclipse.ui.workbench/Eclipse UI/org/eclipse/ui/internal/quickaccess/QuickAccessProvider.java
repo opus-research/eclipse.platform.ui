@@ -13,50 +13,54 @@ package org.eclipse.ui.internal.quickaccess;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.ui.quickaccess.IQuickAccessElement;
+import org.eclipse.ui.quickaccess.IQuickAccessProvider;
 
 /**
  * @since 3.3
  * 
  */
-public abstract class QuickAccessProvider {
+public abstract class QuickAccessProvider implements IQuickAccessProvider {
 
-	private QuickAccessElement[] sortedElements;
+	private IQuickAccessElement[] sortedElements;
 
-	/**
-	 * Returns the unique ID of this provider.
-	 * 
-	 * @return the unique ID
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getId()
 	 */
+	@Override
 	public abstract String getId();
 
-	/**
-	 * Returns the name of this provider to be displayed to the user.
-	 * 
-	 * @return the name
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getName()
 	 */
+	@Override
 	public abstract String getName();
 
-	/**
-	 * Returns the image descriptor for this provider.
-	 * 
-	 * @return the image descriptor, or null if not defined
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getImageDescriptor()
 	 */
+	@Override
 	public abstract ImageDescriptor getImageDescriptor();
 
-	/**
-	 * Returns the elements provided by this provider.
-	 * 
-	 * @return this provider's elements
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getElements()
 	 */
-	public abstract QuickAccessElement[] getElements();
+	@Override
+	public abstract IQuickAccessElement[] getElements();
 
-	public QuickAccessElement[] getElementsSorted() {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getElementsSorted()
+	 */
+	@Override
+	public IQuickAccessElement[] getElementsSorted() {
 		if (sortedElements == null) {
 			sortedElements = getElements();
-			Arrays.sort(sortedElements, new Comparator<QuickAccessElement>() {
+			Arrays.sort(sortedElements, new Comparator<IQuickAccessElement>() {
 				@Override
-				public int compare(QuickAccessElement e1, QuickAccessElement e2) {
+				public int compare(IQuickAccessElement e1, IQuickAccessElement e2) {
 					return e1.getSortLabel().compareTo(e2.getSortLabel());
 				}
 			});
@@ -64,24 +68,54 @@ public abstract class QuickAccessProvider {
 		return sortedElements;
 	}
 	
-	/**
-	 * Returns the element for the given ID if available, or null if no matching
-	 * element is available.
-	 * 
-	 * @param id
-	 *            the ID of an element
-	 * @return the element with the given ID, or null if not found.
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#getElementForId(java.lang.String)
 	 */
-	public abstract QuickAccessElement getElementForId(String id);
+	@Override
+	public abstract IQuickAccessElement getElementForId(String id);
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#isAlwaysPresent()
+	 */
+	@Override
 	public boolean isAlwaysPresent() {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessProvider#reset()
+	 */
+	@Override
 	public void reset() {
 		sortedElements = null;
 		doReset();
 	}
 
 	protected abstract void doReset();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.quickaccess.IQuickAccessProvider#setWindow(org.eclipse
+	 * .e4.ui.model.application.ui.basic.MWindow)
+	 */
+	@Override
+	public void setWindow(MWindow window) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.quickaccess.IQuickAccessProvider#setApplication(org.eclipse
+	 * .e4.ui.model.application.MApplication)
+	 */
+	@Override
+	public void setApplication(MApplication application) {
+		// TODO Auto-generated method stub
+
+	}
 }
