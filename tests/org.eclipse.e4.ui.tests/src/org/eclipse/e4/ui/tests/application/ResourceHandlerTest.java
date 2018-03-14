@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,11 +11,6 @@
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.application;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
@@ -30,7 +25,6 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.osgi.service.datalocation.Location;
-import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -62,6 +56,7 @@ public class ResourceHandlerTest extends HeadlessStartupTest {
 		localContext.set(E4Workbench.INSTANCE_LOCATION, getInstanceLocation());
 		localContext.set(E4Workbench.PERSIST_STATE, Boolean.TRUE);
 		localContext.set(E4Workbench.CLEAR_PERSISTED_STATE, Boolean.TRUE);
+		localContext.set(E4Workbench.DELTA_RESTORE, Boolean.TRUE);
 
 		localContext.set(E4Workbench.INITIAL_WORKBENCH_MODEL_URI, uri);
 
@@ -70,7 +65,42 @@ public class ResourceHandlerTest extends HeadlessStartupTest {
 
 	}
 
-	@Test
+	// TBD the test is not valid - resource handler does not know how to create
+	// a "default" model. My be we could add a "default default" model?
+	// public void testLoadMostRecent() {
+	// URI uri = URI.createPlatformPluginURI(
+	// "org.eclipse.e4.ui.tests/xmi/InvalidContainment.e4xmi", true);
+	//
+	// ResourceHandler handler = createHandler(uri);
+	// Resource resource = handler.loadMostRecentModel();
+	// assertNotNull(resource);
+	// assertEquals(E4XMIResource.class, resource.getClass());
+	// checkData(resource);
+	// }
+
+	// private void checkData(Resource resource) {
+	// assertNotNull(resource);
+	// assertEquals(1, resource.getContents().size());
+	// MApplication app = (MApplication) resource.getContents().get(0);
+	// assertEquals(1, app.getChildren().size());
+	// MWindow w = app.getChildren().get(0);
+	// assertEquals("window1", w.getElementId());
+	// assertEquals(2, w.getChildren().size());
+	// MPartStack stack = (MPartStack) w.getChildren().get(0);
+	// assertEquals("window1.partstack1", stack.getElementId());
+	// assertEquals(2, stack.getChildren().size());
+	// assertEquals("window1.partstack1.part1", stack.getChildren().get(0)
+	// .getElementId());
+	// assertEquals("window1.partstack1.inputpart1", stack.getChildren()
+	// .get(1).getElementId());
+	//
+	// stack = (MPartStack) w.getChildren().get(1);
+	// assertEquals("window1.partstack2", stack.getElementId());
+	// assertEquals(1, stack.getChildren().size());
+	// assertEquals("window1.partstack2.part1", stack.getChildren().get(0)
+	// .getElementId());
+	// }
+
 	public void testModelProcessor() {
 		URI uri = URI.createPlatformPluginURI(
 				"org.eclipse.e4.ui.tests/xmi/modelprocessor/base.e4xmi", true);
@@ -132,7 +162,6 @@ public class ResourceHandlerTest extends HeadlessStartupTest {
 				.getChildren().get(0).getChildren().get(7).getElementId());
 	}
 
-	@Test
 	public void testXPathModelProcessor() {
 
 		URI uri = URI.createPlatformPluginURI("org.eclipse.e4.ui.tests/xmi/modelprocessor/base.e4xmi", true);
@@ -143,7 +172,7 @@ public class ResourceHandlerTest extends HeadlessStartupTest {
 
 		/**
 		 * We will now test the various ways an element can be contributed to
-		 * multiple parents. ModelFragments.e4xmi has been configured to add 2
+		 * multiple parents. ModelFragments.e4mi has been configured to add 2
 		 * menus to the Main Menu. These menus will receive our test
 		 * contributions.
 		 */

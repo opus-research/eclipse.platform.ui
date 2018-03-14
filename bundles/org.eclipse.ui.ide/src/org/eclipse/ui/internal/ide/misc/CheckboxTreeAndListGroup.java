@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -202,17 +202,20 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
-                () -> {
-				    if (event.getCheckable().equals(treeViewer)) {
-						treeItemChecked(event.getElement(), event
-				                .getChecked());
-					} else {
-						listItemChecked(event.getElement(), event
-				                .getChecked(), true);
-					}
+                new Runnable() {
+                    @Override
+					public void run() {
+                        if (event.getCheckable().equals(treeViewer)) {
+							treeItemChecked(event.getElement(), event
+                                    .getChecked());
+						} else {
+							listItemChecked(event.getElement(), event
+                                    .getChecked(), true);
+						}
 
-				    notifyCheckStateChangeListeners(event);
-				});
+                        notifyCheckStateChangeListeners(event);
+                    }
+                });
     }
 
     /**
@@ -572,10 +575,13 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
-                () -> {
-				    setTreeChecked(root, selection);
-				    listViewer.setAllChecked(selection);
-				});
+                new Runnable() {
+                    @Override
+					public void run() {
+                        setTreeChecked(root, selection);
+                        listViewer.setAllChecked(selection);
+                    }
+                });
     }
 
     /**
@@ -772,42 +778,45 @@ public class CheckboxTreeAndListGroup extends EventManager implements
 
         //Potentially long operation - show a busy cursor
         BusyIndicator.showWhile(treeViewer.getControl().getDisplay(),
-                () -> {
-				    Iterator keyIterator = items.keySet().iterator();
+                new Runnable() {
+                    @Override
+					public void run() {
+                        Iterator keyIterator = items.keySet().iterator();
 
-				    //Update the store before the hierarchy to prevent updating parents before all of the children are done
-				    while (keyIterator.hasNext()) {
-				        Object key1 = keyIterator.next();
-				        //Replace the items in the checked state store with those from the supplied items
-				        List selections = (List) items.get(key1);
-				        if (selections.size() == 0) {
-							//If it is empty remove it from the list
-				            checkedStateStore.remove(key1);
-						} else {
-				            checkedStateStore.put(key1, selections);
-				            // proceed up the tree element hierarchy
-				            Object parent = treeContentProvider
-				                    .getParent(key1);
-				            if (parent != null) {
-				                addToHierarchyToCheckedStore(parent);
-				            }
-				        }
-				    }
+                        //Update the store before the hierarchy to prevent updating parents before all of the children are done
+                        while (keyIterator.hasNext()) {
+                            Object key = keyIterator.next();
+                            //Replace the items in the checked state store with those from the supplied items
+                            List selections = (List) items.get(key);
+                            if (selections.size() == 0) {
+								//If it is empty remove it from the list
+                                checkedStateStore.remove(key);
+							} else {
+                                checkedStateStore.put(key, selections);
+                                // proceed up the tree element hierarchy
+                                Object parent = treeContentProvider
+                                        .getParent(key);
+                                if (parent != null) {
+                                    addToHierarchyToCheckedStore(parent);
+                                }
+                            }
+                        }
 
-				    //Now update hierarchies
-				    keyIterator = items.keySet().iterator();
+                        //Now update hierarchies
+                        keyIterator = items.keySet().iterator();
 
-				    while (keyIterator.hasNext()) {
-				        Object key2 = keyIterator.next();
-				        updateHierarchy(key2);
-				        if (currentTreeSelection != null
-				                && currentTreeSelection.equals(key2)) {
-				            listViewer.setAllChecked(false);
-				            listViewer.setCheckedElements(((List) items
-				                    .get(key2)).toArray());
-				        }
-				    }
-				});
+                        while (keyIterator.hasNext()) {
+                            Object key = keyIterator.next();
+                            updateHierarchy(key);
+                            if (currentTreeSelection != null
+                                    && currentTreeSelection.equals(key)) {
+                                listViewer.setAllChecked(false);
+                                listViewer.setCheckedElements(((List) items
+                                        .get(key)).toArray());
+                            }
+                        }
+                    }
+                });
 
     }
 }

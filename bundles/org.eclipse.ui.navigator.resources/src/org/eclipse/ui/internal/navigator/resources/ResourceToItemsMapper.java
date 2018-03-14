@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,11 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.ui.navigator.CommonViewer;
 import org.eclipse.ui.navigator.ICommonViewerMapper;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 
 /**
  * Adds a supplemental map for the CommonViewer to efficiently handle resource
@@ -87,7 +87,7 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 				List<Item> list = (List<Item>) existingMapping;
 				list.remove(item);
 				if (list.isEmpty()) {
-					_resourceToItem.remove(resource);
+					_resourceToItem.remove(list);
 					releaseList(list);
 				}
 			}
@@ -152,6 +152,10 @@ public class ResourceToItemsMapper implements ICommonViewerMapper {
 	}
 
 	private static IResource getCorrespondingResource(Object element) {
-		return Adapters.adapt(element, IResource.class);
+		if (element instanceof IResource)
+			return (IResource) element;
+		if (element instanceof IAdaptable)
+			return ((IAdaptable) element).getAdapter(IResource.class);
+		return null;
 	}
 }

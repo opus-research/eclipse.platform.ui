@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.ui.model.application.MApplication;
@@ -267,6 +266,13 @@ public class QuickAccessDialog extends PopupDialog {
 		return filterText;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.jface.dialogs.PopupDialog#createDialogArea(org.eclipse.swt
+	 * .widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = (Composite) super.createDialogArea(parent);
@@ -283,9 +289,9 @@ public class QuickAccessDialog extends PopupDialog {
 	final protected TriggerSequence[] getInvokingCommandKeySequences() {
 		if (invokingCommandKeySequences == null) {
 			if (invokingCommand != null) {
-				IBindingService bindingService =
-						Adapters.adapt(window.getWorkbench(), IBindingService.class);
-				invokingCommandKeySequences = bindingService.getActiveBindingsFor(invokingCommand.getId());
+				IBindingService bindingService = window.getWorkbench().getAdapter(IBindingService.class);
+				invokingCommandKeySequences = bindingService.getActiveBindingsFor(invokingCommand
+						.getId());
 			}
 		}
 		return invokingCommandKeySequences;

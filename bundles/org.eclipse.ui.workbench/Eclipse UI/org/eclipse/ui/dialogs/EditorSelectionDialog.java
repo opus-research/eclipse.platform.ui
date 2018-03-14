@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Muskalla -Bug 29633
- *     Helena Halperin - Bug 298747
+ *     Benjamin Muskalla -	Bug 29633 [EditorMgmt] "Open" menu should
+ *     						have Open With-->Other
+ *     Helena Halperin - Bug 298747 [EditorMgmt] Bidi Incorrect file type direction in mirrored "Editor Selection" dialog
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378485, 460555, 463262
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -310,7 +310,7 @@ public class EditorSelectionDialog extends Dialog {
 		if (fileName != null) {
 
 			rememberEditorButton = new Button(contents, SWT.CHECK | SWT.LEFT);
-			rememberEditorButton.setText(NLS.bind(WorkbenchMessages.EditorSelection_rememberEditor, fileName));
+			rememberEditorButton.setText(WorkbenchMessages.EditorSelection_rememberEditor);
 			rememberEditorButton.addListener(SWT.Selection, listener);
 			data = new GridData();
 			data.horizontalSpan = 2;
@@ -327,7 +327,6 @@ public class EditorSelectionDialog extends Dialog {
 				data.horizontalIndent = 15;
 				rememberTypeButton.setLayoutData(data);
 				rememberTypeButton.setFont(font);
-				rememberTypeButton.setEnabled(false);
 			}
 		}
 
@@ -382,10 +381,7 @@ public class EditorSelectionDialog extends Dialog {
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
 		} else {
 			// set focus to first element, but don't select it:
-			Tree tree = editorTableViewer.getTree();
-			if (tree.getItemCount() > 0) {
-				tree.showItem(tree.getItem(0));
-			}
+			editorTableViewer.getTree().showItem(editorTableViewer.getTree().getItem(0));
 		}
 		editorTable.setFocus();
 	}
@@ -459,7 +455,7 @@ public class EditorSelectionDialog extends Dialog {
 			return editors;
 		}
 
-		List<IEditorDescriptor> filteredList = new ArrayList<>();
+		List<IEditorDescriptor> filteredList = new ArrayList<IEditorDescriptor>();
 		for (int i = 0; i < editors.length; i++) {
 			boolean add = true;
 			for (int j = 0; j < editorsToFilter.length; j++) {
@@ -565,22 +561,19 @@ public class EditorSelectionDialog extends Dialog {
 		settings.put(STORE_ID_DESCR, selectedEditor.getId());
 		String editorId = selectedEditor.getId();
 		settings.put(STORE_ID_DESCR, editorId);
-		if (rememberEditorButton == null || !rememberEditorButton.getSelection()) {
+		EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
+		if (rememberEditorButton == null) {
 			return;
 		}
-		EditorRegistry reg = (EditorRegistry) WorkbenchPlugin.getDefault().getEditorRegistry();
-		if (rememberTypeButton == null || !rememberTypeButton.getSelection()) {
+		if (rememberEditorButton.getSelection()) {
 			updateFileMappings(reg, true);
-			reg.setDefaultEditor(fileName, selectedEditor);
-		} else {
-			updateFileMappings(reg, false);
-			reg.setDefaultEditor("*." + getFileType(), selectedEditor); //$NON-NLS-1$
+			reg.setDefaultEditor(fileName, editorId);
 		}
-		// bug 468906: always re-set editor mappings: this is needed to rebuild
-		// internal editors map after setting the default editor
-		List<IFileEditorMapping> newMappings = new ArrayList<>();
-		newMappings.addAll(Arrays.asList(reg.getFileEditorMappings()));
-		reg.setFileEditorMappings(newMappings.toArray(new FileEditorMapping[newMappings.size()]));
+		if (rememberTypeButton == null || !rememberTypeButton.getSelection()) {
+			return;
+		}
+		updateFileMappings(reg, false);
+		reg.setDefaultEditor("*." + getFileType(), editorId); //$NON-NLS-1$
 		reg.saveAssociations();
 	}
 
@@ -614,7 +607,7 @@ public class EditorSelectionDialog extends Dialog {
 		} else {
 			mapping = new FileEditorMapping(null, fileType);
 		}
-		List<IFileEditorMapping> newMappings = new ArrayList<>();
+		List<IFileEditorMapping> newMappings = new ArrayList<IFileEditorMapping>();
 		newMappings.addAll(Arrays.asList(mappings));
 		newMappings.add(mapping);
 		FileEditorMapping[] array = newMappings.toArray(new FileEditorMapping[newMappings.size()]);
@@ -659,9 +652,6 @@ public class EditorSelectionDialog extends Dialog {
 	protected void updateEnableState() {
 		boolean enableExternal = externalButton.getSelection();
 		browseExternalEditorsButton.setEnabled(enableExternal);
-		if (rememberEditorButton != null && rememberTypeButton != null) {
-			rememberTypeButton.setEnabled(rememberEditorButton.getSelection());
-		}
 		updateOkButton();
 	}
 

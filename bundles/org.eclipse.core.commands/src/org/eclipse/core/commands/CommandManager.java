@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2016 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,9 @@ public final class CommandManager extends HandleObjectManager implements
 		@Override
 		public void notDefined(String commandId, NotDefinedException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener object : executionListeners) {
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
 					if (object instanceof IExecutionListenerWithChecks) {
 						final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 						listener.notDefined(commandId, exception);
@@ -63,7 +65,9 @@ public final class CommandManager extends HandleObjectManager implements
 		@Override
 		public void notEnabled(String commandId, NotEnabledException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener object : executionListeners) {
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
 					if (object instanceof IExecutionListenerWithChecks) {
 						final IExecutionListenerWithChecks listener = (IExecutionListenerWithChecks) object;
 						listener.notEnabled(commandId, exception);
@@ -76,8 +80,13 @@ public final class CommandManager extends HandleObjectManager implements
 		public final void notHandled(final String commandId,
 				final NotHandledException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.notHandled(commandId, exception);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.notHandled(commandId, exception);
+					}
 				}
 			}
 		}
@@ -86,8 +95,13 @@ public final class CommandManager extends HandleObjectManager implements
 		public final void postExecuteFailure(final String commandId,
 				final ExecutionException exception) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.postExecuteFailure(commandId, exception);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.postExecuteFailure(commandId, exception);
+					}
 				}
 			}
 		}
@@ -96,8 +110,13 @@ public final class CommandManager extends HandleObjectManager implements
 		public final void postExecuteSuccess(final String commandId,
 				final Object returnValue) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.postExecuteSuccess(commandId, returnValue);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.postExecuteSuccess(commandId, returnValue);
+					}
 				}
 			}
 		}
@@ -106,8 +125,13 @@ public final class CommandManager extends HandleObjectManager implements
 		public final void preExecute(final String commandId,
 				final ExecutionEvent event) {
 			if (executionListeners != null) {
-				for (final IExecutionListener listener : executionListeners) {
-					listener.preExecute(commandId, event);
+				final Object[] listeners = executionListeners.getListeners();
+				for (int i = 0; i < listeners.length; i++) {
+					final Object object = listeners[i];
+					if (object instanceof IExecutionListener) {
+						final IExecutionListener listener = (IExecutionListener) object;
+						listener.preExecute(commandId, event);
+					}
 				}
 			}
 		}
@@ -250,7 +274,7 @@ public final class CommandManager extends HandleObjectManager implements
 	 * The collection of execution listeners. This collection is
 	 * <code>null</code> if there are no listeners.
 	 */
-	private ListenerList<IExecutionListener> executionListeners;
+	private ListenerList executionListeners;
 
 	/**
 	 * The help context identifiers ({@link String}) for a handler ({@link IHandler}).
@@ -298,7 +322,7 @@ public final class CommandManager extends HandleObjectManager implements
 		}
 
 		if (executionListeners == null) {
-			executionListeners = new ListenerList<>(ListenerList.IDENTITY);
+			executionListeners = new ListenerList(ListenerList.IDENTITY);
 
 			// Add an execution listener to every command.
 			executionListener = new ExecutionListener();
@@ -313,6 +337,11 @@ public final class CommandManager extends HandleObjectManager implements
 		executionListeners.add(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.ICategoryListener#categoryChanged(org.eclipse.core.commands.CategoryEvent)
+	 */
 	@Override
 	public final void categoryChanged(CategoryEvent categoryEvent) {
 		if (categoryEvent.isDefinedChanged()) {
@@ -331,6 +360,11 @@ public final class CommandManager extends HandleObjectManager implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.commands.ICommandListener#commandChanged(org.eclipse.commands.CommandEvent)
+	 */
 	@Override
 	public final void commandChanged(final CommandEvent commandEvent) {
 		if (commandEvent.isDefinedChanged()) {
