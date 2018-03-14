@@ -19,7 +19,7 @@ import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
-import org.eclipse.e4.ui.model.application.ui.menu.MDirectToolItem;
+import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
@@ -735,8 +735,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 					container.getChildren().add(toolItem);
 				}
 			} else {
-				MDirectToolItem toolItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
-				toolItem.getTags().add("Opaque"); //$NON-NLS-1$
+				MOpaqueToolItem toolItem = MenuFactoryImpl.eINSTANCE.createOpaqueToolItem();
 				toolItem.setElementId(item.getId());
 				if (item instanceof AbstractGroupMarker) {
 					toolItem.setVisible(item.isVisible());
