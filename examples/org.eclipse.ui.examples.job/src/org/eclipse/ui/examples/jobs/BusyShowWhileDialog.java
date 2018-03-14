@@ -23,20 +23,28 @@ public class BusyShowWhileDialog extends IconAndMessageDialog {
 		super(parentShell);
 		message = "Busy While Test"; //$NON-NLS-1$
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.IconAndMessageDialog#getImage()
+	 */
 	protected Image getImage() {
 		return null;
 	}
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 */
 	protected void createButtonsForButtonBar(Composite parent) {
 		super.createButtonsForButtonBar(parent);
 		Button detailsButton = createButton(parent, 4, "Start busy show while", false); //$NON-NLS-1$
 		detailsButton.addSelectionListener(new SelectionListener() {
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					ProgressManager.getInstance().busyCursorWhile(new IRunnableWithProgress() {
-						@Override
+						/* (non-Javadoc)
+						 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
+						 */
 						public void run(IProgressMonitor monitor) throws InvocationTargetException,
 								InterruptedException {
 							long time = System.currentTimeMillis();
@@ -45,7 +53,9 @@ public class BusyShowWhileDialog extends IconAndMessageDialog {
 							while (end > System.currentTimeMillis()) {
 								final Shell myShell = BusyShowWhileDialog.this.getShell();
 								myShell.getDisplay().asyncExec(new Runnable() {
-									@Override
+									/* (non-Javadoc)
+									 * @see java.lang.Runnable#run()
+									 */
 									public void run() {
 										if(myShell.isDisposed())
 											return;
@@ -62,7 +72,9 @@ public class BusyShowWhileDialog extends IconAndMessageDialog {
 					//ignore - in this context it means cancelation
 				}
 			}
-			@Override
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			public void widgetDefaultSelected(SelectionEvent e) {
 				//do nothing
 			}
