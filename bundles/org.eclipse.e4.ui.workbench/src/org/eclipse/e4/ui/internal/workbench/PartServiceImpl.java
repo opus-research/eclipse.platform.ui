@@ -1323,7 +1323,7 @@ public class PartServiceImpl implements EPartService {
 
 	@Override
 	public Collection<MPart> getDirtyParts() {
-		List<MPart> dirtyParts = new ArrayList<MPart>();
+		List<MPart> dirtyParts = new ArrayList<>();
 		for (MPart part : getParts()) {
 			if (part.isDirty()) {
 				dirtyParts.add(part);
@@ -1379,7 +1379,7 @@ public class PartServiceImpl implements EPartService {
 	public Collection<MInputPart> getInputParts(String inputUri) {
 		Assert.isNotNull(inputUri, "Input uri must not be null"); //$NON-NLS-1$
 
-		Collection<MInputPart> rv = new ArrayList<MInputPart>();
+		Collection<MInputPart> rv = new ArrayList<>();
 
 		for (MInputPart p : getParts(MInputPart.class, null)) {
 			if (inputUri.equals(p.getInputURI())) {

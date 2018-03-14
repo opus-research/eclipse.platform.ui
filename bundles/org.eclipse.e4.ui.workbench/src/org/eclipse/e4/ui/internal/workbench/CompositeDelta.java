@@ -20,7 +20,7 @@ public class CompositeDelta implements IDelta {
 
 	private final Object object;
 
-	private final LinkedList<IDelta> deltas = new LinkedList<IDelta>();
+	private final LinkedList<IDelta> deltas = new LinkedList<>();
 
 	public CompositeDelta(Object object) {
 		this.object = object;

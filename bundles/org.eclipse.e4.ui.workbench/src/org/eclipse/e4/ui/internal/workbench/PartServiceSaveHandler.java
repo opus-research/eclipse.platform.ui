@@ -69,7 +69,7 @@ public class PartServiceSaveHandler implements ISaveHandler {
 	@Override
 	public boolean saveParts(Collection<MPart> dirtyParts, boolean confirm) {
 		if (confirm) {
-			List<MPart> dirtyPartsList = Collections.unmodifiableList(new ArrayList<MPart>(
+			List<MPart> dirtyPartsList = Collections.unmodifiableList(new ArrayList<>(
 					dirtyParts));
 			Save[] decisions = promptToSave(dirtyPartsList);
 			for (Save decision : decisions) {
