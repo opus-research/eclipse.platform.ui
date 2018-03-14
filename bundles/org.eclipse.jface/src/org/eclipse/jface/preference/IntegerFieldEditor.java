@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     <sgandon@nds.com> - Fix for bug 109389 - IntegerFieldEditor
  *     does not fire property change all the time
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.preference;
 
@@ -71,8 +70,9 @@ public class IntegerFieldEditor extends StringFieldEditor {
     public void setValidRange(int min, int max) {
         minValidValue = min;
         maxValidValue = max;
-		setErrorMessage(JFaceResources.format("IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
-				new Integer(min), new Integer(max)));
+        setErrorMessage(JFaceResources.format(
+        		"IntegerFieldEditor.errorMessageRange", //$NON-NLS-1$
+        		new Object[] { new Integer(min), new Integer(max) }));
     }
 
     @Override

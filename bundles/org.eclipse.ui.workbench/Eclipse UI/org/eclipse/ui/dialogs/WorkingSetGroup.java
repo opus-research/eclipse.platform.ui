@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 483528
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -53,8 +52,8 @@ public final class WorkingSetGroup {
 				false));
 		workingSetGroup.setLayout(new GridLayout(1, false));
 
-		workingSetBlock = new WorkingSetConfigurationBlock(WorkbenchPlugin.getDefault().getDialogSettings(),
-				workingSetTypes);
+		workingSetBlock = new WorkingSetConfigurationBlock(workingSetTypes,
+				WorkbenchPlugin.getDefault().getDialogSettings());
 		workingSetBlock.setWorkingSets(workingSetBlock
 				.findApplicableWorkingSets(currentSelection));
 		workingSetBlock.createContent(workingSetGroup);

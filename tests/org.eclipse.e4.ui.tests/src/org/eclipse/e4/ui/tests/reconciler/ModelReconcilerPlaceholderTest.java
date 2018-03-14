@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,10 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -31,11 +33,14 @@ public abstract class ModelReconcilerPlaceholderTest extends
 	@Test
 	public void testPlaceholder_Ref_Set() {
 		MApplication application = createApplication();
-		MWindow window = ems.createModelElement(MWindow.class);
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
-		MPart part = ems.createModelElement(MPart.class);
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
@@ -99,11 +104,14 @@ public abstract class ModelReconcilerPlaceholderTest extends
 	@Test
 	public void testPlaceholder_Ref_Unset() {
 		MApplication application = createApplication();
-		MWindow window = ems.createModelElement(MWindow.class);
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
-		MPart part = ems.createModelElement(MPart.class);
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
+				.createPerspectiveStack();
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
+				.createPerspective();
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
+				.createPlaceholder();
 
 		application.getChildren().add(window);
 		application.setSelectedElement(window);

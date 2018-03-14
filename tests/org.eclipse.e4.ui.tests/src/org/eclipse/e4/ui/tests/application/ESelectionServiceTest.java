@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,9 +31,11 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -46,16 +48,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testGetSelection() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -95,16 +97,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testGetSelection_Id() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -143,16 +145,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -196,16 +198,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener2() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -267,16 +269,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener3() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -322,7 +324,7 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug314538() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
@@ -336,20 +338,20 @@ public class ESelectionServiceTest extends UITest {
 		SelectionListener listener = new SelectionListener();
 		windowService.addSelectionListener(listener);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		perspective.getChildren().add(partA);
 		perspective.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		perspective.getChildren().add(partB);
 
@@ -384,16 +386,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -448,16 +450,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id2() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -490,20 +492,20 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id3() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPartStack partStack = ems.createModelElement(MPartStack.class);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB"); //$NON-NLS-1$
 		partStack.getChildren().add(partB);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setElementId("partC"); //$NON-NLS-1$
 		partStack.getChildren().add(partC);
 		partStack.setSelectedElement(partB);
@@ -579,11 +581,11 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testOnePartSelection() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -605,13 +607,13 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testTwoPartHandlerExecute() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 
@@ -674,15 +676,15 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testThreePartSelection() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
 
@@ -743,15 +745,15 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testPartOneTracksPartThree() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setElementId("partC");
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
@@ -813,15 +815,15 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testPartOneTracksPartThree2() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
-		MPart partC = ems.createModelElement(MPart.class);
+		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
 		partC.setElementId("partC");
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
@@ -899,13 +901,13 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testInjection() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 
@@ -949,19 +951,19 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug343003() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = ems.createModelElement(MPerspective.class);
+		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		perspective.getChildren().add(partA);
 		perspective.setSelectedElement(partA);
 
@@ -974,11 +976,11 @@ public class ESelectionServiceTest extends UITest {
 		SelectionListener listener = new SelectionListener();
 		selectionServiceA.addSelectionListener("partB", listener); //$NON-NLS-1$
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		partB.setElementId("partB");
 		window.getSharedElements().add(partB);
 
-		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
+		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		placeholder.setRef(partB);
 		partB.setCurSharedRef(placeholder);
 		perspective.getChildren().add(placeholder);
@@ -993,11 +995,11 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug343984() throws Exception {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = ems.createModelElement(MPart.class);
+		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -1023,13 +1025,13 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug393137() {
-		MWindow window = ems.createModelElement(MWindow.class);
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partA);
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 

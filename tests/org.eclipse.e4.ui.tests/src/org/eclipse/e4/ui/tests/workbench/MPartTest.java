@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,12 +21,13 @@ import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.internal.workbench.swt.PartRenderingEngine;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.junit.After;
@@ -36,13 +37,11 @@ import org.junit.Test;
 public class MPartTest {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
-	private EModelService ems;
 
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG, PartRenderingEngine.engineURI);
-		ems = appContext.get(EModelService.class);
 	}
 
 	@After
@@ -57,7 +56,7 @@ public class MPartTest {
 	public void testSetName() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -81,7 +80,7 @@ public class MPartTest {
 	public void testCTabItem_GetImage() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -100,7 +99,7 @@ public class MPartTest {
 	private void testDeclaredName(String declared, String expected) {
 		final MWindow window = createWindowWithOneView(declared);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -133,7 +132,7 @@ public class MPartTest {
 	private void testDeclaredTooltip(String partToolTip, String expectedToolTip) {
 		final MWindow window = createWindowWithOneView("Part Name", partToolTip);
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -167,7 +166,7 @@ public class MPartTest {
 	private void testMPart_setTooltip(String partToolTip, String expectedToolTip) {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -206,7 +205,7 @@ public class MPartTest {
 	public void testMPart_getContext() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -227,7 +226,7 @@ public class MPartTest {
 	public void testMPartBug369866() {
 		final MWindow window = createWindowWithOneView("Part");
 
-		MApplication application = ems.createModelElement(MApplication.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		application.getChildren().add(window);
 		application.setContext(appContext);
 		appContext.set(MApplication.class, application);
@@ -265,15 +264,15 @@ public class MPartTest {
 	}
 
 	private MWindow createWindowWithOneView(String partName, String toolTip) {
-		final MWindow window = ems.createModelElement(MWindow.class);
+		final MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setHeight(300);
 		window.setWidth(400);
 		window.setLabel("MyWindow");
-		MPartSashContainer sash = ems.createModelElement(MPartSashContainer.class);
+		MPartSashContainer sash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 		window.getChildren().add(sash);
-		MPartStack stack = ems.createModelElement(MPartStack.class);
+		MPartStack stack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		sash.getChildren().add(stack);
-		MPart contributedPart = ems.createModelElement(MPart.class);
+		MPart contributedPart = BasicFactoryImpl.eINSTANCE.createPart();
 		stack.getChildren().add(contributedPart);
 		contributedPart.setLabel(partName);
 		contributedPart.setTooltip(toolTip);
