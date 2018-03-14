@@ -23,11 +23,6 @@ public class StringToCharacterConverterTest extends TestCase {
 	private StringToCharacterConverter converter;
 	private StringToCharacterConverter primitiveConverter;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		converter = StringToCharacterConverter.toCharacter(false);

@@ -304,9 +304,6 @@ public class UpdateStrategyTest extends AbstractDefaultRealmTestCase {
 			super.fillDefaults(source, destination);
 		}
 		
-		/* (non-Javadoc)
-		 * @see org.eclipse.core.databinding.UpdateValueStrategy#setConverter(org.eclipse.core.databinding.conversion.IConverter)
-		 */
 		public UpdateValueStrategy setConverter(IConverter converter) {
 			this.converter = converter;
 			return super.setConverter(converter);

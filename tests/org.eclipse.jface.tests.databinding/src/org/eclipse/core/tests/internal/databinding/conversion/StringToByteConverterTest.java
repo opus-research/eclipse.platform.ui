@@ -24,11 +24,6 @@ public class StringToByteConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private StringToByteConverter converter;
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		numberFormat = NumberFormat.getIntegerInstance();

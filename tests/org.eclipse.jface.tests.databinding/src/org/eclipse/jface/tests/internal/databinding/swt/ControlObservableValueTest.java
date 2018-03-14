@@ -42,11 +42,6 @@ public class ControlObservableValueTest extends AbstractDefaultRealmTestCase {
 		shell = new Shell();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
 	protected void tearDown() throws Exception {
 		if (shell != null && !shell.isDisposed()) {
 			shell.dispose();

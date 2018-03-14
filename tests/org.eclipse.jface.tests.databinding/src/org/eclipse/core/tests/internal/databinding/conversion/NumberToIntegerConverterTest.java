@@ -22,39 +22,24 @@ import com.ibm.icu.text.NumberFormat;
 public class NumberToIntegerConverterTest extends NumberToNumberTestHarness {
 	private NumberFormat numberFormat;
 	
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	protected void setUp() throws Exception {
 		super.setUp();
 		
 		numberFormat = NumberFormat.getInstance();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetOutOfRangeNumber()
-	 */
 	protected Number doGetOutOfRangeNumber() {
 		return new Long((long) Integer.MAX_VALUE + 1);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToBoxedTypeValidator(java.lang.Class)
-	 */
 	protected IConverter doGetToBoxedTypeValidator(Class fromType) {
 		return new NumberToIntegerConverter(numberFormat, fromType, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToPrimitiveValidator(java.lang.Class)
-	 */
 	protected IConverter doGetToPrimitiveValidator(Class fromType) {
 		return new NumberToIntegerConverter(numberFormat, fromType, true);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.tests.internal.databinding.conversion.NumberToNumberTestHarness#doGetToType(boolean)
-	 */
 	protected Class doGetToType(boolean primitive) {
 		return (primitive) ? Integer.TYPE : Integer.class;
 	}
