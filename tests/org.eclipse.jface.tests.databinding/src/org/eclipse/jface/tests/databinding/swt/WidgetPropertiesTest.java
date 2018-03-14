@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	private Shell shell;
@@ -79,11 +79,8 @@ public class WidgetPropertiesTest extends AbstractSWTTestCase {
 	}
 
 	@Override
-	protected Shell getShell() {
-		if (shell == null) {
-			shell = new Shell(SWT.V_SCROLL);
-		}
-		return shell;
+	protected Shell createShell() {
+		return new Shell(SWT.V_SCROLL);
 	}
 
 	public void testImage_ObserveButton() {
