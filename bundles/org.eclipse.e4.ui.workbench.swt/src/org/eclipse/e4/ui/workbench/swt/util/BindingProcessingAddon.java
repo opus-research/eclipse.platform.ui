@@ -24,13 +24,11 @@ import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.core.commands.contexts.ContextManager;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.e4.core.commands.ECommandService;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.bindings.EBindingService;
 import org.eclipse.e4.ui.bindings.internal.BindingTable;
 import org.eclipse.e4.ui.bindings.internal.BindingTableManager;
@@ -84,9 +82,6 @@ public class BindingProcessingAddon {
 
 	@Inject
 	private EBindingService bindingService;
-
-	@Inject
-	private Logger logger;
 
 	private EventHandler additionHandler;
 
@@ -161,11 +156,6 @@ public class BindingProcessingAddon {
 	 * @param bindingTable
 	 */
 	private void defineBindingTable(MBindingTable bindingTable) {
-		Assert.isNotNull(
-				bindingTable.getBindingContext(),
-				"Binding context referred to by the binding table \"" + bindingTable.getElementId() + "\""); //$NON-NLS-1$
-		Assert.isNotNull(bindingTable.getBindingContext().getElementId(),
-				"Element ID of binding table \"" + bindingTable.getElementId() + "\"."); //$NON-NLS-1$
 		final Context bindingContext = contextManager.getContext(bindingTable
 				.getBindingContext().getElementId());
 		BindingTable table = bindingTables.getTable(bindingTable
