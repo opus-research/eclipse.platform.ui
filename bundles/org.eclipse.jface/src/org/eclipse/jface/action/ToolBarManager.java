@@ -296,12 +296,8 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 			}
 		}
 
-		// Turn redraw off to minimize flicker,
-		boolean useRedraw = (clean.size() - (mi.length - toRemove.size())) >= 0;
 		try {
-			if (useRedraw) {
-				toolBar.setRedraw(false);
-			}
+			toolBar.setRedraw(false);
 
 			// remove obsolete items
 			for (int i = toRemove.size(); --i >= 0;) {
@@ -369,9 +365,7 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 			// turn redraw back on if we turned it off above
 		} finally {
-			if (useRedraw) {
-				toolBar.setRedraw(true);
-			}
+			toolBar.setRedraw(true);
 		}
 
 		int newCount = toolBar.getItemCount();
