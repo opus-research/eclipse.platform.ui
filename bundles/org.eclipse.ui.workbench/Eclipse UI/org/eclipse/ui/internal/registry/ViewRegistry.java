@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
@@ -38,6 +39,7 @@ import org.eclipse.ui.views.IStickyViewDescriptor;
 import org.eclipse.ui.views.IViewCategory;
 import org.eclipse.ui.views.IViewDescriptor;
 import org.eclipse.ui.views.IViewRegistry;
+import org.osgi.framework.Bundle;
 
 public class ViewRegistry implements IViewRegistry {
 
@@ -137,6 +139,14 @@ public class ViewRegistry implements IViewRegistry {
 		String implementationURI = CompatibilityPart.COMPATIBILITY_VIEW_URI;
 		if (e4View) {
 			implementationURI = "bundleclass://" + element.getContributor().getName() + "/" + clsSpec; //$NON-NLS-1$//$NON-NLS-2$
+		} else {
+			IExtension declaringExtension = element.getDeclaringExtension();
+			String name = declaringExtension.getContributor().getName();
+
+			Bundle bundle = Platform.getBundle(name);
+			// the split operation removes potential additional information from the qualified classname
+			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_CLASS, clsSpec.split(":")[0]); //$NON-NLS-1$
+			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_BUNDLE, bundle.getSymbolicName());
 		}
 		descriptor.setContributionURI(implementationURI);
 
