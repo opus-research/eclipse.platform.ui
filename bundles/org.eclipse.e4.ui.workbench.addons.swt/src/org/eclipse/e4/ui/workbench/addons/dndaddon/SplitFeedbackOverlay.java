@@ -127,9 +127,9 @@ public class SplitFeedbackOverlay {
 		// Update the feedback color if the drag is 'modified'
 		if (modified != isModified) {
 			if (!modified) {
-				stylingEngine.setClassname(feedbackShell, "DragFeedback"); //$NON-NLS-1$
+				stylingEngine.setClassname(feedbackShell, "DragFeedback");
 			} else {
-				stylingEngine.setClassname(feedbackShell, "ModifiedDragFeedback"); //$NON-NLS-1$
+				stylingEngine.setClassname(feedbackShell, "ModifiedDragFeedback");
 			}
 			stylingEngine.style(feedbackShell);
 			isModified = modified;
