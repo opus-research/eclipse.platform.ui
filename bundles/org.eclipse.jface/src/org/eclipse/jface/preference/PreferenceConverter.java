@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -458,9 +458,10 @@ public class PreferenceConverter {
         FontData[] oldValue = getFontDataArray(store, name);
         // see if the font has changed
         if (!Arrays.equals(oldValue, value)) {
-            store.putValue(name, getStoredRepresentation(value));
+			String storedValueRepresentation = getStoredRepresentation(value);
+			store.putValue(name, storedValueRepresentation);
             JFaceResources.getFontRegistry().put(name, value);
-            store.firePropertyChangeEvent(name, oldValue, value);
+			store.firePropertyChangeEvent(name, getStoredRepresentation(oldValue), storedValueRepresentation);
         }
     }
 
