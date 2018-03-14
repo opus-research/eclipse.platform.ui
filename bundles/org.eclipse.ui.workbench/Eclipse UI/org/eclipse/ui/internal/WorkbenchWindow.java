@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
+import org.eclipse.e4.core.commands.internal.HandlerServiceImpl;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -597,8 +598,15 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		cs.activateContext(IContextService.CONTEXT_ID_WINDOW);
 		cs.getActiveContextIds();
 
-
-		initializeDefaultServices();
+		// if workbench window is opened as a result of command execution, the
+		// context in which this window's commands are initialized has to
+		// to match the new workbench window context
+		try {
+			HandlerServiceImpl.push(windowContext, null);
+			initializeDefaultServices();
+		} finally {
+			HandlerServiceImpl.pop();
+		}
 
 		/*
 		 * Remove the second QuickAccess control if an older workspace is
