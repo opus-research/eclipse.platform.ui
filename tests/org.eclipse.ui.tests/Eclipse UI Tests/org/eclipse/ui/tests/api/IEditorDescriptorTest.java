@@ -33,20 +33,17 @@ public class IEditorDescriptorTest extends TestCase {
     }
 
     public void testGetId() throws Throwable {
-        for (IEditorDescriptor fEditor : fEditors) {
-			assertNotNull(fEditor.getId());
-		}
+        for (int i = 0; i < fEditors.length; i++)
+            assertNotNull(fEditors[i].getId());
     }
 
     public void testGetImageDescriptor() throws Throwable {
-        for (IEditorDescriptor fEditor : fEditors) {
-			assertNotNull(fEditor.getImageDescriptor());
-		}
+        for (int i = 0; i < fEditors.length; i++)
+            assertNotNull(fEditors[i].getImageDescriptor());
     }
 
     public void testGetLabel() throws Throwable {
-        for (IEditorDescriptor fEditor : fEditors) {
-			assertNotNull(fEditor.getLabel());
-		}
+        for (int i = 0; i < fEditors.length; i++)
+            assertNotNull(fEditors[i].getLabel());
     }
 }

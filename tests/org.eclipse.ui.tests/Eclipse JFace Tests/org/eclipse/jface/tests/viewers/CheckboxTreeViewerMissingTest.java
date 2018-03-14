@@ -22,10 +22,9 @@ public class CheckboxTreeViewerMissingTest extends CheckboxTreeViewerTest {
     private static Image testImage;
 
     public static Image getMissingImage() {
-        if (testImage == null) {
-			testImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
+        if (testImage == null)
+            testImage = ImageDescriptor.createFromFile(TestLabelProvider.class,
                     "images/missing.gif").createImage();
-		}
         return testImage;
     }
 

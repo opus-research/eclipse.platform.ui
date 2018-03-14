@@ -60,11 +60,10 @@ public class EnableTestPreferencePage extends FieldEditorPreferencePage
     }
 
     public void flipState() {
-        if (enabledState) {
-			enabledState = false;
-		} else {
-			enabledState = true;
-		}
+        if (enabledState)
+            enabledState = false;
+        else
+            enabledState = true;
 
         be.setEnabled(enabledState, beParent);
         ce.setEnabled(enabledState, ceParent);

@@ -57,8 +57,8 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 				? Messages.DefaultUiFreezeEventLogger_ui_delay_header_running_2
 				: Messages.DefaultUiFreezeEventLogger_ui_delay_header_non_running_2;
 		long duration = event.getTotalDuration();
-		String format = duration >= 100000 ? "%.0f" : duration >= 10 ? "%.2g" : "%.1g"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		String header = NLS.bind(pattern, String.format(format, duration / 1000.0), startTime);
+		String header = NLS.bind(pattern,
+				String.format(duration >= 10 ? "%.2g" : "%.1g", duration / 1000.0), startTime); //$NON-NLS-1$ //$NON-NLS-2$
 
 		int severity = duration >= longEventErrorThresholdMillis ?
 				IStatus.ERROR : IStatus.WARNING;
@@ -103,22 +103,21 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 		String lockName = thread.getLockName();
 		if (lockName != null && !lockName.isEmpty()) {
 			LockInfo lock = thread.getLockInfo();
+			threadText.append(NLS.bind(
+					Messages.DefaultUiFreezeEventLogger_waiting_for_1,
+					getClassAndHashCode(lock)));
 			String lockOwnerName = thread.getLockOwnerName();
-			if (lockOwnerName == null) {
+			if (lockOwnerName != null && !lockOwnerName.isEmpty()) {
 				threadText.append(NLS.bind(
-						Messages.DefaultUiFreezeEventLogger_waiting_for_1,
-						getClassAndHashCode(lock)));
-			} else {
-				threadText.append(NLS.bind(
-						Messages.DefaultUiFreezeEventLogger_waiting_for_with_lock_owner_3,
-						new Object[] { getClassAndHashCode(lock), lockOwnerName,
-								thread.getLockOwnerId() }));
+						Messages.DefaultUiFreezeEventLogger_lock_owner_2,
+						lockOwnerName, thread.getLockOwnerId()));
 			}
 		}
 
 		for (LockInfo lockInfo : thread.getLockedSynchronizers()) {
 			threadText.append(NLS.bind(
-					Messages.DefaultUiFreezeEventLogger_holding_1, getClassAndHashCode(lockInfo)));
+					Messages.DefaultUiFreezeEventLogger_holding_1,
+					getClassAndHashCode(lockInfo)));
 		}
 
 		return new Status(IStatus.INFO, PreferenceConstants.PLUGIN_ID, threadText.toString(),

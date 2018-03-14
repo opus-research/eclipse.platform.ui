@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -54,7 +53,7 @@ import org.eclipse.ui.progress.IJobRunnable;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class TestBackgroundSaveEditor extends EditorPart implements
 		ISaveablesSource {
@@ -206,7 +205,7 @@ public class TestBackgroundSaveEditor extends EditorPart implements
 
 	@Override
 	public void createPartControl(Composite parent) {
-		Realm realm = DisplayRealm.getRealm(parent.getDisplay());
+		Realm realm = SWTObservables.getRealm(parent.getDisplay());
 		final DataBindingContext dbc = new DataBindingContext(realm);
 		parent.addDisposeListener(new DisposeListener() {
 			@Override
@@ -330,10 +329,9 @@ public class TestBackgroundSaveEditor extends EditorPart implements
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
-		if (!(input instanceof IFileEditorInput)) {
+		if (!(input instanceof IFileEditorInput))
 			throw new PartInitException(
 					"Invalid Input: Must be IFileEditorInput");
-		}
 		setSite(site);
 		setInput(input);
 		this.input = input;
@@ -507,5 +505,5 @@ public class TestBackgroundSaveEditor extends EditorPart implements
 	public Saveable[] getSaveables() {
 		return new Saveable[] { mySaveable };
 	}
-
+	
 }
