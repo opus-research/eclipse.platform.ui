@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com>
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
- *     Robert Roth <robert.roth.off@gmailc.om>
- *          - Fix for Bug 364736 Setting limit to 0 has no effect
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -300,16 +298,9 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 
 		limitText.addModifyListener(e -> {
-			boolean isInvalid = false;
 			try {
-				int value = Integer.parseInt(limitText.getText());
-				if (value == 0) {
-					isInvalid = true;
-				}
+				Integer.parseInt(limitText.getText());
 			} catch (NumberFormatException ex) {
-				isInvalid = true;
-			}
-			if (isInvalid) {
 				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});
