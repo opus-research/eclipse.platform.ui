@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -170,7 +170,7 @@ public class ProgressManager extends ProgressProvider implements
 	 * The JobMonitor is the inner class that handles the IProgressMonitor
 	 * integration with the ProgressMonitor.
 	 */
-	public class JobMonitor implements IProgressMonitorWithBlocking {
+	class JobMonitor implements IProgressMonitorWithBlocking {
 		Job job;
 
 		String currentTaskName;
@@ -191,7 +191,7 @@ public class ProgressManager extends ProgressProvider implements
 		 *
 		 * @param monitor
 		 */
-		public void addProgressListener(IProgressMonitorWithBlocking monitor) {
+		void addProgressListener(IProgressMonitorWithBlocking monitor) {
 			listener = monitor;
 			JobInfo info = getJobInfo(job);
 			TaskInfo currentTask = info.getTaskInfo();
@@ -199,16 +199,6 @@ public class ProgressManager extends ProgressProvider implements
 				listener.beginTask(currentTaskName, currentTask.totalWork);
 				listener.internalWorked(currentTask.preWork);
 			}
-		}
-
-		/**
-		 * @param monitor
-		 */
-		public void removeProgressListener(IProgressMonitorWithBlocking monitor) {
-			if (listener == monitor) {
-				listener = null;
-			}
-
 		}
 
 		@Override
@@ -323,7 +313,6 @@ public class ProgressManager extends ProgressProvider implements
 				listener.setBlocked(reason);
 			}
 		}
-
 	}
 
 	/**
