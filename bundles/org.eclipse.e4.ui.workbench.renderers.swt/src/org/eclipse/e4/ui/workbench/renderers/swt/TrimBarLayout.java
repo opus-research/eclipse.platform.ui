@@ -83,13 +83,6 @@ public class TrimBarLayout extends Layout {
 		this.horizontal = horizontal;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
-	 * , int, int, boolean)
-	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {

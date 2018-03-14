@@ -318,26 +318,11 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return parent.getChildren().indexOf(element);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.workbench.renderers.AbstractPartRenderer#childRendered
-	 * (org.eclipse.e4.ui.model.application.MElementContainer,
-	 * org.eclipse.e4.ui.model.application.MUIElement)
-	 */
 	@Override
 	public void childRendered(MElementContainer<MUIElement> parentElement,
 			MUIElement element) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#init(org
-	 * .eclipse.e4.core.contexts.IEclipseContext)
-	 */
 	@Override
 	public void init(IEclipseContext context) {
 		super.init(context);
@@ -393,13 +378,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		return getModelElement(ctrl.getParent());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#forceFocus
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public void forceFocus(MUIElement element) {
 		if (element.getWidget() instanceof Control) {

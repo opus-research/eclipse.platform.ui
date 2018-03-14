@@ -221,13 +221,6 @@ public class AreaRenderer extends SWTPartRenderer {
 			ensureComposite(areaModel);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
-	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
-	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parentElement = element.getParent();
