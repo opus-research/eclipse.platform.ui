@@ -147,13 +147,11 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			if (UIEvents.contains(event, UIEvents.EventTags.NEW_VALUE,
 					IPresentationEngine.HIDDEN_EXPLICITLY)) {
 				changedElement.setVisible(false);
-				changedElement.setToBeRendered(false);
 			}
 		} else if (UIEvents.isREMOVE(event)) {
 			if (UIEvents.contains(event, UIEvents.EventTags.OLD_VALUE,
 					IPresentationEngine.HIDDEN_EXPLICITLY)) {
 				changedElement.setVisible(true);
-				changedElement.setToBeRendered(true);
 			}
 		}
 	}
@@ -168,7 +166,6 @@ public class ToolControlRenderer extends SWTPartRenderer {
 			if (toolControl.getTags().contains(
 					IPresentationEngine.HIDDEN_EXPLICITLY)) {
 				toolControl.setVisible(false);
-				toolControl.setToBeRendered(false);
 			}
 		}
 	}
