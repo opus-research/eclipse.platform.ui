@@ -1165,7 +1165,6 @@ public class WorkbenchMessages extends NLS {
 	// Util
 	public static String Util_List;
 	public static String Util_listNull;
-	public static String Icon_Not_Found;
 
 
 	

@@ -7,13 +7,10 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Sopot Cela <sopotcela@gmail.com> - Bug 391961
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.perspectiveswitcher;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -225,26 +222,6 @@ public class PerspectiveSwitcher {
 			} else if (UIEvents.UILabel.TOOLTIP.equals(attName)) {
 				String newTTip = (String) newValue;
 				ti.setToolTipText(newTTip);
-			} else if (UIEvents.UILabel.ICONURI.equals(attName)) {
-				Image currentImage = ti.getImage();
-				String uri = (String) newValue;
-				URL url = null;
-				try {
-					url = new URL(uri);
-					ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
-					if (descriptor == null) {
-						ti.setImage(null);
-					} else
-						ti.setImage(descriptor.createImage());
-				} catch (IOException e) {
-					ti.setImage(null);
-					IStatus status = new Status(IStatus.WARNING, "org.eclipse.ui.workbench", //$NON-NLS-1$
-							WorkbenchMessages.Icon_Not_Found, e);
-					StatusManager.getManager().handle(status);
-				} finally {
-					if (currentImage != null)
-						currentImage.dispose();
-				}
 			}
 		}
 	};
