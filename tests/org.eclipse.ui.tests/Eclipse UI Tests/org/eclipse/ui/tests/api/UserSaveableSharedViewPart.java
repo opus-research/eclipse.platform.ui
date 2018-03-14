@@ -32,29 +32,49 @@ public class UserSaveableSharedViewPart extends MockViewPart implements
 	
 	private SharedModel fSharedModel = new SharedModel();
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave");
 		fSharedModel.isDirty = false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	public void doSaveAs() {
 		callTrace.add("doSaveAs");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	public boolean isDirty() {
 		callTrace.add("isDirty");
 		return fSharedModel.isDirty;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	public boolean isSaveAsAllowed() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded");
 		return fSharedModel.isDirty;

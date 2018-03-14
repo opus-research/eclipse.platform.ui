@@ -188,7 +188,6 @@ public class AbstractMultiEditorTest extends UITestCase {
 	/**
 	 * Close any editors at the beginner of a test, so the test can be clean.
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		IWorkbenchPage page = fWorkbench.getActiveWorkbenchWindow()
@@ -208,7 +207,6 @@ public class AbstractMultiEditorTest extends UITestCase {
 
 		public ArrayList messages = new ArrayList();
 
-		@Override
 		public void logging(IStatus status, String plugin) {
 			String msg = status.getMessage();
 			Throwable ex = status.getException();

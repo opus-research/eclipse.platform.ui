@@ -109,7 +109,6 @@ public final class AggregateValidationStatus extends ComputedValue {
 		this.strategy = strategy;
 	}
 
-	@Override
 	protected Object calculate() {
 		IStatus result;
 		if (strategy == MERGED) {

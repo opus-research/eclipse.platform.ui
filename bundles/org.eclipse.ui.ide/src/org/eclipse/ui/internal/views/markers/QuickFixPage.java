@@ -102,7 +102,6 @@ public class QuickFixPage extends WizardPage {
 		setMessage(problemDescription);
 	}
 
-	@Override
 	public void createControl(Composite parent) {
 
 		initializeDialogUnits(parent);
@@ -198,7 +197,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				markersTable.setAllChecked(true);
 				setPageComplete(!resolutionsList.getSelection().isEmpty());
@@ -216,7 +214,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
 			 */
-			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				markersTable.setAllChecked(false);
 				setPageComplete(false);
@@ -238,7 +235,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
-			@Override
 			public Object[] getElements(Object inputElement) {
 				return resolutions.keySet().toArray();
 			}
@@ -248,7 +244,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
-			@Override
 			public void dispose() {
 
 			}
@@ -259,7 +254,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
@@ -272,7 +266,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.LabelProvider#getText(java.lang.Object)
 			 */
-			@Override
 			public String getText(Object element) {
 				return ((IMarkerResolution) element).getLabel();
 			}
@@ -283,7 +276,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.LabelProvider#getImage(java.lang.Object)
 			 * @since 3.7
 			 */
-			@Override
 			public Image getImage(Object element) {
 				return element instanceof IMarkerResolution2 ? ((IMarkerResolution2)element).getImage() : null;
 			}
@@ -298,7 +290,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
-			@Override
 			public int compare(Viewer viewer, Object e1, Object e2) {
 				return ((IMarkerResolution) e1).getLabel().compareTo(
 						((IMarkerResolution)e2).getLabel());
@@ -312,7 +303,6 @@ public class QuickFixPage extends WizardPage {
 					 * 
 					 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 					 */
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						markersTable.refresh();
 						setPageComplete(markersTable.getCheckedElements().length > 0);
@@ -337,7 +327,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 			 */
-			@Override
 			public void dispose() {
 
 			}
@@ -347,7 +336,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 			 */
-			@Override
 			public Object[] getElements(Object inputElement) {
 				IMarkerResolution selected = getSelectedResolution();
 				if (selected == null) {
@@ -366,7 +354,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 			 *      java.lang.Object, java.lang.Object)
 			 */
-			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
@@ -381,7 +368,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java.lang.Object,
 			 *      int)
 			 */
-			@Override
 			public Image getColumnImage(Object element, int columnIndex) {
 				if (columnIndex == 0)
 					return Util.getImage(((IMarker) element).getAttribute(
@@ -395,7 +381,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.lang.Object,
 			 *      int)
 			 */
-			@Override
 			public String getColumnText(Object element, int columnIndex) {
 				IMarker marker =(IMarker) element;
 				if (columnIndex == 0)
@@ -425,7 +410,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
 			 */
-			@Override
 			public void addListener(ILabelProviderListener listener) {
 				// do nothing
 
@@ -436,7 +420,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
 			 */
-			@Override
 			public void dispose() {
 				// do nothing
 
@@ -448,7 +431,6 @@ public class QuickFixPage extends WizardPage {
 			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
 			 *      java.lang.String)
 			 */
-			@Override
 			public boolean isLabelProperty(Object element, String property) {
 				return false;
 			}
@@ -458,7 +440,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
 			 */
-			@Override
 			public void removeListener(ILabelProviderListener listener) {
 				// do nothing
 
@@ -471,7 +452,6 @@ public class QuickFixPage extends WizardPage {
 			 * 
 			 * @see org.eclipse.jface.viewers.ICheckStateListener#checkStateChanged(org.eclipse.jface.viewers.CheckStateChangedEvent)
 			 */
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				if (event.getChecked() == true) {
 					setPageComplete(true);
@@ -486,17 +466,14 @@ public class QuickFixPage extends WizardPage {
 			
 			{ setLinkWithEditor(false); }
 
-			@Override
 			protected void activate(ISelection selection) {
 				open(selection, true);
 			}
 
 			/** Not supported*/
-			@Override
 			protected void linkToEditor(ISelection selection) {
 			}
 			
-			@Override
 			protected void open(ISelection selection, boolean activate) {
 				if (selection.isEmpty())
 					return;
@@ -581,7 +558,6 @@ public class QuickFixPage extends WizardPage {
 							 * 
 							 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 							 */
-							@Override
 							public void run(IProgressMonitor monitor) {
 								IMarker[] markers = new IMarker[checked.length];
 								System.arraycopy(checked, 0, markers, 0,
@@ -609,7 +585,6 @@ public class QuickFixPage extends WizardPage {
 							 * 
 							 * @see org.eclipse.jface.operation.IRunnableWithProgress#run(org.eclipse.core.runtime.IProgressMonitor)
 							 */
-							@Override
 							public void run(IProgressMonitor monitor) {
 								monitor
 										.beginTask(

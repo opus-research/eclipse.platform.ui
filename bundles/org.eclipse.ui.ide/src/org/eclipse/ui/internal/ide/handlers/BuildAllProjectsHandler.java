@@ -32,7 +32,6 @@ public class BuildAllProjectsHandler extends AbstractHandler {
 	/**
 	 * @throws ExecutionException  
 	 */
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
     	if (isEnabled()) {
 			IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
@@ -51,7 +50,6 @@ public class BuildAllProjectsHandler extends AbstractHandler {
 	/*
 	 * @see org.eclipse.core.commands.AbstractHandler#setEnabled(java.lang.Object)
 	 */
-	@Override
 	public void setEnabled(Object evaluationContext) {
     	IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProject[] projects = workspace.getRoot().getProjects();

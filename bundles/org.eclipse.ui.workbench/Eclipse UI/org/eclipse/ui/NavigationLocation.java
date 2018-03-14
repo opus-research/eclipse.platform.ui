@@ -44,11 +44,19 @@ public abstract class NavigationLocation implements INavigationLocation {
         return page.findEditor(input);
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
     @Override
 	public Object getInput() {
         return input;
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
     @Override
 	public String getText() {
         IEditorPart part = getEditorPart();
@@ -58,6 +66,10 @@ public abstract class NavigationLocation implements INavigationLocation {
         return part.getTitle();
     }
 
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationLocation.
+     */
     @Override
 	public void setInput(Object input) {
         this.input = (IEditorInput) input;

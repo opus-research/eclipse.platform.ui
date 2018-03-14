@@ -18,7 +18,6 @@ public class CommandHandler extends AbstractHandler implements IHandler {
 
 	
 	public boolean executed;
-	@Override
 	public Object execute(ExecutionEvent event) {
 		executed = true;
 		return null;
