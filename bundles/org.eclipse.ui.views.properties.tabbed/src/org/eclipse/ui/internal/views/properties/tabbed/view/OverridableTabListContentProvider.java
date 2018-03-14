@@ -114,8 +114,8 @@ class OverridableTabListContentProvider extends TabListContentProvider
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = (IContributedContentsView) Adapters.adapt(currentPart,
-					IContributedContentsView.class);
+			IContributedContentsView view = (IContributedContentsView) Adapters.getAdapter(currentPart,
+					IContributedContentsView.class, true);
 			if (view != null) {
 				IWorkbenchPart part = view.getContributingPart();
 				if (part != null) {
