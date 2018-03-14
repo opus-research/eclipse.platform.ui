@@ -2149,6 +2149,9 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			if (text == null) {
 				text = item.getToolTipText();
 			}
+			if (text == null) {
+				text = item.getText();
+			}
 			if (iconDescriptor == null) {
 				Image image = item.getImage();
 				if (image != null) {
