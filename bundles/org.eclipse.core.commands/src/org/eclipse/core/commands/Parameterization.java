@@ -81,9 +81,6 @@ public final class Parameterization {
 		this.value = value;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -150,9 +147,6 @@ public final class Parameterization {
 		return returnValue;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(parameter);

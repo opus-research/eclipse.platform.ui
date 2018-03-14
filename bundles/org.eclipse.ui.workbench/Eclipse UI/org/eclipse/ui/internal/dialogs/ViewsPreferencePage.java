@@ -37,6 +37,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -109,6 +110,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 			themeIdCombo.setSelection(new StructuredSelection(currentTheme));
 		}
 		themeIdCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ITheme selection = getSelectedTheme();
 				engine.setTheme(selection, false);
@@ -175,6 +177,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		return (ITheme) ((IStructuredSelection) themeIdCombo.getSelection()).getFirstElement();
 	}
 
+	@Override
 	public void init(IWorkbench workbench) {
 		MApplication application = (MApplication) workbench.getService(MApplication.class);
 		IEclipseContext context = application.getContext();
@@ -272,6 +275,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 		colorsAndFontsThemeCombo.setInput(getColorsAndFontsThemes());
 		colorsAndFontsThemeCombo.getControl().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		colorsAndFontsThemeCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				ColorsAndFontsTheme colorsAndFontsTheme = getSelectedColorsAndFontsTheme();
 				refreshColorsAndFontsThemeDescriptionText(colorsAndFontsTheme);
@@ -314,7 +318,8 @@ public class ViewsPreferencePage extends PreferencePage implements
 
 		for (int i = 0; i < colorsAndFontsThemes.size(); i++) {
 			if (colorsAndFontsThemes.get(i).getId().equals(colorAndFontThemeId)) {
-				colorsAndFontsThemeCombo.getCombo().select(i);
+				ISelection selection = new StructuredSelection(colorsAndFontsThemes.get(i));
+				colorsAndFontsThemeCombo.setSelection(selection);
 				break;
 			}
 		}
