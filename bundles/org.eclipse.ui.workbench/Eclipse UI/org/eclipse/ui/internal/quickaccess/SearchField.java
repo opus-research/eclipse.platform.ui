@@ -53,8 +53,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -159,16 +157,12 @@ public class SearchField {
 
 			@Override
 			protected void doClose() {
+				text.setText(""); //$NON-NLS-1$
 				resetProviders();
-				if (text != null && !text.isDisposed()) {
-					text.setText(""); //$NON-NLS-1$
-					removeAccessibleListener();
-				}
-				if (shell != null && !shell.isDisposed()) {
-					dialogHeight = shell.getSize().y;
-					dialogWidth = shell.getSize().x;
-					shell.setVisible(false);
-				}
+				dialogHeight = shell.getSize().y;
+				dialogWidth = shell.getSize().x;
+				shell.setVisible(false);
+				removeAccessibleListener();
 			}
 
 			@Override
@@ -207,13 +201,6 @@ public class SearchField {
 		shell = new Shell(parent.getShell(), SWT.RESIZE | SWT.ON_TOP);
 		shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(QuickAccessMessages.QuickAccess_EnterSearch); // just for debugging, not shown anywhere
-		shell.addShellListener(new ShellAdapter() {
-			@Override
-			public void shellClosed(ShellEvent e) {
-				quickAccessContents.doClose();
-				e.doit = false;
-			}
-		});
 		GridLayoutFactory.fillDefaults().applyTo(shell);
 		table = quickAccessContents.createTable(shell, Window.getDefaultOrientation());
 		text.addFocusListener(new FocusListener() {
