@@ -13,7 +13,6 @@
 package org.eclipse.core.databinding.observable.set;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +20,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.databinding.observable.Diffs;
-import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.internal.databinding.observable.IStalenessConsumer;
 import org.eclipse.core.internal.databinding.observable.StalenessTracker;
@@ -36,17 +34,15 @@ import org.eclipse.core.internal.databinding.observable.StalenessTracker;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
- * @param <E>
- *            type of the elements in the union set
+ *
  * @since 1.0
  */
-public final class UnionSet<E> extends ObservableSet<E> {
+public final class UnionSet extends ObservableSet {
 
 	/**
 	 * child sets
 	 */
-	private Set<IObservableSet<? extends E>> childSets;
+	private IObservableSet[] childSets;
 
 	private boolean stale = false;
 
@@ -55,23 +51,15 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	 * when the first listener is added to the union set. Null if nobody is
 	 * listening to the UnionSet.
 	 */
-	private HashMap<E, Integer> refCounts = null;
+	private HashMap refCounts = null;
 
 	private StalenessTracker stalenessTracker;
 
 	/**
 	 * @param childSets
 	 */
-	public UnionSet(IObservableSet<? extends E>[] childSets) {
-		this(new HashSet<IObservableSet<? extends E>>(Arrays.asList(childSets)));
-	}
-
-	/**
-	 * @param childSets
-	 * @since 1.5
-	 */
-	public UnionSet(Set<IObservableSet<? extends E>> childSets) {
-		this(childSets, childSets.iterator().next().getElementType());
+	public UnionSet(IObservableSet[] childSets) {
+		this(childSets, childSets[0].getElementType());
 	}
 
 	/**
@@ -79,31 +67,20 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	 * @param elementType
 	 * @since 1.2
 	 */
-	public UnionSet(IObservableSet<? extends E>[] childSets, Object elementType) {
-		this(
-				new HashSet<IObservableSet<? extends E>>(
-						Arrays.asList(childSets)), elementType);
+	public UnionSet(IObservableSet[] childSets, Object elementType) {
+		super(childSets[0].getRealm(), null, elementType);
+		System.arraycopy(childSets, 0,
+				this.childSets = new IObservableSet[childSets.length], 0,
+				childSets.length);
+		this.stalenessTracker = new StalenessTracker(childSets,
+				stalenessConsumer);
 	}
 
-	/**
-	 * @param childSets
-	 * @param elementType
-	 * @since 1.5
-	 */
-	public UnionSet(Set<IObservableSet<? extends E>> childSets,
-			Object elementType) {
-		super(childSets.iterator().next().getRealm(), null, elementType);
-		this.childSets = childSets;
-
-		this.stalenessTracker = new StalenessTracker(
-				childSets.toArray(new IObservableSet[0]), stalenessConsumer);
-	}
-
-	private ISetChangeListener<E> childSetChangeListener = new ISetChangeListener<E>() {
+	private ISetChangeListener childSetChangeListener = new ISetChangeListener() {
 		@Override
-		public void handleSetChange(SetChangeEvent<E> event) {
-			processAddsAndRemoves(event.diff.getAdditions(),
-					event.diff.getRemovals());
+		public void handleSetChange(SetChangeEvent event) {
+			processAddsAndRemoves(event.diff.getAdditions(), event.diff
+					.getRemovals());
 		}
 	};
 
@@ -125,7 +102,9 @@ public final class UnionSet<E> extends ObservableSet<E> {
 			return stale;
 		}
 
-		for (IObservableSet<? extends E> childSet : childSets) {
+		for (int i = 0; i < childSets.length; i++) {
+			IObservableSet childSet = childSets[i];
+
 			if (childSet.isStale()) {
 				return true;
 			}
@@ -133,15 +112,14 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		return false;
 	}
 
-	private void processAddsAndRemoves(Set<? extends E> adds,
-			Set<? extends E> removes) {
-		Set<E> addsToFire = new HashSet<E>();
-		Set<E> removesToFire = new HashSet<E>();
+	private void processAddsAndRemoves(Set adds, Set removes) {
+		Set addsToFire = new HashSet();
+		Set removesToFire = new HashSet();
 
-		for (Iterator<? extends E> iter = adds.iterator(); iter.hasNext();) {
-			E added = iter.next();
+		for (Iterator iter = adds.iterator(); iter.hasNext();) {
+			Object added = iter.next();
 
-			Integer refCount = refCounts.get(added);
+			Integer refCount = (Integer) refCounts.get(added);
 			if (refCount == null) {
 				refCounts.put(added, new Integer(1));
 				addsToFire.add(added);
@@ -152,10 +130,10 @@ public final class UnionSet<E> extends ObservableSet<E> {
 			}
 		}
 
-		for (Iterator<? extends E> iter = removes.iterator(); iter.hasNext();) {
-			E removed = iter.next();
+		for (Iterator iter = removes.iterator(); iter.hasNext();) {
+			Object removed = iter.next();
 
-			Integer refCount = refCounts.get(removed);
+			Integer refCount = (Integer) refCounts.get(removed);
 			if (refCount != null) {
 				int refs = refCount.intValue();
 				if (refs <= 1) {
@@ -180,13 +158,13 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	protected void firstListenerAdded() {
 		super.firstListenerAdded();
 
-		refCounts = new HashMap<E, Integer>();
-		for (IObservableSet<? extends E> childSet : childSets) {
-			childSet.addSetChangeListener(childSetChangeListener);
-			incrementRefCounts(childSet);
+		refCounts = new HashMap();
+		for (int i = 0; i < childSets.length; i++) {
+			IObservableSet next = childSets[i];
+			next.addSetChangeListener(childSetChangeListener);
+			incrementRefCounts(next);
 		}
-		stalenessTracker = new StalenessTracker(
-				childSets.toArray(new IObservable[0]), stalenessConsumer);
+		stalenessTracker = new StalenessTracker(childSets, stalenessConsumer);
 		setWrappedSet(refCounts.keySet());
 	}
 
@@ -194,22 +172,24 @@ public final class UnionSet<E> extends ObservableSet<E> {
 	protected void lastListenerRemoved() {
 		super.lastListenerRemoved();
 
-		for (IObservableSet<? extends E> childSet : childSets) {
-			childSet.removeSetChangeListener(childSetChangeListener);
-			stalenessTracker.removeObservable(childSet);
+		for (int i = 0; i < childSets.length; i++) {
+			IObservableSet next = childSets[i];
+
+			next.removeSetChangeListener(childSetChangeListener);
+			stalenessTracker.removeObservable(next);
 		}
 		refCounts = null;
 		stalenessTracker = null;
 		setWrappedSet(null);
 	}
 
-	private ArrayList<E> incrementRefCounts(Collection<? extends E> added) {
-		ArrayList<E> adds = new ArrayList<E>();
+	private ArrayList incrementRefCounts(Collection added) {
+		ArrayList adds = new ArrayList();
 
-		for (Iterator<? extends E> iter = added.iterator(); iter.hasNext();) {
-			E next = iter.next();
+		for (Iterator iter = added.iterator(); iter.hasNext();) {
+			Object next = iter.next();
 
-			Integer refCount = refCounts.get(next);
+			Integer refCount = (Integer) refCounts.get(next);
 			if (refCount == null) {
 				adds.add(next);
 				refCount = new Integer(1);
@@ -231,12 +211,12 @@ public final class UnionSet<E> extends ObservableSet<E> {
 		}
 	}
 
-	private Set<E> computeElements() {
+	private Set computeElements() {
 		// If there is no cached value, compute the union from scratch
 		if (refCounts == null) {
-			Set<E> result = new HashSet<E>();
-			for (IObservableSet<? extends E> childSet : childSets) {
-				result.addAll(childSet);
+			Set result = new HashSet();
+			for (int i = 0; i < childSets.length; i++) {
+				result.addAll(childSets[i]);
 			}
 			return result;
 		}

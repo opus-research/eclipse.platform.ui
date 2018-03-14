@@ -24,28 +24,19 @@ import org.eclipse.core.databinding.property.map.MapProperty;
 import org.eclipse.core.databinding.property.value.IValueProperty;
 
 /**
- * @param <S>
- *            type of the source object
- * @param <M>
- *            type of the property of the source object this type being the type
- *            that has the map as a property
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
  * @since 3.3
  *
  */
-public class ValuePropertyDetailMap<S, M, K, V> extends MapProperty<S, K, V> {
-	private final IValueProperty<S, M> masterProperty;
-	private final IMapProperty<? super M, K, V> detailProperty;
+public class ValuePropertyDetailMap extends MapProperty {
+	private final IValueProperty masterProperty;
+	private final IMapProperty detailProperty;
 
 	/**
 	 * @param masterProperty
 	 * @param detailProperty
 	 */
-	public ValuePropertyDetailMap(IValueProperty<S, M> masterProperty,
-			IMapProperty<? super M, K, V> detailProperty) {
+	public ValuePropertyDetailMap(IValueProperty masterProperty,
+			IMapProperty detailProperty) {
 		this.masterProperty = masterProperty;
 		this.detailProperty = detailProperty;
 	}
@@ -61,26 +52,26 @@ public class ValuePropertyDetailMap<S, M, K, V> extends MapProperty<S, K, V> {
 	}
 
 	@Override
-	protected Map<K, V> doGetMap(S source) {
-		M masterValue = masterProperty.getValue(source);
+	protected Map doGetMap(Object source) {
+		Object masterValue = masterProperty.getValue(source);
 		return detailProperty.getMap(masterValue);
 	}
 
 	@Override
-	protected void doSetMap(S source, Map<K, V> map) {
-		M masterValue = masterProperty.getValue(source);
+	protected void doSetMap(Object source, Map map) {
+		Object masterValue = masterProperty.getValue(source);
 		detailProperty.setMap(masterValue, map);
 	}
 
 	@Override
-	protected void doUpdateMap(S source, MapDiff<K, V> diff) {
-		M masterValue = masterProperty.getValue(source);
+	protected void doUpdateMap(Object source, MapDiff diff) {
+		Object masterValue = masterProperty.getValue(source);
 		detailProperty.updateMap(masterValue, diff);
 	}
 
 	@Override
-	public IObservableMap<K, V> observe(Realm realm, S source) {
-		IObservableValue<M> masterValue;
+	public IObservableMap observe(Realm realm, Object source) {
+		IObservableValue masterValue;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -89,16 +80,14 @@ public class ValuePropertyDetailMap<S, M, K, V> extends MapProperty<S, K, V> {
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableMap<K, V> detailMap = detailProperty
-				.observeDetail(masterValue);
+		IObservableMap detailMap = detailProperty.observeDetail(masterValue);
 		PropertyObservableUtil.cascadeDispose(detailMap, masterValue);
 		return detailMap;
 	}
 
 	@Override
-	public <U extends S> IObservableMap<K, V> observeDetail(
-			IObservableValue<U> master) {
-		IObservableValue<M> masterValue;
+	public IObservableMap observeDetail(IObservableValue master) {
+		IObservableValue masterValue;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -107,8 +96,7 @@ public class ValuePropertyDetailMap<S, M, K, V> extends MapProperty<S, K, V> {
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableMap<K, V> detailMap = detailProperty
-				.observeDetail(masterValue);
+		IObservableMap detailMap = detailProperty.observeDetail(masterValue);
 		PropertyObservableUtil.cascadeDispose(detailMap, masterValue);
 		return detailMap;
 	}

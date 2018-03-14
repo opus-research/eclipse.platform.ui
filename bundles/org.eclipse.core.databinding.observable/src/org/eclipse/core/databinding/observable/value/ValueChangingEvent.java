@@ -18,14 +18,11 @@ import org.eclipse.core.databinding.observable.ObservableEvent;
  * Value changing event describing a pending change of an
  * {@link IObservableValue} object's current value. Listeners can veto the
  * pending change by setting {@link #veto} to <code>true</code>.
- * 
- * @param <T>
- * 
+ *
  * @since 1.0
  *
  */
-public class ValueChangingEvent<T> extends
-		ObservableEvent<ValueChangingEvent<T>> {
+public class ValueChangingEvent extends ObservableEvent {
 
 	/**
 	 *
@@ -38,11 +35,11 @@ public class ValueChangingEvent<T> extends
 	 * Description of the change to the source observable value. Listeners must
 	 * not change this field.
 	 */
-	public ValueDiff<T> diff;
+	public ValueDiff diff;
 
 	/**
-	 * Flag for vetoing this change. Default value is <code>false</code>, can be
-	 * set to <code>true</code> by listeners to veto this change.
+	 * Flag for vetoing this change. Default value is <code>false</code>, can
+	 * be set to <code>true</code> by listeners to veto this change.
 	 */
 	public boolean veto = false;
 
@@ -54,7 +51,7 @@ public class ValueChangingEvent<T> extends
 	 * @param diff
 	 *            the value change
 	 */
-	public ValueChangingEvent(IObservableValue<T> source, ValueDiff<T> diff) {
+	public ValueChangingEvent(IObservableValue source, ValueDiff diff) {
 		super(source);
 		this.diff = diff;
 	}
@@ -62,13 +59,13 @@ public class ValueChangingEvent<T> extends
 	/**
 	 * @return the observable value from which this event originated
 	 */
-	public IObservableValue<?> getObservableValue() {
-		return (IObservableValue<?>) source;
+	public IObservableValue getObservableValue() {
+		return (IObservableValue) source;
 	}
 
 	@Override
 	protected void dispatch(IObservablesListener listener) {
-		((IValueChangingListener<T>) listener).handleValueChanging(this);
+		((IValueChangingListener) listener).handleValueChanging(this);
 	}
 
 	@Override
