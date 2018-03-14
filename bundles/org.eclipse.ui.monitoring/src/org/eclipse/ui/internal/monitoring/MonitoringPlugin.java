@@ -8,7 +8,6 @@
  * Contributors:
  *     Steve Foreman (Google) - initial API and implementation
  *     Marcus Eng (Google)
- *     Sergey Prigogin (Google)
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
@@ -23,11 +22,15 @@ import org.osgi.framework.BundleContext;
  */
 public class MonitoringPlugin extends AbstractUIPlugin {
 	private static MonitoringPlugin plugin;
+	private static final String TRACE_EVENT_MONITOR = "/debug/event_monitor"; //$NON-NLS-1$
+	private static final String TRACE_PREFIX = "Event Loop Monitor"; //$NON-NLS-1$
+	private static Tracer tracer;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		tracer = Tracer.create(TRACE_PREFIX, PreferenceConstants.PLUGIN_ID + TRACE_EVENT_MONITOR);
 	}
 
 	@Override
@@ -38,6 +41,10 @@ public class MonitoringPlugin extends AbstractUIPlugin {
 
 	public static MonitoringPlugin getDefault() {
 		return plugin;
+	}
+
+	public static Tracer getTracer() {
+		return tracer;
 	}
 
 	public static void logError(String message, Throwable e) {

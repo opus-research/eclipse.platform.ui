@@ -13,7 +13,6 @@ package org.eclipse.ui.internal.monitoring.preferences;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -32,12 +31,10 @@ import org.eclipse.ui.monitoring.PreferenceConstants;
 /**
  * Preference page that allows user to toggle plug in settings from Eclipse preferences.
  */
-public class MonitoringPreferencePage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage {
+public class MonitoringPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 	private static final int HOUR_IN_MS = 3600000;
-	private static final IPreferenceStore preferences =
-			MonitoringPlugin.getDefault().getPreferenceStore();
-	private BooleanFieldEditor monitoringEnabled;
+	private static final IPreferenceStore preferences = MonitoringPlugin.getDefault().getPreferenceStore();
+	private boolean pluginEnabled = preferences.getBoolean(PreferenceConstants.MONITORING_ENABLED);
 	private IntegerEditor longEventThreshold;
 	private IntegerEditor sampleInterval;
 	private IntegerEditor initialSampleDelay;
@@ -108,27 +105,25 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 	@Override
 	public void createFieldEditors() {
 		Composite parent = getFieldEditorParent();
-    	PixelConverter pixelConverter = new PixelConverter(parent);
-		GridLayout layout = new GridLayout(1, false);
+		final GridLayout layout = new GridLayout();
 		layout.marginWidth = 0;
 		parent.setLayout(layout);
 
-		Composite container = new Composite(parent, SWT.NONE);
-		layout = new GridLayout(1, false);
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		layout.verticalSpacing = pixelConverter.convertHeightInCharsToPixels(1);
-		container.setLayout(layout);
-		container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		Composite groupContainer = new Composite(parent, SWT.NONE);
+		GridLayout groupLayout = new GridLayout(1, false);
+		groupLayout.marginWidth = 0;
+		groupLayout.marginHeight = 0;
+		groupContainer.setLayout(groupLayout);
+		groupContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		Composite topGroup = new Composite(container, SWT.NONE);
-		layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		topGroup.setLayout(layout);
+		Composite topGroup = new Composite(groupContainer, SWT.NONE);
+		GridLayout innerGroupLayout = new GridLayout(2, false);
+		innerGroupLayout.marginWidth = 0;
+		innerGroupLayout.marginHeight = 0;
+		topGroup.setLayout(innerGroupLayout);
 		topGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		monitoringEnabled = createBooleanEditor(PreferenceConstants.MONITORING_ENABLED,
+		createBooleanEditor(PreferenceConstants.MONITORING_ENABLED,
 				Messages.MonitoringPreferencePage_enable_thread_label, topGroup);
 
 		longEventThreshold = createIntegerEditor(
@@ -151,20 +146,17 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 
 		createBooleanEditor(PreferenceConstants.DUMP_ALL_THREADS,
 				Messages.MonitoringPreferencePage_dump_all_threads_label, topGroup);
-		topGroup.setLayout(layout);
+		topGroup.setLayout(innerGroupLayout);
 
 		createBooleanEditor(PreferenceConstants.LOG_TO_ERROR_LOG,
 				Messages.MonitoringPreferencePage_log_freeze_events_label, topGroup);
-		topGroup.setLayout(layout);
+		topGroup.setLayout(innerGroupLayout);
 
-		final Composite bottomGroup = new Composite(container, SWT.NONE);
-		layout = new GridLayout(2, false);
-		layout.marginWidth = 0;
-		layout.marginHeight = 0;
-		bottomGroup.setLayout(layout);
-		bottomGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		final Composite bottomGroup = new Composite(groupContainer, SWT.NONE);
+		bottomGroup.setLayout(innerGroupLayout);
+		bottomGroup.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-		addField(new FilterListEditor(PreferenceConstants.FILTER_TRACES,
+		addField(new ListFieldEditor(PreferenceConstants.FILTER_TRACES,
 				Messages.MonitoringPreferencePage_filter_label, bottomGroup), bottomGroup);
 	}
 
@@ -181,26 +173,16 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
     			String preferenceName = ((FieldEditor) source).getPreferenceName();
 				if (preferenceName.equals(PreferenceConstants.MONITORING_ENABLED)) {
     				boolean enabled = Boolean.TRUE.equals(event.getNewValue());
-	    			enableDependentFields(enabled);
+	    			for (Map.Entry<FieldEditor, Composite> entry : editors.entrySet()) {
+						FieldEditor editor = entry.getKey();
+	    				if (!editor.getPreferenceName().equals(PreferenceConstants.MONITORING_ENABLED)) {
+	    					editor.setEnabled(enabled, entry.getValue());
+	    				}
+	    			}
     			}
     		}
         }
 		super.propertyChange(event);
-	}
-
-	@Override
-	protected void performDefaults() {
-		super.performDefaults();
-		enableDependentFields(monitoringEnabled.getBooleanValue());
-	}
-
-	private void enableDependentFields(boolean enable) {
-		for (Map.Entry<FieldEditor, Composite> entry : editors.entrySet()) {
-			FieldEditor editor = entry.getKey();
-			if (!editor.getPreferenceName().equals(PreferenceConstants.MONITORING_ENABLED)) {
-				editor.setEnabled(enable, entry.getValue());
-			}
-		}
 	}
 
 	private BooleanFieldEditor createBooleanEditor(String name, String labelText,
@@ -220,8 +202,7 @@ public class MonitoringPreferencePage extends FieldEditorPreferencePage
 		editor.fillIntoGrid(parent, 2);
 		editors.put(editor, parent);
 		if (!editor.getPreferenceName().equals(PreferenceConstants.MONITORING_ENABLED)) {
-			boolean enabled = preferences.getBoolean(PreferenceConstants.MONITORING_ENABLED);
-			editor.setEnabled(enabled, parent);
+			editor.setEnabled(pluginEnabled, parent);
 		}
 		return editor;
 	}
