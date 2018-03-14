@@ -68,12 +68,6 @@ public class RenderMojo extends AbstractMojo {
     /** Used to specify the number of render threads when rasterizing icons. */
     public static final String RENDERTHREADS = "eclipse.svg.renderthreads";
 
-    /** Used to specify the directory name where the SVGs are taken from. */
-    public static final String SOURCE_DIR = "eclipse.svg.sourcedirectory";
-
-    /** Used to specify the directory name where the PNGs are saved to. */
-    public static final String TARGET_DIR = "eclipse.svg.targetdirectory";
-
     /** A list of directories with svg sources to rasterize. */
     private List<IconEntry> icons;
 
@@ -332,7 +326,7 @@ public class RenderMojo extends AbstractMojo {
             // Create the callable and add it to the task pool
             Callable<Object> runnable = new Callable<Object>() {
                 @Override
-                public Object call() throws Exception {
+				public Object call() throws Exception {
                     // The jhlabs filters are not thread safe, so provide one set per thread
                     GrayscaleFilter grayFilter = new GrayscaleFilter();
 
@@ -508,20 +502,6 @@ public class RenderMojo extends AbstractMojo {
                 log.warn("Unusual scale factor: " + iconScaleStr + " (@" + iconScale + "x)");
             }
         }
-        
-        // Defaults to "eclipse-svg"
-        String sourceDir = "eclipse-svg";
-        String sourceDirProp = System.getProperty(SOURCE_DIR);
-        if (sourceDirProp != null) {
-            sourceDir = sourceDirProp;
-        }
-        
-        // Defaults to "eclipse-png"
-        String targetDir = "eclipse-png";
-        String targetDirProp = System.getProperty(TARGET_DIR);
-        if (targetDirProp != null) {
-            targetDir = targetDirProp;
-        }
 
         // Track the time it takes to render the entire set
         long totalStartTime = System.currentTimeMillis();
@@ -531,8 +511,8 @@ public class RenderMojo extends AbstractMojo {
 
         String workingDirectory = System.getProperty("user.dir");
 
-        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/" + targetDir + "/" : "/" + targetDir + "-highdpi/"));
-        File iconDirectoryRoot = new File(sourceDir + "/");
+        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/eclipse-png/" : "/eclipse-png-highdpi/"));
+        File iconDirectoryRoot = new File("eclipse-svg/");
 
         // Search each subdir in the root dir for svg icons
         for (File file : iconDirectoryRoot.listFiles()) {

@@ -44,43 +44,23 @@ import com.mortennobel.imagescaling.ResampleOp;
  */
 public class GalleryMojo extends AbstractMojo {
 
-    /** Maven logger */
+	/** Maven logger */
     Log log;
 
     /** Used for finding gif files by extension. */
     public static final String GIF_EXT = ".gif";
-    
-    /** Used to specify the directory name where the SVGs are taken from. */
-    public static final String PNG_DIR = "eclipse.svg.pngdirectory";
 
-    /** Used to specify the directory name where the SVGs are taken from. */
-    public static final String GIF_DIR = "eclipse.svg.gifdirectory"; 
-
-    /**
-     * <p>Mojo takes rendered images and generates various galleries for
-     * testing and evaluation.</p>
-     */
+	/**
+	 * <p>Mojo takes rendered images and generates various galleries for
+	 * testing and evaluation.</p>
+	 */
     public void execute() throws MojoExecutionException, MojoFailureException {
         log = getLog();
         
-        // Defaults to "eclipse-png"
-        String pngDir = "eclipse-png";
-        String pngDirProp = System.getProperty(PNG_DIR);
-        if (pngDirProp != null) {
-            pngDir = pngDirProp;
-        }
-
-        // Defaults to "eclipse-gif"
-        String gifDir = "eclipse-gif";
-        String gifDirProp = System.getProperty(GIF_DIR);
-        if (gifDirProp != null) {
-            gifDir = gifDirProp;
-        }
-
-        File iconDirectoryRoot = new File(pngDir + "/");
+        File iconDirectoryRoot = new File("eclipse-png/");
 
         Map<String, List<IconEntry>> galleryIconSets = new HashMap<>();
-
+        
         // Search each subdir in the root dir for svg icons
         for (File file : iconDirectoryRoot.listFiles()) {
             if(!file.isDirectory()) {
@@ -99,16 +79,16 @@ public class GalleryMojo extends AbstractMojo {
         File master = new File(galleryDir, "master/");
         
         if(galleryDir.exists()) {
-            galleryDir.delete();
+        	galleryDir.delete();
         }
 
-        galleryDir.mkdirs();
-        gifCompare.mkdirs();
-        master.mkdirs();
-
-        renderGalleries(galleryDir, gifCompare, master, galleryIconSets, 16, 800, pngDir, gifDir);
+    	galleryDir.mkdirs();
+    	gifCompare.mkdirs();
+    	master.mkdirs();
+    	
+        renderGalleries(galleryDir, gifCompare, master, galleryIconSets, 16, 800);
     }
-
+    
     /**
      * <p>Renders each icon set into a gallery image for reviewing and showing off
      * icons, and then composes them into a master gallery image.</p>
@@ -120,10 +100,10 @@ public class GalleryMojo extends AbstractMojo {
      * @param iconSize
      * @param width
      */
-    public void renderGalleries(File galleryDir,  File gifCompare, File master, Map<String, List<IconEntry>> iconSets, int iconSize, int width, String pngDir, String gifDir) {
+    public void renderGalleries(File galleryDir,  File gifCompare, File master, Map<String, List<IconEntry>> iconSets, int iconSize, int width) {
         // Render each icon set and a master list
         List<IconEntry> masterList = new ArrayList<>();
-
+        
         for (Entry<String, List<IconEntry>> entry : iconSets.entrySet()) {
             String key = entry.getKey();
             List<IconEntry> value = entry.getValue();
@@ -132,19 +112,19 @@ public class GalleryMojo extends AbstractMojo {
 
             log.info("Creating gallery for: " + key);
             renderGallery(galleryDir, key, value, iconSize, width, 3);
-            renderGifCompareGallery(gifCompare, key, value, iconSize, width, 6, pngDir, gifDir);
+            renderGifCompareGallery(gifCompare, key, value, iconSize, width, 6);
         }
 
         // Render the master image
         log.info("Rendering master icon gallery...");
         renderMasterGallery(galleryDir, master, "-gallery.png", iconSize, iconSize + width, true);
         renderMasterGallery(galleryDir, master, "-gallery.png", iconSize, iconSize + width, false);
-
+        
         // Master gif compare
         //renderMasterGallery(outputDir, "-gifcompare.png", iconSize, iconSize + width, false);
     }
 
-    /**
+	/**
      * <p>Renders comparison images, the new png/svg icons vs old gifs.</p>
      * 
      * @param outputDir
@@ -154,14 +134,14 @@ public class GalleryMojo extends AbstractMojo {
      * @param width
      * @param margin
      */
-    private void renderGifCompareGallery(File outputDir, String key, List<IconEntry> icons, int iconSize, int width, int margin, String pngDir, String gifDir) {
-        int leftColumnWidth = 300;
-        int textHeaderHeight = 31;
+    private void renderGifCompareGallery(File outputDir, String key, List<IconEntry> icons, int iconSize, int width, int margin) {
+    	int leftColumnWidth = 300;
+    	int textHeaderHeight = 31;
         int outputSize = iconSize;
         int widthTotal = (outputSize * 4) + (margin * 6) + leftColumnWidth;
-
+        
         int rowHeight = iconSize + (margin * 2);
-
+        
         // Compute the height and add some room for the text header (31 px)
         int height = (icons.size() * rowHeight) + textHeaderHeight;
 
@@ -209,19 +189,19 @@ public class GalleryMojo extends AbstractMojo {
                 // Munge the gif path
                 File gifLocalPath = new File(entry.inputPath.getParentFile(), entry.nameBase + GIF_EXT);
                 String absoluteLocalPath = gifLocalPath.getAbsolutePath();
-                String gifAbsPath = absoluteLocalPath.replaceFirst(pngDir, gifDir);
+                String gifAbsPath = absoluteLocalPath.replaceFirst("eclipse-png", "eclipse-gif");
                 File gifPath = new File(gifAbsPath);
 
-                log.debug("Search for GIF...");
-                log.debug("Entry path: " + entry.inputPath.getAbsolutePath());
-                log.debug("GIF path: " + gifPath.getAbsolutePath());
-                
+            	log.debug("Search for GIF...");
+            	log.debug("Entry path: " + entry.inputPath.getAbsolutePath());
+            	log.debug("GIF path: " + gifPath.getAbsolutePath());
+            	
                 BufferedImage gifImage = null;
                 
                 if(gifPath.exists()) {
-                    gifImage = ImageIO.read(gifPath);
+                	gifImage = ImageIO.read(gifPath);
                 } else {
-                    log.debug("GIF not found: " + gifPath.getAbsolutePath());
+                	log.debug("GIF not found: " + gifPath.getAbsolutePath());
                 }
                 
                 g.drawString(entry.nameBase, 5, y + (margin * 3));
@@ -229,13 +209,13 @@ public class GalleryMojo extends AbstractMojo {
                 g.drawLine(0, y, widthTotal, y);
                 
                 if(gifImage != null) {
-                    g.drawImage(gifImage, leftColumnWidth, y + margin, null);
+                	g.drawImage(gifImage, leftColumnWidth, y + margin, null);
                 }
                 
                 g.drawImage(pngImage, second, y + margin, null);
                 
                 if(gifImage != null) {
-                    g.drawImage(gifImage, second + margin + iconSize + 30, y + margin, null);
+                	g.drawImage(gifImage, second + margin + iconSize + 30, y + margin, null);
                 }
                 
                 g.drawImage(pngImage, second + (margin * 2) + (iconSize * 2) + 30, y + margin, null);
@@ -250,15 +230,15 @@ public class GalleryMojo extends AbstractMojo {
 
         try {
             // Write the gallery image to disk
-            String outputName = key + "-" + iconSize + "-gifcompare.png";
+        	String outputName = key + "-" + iconSize + "-gifcompare.png";
             ImageIO.write(bi, "PNG", new File(outputDir, outputName));
         } catch (IOException e) {
             e.printStackTrace();
             log.error("Error writing gif comparison gallery: " + e.getMessage());
         }
     }
-
-
+    
+    
     /**
      * <p>Renders an icon set into a grid within an image.</p>
      * 
@@ -307,7 +287,7 @@ public class GalleryMojo extends AbstractMojo {
                     log.error("Undefined gallery image for : " + def.nameBase);
                     continue;
                 }
-
+                
                 BufferedImage iconImage = ImageIO.read(def.inputPath);
                 BufferedImage sizedImage = resampleOp.filter(iconImage, null);
 
@@ -328,7 +308,7 @@ public class GalleryMojo extends AbstractMojo {
 
         try {
             // Write the gallery image to disk
-            String outputName = key + "-" + iconSize + "-gallery.png";
+        	String outputName = key + "-" + iconSize + "-gallery.png";
             ImageIO.write(bi, "PNG", new File(outputRoot, outputName));
         } catch (IOException e) {
             log.error("Error writing icon: " + e.getMessage());
