@@ -185,7 +185,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 	@Override
 	public boolean performOk() {
 		ITheme theme = getSelectedTheme();
-		if (theme != null && !theme.getId().equals(engine.getActiveTheme().getId())) {
+		if (theme != null) {
 			engine.setTheme(getSelectedTheme(), true);
 		}
 
