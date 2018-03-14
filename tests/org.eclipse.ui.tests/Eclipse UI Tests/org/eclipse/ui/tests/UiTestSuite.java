@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Red Hat Inc. - bug 474132
  *******************************************************************************/
 package org.eclipse.ui.tests;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 import org.eclipse.ui.tests.activities.ActivitiesTestSuite;
 import org.eclipse.ui.tests.api.ApiTestSuite;
@@ -26,10 +28,6 @@ import org.eclipse.ui.tests.preferences.PreferencesTestSuite;
 import org.eclipse.ui.tests.progress.ProgressTestSuite;
 import org.eclipse.ui.tests.services.ServicesTestSuite;
 import org.eclipse.ui.tests.themes.ThemesTestSuite;
-
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Test all areas of the UI.
@@ -83,6 +81,6 @@ public class UiTestSuite extends TestSuite {
 		addTest(new ServicesTestSuite());
 		// addTest(new StatusHandlingTestSuite());
 		// addTest(OpenSystemInPlaceEditorTest.suite());
-		addTest(new JUnit4TestAdapter(ProgressTestSuite.class));
+		addTest(new ProgressTestSuite());
 	}
 }
