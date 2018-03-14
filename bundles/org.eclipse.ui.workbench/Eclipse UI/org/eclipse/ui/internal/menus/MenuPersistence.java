@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,6 @@ final public class MenuPersistence extends RegistryPersistence {
 	private MApplication application;
 	private IEclipseContext appContext;
 	private ArrayList<MenuAdditionCacheEntry> cacheEntries = new ArrayList<MenuAdditionCacheEntry>();
-	private ArrayList<EditorAction> editorActionContributions = new ArrayList<EditorAction>();
 
 	private ArrayList<MMenuContribution> menuContributions = new ArrayList<MMenuContribution>();
 	private ArrayList<MToolBarContribution> toolBarContributions = new ArrayList<MToolBarContribution>();
@@ -85,7 +84,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		application.getTrimContributions().removeAll(trimContributions);
 		menuContributions.clear();
 		cacheEntries.clear();
-		editorActionContributions.clear();
 		super.dispose();
 	}
 	/*
@@ -109,8 +107,6 @@ final public class MenuPersistence extends RegistryPersistence {
 		super.read();
 
 		readAdditions();
-		// readActionSets();
-		readEditorActions();
 
 		ArrayList<MMenuContribution> tmp = new ArrayList<MMenuContribution>(menuContributions);
 		menuContributions.clear();
@@ -164,34 +160,6 @@ final public class MenuPersistence extends RegistryPersistence {
 				cacheEntries.add(menuContribution);
 				menuContribution.mergeIntoModel(menuContributions, toolBarContributions,
 						trimContributions);
-			}
-		}
-	}
-
-	private void readEditorActions() {
-		final IExtensionRegistry registry = Platform.getExtensionRegistry();
-		ArrayList<IConfigurationElement> configElements = new ArrayList<IConfigurationElement>();
-
-		final IConfigurationElement[] extElements = registry
-				.getConfigurationElementsFor(IWorkbenchRegistryConstants.EXTENSION_EDITOR_ACTIONS);
-		for (IConfigurationElement element : extElements) {
-			if (contributorFilter == null
-					|| contributorFilter.matcher(element.getContributor().getName()).matches()) {
-				configElements.add(element);
-			}
-		}
-
-		Collections.sort(configElements, comparer);
-
-		for (IConfigurationElement element : configElements) {
-			for (IConfigurationElement child : element.getChildren()) {
-				if (child.getName().equals(IWorkbenchRegistryConstants.TAG_ACTION)) {
-					EditorAction editorAction = new EditorAction(application, appContext, element,
-							child);
-					editorActionContributions.add(editorAction);
-					editorAction.addToModel(menuContributions, toolBarContributions,
-							trimContributions);
-				}
 			}
 		}
 	}

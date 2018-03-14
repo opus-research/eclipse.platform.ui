@@ -505,7 +505,7 @@ public class MenuHelper {
 			}
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					IWorkbenchWindow window = context.get(IWorkbenchWindow.class);
 					if (window == null) {
 						return null;
@@ -600,7 +600,7 @@ public class MenuHelper {
 			final ParameterizedCommand parmCmd = cs.createCommand(cmdId, null);
 			IContextFunction generator = new ContextFunction() {
 				@Override
-				public Object compute(IEclipseContext context) {
+				public Object compute(IEclipseContext context, String contextKey) {
 					return new IMenuCreator() {
 						private ActionDelegateHandlerProxy handlerProxy;
 
@@ -722,7 +722,7 @@ public class MenuHelper {
 			}
 
 			@Override
-			public Object compute(IEclipseContext context) {
+			public Object compute(IEclipseContext context, String contextKey) {
 				final MHandledItem model = context.get(MHandledItem.class);
 				if (model == null) {
 					return null;

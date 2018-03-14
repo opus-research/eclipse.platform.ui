@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2013 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,8 +40,21 @@ public class CTabItemTest extends CSSSWTTestCase {
 	}
 
 	private void spinEventLoop() {
-		while (shell.getDisplay().readAndDispatch())
-			;
+		final boolean[] done = new boolean[1];
+		Runnable run = new Runnable() {
+			public void run() {
+				done[0] = true;
+			}
+		};
+		Display display = shell.getDisplay();
+		display.timerExec(10, run);
+		while (!done[0]) {
+			 if (display.readAndDispatch()) {
+				 display.timerExec(10, run);
+			 } else {
+				 display.sleep();
+			 }
+		}
 	}
 
 	private CTabFolder createFolder(Composite composite) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2012 BestSolution.at and others.
+ * Copyright (c) 2009, 2013 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,9 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
  * Implementations of this service are responsible for creating or destroying widgets corresponding
  * to model elements, as well as for running any event loop required for handling user events on
  * those widgets.
+ * 
+ * @noimplement This interface is not intended to be implemented by clients.
+ * @since 1.0
  */
 public interface IPresentationEngine {
 	/**
@@ -155,6 +158,15 @@ public interface IPresentationEngine {
 	 *            the model element whose UI element should removed
 	 */
 	public void removeGui(MUIElement element);
+
+	/**
+	 * Attempts to set the UI focus onto the given element. By default we delegate this to the
+	 * elements implementation's @Focus method (if any). If no such method exists we delegate the
+	 * the renderer's 'forceFocus' method.
+	 * 
+	 * @param element
+	 */
+	public void focusGui(MUIElement element);
 
 	/**
 	 * Run the UI. This method is responsible for creating the initial UI and (if necessary)
