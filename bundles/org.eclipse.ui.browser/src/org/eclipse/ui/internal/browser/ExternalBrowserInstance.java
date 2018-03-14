@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,7 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				Trace.FINEST,
 				"Launching external Web browser: " + location + " - " + parameters + " - " + urlText); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-		String[] params = WebBrowserUtil.createParameterArray(parameters, urlText);
+		String params = WebBrowserUtil.createParameterString(parameters, urlText);
 
 		try {
 			if ( Util.isMac()) {
@@ -53,9 +53,8 @@ public class ExternalBrowserInstance extends AbstractWebBrowser {
 				cmdOptions.add(0, "open"); //$NON-NLS-1$
 			}
 
-			for (String param : params) {
-				cmdOptions.add(param);
-			}
+			if (!(params == null || params.length() == 0))
+				cmdOptions.add(params);
 
 			String[] cmd = cmdOptions.toArray(new String[cmdOptions.size()]);
 			Trace.trace(Trace.FINEST, "Launching " + join(" ", cmd)); //$NON-NLS-1$//$NON-NLS-2$
