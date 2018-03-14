@@ -123,14 +123,14 @@
         <repository location='http://download.eclipse.org/e4/updates/0.17'/>
       </repositories>
     </iu>
-    <iu id='org.eclipse.e4.core.tools.feature.feature.group' name='Eclipse e4 Tools' >
+    <iu id='org.eclipse.e4.core.tools.feature.feature.group' name='Eclipse e4 Tools (Incubation)' >
       <repositories size='1'>
-        <repository location='http://download.eclipse.org/eclipse/updates/4.5-I-builds/'/>
+        <repository location='http://download.eclipse.org/e4/updates/0.17'/>
       </repositories>
     </iu>
-    <iu id='org.eclipse.e4.core.tools.feature.source.feature.group' name='Eclipse e4 Tools Source' >
+    <iu id='org.eclipse.e4.core.tools.feature.source.feature.group' name='Eclipse e4 Tools Source (Incubation)' >
       <repositories size='1'>
-        <repository location='http://download.eclipse.org/eclipse/updates/4.5-I-builds/'/>
+        <repository location='http://download.eclipse.org/e4/updates/0.17'/>
       </repositories>
     </iu>
     <iu id='org.eclipse.egit.feature.group' name='Eclipse Git Team Provider' >
@@ -145,7 +145,7 @@
     </iu>
     <iu id='org.eclipse.emf.sdk.feature.group' name='EMF - Eclipse Modeling Framework SDK' >
       <repositories size='1'>
-        <repository location='http://download.eclipse.org/releases/mars'/>
+        <repository location='http://download.eclipse.org/releases/luna'/>
       </repositories>
     </iu>
     <iu id='org.eclipse.jgit.feature.group' name='Java implementation of Git' >
