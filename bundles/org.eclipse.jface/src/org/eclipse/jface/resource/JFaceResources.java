@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431093, 440080
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -186,7 +186,6 @@ public class JFaceResources {
 	public static ColorRegistry getColorRegistry() {
 		if (colorRegistry == null) {
 			colorRegistry = new ColorRegistry();
-			initializeDefaultColors();
 		}
 		return colorRegistry;
 	}
@@ -208,11 +207,6 @@ public class JFaceResources {
 			reg = mgr;
 			registries.put(toQuery, mgr);
 			toQuery.disposeExec(new Runnable() {
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.lang.Runnable#run()
-				 */
 				@Override
 				public void run() {
 					mgr.dispose();
@@ -584,18 +578,11 @@ public class JFaceResources {
 		fontRegistry = registry;
 	}
 
-	/*
-	 * (non-Javadoc) Declare a private constructor to block instantiation.
+	/**
+	 * Declare a private constructor to block instantiation.
 	 */
 	private JFaceResources() {
 		// no-op
 	}
 
-	/*
-	 * Initialize any JFace colors that may not be initialized via a client.
-	 */
-	private static void initializeDefaultColors() {
-		// JFace Colors that may not be defined in a workbench theme should be
-		// defined here.
-	}
 }
