@@ -23,7 +23,6 @@ public class StringToNumberParserByteTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#assertValid(java.lang.Number)
 	 */
-	@Override
 	protected boolean assertValid(Number number) {
 		return StringToNumberParser.inByteRange(number);
 	}
@@ -31,7 +30,6 @@ public class StringToNumberParserByteTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMax()
 	 */
-	@Override
 	protected Number getValidMax() {
 		return new Byte(Byte.MAX_VALUE);
 	}
@@ -39,7 +37,6 @@ public class StringToNumberParserByteTest extends
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.tests.internal.databinding.conversion.StringToNumberParserTestHarness#getValidMin()
 	 */
-	@Override
 	protected Number getValidMin() {
 		return new Byte(Byte.MIN_VALUE);
 	}

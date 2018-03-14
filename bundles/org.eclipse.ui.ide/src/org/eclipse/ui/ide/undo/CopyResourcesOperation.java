@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * A CopyResourcesOperation represents an undoable operation for copying one or
  * more resources in the workspace. Clients may call the public API from a
  * background thread.
- *
+ * 
  * <p>
  * This operation can track any overwritten resources and restore them when the
  * copy is undone. It is up to clients to determine whether overwrites are
@@ -37,12 +37,12 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * location for the copy is assumed to have already been validated by the
  * client. It will not be revalidated on undo and redo.
  * </p>
- *
+ * 
  * <p>
  * This class is intended to be instantiated and used by clients. It is not
  * intended to be subclassed by clients.
  * </p>
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
  * @since 3.3
  */
@@ -56,7 +56,7 @@ public class CopyResourcesOperation extends
 	/**
 	 * Create a CopyResourcesOperation that copies a single resource to a new
 	 * location. The new location includes the name of the copy.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource to be copied
 	 * @param newPath
@@ -75,7 +75,7 @@ public class CopyResourcesOperation extends
 	 * Create a CopyResourcesOperation that copies all of the specified
 	 * resources to a single target location. The original resource name will be
 	 * used when copied to the new location.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be copied
 	 * @param destinationPath
@@ -95,7 +95,7 @@ public class CopyResourcesOperation extends
 	 * resources to its corresponding destination path in the destination path
 	 * array. The resource name for the target is included in the corresponding
 	 * destination path.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be copied. Must not contain null resources.
 	 * @param destinationPaths
@@ -113,7 +113,12 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation copies the resources.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
@@ -125,7 +130,7 @@ public class CopyResourcesOperation extends
 	 * Move or copy any known resources according to the destination parameters
 	 * known by this operation. Store enough information to undo and redo the
 	 * operation.
-	 *
+	 * 
 	 * @param monitor
 	 *            the progress monitor to use for the operation
 	 * @param uiInfo
@@ -185,8 +190,13 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation deletes the previously made copies and restores any
 	 * resources that were overwritten by the copy.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
 	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
@@ -208,6 +218,12 @@ public class CopyResourcesOperation extends
 		monitor.done();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
+	 *      int)
+	 */
 	@Override
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
@@ -237,8 +253,12 @@ public class CopyResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * This implementation computes the ability to delete the original copy and
 	 * restore any overwritten resources.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {

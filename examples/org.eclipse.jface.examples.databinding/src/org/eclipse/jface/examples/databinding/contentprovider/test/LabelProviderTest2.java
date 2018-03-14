@@ -19,7 +19,7 @@ import org.eclipse.core.databinding.observable.list.WritableList;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ListeningLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
@@ -60,6 +60,11 @@ public class LabelProviderTest2 {
 	private Button renameButton;
 
 	private SelectionListener buttonSelectionListener = new SelectionAdapter() {
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+		 */
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Button pressed = (Button) e.widget;
@@ -99,6 +104,12 @@ public class LabelProviderTest2 {
 					}
 				};
 
+				/*
+				 * (non-Javadoc)
+				 *
+				 * @see org.eclipse.jface.databinding.viewers.ViewerLabelProvider#updateLabel(org.eclipse.jface.viewers.ViewerLabel,
+				 *      java.lang.Object)
+				 */
 				@Override
 				public void updateLabel(ViewerLabel label, Object element) {
 					if (element instanceof RenamableItem) {
@@ -183,7 +194,7 @@ public class LabelProviderTest2 {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+        Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				LabelProviderTest2 test = new LabelProviderTest2();

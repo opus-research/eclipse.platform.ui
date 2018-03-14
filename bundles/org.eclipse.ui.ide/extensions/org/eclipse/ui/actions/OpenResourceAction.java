@@ -64,10 +64,10 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 
 	/**
 	 * Creates a new action.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
-	 *
+	 *    
 	 * @deprecated {@link #OpenResourceAction(IShellProvider)}
 	 */
 	@Deprecated
@@ -78,7 +78,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 
 	/**
 	 * Creates a new action.
-	 *
+	 * 
 	 * @param provider
 	 * 				the shell for any dialogs
 	 * @since 3.4
@@ -111,16 +111,25 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		return count;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.OpenResourceAction_operationMessage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.OpenResourceAction_problemMessage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.OpenResourceAction_dialogTitle;
@@ -152,7 +161,7 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 	/**
 	 * Returns the preference for whether to open required projects when opening
 	 * a project. Consults the preference and prompts the user if necessary.
-	 *
+	 * 
 	 * @return <code>true</code> if referenced projects should be opened, and
 	 *         <code>false</code> otherwise.
 	 */
@@ -202,6 +211,10 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction; overrides method on
+	 * WorkspaceAction.
+	 */
 	@Override
 	public void run() {
 		try {
@@ -281,6 +294,9 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 		job.schedule();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected boolean shouldPerformResourcePruning() {
 		return false;

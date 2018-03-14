@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -48,7 +47,7 @@ import org.eclipse.ui.internal.views.ViewsPlugin;
  * a result we are forced to refresh the entire entry tree when a property
  * changes value.
  * </p>
- *
+ * 
  * @since 3.0 (was previously internal)
  */
 public class PropertySheetEntry extends EventManager implements
@@ -64,7 +63,7 @@ public class PropertySheetEntry extends EventManager implements
 	/**
 	 * The property sources for the values we are displaying/editing.
 	 */
-	private Map<Object, IPropertySource> sources = new HashMap<Object, IPropertySource>(0);
+	private Map sources = new HashMap(0);
 
 	/**
 	 * The value of this entry is defined as the the first object in its value
@@ -113,12 +112,18 @@ public class PropertySheetEntry extends EventManager implements
 		}
 	};
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public void addPropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		addListenerObject(listener);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public void applyEditorValue() {
 		if (editor == null) {
@@ -155,7 +160,7 @@ public class PropertySheetEntry extends EventManager implements
 	/**
 	 * Return the unsorted intersection of all the
 	 * <code>IPropertyDescriptor</code>s for the objects.
-	 *
+	 * 
 	 * @return List
 	 */
 	private List computeMergedPropertyDescriptors() {
@@ -219,7 +224,7 @@ public class PropertySheetEntry extends EventManager implements
 	/**
 	 * Returns an map of property descritptors (keyed on id) for the given
 	 * property source.
-	 *
+	 * 
 	 * @param source
 	 *            a property source for which to obtain descriptors
 	 * @return a table of decriptors keyed on their id
@@ -263,7 +268,7 @@ public class PropertySheetEntry extends EventManager implements
 	 * <p>
 	 * Subclasses may overwrite to create new instances of their own class.
 	 * </p>
-	 *
+	 * 
 	 * @return a new <code>PropertySheetEntry</code> instance for the
 	 *         descriptor passed in
 	 * @since 3.1
@@ -272,6 +277,9 @@ public class PropertySheetEntry extends EventManager implements
 		return new PropertySheetEntry();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public void dispose() {
 		if (editor != null) {
@@ -329,11 +337,17 @@ public class PropertySheetEntry extends EventManager implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getCategory() {
 		return descriptor.getCategory();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public IPropertySheetEntry[] getChildEntries() {
 		if (childEntries == null) {
@@ -342,6 +356,9 @@ public class PropertySheetEntry extends EventManager implements
 		return childEntries;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getDescription() {
 		return descriptor.getDescription();
@@ -349,7 +366,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the descriptor for this entry.
-	 *
+	 * 
 	 * @return the descriptor for this entry
 	 * @since 3.1 (was previously private)
 	 */
@@ -357,11 +374,19 @@ public class PropertySheetEntry extends EventManager implements
 		return descriptor;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getDisplayName() {
 		return descriptor.getDisplayName();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.properties.IPropertySheetEntry#getEditor(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public CellEditor getEditor(Composite parent) {
 
@@ -380,7 +405,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the edit value for the object at the given index.
-	 *
+	 * 
 	 * @param index
 	 *            the value object index
 	 * @return the edit value for the object at the given index
@@ -394,21 +419,33 @@ public class PropertySheetEntry extends EventManager implements
 		return value;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getErrorText() {
 		return errorText;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getFilters()[] {
 		return descriptor.getFilterFlags();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public Object getHelpContextIds() {
 		return descriptor.getHelpContextIds();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public Image getImage() {
 		ILabelProvider provider = descriptor.getLabelProvider();
@@ -420,7 +457,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the parent of this entry.
-	 *
+	 * 
 	 * @return the parent entry, or <code>null</code> if it has no parent
 	 * @since 3.1
 	 */
@@ -430,7 +467,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns an property source for the given object.
-	 *
+	 * 
 	 * @param object
 	 *            an object for which to obtain a property source or
 	 *            <code>null</code> if a property source is not available
@@ -439,26 +476,29 @@ public class PropertySheetEntry extends EventManager implements
 	 */
 	protected IPropertySource getPropertySource(Object object) {
 		if (sources.containsKey(object))
-			return sources.get(object);
+			return (IPropertySource) sources.get(object);
 
 		IPropertySource result = null;
 		IPropertySourceProvider provider = propertySourceProvider;
 
 		if (provider == null && object != null) {
-			provider = ViewsPlugin.getAdapter(object,
+			provider = (IPropertySourceProvider) ViewsPlugin.getAdapter(object, 
                     IPropertySourceProvider.class, false);
         }
 
 		if (provider != null) {
 			result = provider.getPropertySource(object);
 		} else {
-			result = ViewsPlugin.getAdapter(object, IPropertySource.class, false);
+            result = (IPropertySource)ViewsPlugin.getAdapter(object, IPropertySource.class, false);
         }
 
 		sources.put(object, result);
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public String getValueAsString() {
 		if (editValue == null) {
@@ -477,7 +517,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the value objects of this entry.
-	 *
+	 * 
 	 * @return the value objects of this entry
 	 * @since 3.1 (was previously private)
 	 */
@@ -485,6 +525,9 @@ public class PropertySheetEntry extends EventManager implements
 		return values;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public boolean hasChildEntries() {
 		if (childEntries != null && childEntries.length > 0) {
@@ -563,7 +606,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Refresh the entry tree from the root down.
-	 *
+	 * 
 	 * @since 3.1 (was previously private)
 	 */
 	protected void refreshFromRoot() {
@@ -594,12 +637,18 @@ public class PropertySheetEntry extends EventManager implements
 		setValues(newValues);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public void removePropertySheetEntryListener(
 			IPropertySheetEntryListener listener) {
 		removeListenerObject(listener);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IPropertySheetEntry.
+	 */
 	@Override
 	public void resetPropertyValue() {
 		if (parent == null) {
@@ -633,7 +682,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Set the descriptor.
-	 *
+	 * 
 	 * @param newDescriptor
 	 */
 	private void setDescriptor(IPropertyDescriptor newDescriptor) {
@@ -658,7 +707,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Sets the parent of the entry to be propertySheetEntry.
-	 *
+	 * 
 	 * @param propertySheetEntry
 	 */
 	private void setParent(PropertySheetEntry propertySheetEntry) {
@@ -669,7 +718,7 @@ public class PropertySheetEntry extends EventManager implements
 	 * Sets a property source provider for this entry. This provider is used to
 	 * obtain an <code>IPropertySource</code> for each of this entries
 	 * objects. If no provider is set then a default provider is used.
-	 *
+	 * 
 	 * @param provider
 	 *            IPropertySourceProvider
 	 */
@@ -684,7 +733,7 @@ public class PropertySheetEntry extends EventManager implements
 	 * call our parent to update the property we represent with the given value.
 	 * We then trigger a model refresh.
 	 * <p>
-	 *
+	 * 
 	 * @param newValue
 	 *            the new value
 	 */
@@ -709,7 +758,7 @@ public class PropertySheetEntry extends EventManager implements
 	 * Updating the child entries will typically call this method on the child
 	 * entries and thus the entire entry tree is updated
 	 * </p>
-	 *
+	 * 
 	 * @param objects
 	 *            the new values for this entry
 	 */
@@ -748,7 +797,7 @@ public class PropertySheetEntry extends EventManager implements
 	 * <p>
 	 * Subclasses may override to set the property value in some custom way.
 	 * </p>
-	 *
+	 * 
 	 * @param child
 	 *            the child entry that changed its value
 	 */
@@ -767,7 +816,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the foreground color for the entry.
-	 *
+	 * 
 	 * @return the foreground color for the entry, or <code>null</code> to use the default
 	 *         foreground color
 	 * @since 3.7
@@ -782,7 +831,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the background color for the entry.
-	 *
+	 * 
 	 * @return the background color for the entry, or <code>null</code> to use the default
 	 *         background color
 	 * @since 3.7
@@ -797,7 +846,7 @@ public class PropertySheetEntry extends EventManager implements
 
 	/**
 	 * Returns the font for the entry.
-	 *
+	 * 
 	 * @return the font for the entry, or <code>null</code> to use the default font
 	 * @since 3.7
 	 */

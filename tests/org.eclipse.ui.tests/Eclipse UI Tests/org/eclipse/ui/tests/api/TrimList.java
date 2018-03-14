@@ -35,65 +35,110 @@ public class TrimList implements IWindowTrim {
 	private Combo fCombo;
 
 	/**
-	 * The trim objects must all have the same parent.  After 3.2M4
+	 * The trim objects must all have the same parent.  After 3.2M4 
 	 * the IWindowTrim interface will be updated so that the workbench
 	 * window can give each piece of trim the correct parent.
 	 * @param shell the parent of this trim
 	 */
 	public TrimList(Shell shell) {
 		fCombo = new Combo(shell, SWT.DROP_DOWN|SWT.READ_ONLY);
-		for (String value : INIT_LIST) {
+		for (int i = 0; i < INIT_LIST.length; i++) {
+			String value = INIT_LIST[i];
 			fCombo.add(value);
 		}
 		fCombo.select(0);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getControl()
+	 */
 	@Override
 	public Control getControl() {
 		return fCombo;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getValidSides()
+	 */
 	@Override
 	public int getValidSides() {
 		return SWT.TOP | SWT.BOTTOM;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#dock(int)
+	 */
 	@Override
 	public void dock(int dropSide) {
 		// nothing to do, we don't have to re-orient our control
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getId()
+	 */
 	@Override
 	public String getId() {
 		return TRIM_LIST_ID;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getDisplayName()
+	 */
 	@Override
 	public String getDisplayName() {
 		// Should be the NLS string name, but I'll cheat for now
 		return "Trim List";
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#isCloseable()
+	 */
 	@Override
 	public boolean isCloseable() {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#handleClose()
+	 */
 	@Override
 	public void handleClose() {
 		// nothing to do here.
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWindowTrim#getWidthHint()
+	 */
 	@Override
 	public int getWidthHint() {
 		return SWT.DEFAULT;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWindowTrim#getHeightHint()
+	 */
 	@Override
 	public int getHeightHint() {
 		return SWT.DEFAULT;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWindowTrim#isResizeable()
+	 */
 	@Override
 	public boolean isResizeable() {
 		return false;

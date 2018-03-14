@@ -24,7 +24,7 @@ import org.eclipse.ui.views.IViewDescriptor;
  * tests in situations where this does not apply (this is not a problem
  * right now since the current tests only use the tabs-on-top drop
  * location).
- *
+ * 
  * @since 3.0
  */
 public class ViewTitleDropTarget extends WorkbenchWindowDropTarget {
@@ -40,6 +40,9 @@ public class ViewTitleDropTarget extends WorkbenchWindowDropTarget {
         return getPage().findView(targetPart);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getName()
+     */
     @Override
 	public String toString() {
         IViewDescriptor desc = WorkbenchPlugin.getDefault().getViewRegistry()
@@ -49,6 +52,9 @@ public class ViewTitleDropTarget extends WorkbenchWindowDropTarget {
         return title + " view title area";
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.dnd.TestDropTarget#getLocation()
+     */
     @Override
 	public Point getLocation() {
         Rectangle bounds = DragOperations.getDisplayBounds(DragOperations
@@ -56,7 +62,7 @@ public class ViewTitleDropTarget extends WorkbenchWindowDropTarget {
 
         return new Point( (bounds.x + bounds.width) - 8, bounds.y + 8);
     }
-
+    
     @Override
 	public Shell getShell() {
     	return getPart().getSite().getShell();

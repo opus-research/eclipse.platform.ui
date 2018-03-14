@@ -40,7 +40,7 @@ import com.ibm.icu.text.MessageFormat;
  * returned from IDEWorkbenchAdvisor#getWorkbenchErrorHandler(). All handled
  * statuses are checked against severity and logged using logging facility (by
  * superclass).
- *
+ * 
  * @since 3.3
  */
 public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
@@ -68,10 +68,10 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 	private static String MSG_FATAL_ERROR_Recursive = IDEWorkbenchMessages.FatalError_RecursiveError;
 
 	private static String MSG_FATAL_ERROR_Title = IDEWorkbenchMessages.InternalError;
-
+	
 	// cache handled statuses
-	private final Map map = Collections.synchronizedMap(new WeakHashMap());
-
+	private final Map map = Collections.synchronizedMap(new WeakHashMap()); 
+ 	
 	/**
 	 * @param configurer
 	 */
@@ -79,6 +79,12 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 		workbenchConfigurer = configurer;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.statushandlers.WorkbenchErrorHandler#handle(org.eclipse.ui.statushandlers.StatusAdapter,
+	 *      int)
+	 */
 	@Override
 	public void handle(final StatusAdapter statusAdapter, int style) {
 
@@ -107,6 +113,11 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 		if (isFatal(statusAdapter)) {
 			UIJob handlingExceptionJob = new UIJob("IDE Exception Handler") //$NON-NLS-1$
 			{
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+				 */
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					handleException(statusAdapter.getStatus().getException());
@@ -283,7 +294,7 @@ public class IDEWorkbenchErrorHandler extends WorkbenchErrorHandler {
 
 		/**
 		 * Updates the dialog message
-		 *
+		 * 
 		 * @param message
 		 *            new message
 		 */

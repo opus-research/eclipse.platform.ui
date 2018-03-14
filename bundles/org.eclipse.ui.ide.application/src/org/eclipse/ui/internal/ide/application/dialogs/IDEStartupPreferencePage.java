@@ -28,7 +28,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * Extends the Startup and Shutdown preference page with IDE-specific settings.
- *
+ * 
  * Note: want IDE settings to appear in main Workbench preference page (via subclassing),
  *   however the superclass, StartupPreferencePage, is internal
  * @since 3.0
@@ -40,6 +40,11 @@ public class IDEStartupPreferencePage extends StartupPreferencePage implements
 
     private Button exitPromptButton;
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferencePage
+     */
     @Override
 	protected Control createContents(Composite parent) {
 
@@ -53,7 +58,7 @@ public class IDEStartupPreferencePage extends StartupPreferencePage implements
 
         Label space = new Label(composite,SWT.NONE);
 		space.setLayoutData(new GridData());
-
+        
         createEarlyStartupSelection(composite);
 
         return composite;

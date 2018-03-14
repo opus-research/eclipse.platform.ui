@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.ImageData;
  * <p>
  * Use <code>MissingImageDescriptor.getInstance</code> to
  * access the singleton instance maintained in an
- * internal state variable.
+ * internal state variable. 
  * </p>
  */
 class MissingImageDescriptor extends ImageDescriptor {
@@ -30,6 +30,9 @@ class MissingImageDescriptor extends ImageDescriptor {
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on ImageDesciptor.
+     */
     @Override
 	public ImageData getImageData() {
         return DEFAULT_IMAGE_DATA;

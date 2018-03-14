@@ -37,7 +37,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
     private String overrideActionId;
 
     private IWorkbenchPart activePart;
-
+    
 	@Override
 	public void partActivated(IWorkbenchPartReference partRef) {
 	}
@@ -77,7 +77,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 
     /**
 	 * Constructs a new ObjectPluginAction.
-	 *
+	 * 
 	 * @param actionElement
 	 *            The configuration element used to construct this action; must
 	 *            not be <code>null</code>.
@@ -92,6 +92,9 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
         overrideActionId = actionElement.getAttribute(ATT_OVERRIDE_ACTION_ID);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -121,7 +124,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 	 * This method will be called every time the action appears in a popup menu.
 	 * The targetPart may change with each invocation.
 	 * </p>
-	 *
+	 * 
 	 * @param targetPart
 	 *            the new part target
 	 */
@@ -156,14 +159,17 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 
     /**
      * Returns the action identifier this action overrides.
-     *
+     * 
      * @return the action identifier to override or <code>null</code>
      */
     @Override
 	public String getOverrideActionId() {
         return overrideActionId;
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.PluginAction#dispose()
+     */
     @Override
 	public void dispose() {
     	if (activePart!=null) {

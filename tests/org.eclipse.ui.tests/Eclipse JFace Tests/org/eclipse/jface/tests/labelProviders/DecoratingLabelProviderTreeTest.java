@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class DecoratingLabelProviderTreeTest extends CompositeLabelProviderTest {
 
@@ -35,16 +35,31 @@ public class DecoratingLabelProviderTreeTest extends CompositeLabelProviderTest 
 		public IntListLabelProvider() {
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+		 */
 		@Override
 		public Color getBackground(Object element) {
 			return background;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+		 */
 		@Override
 		public Color getForeground(Object element) {
 			return foreground;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		@Override
 		public Font getFont(Object element) {
 			return font;
@@ -58,6 +73,11 @@ public class DecoratingLabelProviderTreeTest extends CompositeLabelProviderTest 
 		super(name);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 
@@ -69,7 +89,7 @@ public class DecoratingLabelProviderTreeTest extends CompositeLabelProviderTest 
 				new IntListLabelProvider(), null));
 		return viewer;
 	}
-
+	
 	/**
 	 * Test that all of the colours and fonts from the label provider are
 	 * applied.

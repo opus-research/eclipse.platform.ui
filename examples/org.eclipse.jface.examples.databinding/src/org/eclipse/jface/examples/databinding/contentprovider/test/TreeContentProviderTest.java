@@ -18,7 +18,7 @@ import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.UnionSet;
 import org.eclipse.core.databinding.observable.set.WritableSet;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableSetTreeContentProvider;
 import org.eclipse.jface.internal.databinding.provisional.viewers.ViewerLabelProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -93,6 +93,11 @@ public class TreeContentProviderTest {
 				.generateLayout(shell);
 
 		shell.addDisposeListener(new DisposeListener() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+			 */
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				dispose();
@@ -191,7 +196,7 @@ public class TreeContentProviderTest {
 	 */
 	public static void main(String[] args) {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
 			@Override
 			public void run() {
 				TreeContentProviderTest test = new TreeContentProviderTest();

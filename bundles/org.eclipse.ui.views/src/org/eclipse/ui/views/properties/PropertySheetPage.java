@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -92,7 +91,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     public static final String HELP_CONTEXT_PROPERTY_SHEET_PAGE = "org.eclipse.ui.property_sheet_page_help_context"; //$NON-NLS-1$
 
     private PropertySheetViewer viewer;
-
+    
     private PropertySheetSorter sorter;
 
     private IPropertySheetEntry rootEntry;
@@ -118,7 +117,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 	/**
 	 * Part listener which cleans up this page when the source part is closed.
 	 * This is hooked only when there is a source part.
-	 *
+	 * 
 	 * @since 3.2
 	 */
 	private class PartListener implements IPartListener {
@@ -150,11 +149,11 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 		public void partOpened(IWorkbenchPart part) {
 		}
 	}
-
+	
 	private PartListener partListener = new PartListener();
 
 	private Action columnsAction;
-
+	
     /**
      * Creates a new property sheet page.
      */
@@ -162,12 +161,15 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         super();
     }
 
+    /* (non-Javadoc)
+     * Method declared on <code>IPage</code>.
+     */
     @Override
 	public void createControl(Composite parent) {
         // create a new viewer
         viewer = new PropertySheetViewer(parent);
         viewer.setSorter(sorter);
-
+        
         // set the model for the viewer
         if (rootEntry == null) {
             // create a new root
@@ -214,7 +216,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
                     Object helpContextId = entry.getHelpContextIds();
                     if (helpContextId != null) {
                     	IWorkbenchHelpSystem helpSystem = PlatformUI.getWorkbench().getHelpSystem();
-
+                    	
                         // Since 2.0 the only valid type for helpContextIds
                         // is a String (a single id).
                         if (helpContextId instanceof String) {
@@ -241,10 +243,10 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 
 			/**
 			 * Returns the first help context.
-			 *
+			 * 
 			 * @param helpContext the help context which is either an array of contexts (strings
 			 *            and/or {@linkplain IContext}s) or an {@link IContextComputer}
-			 *
+			 * 
 			 * @param e the help event
 			 * @return the first context which is either a <code>String</code>, {@link IContext} or
 			 *         <code>null</code> if none
@@ -292,22 +294,22 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
     /**
      * The <code>PropertySheetPage</code> implementation of this <code>IAdaptable</code> method
      * handles the <code>ISaveablePart</code> adapter by delegating to the source part.
-     *
+     * 
      * @since 3.2
      */
     @Override
-	public <T> T getAdapter(Class<T> adapter) {
+	public Object getAdapter(Class adapter) {
 		if (ISaveablePart.class.equals(adapter)) {
-			return adapter.cast(getSaveablePart());
+			return getSaveablePart();
 		}
     	return null;
     }
-
+    
 	/**
 	 * Returns an <code>ISaveablePart</code> that delegates to the source part
 	 * for the current page if it implements <code>ISaveablePart</code>, or
 	 * <code>null</code> otherwise.
-	 *
+	 * 
 	 * @return an <code>ISaveablePart</code> or <code>null</code>
 	 * @since 3.2
 	 */
@@ -317,7 +319,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 		}
 		return null;
 	}
-
+    
     /**
      * Returns the cell editor activation listener for this page
      * @return ICellEditorActivationListener the cell editor activation listener for this page
@@ -343,6 +345,9 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         return cellEditorActivationListener;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPage (and Page).
+     */
     @Override
 	public Control getControl() {
         if (viewer == null) {
@@ -458,7 +463,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         	}
 		};
         columnsAction.setToolTipText(PropertiesMessages.Columns_toolTip);
-
+        
         // Copy
         Shell shell = viewer.getControl().getShell();
         clipboard = new Clipboard(shell.getDisplay());
@@ -468,6 +473,9 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
                 .getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
     }
 
+    /* (non-Javadoc)
+     * Method declared on IPage (and Page).
+     */
     @Override
 	public void makeContributions(IMenuManager menuManager,
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
@@ -501,6 +509,9 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         viewer.setInput(viewer.getInput());
     }
 
+    /* (non-Javadoc)
+     * Method declared on ISelectionListener.
+     */
     @Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
         if (viewer == null) {
@@ -511,7 +522,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
         	sourcePart.getSite().getPage().removePartListener(partListener);
         	sourcePart = null;
         }
-
+        
         // change the viewer input since the workbench selection has changed.
         if (selection instanceof IStructuredSelection) {
         	sourcePart = part;
@@ -592,7 +603,7 @@ public class PropertySheetPage extends Page implements IPropertySheetPage, IAdap
 		this.sorter = sorter;
         if (viewer != null) {
         	viewer.setSorter(sorter);
-
+        	
         	// the following will trigger an update
         	if(null != viewer.getRootEntry()) {
 				viewer.setRootEntry(rootEntry);

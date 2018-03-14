@@ -24,13 +24,18 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 
 /**
  * The IDE workbench main preference page.
- *
+ * 
  *Note: want IDE settings to appear in main Workbench preference page (via subclassing),
  *   however the superclass, WorkbenchPreferencePage, is internal
  */
 public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
         implements IWorkbenchPreferencePage {
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.preference.PreferencePage
+     */
     @Override
 	protected Control createContents(Composite parent) {
 
@@ -39,7 +44,7 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
 
         Composite composite = createComposite(parent);
 
-        createSettings(composite);
+        createSettings(composite);        
         createOpenModeGroup(composite);
 
         applyDialogFont(composite);
@@ -70,5 +75,5 @@ public class IDEWorkbenchPreferencePage extends WorkbenchPreferencePage
 	public boolean performOk() {
         return super.performOk();
     }
-
+   
 }

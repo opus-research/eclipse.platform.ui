@@ -87,11 +87,10 @@ public class ListView extends MockViewPart implements IMenuListener {
         addAction.setId(ADD_ACTION_ID);
 
         // Create popup menu.
-        if (useStaticMenu()) {
-			createStaticPopupMenu();
-		} else {
-			createDynamicPopupMenu();
-		}
+        if (useStaticMenu())
+            createStaticPopupMenu();
+        else
+            createDynamicPopupMenu();
     }
 
     /**
@@ -124,11 +123,10 @@ public class ListView extends MockViewPart implements IMenuListener {
     }
 
     public void selectElement(ListElement el) {
-        if (el == null) {
-			viewer.setSelection(new StructuredSelection());
-		} else {
-			viewer.setSelection(new StructuredSelection(el));
-		}
+        if (el == null)
+            viewer.setSelection(new StructuredSelection());
+        else
+            viewer.setSelection(new StructuredSelection(el));
     }
 
     public MenuManager getMenuManager() {

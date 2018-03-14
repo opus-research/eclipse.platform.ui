@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import org.eclipse.core.internal.commands.util.Util;
  * {@link ITypedParameter} and if so, use
  * {@link ITypedParameter#getParameterType()} like this:
  * </p>
- *
+ * 
  * <pre>
  *                   IParameter parameter = // ... get IParameter from Command
  *                   if (parameter instanceof ITypedParameter) {
@@ -38,19 +38,18 @@ import org.eclipse.core.internal.commands.util.Util;
  *                     }
  *                   }
  * </pre>
- *
+ * 
  * @see IParameter
  * @see ITypedParameter#getParameterType()
  * @since 3.2
  */
-@SuppressWarnings("rawtypes")
 public final class ParameterType extends HandleObject implements Comparable {
 
 	/**
 	 * TODO: this was copied from
 	 * org.eclipse.core.internal.expressions.Expressions is there a better place
 	 * to reference this?
-	 *
+	 * 
 	 * @param element
 	 *            The element to test; may be <code>null</code>.
 	 * @param type
@@ -71,7 +70,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * TODO: this was copied from
 	 * org.eclipse.core.internal.expressions.Expressions is there a better place
 	 * to reference this?
-	 *
+	 * 
 	 * @param clazz
 	 *            The class to match; may be <code>null</code>.
 	 * @param type
@@ -79,15 +78,15 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * @return <code>true</code> if the <code>element</code> is an instance
 	 *         of <code>type</code>; <code>false</code> otherwise.
 	 */
-	private static final boolean isSubtype(final Class<?> clazz, final String type) {
+	private static final boolean isSubtype(final Class clazz, final String type) {
 		if (clazz.getName().equals(type)) {
 			return true;
 		}
-		final Class<?> superClass = clazz.getSuperclass();
+		final Class superClass = clazz.getSuperclass();
 		if (superClass != null && isSubtype(superClass, type)) {
 			return true;
 		}
-		final Class<?>[] interfaces = clazz.getInterfaces();
+		final Class[] interfaces = clazz.getInterfaces();
 		for (int i = 0; i < interfaces.length; i++) {
 			if (isSubtype(interfaces[i], type)) {
 				return true;
@@ -114,7 +113,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * type is first constructed, it is undefined. Parameter types should only
 	 * be constructed by the {@link CommandManager} to ensure that the
 	 * identifier remains unique.
-	 *
+	 * 
 	 * @param id
 	 *            The identifier for this type. This value must not be
 	 *            <code>null</code>, and must be unique amongst all parameter
@@ -127,7 +126,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	/**
 	 * Adds a listener to this parameter type that will be notified when its
 	 * state changes.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be added; must not be <code>null</code>.
 	 */
@@ -138,14 +137,13 @@ public final class ParameterType extends HandleObject implements Comparable {
 	/**
 	 * Compares this parameter type with another object by comparing each of the
 	 * non-transient attributes.
-	 *
+	 * 
 	 * @param object
 	 *            The object with which to compare; must be an instance of
 	 *            {@link ParameterType}.
 	 * @return A negative integer, zero or a positive integer, if the object is
 	 *         greater than, equal to or less than this parameter type.
 	 */
-	@Override
 	public final int compareTo(final Object object) {
 		final ParameterType castedObject = (ParameterType) object;
 		int compareTo = Util.compare(defined, castedObject.defined);
@@ -163,7 +161,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * <p>
 	 * Notification is sent to all listeners that something has changed.
 	 * </p>
-	 *
+	 * 
 	 * @param type
 	 *            a string identifying the Java object type for this parameter
 	 *            type; <code>null</code> is interpreted as
@@ -188,7 +186,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	/**
 	 * Notifies all listeners that this parameter type has changed. This sends
 	 * the given event to all of the listeners, if any.
-	 *
+	 * 
 	 * @param event
 	 *            The event to send to the listeners; must not be
 	 *            <code>null</code>.
@@ -212,7 +210,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 
 	/**
 	 * Returns the value converter associated with this parameter, if any.
-	 *
+	 * 
 	 * @return The parameter value converter, or <code>null</code> if there is
 	 *         no value converter for this parameter.
 	 * @throws NotDefinedException
@@ -232,7 +230,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * Returns whether the provided value is compatible with this parameter
 	 * type. An object is compatible with a parameter type if the object is an
 	 * instance of the class defined as the parameter's type class.
-	 *
+	 * 
 	 * @param value
 	 *            an object to check for compatibility with this parameter type;
 	 *            may be <code>null</code>.
@@ -251,7 +249,7 @@ public final class ParameterType extends HandleObject implements Comparable {
 
 	/**
 	 * Unregisters listener for changes to properties of this parameter type.
-	 *
+	 * 
 	 * @param listener
 	 *            the instance to unregister. Must not be <code>null</code>.
 	 *            If an attempt is made to unregister an instance which is not
@@ -265,10 +263,9 @@ public final class ParameterType extends HandleObject implements Comparable {
 	/**
 	 * The string representation of this parameter type. For debugging purposes
 	 * only. This string should not be shown to an end user.
-	 *
+	 * 
 	 * @return The string representation; never <code>null</code>.
 	 */
-	@Override
 	public final String toString() {
 		if (string == null) {
 			final StringBuffer stringBuffer = new StringBuffer();
@@ -286,7 +283,6 @@ public final class ParameterType extends HandleObject implements Comparable {
 	 * Makes this parameter type become undefined. Notification is sent to all
 	 * listeners.
 	 */
-	@Override
 	public final void undefine() {
 		string = null;
 

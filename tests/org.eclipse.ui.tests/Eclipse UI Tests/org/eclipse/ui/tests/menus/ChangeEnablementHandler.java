@@ -26,13 +26,18 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class ChangeEnablementHandler extends AbstractHandler {
 	private static final String CONTEXT_ID = "org.eclipse.ui.menus.contexts.test2";
 
 	private IContextManagerListener fContextManagerListener;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
@@ -73,6 +78,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	boolean fEnabled = true;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	@Override
 	public boolean isEnabled() {
 		return fEnabled;
@@ -85,6 +95,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
+	 */
 	@Override
 	public void dispose() {
 		if (fContextManagerListener != null) {

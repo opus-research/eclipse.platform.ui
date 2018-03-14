@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -65,10 +64,10 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
 
 /**
  * The model manager maintains a list of open saveable models.
- *
+ * 
  * @see Saveable
  * @see ISaveablesSource
- *
+ * 
  * @since 3.2
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
@@ -85,7 +84,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	/**
 	 * Returns the list of open models managed by this model manager.
-	 *
+	 * 
 	 * @return a list of models
 	 */
 	public Saveable[] getOpenModels() {
@@ -93,7 +92,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Iterator saveables = modelMap.values().iterator();
 		while (saveables.hasNext())
 			allDistinctModels.addAll((Set)saveables.next());
-
+		
 		return (Saveable[]) allDistinctModels.toArray(
 				new Saveable[allDistinctModels.size()]);
 	}
@@ -122,7 +121,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	/**
 	 * returns true if the given key was added for the first time
-	 *
+	 * 
 	 * @param referenceMap
 	 * @param key
 	 * @return true if the ref count of the given key is now 1
@@ -140,7 +139,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	/**
 	 * returns true if the given key has been removed
-	 *
+	 * 
 	 * @param referenceMap
 	 * @param key
 	 * @return true if the ref count of the given key was 1
@@ -181,7 +180,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	}
 
 	private void logWarning(String message, Object source, Saveable model) {
-		// create a new exception
+		// create a new exception 
 		AssertionFailedException assertionFailedException = new AssertionFailedException("unknown saveable: " + model //$NON-NLS-1$
 				+ " from part: " + source); //$NON-NLS-1$
 		// record the current stack trace to help with debugging
@@ -321,7 +320,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * <p>
 	 * Listeners should ignore all other event types, including PRE_CLOSE. There
 	 * is no guarantee that listeners are notified before models are closed.
-	 *
+	 * 
 	 * @param listener
 	 */
 	public void addModelLifecycleListener(ISaveablesLifecycleListener listener) {
@@ -331,7 +330,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	/**
 	 * Removes the given listener from the list of listeners. Has no effect if
 	 * the given listener is not contained in the list.
-	 *
+	 * 
 	 * @param listener
 	 */
 	public void removeModelLifecycleListener(ISaveablesLifecycleListener listener) {
@@ -351,25 +350,20 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	public Object preCloseParts(List partsToClose, boolean save, IShellProvider shellProvider,
 			final IWorkbenchWindow window) {
-		return preCloseParts(partsToClose, false, save, shellProvider, window);
-	}
-
-	public Object preCloseParts(List partsToClose, boolean addNonPartSources, boolean save,
-			IShellProvider shellProvider, final IWorkbenchWindow window) {
 		// reference count (how many occurrences of a model will go away?)
 		PostCloseInfo postCloseInfo = new PostCloseInfo();
 		for (Iterator it = partsToClose.iterator(); it.hasNext();) {
 			IWorkbenchPart part = (IWorkbenchPart) it.next();
 			postCloseInfo.partsClosing.add(part);
-			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable != null) {
-				if (save && !saveable.isSaveOnCloseNeeded()) {
+			if (part instanceof ISaveablePart) {
+				ISaveablePart saveablePart = (ISaveablePart) part;
+				if (save && !saveablePart.isSaveOnCloseNeeded()) {
 					// pretend for now that this part is not closing
 					continue;
 				}
 			}
-			if (save && saveable instanceof ISaveablePart2) {
-				ISaveablePart2 saveablePart2 = (ISaveablePart2) saveable;
+			if (save && part instanceof ISaveablePart2) {
+				ISaveablePart2 saveablePart2 = (ISaveablePart2) part;
 				// TODO show saveablePart2 before prompting, see
 				// EditorManager.saveAll
 				int response = SaveableHelper.savePart(saveablePart2, window,
@@ -391,16 +385,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
 				postCloseInfo.modelsDecrementing);
-		if (addNonPartSources) {
-			for (ISaveablesSource nonPartSource : getNonPartSources()) {
-				Saveable[] saveables = nonPartSource.getSaveables();
-				for (Saveable saveable : saveables) {
-					if (saveable.isDirty()) {
-						postCloseInfo.modelsClosing.add(saveable);
-					}
-				}
-			}
-		}
 		if (save) {
 			boolean canceled = promptForSavingIfNecessary(shellProvider, window,
 					postCloseInfo.modelsClosing, postCloseInfo.modelsDecrementing, true);
@@ -432,10 +416,10 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				modelsToOptionallySave.add(modelDecrementing);
 			}
 		}
-
+		
 		boolean shouldCancel = modelsToOptionallySave.isEmpty() ? false : promptForSaving(
 				modelsToOptionallySave, shellProvider, window, canCancel, true);
-
+		
 		if (shouldCancel) {
 			return true;
 		}
@@ -506,7 +490,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 				// don't save if we don't prompt
 				int choice = ISaveablePart2.NO;
-
+				
 				MessageDialog dialog;
 				if (stillOpenElsewhere) {
 					String message = NLS
@@ -546,7 +530,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				choice = SaveableHelper.testGetAutomatedResponse();
 				if (SaveableHelper.testGetAutomatedResponse() == SaveableHelper.USER_RESPONSE) {
 					choice = dialog.open();
-
+					
 					if(stillOpenElsewhere) {
 						// map value of choice back to ISaveablePart2 values
 						switch (choice) {
@@ -604,7 +588,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					if (dlg.getDontPromptSelection()) {
 						apiPreferenceStore.setValue(IWorkbenchPreferenceConstants.PROMPT_WHEN_SAVEABLE_STILL_OPEN, false);
 					}
-
+					
 					modelsToSave = Arrays.asList(dlg.getResult());
 				}
 			}
@@ -623,28 +607,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 *            use a workbench window for this.
 	 * @return <code>true</code> if the operation was canceled
 	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext) {
-		return saveModels(finalModels, shellProvider, runnableContext, true);
-	}
-
-	/**
-	 * Save the given models.
-	 *
-	 * @param finalModels
-	 *            the list of models to be saved
-	 * @param shellProvider
-	 *            the provider used to obtain a shell in prompting is required.
-	 *            Clients can use a workbench window for this.
-	 * @param runnableContext
-	 *            a runnable context that will be used to provide a progress
-	 *            monitor while the save is taking place. Clients can use a
-	 *            workbench window for this.
-	 * @param blockUntilSaved
-	 * @return <code>true</code> if the operation was canceled
-	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext, final boolean blockUntilSaved) {
+	public boolean saveModels(final List finalModels, final IShellProvider shellProvider, IRunnableContext runnableContext) {
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
@@ -659,8 +622,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						monitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1),
-							shellProvider, blockUntilSaved);
+					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), shellProvider, true);
 					if (monitorWrap.isCanceled())
 						break;
 				}
@@ -714,7 +676,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * Returns the saveable models provided by the given part. If the part does
 	 * not provide any models, a default model is returned representing the
 	 * part.
-	 *
+	 * 
 	 * @param part
 	 *            the workbench part
 	 * @return the saveable models
@@ -723,7 +685,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		if (part instanceof ISaveablesSource) {
 			ISaveablesSource source = (ISaveablesSource) part;
 			return source.getSaveables();
-		} else if (SaveableHelper.isSaveable(part)) {
+		} else if (part instanceof ISaveablePart) {
 			return new Saveable[] { new DefaultSaveable(part) };
 		} else {
 			return new Saveable[0];
@@ -750,7 +712,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	/**
 	 * For testing purposes. Not to be called by clients.
-	 *
+	 * 
 	 * @param model
 	 * @return
 	 */
@@ -802,15 +764,15 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						IDialogConstants.CANCEL_LABEL, false);
 			}
 		}
-
+		
 		@Override
 		protected Control createDialogArea(Composite parent) {
 			 Composite dialogAreaComposite = (Composite) super.createDialogArea(parent);
-
+			 
 			 if (stillOpenElsewhere) {
 				 Composite checkboxComposite = new Composite(dialogAreaComposite, SWT.NONE);
 				 checkboxComposite.setLayout(new GridLayout(2, false));
-
+				 
 				 checkbox = new Button(checkboxComposite, SWT.CHECK);
 				 checkbox.addSelectionListener(new SelectionAdapter() {
 					@Override
@@ -821,14 +783,14 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				 GridData gd = new GridData();
 				 gd.horizontalAlignment = SWT.BEGINNING;
 				 checkbox.setLayoutData(gd);
-
+				 
 				 Label label = new Label(checkboxComposite, SWT.NONE);
 				 label.setText(WorkbenchMessages.EditorManager_closeWithoutPromptingOption);
 				 gd = new GridData();
 				 gd.grabExcessHorizontalSpace = true;
 				 gd.horizontalAlignment = SWT.BEGINNING;
 			 }
-
+			 
 			 return dialogAreaComposite;
 		}
 	}

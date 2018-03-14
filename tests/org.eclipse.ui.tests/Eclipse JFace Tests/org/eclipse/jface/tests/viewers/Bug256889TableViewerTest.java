@@ -104,6 +104,11 @@ public class Bug256889TableViewerTest extends ViewerTestCase {
 		return tableViewer;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.ViewerTestCase#setInput()
+	 */
 	@Override
 	protected void setInput() {
 		tableViewer.setInput(getModel());

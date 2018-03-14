@@ -30,8 +30,8 @@ public class ContextIdValues implements IParameterValues {
 				.getWorkbench().getService(IContextService.class);
 		Context[] definedContexts = contextService.getDefinedContexts();
 		try {
-			for (Context definedContext : definedContexts) {
-				values.put(definedContext.getName(), definedContext
+			for (int i = 0; i < definedContexts.length; i++) {
+				values.put(definedContexts[i].getName(), definedContexts[i]
 						.getId());
 			}
 		} catch (NotDefinedException e) {

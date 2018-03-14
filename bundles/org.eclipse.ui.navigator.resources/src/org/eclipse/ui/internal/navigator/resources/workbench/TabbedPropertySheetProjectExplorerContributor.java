@@ -16,20 +16,23 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributo
 
 /**
  * A tabbed property view contributor for the Project Explorer.
- *
+ * 
  * @since 3.2
  */
 public class TabbedPropertySheetProjectExplorerContributor implements
 		ITabbedPropertySheetPageContributor {
-
+	
 	private final String contributorId;
-
+	
 	protected TabbedPropertySheetProjectExplorerContributor(CommonNavigator aCommonNavigator) {
 		contributorId = aCommonNavigator.getViewSite().getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
 	@Override
-	public String getContributorId() {
+	public String getContributorId() { 
 		return contributorId;
 	}
 

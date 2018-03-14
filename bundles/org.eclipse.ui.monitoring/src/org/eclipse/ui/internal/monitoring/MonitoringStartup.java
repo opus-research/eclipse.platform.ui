@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2014 Google Inc and others.
+ * Copyright (C) 2014, Google Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,10 @@ public class MonitoringStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
+		setupPlugin();
+	}
+
+	private void setupPlugin() {
 		if (monitoringThread != null) {
 			return;
 		}
@@ -54,7 +58,7 @@ public class MonitoringStartup implements IStartup {
 
 		final EventLoopMonitorThread thread = temporaryThread;
 		final Display display = MonitoringPlugin.getDefault().getWorkbench().getDisplay();
-		// Final setup and start asynchronously on the display thread.
+		// Final setup and start synced on display thread
 		display.asyncExec(new Runnable() {
 			@Override
 			public void run() {
@@ -76,16 +80,13 @@ public class MonitoringStartup implements IStartup {
 		IPreferenceStore preferences = MonitoringPlugin.getDefault().getPreferenceStore();
 		EventLoopMonitorThread.Parameters args = new EventLoopMonitorThread.Parameters();
 
-		args.longEventWarningThreshold =
-				preferences.getInt(PreferenceConstants.LONG_EVENT_WARNING_THRESHOLD_MILLIS);
-		args.longEventErrorThreshold =
-				preferences.getInt(PreferenceConstants.LONG_EVENT_ERROR_THRESHOLD_MILLIS);
-		args.deadlockThreshold =
-				preferences.getInt(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS);
+		args.longEventThreshold = preferences.getInt(PreferenceConstants.LONG_EVENT_THRESHOLD_MILLIS);
 		args.maxStackSamples = preferences.getInt(PreferenceConstants.MAX_STACK_SAMPLES);
-		args.uiThreadFilter = preferences.getString(PreferenceConstants.UI_THREAD_FILTER);
-		args.noninterestingThreadFilter =
-				preferences.getString(PreferenceConstants.NONINTERESTING_THREAD_FILTER);
+		args.sampleInterval = preferences.getInt(PreferenceConstants.SAMPLE_INTERVAL_MILLIS);
+		args.initialSampleDelay = preferences.getInt(PreferenceConstants.INITIAL_SAMPLE_DELAY_MILLIS);
+		args.deadlockThreshold = preferences.getInt(PreferenceConstants.DEADLOCK_REPORTING_THRESHOLD_MILLIS);
+		args.dumpAllThreads = preferences.getBoolean(PreferenceConstants.DUMP_ALL_THREADS);
+		args.filterTraces = preferences.getString(PreferenceConstants.FILTER_TRACES);
 		args.logToErrorLog = preferences.getBoolean(PreferenceConstants.LOG_TO_ERROR_LOG);
 
 		return args;

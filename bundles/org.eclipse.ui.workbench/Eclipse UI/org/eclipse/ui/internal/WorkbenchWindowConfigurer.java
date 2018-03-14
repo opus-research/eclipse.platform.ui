@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184, 440136
- *     Denis Zygann <d.zygann@web.de> - Bug 457390
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 441184
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -41,7 +40,9 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
+import org.eclipse.ui.internal.e4.compatibility.E4Util;
 import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
+import org.eclipse.ui.presentations.AbstractPresentationFactory;
 
 /**
  * Internal class providing special access for configuring workbench windows.
@@ -52,7 +53,7 @@ import org.eclipse.ui.internal.provisional.application.IActionBarConfigurer2;
  * <p>
  * This class is not intended to be instantiated or subclassed by clients.
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class WorkbenchWindowConfigurer implements
@@ -72,6 +73,11 @@ public final class WorkbenchWindowConfigurer implements
      * The window title to set when the window's shell has been created.
      */
     private String windowTitle;
+
+    /**
+     * Whether the workbench window should show the fast view bars.
+     */
+    private boolean showFastViewBars = false;
 
     /**
      * Whether the workbench window should show the perspective bar
@@ -118,7 +124,7 @@ public final class WorkbenchWindowConfigurer implements
     private DropTargetListener dropTargetListener = null;
 
     /**
-     * Object for configuring this workbench window's action bars.
+     * Object for configuring this workbench window's action bars. 
      * Lazily initialized to an instance unique to this window.
      */
     private WindowActionBarConfigurer actionBarConfigurer = null;
@@ -138,7 +144,7 @@ public final class WorkbenchWindowConfigurer implements
 
         /**
          * Sets the proxy to use, or <code>null</code> for none.
-         *
+         * 
          * @param proxy the proxy
          */
         public void setProxy(IActionBarConfigurer2 proxy) {
@@ -223,10 +229,10 @@ public final class WorkbenchWindowConfigurer implements
      * Creates a new workbench window configurer.
      * <p>
      * This method is declared package-private. Clients obtain instances
-     * via {@link WorkbenchAdvisor#getWindowConfigurer
+     * via {@link WorkbenchAdvisor#getWindowConfigurer 
      * WorkbenchAdvisor.getWindowConfigurer}
      * </p>
-     *
+     * 
      * @param window the workbench window that this object configures
      * @see WorkbenchAdvisor#getWindowConfigurer
      */
@@ -316,14 +322,15 @@ public final class WorkbenchWindowConfigurer implements
     }
 
     @Override
-    public boolean getShowFastViewBars() {
-        // not supported anymore
-        return false;
+	public boolean getShowFastViewBars() {
+        return showFastViewBars;
     }
 
     @Override
-    public void setShowFastViewBars(boolean show) {
-        // not supported anymore
+	public void setShowFastViewBars(boolean show) {
+        showFastViewBars = show;
+        window.setFastViewBarVisible(show);
+        // @issue need to be able to reconfigure after window's controls created
     }
 
     @Override
@@ -420,7 +427,7 @@ public final class WorkbenchWindowConfigurer implements
 
     /**
      * Returns whether the given id is for a cool item.
-     *
+     * 
      * @param the item id
      * @return <code>true</code> if it is a cool item,
      * and <code>false</code> otherwise
@@ -449,6 +456,17 @@ public final class WorkbenchWindowConfigurer implements
     @Override
 	public void setInitialSize(Point size) {
         initialSize = size;
+    }
+
+    @Override
+	public AbstractPresentationFactory getPresentationFactory() {
+		E4Util.unsupported("Not supported anymore"); //$NON-NLS-1$
+		return null;
+    }
+
+    @Override
+	public void setPresentationFactory(AbstractPresentationFactory factory) {
+		E4Util.unsupported("Not supported anymore"); //$NON-NLS-1$
     }
 
     /**

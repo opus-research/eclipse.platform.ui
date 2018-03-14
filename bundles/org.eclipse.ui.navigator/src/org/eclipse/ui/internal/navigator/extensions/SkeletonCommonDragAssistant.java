@@ -18,9 +18,9 @@ import org.eclipse.ui.navigator.CommonDragAdapterAssistant;
 
 /**
  * A Skeleton implementation of {@link CommonDragAdapterAssistant}.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public final class SkeletonCommonDragAssistant extends
 		CommonDragAdapterAssistant {
@@ -35,11 +35,22 @@ public final class SkeletonCommonDragAssistant extends
 	private SkeletonCommonDragAssistant() {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#getSupportedTransferTypes()
+	 */
 	@Override
 	public Transfer[] getSupportedTransferTypes() {
 		return NO_TRANSFER_TYPES;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.navigator.CommonDragAdapterAssistant#setDragData(org.eclipse.swt.dnd.DragSourceEvent,
+	 *      org.eclipse.jface.viewers.IStructuredSelection)
+	 */
 	@Override
 	public boolean setDragData(DragSourceEvent anEvent,
 			IStructuredSelection aSelection) {

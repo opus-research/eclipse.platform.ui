@@ -33,13 +33,23 @@ public class ActiveActionSetExpression extends Expression {
 		expressionInfo = info;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#collectExpressionInfo(org.eclipse.core.expressions.ExpressionInfo)
+	 */
 	@Override
 	public void collectExpressionInfo(ExpressionInfo info) {
-		for (String element : expressionInfo) {
-			info.addVariableNameAccess(element);
+		for (int i = 0; i < expressionInfo.length; i++) {
+			info.addVariableNameAccess(expressionInfo[i]);
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
+	 */
 	@Override
 	public EvaluationResult evaluate(IEvaluationContext context) {
 		final Object variable = context

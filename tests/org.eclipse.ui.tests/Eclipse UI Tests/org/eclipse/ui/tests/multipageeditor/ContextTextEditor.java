@@ -20,13 +20,19 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ContextTextEditor extends TextEditor {
 	public static final String TEXT_CONTEXT_ID = "org.eclipse.ui.textEditorScope";
 
 	public static final String CONTEXT_ID = "org.eclipse.ui.tests.multipageeditor.contextEditor";
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.texteditor.AbstractTextEditor#init(org.eclipse.ui.IEditorSite,
+	 *      org.eclipse.ui.IEditorInput)
+	 */
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {

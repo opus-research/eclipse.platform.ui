@@ -18,7 +18,7 @@ import org.eclipse.ui.navigator.INavigatorContentExtension;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class ExtensionSequenceNumberComparator implements Comparator {
 
@@ -31,20 +31,25 @@ public class ExtensionSequenceNumberComparator implements Comparator {
 	 * The initialized singleton instance.
 	 */
 	public static final ExtensionSequenceNumberComparator DESCENDING = new ExtensionSequenceNumberComparator(false);
-
+	
 	private final int sortAscending;
-
+	
 	/**
 	 * Creates an instance that sorts according to the given boolean flag.
-	 *
+	 * 
 	 * @param toSortAscending
 	 *            <code>true</code> for ascending sort order or
 	 *            <code>false</code> for descending sort order.
 	 */
 	public ExtensionSequenceNumberComparator(boolean toSortAscending) {
-		sortAscending = toSortAscending ? 1 : -1;
+		sortAscending = toSortAscending ? 1 : -1; 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+	 */
 	@Override
 	public int compare(Object o1, Object o2) {
 

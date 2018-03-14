@@ -52,7 +52,7 @@ import org.osgi.service.prefs.Preferences;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEditor {
@@ -73,14 +73,14 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	/**
 	 * Creates a new encoding field editor for setting the encoding on the given
 	 * resource.
-	 *
+	 * 
 	 * @param labelText
 	 *            the label text of the field editor
 	 * @param parent
 	 *            the parent of the field editor's control
 	 * @param charsetResource
 	 *            must be an <code>IContainer</code> or an <code>IFile</code>.
-	 *
+	 * 
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 */
@@ -90,11 +90,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		setLabelAndResource(labelText, charsetResource);
 		createControl(parent);
 	}
-
+	
 	/**
 	 * Creates a new encoding field editor for setting the encoding on the given
 	 * resource.
-	 *
+	 * 
 	 * @param labelText
 	 *            the label text of the field editor
 	 * @param parent
@@ -105,7 +105,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	 *  		  the title for the field editor's control. If groupTitle is
 	 *            <code>null</code> the control will be unlabelled
 	 *            (by default a {@link Composite} instead of a {@link Group}.
-	 *
+	 * 
 	 * @see org.eclipse.core.resources.IContainer#getDefaultCharset()
 	 * @see org.eclipse.core.resources.IFile#getCharset()
 	 * @see AbstractEncodingFieldEditor#setGroupTitle(String)
@@ -132,6 +132,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		this.resource = charsetResource;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
+	 */
 	@Override
 	protected String getStoredValue() {
 		try {
@@ -181,6 +186,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 						.getSelection() == getStoredSeparateDerivedEncodingsValue()));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
+	 */
 	@Override
 	protected void doStore() {
 
@@ -233,6 +243,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		final String finalEncoding = encoding;
 
 		Job charsetJob = new Job(IDEWorkbenchMessages.IDEEncoding_EncodingJob) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -274,12 +289,22 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#store()
+	 */
 	@Override
 	public void store() {
 		// Override the store method as we are not using a preference store
 		doStore();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#load()
+	 */
 	@Override
 	public void load() {
 		// Override the load method as we are not using a preference store
@@ -287,6 +312,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		doLoad();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#loadDefault()
+	 */
 	@Override
 	public void loadDefault() {
 		// Override the loadDefault method as we are not using a preference store
@@ -295,6 +325,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		refreshValidState();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+	 */
 	@Override
 	protected void doLoadDefault() {
 		super.doLoadDefault();
@@ -302,6 +335,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 			separateDerivedEncodingsButton.setSelection(DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#findDefaultEncoding()
+	 */
 	@Override
 	protected String findDefaultEncoding() {
 
@@ -330,7 +368,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	/**
 	 * Returns the charset from the content description if there is one.
-	 *
+	 * 
 	 * @return the charset from the content description, or <code>null</code>
 	 */
 	private String getCharsetFromDescription() {
@@ -341,6 +379,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#defaultButtonText()
+	 */
 	@Override
 	protected String defaultButtonText() {
 
@@ -386,6 +429,12 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#createEncodingGroup(org.eclipse.swt.widgets.Composite,
+	 *      int)
+	 */
 	@Override
 	protected Composite createEncodingGroup(Composite parent, int numColumns) {
 		group = super.createEncodingGroup(parent, numColumns);
@@ -420,7 +469,7 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 	/**
 	 * Returns the content description of the resource if it is a file and it
 	 * has a content description.
-	 *
+	 * 
 	 * @return the content description or <code>null</code> if resource is not
 	 *         an <code>IFile</code> or it does not have a description
 	 */
@@ -435,6 +484,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean, org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);

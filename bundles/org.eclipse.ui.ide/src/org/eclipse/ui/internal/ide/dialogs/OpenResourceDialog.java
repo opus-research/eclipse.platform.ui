@@ -63,7 +63,7 @@ import org.eclipse.ui.views.IViewDescriptor;
 /**
  * Shows a list of resources to the user with a text entry field for a string
  * pattern used to filter the list of resources.
- *
+ * 
  * @since 2.1
  */
 public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
@@ -73,6 +73,10 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 			super(page, file);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see org.eclipse.ui.actions.OpenWithMenu#openEditor(org.eclipse.ui.IEditorDescriptor, boolean)
+		 */
 		@Override
 		protected void openEditor(IEditorDescriptor editorDescriptor, boolean openUsingDescriptor) {
 			computeResult();
@@ -91,6 +95,9 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 			initialize(workbenchWindow);
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.ShowInMenu#getContext(org.eclipse.ui.IWorkbenchPart)
+		 */
 		@Override
 		protected ShowInContext getContext(IWorkbenchPart sourcePart) {
 			return new ShowInContext(null, selectedItems);
@@ -101,18 +108,24 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 			return null;
 		}
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.ShowInMenu#getContributionItem(org.eclipse.ui.views.IViewDescriptor)
+		 */
 		@Override
 		protected IContributionItem getContributionItem(IViewDescriptor viewDescriptor) {
 			final String targetId= viewDescriptor.getId();
 			String label = '&' + viewDescriptor.getLabel();
 			ImageDescriptor icon = viewDescriptor.getImageDescriptor();
 			Action action = new Action(label, icon) {
+				/* (non-Javadoc)
+				 * @see org.eclipse.jface.action.Action#run()
+				 */
 				@Override
 				public void run() {
 					computeResult();
 					setResult(Collections.EMPTY_LIST);
 					close();
-
+					
 					IWorkbenchPage page = getActivePage();
 					IViewPart view;
 					try {
@@ -127,7 +140,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				}
 				private IShowInTarget getShowInTarget(IWorkbenchPart targetPart) {
-					return org.eclipse.ui.internal.util.Util.getAdapter(targetPart, IShowInTarget.class);
+					return (IShowInTarget) org.eclipse.ui.internal.util.Util.getAdapter(targetPart, IShowInTarget.class);
 				}
 			};
 			action.setId(targetId);
@@ -137,13 +150,13 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 
 	private static final int OPEN_WITH_ID = IDialogConstants.CLIENT_ID + 1;
 	private static final int SHOW_IN_ID = IDialogConstants.CLIENT_ID + 2;
-
+	
 	private Button showInButton;
 	private Button openWithButton;
 
 	/**
 	 * Creates a new instance of the class.
-	 *
+	 * 
 	 * @param parentShell
 	 *            the parent shell
 	 * @param container
@@ -157,6 +170,10 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		setTitle(IDEWorkbenchMessages.OpenResourceDialog_title);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.FilteredItemsSelectionDialog#fillContextMenu(org.eclipse.jface.action.IMenuManager)
+	 * @since 3.5
+	 */
 	@Override
 	protected void fillContextMenu(IMenuManager menuManager) {
 		super.fillContextMenu(menuManager);
@@ -165,14 +182,14 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-
+		
 		IWorkbenchPage activePage = getActivePage();
 		if (activePage == null) {
 			return;
 		}
 
 		menuManager.add(new Separator());
-
+		
 		// Add 'Open' menu item
 		OpenFileAction openFileAction = new OpenFileAction(activePage) {
 			@Override
@@ -183,10 +200,10 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		openFileAction.selectionChanged(selectedItems);
 		if (openFileAction.isEnabled()) {
 			menuManager.add(openFileAction);
-
+			
 			IAdaptable selectedAdaptable = getSelectedAdaptable();
 			if (selectedAdaptable != null) {
-
+				
 				// Add 'Open With' sub-menu
 				MenuManager subMenu = new MenuManager(IDEWorkbenchMessages.OpenResourceDialog_openWithMenu_label);
 				OpenWithMenu openWithMenu = new ResourceOpenWithMenu(activePage, selectedAdaptable);
@@ -194,8 +211,8 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 				menuManager.add(subMenu);
 			}
 		}
-
-
+		
+		
 		// Add 'Show In' sub-menu
 		MenuManager showInMenuManager = new MenuManager(IDEWorkbenchMessages.OpenResourceDialog_showInMenu_label);
 		ShowInMenu showInMenu = new ResourceShowInMenu(selectedItems, activePage.getWorkbenchWindow());
@@ -203,6 +220,11 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		menuManager.add(showInMenuManager);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.SelectionDialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+	 * @since 3.5
+	 */
 	@Override
 	protected void createButtonsForButtonBar(final Composite parent) {
 		GridLayout parentLayout = (GridLayout)parent.getLayout();
@@ -216,7 +238,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				});
 		setButtonLayoutData(showInButton);
-
+		
 		openWithButton = createDropdownButton(parent, OPEN_WITH_ID, IDEWorkbenchMessages.OpenResourceDialog_openWithButton_text,
 				new MouseAdapter() {
 					@Override
@@ -225,16 +247,16 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 					}
 				});
 		setButtonLayoutData(openWithButton);
-
+		
 		GridData showInLayoutData = (GridData) showInButton.getLayoutData();
 		GridData openWithLayoutData = (GridData) openWithButton.getLayoutData();
 		int buttonWidth = Math.max(showInLayoutData.widthHint, openWithLayoutData.widthHint);
 		showInLayoutData.widthHint = buttonWidth;
 		openWithLayoutData.widthHint = buttonWidth;
-
+		
 		new Label(parent, SWT.NONE).setLayoutData(new GridData(5, 0));
 		parentLayout.numColumns++;
-
+		
 		Button okButton = createButton(parent, IDialogConstants.OK_ID, IDEWorkbenchMessages.OpenResourceDialog_openButton_text, true);
 		Button cancelButton = createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 
@@ -260,6 +282,9 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		return button;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
+	 */
 	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
@@ -274,6 +299,10 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.dialogs.SelectionStatusDialog#updateButtonsEnableState(org.eclipse.core.runtime.IStatus)
+	 * @since 3.5
+	 */
 	@Override
 	protected void updateButtonsEnableState(IStatus status) {
 		super.updateButtonsEnableState(status);
@@ -327,7 +356,7 @@ public class OpenResourceDialog extends FilteredResourcesSelectionDialog {
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-
+		
 		ShowInMenu showInMenu = new ResourceShowInMenu(selectedItems, activePage.getWorkbenchWindow());
 		showMenu(showInButton, showInMenu);
 	}

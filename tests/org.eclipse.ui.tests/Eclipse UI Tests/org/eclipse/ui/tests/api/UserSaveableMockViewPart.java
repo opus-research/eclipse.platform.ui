@@ -16,12 +16,12 @@ import org.eclipse.ui.ISaveablePart2;
 /**
  * Mock view part that implements ISaveablePart.
  * Used for testing hideView and other view lifecycle on saveable views.
- *
+ * 
  * @since 3.0.1
  */
 public class UserSaveableMockViewPart extends MockViewPart implements
 		ISaveablePart2 {
-
+	
 	public static String ID = "org.eclipse.ui.tests.api.UserSaveableMockViewPart";
 
 	private boolean isDirty = false;
@@ -30,6 +30,9 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 
 	private boolean saveNeeded = true;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSave(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		callTrace.add("doSave" );
@@ -37,23 +40,35 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 		saveNeeded = false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#doSaveAs()
+	 */
 	@Override
 	public void doSaveAs() {
 		callTrace.add("doSaveAs" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isDirty()
+	 */
 	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty" );
 		return isDirty;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveAsAllowed()
+	 */
 	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed" );
 		return saveAsAllowed ;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.ISaveablePart#isSaveOnCloseNeeded()
+	 */
 	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded" );
@@ -64,11 +79,11 @@ public class UserSaveableMockViewPart extends MockViewPart implements
 		this.isDirty = d;
         firePropertyChange(PROP_DIRTY);
 	}
-
+    
     public void setSaveAsAllowed(boolean isSaveAsAllowed) {
         this.saveAsAllowed = isSaveAsAllowed;
     }
-
+    
     public void setSaveNeeded(boolean isSaveOnCloseNeeded) {
         this.saveNeeded = isSaveOnCloseNeeded;
     }

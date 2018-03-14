@@ -20,19 +20,24 @@ import org.eclipse.ui.tests.navigator.AbstractNavigatorTest;
 
 /**
  * @since 3.2
- *
+ * 
  */
 public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 
 	/**
 	 * Create an instance of the receiver.
-	 *
+	 * 
 	 * @param testName
 	 */
 	public PropertyPageEnablementTest(String testName) {
 		super(testName);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -41,7 +46,7 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 
 	/**
 	 * Test the AND condition property page which should only work for files.
-	 *
+	 * 
 	 */
 	public void testAndPage() {
 
@@ -51,9 +56,8 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 		for (Iterator iter = contributors.iterator(); iter.hasNext();) {
 			RegistryPageContributor element = (RegistryPageContributor) iter
 					.next();
-			if (element.getPageId().equals("org.eclipse.ui.tests.and")) {
+			if (element.getPageId().equals("org.eclipse.ui.tests.and"))
 				return;
-			}
 		}
 		assertTrue("And property page for file not found", false);
 
@@ -82,7 +86,7 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 	/**
 	 * Test the OR condition property page which should only work for files and
 	 * folders.
-	 *
+	 * 
 	 */
 	public void testOrPage() {
 
@@ -93,9 +97,8 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 		for (Iterator iter = contributors.iterator(); iter.hasNext();) {
 			RegistryPageContributor element = (RegistryPageContributor) iter
 					.next();
-			if (element.getPageId().equals("org.eclipse.ui.tests.or")) {
+			if (element.getPageId().equals("org.eclipse.ui.tests.or"))
 				found = true;
-			}
 		}
 		assertTrue("OR property page for file not found", found);
 
@@ -106,9 +109,8 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 		for (Iterator iter = contributors.iterator(); iter.hasNext();) {
 			RegistryPageContributor element = (RegistryPageContributor) iter
 					.next();
-			if (element.getPageId().equals("org.eclipse.ui.tests.or")) {
+			if (element.getPageId().equals("org.eclipse.ui.tests.or"))
 				found = true;
-			}
 		}
 		assertTrue("OR property page for file not found", found);
 
@@ -126,7 +128,7 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 
 	/**
 	 * Test the instance of property page which should only work for projects.
-	 *
+	 * 
 	 */
 	public void testInstanceOfPage() {
 
@@ -156,9 +158,8 @@ public class PropertyPageEnablementTest extends AbstractNavigatorTest {
 		for (Iterator iter = contributors.iterator(); iter.hasNext();) {
 			RegistryPageContributor element = (RegistryPageContributor) iter
 					.next();
-			if (element.getPageId().equals("org.eclipse.ui.tests.instanceof")) {
+			if (element.getPageId().equals("org.eclipse.ui.tests.instanceof"))
 				found = true;
-			}
 		}
 		assertTrue("instanceof property page for project not found", found);
 

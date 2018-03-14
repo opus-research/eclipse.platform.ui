@@ -47,27 +47,27 @@ import org.eclipse.ui.internal.ide.filesystem.FileSystemSupportRegistry;
 /**
  * ProjectContentsLocationArea is a convenience class for area that handle entry
  * of locations using URIs.
- *
+ * 
  * @since 3.2
- *
+ * 
  */
 public class ProjectContentsLocationArea {
 	/**
 	 * IErrorMessageReporter is an interface for type that allow message
 	 * reporting.
-	 *
+	 * 
 	 */
 	public interface IErrorMessageReporter {
 		/**
 		 * Report the error message
-		 *
+		 * 
 		 * @param errorMessage
 		 *            String or <code>null</code>. If the errorMessage is
 		 *            null then clear any error state.
 		 * @param infoOnly
 		 *            the message is an informational message, but the dialog
 		 *            cannot continue
-		 *
+		 * 
 		 */
 		public void reportError(String errorMessage, boolean infoOnly);
 	}
@@ -100,7 +100,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param reporter
 	 * @param composite
 	 * @param startProject
@@ -126,7 +126,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Create a new instance of a ProjectContentsLocationArea.
-	 *
+	 * 
 	 * @param reporter
 	 * @param composite
 	 */
@@ -140,7 +140,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Create the contents of the receiver.
-	 *
+	 * 
 	 * @param composite
 	 * @param defaultEnabled
 	 */
@@ -189,7 +189,7 @@ public class ProjectContentsLocationArea {
 	/**
 	 * Return whether or not we are currently showing the default location for
 	 * the project.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	public boolean isDefault() {
@@ -198,7 +198,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Create the area for user entry.
-	 *
+	 * 
 	 * @param composite
 	 * @param defaultEnabled
 	 */
@@ -240,6 +240,11 @@ public class ProjectContentsLocationArea {
 		}
 
 		locationPathField.addModifyListener(new ModifyListener() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
+			 */
 			@Override
 			public void modifyText(ModifyEvent e) {
 				errorReporter.reportError(checkValidLocation(), false);
@@ -249,7 +254,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Create the file system selection area.
-	 *
+	 * 
 	 * @param composite
 	 */
 	private void createFileSystemSelection(Composite composite) {
@@ -268,7 +273,7 @@ public class ProjectContentsLocationArea {
 	/**
 	 * Return the path we are going to display. If it is a file URI then remove
 	 * the file prefix.
-	 *
+	 * 
 	 * @return String
 	 */
 	private String getDefaultPathDisplayString() {
@@ -288,7 +293,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Set the enablement state of the receiver.
-	 *
+	 * 
 	 * @param enabled
 	 */
 	private void setUserAreaEnabled(boolean enabled) {
@@ -304,7 +309,7 @@ public class ProjectContentsLocationArea {
 	/**
 	 * Return the browse button. Usually referenced in order to set the layout
 	 * data for a dialog.
-	 *
+	 * 
 	 * @return Button
 	 */
 	public Button getBrowseButton() {
@@ -319,7 +324,7 @@ public class ProjectContentsLocationArea {
 		}
 		return result;
 	}
-
+	
 	/**
 	 * Open an appropriate directory browser
 	 */
@@ -369,7 +374,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Update the location field based on the selected path.
-	 *
+	 * 
 	 * @param selectedPath
 	 */
 	private void updateLocationField(String selectedPath) {
@@ -378,7 +383,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Return the path on the location field.
-	 *
+	 * 
 	 * @return the path or the field's text if the path is invalid
 	 */
 	private String getPathFromLocationField() {
@@ -395,7 +400,7 @@ public class ProjectContentsLocationArea {
 	/**
 	 * Check if the entry in the widget location is valid. If it is valid return
 	 * null. Otherwise return a string that indicates the problem.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String checkValidLocation() {
@@ -431,7 +436,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Get the URI for the location field if possible.
-	 *
+	 * 
 	 * @return URI or <code>null</code> if it is not valid.
 	 */
 	public URI getProjectLocationURI() {
@@ -448,7 +453,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Return the selected contributor
-	 *
+	 * 
 	 * @return FileSystemConfiguration or <code>null</code> if it cannot be
 	 *         determined.
 	 */
@@ -463,7 +468,7 @@ public class ProjectContentsLocationArea {
 
 	/**
 	 * Set the text to the default or clear it if not using the defaults.
-	 *
+	 * 
 	 * @param newName
 	 *            the name of the project to use. If <code>null</code> use the
 	 *            existing project name.
@@ -480,7 +485,7 @@ public class ProjectContentsLocationArea {
 	/**
 	 * Return the location for the project. If we are using defaults then return
 	 * the workspace root so that core creates it with default values.
-	 *
+	 * 
 	 * @return String
 	 */
 	public String getProjectLocation() {

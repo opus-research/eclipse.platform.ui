@@ -40,6 +40,9 @@ public class TitleTestView extends ViewPart {
 
     Label cdLabel;
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	public void createPartControl(Composite parent) {
         composite = new Composite(parent, SWT.NONE);
@@ -96,6 +99,9 @@ public class TitleTestView extends ViewPart {
         updateLabels();
 
         addPropertyListener(new IPropertyListener() {
+            /* (non-Javadoc)
+             * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
+             */
             @Override
 			public void propertyChanged(Object source, int propId) {
                 updateLabels();
@@ -109,6 +115,9 @@ public class TitleTestView extends ViewPart {
         cdLabel.setText(getContentDescription());
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+     */
     @Override
 	public void setFocus() {
 

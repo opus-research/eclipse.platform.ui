@@ -29,8 +29,8 @@ import org.eclipse.ui.internal.ide.undo.IFileContentDescription;
  * be linked to the file at the specified location. If a link location is not
  * specified, the file will be created in the location specified by the handle,
  * and the entire containment path of the file will be created if it does not
- * exist.  The file should not already exist, and the existence of the
- * containment path should not be changed between the time this operation
+ * exist.  The file should not already exist, and the existence of the 
+ * containment path should not be changed between the time this operation 
  * is created and the time it is executed.
  * <p>
  * Clients may call the public API from a background thread.
@@ -46,7 +46,7 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 
 	/**
 	 * Create a CreateFileOperation
-	 *
+	 * 
 	 * @param fileHandle
 	 *            the file to be created
 	 * @param linkLocation
@@ -88,6 +88,11 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 	private IFileContentDescription createFileContentDescription(
 			final IFile file, final InputStream contents) {
 		return new IFileContentDescription() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getContents()
+			 */
 			@Override
 			public InputStream getContents() {
 				if (contents != null) {
@@ -96,6 +101,11 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 				return new ByteArrayInputStream(new byte[0]);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#getCharset()
+			 */
 			@Override
 			public String getCharset() {
 				try {
@@ -105,13 +115,22 @@ public class CreateFileOperation extends AbstractCreateResourcesOperation {
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.ui.internal.ide.undo.IFileContentDescription#exists()
+			 */
 			@Override
 			public boolean exists() {
 				return true;
 			}
 		};
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.ide.undo.AbstractCreateResourcesOperation#computeExecutionStatus(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	@Override
 	public IStatus computeExecutionStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeExecutionStatus(monitor);

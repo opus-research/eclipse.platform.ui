@@ -42,7 +42,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
  * Subclasses may extend, but must call <code>createEncodingGroup</code>
  * during <code>doFillIntoGrid</code>.
  * </p>
- *
+ * 
  * @see org.eclipse.ui.ide.IDEEncoding
  * @since 3.1
  */
@@ -74,7 +74,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 	/**
 	 * Creates a new encoding field editor with the given preference name, label
 	 * and parent.
-	 *
+	 * 
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -90,7 +90,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 	/**
 	 * Creates a new encoding field editor with the given preference name, label
 	 * and parent.
-	 *
+	 * 
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -111,16 +111,32 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 		createControl(parent);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#adjustForNumColumns(int)
+	 */
 	@Override
 	protected void adjustForNumColumns(int numColumns) {
 		((GridData) getContainer().getLayoutData()).horizontalSpan = numColumns;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite,
+	 *      int)
+	 */
 	@Override
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		container = createEncodingGroup(parent, numColumns);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+	 */
 	@Override
 	protected void doLoad() {
 		if (encodingCombo != null) {
@@ -133,31 +149,56 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the value that is currently stored for the encoding.
-	 *
+	 * 
 	 * @return the currently stored encoding
 	 */
 	protected abstract String getStoredValue();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+	 */
 	@Override
 	protected void doLoadDefault() {
 		updateEncodingState(true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#getNumberOfControls()
+	 */
 	@Override
 	public int getNumberOfControls() {
 		return 1;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#isValid()
+	 */
 	@Override
 	public boolean isValid() {
 		return isValid;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#refreshValidState()
+	 */
 	@Override
 	protected void refreshValidState() {
 		updateValidState();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#setPreferenceStore(org.eclipse.jface.preference.IPreferenceStore)
+	 */
 	@Override
 	public void setPreferenceStore(IPreferenceStore store) {
 		super.setPreferenceStore(store);
@@ -178,7 +219,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 	 * <p>
 	 * Subclasses may extend.
 	 * </p>
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 * @param numColumns
@@ -231,12 +272,22 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 		data = new GridData();
 		encodingCombo.setLayoutData(data);
 		encodingCombo.addSelectionListener(new SelectionAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+			 */
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateValidState();
 			}
 		});
 		encodingCombo.addKeyListener(new KeyAdapter() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.swt.events.KeyListener#keyReleased(org.eclipse.swt.events.KeyEvent)
+			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
 				updateValidState();
@@ -246,6 +297,13 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 		return topControl;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean,
+	 *      org.eclipse.swt.widgets.Composite)
+	 * @since 3.3
+	 */
 	@Override
 	public void setEnabled(boolean enabled, Composite parent) {
 		if (container != null)
@@ -256,12 +314,12 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 			otherEncodingButton.setEnabled(enabled);
 		if (encodingCombo != null)
 			encodingCombo.setEnabled(enabled && otherEncodingButton.getSelection());
-
+		
 	}
 
 	/**
 	 * Returns the default encoding for the object being shown.
-	 *
+	 * 
 	 * @return the default encoding for the object being shown
 	 */
 	protected String findDefaultEncoding() {
@@ -270,7 +328,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the text for the default encoding button.
-	 *
+	 * 
 	 * @return the text for the default encoding button
 	 */
 	protected String defaultButtonText() {
@@ -283,7 +341,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 	 * Populates the encodings combo. Sets the text based on the selected
 	 * encoding. If there is no selected encoding, the text is set to the
 	 * default encoding.
-	 *
+	 * 
 	 * @param encodings
 	 *            the list of encodings (list of String)
 	 * @param selectedEncoding
@@ -332,7 +390,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the currently selected encoding.
-	 *
+	 * 
 	 * @return the currently selected encoding
 	 */
 	protected String getSelectedEncoding() {
@@ -349,7 +407,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns whether or not the given encoding is valid.
-	 *
+	 * 
 	 * @param enc
 	 *            the encoding to validate
 	 * @return <code>true</code> if the encoding is valid, <code>false</code>
@@ -367,7 +425,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the default encoding.
-	 *
+	 * 
 	 * @return the default encoding
 	 */
 	protected String getDefaultEnc() {
@@ -376,7 +434,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns whether or not the encoding setting changed.
-	 *
+	 * 
 	 * @param encodingSetting
 	 *            the setting from the page.
 	 * @return boolean <code>true</code> if the resource encoding is the same
@@ -395,7 +453,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 
 	/**
 	 * Return whether or not the default has been selected.
-	 *
+	 * 
 	 * @return <code>true</code> if the default button has been selected.
 	 */
 	boolean isDefaultSelected() {
@@ -406,10 +464,10 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 	 * Set the title of the group to groupTitle. If this is not called a default
 	 * title is used. If groupTitle is <code>null</code> the control will be
 	 * unlabelled (by default a {@link Composite} instead of a {@link Group}.
-	 *
+	 * 
 	 * <strong>NOTE</strong> this value must be set before
 	 * {@link #createControl(Composite)} is called or it will be ignored.
-	 *
+	 * 
 	 * @param groupTitle
 	 *            The groupTitle to set.
      * @since 3.3

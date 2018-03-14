@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Matthieu Wipliez <matthieu.wipliez@synflow.com> (Synflow SAS) - [CommonNavigator] Implementation of Binding isVisibleExtension not excluding as expected - http://bugs.eclipse.org/425867
+ *     Matthieu Wipliez <matthieu.wipliez@synflow.com> (Synflow SAS) - [CommonNavigator] Implementation of Binding isVisibleExtension not excluding as expected - http://bugs.eclipse.org/425867 
  ******************************************************************************/
 
 package org.eclipse.ui.internal.navigator.extensions;
@@ -43,6 +43,11 @@ class Binding {
 		TAG_EXTENSION = tagExtension;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isVisibleExtension(java.lang.String)
+	 */
 	boolean isVisibleExtension(String anExtensionId) {
 		// Have we seen this pattern before?
 		if (knownIds.containsKey(anExtensionId)) {
@@ -83,10 +88,15 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#isRootExtension(java.lang.String)
+	 */
 	boolean isRootExtension(String anExtensionId) {
 		if (rootPatterns.size() == 0) {
 			return false;
-		}
+		} 
 		// Have we seen this pattern before?
 		if (knownRootIds.containsKey(anExtensionId)) {
 			// we have, don't recompute
@@ -104,6 +114,11 @@ class Binding {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.navigator.extensions.INavigatorViewerDescriptor#hasOverriddenRootExtensions()
+	 */
 	boolean hasOverriddenRootExtensions() {
 		return rootPatterns.size() > 0;
 	}
@@ -191,11 +206,11 @@ class Binding {
 		}
 
 	}
-
+	
 	void addBinding(Binding otherBinding) {
 		includePatterns.addAll(otherBinding.includePatterns);
 		excludePatterns.addAll(otherBinding.excludePatterns);
 		rootPatterns.addAll(otherBinding.rootPatterns);
 	}
-
+	
 }

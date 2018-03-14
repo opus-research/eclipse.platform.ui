@@ -28,7 +28,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 /**
  * A MultiPageEditorPart with methods that take a peek at things like selection
  * events or selection status or page change events.
- *
+ * 
  * @since 3.2
  */
 public class MultiVariablePageEditor extends MultiPageEditorPart {
@@ -72,7 +72,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * No save as.
-	 *
+	 * 
 	 * @return false
 	 */
 	@Override
@@ -80,6 +80,11 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.part.MultiPageEditorPart#pageChange(int)
+	 */
 	@Override
 	protected void pageChange(int newPageIndex) {
 		super.pageChange(newPageIndex);
@@ -106,7 +111,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 	/**
 	 * Set the active page in this MPEP. Just delegate back to
 	 * setActivePage(int).
-	 *
+	 * 
 	 * @param index
 	 *            The page index which must be valid.
 	 */
@@ -116,7 +121,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * Add a page with a composite for testing.
-	 *
+	 * 
 	 */
 	public void addLastPage() {
 		lastPage = new Composite(getContainer(), SWT.NONE);
@@ -127,7 +132,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * remove the last page for testing.
-	 *
+	 * 
 	 */
 	public void removeLastPage() {
 		if (getPageCount() > 0) {
@@ -138,13 +143,13 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * Get the last page composite for testing.
-	 *
+	 * 
 	 * @return the last page.
 	 */
 	public Control getLastPage() {
 		return lastPage;
 	}
-
+	
 	@Override
 	public IEditorPart getEditor(int pageIndex) {
 		return super.getEditor(pageIndex);
@@ -152,7 +157,7 @@ public class MultiVariablePageEditor extends MultiPageEditorPart {
 
 	/**
 	 * Return the control for testing (like the editor control).
-	 *
+	 * 
 	 * @param index
 	 *            the page index to get
 	 * @return the control for that page

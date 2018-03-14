@@ -29,14 +29,14 @@ import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 public class CommonViewerSiteIEditorPartSiteDelegate implements
 		ICommonViewerWorkbenchSite {
 
-	private IEditorSite editorSite;
+	private IEditorSite editorSite;  
 
 	/**
-	 *
+	 * 
 	 * @param anEditorSite
 	 */
 	public CommonViewerSiteIEditorPartSiteDelegate(IEditorSite anEditorSite) {
-		editorSite = anEditorSite;
+		editorSite = anEditorSite; 
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class CommonViewerSiteIEditorPartSiteDelegate implements
 	@Override
 	public Object getAdapter(Class adapter) {
 		return editorSite.getAdapter(adapter);
-	}
+	} 
 
 	@Override
 	public IWorkbenchPage getPage() {
@@ -85,11 +85,17 @@ public class CommonViewerSiteIEditorPartSiteDelegate implements
 		editorSite.registerContextMenu(menuId, menuManager, selectionProvider);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getViewPart()
+	 */
 	@Override
-	public IWorkbenchPart getPart() {
+	public IWorkbenchPart getPart() { 
 		return editorSite.getPart();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getSite()
+	 */
 	@Override
 	public IWorkbenchPartSite getSite() {
 		return editorSite;

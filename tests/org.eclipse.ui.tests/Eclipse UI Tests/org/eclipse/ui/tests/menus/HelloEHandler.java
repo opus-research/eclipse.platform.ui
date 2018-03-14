@@ -20,10 +20,15 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class HelloEHandler extends AbstractHandler {
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil

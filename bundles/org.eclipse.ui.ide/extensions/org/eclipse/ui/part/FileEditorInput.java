@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 package org.eclipse.ui.part;
 
@@ -15,14 +14,18 @@ import java.net.URI;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IStorage;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.core.runtime.content.IContentType;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IStorage;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPathEditorInput;
@@ -43,7 +46,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 public class FileEditorInput extends PlatformObject implements IFileEditorInput, IPathEditorInput, IURIEditorInput,
 		IPersistableElement {
 	private IFile file;
-
+	
 	/**
 	 * Return whether or not file is local. Only {@link IFile}s with a local
 	 * value should call {@link IPathEditorInput#getPath()}
@@ -76,7 +79,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 					"Failed to obtain file store for resource", e); //$NON-NLS-1$
 			return false;
 		}
-
+	
 	}
 
 	/**
@@ -88,7 +91,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 		if (file == null)
 			throw new IllegalArgumentException();
 		this.file = file;
-
+	
 	}
 
 	/* (non-Javadoc)
@@ -192,7 +195,7 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 		FileEditorInputFactory.saveState(memento, this);
 	}
 
-
+	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IURIEditorInput#getURI()
@@ -201,8 +204,8 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	public URI getURI() {
 		return file.getLocationURI();
 	}
-
-
+	
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IPathEditorInput#getPath()
 	 */
@@ -241,18 +244,18 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 	public String toString() {
 		return getClass().getName() + "(" + getFile().getFullPath() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-
+	
 	/*
 	 * Allows for the return of an {@link IWorkbenchAdapter} adapter.
-	 *
+	 * 
 	 * @since 3.5
-	 *
+	 * 
 	 * @see org.eclipse.core.runtime.PlatformObject#getAdapter(java.lang.Class)
 	 */
 	@Override
-	public <T> T getAdapter(Class<T> adapterType) {
-		if (IWorkbenchAdapter.class.equals(adapterType)) {
-			return adapterType.cast(new IWorkbenchAdapter() {
+	public Object getAdapter(Class adapter) {
+		if (IWorkbenchAdapter.class.equals(adapter)) {
+			return new IWorkbenchAdapter() {
 
 				@Override
 				public Object[] getChildren(Object o) {
@@ -273,9 +276,9 @@ public class FileEditorInput extends PlatformObject implements IFileEditorInput,
 				public Object getParent(Object o) {
 					return FileEditorInput.this.getFile().getParent();
 				}
-			});
+			};
 		}
 
-		return super.getAdapter(adapterType);
+		return super.getAdapter(adapter);
 	}
 }

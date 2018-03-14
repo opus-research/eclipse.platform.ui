@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -38,13 +38,13 @@ import org.eclipse.ui.internal.ide.misc.DisjointSet;
 
 /**
  * This action closes all projects that are unrelated to the selected projects. A
- * project is unrelated if it is not directly or transitively referenced by one
+ * project is unrelated if it is not directly or transitively referenced by one 
  * of the selected projects, and does not directly or transitively reference
  * one of the selected projects.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @see IDEActionFactory#CLOSE_UNRELATED_PROJECTS
  * @since 3.3
  */
@@ -54,21 +54,21 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 	 */
 	public static final String ID = PlatformUI.PLUGIN_ID + ".CloseUnrelatedProjectsAction"; //$NON-NLS-1$
 
-	private final List<IResource> projectsToClose = new ArrayList<>();
+	private final List projectsToClose = new ArrayList();
 
 	private boolean selectionDirty = true;
 
-	private List<? extends IResource> oldSelection = Collections.emptyList();
+	private List oldSelection = Collections.EMPTY_LIST;
 
-
+	
 	/**
 	 * Builds the connected component set for the input projects.
 	 * The result is a DisjointSet where all related projects belong
 	 * to the same set.
 	 */
-	private static DisjointSet<IProject> buildConnectedComponents(IProject[] projects) {
+	private static DisjointSet buildConnectedComponents(IProject[] projects) {
 		//initially each vertex is in a set by itself
-		DisjointSet<IProject> set = new DisjointSet<>();
+		DisjointSet set = new DisjointSet();
 		for (int i = 0; i < projects.length; i++) {
 			set.makeSet(projects[i]);
 		}
@@ -78,13 +78,12 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 				//each reference represents an edge in the project reference
 				//digraph from projects[i] -> references[j]
 				for (int j = 0; j < references.length; j++) {
-					IProject setOne = set.findSet(projects[i]);
+					Object setOne = set.findSet(projects[i]);
 					//note that referenced projects may not exist in the workspace
-					IProject setTwo = set.findSet(references[j]);
+					Object setTwo = set.findSet(references[j]);
 					//these two projects are related, so join their sets
-					if (setOne != null && setTwo != null && setOne != setTwo) {
+					if (setOne != null && setTwo != null && setOne != setTwo)
 						set.union(setOne, setTwo);
-					}
 				}
 			} catch (CoreException e) {
 				//assume inaccessible projects have no references
@@ -95,11 +94,11 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 
 	/**
 	 * Creates this action.
-	 *
+	 * 
 	 * @param shell
 	 *            The shell to use for parenting any dialogs created by this
 	 *            action.
-	 *
+	 *            
 	 * @deprecated {@link #CloseUnrelatedProjectsAction(IShellProvider)}
 	 */
 	@Deprecated
@@ -107,10 +106,10 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 		super(shell, IDEWorkbenchMessages.CloseUnrelatedProjectsAction_text);
 		initAction();
 	}
-
+	
 	/**
 	 * Creates this action.
-	 *
+	 * 
 	 * @param provider
 	 *            The shell to use for parenting any dialogs created by this
 	 *            action.
@@ -120,53 +119,51 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 		super(provider, IDEWorkbenchMessages.CloseUnrelatedProjectsAction_text);
 		initAction();
 	}
-
+	
+	/*
+	 * (non-Javadoc)overrides method on CloseResourceAction.
+	 */
 	@Override
 	public void run() {
-		if (promptForConfirmation()) {
-			super.run();
-		}
+		if(promptForConfirmation())
+				super.run();
 	}
-
+   
    /**
 	 * Returns whether to close unrelated projects.
 	 * Consults the preference and prompts the user if necessary.
-	 *
+	 * 
 	 * @return <code>true</code> if unrelated projects should be closed, and
 	 *         <code>false</code> otherwise.
 	 */
 	private boolean promptForConfirmation() {
 		IPreferenceStore store = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		if (store.getBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS)) {
+		if (store.getBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS))
 			return true;
-		}
 
 		// get first project name
-		List<? extends IResource> selection = super.getSelectedResources();
+		List selection = super.getSelectedResources();
 		int selectionSize = selection.size();
-		if (selectionSize == 0) {
+		if (selectionSize == 0)
 			return true;
-		}
 
 		String message = null;
 		if (selectionSize == 1) { // if one project is selected then print its name
-			IResource firstSelected = selection.get(0);
+			Object firstSelected = selection.get(0);
 			String projectName = null;
-			if (firstSelected instanceof IProject) {
+			if (firstSelected instanceof IProject)
 				projectName = ((IProject) firstSelected).getName();
-			}
 			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsg1, projectName);
 		} else // if more then one project is selected then print there number
 			message = NLS.bind(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_confirmMsgN,
 					new Integer(selectionSize));
 
-			MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
+		MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(
 						getShell(), IDEWorkbenchMessages.CloseUnrelatedProjectsAction_toolTip,
 						message, IDEWorkbenchMessages.CloseUnrelatedProjectsAction_AlwaysClose,
 						false, null, null);
-		if (dialog.getReturnCode() != IDialogConstants.OK_ID) {
+		if (dialog.getReturnCode() != IDialogConstants.OK_ID)
 			return false;
-		}
 		store.setValue(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS, dialog.getToggleState());
 		return true;
 	}
@@ -179,33 +176,41 @@ public class CloseUnrelatedProjectsAction extends CloseResourceAction {
 		setToolTipText(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_toolTip);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IIDEHelpContextIds.CLOSE_UNRELATED_PROJECTS_ACTION);
 	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.SelectionListenerAction#clearCache()
+	 */
 	@Override
 	protected void clearCache() {
 		super.clearCache();
-		oldSelection = Collections.emptyList();
+		oldSelection = Collections.EMPTY_LIST;
 		selectionDirty = true;
 	}
 
 	/**
 	 * Computes the related projects of the selection.
 	 */
-	private void computeRelated(List<? extends IResource> selection) {
+	private void computeRelated(List selection) {
 		//build the connected component set for all projects in the workspace
-		DisjointSet<IProject> set = buildConnectedComponents(ResourcesPlugin.getWorkspace().getRoot().getProjects());
+		DisjointSet set = buildConnectedComponents(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 		//remove the connected components that the selected projects are in
-		for (IResource resource : selection) {
-			set.removeSet(resource);
-		}
+		for (Iterator it = selection.iterator(); it.hasNext();)
+			set.removeSet(it.next());
 		//the remainder of the projects in the disjoint set are unrelated to the selection
 		projectsToClose.clear();
 		set.toList(projectsToClose);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.SelectionListenerAction#getSelectedResources()
+	 */
 	@Override
-	protected List<? extends IResource> getSelectedResources() {
+	protected List getSelectedResources() {
 		if (selectionDirty) {
-			List<? extends IResource> newSelection = super.getSelectedResources();
+			List newSelection = super.getSelectedResources();
 			if (!oldSelection.equals(newSelection)) {
 				oldSelection = newSelection;
 				computeRelated(newSelection);
