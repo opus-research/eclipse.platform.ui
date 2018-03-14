@@ -830,32 +830,22 @@ public class TrimStack {
 	 * @param show
 	 *            whether the stack should be visible
 	 */
-	boolean use_overlays = false;
-
 	public void showStack(boolean show) {
 		Control ctrl = (Control) minimizedElement.getWidget();
 		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
 			return;
 
 		if (show && !isShowing) {
-			if (use_overlays) {
-				hostPane = getHostPane();
-				ctrl.setParent(hostPane);
-				clientAreaComposite.addControlListener(caResizeListener);
+			hostPane = getHostPane();
+			ctrl.setParent(hostPane);
+			clientAreaComposite.addControlListener(caResizeListener);
 
-				// Set the initial location
-				setPaneLocation(hostPane);
+			// Set the initial location
+			setPaneLocation(hostPane);
 
-				hostPane.addListener(SWT.Traverse, escapeListener);
-
-				hostPane.layout(true);
-				hostPane.moveAbove(null);
-				hostPane.setVisible(true);
-			} else {
-				minimizedElement.setVisible(true);
-				ctrl.addListener(SWT.Traverse, escapeListener);
-			}
-
+			hostPane.layout(true);
+			hostPane.moveAbove(null);
+			hostPane.setVisible(true);
 			isShowing = true;
 
 			// Activate the part that is being brought up...
@@ -910,21 +900,14 @@ public class TrimStack {
 
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
-			if (use_overlays) {
-				// Check to ensure that the client area is non-null since the
-				// trimstack may be currently hosted in the limbo shell
-				if (clientAreaComposite != null) {
-					clientAreaComposite.removeControlListener(caResizeListener);
-				}
+			// Check to ensure that the client area is non-null since the
+			// trimstack may be currently hosted in the limbo shell
+			if (clientAreaComposite != null) {
+				clientAreaComposite.removeControlListener(caResizeListener);
+			}
 
-				hostPane.removeListener(SWT.Traverse, escapeListener);
-
-				if (hostPane != null && hostPane.isVisible()) {
-					hostPane.setVisible(false);
-				}
-			} else {
-				ctrl.removeListener(SWT.Traverse, escapeListener);
-				minimizedElement.setVisible(false);
+			if (hostPane != null && hostPane.isVisible()) {
+				hostPane.setVisible(false);
 			}
 
 			isShowing = false;
@@ -992,6 +975,8 @@ public class TrimStack {
 		hostPane = new Composite(trimStackTB.getShell(), SWT.NONE);
 		hostPane.setData(ShellActivationListener.DIALOG_IGNORE_KEY, Boolean.TRUE);
 		setHostSize();
+
+		hostPane.addListener(SWT.Traverse, escapeListener);
 
 		// Set a special layout that allows resizing
 		fixedSides = getFixedSides();
