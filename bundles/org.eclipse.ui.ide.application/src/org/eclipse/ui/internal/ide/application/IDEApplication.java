@@ -29,13 +29,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
@@ -45,6 +44,8 @@ import org.eclipse.ui.internal.ide.ChooseWorkspaceDialog;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.StatusUtil;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * The "main program" for the Eclipse IDE.
@@ -60,9 +61,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 
     private static final String VERSION_FILENAME = "version.ini"; //$NON-NLS-1$
 
-    private static final String WORKSPACE_VERSION_KEY = "org.eclipse.core.runtime"; //$NON-NLS-1$
-
-    private static final String WORKSPACE_VERSION_VALUE = "1"; //$NON-NLS-1$
+    private static final String WORKSPACE_VERSION_REFERENCE_BUNDLE = "org.eclipse.core.resources"; //$NON-NLS-1$
+    private static final String WORKSPACE_VERSION_REFERENCE_BUNDLE_LEGACY = "org.eclipse.core.runtime"; //$NON-NLS-1$
 
     private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
 
@@ -362,7 +362,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return false;
 		}
 
-        String version = readWorkspaceVersion(url);
+        Version version = readWorkspaceVersion(url);
 
         // if the version could not be read, then there is not any existing
         // workspace data to trample, e.g., perhaps its a new directory that
@@ -371,33 +371,46 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return true;
 		}
 
-        final int ide_version = Integer.parseInt(WORKSPACE_VERSION_VALUE);
-        int workspace_version = Integer.parseInt(version);
+        final Version ide_version = toMajorMinorVersion(Platform.getBundle(WORKSPACE_VERSION_REFERENCE_BUNDLE).getVersion());
+        Version workspace_version = toMajorMinorVersion(version);
+        int versionCompareResult = workspace_version.compareTo(ide_version);
 
         // equality test is required since any version difference (newer
         // or older) may result in data being trampled
-        if (workspace_version == ide_version) {
+		if (versionCompareResult == 0) {
 			return true;
+		} 
+
+		// At this point workspace has been detected to be from a version
+		// other than the current ide version -- find out if the user wants
+		// to use it anyhow.
+		int severity;
+		String title;
+		String message;
+		if (versionCompareResult < 0) {
+			// Workspace < IDE. Update must be possible without issues,
+			// so only inform user about it.
+			severity = MessageDialog.INFORMATION;
+			title = IDEWorkbenchMessages.IDEApplication_versionTitle_olderWorkspace;
+			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_olderWorkspace, url.getFile());
+		} else {
+			// Workspace > IDE. It must have been opened with a newer IDE version.
+			// Downgrade might be problematic, so warn user about it.
+			severity = MessageDialog.WARNING;
+			title = IDEWorkbenchMessages.IDEApplication_versionTitle_newerWorkspace;
+			message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage_newerWorkspace, url.getFile());
 		}
 
-        // At this point workspace has been detected to be from a version
-        // other than the current ide version -- find out if the user wants
-        // to use it anyhow.
-        String title = IDEWorkbenchMessages.IDEApplication_versionTitle;
-        String message = NLS.bind(IDEWorkbenchMessages.IDEApplication_versionMessage, url.getFile());
-
-        MessageBox mbox = new MessageBox(shell, SWT.OK | SWT.CANCEL
-                | SWT.ICON_WARNING | SWT.APPLICATION_MODAL);
-        mbox.setText(title);
-        mbox.setMessage(message);
-        return mbox.open() == SWT.OK;
+		MessageDialog dialog = new MessageDialog(shell, title, null, message, severity,
+				new String[] {IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL}, 0);
+		return dialog.open() == Window.OK;
     }
 
-    /**
+	/**
      * Look at the argument URL for the workspace's version information. Return
      * that version if found and null otherwise.
      */
-    private static String readWorkspaceVersion(URL workspace) {
+    private static Version readWorkspaceVersion(URL workspace) {
         File versionFile = getVersionFile(workspace, false);
         if (versionFile == null || !versionFile.exists()) {
 			return null;
@@ -415,12 +428,28 @@ public class IDEApplication implements IApplication, IExecutableExtension {
                 is.close();
             }
 
-            return props.getProperty(WORKSPACE_VERSION_KEY);
+            String versionString = props.getProperty(WORKSPACE_VERSION_REFERENCE_BUNDLE);
+            if (versionString != null) {
+            	return Version.parseVersion(versionString);
+            }
+            // read in the legacy key, so that we get a transition from old workspace version "1"
+            versionString = props.getProperty(WORKSPACE_VERSION_REFERENCE_BUNDLE_LEGACY);
+            if (versionString != null) {
+            	return Version.parseVersion(versionString);
+            }
+            return null;
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not read version file", new Status( //$NON-NLS-1$
                     IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH,
                     IStatus.ERROR,
-                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$, 
+                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$
+                    e));
+            return null;
+        } catch (IllegalArgumentException e) {
+            IDEWorkbenchPlugin.log("Could not parse version", new Status( //$NON-NLS-1$
+                    IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH,
+                    IStatus.ERROR,
+                    e.getMessage() == null ? "" : e.getMessage(), //$NON-NLS-1$
                     e));
             return null;
         }
@@ -442,13 +471,15 @@ public class IDEApplication implements IApplication, IExecutableExtension {
 			return;
 		}
 
+        Bundle bundle = Platform.getBundle(WORKSPACE_VERSION_REFERENCE_BUNDLE);
+        String version = bundle.getVersion().toString();
+
         OutputStream output = null;
         try {
-            String versionLine = WORKSPACE_VERSION_KEY + '='
-                    + WORKSPACE_VERSION_VALUE;
-
             output = new FileOutputStream(versionFile);
-            output.write(versionLine.getBytes("UTF-8")); //$NON-NLS-1$
+            Properties props = new Properties();
+            props.setProperty(WORKSPACE_VERSION_REFERENCE_BUNDLE, version);
+            props.store(output, null);
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not write version file", //$NON-NLS-1$
                     StatusUtil.newStatus(IStatus.ERROR, e.getMessage(), e));
@@ -499,6 +530,13 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             return null;
         }
     }
+
+    /**
+	 * @return the major and minor parts of the given version
+	 */
+	private static Version toMajorMinorVersion(Version version) {
+		return new Version(version.getMajor(), version.getMinor(), 0);
+	}
 
     /* (non-Javadoc)
      * @see org.eclipse.equinox.app.IApplication#stop()
