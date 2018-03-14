@@ -20,7 +20,7 @@ import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptorConta
 import org.eclipse.e4.ui.model.application.ui.MContext;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
-import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
+import org.eclipse.e4.ui.model.application.ui.basic.MFrame;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContributions;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContributions;
@@ -123,7 +123,7 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 
 	/**
 	 * Returns the value of the '<em><b>Dialogs</b></em>' reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MDialog}.
+	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MFrame}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
@@ -136,6 +136,6 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 	 * @model
 	 * @generated
 	 */
-	List<MDialog> getDialogs();
+	List<MFrame> getDialogs();
 
 } // MApplication
