@@ -545,12 +545,6 @@ public class E4Application implements IApplication {
 		Locale transformedLocale = ResourceBundleHelper.toLocale(
 				defaultLocaleString, Locale.ENGLISH);
 
-		// if the Locale transformation returned a different Locale than the
-		// current set default Locale, then the current set default Locale is
-		// invalid and we update the default Locale to a valid one
-		if (!Locale.getDefault().equals(transformedLocale))
-			Locale.setDefault(transformedLocale);
-
 		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
