@@ -68,8 +68,6 @@ import org.eclipse.core.runtime.IRegistryChangeListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -287,8 +285,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		org.eclipse.e4.ui.workbench.IWorkbench {
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
-
-	private static final String WORKBENCH_AUTO_SAVE_BACKGROUND_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
 
 	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
 
@@ -1271,21 +1267,13 @@ public final class Workbench extends EventManager implements IWorkbench,
 	 * part of persist(false) during auto-save.
 	 */
 	private void persistWorkbenchModel() {
-		try {
-			Job.getJobManager().join(WORKBENCH_AUTO_SAVE_JOB, new NullProgressMonitor());
-		} catch (OperationCanceledException e) {
-			// ignore
-		} catch (InterruptedException e) {
-			// ignore
-		}
-
 		final MApplication appCopy = (MApplication) EcoreUtil.copy((EObject) application);
 		if (detectWorkbenchCorruption(appCopy)) {
 			return;
 		}
 		final IModelResourceHandler handler = e4Context.get(IModelResourceHandler.class);
 
-		Job cleanAndSaveJob = new Job(WORKBENCH_AUTO_SAVE_BACKGROUND_JOB) {
+		Job cleanAndSaveJob = new Job("Workbench Auto-Save Background Job") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
@@ -1301,11 +1289,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 					res.getResourceSet().getResources().remove(res);
 				}
 				return Status.OK_STATUS;
-			}
-
-			@Override
-			public boolean belongsTo(Object family) {
-				return WORKBENCH_AUTO_SAVE_JOB.equals(family);
 			}
 
 		};
@@ -3020,6 +3003,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 							return Status.OK_STATUS;
 						}
 
+						@Override
+						public boolean belongsTo(Object family) {
+							return WORKBENCH_AUTO_SAVE_JOB == family;
+						}
 					};
 					autoSaveJob.setSystem(true);
 					autoSaveJob.schedule(millisecondInterval);
