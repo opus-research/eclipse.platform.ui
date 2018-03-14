@@ -67,6 +67,9 @@ public abstract class SelectionDialog extends TrayDialog {
 		super(parentShell);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared in Window.
+	 */
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
@@ -75,6 +78,9 @@ public abstract class SelectionDialog extends TrayDialog {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on Dialog.
+	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,

@@ -152,6 +152,11 @@ public class MockViewPart extends MockWorkbenchPart implements IViewPart {
 		});
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.api.MockPart#dispose()
+	 */
 	@Override
 	public void dispose() {
 		// Test for bug 94457: The contribution items must still be in the
@@ -184,6 +189,11 @@ public class MockViewPart extends MockWorkbenchPart implements IViewPart {
 		// do nothing
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.api.MockWorkbenchPart#getActionBars()
+	 */
 	@Override
 	protected IActionBars getActionBars() {
 		return getViewSite().getActionBars();
