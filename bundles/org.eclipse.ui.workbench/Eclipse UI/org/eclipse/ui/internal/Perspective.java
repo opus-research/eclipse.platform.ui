@@ -10,13 +10,14 @@
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
- *     Andrey Loskutov <loskutov@gmx.de> - Cleaned up code, Bug 404348, 421178
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 404348, 421178, 456727
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.contexts.IContextService;
@@ -36,15 +37,8 @@ public class Perspective {
 	private final List<IActionSetDescriptor> alwaysOffActionSets;
 	private final MPerspective layout;
 
-	/**
-	 * @param desc
-	 *            can be null
-	 * @param layout
-	 *            non null
-	 * @param page
-	 *            non null
-	 */
 	public Perspective(PerspectiveDescriptor desc, MPerspective layout, WorkbenchPage page) {
+		Assert.isNotNull(page);
 		this.page = page;
 		this.layout = layout;
 		descriptor = desc;
@@ -54,7 +48,7 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
+			List<String> alwaysOn = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
 
 			// read explicitly disabled sets.
 			String hiddenIDs = page.getHiddenItems();
@@ -71,20 +65,15 @@ public class Perspective {
 				}
 			}
 
-			ids.removeAll(alwaysOff);
+			alwaysOn.removeAll(alwaysOff);
 
-			List<IActionSetDescriptor> temp = new ArrayList<IActionSetDescriptor>();
-			createInitialActionSets(temp, ids);
-
-			for (IActionSetDescriptor descriptor : temp) {
+			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOn)) {
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
 				}
 			}
 
-			temp = new ArrayList<IActionSetDescriptor>();
-			createInitialActionSets(temp, alwaysOff);
-			for (IActionSetDescriptor descriptor : temp) {
+			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOff)) {
 				if (!alwaysOffActionSets.contains(descriptor)) {
 					alwaysOffActionSets.add(descriptor);
 				}
@@ -95,24 +84,23 @@ public class Perspective {
 
 	/**
 	 * Create the initial list of action sets.
+	 * 
+	 * @return action set descriptors created from given descriptor id's, can be
+	 *         empty but never null.
 	 */
-	protected void createInitialActionSets(List<IActionSetDescriptor> outputList, List<String> stringList) {
+	private List<IActionSetDescriptor> createInitialActionSets(List<String> ids) {
+		List<IActionSetDescriptor> result = new ArrayList<IActionSetDescriptor>();
 		ActionSetRegistry reg = WorkbenchPlugin.getDefault().getActionSetRegistry();
-		for (String id : stringList) {
+		for (String id : ids) {
 			IActionSetDescriptor desc = reg.findActionSet(id);
 			if (desc != null) {
-				outputList.add(desc);
+				result.add(desc);
 			} else {
 				// plugin with actionSet was removed
 				// we remember then so it's available when added back
 			}
 		}
-	}
-
-	/**
-	 * Dispose the perspective and all views contained within.
-	 */
-	public void dispose() {
+		return result;
 	}
 
 	/**
@@ -152,45 +140,31 @@ public class Perspective {
 	}
 
 	private void removeAlwaysOn(IActionSetDescriptor descriptor) {
-		if (descriptor == null) {
-			return;
-		}
-		boolean removed = alwaysOnActionSets.remove(descriptor);
-		if (removed) {
+		if (alwaysOnActionSets.contains(descriptor)) {
+			alwaysOnActionSets.remove(descriptor);
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_HIDE);
 		}
 	}
 
-	protected void addAlwaysOff(IActionSetDescriptor descriptor) {
-		if (descriptor == null) {
-			return;
+	private void addAlwaysOff(IActionSetDescriptor descriptor) {
+		if (!alwaysOffActionSets.contains(descriptor)) {
+			alwaysOffActionSets.add(descriptor);
+			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_MASK);
+			removeAlwaysOn(descriptor);
 		}
-		if (alwaysOffActionSets.contains(descriptor)) {
-			return;
-		}
-		alwaysOffActionSets.add(descriptor);
-		page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_MASK);
-		removeAlwaysOn(descriptor);
 	}
 
-	protected void addAlwaysOn(IActionSetDescriptor descriptor) {
-		if (descriptor == null) {
-			return;
+	private void addAlwaysOn(IActionSetDescriptor descriptor) {
+		if (!alwaysOnActionSets.contains(descriptor)) {
+			alwaysOnActionSets.add(descriptor);
+			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_SHOW);
+			removeAlwaysOff(descriptor);
 		}
-		if (alwaysOnActionSets.contains(descriptor)) {
-			return;
-		}
-		alwaysOnActionSets.add(descriptor);
-		page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_SHOW);
-		removeAlwaysOff(descriptor);
 	}
 
 	private void removeAlwaysOff(IActionSetDescriptor descriptor) {
-		if (descriptor == null) {
-			return;
-		}
-		boolean removed = alwaysOffActionSets.remove(descriptor);
-		if (removed) {
+		if (alwaysOffActionSets.contains(descriptor)) {
+			alwaysOffActionSets.remove(descriptor);
 			page.perspectiveActionSetChanged(this, descriptor, ActionSetManager.CHANGE_UNMASK);
 		}
 	}
