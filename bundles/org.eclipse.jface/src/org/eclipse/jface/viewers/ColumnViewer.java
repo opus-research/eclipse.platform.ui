@@ -216,57 +216,7 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 */
 	private void setupEditingSupport(final int columnIndex, ViewerColumn viewer) {
 		if (getCellModifier() != null) {
-			viewer.setEditingSupport(new EditingSupport(this) {
-
-				@Override
-				public boolean canEdit(Object element) {
-					Object[] properties = getColumnProperties();
-
-					if (columnIndex < properties.length) {
-						return getCellModifier().canModify(element,
-								(String) getColumnProperties()[columnIndex]);
-					}
-
-					return false;
-				}
-
-				@Override
-				public CellEditor getCellEditor(Object element) {
-					CellEditor[] editors = getCellEditors();
-					if (columnIndex < editors.length) {
-						return getCellEditors()[columnIndex];
-					}
-					return null;
-				}
-
-				@Override
-				public Object getValue(Object element) {
-					Object[] properties = getColumnProperties();
-
-					if (columnIndex < properties.length) {
-						return getCellModifier().getValue(element,
-								(String) getColumnProperties()[columnIndex]);
-					}
-
-					return null;
-				}
-
-				@Override
-				public void setValue(Object element, Object value) {
-					Object[] properties = getColumnProperties();
-
-					if (columnIndex < properties.length) {
-						getCellModifier().modify(findItem(element),
-								(String) getColumnProperties()[columnIndex],
-								value);
-					}
-				}
-
-				@Override
-				boolean isLegacySupport() {
-					return true;
-				}
-			});
+			viewer.setEditingSupport(new DefaultColumnViewerEditingSupport(this, columnIndex));
 		}
 	}
 
@@ -546,20 +496,26 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * by this viewer the call simply has no effect.
 	 * 
 	 * <p>
-	 * Since 3.3, an alternative API is available, see {@link
-	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
-	 * of editing values in a column viewer.
+	 * Since 3.3, an alternative API is available, see
+	 * {@link ViewerColumn#setEditingSupport(EditingSupport)} for a more
+	 * flexible way of editing values in a column viewer.
 	 * </p>
 	 * <p>
-	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer} with more than 1 column <b>have</b>
-	 * to pass the SWT.FULL_SELECTION style bit
+	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer}
+	 * with more than 1 column <b>have</b> to pass the SWT.FULL_SELECTION style
+	 * bit
 	 * </p>
+	 * 
 	 * @param editors
-	 * 		the list of cell editors
+	 *            the list of cell editors
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
+	 * 
+	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
+	 *             for a more flexible way of editing values in a column viewer.
 	 */
+	@Deprecated
 	public void setCellEditors(CellEditor[] editors) {
 		this.cellEditors = editors;
 	}
@@ -569,20 +525,26 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * if editing is not supported by this viewer.
 	 * 
 	 * <p>
-	 * Since 3.3, an alternative API is available, see {@link
-	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
-	 * of editing values in a column viewer.
+	 * Since 3.3, an alternative API is available, see
+	 * {@link ViewerColumn#setEditingSupport(EditingSupport)} for a more
+	 * flexible way of editing values in a column viewer.
 	 * </p>
 	 * <p>
-	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer} with more than 1 column <b>have</b>
-	 * to pass the SWT.FULL_SELECTION style bit
+	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer}
+	 * with more than 1 column <b>have</b> to pass the SWT.FULL_SELECTION style
+	 * bit
 	 * </p>
+	 * 
 	 * @param modifier
-	 * 		the cell modifier
+	 *            the cell modifier
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
+	 * 
+	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
+	 *             for a more flexible way of editing values in a column viewer.
 	 */
+	@Deprecated
 	public void setCellModifier(ICellModifier modifier) {
 		this.cellModifier = modifier;
 	}
@@ -594,20 +556,26 @@ public abstract class ColumnViewer extends StructuredViewer {
 	 * call simply has no effect.
 	 * 
 	 * <p>
-	 * Since 3.3, an alternative API is available, see {@link
-	 * ViewerColumn#setEditingSupport(EditingSupport)} for a more flexible way
-	 * of editing values in a column viewer.
+	 * Since 3.3, an alternative API is available, see
+	 * {@link ViewerColumn#setEditingSupport(EditingSupport)} for a more
+	 * flexible way of editing values in a column viewer.
 	 * </p>
 	 * <p>
-	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer} with more than 1 column <b>have</b>
-	 * to pass the SWT.FULL_SELECTION style bit
+	 * Users setting up an editable {@link TreeViewer} or {@link TableViewer}
+	 * with more than 1 column <b>have</b> to pass the SWT.FULL_SELECTION style
+	 * bit
 	 * </p>
+	 * 
 	 * @param columnProperties
-	 * 		the list of column properties
+	 *            the list of column properties
 	 * @since 3.1 (in subclasses, added in 3.3 to abstract class)
 	 * @see ViewerColumn#setEditingSupport(EditingSupport)
 	 * @see EditingSupport
+	 * 
+	 * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)}
+	 *             for a more flexible way of editing values in a column viewer.
 	 */
+	@Deprecated
 	public void setColumnProperties(String[] columnProperties) {
 		this.columnProperties = columnProperties;
 	}
