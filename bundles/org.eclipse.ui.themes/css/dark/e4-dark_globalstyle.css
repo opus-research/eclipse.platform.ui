@@ -413,7 +413,7 @@ FlyoutControlComposite, FlyoutControlComposite ToolBar, FlyoutControlComposite C
  * which does not look very nice.
  */
 Label#org-eclipse-ui-splash-progressText {
-	background-color: #f7f7f7;
+	background-color: rgba(0, 0, 0, 0); /* transparent */
 	color: #9c9696; /* see property startupForegroundColor in the product */
 }
 
