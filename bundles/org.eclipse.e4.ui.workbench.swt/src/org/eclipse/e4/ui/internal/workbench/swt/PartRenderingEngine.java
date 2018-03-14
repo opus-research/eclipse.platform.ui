@@ -44,7 +44,6 @@ import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.ModelAssembler;
 import org.eclipse.e4.ui.internal.workbench.Policy;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
@@ -1077,15 +1076,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 						testShell = new Shell(display, SWT.SHELL_TRIM);
 						createGui((MUIElement) uiRoot, testShell, null);
 					}
-				}
-
-				// Starts the final model assembly phase (bug 376486)
-				String xmiUriArg = System
-						.getProperty(org.eclipse.e4.ui.workbench.IWorkbench.XMI_URI_ARG);
-				if ("org.eclipse.ui.workbench/LegacyIDE.e4xmi".equals(xmiUriArg)) { //$NON-NLS-1$
-					ModelAssembler contribProcessor = ContextInjectionFactory
-							.make(ModelAssembler.class, appContext);
-					contribProcessor.processModel(ModelAssembler.LEGACY_E3STEP);
 				}
 
 				// allow any early startup extensions to run
