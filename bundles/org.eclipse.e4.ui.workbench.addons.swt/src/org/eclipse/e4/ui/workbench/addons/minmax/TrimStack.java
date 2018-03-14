@@ -24,8 +24,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
 import org.eclipse.e4.ui.internal.workbench.swt.ShellActivationListener;
-import org.eclipse.e4.ui.model.application.MAddon;
-import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MGenericStack;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -35,7 +33,6 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.basic.MCompositePart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
@@ -87,8 +84,6 @@ public class TrimStack {
 
 	private static final String RESTORE_ICON_URI = "platform:/plugin/org.eclipse.e4.ui.workbench.addons.swt/icons/full/etool16/fastview_restore.gif"; //$NON-NLS-1$
 
-	public static final String USE_OVERLAYS_KEY = "UseOverlays"; //$NON-NLS-1$
-
 	static final String STATE_XSIZE = "XSize"; //$NON-NLS-1$
 
 	static final String STATE_YSIZE = "YSize"; //$NON-NLS-1$
@@ -104,10 +99,8 @@ public class TrimStack {
 	 */
 	private Menu trimStackMenu;
 
-	private boolean cachedUseOverlays = true;
 	private boolean isShowing = false;
 	private MUIElement minimizedElement;
-	private Composite clientAreaComposite;
 	private Composite hostPane;
 
 	@Inject
@@ -242,14 +235,6 @@ public class TrimStack {
 				return;
 			}
 
-			if (changedElement instanceof MCompositePart) {
-				MPart innerPart = getLeafPart(changedElement);
-				if (innerPart != null) {
-					fixToolItemSelection();
-					return;
-				}
-			}
-
 			if (changedElement == getLeafPart(minimizedElement)) {
 				fixToolItemSelection();
 				return;
@@ -258,25 +243,6 @@ public class TrimStack {
 			showStack(false);
 		}
 	};
-	
-	// Close any open stacks before shutting down
-	private EventHandler shutdownHandler = new EventHandler() {
-		public void handleEvent(org.osgi.service.event.Event event) {
-			showStack(false);
-		}
-	};
-
-	private MAddon minMaxAddon;
-
-	@Inject
-	private void setMinMaxElement(MApplication theApp) {
-		for (MAddon addon : theApp.getAddons()) {
-			String uri = addon.getContributionURI();
-			if (uri != null && uri.contains("MinMaxAddon")) { //$NON-NLS-1$
-				minMaxAddon = addon;
-			}
-		}
-	}
 
 	private void fixToolItemSelection() {
 		if (trimStackTB == null || trimStackTB.isDisposed())
@@ -288,7 +254,7 @@ public class TrimStack {
 				item.setSelection(false);
 			}
 		} else {
-			if (isEditorStack() || minimizedElement instanceof MPlaceholder) {
+			if (isEditorStack()) {
 				trimStackTB.getItem(1).setSelection(true);
 			} else if (isPerspectiveStack()) {
 				MPerspectiveStack pStack = (MPerspectiveStack) minimizedElement;
@@ -311,11 +277,7 @@ public class TrimStack {
 	}
 
 	private boolean isEditorStack() {
-		if (!(minimizedElement instanceof MPlaceholder))
-			return false;
-
-		MPlaceholder ph = (MPlaceholder) minimizedElement;
-		return ph.getRef() instanceof MArea;
+		return minimizedElement instanceof MPlaceholder;
 	}
 
 	private boolean isPerspectiveStack() {
@@ -498,7 +460,6 @@ public class TrimStack {
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_WIDGET, widgetHandler);
 		eventBroker.subscribe(UIEvents.UILifeCycle.BRINGTOTOP, openHandler);
 		eventBroker.subscribe(UIEvents.UILifeCycle.ACTIVATE, closeHandler);
-		eventBroker.subscribe(UIEvents.UILifeCycle.APP_SHUTDOWN_STARTED, shutdownHandler);
 	}
 
 	/**
@@ -531,19 +492,10 @@ public class TrimStack {
 		trimStackTB = new ToolBar(parent, orientation | SWT.FLAT | SWT.WRAP);
 		trimStackTB.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
-				showStack(false);
-
 				trimStackTB = null;
 				trimStackMenu = null;
 			}
 		});
-
-		// Get the shell's client area composite
-		Shell theShell = trimStackTB.getShell();
-		if (theShell.getLayout() instanceof TrimmedPartLayout) {
-			TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
-			clientAreaComposite = tpl.clientArea;
-		}
 
 		trimStackTB.addListener(SWT.MenuDetect, new Listener() {
 			public void handleEvent(Event event) {
@@ -570,8 +522,6 @@ public class TrimStack {
 				} else if (isEditorStack()) {
 					// An empty editor area
 					createEmtpyEditorAreaMenu();
-				} else {
-					createUseOverlaysMenu();
 				}
 			}
 		});
@@ -600,23 +550,6 @@ public class TrimStack {
 		restoreItem.addListener(SWT.Selection, new Listener() {
 			public void handleEvent(Event event) {
 				minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
-			}
-		});
-	}
-
-	/**
-	 * Creates a restore menu item that removes the minimized tag from the {@link #minimizedElement}
-	 */
-	private void createUseOverlaysMenu() {
-		MenuItem useOverlaysItem = new MenuItem(trimStackMenu, SWT.CHECK);
-		useOverlaysItem.setText(Messages.TrimStack_Use_Overlays);
-		useOverlaysItem.setSelection(useOverlays());
-		useOverlaysItem.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
-				if (minMaxAddon != null) {
-					minMaxAddon.getPersistedState().put(USE_OVERLAYS_KEY,
-							Boolean.toString(!useOverlays()));
-				}
 			}
 		});
 	}
@@ -726,10 +659,6 @@ public class TrimStack {
 		}
 	}
 
-	public MUIElement getMinimizedElement() {
-		return minimizedElement;
-	}
-
 	private MUIElement findElement() {
 		MUIElement result;
 		List<MPerspectiveStack> ps = modelService.findElements(window, null,
@@ -810,16 +739,6 @@ public class TrimStack {
 			ti.setToolTipText(Messages.TrimStack_SharedAreaTooltip);
 			ti.setImage(getLayoutImage());
 			ti.addSelectionListener(toolItemSelectionListener);
-		} else if (minimizedElement instanceof MPlaceholder) {
-			MPlaceholder ph = (MPlaceholder) minimizedElement;
-			if (ph.getRef() instanceof MPart) {
-				MPart part = (MPart) ph.getRef();
-				ToolItem ti = new ToolItem(trimStackTB, SWT.CHECK);
-				ti.setData(part);
-				ti.setImage(getImage(part));
-				ti.setToolTipText(getLabelText(part));
-				ti.addSelectionListener(toolItemSelectionListener);
-			}
 		} else if (minimizedElement instanceof MGenericStack<?>) {
 			// Handle *both* PartStacks and PerspectiveStacks here...
 			MGenericStack<?> theStack = (MGenericStack<?>) minimizedElement;
@@ -858,8 +777,6 @@ public class TrimStack {
 	}
 
 	void restoreStack() {
-		showStack(false);
-
 		minimizedElement.setVisible(true);
 		minimizedElement.getTags().remove(IPresentationEngine.MINIMIZED);
 		toolControl.setToBeRendered(false);
@@ -876,37 +793,23 @@ public class TrimStack {
 	 *            whether the stack should be visible
 	 */
 	public void showStack(boolean show) {
-		Control ctrl = (Control) minimizedElement.getWidget();
-		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
+		Control ctf = (Control) minimizedElement.getWidget();
+		Composite clientArea = getShellClientComposite();
+		if (clientArea == null)
 			return;
 
 		if (show && !isShowing) {
-			if (useOverlays()) {
-				hostPane = getHostPane();
-				ctrl.setParent(hostPane);
-				clientAreaComposite.addControlListener(caResizeListener);
+			hostPane = getHostPane();
+			ctf.setParent(hostPane);
 
-				// Set the initial location
-				setPaneLocation(hostPane);
+			clientArea.addControlListener(caResizeListener);
 
-				hostPane.addListener(SWT.Traverse, escapeListener);
+			// Set the initial location
+			setPaneLocation(hostPane);
 
-				hostPane.layout(true);
-				hostPane.moveAbove(null);
-				hostPane.setVisible(true);
-
-				// Cache the value to ensure that a stack is hidden using the same mode it was
-				// opened in
-				cachedUseOverlays = true;
-			} else {
-				minimizedElement.setVisible(true);
-				ctrl.addListener(SWT.Traverse, escapeListener);
-
-				// Cache the value to ensure that a stack is hidden using the same mode it was
-				// opened in
-				cachedUseOverlays = false;
-			}
-
+			hostPane.layout(true);
+			hostPane.moveAbove(null);
+			hostPane.setVisible(true);
 			isShowing = true;
 
 			// Activate the part that is being brought up...
@@ -921,7 +824,8 @@ public class TrimStack {
 						partService.activate((MPart) ph.getRef());
 					}
 				}
-			} else if (isEditorStack()) {
+			} else if (minimizedElement instanceof MPlaceholder
+					&& ((MPlaceholder) minimizedElement).getRef() instanceof MArea) {
 				MArea area = (MArea) ((MPlaceholder) minimizedElement).getRef();
 
 				// See if we can find an element to activate...
@@ -951,32 +855,17 @@ public class TrimStack {
 				if (partToActivate != null) {
 					partService.activate(partToActivate);
 				}
-			} else if (minimizedElement instanceof MPlaceholder) {
-				MPlaceholder ph = (MPlaceholder) minimizedElement;
-				if (ph.getRef() instanceof MPart) {
-					MPart part = (MPart) ph.getRef();
-					partService.activate(part);
-				}
 			}
 
 			fixToolItemSelection();
 		} else if (!show && isShowing) {
-			if (cachedUseOverlays) {
-				// Check to ensure that the client area is non-null since the
-				// trimstack may be currently hosted in the limbo shell
-				if (clientAreaComposite != null) {
-					clientAreaComposite.removeControlListener(caResizeListener);
-				}
+			// Check to ensure that the client area is non-null since the
+			// trimstack may be currently hosted in the limbo shell
+			if (clientArea != null)
+				clientArea.removeControlListener(caResizeListener);
 
-				hostPane.removeListener(SWT.Traverse, escapeListener);
-
-				if (hostPane != null && hostPane.isVisible()) {
-					hostPane.setVisible(false);
-				}
-			} else {
-				if (ctrl != null && !ctrl.isDisposed())
-					ctrl.removeListener(SWT.Traverse, escapeListener);
-				minimizedElement.setVisible(false);
+			if (hostPane != null && hostPane.isVisible()) {
+				hostPane.setVisible(false);
 			}
 
 			isShowing = false;
@@ -984,25 +873,24 @@ public class TrimStack {
 		}
 	}
 
-	/**
-	 * @return 'true' iff the minimized stack should overlay the current presentation, 'false' means
-	 *         to temporarily restore the stack into the current presentation.
-	 */
-	private boolean useOverlays() {
-		if (minMaxAddon == null)
-			return true;
+	Composite getShellClientComposite() {
+		if (trimStackTB == null || trimStackTB.isDisposed()) {
+			return null;
+		}
+		Shell theShell = trimStackTB.getShell();
+		if (!(theShell.getLayout() instanceof TrimmedPartLayout))
+			return null;
 
-		String useOverlays = minMaxAddon.getPersistedState().get(USE_OVERLAYS_KEY);
-		if (useOverlays == null)
-			useOverlays = "true"; //$NON-NLS-1$
-		return Boolean.parseBoolean(useOverlays);
+		TrimmedPartLayout tpl = (TrimmedPartLayout) theShell.getLayout();
+		return tpl.clientArea;
 	}
 
 	private void setPaneLocation(Composite someShell) {
-		if (clientAreaComposite == null || clientAreaComposite.isDisposed())
+		Composite clientComp = getShellClientComposite();
+		if (clientComp == null || clientComp.isDisposed())
 			return;
 
-		Rectangle caRect = clientAreaComposite.getBounds();
+		Rectangle caRect = getShellClientComposite().getBounds();
 
 		// NOTE: always starts in the persisted (or default) size
 		Point paneSize = getHostPane().getSize();
@@ -1058,6 +946,8 @@ public class TrimStack {
 		hostPane = new Composite(trimStackTB.getShell(), SWT.NONE);
 		hostPane.setData(ShellActivationListener.DIALOG_IGNORE_KEY, Boolean.TRUE);
 		setHostSize();
+
+		hostPane.addListener(SWT.Traverse, escapeListener);
 
 		// Set a special layout that allows resizing
 		fixedSides = getFixedSides();

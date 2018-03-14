@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,29 +93,13 @@ public class ToolBarManager extends ContributionManager implements
 	public ToolBarManager(ToolBar toolbar) {
 		this();
 		this.toolBar = toolbar;
-		if (toolBarExist()) {
-			this.itemStyle = toolBar.getStyle();
-		}
 	}
 
 	/**
-	 * Sets SWT button style for new tool bar controls created
-	 * in the {@code createControl(Composite)} method. It does not
-	 * affect already existing tool bar control.
-	 *
-	 * @param style
-	 *            the tool bar item style
-	 * @since 3.10
-	 */
-	public void setStyle(int style) {
-		itemStyle = style;
-	}
-
-	/**
-	 * Creates and returns this manager's tool bar control. Does not create
-	 * a new control if one already exists and is not disposed.
-	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
-	 *
+	 * Creates and returns this manager's tool bar control. Does not create a
+	 * new control if one already exists. Also create an {@link AccessibleListener}
+	 * for the {@link ToolBar}.
+	 * 
 	 * @param parent
 	 *            the parent control
 	 * @return the tool bar control
@@ -141,7 +125,6 @@ public class ToolBarManager extends ContributionManager implements
 	 */
 	private AccessibleListener getAccessibleListener() {
 		return new AccessibleAdapter() {
-			@Override
 			public void getName(AccessibleEvent e) {
 				if (e.childID != ACC.CHILDID_SELF) {
 					ToolItem item = toolBar.getItem(e.childID);
@@ -263,7 +246,7 @@ public class ToolBarManager extends ContributionManager implements
 
 				// clean contains all active items without double separators
 				IContributionItem[] items = getItems();
-				ArrayList<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
+				ArrayList clean = new ArrayList(items.length);
 				IContributionItem separator = null;
 				//			long cleanStartTime= 0;
 				//			if (DEBUG) {
@@ -296,7 +279,7 @@ public class ToolBarManager extends ContributionManager implements
 
 				// determine obsolete items (removed or non active)
 				ToolItem[] mi = toolBar.getItems();
-				ArrayList<ToolItem> toRemove = new ArrayList<ToolItem>(mi.length);
+				ArrayList toRemove = new ArrayList(mi.length);
 				for (int i = 0; i < mi.length; i++) {
 					// there may be null items in a toolbar
 					if (mi[i] == null)
@@ -326,7 +309,7 @@ public class ToolBarManager extends ContributionManager implements
 
                     // remove obsolete items
                     for (int i = toRemove.size(); --i >= 0;) {
-                        ToolItem item = toRemove.get(i);
+                        ToolItem item = (ToolItem) toRemove.get(i);
                         if (!item.isDisposed()) {
                             Control ctrl = item.getControl();
                             if (ctrl != null) {
@@ -342,8 +325,8 @@ public class ToolBarManager extends ContributionManager implements
                     mi = toolBar.getItems();
                     int srcIx = 0;
                     int destIx = 0;
-                    for (Iterator<IContributionItem> e = clean.iterator(); e.hasNext();) {
-                        src = e.next();
+                    for (Iterator e = clean.iterator(); e.hasNext();) {
+                        src = (IContributionItem) e.next();
 
                         // get corresponding item in SWT widget
                         if (srcIx < mi.length) {

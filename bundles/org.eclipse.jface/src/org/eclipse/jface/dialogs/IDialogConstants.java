@@ -408,8 +408,7 @@ public interface IDialogConstants {
      * @deprecated This constant is no longer in use.
      * The button heights are now determined by the layout.
      */
-    @Deprecated
-	public int BUTTON_HEIGHT = 14;
+    public int BUTTON_HEIGHT = 14;
 
     /**
      * Button width in dialog units (value 61).
@@ -422,8 +421,7 @@ public interface IDialogConstants {
      * @deprecated As of 3.9, this is deprecated as it is too big as DLU and got accidentally used
      *             when setting pixel values
      */
-    @Deprecated
-	public int INDENT = 21;
+    public int INDENT = 21;
 
     /**
      * Small indent in dialog units (value 7).
@@ -431,8 +429,7 @@ public interface IDialogConstants {
      * @deprecated As of 3.9, this is deprecated as it is not clear what the meaning of a
      *             "small indent" would be
      */
-    @Deprecated
-	public int SMALL_INDENT = 7;
+    public int SMALL_INDENT = 7;
 
     /**
      * Entry field width in dialog units (value 200).
