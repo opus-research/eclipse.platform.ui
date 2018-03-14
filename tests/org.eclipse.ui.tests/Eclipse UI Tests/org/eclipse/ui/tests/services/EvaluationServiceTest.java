@@ -130,7 +130,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testBasicService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		waitForJobs(500, 3000);
 		boolean activeShell = forceActive(window.getShell());
 
 		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
@@ -200,7 +199,6 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testTwoEvaluations() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		waitForJobs(500, 3000);
 		boolean activeShell = forceActive(window.getShell());
 
 		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
@@ -248,13 +246,13 @@ public class EvaluationServiceTest extends UITestCase {
 
 			assertEquals(2, listener1.count);
 			assertTrue(listener1.currentValue);
-			assertEquals(3, listener2.count);
-			assertTrue(listener2.currentValue);
+			assertEquals(1, listener2.count);
+			assertFalse(listener2.currentValue);
 
 			evalRef1.setResult(false);
 			contextService.deactivateContext(context1);
 			context1 = null;
-			assertEquals(4, listener2.count);
+			assertEquals(2, listener2.count);
 			assertFalse(listener2.currentValue);
 
 			// we already set this guy to false, so he should be the old

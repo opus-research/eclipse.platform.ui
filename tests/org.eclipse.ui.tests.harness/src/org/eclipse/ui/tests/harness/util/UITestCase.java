@@ -260,6 +260,11 @@ public abstract class UITestCase extends TestCase {
 		}
 	}
 
+	/**
+	 * Pauses execution of the current thread
+	 *
+	 * @param millis
+	 */
 	protected static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
@@ -269,7 +274,12 @@ public abstract class UITestCase extends TestCase {
 	}
 
 	/**
-	 * Tries to make given shell active
+	 * Tries to make given shell active.
+	 *
+	 * <p>
+	 * Note: the method runs at least 1000 milliseconds to make sure the active
+	 * window is really active, see
+	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=417258#c27
 	 *
 	 * @param shell
 	 *            non null
@@ -282,14 +292,17 @@ public abstract class UITestCase extends TestCase {
 			s.setMinimized(true);
 			processEvents();
 		}
+		waitForJobs(200, 3000);
 		for (Shell s : shells) {
 			s.setMinimized(false);
 			processEvents();
 		}
+		waitForJobs(200, 3000);
 		shell.setVisible(false);
 		processEvents();
 		shell.setMinimized(true);
 		processEvents();
+		waitForJobs(200, 3000);
 		shell.setVisible(true);
 		processEvents();
 		shell.setMinimized(false);
@@ -298,6 +311,7 @@ public abstract class UITestCase extends TestCase {
 		processEvents();
 		shell.forceFocus();
 		processEvents();
+		waitForJobs(400, 3000);
 		return display.getActiveShell() == shell;
 	}
 
