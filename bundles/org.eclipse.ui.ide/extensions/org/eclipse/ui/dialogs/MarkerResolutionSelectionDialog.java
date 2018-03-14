@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,10 @@
  * Contributors:
  *   IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog font should be activated and used by other components.
- *   Simon Scholz <simon.scholz@vogella.com> - Bug 448060
  *******************************************************************************/
 
 package org.eclipse.ui.dialogs;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -31,6 +29,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
+import org.eclipse.ui.internal.ide.dialogs.SimpleListContentProvider;
 
 /**
  * Dialog to allow the user to select from a list of marker
@@ -86,9 +85,6 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         setInitialSelections(new Object[] { markerResolutions[0] });
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -96,9 +92,6 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
                 IIDEHelpContextIds.MARKER_RESOLUTION_SELECTION_DIALOG);
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);
@@ -123,8 +116,10 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         });
 
         // Set the content provider
-		listViewer.setContentProvider(ArrayContentProvider.getInstance());
-		listViewer.setInput(resolutions); // it is ignored but must be non-null
+        SimpleListContentProvider cp = new SimpleListContentProvider();
+        cp.setElements(resolutions);
+        listViewer.setContentProvider(cp);
+        listViewer.setInput(new Object()); // it is ignored but must be non-null
 
         // Set the initial selection
         listViewer.setSelection(new StructuredSelection(
@@ -149,9 +144,6 @@ public class MarkerResolutionSelectionDialog extends SelectionDialog {
         return composite;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected void okPressed() {
         IStructuredSelection selection = (IStructuredSelection) listViewer
