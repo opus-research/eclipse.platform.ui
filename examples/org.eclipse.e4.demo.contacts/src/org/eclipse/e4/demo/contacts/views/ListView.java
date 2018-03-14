@@ -14,7 +14,7 @@
 package org.eclipse.e4.demo.contacts.views;
 
 import javax.inject.Inject;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.e4.demo.contacts.model.Contact;
 import org.eclipse.e4.demo.contacts.model.ContactsRepositoryFactory;
@@ -105,9 +105,12 @@ public class ListView {
 
 		contactsViewer.setContentProvider(contentProvider);
 
-		IObservableMap[] attributes = BeansObservables.observeMaps(
-				contentProvider.getKnownElements(), Contact.class,
-				new String[] { "firstName", "lastName" });
+		IObservableMap firstName = BeanProperties.value(Contact.class, "firstName")
+				.observeDetail(contentProvider.getKnownElements());
+		IObservableMap lastName = BeanProperties.value(Contact.class, "lastName")
+				.observeDetail(contentProvider.getKnownElements());
+		IObservableMap[] attributes = { firstName, lastName };
+
 		contactsViewer.setLabelProvider(new ObservableMapLabelProvider(
 				attributes));
 
