@@ -44,7 +44,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.BuildAction;
@@ -291,16 +290,10 @@ public class CleanDialog extends MessageDialog {
         data.heightHint = IDialogConstants.ENTRY_FIELD_WIDTH;
         projectNames.getTable().setLayoutData(data);
         projectNames.setCheckedElements(selection);
-        final Object[] checked = projectNames.getCheckedElements();
+        Object[] checked = projectNames.getCheckedElements();
         // reveal first checked project unless in "all projects" mode
         if (checked.length > 0 && !allButton.getSelection()) {
-            Display.getCurrent().asyncExec(new Runnable() {
-				public void run() {
-					if (!projectNames.getTable().isDisposed()) {
-						projectNames.reveal(checked[0]);
-					}
-				}
-			});
+            projectNames.reveal(checked[0]);
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
