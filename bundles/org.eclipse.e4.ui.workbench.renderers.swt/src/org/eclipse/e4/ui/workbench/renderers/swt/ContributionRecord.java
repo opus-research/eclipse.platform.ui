@@ -41,7 +41,7 @@ public class ContributionRecord {
 	public static final String FACTORY = "ContributionFactory"; //$NON-NLS-1$
 	static final String STATIC_CONTEXT = "ContributionFactoryContext"; //$NON-NLS-1$
 
-	MMenu menuModel;
+	private MMenu menuModel;
 	private MMenuContribution menuContribution;
 	private ArrayList<MMenuElement> generatedElements = new ArrayList<MMenuElement>();
 	private HashSet<MMenuElement> sharedElements = new HashSet<MMenuElement>();
@@ -363,5 +363,9 @@ public class ContributionRecord {
 			idx++;
 		}
 		return id.equals("additions") ? menuModel.getChildren().size() : -1; //$NON-NLS-1$
+	}
+
+	public MMenu getMenuModel() {
+		return menuModel;
 	}
 }

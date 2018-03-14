@@ -404,7 +404,7 @@ MenuManagerEventHelper.getInstance()
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
 		for (ContributionRecord record : vals
 				.toArray(new ContributionRecord[vals.size()])) {
-			if (record.menuModel == menuModel) {
+			if (record.getMenuModel() == menuModel) {
 				record.dispose();
 				for (MMenuElement copy : record.getGeneratedElements()) {
 					cleanUpCopy(record, copy);
