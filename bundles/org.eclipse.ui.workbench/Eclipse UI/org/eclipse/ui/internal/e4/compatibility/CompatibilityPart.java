@@ -26,7 +26,6 @@ import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.di.Focus;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.e4.ui.model.application.ui.MDirtyable;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -352,7 +351,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 		}
 
 		ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
-		if (saveable != null) {
+		if (saveable != null && SaveableHelper.isDirtyStateSupported(wrapped)) {
 			part.setDirty(saveable.isDirty());
 		}
 
@@ -374,9 +373,18 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_DIRTY:
+					boolean supportsDirtyState = SaveableHelper.isDirtyStateSupported(wrapped);
+					if (!supportsDirtyState) {
+						part.setDirty(false);
+						return;
+					}
 					ISaveablePart saveable = SaveableHelper.getSaveable(wrapped);
 					if (saveable != null) {
-						((MDirtyable) part).setDirty(saveable.isDirty());
+						part.setDirty(saveable.isDirty());
+					} else if (part.isDirty()) {
+						// reset if the wrapped legacy part do not exposes
+						// saveable adapter anymore, see bug 495567 comment 6
+						part.setDirty(false);
 					}
 					break;
 				case IWorkbenchPartConstants.PROP_INPUT:
@@ -385,6 +393,7 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 					break;
 				}
 			}
+
 		});
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2010 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 
 package org.eclipse.ui.actions;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -30,7 +31,6 @@ import org.eclipse.ui.internal.PerspectiveTracker;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.dialogs.NewWizard;
-import org.eclipse.ui.internal.util.Util;
 
 /**
  * Invoke the resource creation wizard selection Wizard.
@@ -179,7 +179,7 @@ public class NewWizardAction extends Action implements
                         .getActivePart();
                 if (part instanceof IEditorPart) {
                     IEditorInput input = ((IEditorPart) part).getEditorInput();
-                    Object resource = Util.getAdapter(input, resourceClass);
+					Object resource = Adapters.adapt(input, resourceClass);
                     if (resource != null) {
                         selectionToPass = new StructuredSelection(resource);
                     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2007 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 
 /**
@@ -142,11 +141,8 @@ public class FileDescription extends AbstractResourceDescription {
 		SubMonitor subMonitor = SubMonitor.convert(mon, 200);
 		subMonitor.setTaskName(UndoMessages.FileDescription_NewFileProgress);
 		try {
-			if (subMonitor.isCanceled()) {
-				throw new OperationCanceledException();
-			}
 			if (location != null) {
-				fileHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.newChild(200));
+				fileHandle.createLink(location, IResource.ALLOW_MISSING_LOCAL, subMonitor.split(200));
 			} else {
 				InputStream contents = new ByteArrayInputStream(
 						UndoMessages.FileDescription_ContentsCouldNotBeRestored
@@ -159,11 +155,8 @@ public class FileDescription extends AbstractResourceDescription {
 						&& fileContentDescription.exists()) {
 					contents = fileContentDescription.getContents();
 				}
-				fileHandle.create(contents, false, subMonitor.newChild(100));
-				fileHandle.setCharset(charset, subMonitor.newChild(100));
-			}
-			if (subMonitor.isCanceled()) {
-				throw new OperationCanceledException();
+				fileHandle.create(contents, false, subMonitor.split(100));
+				fileHandle.setCharset(charset, subMonitor.split(100));
 			}
 		} catch (CoreException e) {
 			if (e.getStatus().getCode() == IResourceStatus.PATH_OCCUPIED) {

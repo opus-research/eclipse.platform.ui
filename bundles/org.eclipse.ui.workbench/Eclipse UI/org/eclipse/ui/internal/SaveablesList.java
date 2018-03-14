@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -73,7 +74,7 @@ import org.eclipse.ui.model.WorkbenchPartLabelProvider;
  */
 public class SaveablesList implements ISaveablesLifecycleListener {
 
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<ISaveablesLifecycleListener> listeners = new ListenerList<>();
 
 	// event source (mostly ISaveablesSource) -> Set of Saveable
 	private Map<Object, Set<Saveable>> modelMap = new HashMap<>();
@@ -133,9 +134,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Integer refCount = referenceMap.get(key);
 		if (refCount == null) {
 			result = true;
-			refCount = new Integer(0);
+			refCount = Integer.valueOf(0);
 		}
-		referenceMap.put(key, new Integer(refCount.intValue() + 1));
+		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
 		return result;
 	}
 
@@ -155,7 +156,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			referenceMap.remove(key);
 			result = true;
 		} else {
-			referenceMap.put(key, new Integer(refCount.intValue() - 1));
+			referenceMap.put(key, Integer.valueOf(refCount.intValue() - 1));
 		}
 		return result;
 	}
@@ -304,10 +305,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param event
 	 */
 	private void fireModelLifecycleEvent(SaveablesLifecycleEvent event) {
-		Object[] listenerArray = listeners.getListeners();
-		for (int i = 0; i < listenerArray.length; i++) {
-			((ISaveablesLifecycleListener) listenerArray[i])
-					.handleLifecycleEvent(event);
+		for (ISaveablesLifecycleListener listener : listeners) {
+			listener.handleLifecycleEvent(event);
 		}
 	}
 
@@ -455,8 +454,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param modelsDecrementing
 	 */
 	private void fillModelsClosing(Set<Saveable> modelsClosing, Map<Saveable, Integer> modelsDecrementing) {
-		for (Saveable model : modelsDecrementing.keySet()) {
-			if (modelsDecrementing.get(model).equals(modelRefCounts.get(model))) {
+		for (Entry<Saveable, Integer> entry : modelsDecrementing.entrySet()) {
+			Saveable model = entry.getKey();
+			if (entry.getValue().equals(modelRefCounts.get(model))) {
 				modelsClosing.add(model);
 			}
 		}
@@ -530,7 +530,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 									model.getName());
 					dialog = new MessageDialog(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, buttons, 0) {
+							MessageDialog.QUESTION, 0, buttons) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
@@ -662,7 +662,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						subMonitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, subMonitor.newChild(1),
+					SaveableHelper.doSaveModel(model, subMonitor.split(1),
 							shellProvider, blockUntilSaved);
 					if (subMonitor.isCanceled())
 						break;

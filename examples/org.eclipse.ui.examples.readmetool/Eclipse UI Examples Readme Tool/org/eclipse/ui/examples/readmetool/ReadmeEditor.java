@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -99,14 +99,15 @@ public class ReadmeEditor extends TextEditor {
             page.update();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-	public Object getAdapter(Class key) {
+	public <T> T getAdapter(Class<T> key) {
         if (key.equals(IContentOutlinePage.class)) {
             IEditorInput input = getEditorInput();
             if (input instanceof IFileEditorInput) {
                 page = new ReadmeContentOutlinePage(((IFileEditorInput) input)
                         .getFile());
-                return page;
+                return (T) page;
             }
         }
         return super.getAdapter(key);
@@ -121,7 +122,7 @@ public class ReadmeEditor extends TextEditor {
         if (subMenu != null) {
             // Add readme actions with various attributes
             Object[][] att = new Object[][] { { IReadmeConstants.MARKER_ATT_ID,
-                    new Integer(1234) } };
+                    Integer.valueOf(1234) } };
             subMenu
                     .add(new AddReadmeMarkerAction(
                             this,
@@ -132,7 +133,7 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " id=1234")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] { { IReadmeConstants.MARKER_ATT_LEVEL,
-                    new Integer(7) } };
+                    Integer.valueOf(7) } };
             subMenu
                     .add(new AddReadmeMarkerAction(
                             this,
@@ -143,7 +144,7 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " level=7")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] {
-                    { IReadmeConstants.MARKER_ATT_LEVEL, new Integer(7) },
+                    { IReadmeConstants.MARKER_ATT_LEVEL, Integer.valueOf(7) },
                     { IReadmeConstants.MARKER_ATT_DEPT, "infra" } }; //$NON-NLS-1$
             subMenu
                     .add(new AddReadmeMarkerAction(
@@ -176,8 +177,8 @@ public class ReadmeEditor extends TextEditor {
                                     .getString("Readme_marker_message_example") + " language=english")); //$NON-NLS-1$ //$NON-NLS-2$
 
             att = new Object[][] {
-                    { IReadmeConstants.MARKER_ATT_ID, new Integer(1234) },
-                    { IReadmeConstants.MARKER_ATT_LEVEL, new Integer(7) },
+                    { IReadmeConstants.MARKER_ATT_ID, Integer.valueOf(1234) },
+                    { IReadmeConstants.MARKER_ATT_LEVEL, Integer.valueOf(7) },
                     { IReadmeConstants.MARKER_ATT_DEPT, "infra" }, //$NON-NLS-1$
                     { IReadmeConstants.MARKER_ATT_CODE, "red" }, //$NON-NLS-1$
                     { IReadmeConstants.MARKER_ATT_LANG, "english" } }; //$NON-NLS-1$

@@ -7,13 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 400714, 441267, 441184, 445723, 445724, 472654, 481608
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import com.ibm.icu.text.MessageFormat;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -85,8 +84,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.SynchronousBundleListener;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -1162,29 +1159,6 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 		return bundleContext.getBundles().length;
 	}
 
-	/* package */ OutputStream getSplashStream() {
-		// assumes the output stream is available as a service
-		// see EclipseStarter.publishSplashScreen
-		ServiceReference[] ref;
-		try {
-			ref = bundleContext.getServiceReferences(OutputStream.class.getName(), null);
-		} catch (InvalidSyntaxException e) {
-			return null;
-		}
-		if(ref==null) {
-			return null;
-		}
-		for (int i = 0; i < ref.length; i++) {
-			String name = (String) ref[i].getProperty("name"); //$NON-NLS-1$
-			if (name != null && name.equals("splashstream")) {  //$NON-NLS-1$
-				Object result = bundleContext.getService(ref[i]);
-				bundleContext.ungetService(ref[i]);
-				return (OutputStream) result;
-			}
-		}
-		return null;
-	}
-
 	/**
 	 * @return the bundle listener for this plug-in
 	 */
@@ -1271,7 +1245,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 			// we're on a 32 bit platform so invoke it with splash
 			// handle as an int
 			splashShell = (Shell) method.invoke(null, new Object[] { display,
-					new Integer(splashHandle) });
+					Integer.valueOf(splashHandle) });
 		} catch (NoSuchMethodException e) {
 			// look for the 64 bit internal_new shell method
 			try {
