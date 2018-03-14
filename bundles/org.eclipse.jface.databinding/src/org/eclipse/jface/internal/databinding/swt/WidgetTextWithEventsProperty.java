@@ -47,7 +47,6 @@ public class WidgetTextWithEventsProperty extends WidgetDelegatingValueProperty 
 					+ event + "] is not supported."); //$NON-NLS-1$
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof StyledText) {
 			if (styledText == null)
