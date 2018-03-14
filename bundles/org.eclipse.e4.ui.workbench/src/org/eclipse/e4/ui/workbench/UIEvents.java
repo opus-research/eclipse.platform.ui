@@ -279,6 +279,11 @@ public class UIEvents {
 		public static final String ACTIVATE = TOPIC + TOPIC_SEP + "activate"; //$NON-NLS-1$
 
 		/**
+		 * Sent just before an MPart is disposed
+		 */
+		public static final String DISPOSING = TOPIC + TOPIC_SEP + "disposing"; //$NON-NLS-1$
+
+		/**
 		 * Sent when a perspective is saved
 		 */
 		public static final String PERSPECTIVE_SAVED = TOPIC + TOPIC_SEP + "perpSaved"; //$NON-NLS-1$

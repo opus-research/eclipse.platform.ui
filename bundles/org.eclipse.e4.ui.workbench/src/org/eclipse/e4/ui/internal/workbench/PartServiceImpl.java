@@ -50,6 +50,7 @@ import org.eclipse.e4.ui.services.EContextService;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.UIEvents.UILifeCycle;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.IPartListener;
@@ -1259,6 +1260,7 @@ public class PartServiceImpl implements EPartService {
 			}
 
 			if (toBeRemoved != null) {
+				eventBroker.send(UILifeCycle.DISPOSING, part);
 				toBeRemoved.setToBeRendered(false);
 			} else {
 				part.setToBeRendered(false);
