@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 430873
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -30,34 +29,31 @@ public abstract class ViewerFilter {
     protected ViewerFilter() {
     }
 
-	/**
-	 * Filters the given elements for the given viewer. The input array is not
-	 * modified.
-	 * <p>
-	 * The default implementation of this method calls <code>select</code> on
-	 * each element in the array, and returns only those elements for which
-	 * <code>select</code> returns <code>true</code>.
-	 * </p>
-	 * 
-	 * @param viewer
-	 *            the viewer
-	 * @param parent
-	 *            the parent element
-	 * @param elements
-	 *            the elements to filter
-	 * @return the filtered elements
-	 */
-	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
-		int size = elements.length;
-		ArrayList<Object> out = new ArrayList<Object>(size);
-		for (int i = 0; i < size; ++i) {
-			Object element = elements[i];
-			if (select(viewer, parent, element)) {
+    /**
+     * Filters the given elements for the given viewer.
+     * The input array is not modified.
+     * <p>
+     * The default implementation of this method calls 
+     * <code>select</code> on each element in the array, 
+     * and returns only those elements for which <code>select</code>
+     * returns <code>true</code>.
+     * </p>
+     * @param viewer the viewer
+     * @param parent the parent element
+     * @param elements the elements to filter
+     * @return the filtered elements
+     */
+    public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+        int size = elements.length;
+        ArrayList out = new ArrayList(size);
+        for (int i = 0; i < size; ++i) {
+            Object element = elements[i];
+            if (select(viewer, parent, element)) {
 				out.add(element);
 			}
-		}
-		return out.toArray();
-	}
+        }
+        return out.toArray();
+    }
 
     /**
      * Filters the given elements for the given viewer.
