@@ -147,6 +147,11 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 		filterGroup = new FilterActionGroup(commonViewer);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
+	 */
 	@Override
 	public void fillActionBars(IActionBars actionBars) {
 
@@ -212,6 +217,11 @@ public class CommonNavigatorActionGroup extends ActionGroup {
 	}
 	
 	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
