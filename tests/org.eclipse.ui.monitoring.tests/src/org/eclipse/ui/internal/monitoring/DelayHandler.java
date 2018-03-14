@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.monitoring;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -24,7 +25,7 @@ public class DelayHandler extends AbstractHandler {
 	private static final Display display = Display.getDefault();
 
 	@Override
-	public Object execute(ExecutionEvent event) {
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 		String syncStr =
 				event.getParameter("org.eclipse.ui.monitoring.manualtesting.commands.delay.sync");
 		final boolean sync = syncStr != null && !syncStr.isEmpty() && Boolean.parseBoolean(syncStr);
