@@ -12,6 +12,7 @@
  *   Carsten Pfeiffer <carsten.pfeiffer@gebit.de> - Fix for bug 182354 - 
  *     [Dialogs] API - make ElementTreeSelectionDialog usable with a 
  *     FilteredTree
+ *   Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -124,7 +125,7 @@ public class ElementTreeSelectionDialog extends SelectionStatusDialog {
      * @param selection the initial selection.
      */
     public void setInitialSelection(Object selection) {
-        setInitialSelections(new Object[] { selection });
+		setInitialSelections(selection);
     }
 
     /**

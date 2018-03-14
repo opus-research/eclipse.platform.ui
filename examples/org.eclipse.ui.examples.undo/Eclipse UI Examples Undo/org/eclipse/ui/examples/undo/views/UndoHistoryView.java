@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 427961
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 448260
  *******************************************************************************/
 package org.eclipse.ui.examples.undo.views;
 
@@ -279,7 +280,7 @@ public class UndoHistoryView extends ViewPart implements
 		dialog.setTitle(UndoExampleMessages.UndoHistoryView_ContextFilterDialog);
 		dialog.setMessage(UndoExampleMessages.UndoHistoryView_ChooseContextMessage);
 		dialog.setElements(input.toArray());
-		dialog.setInitialSelections(new Object[] { fContext });
+		dialog.setInitialSelections(fContext);
 		if (dialog.open() == Window.OK) {
 			Object[] contexts = dialog.getResult();
 			if (contexts[0] instanceof IUndoContext) {
