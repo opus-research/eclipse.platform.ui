@@ -11,9 +11,7 @@
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
+import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
@@ -27,30 +25,26 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
-public class MSaveablePartTest {
+public class MSaveablePartTest extends TestCase {
 	protected IEclipseContext appContext;
 	protected E4Workbench wb;
 
-	@Before
-	public void setUp() throws Exception {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		appContext.set(E4Workbench.PRESENTATION_URI_ARG,
 				PartRenderingEngine.engineURI);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@Override
+	protected void tearDown() throws Exception {
 		if (wb != null) {
 			wb.close();
 		}
 		appContext.dispose();
 	}
 
-	@Test
 	public void testCreateView() {
 		final MWindow window = createWindowWithOneView("Part Name");
 
