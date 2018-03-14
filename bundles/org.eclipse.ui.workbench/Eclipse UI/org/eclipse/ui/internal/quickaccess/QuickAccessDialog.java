@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.internal.progress.ProgressManagerUtil;
@@ -86,14 +85,12 @@ public class QuickAccessDialog extends PopupDialog {
 
 					@Override
 					public void run() {
-						final CommandProvider commandProvider = new CommandProvider();
 						QuickAccessProvider[] providers = new QuickAccessProvider[] {
 								new PreviousPicksProvider(previousPicksList),
 								new EditorProvider(),
 								new ViewProvider(model.getContext().get(MApplication.class), model),
 								new PerspectiveProvider(),
-								commandProvider, new ActionProvider(),
-								new WizardProvider(),
+								new CommandProvider(), new ActionProvider(), new WizardProvider(),
 								new PreferenceProvider(), new PropertiesProvider() };
 						providerMap = new HashMap();
 						for (int i = 0; i < providers.length; i++) {
@@ -203,11 +200,6 @@ public class QuickAccessDialog extends PopupDialog {
 								if (selectedElement instanceof QuickAccessElement) {
 									addPreviousPick(text, selectedElement);
 									storeDialog(getDialogSettings());
-									IHandlerService hs = model.getContext().get(
-											IHandlerService.class);
-									if (commandProvider.getContextSnapshot() == null) {
-										commandProvider.setSnapshot(hs.createContextSnapshot(true));
-									}
 									QuickAccessElement element = (QuickAccessElement) selectedElement;
 									element.execute();
 								}
