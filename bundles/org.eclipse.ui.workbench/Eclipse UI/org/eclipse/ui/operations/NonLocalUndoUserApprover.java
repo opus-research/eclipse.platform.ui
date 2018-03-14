@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -173,7 +173,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 					// preferred
 					// comparison class has been provided.
 					if (affectedObjectsClass != null) {
-						Object adapter = Adapters.getAdapter(modifiedElement, affectedObjectsClass, true);
+						Object adapter = Adapters.adapt(modifiedElement, affectedObjectsClass);
 						if (adapter != null && elementsContains(adapter)) {
 							local = true;
 						}
@@ -199,8 +199,8 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 			@Override
 			public void run() {
 				MessageDialog dialog = new MessageDialog(part.getSite().getShell(), title,
-						null, message, MessageDialog.QUESTION, new String[] { IDialogConstants.OK_LABEL,
-		                        discardButton, IDialogConstants.CANCEL_LABEL }, 0); // yes is the default
+						null, message, MessageDialog.QUESTION, 0, IDialogConstants.OK_LABEL, discardButton,
+						IDialogConstants.CANCEL_LABEL); // yes is the default
 		        answer[0] = dialog.open();
 		}});
 		switch (answer[0]) {
@@ -236,7 +236,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 		// not originate
 		// in our context.
 		if (uiInfo != null) {
-			IUndoContext originatingContext = Adapters.getAdapter(uiInfo, IUndoContext.class, true);
+			IUndoContext originatingContext = Adapters.adapt(uiInfo, IUndoContext.class);
 			if (originatingContext != null
 					&& !(originatingContext.matches(context))) {
 				return false;
@@ -264,7 +264,7 @@ public final class NonLocalUndoUserApprover implements IOperationApprover {
 				elementsAndAdapters.add(element);
 				if (affectedObjectsClass != null
 						&& !affectedObjectsClass.isInstance(element)) {
-					Object adapter = Adapters.getAdapter(element, affectedObjectsClass, true);
+					Object adapter = Adapters.adapt(element, affectedObjectsClass);
 					if (adapter != null) {
 						elementsAndAdapters.add(adapter);
 					}

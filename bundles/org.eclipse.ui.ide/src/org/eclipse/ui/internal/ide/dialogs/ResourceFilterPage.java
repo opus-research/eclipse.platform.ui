@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2010 Freescale Semiconductor and others.
+ * Copyright (c) 2008, 2015 Freescale Semiconductor and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public class ResourceFilterPage extends PropertyPage {
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(),
 				IIDEHelpContextIds.RESOURCE_FILTER_PROPERTY_PAGE);
 
-		IResource resource = Adapters.getAdapter(getElement(), IResource.class, true);
+		IResource resource = Adapters.adapt(getElement(), IResource.class);
 		IContainer container = resource instanceof IContainer ? (IContainer) resource
 				: null;
 		groupWidget.setContainer(container);

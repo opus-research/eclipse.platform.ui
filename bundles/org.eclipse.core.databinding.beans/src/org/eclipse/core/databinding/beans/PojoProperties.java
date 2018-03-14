@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2009 Matthew Hall and others.
+ * Copyright (c) 2008, 2015 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -171,7 +171,7 @@ public class PojoProperties {
 	 * @return a value property array for the given property names of the given
 	 *         bean class.
 	 */
-	public static IBeanValueProperty[] values(String[] propertyNames) {
+	public static IBeanValueProperty[] values(String... propertyNames) {
 		return values(null, propertyNames);
 	}
 

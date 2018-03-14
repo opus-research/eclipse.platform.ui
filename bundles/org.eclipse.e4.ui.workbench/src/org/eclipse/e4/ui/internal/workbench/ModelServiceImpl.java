@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
+import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
@@ -169,6 +170,8 @@ public class ModelServiceImpl implements EModelService {
 					children.addAll(app.getBindingContexts());
 				} else if (clazz.equals(MBindingTable.class) || clazz.equals(MKeyBinding.class)) {
 					children.addAll(app.getBindingTables());
+				} else if (clazz.equals(MAddon.class)) {
+					children.addAll(app.getAddons());
 				}
 				// } else { only look for these if specifically asked.
 				// children.addAll(app.getHandlers());
@@ -432,6 +435,15 @@ public class ModelServiceImpl implements EModelService {
 				count++;
 			}
 		}
+
+		if (element instanceof MPerspective) {
+			MPerspective perspective = (MPerspective) element;
+			for (MWindow window : perspective.getWindows()) {
+				if (window.isToBeRendered()) {
+					count++;
+				}
+			}
+		}
 		return count;
 	}
 
@@ -494,17 +506,49 @@ public class ModelServiceImpl implements EModelService {
 
 		MUIElement appElement = refWin == null ? null : refWin.getParent();
 		if (appElement instanceof MApplication) {
-			// use appContext as MApplication.getContext() is null during the processing of
-			// the model processor classes
-			EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
-			// Re-resolve any placeholder references
-			List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
-			for (MPlaceholder ph : phList) {
-				resolver.resolvePlaceholderRef(ph, refWin);
-			}
+			getNullRefPlaceHolders(element, refWin, true);
 		}
 
 		return element;
+	}
+
+	private List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin, boolean resolveAlways) {
+		// use appContext as MApplication.getContext() is null during the processing of
+		// the model processor classes
+		EPlaceholderResolver resolver = appContext.get(EPlaceholderResolver.class);
+		// Re-resolve any placeholder references
+		List<MPlaceholder> phList = findElements(element, null, MPlaceholder.class, null);
+		List<MPlaceholder> nullRefList = new ArrayList<>();
+		for (MPlaceholder ph : phList) {
+			if (resolveAlways) {
+				resolver.resolvePlaceholderRef(ph, refWin);
+			} else if ((!resolveAlways) && (ph.getRef() == null)) {
+				resolver.resolvePlaceholderRef(ph, refWin);
+				MUIElement partElement = ph.getRef();
+				if (partElement instanceof MPart) {
+					MPart part = (MPart) partElement;
+					if (part.getIconURI() == null) {
+						MPartDescriptor desc = getPartDescriptor(part.getElementId());
+						if (desc != null) {
+							part.setIconURI(desc.getIconURI());
+						}
+					}
+				}
+			}
+			if (ph.getRef() == null) {
+				nullRefList.add(ph);
+			}
+		}
+		return nullRefList;
+	}
+
+	/**
+	 * @param element
+	 * @param refWin
+	 * @return list of null referencing place holders
+	 */
+	public List<MPlaceholder> getNullRefPlaceHolders(MUIElement element, MWindow refWin) {
+		return getNullRefPlaceHolders(element, refWin, false);
 	}
 
 	@Override
@@ -650,6 +694,13 @@ public class ModelServiceImpl implements EModelService {
 	private void combine(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			MPartSashContainer newSash, boolean newFirst, float ratio) {
 		MElementContainer<MUIElement> curParent = relTo.getParent();
+		if (curParent == null) {
+			// if relTo is a shared element, use its current placeholder
+			MWindow win = getTopLevelWindowFor(relTo);
+			relTo = findPlaceholderFor(win, relTo);
+			curParent = relTo.getParent();
+		}
+		Assert.isLegal(relTo != null && curParent != null);
 		int index = curParent.getChildren().indexOf(relTo);
 		curParent.getChildren().remove(relTo);
 		if (newFirst) {
@@ -910,7 +961,8 @@ public class ModelServiceImpl implements EModelService {
 	public MPerspective getActivePerspective(MWindow window) {
 		List<MPerspectiveStack> pStacks = findElements(window, null, MPerspectiveStack.class, null);
 		if (pStacks.size() == 1) {
-			return pStacks.get(0).getSelectedElement();
+			MPerspective perspective = pStacks.get(0).getSelectedElement();
+			return perspective;
 		}
 
 		return null;
@@ -994,6 +1046,32 @@ public class ModelServiceImpl implements EModelService {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public MPart createPart(MPartDescriptor descriptor) {
+		if (descriptor == null) {
+			return null;
+		}
+		MPart part = createModelElement(MPart.class);
+		part.setElementId(descriptor.getElementId());
+		part.getMenus().addAll(EcoreUtil.copyAll(descriptor.getMenus()));
+		if (descriptor.getToolbar() != null) {
+			part.setToolbar((MToolBar) EcoreUtil.copy((EObject) descriptor.getToolbar()));
+		}
+		part.setContributorURI(descriptor.getContributorURI());
+		part.setCloseable(descriptor.isCloseable());
+		part.setContributionURI(descriptor.getContributionURI());
+		part.setLabel(descriptor.getLabel());
+		part.setIconURI(descriptor.getIconURI());
+		part.setTooltip(descriptor.getTooltip());
+		part.getHandlers().addAll(EcoreUtil.copyAll(descriptor.getHandlers()));
+		part.getTags().addAll(descriptor.getTags());
+		part.getVariables().addAll(descriptor.getVariables());
+		part.getProperties().putAll(descriptor.getProperties());
+		part.getPersistedState().putAll(descriptor.getPersistedState());
+		part.getBindingContexts().addAll(descriptor.getBindingContexts());
+		return part;
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,11 @@
  *     Brad Reynolds - bugs 116920, 147515
  *     Matthew Hall - bug 274081
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 488145
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.value;
+
+import java.util.function.Supplier;
 
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
@@ -39,9 +42,9 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * <pre>
  * final IObservableList addends = WritableValue.withValueType(Integer.TYPE);
- * addends.add(new Integer(0));
- * addends.add(new Integer(1));
- * addends.add(new Integer(2));
+ * addends.add(Integer.valueOf(0));
+ * addends.add(Integer.valueOf(1));
+ * addends.add(Integer.valueOf(2));
  *
  * IObservableValue sum = new ComputedValue() {
  * 	protected Object calculate() {
@@ -56,7 +59,7 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
  *
  * System.out.println(sum.getValue()); // =&gt; 3
  *
- * addends.add(new Integer(10));
+ * addends.add(Integer.valueOf(10));
  * System.out.println(sum.getValue()); // =&gt; 13
  * </pre>
  *
@@ -78,6 +81,34 @@ public abstract class ComputedValue<T> extends AbstractObservableValue<T> {
 	 * value of <code>null</code> if we are not currently listening.
 	 */
 	private IObservable[] dependencies = null;
+
+	/**
+	 * Factory method to create {@link ComputedValue} objects in an easy manner.
+	 * <br/>
+	 * <br/>
+	 * Example observing the size of an {@link IObservableList}:
+	 *
+	 * <pre>
+	 * IObservableValue&lt;Integer&gt; listSizeObservable = ComputedValue.create(() -> observableList.size());
+	 * </pre>
+	 *
+	 * @param supplier
+	 *            {@link Supplier}, whose {@link Supplier#get()} method is a
+	 *            TrackedGetter. See
+	 *            {@link ObservableTracker#getterCalled(IObservable)} for
+	 *            details.
+	 * @return {@link ComputedValue} whose value is computed using the given
+	 *         {@link Supplier}.
+	 * @since 1.6
+	 */
+	public static <T> IObservableValue<T> create(Supplier<T> supplier) {
+		return new ComputedValue<T>() {
+			@Override
+			protected T calculate() {
+				return supplier.get();
+			}
+		};
+	}
 
 	/**
 	 *
