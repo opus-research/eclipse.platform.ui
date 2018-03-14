@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 483465
  *******************************************************************************/
 package org.eclipse.jface.resource;
 
@@ -103,17 +102,24 @@ class URLImageDescriptor extends ImageDescriptor {
 
 	private static ImageData getImageData(URL url) {
 		ImageData result = null;
-		try (InputStream in = getStream(url)) {
-			if (in != null) {
+		InputStream in = getStream(url);
+		if (in != null) {
+			try {
 				result = new ImageData(in);
+			} catch (SWTException e) {
+				if (e.code != SWT.ERROR_INVALID_IMAGE) {
+					throw e;
+					// fall through otherwise
+				}
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					Policy.getLog().log(
+							new Status(IStatus.ERROR, Policy.JFACE, e
+									.getLocalizedMessage(), e));
+				}
 			}
-		} catch (SWTException e) {
-			if (e.code != SWT.ERROR_INVALID_IMAGE) {
-				throw e;
-				// fall through otherwise
-			}
-		} catch (IOException e) {
-			Policy.getLog().log(new Status(IStatus.ERROR, Policy.JFACE, e.getLocalizedMessage(), e));
 		}
 		return result;
 	}
@@ -138,13 +144,6 @@ class URLImageDescriptor extends ImageDescriptor {
 			}
 			return new BufferedInputStream(url.openStream());
 		} catch (IOException e) {
-			if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
-				String path = url.getPath();
-				if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
-					String message = "High-resolution image missing: " + url; //$NON-NLS-1$
-					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
-				}
-			}
 			return null;
 		}
 	}
@@ -173,9 +172,6 @@ class URLImageDescriptor extends ImageDescriptor {
 		if (dot != -1 && (zoom == 150 || zoom == 200)) {
 			String lead = path.substring(0, dot);
 			String tail = path.substring(dot);
-			if (InternalPolicy.DEBUG_LOAD_URL_IMAGE_DESCRIPTOR_2x_PNG_FOR_GIF && ".gif".equalsIgnoreCase(tail)) { //$NON-NLS-1$
-				tail = ".png"; //$NON-NLS-1$
-			}
 			String x = zoom == 150 ? "@1.5x" : "@2x"; //$NON-NLS-1$ //$NON-NLS-2$
 			try {
 				String file = lead + x + tail;
@@ -218,12 +214,6 @@ class URLImageDescriptor extends ImageDescriptor {
 		} catch (IOException e) {
 			if (logIOException) {
 				Policy.logException(e);
-			} else if (InternalPolicy.DEBUG_LOG_URL_IMAGE_DESCRIPTOR_MISSING_2x) {
-				String path = url.getPath();
-				if (path.endsWith("@2x.png") || path.endsWith("@1.5x.png")) { //$NON-NLS-1$ //$NON-NLS-2$
-					String message = "High-resolution image missing: " + url; //$NON-NLS-1$
-					Policy.getLog().log(new Status(IStatus.WARNING, Policy.JFACE, message, e));
-				}
 			}
 			return null;
 		}

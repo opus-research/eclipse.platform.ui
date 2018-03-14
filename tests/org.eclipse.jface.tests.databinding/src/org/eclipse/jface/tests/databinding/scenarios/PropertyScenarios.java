@@ -135,7 +135,7 @@ public class PropertyScenarios extends ScenariosTestCase {
         getDbc().bindValue(SWTObservables.observeText(text, SWT.Modify),
                 BeansObservables.observeValue(cart, "lodgingDays"));
 
-        assertEquals(Integer.valueOf(cart.getLodgingDays()).toString(), text.getText());
+        assertEquals(new Integer(cart.getLodgingDays()).toString(), text.getText());
     }
 
     public void testScenario04() {
@@ -494,7 +494,7 @@ new UpdateValueStrategy().setConverter(toDouble).setAfterGetValidator(validator)
         // and vice versa.
         Converter negatingConverter = new Converter(boolean.class, boolean.class) {
             private Boolean negated(Boolean booleanObject) {
-                return Boolean.valueOf(!booleanObject.booleanValue());
+                return new Boolean(!booleanObject.booleanValue());
             }
 
             @Override

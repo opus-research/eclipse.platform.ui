@@ -28,7 +28,11 @@ public class DynamicTestsTreeNode extends TreeNode implements
 		super(object);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
 	public String getContributorId() {
 		return getDynamicTestsElement().getContributorId();
 	}

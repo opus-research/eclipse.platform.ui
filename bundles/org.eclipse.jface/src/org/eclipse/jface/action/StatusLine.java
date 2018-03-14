@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 
 package org.eclipse.jface.action;
@@ -27,6 +25,8 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -115,7 +115,7 @@ import org.eclipse.swt.widgets.ToolItem;
 
 	/** stop image descriptor */
 	protected static ImageDescriptor fgStopImage = ImageDescriptor
-			.createFromFile(StatusLine.class, "images/stop.png");//$NON-NLS-1$
+			.createFromFile(StatusLine.class, "images/stop.gif");//$NON-NLS-1$
 
 	private MenuItem copyMenuItem;
 	static {
@@ -276,7 +276,12 @@ import org.eclipse.swt.widgets.ToolItem;
 			}
 		});
 
-		addDisposeListener(e -> handleDispose());
+		addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				handleDispose();
+			}
+		});
 
 		// StatusLineManager skips over the standard status line widgets
 		// in its update method. There is thus a dependency
@@ -321,10 +326,13 @@ import org.eclipse.swt.widgets.ToolItem;
 				setCanceled(true);
 			}
 		});
-		fCancelButton.addDisposeListener(e -> {
-			Image i = fCancelButton.getImage();
-			if ((i != null) && (!i.isDisposed())) {
-				i.dispose();
+		fCancelButton.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				Image i = fCancelButton.getImage();
+				if ((i != null) && (!i.isDisposed())) {
+					i.dispose();
+				}
 			}
 		});
 
@@ -364,7 +372,12 @@ import org.eclipse.swt.widgets.ToolItem;
 		final boolean animated = (totalWork == UNKNOWN || totalWork == 0);
 		// make sure the progress bar is made visible while
 		// the task is running. Fixes bug 32198 for the non-animated case.
-		Runnable timer = () -> StatusLine.this.startTask(timestamp, animated);
+		Runnable timer = new Runnable() {
+			@Override
+			public void run() {
+				StatusLine.this.startTask(timestamp, animated);
+			}
+		};
 		if (fProgressBar == null) {
 			return;
 		}
@@ -651,7 +664,8 @@ import org.eclipse.swt.widgets.ToolItem;
 		if (fTaskName == null || fTaskName.length() == 0) {
 			text = newName;
 		} else {
-			text = JFaceResources.format("Set_SubTask", fTaskName, newName);//$NON-NLS-1$
+			text = JFaceResources.format(
+					"Set_SubTask", new Object[] { fTaskName, newName });//$NON-NLS-1$
 		}
 		setMessage(text);
 	}

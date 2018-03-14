@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2016 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
 import org.eclipse.core.runtime.IStatus;
@@ -94,13 +93,13 @@ public class ProgressManager extends ProgressProvider implements
 
 	private static ProgressManager singleton;
 
-	final private Map<Job, JobInfo> jobs = Collections.synchronizedMap(new HashMap<>());
+	final private Map jobs = Collections.synchronizedMap(new HashMap());
 
 	final private Map familyListeners = Collections
 			.synchronizedMap(new HashMap());
 
 	//	list of IJobProgressManagerListener
-	private ListenerList<IJobProgressManagerListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	final IJobChangeListener changeListener;
 
@@ -202,6 +201,12 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#beginTask(java.lang.String,
+		 *      int)
+		 */
 		@Override
 		public void beginTask(String taskName, int totalWork) {
 			JobInfo info = getJobInfo(job);
@@ -213,6 +218,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#done()
+		 */
 		@Override
 		public void done() {
 			JobInfo info = getJobInfo(job);
@@ -224,6 +234,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#internalWorked(double)
+		 */
 		@Override
 		public void internalWorked(double work) {
 			JobInfo info = getJobInfo(job);
@@ -236,6 +251,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#isCanceled()
+		 */
 		@Override
 		public boolean isCanceled() {
 			// Use the internal get so we don't create a Job Info for
@@ -246,6 +266,11 @@ public class ProgressManager extends ProgressProvider implements
 			return info.isCanceled();
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#setCanceled(boolean)
+		 */
 		@Override
 		public void setCanceled(boolean value) {
 			JobInfo info = getJobInfo(job);
@@ -259,6 +284,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#setTaskName(java.lang.String)
+		 */
 		@Override
 		public void setTaskName(String taskName) {
 			JobInfo info = getJobInfo(job);
@@ -276,6 +306,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#subTask(java.lang.String)
+		 */
 		@Override
 		public void subTask(String name) {
 			if (name == null) {
@@ -290,11 +325,21 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitor#worked(int)
+		 */
 		@Override
 		public void worked(int work) {
 			internalWorked(work);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#clearBlocked()
+		 */
 		@Override
 		public void clearBlocked() {
 			JobInfo info = getJobInfo(job);
@@ -305,6 +350,11 @@ public class ProgressManager extends ProgressProvider implements
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.core.runtime.IProgressMonitorWithBlocking#setBlocked(org.eclipse.core.runtime.IStatus)
+		 */
 		@Override
 		public void setBlocked(IStatus reason) {
 			JobInfo info = getJobInfo(job);
@@ -314,7 +364,6 @@ public class ProgressManager extends ProgressProvider implements
 				listener.setBlocked(reason);
 			}
 		}
-
 	}
 
 	/**
@@ -374,6 +423,11 @@ public class ProgressManager extends ProgressProvider implements
 	private IJobChangeListener createChangeListener() {
 		return new JobChangeAdapter() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#aboutToRun(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void aboutToRun(IJobChangeEvent event) {
 				JobInfo info = getJobInfo(event.getJob());
@@ -387,6 +441,11 @@ public class ProgressManager extends ProgressProvider implements
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#done(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void done(IJobChangeEvent event) {
 				if (!PlatformUI.isWorkbenchRunning()) {
@@ -438,6 +497,11 @@ public class ProgressManager extends ProgressProvider implements
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#scheduled(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void scheduled(IJobChangeEvent event) {
 				updateFor(event);
@@ -447,6 +511,11 @@ public class ProgressManager extends ProgressProvider implements
 						final IJobChangeEvent finalEvent = event;
 						WorkbenchJob showJob = new WorkbenchJob(
 								ProgressMessages.ProgressManager_showInDialogName) {
+							/*
+							 * (non-Javadoc)
+							 *
+							 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+							 */
 							@Override
 							public IStatus runInUIThread(
 									IProgressMonitor monitor) {
@@ -477,11 +546,21 @@ public class ProgressManager extends ProgressProvider implements
 				}
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#awake(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void awake(IJobChangeEvent event) {
 				updateFor(event);
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.JobChangeAdapter#sleeping(org.eclipse.core.runtime.jobs.IJobChangeEvent)
+			 */
 			@Override
 			public void sleeping(IJobChangeEvent event) {
 
@@ -506,7 +585,9 @@ public class ProgressManager extends ProgressProvider implements
 			sleepGroup(group,info);
 		}
 
-		for (IJobProgressManagerListener listener : listeners) {
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
 			// Is this one the user never sees?
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
@@ -523,8 +604,10 @@ public class ProgressManager extends ProgressProvider implements
 	 * @param group
 	 */
 	private void sleepGroup(GroupInfo group, JobInfo info) {
-		for (IJobProgressManagerListener listener : listeners) {
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
 
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
 			if (isNeverDisplaying(info.getJob(), listener.showsDebug()))
 				continue;
 
@@ -549,11 +632,21 @@ public class ProgressManager extends ProgressProvider implements
 				ImageDescriptor.createFromURL(new URL(iconsRoot, fileName)));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.ProgressProvider#createMonitor(org.eclipse.core.runtime.jobs.Job)
+	 */
 	@Override
 	public IProgressMonitor createMonitor(Job job) {
 		return progressFor(job);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.ProgressProvider#getDefaultMonitor()
+	 */
 	@Override
 	public IProgressMonitor getDefaultMonitor() {
 		// only need a default monitor for operations the UI thread
@@ -633,7 +726,7 @@ public class ProgressManager extends ProgressProvider implements
 	 * @return JobInfo
 	 */
 	JobInfo internalGetJobInfo(Job job) {
-		return jobs.get(job);
+		return (JobInfo) jobs.get(job);
 	}
 
 	/**
@@ -663,8 +756,9 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public void refreshGroup(GroupInfo info) {
 
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.refreshGroup(info);
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			((IJobProgressManagerListener)listenersArray[i]).refreshGroup(info);
 		}
 	}
 
@@ -675,8 +769,9 @@ public class ProgressManager extends ProgressProvider implements
 	public void refreshAll() {
 
 		pruneStaleJobs();
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.refreshAll();
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			((IJobProgressManagerListener)listenersArray[i]).refreshAll();
 		}
 
 	}
@@ -688,11 +783,14 @@ public class ProgressManager extends ProgressProvider implements
 	 *            JobInfo
 	 */
 	public void removeJobInfo(JobInfo info) {
+
 		Job job = info.getJob();
 		jobs.remove(job);
 		runnableMonitors.remove(job);
 
-		for (IJobProgressManagerListener listener : listeners) {
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.removeJob(info);
 			}
@@ -706,8 +804,10 @@ public class ProgressManager extends ProgressProvider implements
 	 *            GroupInfo
 	 */
 	public void removeGroup(GroupInfo group) {
-		for (IJobProgressManagerListener listener : listeners) {
-			listener.removeGroup(group);
+
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			((IJobProgressManagerListener)listenersArray[i]).removeGroup(group);
 		}
 	}
 
@@ -723,7 +823,9 @@ public class ProgressManager extends ProgressProvider implements
 		}
 
 		jobs.put(info.getJob(), info);
-		for (IJobProgressManagerListener listener : listeners) {
+		Object[] listenersArray = listeners.getListeners();
+		for (int i = 0; i < listenersArray.length; i++) {
+			IJobProgressManagerListener listener = (IJobProgressManagerListener) listenersArray[i];
 			if (!isCurrentDisplaying(info.getJob(), listener.showsDebug())) {
 				listener.addJob(info);
 			}
@@ -780,10 +882,12 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public JobInfo[] getJobInfos(boolean debug) {
 		synchronized (jobs) {
-			Collection<JobInfo> result = new ArrayList<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					result.add(entry.getValue());
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new ArrayList();
+			while (iterator.hasNext()) {
+				Job next = (Job) iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					result.add(jobs.get(next));
 				}
 			}
 			JobInfo[] infos = new JobInfo[result.size()];
@@ -800,10 +904,12 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public JobTreeElement[] getRootElements(boolean debug) {
 		synchronized (jobs) {
-			Collection<JobTreeElement> result = new HashSet<>();
-			for (Entry<Job, JobInfo> entry : jobs.entrySet()) {
-				if (!isCurrentDisplaying(entry.getKey(), debug)) {
-					JobInfo jobInfo = entry.getValue();
+			Iterator iterator = jobs.keySet().iterator();
+			Collection result = new HashSet();
+			while (iterator.hasNext()) {
+				Job next = (Job) iterator.next();
+				if (!isCurrentDisplaying(next, debug)) {
+					JobInfo jobInfo = (JobInfo) jobs.get(next);
 					GroupInfo group = jobInfo.getGroupInfo();
 					if (group == null) {
 						result.add(jobInfo);
@@ -825,7 +931,11 @@ public class ProgressManager extends ProgressProvider implements
 	 */
 	public boolean hasJobInfos() {
 		synchronized (jobs) {
-			return !jobs.isEmpty();
+			Iterator iterator = jobs.keySet().iterator();
+			while (iterator.hasNext()) {
+				return true;
+			}
+			return false;
 		}
 	}
 
@@ -864,6 +974,11 @@ public class ProgressManager extends ProgressProvider implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#busyCursorWhile(org.eclipse.jface.operation.IRunnableWithProgress)
+	 */
 	@Override
 	public void busyCursorWhile(final IRunnableWithProgress runnable)
 			throws InvocationTargetException, InterruptedException {
@@ -928,6 +1043,11 @@ public class ProgressManager extends ProgressProvider implements
 
 		final WorkbenchJob updateJob = new WorkbenchJob(
 				ProgressMessages.ProgressManager_openJobName) {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				setUserInterfaceActive(true);
@@ -951,11 +1071,22 @@ public class ProgressManager extends ProgressProvider implements
 		Job.getJobManager().removeJobChangeListener(this.changeListener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.ProgressProvider#createProgressGroup()
+	 */
 	@Override
 	public IProgressMonitor createProgressGroup() {
 		return new GroupInfo();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.jobs.ProgressProvider#createMonitor(org.eclipse.core.runtime.jobs.Job,
+	 *      org.eclipse.core.runtime.IProgressMonitor, int)
+	 */
 	@Override
 	public IProgressMonitor createMonitor(Job job, IProgressMonitor group,
 			int ticks) {
@@ -1039,6 +1170,12 @@ public class ProgressManager extends ProgressProvider implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#showInDialog(org.eclipse.swt.widgets.Shell,
+	 *      org.eclipse.core.runtime.jobs.Job)
+	 */
 	@Override
 	public void showInDialog(Shell shell, Job job) {
 		if (shouldRunInBackground()) {
@@ -1050,6 +1187,12 @@ public class ProgressManager extends ProgressProvider implements
 		dialog.show(job, shell);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.operation.IRunnableContext#run(boolean, boolean,
+	 *      org.eclipse.jface.operation.IRunnableWithProgress)
+	 */
 	@Override
 	public void run(boolean fork, boolean cancelable,
 			IRunnableWithProgress runnable) throws InvocationTargetException,
@@ -1065,6 +1208,12 @@ public class ProgressManager extends ProgressProvider implements
 		busyCursorWhile(runnable);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#runInUI(org.eclipse.jface.operation.IRunnableWithProgress,
+	 *      org.eclipse.core.runtime.jobs.ISchedulingRule)
+	 */
 	@Override
 	public void runInUI(final IRunnableContext context,
 			final IRunnableWithProgress runnable, final ISchedulingRule rule)
@@ -1093,11 +1242,22 @@ public class ProgressManager extends ProgressProvider implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#getLongOperationTime()
+	 */
 	@Override
 	public int getLongOperationTime() {
 		return 800;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#registerIconForFamily(org.eclipse.jface.resource.ImageDescriptor,
+	 *      java.lang.Object)
+	 */
 	@Override
 	public void registerIconForFamily(ImageDescriptor icon, Object family) {
 		String key = IMAGE_KEY + String.valueOf(imageKeyTable.size());
@@ -1111,6 +1271,11 @@ public class ProgressManager extends ProgressProvider implements
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.progress.IProgressService#getIconFor(org.eclipse.core.runtime.jobs.Job)
+	 */
 	@Override
 	public Image getIconFor(Job job) {
 		Enumeration families = imageKeyTable.keys();

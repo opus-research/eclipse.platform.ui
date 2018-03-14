@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.ui.internal.navigator.resources.nested;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.commands.Command;
@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -77,7 +76,14 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 			return null;
 		}
 		IContainer container = (IContainer)parentElement;
-		return NestedProjectManager.getInstance().getDirectChildrenProjects(container);
+		Set<IProject> nestedProjects = new HashSet<IProject>();
+		for (IProject project : container.getWorkspace().getRoot().getProjects()) {
+			if (container.getLocation().isPrefixOf(project.getLocation())
+					&& project.getLocation().segmentCount() - container.getLocation().segmentCount() == 1) {
+				nestedProjects.add(project);
+			}
+		}
+		return nestedProjects.toArray(new IProject[nestedProjects.size()]);
 	}
 
 	@Override
@@ -93,49 +99,32 @@ public class NestedProjectsContentProvider implements ITreeContentProvider, IRes
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof IContainer) {
-			return NestedProjectManager.getInstance().hasDirectChildrenProjects((IContainer) element);
-		}
-		return false;
+		Object[] children = getChildren(element);
+		return children != null && children.length > 0;
 	}
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		IResourceDelta delta = event.getDelta();
-		if (delta == null || event.getType() != IResourceChangeEvent.POST_CHANGE) {
-			return;
-		}
-		final Set<IContainer> parentsToRefresh = new LinkedHashSet<>();
-		if (delta.getKind() == IResourceDelta.CHANGED && delta.getResource() instanceof IWorkspaceRoot) {
-			for (IResourceDelta childDelta : event.getDelta().getAffectedChildren()) {
-				IResource childResource = childDelta.getResource();
-				if (childResource instanceof IProject && (childDelta.getKind() == IResourceDelta.ADDED
-						|| childDelta.getKind() == IResourceDelta.REMOVED)) {
-					IProject affectedProject = (IProject) childResource;
-					IContainer parent = getParent(affectedProject);
-					if (parent != null) {
-						parentsToRefresh.add(parent);
-					} else {
-						// workspace root
-						parentsToRefresh.clear();
-						parentsToRefresh.add(affectedProject.getParent());
-						break;
+		if (event.getDelta().getKind() == IResourceDelta.CHANGED && event.getDelta().getResource().getType() == IResource.ROOT) {
+			final Set<IContainer> parentsToRefresh = new HashSet<IContainer>();
+			for (IResourceDelta delta : event.getDelta().getAffectedChildren()) {
+				if (delta.getResource().getType() == IResource.PROJECT && delta.getKind() == IResourceDelta.ADDED) {
+					IProject newProject = (IProject)delta.getResource();
+					if (NestedProjectManager.getInstance().isShownAsNested(newProject)) {
+						parentsToRefresh.add(getParent(newProject));
 					}
 				}
 			}
-		}
-		if (!parentsToRefresh.isEmpty()) {
-			PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (viewer.getTree() == null || viewer.getTree().isDisposed()) {
-						return;
+			if (!parentsToRefresh.isEmpty()) {
+				this.viewer.getTree().getDisplay().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						for (IContainer parent : parentsToRefresh) {
+							NestedProjectsContentProvider.this.viewer.refresh(parent);
+						}
 					}
-					for (IContainer parent : parentsToRefresh) {
-						NestedProjectsContentProvider.this.viewer.refresh(parent);
-					}
-				}
-			});
+				});
+			}
 		}
 	}
 

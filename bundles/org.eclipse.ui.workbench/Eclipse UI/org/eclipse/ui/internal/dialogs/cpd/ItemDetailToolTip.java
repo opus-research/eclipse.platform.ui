@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -145,7 +144,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 					text = WorkbenchMessages.HideItems_itemInUnavailableCommand;
 				} else {
 					//i.e. has children
-					Set<ActionSet> actionGroup = new LinkedHashSet<>();
+					Set<ActionSet> actionGroup = new LinkedHashSet<ActionSet>();
 					ItemDetailToolTip.collectDescendantCommandGroups(actionGroup, item,
 							filter);
 
@@ -214,7 +213,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		// Show key binding info
 		if (showKeyBindings && CustomizePerspectiveDialog.getCommandID(item) != null) {
 			// See if there is a command associated with the command id
-			ICommandService commandService = dialog.window
+			ICommandService commandService = (ICommandService) dialog.window
 					.getService(ICommandService.class);
 			Command command = commandService.getCommand(CustomizePerspectiveDialog.getCommandID(item));
 
@@ -252,7 +251,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 				// bindings
 				final Object highlight;
 				if (bindings.length == 0) {
-					Map<String, String> parameters = new HashMap<>();
+					Map<String, String> parameters = new HashMap<String, String>();
 
 					// If item is a shortcut, need to add a parameter to go
 					// to
@@ -287,7 +286,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 				bindingLink.addSelectionListener(new SelectionListener() {
 					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
-						widgetSelected(e);
+						widgetDefaultSelected(e);
 					}
 
 					@Override
@@ -389,7 +388,8 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 	 * Gets the keybindings associated with a ContributionItem.
 	 */
 	static Binding[] getKeyBindings(WorkbenchWindow window, DisplayItem item) {
-		IBindingService bindingService = window.getService(IBindingService.class);
+		IBindingService bindingService = (IBindingService) window
+				.getService(IBindingService.class);
 
 		if (!(bindingService instanceof BindingService)) {
 			return new Binding[0];
@@ -404,7 +404,7 @@ class ItemDetailToolTip extends NameAndDescriptionToolTip {
 		Collection<?> allBindings = bindingManager
 				.getActiveBindingsDisregardingContextFlat();
 
-		List<Binding> foundBindings = new ArrayList<>(2);
+		List<Binding> foundBindings = new ArrayList<Binding>(2);
 
 		for (Iterator<?> i = allBindings.iterator(); i.hasNext();) {
 			Binding binding = (Binding) i.next();

@@ -56,7 +56,6 @@ public class TestJob extends Job {
 	 * @param rescheduleWait
 	 * @param reschedule
 	 */
-	
 	public TestJob(long duration, boolean lock, boolean failure,
 			boolean indeterminate, boolean reschedule, long rescheduleWait) {
 		super("Test job"); //$NON-NLS-1$
@@ -72,7 +71,11 @@ public class TestJob extends Job {
 			setRule(ResourcesPlugin.getWorkspace().getRoot());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.internal.jobs.InternalJob#belongsTo(java.lang.Object)
+	 */
 	public boolean belongsTo(Object family) {
 		if (family instanceof TestJob) {
 			return true;
@@ -80,7 +83,11 @@ public class TestJob extends Job {
 		return family == FAMILY_TEST_JOB;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.internal.jobs.InternalJob#run(org.eclipse.core.runtime.IProgressMonitor)
+	 */
 	public IStatus run(IProgressMonitor monitor) {
 		if (failure) {
 			MultiStatus result = new MultiStatus(

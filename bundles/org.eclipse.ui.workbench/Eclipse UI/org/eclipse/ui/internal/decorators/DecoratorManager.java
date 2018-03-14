@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,7 +81,7 @@ public class DecoratorManager implements ILabelProviderListener,
 	private LightweightDecoratorManager lightweightManager;
 
 	// Hold onto the list of listeners to be told if a change has occured
-	private ListenerList<ILabelProviderListener> listeners = new ListenerList<>();
+	private ListenerList listeners = new ListenerList();
 
 	// The full definitions read from the registry.
 	// Initalize to an empty collection as this is rarely used now.
@@ -138,6 +138,12 @@ public class DecoratorManager implements ILabelProviderListener,
 			return resourceManager;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.LabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+		 *      java.lang.Object, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public Image decorateImage(Image image, Object element,
 				IDecorationContext context) {
@@ -145,12 +151,24 @@ public class DecoratorManager implements ILabelProviderListener,
 					getResourceManager());
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.LabelDecorator#decorateText(java.lang.String,
+		 *      java.lang.Object, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public String decorateText(String text, Object element,
 				IDecorationContext context) {
 			return decoratorManager.decorateText(text, element, context);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.LabelDecorator#prepareDecoration(java.lang.Object,
+		 *      java.lang.String, org.eclipse.jface.viewers.IDecorationContext)
+		 */
 		@Override
 		public boolean prepareDecoration(Object element, String originalText,
 				IDecorationContext context) {
@@ -158,44 +176,87 @@ public class DecoratorManager implements ILabelProviderListener,
 					context);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IDelayedLabelDecorator#prepareDecoration(java.lang.Object,
+		 *      java.lang.String)
+		 */
 		@Override
 		public boolean prepareDecoration(Object element, String originalText) {
 			return prepareDecoration(element, originalText,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IFontDecorator#decorateFont(java.lang.Object)
+		 */
 		@Override
 		public Font decorateFont(Object element) {
 			return decoratorManager.decorateFont(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateBackground(Object element) {
 			return decoratorManager.decorateBackground(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
+		 */
 		@Override
 		public Color decorateForeground(Object element) {
 			return decoratorManager.decorateForeground(element);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public Image decorateImage(Image image, Object element) {
 			return decorateImage(image, element,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String,
+		 *      java.lang.Object)
+		 */
 		@Override
 		public String decorateText(String text, Object element) {
 			return decorateText(text, element,
 					DecorationContext.DEFAULT_CONTEXT);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void addListener(ILabelProviderListener listener) {
 			decoratorManager.addListener(listener);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+		 */
 		@Override
 		public void dispose() {
 			if (resourceManager != null) {
@@ -204,11 +265,22 @@ public class DecoratorManager implements ILabelProviderListener,
 			}
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.Object,
+		 *      java.lang.String)
+		 */
 		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return decoratorManager.isLabelProperty(element, property);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.jface.viewers.ILabelProviderListener)
+		 */
 		@Override
 		public void removeListener(ILabelProviderListener listener) {
 			decoratorManager.removeListener(listener);
@@ -384,7 +456,9 @@ public class DecoratorManager implements ILabelProviderListener,
 	 *            the event with the update details
 	 */
 	void fireListeners(final LabelProviderChangedEvent event) {
-		for (final ILabelProviderListener l : listeners) {
+		Object[] array = listeners.getListeners();
+		for (int i = 0; i < array.length; i++) {
+			final ILabelProviderListener l = (ILabelProviderListener) array[i];
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -417,12 +491,22 @@ public class DecoratorManager implements ILabelProviderListener,
 
 		WorkbenchJob updateJob = new WorkbenchJob(
 				WorkbenchMessages.DecorationScheduler_UpdateJobName) {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				fireListeners(event);
 				return Status.OK_STATUS;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
+			 */
 			@Override
 			public boolean belongsTo(Object family) {
 				return FAMILY_DECORATE == family;
@@ -477,6 +561,9 @@ public class DecoratorManager implements ILabelProviderListener,
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateText(java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public String decorateText(String text, Object element) {
 		return decorateText(text, element, DecorationContext.DEFAULT_CONTEXT);
@@ -547,6 +634,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		return result;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ILabelDecorator#decorateImage(org.eclipse.swt.graphics.Image,
+	 *      java.lang.Object)
+	 */
 	@Override
 	public Image decorateImage(Image image, Object element) {
 		return decorateImage(image, element, DecorationContext.DEFAULT_CONTEXT,
@@ -851,6 +944,11 @@ public class DecoratorManager implements ILabelProviderListener,
 		dispose();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.IDecoratorManager#getEnabled(java.lang.String)
+	 */
 	@Override
 	public boolean getEnabled(String decoratorId) {
 		DecoratorDefinition definition = getDecoratorDefinition(decoratorId);
@@ -1044,6 +1142,12 @@ public class DecoratorManager implements ILabelProviderListener,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.LabelDecorator#prepareDecoration(java.lang.Object,
+	 *      java.lang.String, org.eclipse.jface.viewers.IDecorationContext)
+	 */
 	public boolean prepareDecoration(Object element, String originalText,
 			IDecorationContext context) {
 		// Check if there is a decoration ready or if there is no lightweight
@@ -1068,21 +1172,42 @@ public class DecoratorManager implements ILabelProviderListener,
 		return !force;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IDelayedLabelDecorator#prepareDecoration(java.lang.Object,
+	 *      java.lang.String)
+	 */
 	@Override
 	public boolean prepareDecoration(Object element, String originalText) {
 		return prepareDecoration(element, originalText,
 				DecorationContext.DEFAULT_CONTEXT);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IFontDecorator#decorateFont(java.lang.Object)
+	 */
 	public Font decorateFont(Object element) {
 		return scheduler.getFont(element, getResourceAdapter(element));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IColorDecorator#decorateBackground(java.lang.Object)
+	 */
 	public Color decorateBackground(Object element) {
 		return scheduler.getBackgroundColor(element,
 				getResourceAdapter(element));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.IColorDecorator#decorateForeground(java.lang.Object)
+	 */
 	public Color decorateForeground(Object element) {
 		return scheduler.getForegroundColor(element,
 				getResourceAdapter(element));
@@ -1105,6 +1230,12 @@ public class DecoratorManager implements ILabelProviderListener,
 				EXTENSIONPOINT_UNIQUE_ID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#addExtension(org.eclipse.core.runtime.dynamicHelpers.IExtensionTracker,
+	 *      org.eclipse.core.runtime.IExtension)
+	 */
 	@Override
 	public void addExtension(IExtensionTracker tracker,
 			IExtension addedExtension) {
@@ -1119,6 +1250,12 @@ public class DecoratorManager implements ILabelProviderListener,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension,
+	 *      java.lang.Object[])
+	 */
 	@Override
 	public void removeExtension(IExtension source, Object[] objects) {
 

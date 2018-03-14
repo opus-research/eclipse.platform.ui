@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.jface.util;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableTree;
 import org.eclipse.swt.custom.TableTreeItem;
@@ -26,6 +25,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+
+import org.eclipse.core.runtime.ListenerList;
 
 /**
  * Implementation of single-click and double-click strategies.
@@ -108,11 +109,11 @@ public class OpenStrategy {
 
     private Listener eventHandler;
 
-	private ListenerList<IOpenEventListener> openEventListeners = new ListenerList<>();
+    private ListenerList openEventListeners = new ListenerList();
 
-	private ListenerList<SelectionListener> selectionEventListeners = new ListenerList<>();
+    private ListenerList selectionEventListeners = new ListenerList();
 
-	private ListenerList<SelectionListener> postSelectionEventListeners = new ListenerList<>();
+    private ListenerList postSelectionEventListeners = new ListenerList();
 
     /**
      * @param control the control the strategy is applied to
@@ -236,8 +237,9 @@ public class OpenStrategy {
         if (e.item != null && e.item.isDisposed()) {
 			return;
 		}
-		for (SelectionListener l : selectionEventListeners) {
-			l.widgetSelected(e);
+        Object l[] = selectionEventListeners.getListeners();
+        for (int i = 0; i < l.length; i++) {
+            ((SelectionListener) l[i]).widgetSelected(e);
         }
     }
 
@@ -245,8 +247,9 @@ public class OpenStrategy {
      * Fire the default selection event to all selectionEventListeners
      */
     private void fireDefaultSelectionEvent(SelectionEvent e) {
-		for (SelectionListener l : selectionEventListeners) {
-			l.widgetDefaultSelected(e);
+        Object l[] = selectionEventListeners.getListeners();
+        for (int i = 0; i < l.length; i++) {
+            ((SelectionListener) l[i]).widgetDefaultSelected(e);
         }
     }
 
@@ -257,8 +260,9 @@ public class OpenStrategy {
         if (e.item != null && e.item.isDisposed()) {
 			return;
 		}
-		for (SelectionListener l : postSelectionEventListeners) {
-			l.widgetSelected(e);
+        Object l[] = postSelectionEventListeners.getListeners();
+        for (int i = 0; i < l.length; i++) {
+            ((SelectionListener) l[i]).widgetSelected(e);
         }
     }
 
@@ -269,8 +273,9 @@ public class OpenStrategy {
         if (e.item != null && e.item.isDisposed()) {
 			return;
 		}
-		for (IOpenEventListener l : openEventListeners) {
-			l.handleOpen(e);
+        Object l[] = openEventListeners.getListeners();
+        for (int i = 0; i < l.length; i++) {
+            ((IOpenEventListener) l[i]).handleOpen(e);
         }
     }
 
@@ -337,16 +342,19 @@ public class OpenStrategy {
 					}
                     mouseMoveEvent = e;
                     final Runnable runnable[] = new Runnable[1];
-                    runnable[0] = () -> {
-					    long time = System.currentTimeMillis();
-					    int diff = (int) (time - startTime);
-					    if (diff <= TIME) {
-					        display.timerExec(diff * 2 / 3, runnable[0]);
-					    } else {
-					        timerStarted = false;
-					        setSelection(mouseMoveEvent);
-					    }
-					};
+                    runnable[0] = new Runnable() {
+                        @Override
+						public void run() {
+                            long time = System.currentTimeMillis();
+                            int diff = (int) (time - startTime);
+                            if (diff <= TIME) {
+                                display.timerExec(diff * 2 / 3, runnable[0]);
+                            } else {
+                                timerStarted = false;
+                                setSelection(mouseMoveEvent);
+                            }
+                        }
+                    };
                     startTime = System.currentTimeMillis();
                     if (!timerStarted) {
                         timerStarted = true;
@@ -410,22 +418,29 @@ public class OpenStrategy {
                     // want to delay any selection until the last arrowDown/Up occurs.  This
                     // handles the case where the user presses arrowDown/Up successively.
                     // We only want to open an editor for the last selected item.
-                    display.asyncExec(() -> {
-					    if (arrowKeyDown) {
-					        display.timerExec(TIME, () -> {
-							    if (id == count[0]) {
-							        firePostSelectionEvent(new SelectionEvent(
-							                e));
-							        if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
-										fireOpenEvent(new SelectionEvent(
-							                    e));
-									}
-							    }
-							});
-					    } else {
-					        firePostSelectionEvent(new SelectionEvent(e));
-					    }
-					});
+                    display.asyncExec(new Runnable() {
+                        @Override
+						public void run() {
+                            if (arrowKeyDown) {
+                                display.timerExec(TIME, new Runnable() {
+
+                                    @Override
+									public void run() {
+                                        if (id == count[0]) {
+                                            firePostSelectionEvent(new SelectionEvent(
+                                                    e));
+                                            if ((CURRENT_METHOD & ARROW_KEYS_OPEN) != 0) {
+												fireOpenEvent(new SelectionEvent(
+                                                        e));
+											}
+                                        }
+                                    }
+                                });
+                            } else {
+                                firePostSelectionEvent(new SelectionEvent(e));
+                            }
+                        }
+                    });
                     break;
                 }
             }
