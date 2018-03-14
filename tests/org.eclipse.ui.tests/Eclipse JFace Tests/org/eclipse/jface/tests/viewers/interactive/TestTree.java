@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
@@ -30,8 +29,10 @@ public class TestTree extends TestBrowser {
         fExpandAllAction = new ExpandAllAction("Expand All", this);
     }
 
-    @Override
-	public Viewer createViewer(Composite parent) {
+    /**
+     * 
+     */
+    public Viewer createViewer(Composite parent) {
         TreeViewer viewer = new TreeViewer(parent);
         viewer.setContentProvider(new TestModelContentProvider());
         viewer.setUseHashlookup(true);
@@ -56,8 +57,7 @@ public class TestTree extends TestBrowser {
     /**
      * Adds the expand all action to the tests menu.
      */
-    @Override
-	protected void viewerFillMenuBar(MenuManager mgr) {
+    protected void viewerFillMenuBar(MenuManager mgr) {
         MenuManager testMenu = (MenuManager) (mgr.findMenuUsingPath("tests"));
         testMenu.add(new Separator());
         testMenu.add(fExpandAllAction);

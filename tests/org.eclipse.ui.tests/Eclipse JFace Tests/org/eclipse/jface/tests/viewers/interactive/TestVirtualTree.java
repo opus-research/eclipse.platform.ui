@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433608
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
@@ -24,7 +23,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class TestVirtualTree extends TestTree {
 
-	@Override
 	public Viewer createViewer(Composite parent) {
 		Tree tree = new Tree(parent, SWT.VIRTUAL);
 		tree.addListener(SWT.SetData, new Listener() {
@@ -36,7 +34,6 @@ public class TestVirtualTree extends TestTree {
 				return getPosition(parentItem) + "." + parentItem.indexOf(item);
 			}
 
-			@Override
 			public void handleEvent(Event event) {
 				String position = getPosition((TreeItem) event.item);
 				if (position.endsWith(".32"))
@@ -60,7 +57,6 @@ public class TestVirtualTree extends TestTree {
 		TestBrowser browser = new TestVirtualTree();
 		if (args.length > 0 && args[0].equals("-twopanes"))
 			browser.show2Panes();
-
 		browser.setBlockOnOpen(true);
 		browser.open(TestElement.createModel(3, 10));
 	}
