@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -36,6 +37,20 @@ public class BooleanCellEditor extends CellEditor {
 	private int index;
 	private String restoredText;
 	private Image restoredImage;
+	private KeyListener macSelectionListener = new KeyListener(){
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if( e.character == ' ' ) {
+				button.setSelection(!button.getSelection());
+			}
+		}
+	};
 
 	private boolean changeOnActivation;
 
