@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,6 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     private List errorTable = new ArrayList(1); //IStatus
 
     private boolean useCompression = true;
-
-	private boolean resolveLinks = false;
 
     private boolean useTarFormat = false;
 
@@ -187,7 +185,7 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void exportResource(IResource exportResource, int leadupDepth)
             throws InterruptedException {
-		if (!exportResource.isAccessible() || (!resolveLinks && exportResource.isLinked())) {
+        if (!exportResource.isAccessible()) {
 			return;
 		}
 
@@ -270,9 +268,9 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
      */
     protected void initialize() throws IOException {
     	if(useTarFormat) {
-    		exporter = new TarFileExporter(destinationFilename, useCompression, resolveLinks);
+    		exporter = new TarFileExporter(destinationFilename, useCompression);
     	} else {
-        	exporter = new ZipFileExporter(destinationFilename, useCompression, resolveLinks);
+        	exporter = new ZipFileExporter(destinationFilename, useCompression);
     	}
     }
 
@@ -373,15 +371,4 @@ public class ArchiveFileExportOperation implements IRunnableWithProgress {
     public void setUseTarFormat(boolean value) {
     	useTarFormat = value;
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setIncludeLinkedResources(boolean value) {
-		resolveLinks = value;
-	}
 }

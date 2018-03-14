@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -32,7 +33,8 @@ public abstract class ModelReconcilerToolBarContributionsTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MToolBarContribution contribution = ems.createModelElement(MToolBarContribution.class);
+		MToolBarContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createToolBarContribution();
 		contribution.setElementId("contributionId");
 		application.getToolBarContributions().add(contribution);
 
@@ -56,7 +58,8 @@ public abstract class ModelReconcilerToolBarContributionsTest extends
 	public void testToolBarContributions_ToolBarContributions_Remove() {
 		MApplication application = createApplication();
 
-		MToolBarContribution contribution = ems.createModelElement(MToolBarContribution.class);
+		MToolBarContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createToolBarContribution();
 		contribution.setElementId("contributionId");
 		application.getToolBarContributions().add(contribution);
 

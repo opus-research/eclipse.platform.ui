@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.menu.MTrimContribution;
+import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -32,7 +33,8 @@ public abstract class ModelReconcilerTrimContributionsTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MTrimContribution contribution = ems.createModelElement(MTrimContribution.class);
+		MTrimContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createTrimContribution();
 		contribution.setElementId("contributionId");
 		application.getTrimContributions().add(contribution);
 
@@ -56,7 +58,8 @@ public abstract class ModelReconcilerTrimContributionsTest extends
 	public void testTrimContributions_TrimContributions_Remove() {
 		MApplication application = createApplication();
 
-		MTrimContribution contribution = ems.createModelElement(MTrimContribution.class);
+		MTrimContribution contribution = MenuFactoryImpl.eINSTANCE
+				.createTrimContribution();
 		contribution.setElementId("contributionId");
 		application.getTrimContributions().add(contribution);
 

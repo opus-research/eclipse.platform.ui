@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
+import org.eclipse.e4.ui.model.application.commands.impl.CommandsFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -26,12 +27,14 @@ public abstract class ModelReconcilerKeyBindingTest extends ModelReconcilerTest 
 
 	private void testKeySequence_KeySequence(String before, String after) {
 		MApplication application = createApplication();
-		MBindingTable bindingTable = ems.createModelElement(MBindingTable.class);
+		MBindingTable bindingTable = CommandsFactoryImpl.eINSTANCE
+				.createBindingTable();
 		application.getBindingTables().add(bindingTable);
-		MCommand command = ems.createModelElement(MCommand.class);
+		MCommand command = CommandsFactoryImpl.eINSTANCE.createCommand();
 		application.getCommands().add(command);
 
-		MKeyBinding keyBinding = ems.createModelElement(MKeyBinding.class);
+		MKeyBinding keyBinding = CommandsFactoryImpl.eINSTANCE
+				.createKeyBinding();
 		keyBinding.setKeySequence(before);
 		keyBinding.setCommand(command);
 		bindingTable.getBindings().add(keyBinding);

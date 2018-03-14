@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,11 +20,12 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
-import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,12 +47,10 @@ public class Bug308317Test {
 	}
 
 	protected IEclipseContext appContext;
-	private EModelService ems;
 
 	@Before
 	public void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
-		ems = appContext.get(EModelService.class);
 	}
 
 	@After
@@ -61,23 +60,24 @@ public class Bug308317Test {
 
 	@Test
 	public void testBug308317() throws Exception {
-		MApplication application = ems.createModelElement(MApplication.class);
-		MWindow window = ems.createModelElement(MWindow.class);
+		MApplication application = ApplicationFactoryImpl.eINSTANCE
+				.createApplication();
+		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPartStack stackA = ems.createModelElement(MPartStack.class);
+		MPartStack stackA = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stackA);
 		window.setSelectedElement(stackA);
 
-		MPartStack stackB = ems.createModelElement(MPartStack.class);
+		MPartStack stackB = BasicFactoryImpl.eINSTANCE.createPartStack();
 		window.getChildren().add(stackB);
 
-		MPart partA = ems.createModelElement(MPart.class);
+		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
 		stackA.getChildren().add(partA);
 		stackA.setSelectedElement(partA);
 
-		MPart partB = ems.createModelElement(MPart.class);
+		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
 		stackB.getChildren().add(partB);
 		stackB.setSelectedElement(partB);
 
@@ -94,7 +94,7 @@ public class Bug308317Test {
 		partB.setContext(partContextB);
 
 		application.setContext(appContext);
-		appContext.set(MApplication.class, application);
+		appContext.set(MApplication.class.getName(), application);
 
 		PartConsumer getter = ContextInjectionFactory.make(PartConsumer.class,
 				window.getContext());
