@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,12 +25,11 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class TabbedPropertySheetAdapterFactory
     implements IAdapterFactory {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+    @Override
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof ProjectExplorer) {
         	if (IPropertySheetPage.class == adapterType)
-				return (T) new TabbedPropertySheetPage(
+                return new TabbedPropertySheetPage(
                     new TabbedPropertySheetProjectExplorerContributor(
                         (CommonNavigator) adaptableObject));
         }
@@ -38,7 +37,7 @@ public class TabbedPropertySheetAdapterFactory
     }
 
     @Override
-	public Class<?>[] getAdapterList() {
+	public Class[] getAdapterList() {
         return new Class[] {IPropertySheetPage.class};
     }
 
