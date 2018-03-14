@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,9 +42,11 @@ public class SashRenderer extends SWTPartRenderer {
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicOrientationChanged(@UIEventTopic(UIEvents.GenericTile.TOPIC_HORIZONTAL) Event event) {
+	private void subscribeTopicOrientationChanged(
+			@UIEventTopic(UIEvents.GenericTile.TOPIC_HORIZONTAL) Event event) {
 		// Ensure that this event is for a MPartSashContainer
-		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement element = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 		if (element.getRenderer() != SashRenderer.this) {
 			return;
 		}
@@ -57,7 +59,8 @@ public class SashRenderer extends SWTPartRenderer {
 	private void subscribeTopicSashWeightChanged(
 			@UIEventTopic(UIEvents.UIElement.TOPIC_CONTAINERDATA) Event event) {
 		// Ensure that this event is for a MPartSashContainer
-		MUIElement element = (MUIElement) event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement element = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 		if (element.getRenderer() != SashRenderer.this) {
 			return;
 		}
@@ -128,7 +131,8 @@ public class SashRenderer extends SWTPartRenderer {
 	}
 
 	@Override
-	public void childRendered(MElementContainer<MUIElement> parentElement, MUIElement element) {
+	public void childRendered(MElementContainer<MUIElement> parentElement,
+			MUIElement element) {
 		super.childRendered(parentElement, element);
 
 		// Ensure that the element's 'containerInfo' is initialized
@@ -154,7 +158,8 @@ public class SashRenderer extends SWTPartRenderer {
 	}
 
 	@Override
-	public void hideChild(MElementContainer<MUIElement> parentElement, MUIElement child) {
+	public void hideChild(MElementContainer<MUIElement> parentElement,
+			MUIElement child) {
 		super.hideChild(parentElement, child);
 
 		forceLayout(parentElement);
@@ -174,9 +179,6 @@ public class SashRenderer extends SWTPartRenderer {
 		return null;
 	}
 
-	/*
-	 *
-	 */
 	private static int getWeight(MUIElement element) {
 		String info = element.getContainerData();
 		if (info == null || info.length() == 0) {
