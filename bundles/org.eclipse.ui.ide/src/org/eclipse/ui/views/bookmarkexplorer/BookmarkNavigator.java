@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -71,6 +70,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.views.bookmarkexplorer.BookmarkMessages;
 import org.eclipse.ui.internal.views.markers.ExtendedMarkersView;
@@ -305,9 +305,6 @@ public class BookmarkNavigator extends ViewPart {
         });
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
     @Override
 	public void createPartControl(Composite parent) {
         clipboard = new Clipboard(parent.getDisplay());
@@ -396,7 +393,7 @@ public class BookmarkNavigator extends ViewPart {
      * Returns the UI plugin for the bookmarks view.
      */
     static AbstractUIPlugin getPlugin() {
-        return (AbstractUIPlugin) Platform.getPlugin(PlatformUI.PLUGIN_ID);
+		return WorkbenchPlugin.getDefault();
     }
 
     /**
@@ -447,9 +444,6 @@ public class BookmarkNavigator extends ViewPart {
         showInNavigatorAction.selectionChanged(selection);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IViewPart.
-     */
     @Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
@@ -593,9 +587,6 @@ public class BookmarkNavigator extends ViewPart {
 
     }
 
-    /* (non-Javadoc)
-     * Method declared on IWorkbenchPart.
-     */
     @Override
 	public void setFocus() {
         if (viewer != null) {
