@@ -12,7 +12,6 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.jface.action.AbstractGroupMarker;
@@ -365,7 +364,7 @@ public class PluginActionSetBuilder extends PluginActionBuilder {
                 for (int i = 0; i < menus.size(); i++) {
                     IConfigurationElement menuElement = (IConfigurationElement) menus
                             .get(i);
-                    contributeMenu(menuElement, menuMgr, menuAppendIfMissing);
+					contributeMenu(menuElement, menuMgr, menuAppendIfMissing);
                 }
             }
 
