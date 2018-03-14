@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -33,25 +32,34 @@ import com.ibm.icu.text.Collator;
 /**
  * The MarkerEntry is the class that wrappers an {@link IMarker} for display in
  * an {@link ExtendedMarkersView}.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	static {
 		Platform.getAdapterManager().registerAdapters(new IAdapterFactory() {
-
-			@Override
-			public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.core.runtime.IAdapterFactory#getAdapter(java.lang
+			 * .Object, java.lang.Class)
+			 */
+			public Object getAdapter(Object adaptableObject, Class adapterType) {
 				if (adapterType == IMarker.class
 						&& adaptableObject instanceof MarkerEntry)
-					return adapterType.cast(((MarkerEntry) adaptableObject).getMarker());
+					return ((MarkerEntry) adaptableObject).getMarker();
 
 				return null;
 			}
 
-			@Override
-			public Class<?>[] getAdapterList() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.IAdapterFactory#getAdapterList()
+			 */
+			public Class[] getAdapterList() {
 				return new Class[] { IMarker.class };
 			}
 		}, MarkerEntry.class);
@@ -59,8 +67,8 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	// The key for the string we built for display
 	private static final Object LOCATION_STRING = "LOCATION_STRING"; //$NON-NLS-1$
 	private MarkerCategory category;
-	private Map cache;
-
+	private Map cache = null;
+	
 	/**
 	 * Set the MarkerEntry to be stale, if discovered at any point of time
 	 * of its use.This will greatly speed up a lot of parts of the view.
@@ -76,7 +84,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param marker
 	 */
 	public MarkerEntry(IMarker marker) {
@@ -84,14 +92,23 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		stale = false;
 	}
 
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
+	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IMarker.class))
-			return adapter.cast(marker);
+			return marker;
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerItem#getAttributeValue(java.lang.String,
+	 *      boolean)
+	 */
 	public boolean getAttributeValue(String attribute, boolean defaultValue) {
 		Object value = getAttributeValue(attribute);
 		if (value == null)
@@ -99,7 +116,12 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		return ((Boolean) value).booleanValue();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerItem#getAttributeValue(java.lang.String,
+	 *      int)
+	 */
 	public int getAttributeValue(String attribute, int defaultValue) {
 
 		Object value = getAttributeValue(attribute);
@@ -112,7 +134,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	/**
 	 * Return the Object that is the marker value for attribute. Return null if
 	 * it is not found.
-	 *
+	 * 
 	 * @param attribute
 	 * @return Object or <code>null</code>
 	 */
@@ -137,7 +159,10 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		return value;
 	}
 
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getAttributeValue(java.lang.String, java.lang.String)
+	 */
 	public String getAttributeValue(String attribute, String defaultValue) {
 
 		Object value = getAttributeValue(attribute);
@@ -146,13 +171,13 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		// The following toString() is a no-op for string attribute
 		// values (which we expect!), but safeguards against clients
 		// who used non-String objects (e.g. Integer) as attribute values,
-		// see bug 218249.
+		// see bug 218249. 
 		return value.toString();
 	}
 
 	/**
 	 * Get the category of the receiver.
-	 *
+	 * 
 	 * @return {@link MarkerCategory}
 	 */
 	MarkerCategory getCategory() {
@@ -161,17 +186,16 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getChildren()
 	 */
-	@Override
 	MarkerSupportItem[] getChildren() {
 		return MarkerSupportInternalUtilities.EMPTY_MARKER_ITEM_ARRAY;
 	}
 
 	/**
 	 * Get the CollationKey for the string attribute.
-	 *
+	 * 
 	 * @param attribute
 	 * @param defaultValue
 	 *            the defaultValue if the value is not set
@@ -181,7 +205,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		String attributeValue;
 		Object value = getCache().get(attribute);
 		if (value != null) {
-			// Only return a collation key otherwise
+			// Only return a collation key otherwise 
 			//use the value to generate it
 			if (value instanceof CollationKey)
 				return (CollationKey) value;
@@ -199,7 +223,11 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		return key;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getCreationTime()
+	 */
 	long getCreationTime() {
 		if(stale){
 			return -1;
@@ -213,18 +241,30 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getDescription()
+	 */
 	String getDescription() {
 		return getAttributeValue(IMarker.MESSAGE,
 				MarkerSupportInternalUtilities.UNKNOWN_ATRRIBTE_VALUE_STRING);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getID()
+	 */
 	long getID() {
 		return marker.getId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerItem#getLocation()
+	 */
 	public String getLocation() {
 		if(stale||checkIfMarkerStale()){
 			return MarkerSupportInternalUtilities.UNKNOWN_ATRRIBTE_VALUE_STRING;
@@ -259,12 +299,20 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerItem#getMarker()
+	 */
 	public IMarker getMarker() {
 		return marker;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getMarkerTypeName()
+	 */
 	String getMarkerTypeName() {
 		if(stale){
 			return NLS.bind(MarkerMessages.FieldMessage_WrongType, marker
@@ -295,12 +343,20 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#getParent()
+	 */
 	MarkerSupportItem getParent() {
 		return category;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.views.markers.MarkerItem#getPath()
+	 */
 	public String getPath() {
 		String folder = getAttributeValue(MarkerViewUtil.PATH_ATTRIBUTE, null);
 		if (folder != null) {
@@ -321,14 +377,18 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		return folder;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.MarkerSupportItem#isConcrete()
+	 */
 	boolean isConcrete() {
 		return true;
 	}
 
 	/**
 	 * Set the category to markerCategory.
-	 *
+	 * 
 	 * @param markerCategory
 	 */
 	void setCategory(MarkerCategory markerCategory) {
@@ -338,7 +398,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 
 	/**
 	 * Set the marker for the receiver.
-	 *
+	 * 
 	 * @param marker
 	 *            The marker to set.
 	 */
@@ -351,7 +411,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 
 	/**
 	 * Get the cache for the receiver. Create if neccessary.
-	 *
+	 * 
 	 * @return {@link HashMap}
 	 */
 	Map getCache() {
@@ -363,9 +423,8 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	/**
 	 * Clear the cached values for performance reasons.
 	 */
-	@Override
 	void clearCache() {
-		cache = null;
+		cache = null;		
 	}
 
 	/**
@@ -383,7 +442,7 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return true if the {@link MarkerEntry} is stale,i.e. the marker does not
 	 *         exist. A false value can mean that marker's state of existence was
 	 *         never captured or that it exists.#checkIfMarkerExists() will
@@ -392,8 +451,10 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 	boolean getStaleState() {
 		return stale;
 	}
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -401,7 +462,9 @@ class MarkerEntry extends MarkerSupportItem implements IAdaptable {
 		return result;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;

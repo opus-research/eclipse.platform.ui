@@ -24,7 +24,7 @@ public class UnmodifiableObservableValue extends DecoratingObservableValue {
 	/**
 	 * Constructs an UnmodifiableObservableValue which wraps the given
 	 * observable value
-	 *
+	 * 
 	 * @param wrappedValue
 	 *            the observable value to wrap in an unmodifiable instance.
 	 */
@@ -32,7 +32,6 @@ public class UnmodifiableObservableValue extends DecoratingObservableValue {
 		super(wrappedValue, false);
 	}
 
-	@Override
 	public void setValue(Object value) {
 		throw new UnsupportedOperationException();
 	}

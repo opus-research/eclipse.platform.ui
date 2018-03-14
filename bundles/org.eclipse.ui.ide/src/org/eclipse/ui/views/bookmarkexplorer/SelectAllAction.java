@@ -24,7 +24,7 @@ class SelectAllAction extends BookmarkAction {
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param view the view
      */
     public SelectAllAction(BookmarkNavigator view) {
@@ -35,8 +35,7 @@ class SelectAllAction extends BookmarkAction {
         setEnabled(true);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         Viewer viewer = getView().getViewer();
         Control control = viewer.getControl();
         if (control instanceof Table) {

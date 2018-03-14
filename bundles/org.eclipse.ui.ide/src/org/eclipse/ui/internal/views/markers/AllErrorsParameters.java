@@ -18,9 +18,9 @@ import org.eclipse.ui.views.markers.FiltersContributionParameters;
 
 /**
  * AllErrorsParameters is the parameters for the error severity type.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class AllErrorsParameters extends FiltersContributionParameters {
 
@@ -40,10 +40,9 @@ public class AllErrorsParameters extends FiltersContributionParameters {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.FiltersContributionParameters#getParameterValues()
 	 */
-	@Override
 	public Map getParameterValues() {
 		return errorsMap;
 	}

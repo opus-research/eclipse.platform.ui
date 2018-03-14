@@ -1,14 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -21,15 +20,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.di.extensions.Preference;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
-import org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyMruVisibleSWTHandler;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -51,6 +45,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
@@ -69,8 +64,6 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabFolder2Adapter;
 import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -113,48 +106,11 @@ import org.w3c.dom.css.CSSValue;
  * IPresentation.STYLE_OVERRIDE_KEY key
  *
  */
-public class StackRenderer extends LazyStackRenderer implements IPreferenceChangeListener {
+public class StackRenderer extends LazyStackRenderer {
 	/**
-	 *
+	 * 
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
-
-	/**
-	 * Key to control the default default value of the "most recently used"
-	 * order enablement
-	 */
-	public static final String MRU_KEY_DEFAULT = "enableMRUDefault"; //$NON-NLS-1$
-
-	/**
-	 * Key to control the actual boolean preference of the "most recently used"
-	 * order enablement
-	 */
-	public static final String MRU_KEY = "enableMRU"; //$NON-NLS-1$
-
-	/**
-	 * Key to switch if the "most recently used" behavior controlled via CSS or
-	 * preferences
-	 */
-	public static final String MRU_CONTROLLED_BY_CSS_KEY = "MRUControlledByCSS"; //$NON-NLS-1$
-
-	/**
-	 * Default default value for MRU behavior.
-	 */
-	public static final boolean MRU_DEFAULT = false;
-
-	/*
-	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
-	 * the MRU behavior via IEclipsePreferences, so that CSS values from the
-	 * themes aren't used.
-	 *
-	 * TODO once we can use preferences from CSS (and update the value on the
-	 * fly) we can switch this default to true, see discussion on bug 388476.
-	 */
-	private static final boolean MRU_CONTROLLED_BY_CSS_DEFAULT = false;
-
-	@Inject
-	@Preference(nodePath = "org.eclipse.e4.ui.workbench.renderers.swt")
-	private IEclipsePreferences preferences;
 
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
@@ -177,13 +133,16 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	private Image viewMenuImage;
+	Image viewMenuImage;
 
 	@Inject
-	private IEventBroker eventBroker;
+	IStylingEngine stylingEngine;
 
 	@Inject
-	private IPresentationEngine renderer;
+	IEventBroker eventBroker;
+
+	@Inject
+	IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -201,12 +160,13 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 * container. The tab folder may need to layout itself again if a part's
 	 * toolbar has been changed.
 	 */
+	private EventHandler childrenHandler;
 	private EventHandler tabStateHandler;
 
 	// Manages CSS styling based on active part changes
 	private EventHandler stylingHandler;
 
-	private boolean ignoreTabSelChanges;
+	private boolean ignoreTabSelChanges = false;
 
 	List<CTabItem> getItemsToSet(MPart part) {
 		List<CTabItem> itemsToSet = new ArrayList<CTabItem>();
@@ -232,13 +192,20 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return itemsToSet;
 	}
 
-
+	/**
+	 * This is the new way to handle UIEvents (as opposed to subscring and
+	 * unsubscribing them with the event broker.
+	 * 
+	 * The method is described in detail at
+	 * http://wiki.eclipse.org/Eclipse4/RCP/Event_Model
+	 */
 	@SuppressWarnings("unchecked")
 	@Inject
 	@Optional
-	private void subscribeTopicTransientDataChanged(
+	private void handleTransientDataEvents(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
-		Object changedElement = event.getProperty(UIEvents.EventTags.ELEMENT);
+		MUIElement changedElement = (MUIElement) event
+				.getProperty(UIEvents.EventTags.ELEMENT);
 
 		if (!(changedElement instanceof MPart))
 			return;
@@ -269,9 +236,14 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 	}
 
+	// private ToolBar menuTB;
+	// private boolean menuButtonShowing = false;
+
+	// private Control partTB;
+
 	/**
 	 * Handles changes in tags
-	 *
+	 * 
 	 * @param event
 	 */
 	@Inject
@@ -301,36 +273,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 	}
 
-	@Inject
-	@Optional
-	private void subscribeTopicChildrenChanged(
-			@UIEventTopic(UIEvents.ElementContainer.TOPIC_CHILDREN) Event event) {
-
-		Object changedObj = event.getProperty(UIEvents.EventTags.ELEMENT);
-		// only interested in changes to toolbars
-		if (!(changedObj instanceof MToolBar)) {
-			return;
-		}
-
-		MUIElement container = modelService
-				.getContainer((MUIElement) changedObj);
-		// check if this is a part's toolbar
-		if (container instanceof MPart) {
-			MElementContainer<?> parent = ((MPart) container).getParent();
-			// only relayout if this part is the selected element and we
-			// actually rendered this element
-			if (parent instanceof MPartStack
-					&& parent.getSelectedElement() == container
-					&& parent.getRenderer() == StackRenderer.this) {
-				Object widget = parent.getWidget();
-				if (widget instanceof CTabFolder) {
-					adjustTopRight((CTabFolder) widget);
-				}
-			}
-		}
-	}
-
-
 	@Override
 	protected boolean requiresFocus(MPart element) {
 		MUIElement inStack = element.getCurSharedRef() != null ? element
@@ -345,12 +287,13 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return super.requiresFocus(element);
 	}
 
+	public StackRenderer() {
+		super();
+	}
+
 	@PostConstruct
 	public void init() {
 		super.init(eventBroker);
-
-		preferences.addPreferenceChangeListener(this);
-		preferenceChange(null);
 
 		// TODO: Refactor using findItemForPart(MPart) method
 		itemUpdater = new EventHandler() {
@@ -499,6 +442,37 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		eventBroker.subscribe(UIEvents.UIElement.TOPIC_TOBERENDERED,
 				viewMenuUpdater);
 
+		childrenHandler = new EventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				Object changedObj = event
+						.getProperty(UIEvents.EventTags.ELEMENT);
+				// only interested in changes to toolbars
+				if (!(changedObj instanceof MToolBar)) {
+					return;
+				}
+
+				MUIElement container = modelService
+						.getContainer((MUIElement) changedObj);
+				// check if this is a part's toolbar
+				if (container instanceof MPart) {
+					MElementContainer<?> parent = ((MPart) container)
+							.getParent();
+					// only relayout if this part is the selected element and we
+					// actually rendered this element
+					if (parent instanceof MPartStack
+							&& parent.getSelectedElement() == container
+							&& parent.getRenderer() == StackRenderer.this) {
+						Object widget = parent.getWidget();
+						if (widget instanceof CTabFolder) {
+							adjustTopRight((CTabFolder) widget);
+						}
+					}
+				}
+			}
+		};
+		eventBroker.subscribe(UIEvents.ElementContainer.TOPIC_CHILDREN,
+				childrenHandler);
 
 		stylingHandler = new EventHandler() {
 			@Override
@@ -589,6 +563,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		eventBroker.unsubscribe(itemUpdater);
 		eventBroker.unsubscribe(dirtyUpdater);
 		eventBroker.unsubscribe(viewMenuUpdater);
+		eventBroker.unsubscribe(childrenHandler);
 		eventBroker.unsubscribe(stylingHandler);
 		eventBroker.unsubscribe(tabStateHandler);
 	}
@@ -630,7 +605,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		int styleOverride = getStyleOverride(pStack);
 		int style = styleOverride == -1 ? SWT.BORDER : styleOverride;
 		final CTabFolder ctf = new CTabFolder(parentComposite, style);
-		ctf.setMRUVisible(getMRUValue(ctf));
+		ctf.setMRUVisible(getInitialMRUValue(ctf));
 
 		// Adjust the minimum chars based on the location
 		int location = modelService.getElementLocation(element);
@@ -651,10 +626,10 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	}
 
 	private boolean getInitialMRUValue(Control control) {
+		boolean result = false;
 		CSSRenderingUtils util = context.get(CSSRenderingUtils.class);
-		if (util == null) {
-			return getMRUValueFromPreferences();
-		}
+		if (util == null)
+			return result;
 
 		CSSValue value = util.getCSSValue(control,
 				"MPartStack", "swt-mru-visible"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -662,34 +637,10 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		if (value == null) {
 			value = util.getCSSValue(control, "MPartStack", "mru-visible"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		if (value == null) {
-			return getMRUValueFromPreferences();
-		}
+		if (value == null)
+			return result;
+
 		return Boolean.parseBoolean(value.getCssText());
-	}
-
-	private boolean getMRUValue(Control control) {
-		if (CSSPropertyMruVisibleSWTHandler.isMRUControlledByCSS()) {
-			return getInitialMRUValue(control);
-		}
-		return getMRUValueFromPreferences();
-	}
-
-	private boolean getMRUValueFromPreferences() {
-		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, MRU_DEFAULT);
-		boolean actualValue = preferences.getBoolean(MRU_KEY, initialMRUValue);
-		return actualValue;
-	}
-
-	private void updateMRUValue(CTabFolder ctf) {
-		boolean actualMRUValue = getMRUValue(ctf);
-		ctf.setMRUVisible(actualMRUValue);
-	}
-
-	@Override
-	public void preferenceChange(PreferenceChangeEvent event) {
-		boolean mruControlledByCSS = preferences.getBoolean(MRU_CONTROLLED_BY_CSS_KEY, MRU_CONTROLLED_BY_CSS_DEFAULT);
-		CSSPropertyMruVisibleSWTHandler.setMRUControlledByCSS(mruControlledByCSS);
 	}
 
 	/**
@@ -836,7 +787,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		} finally {
 			adjusting = false;
 		}
-		updateMRUValue(ctf);
 	}
 
 	@Override
@@ -859,7 +809,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				cti.setControl((Control) element.getWidget());
 			return;
 		}
-		updateMRUValue(ctf);
+
 		int createFlags = SWT.NONE;
 		if (part != null && isClosable(part)) {
 			createFlags |= SWT.CLOSE;
@@ -1006,7 +956,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		if (!(me instanceof MElementContainer<?>))
 			return;
 
-		@SuppressWarnings("unchecked")
 		final MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) me;
 
 		// Match the selected TabItem to its Part
@@ -1176,13 +1125,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				}
 			}
 		});
-
-		ctf.addControlListener(new ControlAdapter() {
-			@Override
-			public void controlResized(ControlEvent e) {
-				updateMRUValue(ctf);
-			}
-		});
 	}
 
 	public void showAvailableItems(MElementContainer<?> stack, CTabFolder ctf) {
@@ -1190,7 +1132,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
-                getMRUValueFromPreferences());
+				getInitialMRUValue(ctf));
 		editorList.setInput();
 
 		Point size = editorList.computeSizeHint();
@@ -1246,7 +1188,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 	/**
 	 * Closes the part that's backed by the given widget.
-	 *
+	 * 
 	 * @param widget
 	 *            the part that owns this widget
 	 * @param check
@@ -1471,34 +1413,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 					}
 				});
 
-				int leftFrom = getCloseableSideParts(part, true).size();
-				if (leftFrom > 0) {
-					MenuItem menuItemLeft = new MenuItem(menu, SWT.NONE);
-					menuItemLeft.setText(SWTRenderersMessages.menuCloseLeft);
-					menuItemLeft.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
-							closeSideParts(part, true);
-						}
-					});
-				}
-
-				int rightFrom = getCloseableSideParts(part, false).size();
-				if (rightFrom > 0) {
-					MenuItem menuItemRight = new MenuItem(menu, SWT.NONE);
-					menuItemRight.setText(SWTRenderersMessages.menuCloseRight);
-					menuItemRight.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(SelectionEvent e) {
-							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
-							closeSideParts(part, false);
-						}
-					});
-				}
-
-				new MenuItem(menu, SWT.SEPARATOR);
-
 				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
 				menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
 				menuItemAll.addSelectionListener(new SelectionAdapter() {
@@ -1523,60 +1437,16 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return parent;
 	}
 
-	private List<MPart> getCloseableSideParts(MPart part, boolean left) {
-		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null) {
-			return new ArrayList<MPart>();
-		}
-
-		int thisPartIdx = getPartIndex(part, container);
-		if (thisPartIdx == -1) {
-			return new ArrayList<MPart>();
-		}
-		List<MUIElement> children = container.getChildren();
-		final int start = left ? 0 : thisPartIdx + 1;
-		final int end = left ? thisPartIdx : children.size();
-
-		return getCloseableSiblingParts(part, children, start, end);
-	}
-
-	private int getPartIndex(MPart part, MElementContainer<MUIElement> container) {
-		List<MUIElement> children = container.getChildren();
-		for (int i = 0; i < children.size(); i++) {
-			MUIElement child = children.get(i);
-			MPart otherPart = null;
-			if (child instanceof MPart) {
-				otherPart = (MPart) child;
-			} else if (child instanceof MPlaceholder) {
-				MUIElement otherItem = ((MPlaceholder) child).getRef();
-				if (otherItem instanceof MPart) {
-					otherPart = (MPart) otherItem;
-				}
-			}
-			if (otherPart == part) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
 	private List<MPart> getCloseableSiblingParts(MPart part) {
-		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null) {
-			return new ArrayList<MPart>();
-		}
-
-		List<MUIElement> children = container.getChildren();
-		return getCloseableSiblingParts(part, children, 0, children.size());
-	}
-
-	private List<MPart> getCloseableSiblingParts(MPart part, List<MUIElement> children,
-			final int start, final int end) {
 		// broken out from closeSiblingParts so it can be used to determine how
 		// many closeable siblings are available
+		MElementContainer<MUIElement> container = getParent(part);
 		List<MPart> closeableSiblings = new ArrayList<MPart>();
-		for (int i = start; i < end; i++) {
-			MUIElement child = children.get(i);
+		if (container == null)
+			return closeableSiblings;
+
+		List<MUIElement> children = container.getChildren();
+		for (MUIElement child : children) {
 			// If the element isn't showing skip it
 			if (!child.isToBeRendered())
 				continue;
@@ -1600,26 +1470,12 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		return closeableSiblings;
 	}
 
-	private void closeSideParts(MPart part, boolean left) {
-		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null) {
-			return;
-		}
-		List<MPart> others = getCloseableSideParts(part, left);
-		closeSiblingParts(part, others, true);
-	}
-
 	private void closeSiblingParts(MPart part, boolean skipThisPart) {
 		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null) {
+		if (container == null)
 			return;
-		}
-		List<MPart> others = getCloseableSiblingParts(part);
-		closeSiblingParts(part, others, skipThisPart);
-	}
 
-	private void closeSiblingParts(MPart part, List<MPart> others, boolean skipThisPart) {
-		MElementContainer<MUIElement> container = getParent(part);
+		List<MPart> others = getCloseableSiblingParts(part);
 
 		// add the current part last so that we unrender obscured items first
 		if (!skipThisPart && part.isToBeRendered() && isClosable(part)) {
@@ -1686,7 +1542,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 
 	/**
 	 * Determine whether the given view menu has any visible menu items.
-	 *
+	 * 
 	 * @param viewMenu
 	 *            the view menu to check
 	 * @param part

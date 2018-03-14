@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Fair Isaac Corporation <Hemant.Singh@Gmail.com> - http://bugs.eclipse.org/333590
- *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.model;
 
@@ -32,27 +31,26 @@ import org.eclipse.ui.model.IWorkbenchAdapter3;
  * navigating, and populating menus for core objects.
  */
 public class WorkbenchAdapterFactory implements IAdapterFactory {
+    private Object workspaceAdapter = new WorkbenchWorkspace();
 
-	private WorkbenchWorkspace workspaceAdapter = new WorkbenchWorkspace();
+    private Object rootAdapter = new WorkbenchRootResource();
 
-	private WorkbenchRootResource rootAdapter = new WorkbenchRootResource();
+    private Object projectAdapter = new WorkbenchProject();
 
-	private WorkbenchProject projectAdapter = new WorkbenchProject();
+    private Object folderAdapter = new WorkbenchFolder();
 
-	private WorkbenchFolder folderAdapter = new WorkbenchFolder();
+    private Object fileAdapter = new WorkbenchFile();
 
-	private WorkbenchFile fileAdapter = new WorkbenchFile();
+    private Object markerAdapter = new WorkbenchMarker();
 
-	private WorkbenchMarker markerAdapter = new WorkbenchMarker();
+    private Object resourceFactory = new ResourceFactory();
 
-	private ResourceFactory resourceFactory = new ResourceFactory();
-
-	private WorkspaceFactory workspaceFactory = new WorkspaceFactory();
+    private Object workspaceFactory = new WorkspaceFactory();
 
     /**
      * Returns the IActionFilter for an object.
      */
-	protected IActionFilter getActionFilter(Object o) {
+    protected Object getActionFilter(Object o) {
         if (o instanceof IResource) {
             switch (((IResource) o).getType()) {
             case IResource.FILE:
@@ -77,32 +75,31 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      * @param o the adaptable object being queried
      *   (usually an instance of <code>IAdaptable</code>)
      * @param adapterType the type of adapter to look up
-     * @return a object castable to the given adapter type,
-     *    or <code>null</code> if this adapter provider
+     * @return a object castable to the given adapter type, 
+     *    or <code>null</code> if this adapter provider 
      *    does not have an adapter of the given type for the
      *    given object
      */
-    @Override
-	public <T> T getAdapter(Object o, Class<T> adapterType) {
+    public Object getAdapter(Object o, Class adapterType) {
         if (adapterType.isInstance(o)) {
-			return adapterType.cast(o);
+            return o;
         }
         if (adapterType == IWorkbenchAdapter.class
                 || adapterType == IWorkbenchAdapter2.class
                 || adapterType == IWorkbenchAdapter3.class) {
-			return adapterType.cast(getWorkbenchElement(o));
+            return getWorkbenchElement(o);
         }
         if (adapterType == IPersistableElement.class) {
-			return adapterType.cast(getPersistableElement(o));
+            return getPersistableElement(o);
         }
         if (adapterType == IElementFactory.class) {
-			return adapterType.cast(getElementFactory(o));
+            return getElementFactory(o);
         }
         if (adapterType == IActionFilter.class) {
-			return adapterType.cast(getActionFilter(o));
+            return getActionFilter(o);
         }
         if (adapterType == IUndoContext.class) {
-			return adapterType.cast(getUndoContext(o));
+        	return getUndoContext(o);
         }
         return null;
     }
@@ -118,8 +115,7 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      *
      * @return the collection of adapter types
      */
-    @Override
-	public Class<?>[] getAdapterList() {
+    public Class[] getAdapterList() {
         return new Class[] { IWorkbenchAdapter.class, IWorkbenchAdapter2.class,
                 IWorkbenchAdapter3.class, IElementFactory.class,
                 IPersistableElement.class, IActionFilter.class,
@@ -131,7 +127,7 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      * associated with the given object. Returns <code>null</code> if
      * no such object can be found.
      */
-	protected IElementFactory getElementFactory(Object o) {
+    protected Object getElementFactory(Object o) {
         if (o instanceof IResource) {
             return resourceFactory;
         }
@@ -146,7 +142,7 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      * associated with the given object. Returns <code>null</code> if
      * no such object can be found.
      */
-	protected IPersistableElement getPersistableElement(Object o) {
+    protected Object getPersistableElement(Object o) {
         if (o instanceof IResource) {
             return new ResourceFactory((IResource) o);
         }
@@ -161,7 +157,7 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
      * associated with the given object. Returns <code>null</code> if
      * no such object can be found.
      */
-	protected IWorkbenchAdapter getWorkbenchElement(Object o) {
+    protected Object getWorkbenchElement(Object o) {
         if (o instanceof IResource) {
             switch (((IResource) o).getType()) {
             case IResource.FILE:
@@ -183,11 +179,11 @@ public class WorkbenchAdapterFactory implements IAdapterFactory {
         }
         return null;
     }
-
+    
     /**
      * Returns the IUndoContext for an object.
      */
-	protected IUndoContext getUndoContext(Object o) {
+    protected Object getUndoContext(Object o) {
         if (o instanceof IWorkspace) {
             return PlatformUI.getWorkbench().getOperationSupport().getUndoContext();
         }

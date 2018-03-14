@@ -24,7 +24,7 @@ import org.eclipse.ui.actions.ActionGroup;
  * context will be flushed actively whenever an invalid operation is found on
  * top of its history. This class may be instantiated by clients.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class UndoRedoActionGroup extends ActionGroup {
@@ -36,7 +36,7 @@ public final class UndoRedoActionGroup extends ActionGroup {
 	/**
 	 * Construct an undo redo action group for the specified workbench part
 	 * site, using the specified undo context.
-	 *
+	 * 
 	 * @param site
 	 *            the workbench part site that is creating the action group
 	 * @param undoContext
@@ -59,6 +59,11 @@ public final class UndoRedoActionGroup extends ActionGroup {
 		redoActionHandler.setPruneHistory(pruneHistory);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionGroup#fillActionBars(org.eclipse.ui.IActionBars)
+	 */
 	@Override
 	public void fillActionBars(IActionBars actionBars) {
 		super.fillActionBars(actionBars);

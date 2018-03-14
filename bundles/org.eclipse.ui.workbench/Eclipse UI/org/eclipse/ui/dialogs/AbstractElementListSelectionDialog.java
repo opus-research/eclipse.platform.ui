@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * An abstract class to select elements out of a list of elements.
- *
+ * 
  * @since 2.0
  */
 public abstract class AbstractElementListSelectionDialog extends SelectionStatusDialog {
@@ -169,7 +169,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
     /**
 	 * Sets the elements of the list (widget).
-	 *
+	 * 
 	 * @param elements
 	 *            the elements of the list.
 	 */
@@ -182,7 +182,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
     /**
 	 * This method is called when the elements of the backing list are changed
 	 * to refresh the standard dialog widgets.
-	 *
+	 * 
 	 * @since 3.8
 	 */
 	protected void handleElementsChanged() {
@@ -197,7 +197,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 
 	/**
 	 * Sets the filter pattern.
-	 *
+	 * 
 	 * @param filter
 	 *            the filter pattern.
 	 */
@@ -334,6 +334,9 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return status.isOK();
     }
 
+    /*
+     * @see Dialog#cancelPressed
+     */
     @Override
 	protected void cancelPressed() {
         setResult(null);
@@ -361,7 +364,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         data.verticalAlignment = GridData.FILL;
         list.setLayoutData(data);
         list.setFont(parent.getFont());
-        list.setFilter((fFilter == null ? "" : fFilter)); //$NON-NLS-1$
+        list.setFilter((fFilter == null ? "" : fFilter)); //$NON-NLS-1$		
 
         list.addSelectionListener(new SelectionListener() {
             @Override
@@ -380,7 +383,7 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return list;
     }
 
-    // 3515
+    // 3515	
     private void handleWidgetSelected() {
         Object[] newSelection = fFilteredList.getSelection();
 
@@ -437,6 +440,10 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         return text;
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#open()
+     */
     @Override
 	public int open() {
         super.open();
@@ -447,6 +454,10 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
         super.create();
     }
 
+    /*
+     *  (non-Javadoc)
+     * @see org.eclipse.jface.window.Window#create()
+     */
     @Override
 	public void create() {
 
@@ -490,13 +501,13 @@ public abstract class AbstractElementListSelectionDialog extends SelectionStatus
 			okButton.setEnabled(getSelectedElements().length != 0);
 		}
     }
-
+    
     /**
      * Gets the optional validator used to check if the selection is valid.
      * The validator is invoked whenever the selection changes.
      * @return the validator to validate the selection, or <code>null</code>
      * if no validator has been set.
-     *
+     * 
      * @since 3.5
      */
     protected ISelectionStatusValidator getValidator() {

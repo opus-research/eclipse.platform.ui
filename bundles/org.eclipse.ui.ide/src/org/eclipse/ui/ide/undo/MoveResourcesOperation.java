@@ -42,7 +42,7 @@ import org.eclipse.ui.internal.ide.undo.UndoMessages;
  * <p>
  * @noextend This class is not intended to be subclassed by clients.
  * @since 3.3
- *
+ * 
  */
 public class MoveResourcesOperation extends
 		AbstractCopyOrMoveResourcesOperation {
@@ -56,7 +56,7 @@ public class MoveResourcesOperation extends
 	/**
 	 * Create a MoveResourcesOperation that moves all of the specified resources
 	 * to the same target location, using their existing names.
-	 *
+	 * 
 	 * @param resources
 	 *            the resources to be moved
 	 * @param destinationPath
@@ -77,7 +77,7 @@ public class MoveResourcesOperation extends
 	 * Create a MoveResourcesOperation that moves a single resource to a new
 	 * location. The new location includes the name of the resource, so this may
 	 * be used for a move/rename operation or a simple move.
-	 *
+	 * 
 	 * @param resource
 	 *            the resource to be moved
 	 * @param newPath
@@ -94,9 +94,13 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Map execute to moving the resources
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doExecute(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doExecute(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		move(monitor, uiInfo);
@@ -105,7 +109,7 @@ public class MoveResourcesOperation extends
 	/**
 	 * Move any known resources according to the destination parameters known by
 	 * this operation. Store enough information to undo and redo the operation.
-	 *
+	 * 
 	 * @param monitor
 	 *            the progress monitor to use for the operation
 	 * @param uiInfo
@@ -171,9 +175,13 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Map undo to moving the resources.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#doUndo(org.eclipse.core.runtime.IProgressMonitor,
+	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected void doUndo(IProgressMonitor monitor, IAdaptable uiInfo)
 			throws CoreException {
 		// We've recorded the original moves atomically, so perform the move
@@ -190,7 +198,12 @@ public class MoveResourcesOperation extends
 		this.destinationPaths = originalDestinationPaths;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#updateResourceChangeDescriptionFactory(org.eclipse.core.resources.mapping.IResourceChangeDescriptionFactory,
+	 *      int)
+	 */
 	protected boolean updateResourceChangeDescriptionFactory(
 			IResourceChangeDescriptionFactory factory, int operation) {
 		for (int i = 0; i < resources.length; i++) {
@@ -201,9 +214,12 @@ public class MoveResourcesOperation extends
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
 	 * Map undo to move status.
+	 * 
+	 * @see org.eclipse.ui.ide.undo.AbstractWorkspaceOperation#computeUndoableStatus(org.eclipse.core.runtime.IProgressMonitor)
 	 */
-	@Override
 	public IStatus computeUndoableStatus(IProgressMonitor monitor) {
 		IStatus status = super.computeUndoableStatus(monitor);
 		if (status.isOK()) {

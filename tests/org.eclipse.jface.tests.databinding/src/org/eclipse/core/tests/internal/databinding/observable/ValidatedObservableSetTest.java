@@ -37,7 +37,6 @@ public class ValidatedObservableSetTest extends AbstractDefaultRealmTestCase {
 	static class Delegate extends AbstractObservableCollectionContractDelegate {
 		private Object elementType = new Object();
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			IObservableSet target = new WritableSet(realm,
@@ -49,23 +48,19 @@ public class ValidatedObservableSetTest extends AbstractDefaultRealmTestCase {
 			return new ValidatedObservableSetStub(target, validationStatus);
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return new Object();
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return elementType;
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			ValidatedObservableSetStub validated = (ValidatedObservableSetStub) observable;
 			validated.target.add(createElement(validated));
 		}
 
-		@Override
 		public void setStale(IObservable observable, boolean stale) {
 			ValidatedObservableSetStub validated = (ValidatedObservableSetStub) observable;
 			if (stale) {

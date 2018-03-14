@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class WidgetTooltipTextProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty cTabItem;
@@ -34,13 +34,12 @@ public class WidgetTooltipTextProperty extends WidgetDelegatingValueProperty {
 	private IValueProperty treeColumn;
 
 	/**
-	 *
+	 * 
 	 */
 	public WidgetTooltipTextProperty() {
 		super(String.class);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof CTabItem) {
 			if (cTabItem == null)

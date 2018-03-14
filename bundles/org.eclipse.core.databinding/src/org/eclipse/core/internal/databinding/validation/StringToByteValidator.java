@@ -19,7 +19,7 @@ import org.eclipse.core.internal.databinding.conversion.StringToNumberParser;
 public class StringToByteValidator extends AbstractStringToNumberValidator {
 	private static final Byte MIN = new Byte(Byte.MIN_VALUE);
 	private static final Byte MAX = new Byte(Byte.MAX_VALUE);
-
+	
 	/**
 	 * @param converter
 	 */
@@ -27,7 +27,9 @@ public class StringToByteValidator extends AbstractStringToNumberValidator {
 		super(converter, MIN, MAX);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.validation.AbstractStringToNumberValidator#isInRange(java.lang.Number)
+	 */
 	protected boolean isInRange(Number number) {
 		return StringToNumberParser.inByteRange(number);
 	}

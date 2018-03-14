@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.property.NativePropertyListener;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public abstract class BeanPropertyListener extends NativePropertyListener
 		implements PropertyChangeListener {
@@ -35,7 +35,6 @@ public abstract class BeanPropertyListener extends NativePropertyListener
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
-	@Override
 	public void propertyChange(java.beans.PropertyChangeEvent evt) {
 		if (evt.getPropertyName() == null
 				|| propertyDescriptor.getName().equals(evt.getPropertyName())) {
@@ -53,13 +52,11 @@ public abstract class BeanPropertyListener extends NativePropertyListener
 
 	protected abstract IDiff computeDiff(Object oldValue, Object newValue);
 
-	@Override
 	protected void doAddTo(Object source) {
 		BeanPropertyListenerSupport.hookListener(source, propertyDescriptor
 				.getName(), this);
 	}
 
-	@Override
 	protected void doRemoveFrom(Object source) {
 		BeanPropertyListenerSupport.unhookListener(source, propertyDescriptor
 				.getName(), this);

@@ -32,9 +32,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 public class HandlerServiceHandler extends AbstractHandler {
 
 	private static final String FAILED_TO_FIND_HANDLER_DURING_EXECUTION = "Failed to find handler during execution"; //$NON-NLS-1$
-	private static final String HANDLER_MISSING_EXECUTE_ANNOTATION = "Handler is missing @Execute"; //$NON-NLS-1$
-	private static final Object missingExecute = new Object();
-
 	protected String commandId;
 
 	public HandlerServiceHandler(String commandId) {
@@ -149,14 +146,8 @@ public class HandlerServiceHandler extends AbstractHandler {
 						.create(HandlerServiceImpl.TMP_STATIC_CONTEXT);
 				staticContext.set(HandlerServiceImpl.PARM_MAP, event.getParameters());
 			}
-			Object result = ContextInjectionFactory.invoke(handler, Execute.class,
- executionContext,
-					staticContext, missingExecute);
-			if (result == missingExecute) {
-				throw new ExecutionException(HANDLER_MISSING_EXECUTE_ANNOTATION,
-						new NotHandledException(getClass().getName()));
-			}
-			return result;
+			return ContextInjectionFactory.invoke(handler, Execute.class, executionContext,
+					staticContext, null);
 		} finally {
 			if (localStaticContext != null) {
 				localStaticContext.dispose();

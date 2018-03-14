@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.commands;
 
@@ -17,6 +16,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.commands.AbstractHandler;
+import org.eclipse.ui.commands.ExecutionException;
 import org.eclipse.ui.commands.HandlerSubmission;
 import org.eclipse.ui.commands.ICommand;
 import org.eclipse.ui.commands.IHandler;
@@ -27,14 +27,14 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * A test for whether part identifiers work properly for HandlerSubmissions.
- *
+ * 
  * @since 3.1
  */
 public final class Bug74990Test extends UITestCase {
 
 	/**
 	 * Constructs a new instance of <code>Bug74990Test</code>.
-	 *
+	 * 
 	 * @param name
 	 *            The name of the test
 	 */
@@ -47,11 +47,11 @@ public final class Bug74990Test extends UITestCase {
 	 * matched properly. This is only using the part id. The test verifies that
 	 * it is active when the part is active, and not active when the part is not
 	 * active.
-	 *
+	 * 
 	 * @throws PartInitException
 	 *             If something goes wrong creating the part to which this
 	 *             handler is tied.
-	 *
+	 * 
 	 */
 	public final void testPartIdSubmission() throws PartInitException {
 		// Define a command.
@@ -63,8 +63,8 @@ public final class Bug74990Test extends UITestCase {
 
 		// Create a handler submission.
 		final IHandler handler = new AbstractHandler() {
-			@Override
-			public final Object execute(final Map parameterValuesByName) {
+			public final Object execute(final Map parameterValuesByName)
+					throws ExecutionException {
 				// Do nothing.
 				return null;
 			}
@@ -90,7 +90,7 @@ public final class Bug74990Test extends UITestCase {
 			while (fWorkbench.getDisplay().readAndDispatch()) {
 				((Workbench)fWorkbench).getContext().processWaiting();
 			}
-
+			
 			assertTrue("The MockViewPart command should be handled",
 					testCommand.isHandled());
 

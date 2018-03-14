@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -25,7 +24,7 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * @since 3.7
- *
+ * 
  */
 public class DirtyStateTracker implements IPartListener, IWindowListener,
 		IPropertyListener {
@@ -41,7 +40,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 	}
 
 	public void update() {
-		IEvaluationService service = workbench
+		IEvaluationService service = (IEvaluationService) workbench
 				.getService(IEvaluationService.class);
 		service.requestEvaluation(ISources.ACTIVE_PART_NAME);
 	}
@@ -57,7 +56,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPartListener#partActivated(org.eclipse.ui.IWorkbenchPart)
 	 */
@@ -70,7 +69,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPartListener#partBroughtToTop(org.eclipse.ui.IWorkbenchPart
 	 * )
@@ -81,7 +80,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPartListener#partClosed(org.eclipse.ui.IWorkbenchPart)
 	 */
@@ -95,7 +94,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPartListener#partDeactivated(org.eclipse.ui.IWorkbenchPart
 	 * )
@@ -106,7 +105,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IPartListener#partOpened(org.eclipse.ui.IWorkbenchPart)
 	 */
@@ -119,7 +118,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IWindowListener#windowActivated(org.eclipse.ui.
 	 * IWorkbenchWindow)
 	 */
@@ -130,7 +129,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IWindowListener#windowDeactivated(org.eclipse.ui.
 	 * IWorkbenchWindow)
 	 */
@@ -140,7 +139,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IWindowListener#windowClosed(org.eclipse.ui.IWorkbenchWindow
 	 * )
@@ -152,7 +151,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.IWindowListener#windowOpened(org.eclipse.ui.IWorkbenchWindow
 	 * )
@@ -164,7 +163,7 @@ public class DirtyStateTracker implements IPartListener, IWindowListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object,
 	 * int)
 	 */
