@@ -6,43 +6,39 @@
  *
  * Contributors:
  *     Stefan Winkler - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.swt;
 
-import static org.junit.Assert.assertEquals;
-
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.After;
-import org.junit.Before;
 
 public class InheritTest extends CSSSWTTestCase {
 
-
+	private CSSEngine engine;
+	private Display display;
 	private Color redColor;
 
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
 	static final RGB RED = new RGB(255, 0, 0);
 
-	@Before
 	@Override
-	public void setUp() {
+	protected void setUp() throws Exception {
 		super.setUp();
 
-
+		display = Display.getDefault();
 		redColor = new Color(display, RED);
 	}
 
-	@After
 	@Override
-	public void tearDown() {
+	protected void tearDown() throws Exception {
 		redColor.dispose();
 		super.tearDown();
 	}
