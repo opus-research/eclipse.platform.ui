@@ -22,7 +22,7 @@ import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.IViewerUpdater;
 import org.eclipse.jface.viewers.AbstractListViewer;
 import org.eclipse.jface.viewers.AbstractTableViewer;
@@ -89,7 +89,7 @@ public abstract class ObservableCollectionContentProvider implements
 		this.explicitViewerUpdater = explicitViewerUpdater;
 
 		display = Display.getDefault();
-		viewerObservable = new WritableValue(DisplayRealm.getRealm(display));
+		viewerObservable = new WritableValue(SWTObservables.getRealm(display));
 		viewerUpdater = null;
 
 		elementSetFactory = new IObservableFactory() {
@@ -98,7 +98,7 @@ public abstract class ObservableCollectionContentProvider implements
 				IElementComparer comparer = null;
 				if (target instanceof StructuredViewer)
 					comparer = ((StructuredViewer) target).getComparer();
-				return ObservableViewerElementSet.withComparer(DisplayRealm
+				return ObservableViewerElementSet.withComparer(SWTObservables
 						.getRealm(display), null, comparer);
 			}
 		};

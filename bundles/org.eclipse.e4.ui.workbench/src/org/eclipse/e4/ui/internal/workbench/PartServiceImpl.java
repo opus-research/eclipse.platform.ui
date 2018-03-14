@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 
@@ -20,7 +19,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
@@ -171,10 +169,6 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	@Optional
 	private EContextService contextService;
-
-	@Inject
-	@Optional
-	private ContextManager contextManager;
 
 	private PartActivationHistory partActivationHistory;
 
@@ -550,29 +544,6 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
-	public boolean isPartOrPlaceholderInPerspective(String elementId, MPerspective perspective) {
-		List<MPart> findElements = modelService.findElements(perspective, elementId, MPart.class, null);
-		if (!findElements.isEmpty()) {
-			MPart part = findElements.get(0);
-
-			// if that is a shared part, check the placeholders
-			if (workbenchWindow.getSharedElements().contains(part)) {
-				List<MPlaceholder> placeholders = modelService.findElements(perspective, elementId,
-						MPlaceholder.class, null);
-				for (MPlaceholder mPlaceholder : placeholders) {
-					if (mPlaceholder.isVisible() && mPlaceholder.isToBeRendered()) {
-						return true;
-					}
-				}
-				return false;
-			}
-			// not a shared part
-			return part.isVisible() && part.isToBeRendered();
-		}
-		return false;
-	}
-
-	@Override
 	public void switchPerspective(MPerspective perspective) {
 		Assert.isNotNull(perspective);
 		MWindow window = getWindow();
@@ -670,9 +641,6 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
-		if (contextManager != null) {
-			contextManager.deferUpdates(true);
-		}
 
 		MPart lastActivePart = activePart;
 		activePart = part;
@@ -704,9 +672,6 @@ public class PartServiceImpl implements EPartService {
 		} finally {
 			if (contextService != null) {
 				contextService.deferUpdates(false);
-			}
-			if (contextManager != null) {
-				contextManager.deferUpdates(false);
 			}
 		}
 	}

@@ -34,10 +34,9 @@ public class EditorWithDisposeException extends EditorPart {
     @Override
 	public void init(IEditorSite site, IEditorInput input)
             throws PartInitException {
-
-        if (!(input instanceof IFileEditorInput)) {
-			throw new PartInitException("Invalid Input: Must be IFileEditorInput");
-		}
+        
+        if (!(input instanceof IFileEditorInput))
+            throw new PartInitException("Invalid Input: Must be IFileEditorInput");
         setSite(site);
         setInput(input);
     }
@@ -55,9 +54,9 @@ public class EditorWithDisposeException extends EditorPart {
     @Override
 	public void createPartControl(Composite parent) {
         parent.setLayout(new FillLayout());
-
+        
         Label testLabel = new Label(parent, SWT.NONE);
-
+        
         testLabel.setText("This editor is supposed to throw an exception when closed");
     }
 
@@ -65,7 +64,7 @@ public class EditorWithDisposeException extends EditorPart {
 	public void setFocus() {
 
     }
-
+    
     @Override
 	public void dispose() {
         throw new RuntimeException("This exception was thrown intentionally as part of an error handling test");
