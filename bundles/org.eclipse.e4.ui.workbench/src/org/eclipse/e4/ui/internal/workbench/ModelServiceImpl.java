@@ -106,10 +106,9 @@ public class ModelServiceImpl implements EModelService {
 				appContext.get(IExtensionRegistry.class));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.e4.ui.workbench.modeling.EModelService#createModelElement(java.lang.Class)
+	/**
+	 * @see EModelService#createModelElement(Class)
+	 * @generated
 	 */
 	@SuppressWarnings("unchecked")
 	public final <T extends MApplicationElement> T createModelElement(Class<T> elementType) {
