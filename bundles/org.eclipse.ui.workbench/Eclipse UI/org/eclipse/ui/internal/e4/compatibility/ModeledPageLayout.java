@@ -62,7 +62,6 @@ public class ModeledPageLayout implements IPageLayout {
 	public static final String SHOW_VIEW_TAG = "persp.viewSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_MENU_PREFIX = "persp.hideMenuSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_TOOLBAR_PREFIX = "persp.hideToolbarSC:"; //$NON-NLS-1$
-	public static final String HIDDEN_ACTIONSET_PREFIX = "persp.hideActionSetSC:"; //$NON-NLS-1$
 	public static final String HIDDEN_ITEMS_KEY = "persp.hiddenItems"; //$NON-NLS-1$
 
 	public static List<String> getIds(MPerspective model, String tagPrefix) {
@@ -148,6 +147,8 @@ public class ModeledPageLayout implements IPageLayout {
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
 			editorStack = modelService.createModelElement(MPartStack.class);
+			// temporary HACK for bug 303982
+			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
 			editorStack.getTags().add("EditorStack"); //$NON-NLS-1$
 			editorStack.setElementId("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
@@ -411,6 +412,8 @@ public class ModeledPageLayout implements IPageLayout {
 
 	private MPartStack createStack(String id, boolean visible) {
 		MPartStack newStack = modelService.createModelElement(MPartStack.class);
+		// temporary HACK for bug 303982
+		newStack.getTags().add("newtablook"); //$NON-NLS-1$
 		newStack.setElementId(id);
 		newStack.setToBeRendered(visible);
 		return newStack;

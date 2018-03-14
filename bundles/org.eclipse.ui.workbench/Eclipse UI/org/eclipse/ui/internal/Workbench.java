@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708, 418661
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *******************************************************************************/
@@ -27,9 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,7 +70,6 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.dynamichelpers.IExtensionTracker;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -287,18 +283,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 
 	public static String WORKBENCH_AUTO_SAVE_JOB = "Workbench Auto-Save Job"; //$NON-NLS-1$
 
-	private static final String WORKBENCH_AUTO_SAVE_BACKGROUND_JOB = "Workbench Auto-Save Background Job"; //$NON-NLS-1$
-
-	private JobGroup jobGroupWorkbenchAutoSave = new JobGroup(WORKBENCH_AUTO_SAVE_JOB, 1, 1);
-
 	private static String MEMENTO_KEY = "memento"; //$NON-NLS-1$
-
-	private static final String PROP_VM = "eclipse.vm"; //$NON-NLS-1$
-	private static final String PROP_VMARGS = "eclipse.vmargs"; //$NON-NLS-1$
-	private static final String PROP_COMMANDS = "eclipse.commands"; //$NON-NLS-1$
-	private static final String PROP_EXIT_CODE = "eclipse.exitcode"; //$NON-NLS-1$
-	private static final String CMD_DATA = "-data"; //$NON-NLS-1$
-	private static final String CMD_VMARGS = "-vmargs"; //$NON-NLS-1$
 
 	private final class StartupProgressBundleListener implements SynchronousBundleListener {
 
@@ -1278,7 +1263,7 @@ public final class Workbench extends EventManager implements IWorkbench,
 		}
 		final IModelResourceHandler handler = e4Context.get(IModelResourceHandler.class);
 
-		Job cleanAndSaveJob = new Job(WORKBENCH_AUTO_SAVE_BACKGROUND_JOB) {
+		Job cleanAndSaveJob = new Job("Workbench Auto-Save Background Job") { //$NON-NLS-1$
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				final Resource res = handler.createResourceWithApp(appCopy);
@@ -1299,7 +1284,6 @@ public final class Workbench extends EventManager implements IWorkbench,
 		};
 		cleanAndSaveJob.setPriority(Job.SHORT);
 		cleanAndSaveJob.setSystem(true);
-		cleanAndSaveJob.setJobGroup(jobGroupWorkbenchAutoSave);
 		cleanAndSaveJob.schedule();
 	}
 
@@ -2633,103 +2617,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		return close(PlatformUI.RETURN_RESTART, false);
 	}
 
-	@Override
-	public boolean restart(boolean useCurrrentWorkspace) {
-		if (useCurrrentWorkspace) {
-			URL instanceUrl = Platform.getInstanceLocation().getURL();
-			if (instanceUrl != null) {
-				try {
-					URI uri = instanceUrl.toURI();
-					String command_line = buildCommandLine(uri.toString());
-					if (command_line != null) {
-						System.setProperty(PROP_EXIT_CODE, IApplication.EXIT_RELAUNCH.toString());
-						System.setProperty(IApplicationContext.EXIT_DATA_PROPERTY, command_line);
-					}
-				} catch (URISyntaxException e) {
-					// do nothing; workbench will be restarted with the same
-					// command line as used for the previous launch
-				}
-			}
-		}
-		return close(PlatformUI.RETURN_RESTART, false);
-	}
 
-	/**
-	 * Create and return a string with command line options for eclipse.exe that
-	 * will launch a new workbench that is the same as the currently running
-	 * one, but using the argument directory as its workspace.
-	 * <p>
-	 * Note that this method has been copied from
-	 * OpenWorkspaceAction.buildCommandLine(String workspace)
-	 * </p>
-	 * 
-	 * @param workspace
-	 *            the directory to use as the new workspace
-	 * @return a string of command line options or <code>null</code> if
-	 *         'eclipse.vm' is not set
-	 */
-	private String buildCommandLine(String workspace) {
-		String property = System.getProperty(PROP_VM);
-		if (property == null) {
-			if (!Platform.inDevelopmentMode()) {
-				// Don't log this when in development mode, since 'eclipse.vm'
-				// is never set in this case
-				WorkbenchPlugin.log(NLS.bind(WorkbenchMessages.Workbench_missingPropertyMessage, PROP_VM));
-			}
-			return null;
-		}
-
-		StringBuffer result = new StringBuffer(512);
-		result.append(property);
-		result.append('\n');
-
-		// append the vmargs and commands. Assume that these already end in \n
-		String vmargs = System.getProperty(PROP_VMARGS);
-		if (vmargs != null) {
-			result.append(vmargs);
-		}
-
-		// append the rest of the args, replacing or adding -data as required
-		property = System.getProperty(PROP_COMMANDS);
-		if (property == null) {
-			result.append(CMD_DATA);
-			result.append('\n');
-			result.append(workspace);
-			result.append('\n');
-		} else {
-			// find the index of the arg to add/replace its value
-			int cmd_data_pos = property.lastIndexOf(CMD_DATA);
-			if (cmd_data_pos != -1) {
-				cmd_data_pos += CMD_DATA.length() + 1;
-				result.append(property.substring(0, cmd_data_pos));
-				result.append(workspace);
-				// append from the next arg
-				int nextArg = property.indexOf("\n-", cmd_data_pos - 1); //$NON-NLS-1$
-				if (nextArg != -1) {
-					result.append(property.substring(nextArg));
-				}
-			} else {
-				result.append(CMD_DATA);
-				result.append('\n');
-				result.append(workspace);
-				result.append('\n');
-				result.append(property);
-			}
-		}
-
-		// put the vmargs back at the very end (the eclipse.commands property
-		// already contains the -vm arg)
-		if (vmargs != null) {
-			if (result.charAt(result.length() - 1) != '\n') {
-				result.append('\n');
-			}
-			result.append(CMD_VMARGS);
-			result.append('\n');
-			result.append(vmargs);
-		}
-
-		return result.toString();
-	}
 
 	/**
 	 * Returns the ids of all plug-ins that extend the
@@ -2741,16 +2629,16 @@ UIEvents.Context.TOPIC_CONTEXT,
 		IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(
 				PlatformUI.PLUGIN_ID, IWorkbenchRegistryConstants.PL_STARTUP);
 		IExtension[] extensions = point.getExtensions();
-		ArrayList<String> pluginIds = new ArrayList<String>(extensions.length);
+		ArrayList pluginIds = new ArrayList(extensions.length);
 		for (int i = 0; i < extensions.length; i++) {
-			String id = extensions[i].getNamespaceIdentifier();
+			String id = extensions[i].getNamespace();
 			if (!pluginIds.contains(id)) {
 				pluginIds.add(id);
 			}
 		}
 		ContributionInfo[] result = new ContributionInfo[pluginIds.size()];
 		for (int i = 0; i < result.length; i++) {
-			result[i] = new ContributionInfo(pluginIds.get(i),
+			result[i] = new ContributionInfo((String) pluginIds.get(i),
 					ContributionInfoMessages.ContributionInfo_EarlyStartupPlugin, null);
 
 		}
@@ -3009,6 +2897,10 @@ UIEvents.Context.TOPIC_CONTEXT,
 							return Status.OK_STATUS;
 						}
 
+						@Override
+						public boolean belongsTo(Object family) {
+							return WORKBENCH_AUTO_SAVE_JOB == family;
+						}
 					};
 					autoSaveJob.setSystem(true);
 					autoSaveJob.schedule(millisecondInterval);

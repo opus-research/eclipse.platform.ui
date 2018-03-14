@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
  *     Snjezana Peco <snjezana.peco@redhat.com> - Memory leaks in Juno when opening and closing XML Editor - http://bugs.eclipse.org/397909
  *     Marco Descher <marco@descher.at> - Bug 397677
  *     Dmitry Spiridenok - Bug 429756
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723, 450863
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445723
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -154,7 +154,7 @@ public class HandledContributionItem extends ContributionItem {
 	};
 
 	@Inject
-	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
+	void setResourceUtils(IResourceUtilities utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
@@ -232,11 +232,6 @@ public class HandledContributionItem extends ContributionItem {
 	private void generateCommand() {
 		if (model.getCommand() != null && model.getWbCommand() == null) {
 			String cmdId = model.getCommand().getElementId();
-			if (cmdId == null) {
-				Activator.log(IStatus.ERROR, "Unable to generate parameterized command for " + model //$NON-NLS-1$
-						+ ". ElementId is not allowed to be null."); //$NON-NLS-1$
-				return;
-			}
 			List<MParameter> modelParms = model.getParameters();
 			Map<String, Object> parameters = new HashMap<String, Object>(4);
 			for (MParameter mParm : modelParms) {

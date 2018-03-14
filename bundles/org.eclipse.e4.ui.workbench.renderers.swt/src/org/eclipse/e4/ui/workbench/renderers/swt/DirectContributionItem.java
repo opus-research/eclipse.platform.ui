@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards
  *     to toolbar always displays icon and text
- *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 443092
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -89,7 +88,7 @@ public class DirectContributionItem extends ContributionItem {
 	private ISWTResourceUtilities resUtils = null;
 
 	@Inject
-	void setResourceUtils(IResourceUtilities<ImageDescriptor> utils) {
+	void setResourceUtils(IResourceUtilities utils) {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
@@ -487,9 +486,6 @@ public class DirectContributionItem extends ContributionItem {
 	 * @return the execution context
 	 */
 	private IEclipseContext getExecutionContext(IEclipseContext context) {
-		if (context == null)
-			return null;
-
 		return context.getActiveLeaf();
 	}
 
