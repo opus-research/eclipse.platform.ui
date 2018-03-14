@@ -8,10 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990, Bug 400217
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
+ *     Sopot Cela <scela@redhat.com> - Bug 472761
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -98,15 +100,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public static final String UPDATE_VARS = "ToolBarManagerRenderer.updateVars"; //$NON-NLS-1$
 	private static final String DISPOSE_ADDED = "ToolBarManagerRenderer.disposeAdded"; //$NON-NLS-1$
 
-	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<MToolBar, ToolBarManager>();
-	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<ToolBarManager, MToolBar>();
+	private Map<MToolBar, ToolBarManager> modelToManager = new HashMap<>();
+	private Map<ToolBarManager, MToolBar> managerToModel = new HashMap<>();
 
-	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<MToolBarElement, IContributionItem>();
-	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<IContributionItem, MToolBarElement>();
+	private Map<MToolBarElement, IContributionItem> modelToContribution = new HashMap<>();
+	private Map<IContributionItem, MToolBarElement> contributionToModel = new HashMap<>();
 
-	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
+	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<>();
 
-	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
+	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
@@ -266,7 +268,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	private HashSet<String> updateVariables = new HashSet<String>();
+	private HashSet<String> updateVariables = new HashSet<>();
 
 	@Inject
 	@Optional
@@ -296,14 +298,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 
 		getUpdater().updateContributionItems(s);
-
-		for (Map.Entry<IContributionItem, MToolBarElement> entry : contributionToModel.entrySet()) {
-			processVisibility(entry.getKey(), entry.getValue());
-		}
-		for (ToolBarManager mgr : managerToModel.keySet()) {
-			mgr.update(false);
-		}
-
 	}
 
 	@Inject
@@ -386,7 +380,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		Control renderedCtrl = newTB;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
-			element.getTags().add(IPresentationEngine.DRAGGABLE);
+			if (!element.getTags().contains(IPresentationEngine.NO_MOVE)) {
+				element.getTags().add(IPresentationEngine.DRAGGABLE);
+			}
 
 			setCSSInfo(element, newTB);
 
@@ -396,7 +392,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IEclipseContext parentContext = getContextForParent(element);
 			CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
 			if (cssUtils != null) {
-				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, true);
+				MUIElement modelElement = (MUIElement) newTB.getData(AbstractPartRenderer.OWNING_ME);
+				boolean draggable = ((modelElement != null) && (modelElement.getTags().contains(IPresentationEngine.DRAGGABLE)));
+				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, draggable);
 			}
 		}
 
@@ -414,7 +412,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			addCleanupDisposeListener(toolbarModel, manager.getControl());
 		}
 
-		final ArrayList<MToolBarContribution> toContribute = new ArrayList<MToolBarContribution>();
+		final ArrayList<MToolBarContribution> toContribute = new ArrayList<>();
 		ContributionsAnalyzer.XXXgatherToolBarContributions(toolbarModel,
 				application.getToolBarContributions(), elementId, toContribute);
 		generateContributions(toolbarModel, toContribute);
@@ -446,7 +444,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBarManager manager = getManager(toolbarModel);
 		boolean done = toContribute.size() == 0;
 		while (!done) {
-			ArrayList<MToolBarContribution> curList = new ArrayList<MToolBarContribution>(toContribute);
+			ArrayList<MToolBarContribution> curList = new ArrayList<>(toContribute);
 			int retryCount = toContribute.size();
 			toContribute.clear();
 
@@ -744,9 +742,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final IEclipseContext lclContext = getContext(itemModel);
 		ToolControlContribution ci = ContextInjectionFactory.make(ToolControlContribution.class, lclContext);
 		ci.setModel(itemModel);
-
-		processVisibility(ci, itemModel);
-
+		ci.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ci);
 		linkModelToContribution(itemModel, ci);
 	}
@@ -760,9 +756,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final IEclipseContext lclContext = getContext(itemModel);
 		DirectContributionItem ci = ContextInjectionFactory.make(DirectContributionItem.class, lclContext);
 		ci.setModel(itemModel);
-
-		processVisibility(ci, itemModel);
-
+		ci.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ci);
 		linkModelToContribution(itemModel, ci);
 	}
@@ -776,9 +770,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final IEclipseContext lclContext = getContext(itemModel);
 		HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class, lclContext);
 		ci.setModel(itemModel);
-
-		processVisibility(ci, itemModel);
-
+		ci.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ci);
 		linkModelToContribution(itemModel, ci);
 	}
@@ -796,9 +788,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		} else {
 			return;
 		}
-
-		processVisibility(ici, itemModel);
-
+		ici.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ici);
 		linkModelToContribution(itemModel, ici);
 	}
@@ -895,7 +885,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public ArrayList<ToolBarContributionRecord> getList(MToolBarElement item) {
 		ArrayList<ToolBarContributionRecord> tmp = sharedElementToRecord.get(item);
 		if (tmp == null) {
-			tmp = new ArrayList<ToolBarContributionRecord>();
+			tmp = new ArrayList<>();
 			sharedElementToRecord.put(item, tmp);
 		}
 		return tmp;
@@ -923,7 +913,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	 */
 	public void reconcileManagerToModel(IToolBarManager menuManager, MToolBar toolBar) {
 		List<MToolBarElement> modelChildren = toolBar.getChildren();
-		HashSet<MToolItem> oldModelItems = new HashSet<MToolItem>();
+		HashSet<MToolItem> oldModelItems = new HashSet<>();
 		for (MToolBarElement itemModel : modelChildren) {
 			if (OpaqueElementUtil.isOpaqueToolItem(itemModel)) {
 				oldModelItems.add((MToolItem) itemModel);

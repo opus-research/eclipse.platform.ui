@@ -48,8 +48,6 @@ import org.w3c.dom.svg.SVGDocument;
 import com.jhlabs.image.ContrastFilter;
 import com.jhlabs.image.GrayscaleFilter;
 import com.jhlabs.image.HSBAdjustFilter;
-import com.jhlabs.image.PointFilter;
-import com.jhlabs.image.TransferFilter;
 
 /**
  * <p>Mojo which renders SVG icons into PNG format.</p>
@@ -67,6 +65,12 @@ public class RenderMojo extends AbstractMojo {
 
     /** Used to specify the number of render threads when rasterizing icons. */
     public static final String RENDERTHREADS = "eclipse.svg.renderthreads";
+
+    /** Used to specify the directory name where the SVGs are taken from. */
+    public static final String SOURCE_DIR = "eclipse.svg.sourcedirectory";
+
+    /** Used to specify the directory name where the PNGs are saved to. */
+    public static final String TARGET_DIR = "eclipse.svg.targetdirectory";
 
     /** A list of directories with svg sources to rasterize. */
     private List<IconEntry> icons;
@@ -151,9 +155,35 @@ public class RenderMojo extends AbstractMojo {
         Element svgDocumentNode = svgDocument.getDocumentElement();
         String nativeWidthStr = svgDocumentNode.getAttribute("width");
         String nativeHeightStr = svgDocumentNode.getAttribute("height");
+        int nativeWidth = -1;
+        int nativeHeight = -1;
 
-        int nativeWidth = Integer.parseInt(nativeWidthStr);
-        int nativeHeight = Integer.parseInt(nativeHeightStr);
+        try{
+            if (nativeWidthStr != "" && nativeHeightStr != ""){
+                nativeWidth = Integer.parseInt(nativeWidthStr);
+                nativeHeight = Integer.parseInt(nativeHeightStr);
+            } else {
+                // Vector graphics editing programs don't always output height and width attributes on SVG.
+                // As fall back: parse the viewBox attribute (which is almost always set).
+                String viewBoxStr = svgDocumentNode.getAttribute("viewBox");
+                if (viewBoxStr == ""){
+                    log.error("Icon defines neither width/height nor a viewBox, skipping: " + icon.nameBase);
+                    failedIcons.add(icon);
+                    return;
+                }
+                String[] splitted = viewBoxStr.split(" ");
+                String xStr = splitted[0];
+                String yStr = splitted[1];
+                String widthStr = splitted[2];
+                String heightStr = splitted[3];
+                nativeWidth = Integer.parseInt(widthStr) - Integer.parseInt(xStr);
+                nativeHeight = Integer.parseInt(heightStr) - Integer.parseInt(yStr); 
+            }
+        }catch (NumberFormatException e){
+            log.error("Dimension could not be parsed ( "+e.getMessage()+ "), skipping: " + icon.nameBase);
+            failedIcons.add(icon);
+            return;
+        }
 
         int outputWidth = (int) (nativeWidth * outputScale);
         int outputHeight = (int) (nativeHeight * outputScale);
@@ -284,7 +314,7 @@ public class RenderMojo extends AbstractMojo {
         int remainingIcons = icons.size();
 
         // The number of icons to distribute to a rendering callable
-        final int threadExecSize = icons.size() / this.threads;
+        final int threadExecSize = Math.max(1, icons.size() / this.threads);
 
         // The current offset to start a batch, as they're distributed
         // between rendering callables
@@ -292,7 +322,7 @@ public class RenderMojo extends AbstractMojo {
 
         // A list of callables used to render icons on multiple threads
         // Each callable gets a set of icons to render
-        List<Callable<Object>> tasks = new ArrayList<Callable<Object>>(
+        List<Callable<Object>> tasks = new ArrayList<>(
                 this.threads);
 
         // Distribute the rasterization operations between multiple threads
@@ -325,6 +355,7 @@ public class RenderMojo extends AbstractMojo {
 
             // Create the callable and add it to the task pool
             Callable<Object> runnable = new Callable<Object>() {
+                @Override
                 public Object call() throws Exception {
                     // The jhlabs filters are not thread safe, so provide one set per thread
                     GrayscaleFilter grayFilter = new GrayscaleFilter();
@@ -467,7 +498,7 @@ public class RenderMojo extends AbstractMojo {
     private void init(int threads, double scale) {
         this.threads = threads;
         this.outputScale = Math.max(1, scale);
-        icons = new ArrayList<IconEntry>();
+        icons = new ArrayList<>();
         execPool = Executors.newFixedThreadPool(threads);
         counter = new AtomicInteger();
     }
@@ -502,6 +533,20 @@ public class RenderMojo extends AbstractMojo {
             }
         }
 
+        // Defaults to "eclipse-svg"
+        String sourceDir = "eclipse-svg";
+        String sourceDirProp = System.getProperty(SOURCE_DIR);
+        if (sourceDirProp != null) {
+            sourceDir = sourceDirProp;
+        }
+
+        // Defaults to "eclipse-png"
+        String targetDir = "eclipse-png";
+        String targetDirProp = System.getProperty(TARGET_DIR);
+        if (targetDirProp != null) {
+            targetDir = targetDirProp;
+        }
+
         // Track the time it takes to render the entire set
         long totalStartTime = System.currentTimeMillis();
 
@@ -510,8 +555,8 @@ public class RenderMojo extends AbstractMojo {
 
         String workingDirectory = System.getProperty("user.dir");
 
-        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/eclipse-png/" : "/eclipse-png-highdpi/"));
-        File iconDirectoryRoot = new File("eclipse-svg/");
+        File outputDir = new File(workingDirectory + (iconScale == 1 ? "/" + targetDir + "/" : "/" + targetDir + "-highdpi/"));
+        File iconDirectoryRoot = new File(sourceDir + "/");
 
         // Search each subdir in the root dir for svg icons
         for (File file : iconDirectoryRoot.listFiles()) {
