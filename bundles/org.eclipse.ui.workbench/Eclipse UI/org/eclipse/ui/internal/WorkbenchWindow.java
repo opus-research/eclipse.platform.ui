@@ -114,6 +114,7 @@ import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
@@ -210,6 +211,8 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
 
 	public static final String ACTION_SET_CMD_PREFIX = "AS::"; //$NON-NLS-1$
+
+	private static final String PERSISTED_STATE_ISRESTORED = "isRestored"; //$NON-NLS-1$
 
 	@Inject
 	private IWorkbench workbench;
@@ -751,6 +754,19 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 						false);
 				PrefUtil.saveAPIPrefs();
 			}
+
+			if (Boolean.valueOf(getModel().getPersistedState().get(PERSISTED_STATE_ISRESTORED))) {
+				SafeRunnable.run(new SafeRunnable() {
+
+					@Override
+					public void run() throws Exception {
+						getWindowAdvisor().postWindowRestore();
+					}
+				});
+			} else {
+				getModel().getPersistedState().put(PERSISTED_STATE_ISRESTORED, Boolean.TRUE.toString());
+			}
+
 			getWindowAdvisor().postWindowCreate();
 			getWindowAdvisor().openIntro();
 
