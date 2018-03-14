@@ -60,7 +60,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     public String getLabel(Object o) {
         if (o instanceof AdaptableResourceWrapper)
             return ((AdaptableResourceWrapper) o).getLabel();
-		return null;
+        else
+            return null;
     }
 
     /*
@@ -69,7 +70,8 @@ public class TestAdaptableWorkbenchAdapter extends LabelProvider implements
     public Object getParent(Object o) {
         if (o instanceof AdaptableResourceWrapper)
             return ((AdaptableResourceWrapper) o).getParent();
-		return null;
+        else
+            return null;
     }
 
     /**
