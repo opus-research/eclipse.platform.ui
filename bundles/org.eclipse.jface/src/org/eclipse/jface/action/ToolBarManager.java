@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 457211
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457214
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -61,7 +60,7 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 	 * {@link #createControl(Composite)} method to create the tool bar control.
 	 */
 	public ToolBarManager() {
-		// Do nothing if there are no parameters
+		//Do nothing if there are no parameters
 	}
 
 	/**
@@ -98,9 +97,9 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 	}
 
 	/**
-	 * Sets SWT button style for new tool bar controls created in the
-	 * {@code createControl(Composite)} method. It does not affect already
-	 * existing tool bar control.
+	 * Sets SWT button style for new tool bar controls created
+	 * in the {@code createControl(Composite)} method. It does not
+	 * affect already existing tool bar control.
 	 *
 	 * @param style
 	 *            the tool bar item style
@@ -111,9 +110,9 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 	}
 
 	/**
-	 * Creates and returns this manager's tool bar control. Does not create a
-	 * new control if one already exists and is not disposed. Also create an
-	 * {@link AccessibleListener} for the {@link ToolBar}.
+	 * Creates and returns this manager's tool bar control. Does not create
+	 * a new control if one already exists and is not disposed.
+	 * Also create an {@link AccessibleListener} for the {@link ToolBar}.
 	 *
 	 * @param parent
 	 *            the parent control
@@ -225,7 +224,8 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 				for (CoolItem item : items) {
 					if (item.getControl() == layoutBar) {
 						Point curSize = item.getSize();
-						item.setSize(curSize.x + (afterPack.x - beforePack.x), curSize.y + (afterPack.y - beforePack.y));
+						item.setSize(curSize.x + (afterPack.x - beforePack.x),
+								curSize.y + (afterPack.y - beforePack.y));
 						return;
 					}
 				}
@@ -295,9 +295,17 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 			}
 		}
 
-		// Turn redraw off to minimize flicker
+		// Turn redraw off if the number of items to be added
+		// is above a certain threshold, to minimize flicker,
+		// otherwise the toolbar can be seen to redraw after each item.
+		// Do this before any modifications are made.
+		// We assume each contribution item will contribute at least one
+		// toolbar item.
+		boolean useRedraw = (clean.size() - (mi.length - toRemove.size())) >= 3;
 		try {
-			toolBar.setRedraw(false);
+			if (useRedraw) {
+				toolBar.setRedraw(false);
+			}
 
 			// remove obsolete items
 			for (int i = toRemove.size(); --i >= 0;) {
@@ -365,7 +373,9 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 			// turn redraw back on if we turned it off above
 		} finally {
-			toolBar.setRedraw(true);
+			if (useRedraw) {
+				toolBar.setRedraw(true);
+			}
 		}
 
 		int newCount = toolBar.getItemCount();
@@ -429,7 +439,7 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 	 */
 	private boolean isChildVisible(IContributionItem item) {
 		IContributionManagerOverrides overrides = getOverrides();
-		if (overrides == null) {
+		if(overrides == null) {
 			return item.isVisible();
 		}
 		Boolean v = overrides.getVisible(item);
