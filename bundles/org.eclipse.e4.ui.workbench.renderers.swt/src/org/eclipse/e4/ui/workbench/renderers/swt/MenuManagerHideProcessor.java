@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,36 +70,39 @@ public class MenuManagerHideProcessor implements IMenuListener2 {
 	 *
 	 */
 	private void processDynamicElements(final MenuManager menuManager, Menu menu, final MMenu menuModel) {
-		// We need to make a copy of the dynamic items which need to be removed
-		// because the actual remove happens asynchronously.
-		final Map<MDynamicMenuContribution, ArrayList<MMenuElement>> toBeHidden = new HashMap<MDynamicMenuContribution, ArrayList<MMenuElement>>();
-
-		for (MMenuElement currentMenuElement : menuModel.getChildren()) {
-			if (currentMenuElement instanceof MDynamicMenuContribution) {
-
-				final Map<String, Object> storageMap = currentMenuElement.getTransientData();
-				@SuppressWarnings("unchecked")
-				ArrayList<MMenuElement> mel = (ArrayList<MMenuElement>) storageMap
-						.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
-
-				toBeHidden.put((MDynamicMenuContribution) currentMenuElement, mel);
-
-				// make existing entries for this dynamic contribution item
-				// invisible if there are any
-				if (mel != null && mel.size() > 0) {
-
-					for (MMenuElement item : mel) {
-						item.setVisible(false);
-					}
-				}
-				currentMenuElement.getTransientData().remove(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
-			}
-		}
-
 		if (!menu.isDisposed()) {
 			menu.getDisplay().asyncExec(new Runnable() {
 				@Override
 				public void run() {
+					// We need to make a copy of the dynamic items which need to
+					// be removed
+					// because the actual remove happens asynchronously.
+					final Map<MDynamicMenuContribution, ArrayList<MMenuElement>> toBeHidden = new HashMap<>();
+
+					for (MMenuElement currentMenuElement : menuModel.getChildren()) {
+						if (currentMenuElement instanceof MDynamicMenuContribution) {
+
+							final Map<String, Object> storageMap = currentMenuElement.getTransientData();
+							@SuppressWarnings("unchecked")
+							ArrayList<MMenuElement> mel = (ArrayList<MMenuElement>) storageMap
+									.get(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
+
+							toBeHidden.put((MDynamicMenuContribution) currentMenuElement, mel);
+
+							// make existing entries for this dynamic
+							// contribution item
+							// invisible if there are any
+							if (mel != null && mel.size() > 0) {
+
+								for (MMenuElement item : mel) {
+									item.setVisible(false);
+								}
+							}
+							currentMenuElement.getTransientData()
+									.remove(MenuManagerShowProcessor.DYNAMIC_ELEMENT_STORAGE_KEY);
+						}
+					}
+
 					for (Entry<MDynamicMenuContribution, ArrayList<MMenuElement>> entry : toBeHidden.entrySet()) {
 						MDynamicMenuContribution currentMenuElement = entry.getKey();
 						Object contribution = currentMenuElement.getObject();
