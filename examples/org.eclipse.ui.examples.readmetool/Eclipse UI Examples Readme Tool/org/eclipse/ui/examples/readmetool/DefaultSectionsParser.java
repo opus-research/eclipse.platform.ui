@@ -38,12 +38,12 @@ public class DefaultSectionsParser implements IReadmeFileParser {
      * the parent of 1.2 is 1, the parent of 1.4.1 is 1.4.
      * Returns null if there is no appropriate parent.
      */
-    protected IAdaptable getParent(Hashtable toc, String number) {
+    protected IAdaptable getParent(Hashtable<String, MarkElement> toc, String number) {
         int lastDot = number.lastIndexOf('.');
         if (lastDot < 0)
             return null;
         String parentNumber = number.substring(0, lastDot);
-        return (IAdaptable) toc.get(parentNumber);
+        return toc.get(parentNumber);
     }
 
     /**
@@ -76,9 +76,10 @@ public class DefaultSectionsParser implements IReadmeFileParser {
      * @param file  the element containing the input text
      * @return an element collection representing the parsed input
      */
-    public MarkElement[] parse(IFile file) {
-        Hashtable markTable = new Hashtable(40);
-        Vector topLevel = new Vector();
+    @Override
+	public MarkElement[] parse(IFile file) {
+        Hashtable<String, MarkElement> markTable = new Hashtable<>(40);
+        Vector<MarkElement> topLevel = new Vector<>();
         String s = getText(file);
         int start = 0;
         int end = -1;

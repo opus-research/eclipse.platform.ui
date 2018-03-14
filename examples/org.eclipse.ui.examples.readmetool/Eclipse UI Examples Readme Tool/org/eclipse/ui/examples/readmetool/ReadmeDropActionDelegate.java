@@ -25,10 +25,8 @@ import org.eclipse.ui.part.IDropActionDelegate;
 public class ReadmeDropActionDelegate implements IDropActionDelegate {
     public static final String ID = "org_eclipse_ui_examples_readmetool_drop_actions"; //$NON-NLS-1$
 
-    /** (non-Javadoc)
-     * Method declared on IDropActionDelegate
-     */
-    public boolean run(Object source, Object target) {
+    @Override
+	public boolean run(Object source, Object target) {
         if (source instanceof byte[] && target instanceof IFile) {
             IFile file = (IFile) target;
             try {
