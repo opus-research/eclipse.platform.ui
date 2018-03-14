@@ -24,7 +24,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link Widget}.
- *
+ * 
  */
 public class WidgetElement extends ElementAdapter implements NodeList {
 
@@ -33,7 +33,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Convenience method for getting the CSS class of a widget.
-	 *
+	 * 
 	 * @param widget
 	 *            SWT widget with associated CSS class name
 	 * @return CSS class name
@@ -44,7 +44,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Convenience method for getting the CSS ID of a widget.
-	 *
+	 * 
 	 * @param widget
 	 *            SWT widget with associated CSS id
 	 * @return CSS ID
@@ -55,7 +55,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Convenience method for setting the CSS class of a widget.
-	 *
+	 * 
 	 * @param widget
 	 *            SWT widget with associated CSS class name
 	 * @param className
@@ -67,7 +67,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Convenience method for setting the CSS ID of a widget.
-	 *
+	 * 
 	 * @param widget
 	 *            SWT widget with associated CSS id
 	 * @param id
@@ -87,7 +87,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Convenience method for getting the CSS engine responsible for a widget.
-	 *
+	 * 
 	 * @param display
 	 *            SWT display which is styled by an engine
 	 */
@@ -96,29 +96,9 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 	}
 
 	/**
-	 * Convenience method for requesting the CSS engine to re-apply styles to a
-	 * widget.
-	 *
-	 * @param widget
-	 *            widget to be restyled
-	 * @param applyStylesToChildNodes
-	 *            if true, apply styles to the child nodes
-	 */
-	public static void applyStyles(Widget widget,
-			boolean applyStylesToChildNodes) {
-		CSSEngine engine = getEngine(widget);
-		if (engine != null) {
-			engine.applyStyles(widget, applyStylesToChildNodes);
-		}
-	}
-
-	/**
 	 * Convenience method for setting the CSS engine responsible for a display.
-	 *
-	 * @param widget
-	 *            SWT display which is styled by an engine
-	 * @param engine
-	 *            Engine to be associated with the display
+	 * @param widget SWT display which is styled by an engine
+	 * @param engine Engine to be associated with the display
 	 */
 	public static void setEngine(Display display, CSSEngine engine) {
 		display.setData(CSSSWTConstants.CSS_ENGINE_KEY, engine);
@@ -140,7 +120,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Compute local name.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String computeLocalName() {
@@ -150,9 +130,6 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 		// localName is Label
 		// CSS selector will use this localName
 		// ex : Label {background-color:red;}
-
-		// for inner classes, the hyphen is used, e.g., for Outer$Inner,
-		// the selector is Outer-Inner {background-color:red;}
 		Widget widget = getWidget();
 		Class clazz = widget.getClass();
 		return ClassUtils.getSimpleName(clazz);
@@ -160,7 +137,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Compute namespaceURI.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String computeNamespaceURI() {
@@ -178,7 +155,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Compute static pseudo instances.
-	 *
+	 * 
 	 */
 	protected void computeStaticPseudoInstances() {
 
@@ -186,7 +163,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/**
 	 * Compute attribute SWT style.
-	 *
+	 * 
 	 * @return
 	 */
 	protected String computeAttributeSWTStyle() {
@@ -195,7 +172,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.e4.ui.css.core.dom.ElementAdapter#getAttribute(java.lang.
 	 * String)
@@ -284,7 +261,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSClass()
 	 */
 	@Override
@@ -299,7 +276,7 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.css.core.dom.CSSStylableElement#getCSSStyle()
 	 */
 	@Override
