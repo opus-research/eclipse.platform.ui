@@ -28,31 +28,42 @@ import org.eclipse.swt.widgets.TreeItem;
 /**
  * DecoratingLabelProviderTreePathTest is the tree path version of the
  * DecoratingLabelProviderTreeTest.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class DecoratingLabelProviderTreePathTest extends
 		CompositeLabelProviderTest {
 
 	class TreePathTestLabelProvider extends LabelProvider implements
 			IColorProvider, IFontProvider, ITreePathLabelProvider {
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+		 */
 		public Color getForeground(Object element) {
 			return foreground;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+		 */
 		public Color getBackground(Object element) {
 			return background;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		public Font getFont(Object element) {
 			return font;
 		}
 
-		@Override
 		public void updateLabel(ViewerLabel label, TreePath elementPath) {
 			label.setText(getText(elementPath.getLastSegment()));
 		}
@@ -60,7 +71,7 @@ public class DecoratingLabelProviderTreePathTest extends
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param name
 	 */
 	public DecoratingLabelProviderTreePathTest(String name) {
@@ -68,7 +79,11 @@ public class DecoratingLabelProviderTreePathTest extends
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.labelProviders.DecoratingLabelProviderTreeTest#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	protected StructuredViewer createViewer(Composite parent) {
 
 		initializeColors(parent);

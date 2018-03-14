@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Remy Chi Jian Suen <remy.suen@gmail.com>
+ *     Remy Chi Jian Suen <remy.suen@gmail.com> 
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
  ******************************************************************************/
 
@@ -67,9 +67,9 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
@@ -88,7 +88,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private Button removeButton;
 	private Button renameButton;
-
+	
 	private Button allButton;
 	private Button andButton;
 	private Button orButton;
@@ -101,12 +101,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private Collection configAreas;
 	private Label limitsLabel;
-
+	
 	private Object[] previouslyChecked = new Object[0];
 
 	/**
 	 * Create a new instance of the receiver on builder.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param generator
 	 */
@@ -120,7 +120,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Return whether or not to AND the filters
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean andFilters() {
@@ -129,11 +129,10 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.ViewerSettingsAndStatusDialog#
 	 * configureShell(org.eclipse.swt.widgets.Shell)
 	 */
-	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(MarkerMessages.configureFiltersDialog_title);
@@ -141,28 +140,26 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
 	 */
-	@Override
 	protected boolean isResizable() {
 		return true;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.views.markers.ViewerSettingsAndStatusDialog#
 	 * createDialogContentArea(org.eclipse.swt.widgets.Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout());
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 		container.setFont(parent.getFont());
-
+		
 		Composite composite = new Composite(container, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
@@ -269,13 +266,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		limitButton.setText(MarkerMessages.MarkerPreferences_MarkerLimits);
 		limitButton.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				limitsLabel.setEnabled(limitButton.getSelection());
 				limitText.setEnabled(limitButton.getSelection());
 			}
 		});
-
+		
 		GridData limitData = new GridData();
 		limitData.verticalIndent = 5;
 		limitButton.setLayoutData(limitData);
@@ -298,7 +294,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		limitText.setLayoutData(textData);
 		limitText.addVerifyListener(new VerifyListener() {
 
-			@Override
 			public void verifyText(VerifyEvent e) {
 				if (e.character != 0 && e.keyCode != SWT.BS
 						&& e.keyCode != SWT.DEL
@@ -310,7 +305,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		limitText.addModifyListener(new ModifyListener() {
 
-			@Override
 			public void modifyText(ModifyEvent e) {
 				try {
 					Integer.parseInt(limitText.getText());
@@ -339,14 +333,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		configsTable.setContentProvider(ArrayContentProvider.getInstance());
 		configsTable.setLabelProvider(new LabelProvider() {
-			@Override
 			public String getText(Object element) {
 				return ((MarkerFieldFilterGroup) element).getName();
 			}
 		});
 
 		configsTable.addCheckStateListener(new ICheckStateListener() {
-			@Override
 			public void checkStateChanged(CheckStateChangedEvent event) {
 				configsTable.setSelection(new StructuredSelection(event
 						.getElement()));
@@ -356,7 +348,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		configsTable
 				.addSelectionChangedListener(new ISelectionChangedListener() {
-					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						storeConfiguration();
 						MarkerFieldFilterGroup group = getSelectionFromTable();
@@ -425,7 +416,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		final FormToolkit toolkit = new FormToolkit(parent.getDisplay());
 		parent.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				toolkit.dispose();
 			}
@@ -449,7 +439,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Create a field area in the form for the FilterConfigurationArea
-	 *
+	 * 
 	 * @param toolkit
 	 * @param form
 	 * @param area
@@ -468,7 +458,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, area
 				.grabExcessVerticalSpace()));
 		expandable.addExpansionListener(new ExpansionAdapter() {
-			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
 				form.reflow(true);
 			}
@@ -503,7 +492,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		Button addNew = new Button(buttons, SWT.PUSH);
 		addNew.setText(MarkerMessages.MarkerFilter_addFilterName);
 		addNew.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				addConfiguration();
 			}
@@ -513,18 +501,16 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		removeButton = new Button(buttons, SWT.PUSH);
 		removeButton.setText(MarkerMessages.MarkerFilter_deleteSelectedName);
 		removeButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				removeFilters(configsTable.getSelection());
 			}
 		});
 		removeButton.setEnabled(false);
 		setButtonLayoutData(removeButton);
-
+		
 		renameButton = new Button(buttons, SWT.PUSH);
 		renameButton.setText(MarkerMessages.MarkerFilter_renameName);
 		renameButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				renameFilter();
 			}
@@ -535,27 +521,26 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	}
 
 	private void renameFilter() {
-
+		
 		MarkerFieldFilterGroup filterGroup = getSelectionFromTable();
 
 		IInputValidator nameValidator = getNameValidator(filterGroup.getName(), getCurrentConfigurationNames());
-
+		
 		InputDialog inputDialog = new InputDialog(getShell(),
 				MarkerMessages.MarkerFilterDialog_title,
 				MarkerMessages.MarkerFilterDialog_message,
 				filterGroup.getName(), nameValidator);
-
+		
 		if(inputDialog.open() == Window.OK) {
 			filterGroup.setName(inputDialog.getValue());
 			configsTable.refresh(filterGroup);
 		}
-
+				
 	}
 
 	private IInputValidator getNameValidator(final String currentName, final Collection existingNames) {
 		return new IInputValidator() {
-
-			@Override
+			
 			public String isValid(String newText) {
 				newText = newText.trim();
 				if (newText.length() == 0)
@@ -573,7 +558,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		allButton = new Button(parent, SWT.CHECK);
 		allButton.setText(MarkerMessages.ALL_Title);
 		allButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				updateShowAll(allButton.getSelection());
 			}
@@ -582,7 +566,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		andButton = new Button(parent, SWT.RADIO);
 		andButton.setText(MarkerMessages.AND_Title);
 		andButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				andFilters = true;
 			}
@@ -594,7 +577,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		orButton = new Button(parent, SWT.RADIO);
 		orButton.setText(MarkerMessages.OR_Title);
 		orButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				andFilters = false;
 			}
@@ -607,7 +589,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Get a collection of names of the filters currently in the list
-	 *
+	 * 
 	 * @return Collection
 	 */
 	private Collection getCurrentConfigurationNames() {
@@ -652,7 +634,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Return the dialog settings for the receiver.
-	 *
+	 * 
 	 * @return IDialogSettings
 	 */
 	private IDialogSettings getDialogSettings() {
@@ -669,7 +651,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Return the filter groups modified by the receiver.
-	 *
+	 * 
 	 * @return Collection of {@link MarkerFieldFilterGroup}
 	 */
 	Collection getFilters() {
@@ -725,7 +707,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Make a working copy of the groups.
-	 *
+	 * 
 	 * @param groups
 	 * @return Collection of MarkerFieldFilterGroup
 	 */
@@ -744,10 +726,9 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
-	@Override
 	protected void okPressed() {
 
 		generator.setMarkerLimitsEnabled(limitButton.getSelection());
@@ -767,7 +748,6 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	}
 
-	@Override
 	protected void performDefaults() {
 
 		andFilters = false;
@@ -798,7 +778,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Remove the filters in selection.
-	 *
+	 * 
 	 * @param selection
 	 */
 	private void removeFilters(ISelection selection) {
@@ -812,7 +792,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	 * Save the dialog settings for the receiver.
 	 */
 	private void saveDialogSettings() {
-
+		
 		IDialogSettings settings = getDialogSettings();
 
 		if (selectedFilterGroup != null)
@@ -823,7 +803,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			selectedNames[i] = ((MarkerFieldFilterGroup)previouslyChecked[i]).getName();
 		}
 		settings.put(PREV_SELECTED_ELEMENTS, selectedNames);
-
+		
 	}
 
 	private void updateButtonEnablement(MarkerFieldFilterGroup group) {
@@ -840,7 +820,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Set the control and all of it's visibility state to visible.
-	 *
+	 * 
 	 * @param enabled
 	 * @param control
 	 */

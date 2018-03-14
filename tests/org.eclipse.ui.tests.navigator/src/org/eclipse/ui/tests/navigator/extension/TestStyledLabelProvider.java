@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelP
 public abstract class TestStyledLabelProvider extends TestLabelProvider implements
 		IStyledLabelProvider {
 
-	@Override
 	public StyledString getStyledText(Object element) {
 		if (_blank || _null)
 			return new StyledString("");

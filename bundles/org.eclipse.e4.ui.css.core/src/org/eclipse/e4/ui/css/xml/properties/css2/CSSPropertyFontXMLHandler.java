@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 - 2013 Angelo Zerr and others.
+ * Copyright (c) 2008 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
  *******************************************************************************/
 package org.eclipse.e4.ui.css.xml.properties.css2;
 
@@ -21,24 +20,22 @@ import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
 
 /**
- *
+ * 
  */
 public class CSSPropertyFontXMLHandler extends AbstractCSSPropertyFontHandler {
 
 	public final static ICSSPropertyFontHandler INSTANCE = new CSSPropertyFontXMLHandler();
 
-	@Override
 	public boolean applyCSSProperty(Object node, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		if (node instanceof Element && ((Node) node).getOwnerDocument() != null) {
-			super.applyCSSProperty(node, property, value, pseudo,
+			super.applyCSSProperty((Element) node, property, value, pseudo,
 					engine);
 			return true;
 		}
 		return false;
 	}
 
-	@Override
 	public void applyCSSPropertyFontSize(Object node, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -50,7 +47,6 @@ public class CSSPropertyFontXMLHandler extends AbstractCSSPropertyFontHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyFontWeight(Object node, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -62,7 +58,6 @@ public class CSSPropertyFontXMLHandler extends AbstractCSSPropertyFontHandler {
 		}
 	}
 
-	@Override
 	public void applyCSSPropertyFontStyle(Object node, CSSValue value,
 			String pseudo, CSSEngine engine) throws Exception {
 		if (value.getCssValueType() == CSSValue.CSS_PRIMITIVE_VALUE) {
@@ -74,49 +69,42 @@ public class CSSPropertyFontXMLHandler extends AbstractCSSPropertyFontHandler {
 		}
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontAdjust(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontFamily(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontSize(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontStretch(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontStyle(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontVariant(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyFontWeight(Object element, String pseudo,
 			CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub

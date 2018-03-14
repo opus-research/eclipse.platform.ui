@@ -58,7 +58,7 @@ import org.eclipse.ui.keys.IBindingService;
  * currently active bindings, as well as the current state of the binding
  * architecture.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class BindingService implements IBindingService {
@@ -90,7 +90,7 @@ public final class BindingService implements IBindingService {
 	private Map<String, MBindingContext> bindingContexts = new HashMap<String, MBindingContext>();
 
 	private String[] activeSchemeIds;
-
+	
 	/**
 	 * Key assist dialog for workbench key bindings, lazily created and cached
 	 */
@@ -118,7 +118,11 @@ public final class BindingService implements IBindingService {
 		};
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	public void dispose() {
 		if (bp != null) {
 			bp.dispose();
@@ -130,57 +134,111 @@ public final class BindingService implements IBindingService {
 		this.context = context;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#addBindingManagerListener(org.eclipse
+	 * .jface.bindings.IBindingManagerListener)
+	 */
 	public void addBindingManagerListener(IBindingManagerListener listener) {
 		manager.addBindingManagerListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#removeBindingManagerListener(org.
+	 * eclipse.jface.bindings.IBindingManagerListener)
+	 */
 	public void removeBindingManagerListener(IBindingManagerListener listener) {
 		manager.removeBindingManagerListener(listener);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getActiveBindingsFor(org.eclipse.
+	 * core.commands.ParameterizedCommand)
+	 */
 	public TriggerSequence[] getActiveBindingsFor(ParameterizedCommand parameterizedCommand) {
 		Collection<TriggerSequence> seq = bindingService.getSequencesFor(parameterizedCommand);
 		return seq.toArray(new TriggerSequence[seq.size()]);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getActiveBindingsFor(java.lang.String
+	 * )
+	 */
 	public TriggerSequence[] getActiveBindingsFor(String commandId) {
 		return getActiveBindingsFor(commandService.createCommand(commandId, null));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getActiveScheme()
+	 */
 	public Scheme getActiveScheme() {
 		return manager.getActiveScheme();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getBestActiveBindingFor(org.eclipse
+	 * .core.commands.ParameterizedCommand)
+	 */
 	public TriggerSequence getBestActiveBindingFor(ParameterizedCommand command) {
 		TriggerSequence seq = bindingService.getBestSequenceFor(command);
 		return seq;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getBestActiveBindingFor(java.lang
+	 * .String)
+	 */
 	public TriggerSequence getBestActiveBindingFor(String commandId) {
 		ParameterizedCommand cmd = commandService.createCommand(commandId, null);
 		return bindingService.getBestSequenceFor(cmd);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getBestActiveBindingFormattedFor(
+	 * java.lang.String)
+	 */
 	public String getBestActiveBindingFormattedFor(String commandId) {
 		TriggerSequence sequence = bindingService.getBestSequenceFor(commandService.createCommand(
 				commandId, null));
 		return sequence == null ? null : sequence.format();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getBindings()
+	 */
 	public Binding[] getBindings() {
 		return manager.getBindings();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getBuffer()
+	 */
 	public TriggerSequence getBuffer() {
 		if (dispatcher == null) {
 			return KeySequence.getInstance();
@@ -188,22 +246,40 @@ public final class BindingService implements IBindingService {
 		return dispatcher.getBuffer();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getDefaultSchemeId()
+	 */
 	public String getDefaultSchemeId() {
 		return BindingPersistence.getDefaultSchemeId();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getDefinedSchemes()
+	 */
 	public Scheme[] getDefinedSchemes() {
 		return manager.getDefinedSchemes();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getLocale()
+	 */
 	public String getLocale() {
 		return manager.getLocale();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getPartialMatches(org.eclipse.jface
+	 * .bindings.TriggerSequence)
+	 */
 	public Map getPartialMatches(TriggerSequence trigger) {
 		final Collection<Binding> partialMatches = bindingService.getPartialMatches(trigger);
 		final Map<TriggerSequence, Binding> result = new HashMap<TriggerSequence, Binding>(
@@ -216,37 +292,71 @@ public final class BindingService implements IBindingService {
 		return result;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getPerfectMatch(org.eclipse.jface
+	 * .bindings.TriggerSequence)
+	 */
 	public Binding getPerfectMatch(TriggerSequence trigger) {
 		return bindingService.getPerfectMatch(trigger);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getPlatform()
+	 */
 	public String getPlatform() {
 		return Util.getWS();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#getScheme(java.lang.String)
+	 */
 	public Scheme getScheme(String schemeId) {
 		return manager.getScheme(schemeId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#isKeyFilterEnabled()
+	 */
 	public boolean isKeyFilterEnabled() {
 		return dispatcher == null ? false : dispatcher.getKeyDownFilter().isEnabled();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#isPartialMatch(org.eclipse.jface.
+	 * bindings.TriggerSequence)
+	 */
 	public boolean isPartialMatch(TriggerSequence trigger) {
 		return bindingService.isPartialMatch(trigger);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#isPerfectMatch(org.eclipse.jface.
+	 * bindings.TriggerSequence)
+	 */
 	public boolean isPerfectMatch(TriggerSequence trigger) {
 		return bindingService.isPerfectMatch(trigger);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#openKeyAssistDialog()
+	 */
 	public void openKeyAssistDialog() {
 		if (keyAssistDialog == null) {
 			Display.getCurrent();
@@ -258,7 +368,13 @@ public final class BindingService implements IBindingService {
 		keyAssistDialog.open();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#readRegistryAndPreferences(org.eclipse
+	 * .ui.commands.ICommandService)
+	 */
 	public void readRegistryAndPreferences(ICommandService commandService) {
 		bp.read();
 	}
@@ -274,7 +390,13 @@ public final class BindingService implements IBindingService {
 		manager.setBindings(bindings);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#savePreferences(org.eclipse.jface
+	 * .bindings.Scheme, org.eclipse.jface.bindings.Binding[])
+	 */
 	public void savePreferences(Scheme activeScheme, Binding[] bindings) throws IOException {
 		saveLegacyPreferences(activeScheme, bindings);
 		persistToModel(activeScheme);
@@ -318,7 +440,7 @@ public final class BindingService implements IBindingService {
 				}
 			}
 		}
-
+		
 		// go through each of the active bindings (from the binding manager) to
 		// see if there are any bindings that we should add to the runtime
 		for (Binding binding : activeBindings) {
@@ -396,7 +518,7 @@ public final class BindingService implements IBindingService {
 	/*
 	 * Copied from
 	 * org.eclipse.jface.bindings.BindingManager.compareSchemes(String, String)
-	 *
+	 * 
 	 * Returns an in based on scheme 1 < scheme 2
 	 */
 	private final int compareSchemes(final String schemeId1, final String schemeId2) {
@@ -418,7 +540,7 @@ public final class BindingService implements IBindingService {
 
 	/**
 	 * Compare 2 bindings, taking into account Scheme and type.
-	 *
+	 * 
 	 * @param current
 	 *            the existing binding
 	 * @param addition
@@ -454,14 +576,24 @@ public final class BindingService implements IBindingService {
 		tags.add(EBindingService.ACTIVE_SCHEME_TAG + ":" + activeScheme.getId()); //$NON-NLS-1$
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.keys.IBindingService#setKeyFilterEnabled(boolean)
+	 */
 	public void setKeyFilterEnabled(boolean enabled) {
 		if (dispatcher != null) {
 			dispatcher.getKeyDownFilter().setEnabled(enabled);
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.keys.IBindingService#getConflictsFor(org.eclipse.jface
+	 * .bindings.TriggerSequence)
+	 */
 	public Collection<Binding> getConflictsFor(TriggerSequence sequence) {
 		return bindingService.getConflictsFor(sequence);
 	}
@@ -514,7 +646,7 @@ public final class BindingService implements IBindingService {
 	 * <p>
 	 * This method completes in amortized <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be added; must not be <code>null</code>.
 	 */
@@ -722,7 +854,7 @@ public final class BindingService implements IBindingService {
 	/**
 	 * Remove the specific binding by identity. Does nothing if the binding is
 	 * not in the manager.
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be removed; must not be <code>null</code>.
 	 */

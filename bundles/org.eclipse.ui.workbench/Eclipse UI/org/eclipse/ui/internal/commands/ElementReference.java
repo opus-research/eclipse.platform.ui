@@ -20,7 +20,7 @@ import org.eclipse.ui.menus.UIElement;
 /**
  * Our element reference that is used during element
  * registration/unregistration.
- *
+ * 
  * @since 3.3
  */
 public class ElementReference implements IElementReference {
@@ -31,7 +31,7 @@ public class ElementReference implements IElementReference {
 
 	/**
 	 * Construct the reference.
-	 *
+	 * 
 	 * @param id
 	 *            command id. Must not be <code>null</code>.
 	 * @param adapt
@@ -51,10 +51,9 @@ public class ElementReference implements IElementReference {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.commands.IElementReference#getElement()
 	 */
-	@Override
 	public UIElement getElement() {
 		return element;
 	}
@@ -62,7 +61,6 @@ public class ElementReference implements IElementReference {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.commands.IElementReference#getCommandId()
 	 */
-	@Override
 	public String getCommandId() {
 		return commandId;
 	}
@@ -70,7 +68,6 @@ public class ElementReference implements IElementReference {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.commands.IElementReference#getParameters()
 	 */
-	@Override
 	public Map getParameters() {
 		return parameters;
 	}

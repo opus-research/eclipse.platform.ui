@@ -58,7 +58,7 @@ public class DecorationBuilder implements IDecoration {
 
 	/**
 	 * Create a decoration builder for the given context
-	 *
+	 * 
 	 * @param context
 	 *            a decoration context
 	 */
@@ -68,7 +68,7 @@ public class DecorationBuilder implements IDecoration {
 
 	/**
 	 * Set the value of the definition we are currently working on.
-	 *
+	 * 
 	 * @param definition
 	 */
 	void setCurrentDefinition(LightweightDecoratorDefinition definition) {
@@ -78,7 +78,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addOverlay(org.eclipse.jface.resource.ImageDescriptor)
 	 */
-	@Override
 	public void addOverlay(ImageDescriptor overlay) {
 		int quadrant = currentDefinition.getQuadrant();
 		if (descriptors[quadrant] == null) {
@@ -90,7 +89,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addOverlay(org.eclipse.jface.resource.ImageDescriptor)
 	 */
-	@Override
 	public void addOverlay(ImageDescriptor overlay, int quadrant) {
 		if (quadrant >= 0 && quadrant < DECORATOR_ARRAY_SIZE) {
 			if (descriptors[quadrant] == null) {
@@ -106,7 +104,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addPrefix(java.lang.String)
 	 */
-	@Override
 	public void addPrefix(String prefixString) {
 		prefixes.add(prefixString);
 		valueSet = true;
@@ -115,7 +112,6 @@ public class DecorationBuilder implements IDecoration {
 	/**
 	 * @see org.eclipse.jface.viewers.IDecoration#addSuffix(java.lang.String)
 	 */
-	@Override
 	public void addSuffix(String suffixString) {
 		suffixes.add(suffixString);
 		valueSet = true;
@@ -123,7 +119,7 @@ public class DecorationBuilder implements IDecoration {
 
 	/**
 	 * Clear the current values and return a DecorationResult.
-	 *
+	 * 
 	 * @return DecorationResult
 	 */
 	DecorationResult createResult() {
@@ -159,7 +155,7 @@ public class DecorationBuilder implements IDecoration {
 
 	/**
 	 * Return whether or not a value has been set.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean hasValue() {
@@ -168,7 +164,7 @@ public class DecorationBuilder implements IDecoration {
 
 	/**
 	 * Apply the previously calculates result to the receiver.
-	 *
+	 * 
 	 * @param result
 	 */
 	void applyResult(DecorationResult result) {
@@ -191,11 +187,10 @@ public class DecorationBuilder implements IDecoration {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#setBackgroundColor(org.eclipse.swt.graphics.Color)
 	 */
 
-	@Override
 	public void setBackgroundColor(Color bgColor) {
 		this.backgroundColor = bgColor;
 		valueSet = true;
@@ -203,10 +198,9 @@ public class DecorationBuilder implements IDecoration {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#setFont(org.eclipse.swt.graphics.Font)
 	 */
-	@Override
 	public void setFont(Font newFont) {
 		this.font = newFont;
 		valueSet = true;
@@ -214,10 +208,9 @@ public class DecorationBuilder implements IDecoration {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#setForegroundColor(org.eclipse.swt.graphics.Color)
 	 */
-	@Override
 	public void setForegroundColor(Color fgColor) {
 		this.foregroundColor = fgColor;
 		valueSet = true;
@@ -225,10 +218,9 @@ public class DecorationBuilder implements IDecoration {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.IDecoration#getDecorationContext()
 	 */
-	@Override
 	public IDecorationContext getDecorationContext() {
 		return context;
 	}

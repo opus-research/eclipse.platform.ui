@@ -20,13 +20,12 @@ import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class TestLabelProviderBlank extends TestStyledLabelProvider {
 
 	public static TestLabelProviderBlank instance;
 
-	@Override
 	protected void initSubclass() {
 		backgroundColor = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
 		backgroundColorName = "Red";
@@ -36,7 +35,6 @@ public class TestLabelProviderBlank extends TestStyledLabelProvider {
 		instance = this;
 	}
 
-	@Override
 	public void init(ICommonContentExtensionSite aSite) {
 		super.init(aSite);
 		_blank = true;

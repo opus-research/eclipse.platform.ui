@@ -27,51 +27,47 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * The TreeColumnLayout is the {@link Layout} used to maintain {@link TreeColumn} sizes in a
+ * The TreeColumnLayout is the {@link Layout} used to maintain {@link TreeColumn} sizes in a 
  * {@link Tree}.
- *
+ * 
  * <p>
  * <b>You can only add the {@link Layout} to a container whose <i>only</i>
  * child is the {@link Tree} control you want the {@link Layout} applied to.
  * Don't assign the layout directly the {@link Tree}</b>
  * </p>
- *
+ * 
  * @since 3.3
  */
 public class TreeColumnLayout extends AbstractColumnLayout {
 	private boolean addListener = true;
-
+	
 	private static class TreeLayoutListener implements TreeListener {
 
-		@Override
 		public void treeCollapsed(TreeEvent e) {
 			update((Tree) e.widget);
 		}
 
-		@Override
 		public void treeExpanded(TreeEvent e) {
 			update((Tree) e.widget);
 		}
-
+		
 		private void update(final Tree tree) {
 			tree.getDisplay().asyncExec(new Runnable() {
 
-				@Override
 				public void run() {
 					if (!tree.isDisposed()) {
 						tree.update();
 						tree.getParent().layout();
 					}
 				}
-
+				
 			});
 		}
-
+		
 	}
-
+	
 	private static final TreeLayoutListener listener = new TreeLayoutListener();
-
-	@Override
+	
 	protected void layout(Composite composite, boolean flushCache) {
 		super.layout(composite, flushCache);
 		if( addListener ) {
@@ -82,20 +78,18 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected int getColumnCount(Scrollable tree) {
 		return ((Tree) tree).getColumnCount();
 	}
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected void setColumnWidths(Scrollable tree, int[] widths) {
 		TreeColumn[] columns = ((Tree) tree).getColumns();
 		for (int i = 0; i < widths.length; i++) {
@@ -105,25 +99,23 @@ public class TreeColumnLayout extends AbstractColumnLayout {
 
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected ColumnLayoutData getLayoutData(Scrollable tableTree, int columnIndex) {
 		TreeColumn column = ((Tree) tableTree).getColumn(columnIndex);
 		return (ColumnLayoutData) column.getData(LAYOUT_DATA);
 	}
-
+	
 	/**
 	 * {@inheritDoc}
-	 *
+	 * 
 	 * @since 3.5
 	 */
-	@Override
 	protected void updateColumnData(Widget column) {
 		TreeColumn tColumn = (TreeColumn) column;
 		Tree t = tColumn.getParent();
-
+		
 		if( ! IS_GTK || t.getColumn(t.getColumnCount()-1) != tColumn ){
 			tColumn.setData(LAYOUT_DATA,new ColumnPixelData(tColumn.getWidth()));
 			layout(t.getParent(), true);

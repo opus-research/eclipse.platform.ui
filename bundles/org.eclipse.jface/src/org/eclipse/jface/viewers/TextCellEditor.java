@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class TextCellEditor extends CellEditor {
      * Creates a new text string cell editor with no control
      * The cell editor value is the string itself, which is initially the empty
      * string. Initially, the cell editor has no cell validator.
-     *
+     * 
      * @since 2.1
      */
     public TextCellEditor() {
@@ -77,7 +77,7 @@ public class TextCellEditor extends CellEditor {
 
     /**
      * Creates a new text string cell editor parented under the given control.
-     * The cell editor value is the string itself, which is initially the empty string.
+     * The cell editor value is the string itself, which is initially the empty string. 
      * Initially, the cell editor has no cell validator.
      *
      * @param parent the parent control
@@ -88,7 +88,7 @@ public class TextCellEditor extends CellEditor {
 
     /**
      * Creates a new text string cell editor parented under the given control.
-     * The cell editor value is the string itself, which is initially the empty string.
+     * The cell editor value is the string itself, which is initially the empty string. 
      * Initially, the cell editor has no cell validator.
      *
      * @param parent the parent control
@@ -138,19 +138,19 @@ public class TextCellEditor extends CellEditor {
         }
     }
 
-    @Override
-	protected Control createControl(Composite parent) {
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
+    protected Control createControl(Composite parent) {
         text = new Text(parent, getStyle());
         text.addSelectionListener(new SelectionAdapter() {
-            @Override
-			public void widgetDefaultSelected(SelectionEvent e) {
+            public void widgetDefaultSelected(SelectionEvent e) {
                 handleDefaultSelection(e);
             }
         });
         text.addKeyListener(new KeyAdapter() {
-            // hook key pressed - see PR 14201
-            @Override
-			public void keyPressed(KeyEvent e) {
+            // hook key pressed - see PR 14201  
+            public void keyPressed(KeyEvent e) {
                 keyReleaseOccured(e);
 
                 // as a result of processing the above call, clients may have
@@ -164,8 +164,7 @@ public class TextCellEditor extends CellEditor {
             }
         });
         text.addTraverseListener(new TraverseListener() {
-            @Override
-			public void keyTraversed(TraverseEvent e) {
+            public void keyTraversed(TraverseEvent e) {
                 if (e.detail == SWT.TRAVERSE_ESCAPE
                         || e.detail == SWT.TRAVERSE_RETURN) {
                     e.doit = false;
@@ -176,16 +175,14 @@ public class TextCellEditor extends CellEditor {
         // use a key listener and a mouse listener to know when selection changes
         // may have occurred
         text.addMouseListener(new MouseAdapter() {
-            @Override
-			public void mouseUp(MouseEvent e) {
+            public void mouseUp(MouseEvent e) {
                 checkSelection();
                 checkDeleteable();
                 checkSelectable();
             }
         });
         text.addFocusListener(new FocusAdapter() {
-            @Override
-			public void focusLost(FocusEvent e) {
+            public void focusLost(FocusEvent e) {
                 TextCellEditor.this.focusLost();
             }
         });
@@ -203,13 +200,14 @@ public class TextCellEditor extends CellEditor {
      *
      * @return the text string
      */
-    @Override
-	protected Object doGetValue() {
+    protected Object doGetValue() {
         return text.getText();
     }
 
-    @Override
-	protected void doSetFocus() {
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
+    protected void doSetFocus() {
         if (text != null) {
             text.selectAll();
             text.setFocus();
@@ -226,8 +224,7 @@ public class TextCellEditor extends CellEditor {
      *
      * @param value a text string (type <code>String</code>)
      */
-    @Override
-	protected void doSetValue(Object value) {
+    protected void doSetValue(Object value) {
         Assert.isTrue(text != null && (value instanceof String));
         text.removeModifyListener(getModifyListener());
         text.setText((String) value);
@@ -263,8 +260,7 @@ public class TextCellEditor extends CellEditor {
      * Since a text editor field is scrollable we don't
      * set a minimumSize.
      */
-    @Override
-	public LayoutData getLayoutData() {
+    public LayoutData getLayoutData() {
         LayoutData data = new LayoutData();
         data.minimumWidth= 0;
         return data;
@@ -276,8 +272,7 @@ public class TextCellEditor extends CellEditor {
     private ModifyListener getModifyListener() {
         if (modifyListener == null) {
             modifyListener = new ModifyListener() {
-                @Override
-				public void modifyText(ModifyEvent e) {
+                public void modifyText(ModifyEvent e) {
                     editOccured(e);
                 }
             };
@@ -288,9 +283,9 @@ public class TextCellEditor extends CellEditor {
     /**
      * Handles a default selection event from the text control by applying the editor
      * value and deactivating this cell editor.
-     *
+     * 
      * @param event the selection event
-     *
+     * 
      * @since 3.0
      */
     protected void handleDefaultSelection(SelectionEvent event) {
@@ -300,12 +295,11 @@ public class TextCellEditor extends CellEditor {
     }
 
     /**
-     * The <code>TextCellEditor</code>  implementation of this
-     * <code>CellEditor</code> method returns <code>true</code> if
+     * The <code>TextCellEditor</code>  implementation of this 
+     * <code>CellEditor</code> method returns <code>true</code> if 
      * the current selection is not empty.
      */
-    @Override
-	public boolean isCopyEnabled() {
+    public boolean isCopyEnabled() {
         if (text == null || text.isDisposed()) {
 			return false;
 		}
@@ -313,12 +307,11 @@ public class TextCellEditor extends CellEditor {
     }
 
     /**
-     * The <code>TextCellEditor</code>  implementation of this
-     * <code>CellEditor</code> method returns <code>true</code> if
+     * The <code>TextCellEditor</code>  implementation of this 
+     * <code>CellEditor</code> method returns <code>true</code> if 
      * the current selection is not empty.
      */
-    @Override
-	public boolean isCutEnabled() {
+    public boolean isCutEnabled() {
         if (text == null || text.isDisposed()) {
 			return false;
 		}
@@ -326,13 +319,12 @@ public class TextCellEditor extends CellEditor {
     }
 
     /**
-     * The <code>TextCellEditor</code>  implementation of this
+     * The <code>TextCellEditor</code>  implementation of this 
      * <code>CellEditor</code> method returns <code>true</code>
-     * if there is a selection or if the caret is not positioned
+     * if there is a selection or if the caret is not positioned 
      * at the end of the text.
      */
-    @Override
-	public boolean isDeleteEnabled() {
+    public boolean isDeleteEnabled() {
         if (text == null || text.isDisposed()) {
 			return false;
 		}
@@ -341,11 +333,10 @@ public class TextCellEditor extends CellEditor {
     }
 
     /**
-     * The <code>TextCellEditor</code>  implementation of this
+     * The <code>TextCellEditor</code>  implementation of this 
      * <code>CellEditor</code> method always returns <code>true</code>.
      */
-    @Override
-	public boolean isPasteEnabled() {
+    public boolean isPasteEnabled() {
         if (text == null || text.isDisposed()) {
 			return false;
 		}
@@ -354,7 +345,7 @@ public class TextCellEditor extends CellEditor {
 
     /**
      * Check if save all is enabled
-     * @return true if it is
+     * @return true if it is 
      */
     public boolean isSaveAllEnabled() {
         if (text == null || text.isDisposed()) {
@@ -367,7 +358,7 @@ public class TextCellEditor extends CellEditor {
      * Returns <code>true</code> if this cell editor is
      * able to perform the select all action.
      * <p>
-     * This default implementation always returns
+     * This default implementation always returns 
      * <code>false</code>.
      * </p>
      * <p>
@@ -376,8 +367,7 @@ public class TextCellEditor extends CellEditor {
      * @return <code>true</code> if select all is possible,
      *  <code>false</code> otherwise
      */
-    @Override
-	public boolean isSelectAllEnabled() {
+    public boolean isSelectAllEnabled() {
         if (text == null || text.isDisposed()) {
 			return false;
 		}
@@ -387,26 +377,25 @@ public class TextCellEditor extends CellEditor {
     /**
      * Processes a key release event that occurred in this cell editor.
      * <p>
-     * The <code>TextCellEditor</code> implementation of this framework method
-     * ignores when the RETURN key is pressed since this is handled in
+     * The <code>TextCellEditor</code> implementation of this framework method 
+     * ignores when the RETURN key is pressed since this is handled in 
      * <code>handleDefaultSelection</code>.
      * An exception is made for Ctrl+Enter for multi-line texts, since
-     * a default selection event is not sent in this case.
+     * a default selection event is not sent in this case. 
      * </p>
      *
      * @param keyEvent the key event
      */
-    @Override
-	protected void keyReleaseOccured(KeyEvent keyEvent) {
+    protected void keyReleaseOccured(KeyEvent keyEvent) {
         if (keyEvent.character == '\r') { // Return key
             // Enter is handled in handleDefaultSelection.
             // Do not apply the editor value in response to an Enter key event
             // since this can be received from the IME when the intent is -not-
-            // to apply the value.
+            // to apply the value.  
             // See bug 39074 [CellEditors] [DBCS] canna input mode fires bogus event from Text Control
             //
             // An exception is made for Ctrl+Enter for multi-line texts, since
-            // a default selection event is not sent in this case.
+            // a default selection event is not sent in this case. 
             if (text != null && !text.isDisposed()
                     && (text.getStyle() & SWT.MULTI) != 0) {
                 if ((keyEvent.stateMask & SWT.CTRL) != 0) {
@@ -421,20 +410,18 @@ public class TextCellEditor extends CellEditor {
     /**
      * The <code>TextCellEditor</code> implementation of this
      * <code>CellEditor</code> method copies the
-     * current selection to the clipboard.
+     * current selection to the clipboard. 
      */
-    @Override
-	public void performCopy() {
+    public void performCopy() {
         text.copy();
     }
 
     /**
      * The <code>TextCellEditor</code> implementation of this
      * <code>CellEditor</code> method cuts the
-     * current selection to the clipboard.
+     * current selection to the clipboard. 
      */
-    @Override
-	public void performCut() {
+    public void performCut() {
         text.cut();
         checkSelection();
         checkDeleteable();
@@ -445,10 +432,9 @@ public class TextCellEditor extends CellEditor {
      * The <code>TextCellEditor</code> implementation of this
      * <code>CellEditor</code> method deletes the
      * current selection or, if there is no selection,
-     * the character next character from the current position.
+     * the character next character from the current position. 
      */
-    @Override
-	public void performDelete() {
+    public void performDelete() {
         if (text.getSelectionCount() > 0) {
 			// remove the contents of the current selection
             text.insert(""); //$NON-NLS-1$
@@ -468,10 +454,9 @@ public class TextCellEditor extends CellEditor {
     /**
      * The <code>TextCellEditor</code> implementation of this
      * <code>CellEditor</code> method pastes the
-     * the clipboard contents over the current selection.
+     * the clipboard contents over the current selection. 
      */
-    @Override
-	public void performPaste() {
+    public void performPaste() {
         text.paste();
         checkSelection();
         checkDeleteable();
@@ -481,10 +466,9 @@ public class TextCellEditor extends CellEditor {
     /**
      * The <code>TextCellEditor</code> implementation of this
      * <code>CellEditor</code> method selects all of the
-     * current text.
+     * current text. 
      */
-    @Override
-	public void performSelectAll() {
+    public void performSelectAll() {
         text.selectAll();
         checkSelection();
         checkDeleteable();
@@ -496,10 +480,9 @@ public class TextCellEditor extends CellEditor {
 	 * current instance's class is TextCellEditor, and true otherwise.
 	 * Subclasses that hook their own focus listener should override this method
 	 * and return false. See also bug 58777.
-	 *
+	 * 
 	 * @since 3.4
 	 */
-	@Override
 	protected boolean dependsOnExternalFocusListener() {
 		return getClass() != TextCellEditor.class;
 	}

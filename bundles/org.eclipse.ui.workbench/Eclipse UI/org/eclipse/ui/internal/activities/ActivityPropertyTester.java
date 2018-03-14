@@ -20,7 +20,7 @@ import org.eclipse.ui.activities.WorkbenchActivityHelper;
  * An expressions property tester that tests whether or not an activity or
  * category of activities is enabled. Useful for cross-component links and to
  * control discoverability of functionality.
- *
+ * 
  * @since 3.3
  */
 public class ActivityPropertyTester extends PropertyTester {
@@ -30,11 +30,10 @@ public class ActivityPropertyTester extends PropertyTester {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.expressions.PropertyTester#test(java.lang.Object,
 	 *      java.lang.String, java.lang.Object[], java.lang.Object)
 	 */
-	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		if (args.length == 1 && receiver instanceof IWorkbench && args[0] instanceof String) {

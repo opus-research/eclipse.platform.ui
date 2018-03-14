@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Martin Frey <martin.frey@logica.com> - bug 256150
  *     Matthew Hall - bug 264307
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 445446
  ******************************************************************************/
 
 package org.eclipse.core.internal.databinding.beans;
@@ -23,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.util.Policy;
 import org.eclipse.core.runtime.IStatus;
@@ -30,13 +30,13 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * @since 1.2
- *
+ * 
  */
 public class BeanPropertyHelper {
 	/**
 	 * Sets the contents of the given property on the given source object to the
 	 * given value.
-	 *
+	 * 
 	 * @param source
 	 *            the source object which has the property being updated
 	 * @param propertyDescriptor
@@ -64,18 +64,22 @@ public class BeanPropertyHelper {
 			 */
 			throw new RuntimeException(e.getCause());
 		} catch (Exception e) {
-			Policy.getLog()
-					.log(new Status(
-							IStatus.WARNING,
-							Policy.JFACE_DATABINDING,
-							IStatus.OK,
-							"Could not change value of " + source + "." + propertyDescriptor.getName(), e)); //$NON-NLS-1$ //$NON-NLS-2$
+			if (BeansObservables.DEBUG) {
+				Policy
+						.getLog()
+						.log(
+								new Status(
+										IStatus.WARNING,
+										Policy.JFACE_DATABINDING,
+										IStatus.OK,
+										"Could not change value of " + source + "." + propertyDescriptor.getName(), e)); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 	}
 
 	/**
 	 * Returns the contents of the given property for the given bean.
-	 *
+	 * 
 	 * @param source
 	 *            the source bean
 	 * @param propertyDescriptor
@@ -93,7 +97,7 @@ public class BeanPropertyHelper {
 			if (!readMethod.isAccessible()) {
 				readMethod.setAccessible(true);
 			}
-			return readMethod.invoke(source);
+			return readMethod.invoke(source, null);
 		} catch (InvocationTargetException e) {
 			/*
 			 * InvocationTargetException wraps any exception thrown by the
@@ -101,12 +105,16 @@ public class BeanPropertyHelper {
 			 */
 			throw new RuntimeException(e.getCause());
 		} catch (Exception e) {
-			Policy.getLog()
-					.log(new Status(
-							IStatus.WARNING,
-							Policy.JFACE_DATABINDING,
-							IStatus.OK,
-							"Could not read value of " + source + "." + propertyDescriptor.getName(), e)); //$NON-NLS-1$ //$NON-NLS-2$
+			if (BeansObservables.DEBUG) {
+				Policy
+						.getLog()
+						.log(
+								new Status(
+										IStatus.WARNING,
+										Policy.JFACE_DATABINDING,
+										IStatus.OK,
+										"Could not read value of " + source + "." + propertyDescriptor.getName(), e)); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return null;
 		}
 	}
@@ -114,15 +122,15 @@ public class BeanPropertyHelper {
 	/**
 	 * Returns the element type of the given collection-typed property for the
 	 * given bean.
-	 *
+	 * 
 	 * @param descriptor
 	 *            the property being inspected
 	 * @return the element type of the given collection-typed property if it is
 	 *         an array property, or Object.class otherwise.
 	 */
-	public static Class<?> getCollectionPropertyElementType(
+	public static Class getCollectionPropertyElementType(
 			PropertyDescriptor descriptor) {
-		Class<?> propertyType = descriptor.getPropertyType();
+		Class propertyType = descriptor.getPropertyType();
 		return propertyType.isArray() ? propertyType.getComponentType()
 				: Object.class;
 	}
@@ -133,7 +141,7 @@ public class BeanPropertyHelper {
 	 * @return the PropertyDescriptor for the named property on the given bean
 	 *         class
 	 */
-	public static PropertyDescriptor getPropertyDescriptor(Class<?> beanClass,
+	public static PropertyDescriptor getPropertyDescriptor(Class beanClass,
 			String propertyName) {
 		if (!beanClass.isInterface()) {
 			BeanInfo beanInfo;
@@ -154,10 +162,10 @@ public class BeanPropertyHelper {
 		} else {
 			try {
 				PropertyDescriptor propertyDescriptors[];
-				List<PropertyDescriptor> pds = new ArrayList<PropertyDescriptor>();
+				List pds = new ArrayList();
 				getInterfacePropertyDescriptors(pds, beanClass);
 				if (pds.size() > 0) {
-					propertyDescriptors = pds
+					propertyDescriptors = (PropertyDescriptor[]) pds
 							.toArray(new PropertyDescriptor[pds.size()]);
 					PropertyDescriptor descriptor;
 					for (int i = 0; i < propertyDescriptors.length; i++) {
@@ -178,7 +186,7 @@ public class BeanPropertyHelper {
 	/**
 	 * Goes recursively into the interface and gets all defined
 	 * propertyDescriptors
-	 *
+	 * 
 	 * @param propertyDescriptors
 	 *            The result list of all PropertyDescriptors the given interface
 	 *            defines (hierarchical)
@@ -187,7 +195,7 @@ public class BeanPropertyHelper {
 	 * @throws IntrospectionException
 	 */
 	private static void getInterfacePropertyDescriptors(
-			List<PropertyDescriptor> propertyDescriptors, Class<?> iface)
+			List propertyDescriptors, Class iface)
 			throws IntrospectionException {
 		BeanInfo beanInfo = Introspector.getBeanInfo(iface);
 		PropertyDescriptor[] pds = beanInfo.getPropertyDescriptors();
@@ -195,7 +203,7 @@ public class BeanPropertyHelper {
 			PropertyDescriptor pd = pds[i];
 			propertyDescriptors.add(pd);
 		}
-		Class<?>[] subIntfs = iface.getInterfaces();
+		Class[] subIntfs = iface.getInterfaces();
 		for (int j = 0; j < subIntfs.length; j++) {
 			getInterfacePropertyDescriptors(propertyDescriptors, subIntfs[j]);
 		}
@@ -209,7 +217,7 @@ public class BeanPropertyHelper {
 	/* package */public static PropertyDescriptor getValueTypePropertyDescriptor(
 			IObservableValue observable, String propertyName) {
 		if (observable.getValueType() != null)
-			return getPropertyDescriptor((Class<?>) observable.getValueType(),
+			return getPropertyDescriptor((Class) observable.getValueType(),
 					propertyName);
 		return null;
 	}
@@ -219,7 +227,7 @@ public class BeanPropertyHelper {
 	 * @return String description of property descriptor
 	 */
 	public static String propertyName(PropertyDescriptor propertyDescriptor) {
-		Class<?> beanClass = propertyDescriptor.getReadMethod()
+		Class beanClass = propertyDescriptor.getReadMethod()
 				.getDeclaringClass();
 		return shortClassName(beanClass)
 				+ "." + propertyDescriptor.getName() + ""; //$NON-NLS-1$ //$NON-NLS-2$
@@ -229,7 +237,7 @@ public class BeanPropertyHelper {
 	 * @param beanClass
 	 * @return class name excluding package
 	 */
-	public static String shortClassName(Class<?> beanClass) {
+	public static String shortClassName(Class beanClass) {
 		if (beanClass == null)
 			return "?"; //$NON-NLS-1$
 		String className = beanClass.getName();

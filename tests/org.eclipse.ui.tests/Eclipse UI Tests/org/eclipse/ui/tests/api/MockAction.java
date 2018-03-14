@@ -36,8 +36,7 @@ public class MockAction extends Action {
         setToolTipText(text);
     }
 
-    @Override
-	public void run() {
+    public void run() {
         hasRun = true;
     }
 

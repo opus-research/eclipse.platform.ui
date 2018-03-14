@@ -40,14 +40,14 @@ import org.eclipse.ui.internal.WorkbenchPlugin;
  * into the workspace, the dialog closes, and the call to <code>open</code>
  * returns.
  * </p>
- *
+ *  
  * @since 3.1
- *
+ * 
  */
 public class PreferencesImportWizard extends Wizard implements IImportWizard {
 
     private WizardPreferencesImportPage1 mainPage;
-
+	
     /**
      * Creates a wizard for importing resources into the workspace from
      * the file system.
@@ -62,23 +62,29 @@ public class PreferencesImportWizard extends Wizard implements IImportWizard {
         setDialogSettings(section);
     }
 
-    @Override
-	public void addPages() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public void addPages() {
         super.addPages();
         mainPage = new WizardPreferencesImportPage1();
         addPage(mainPage);
     }
 
-    @Override
-	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchWizard.
+     */
+    public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
         setWindowTitle(PreferencesMessages.PreferencesImportWizard_import);
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_PREF_WIZ));
         setNeedsProgressMonitor(true);
     }
 
-    @Override
-	public boolean performFinish() {
+    /* (non-Javadoc)
+     * Method declared on IWizard.
+     */
+    public boolean performFinish() {
         return mainPage.finish();
     }
 }

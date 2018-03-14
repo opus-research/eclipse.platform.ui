@@ -29,22 +29,19 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
  * 5) After passing the rule back to the UI thread, but before MC1 dies, the asyncExec is run.
  * 6) The asyncExec forks another model context (MC2), and blocks the UI thread in another event loop.
  * 7) MC2 tries to acquire the workspace lock and deadlocks, because at this point it has been transferred to the UI thread
- *
+ * 
  * NOTE: This bug has not yet been fixed.  This test illustrates the problem, but must
  * not be added to the parent test suite until the problem has been fixed.
  */
 public class TestBug105491 extends TestCase {
 	class TransferTestOperation extends WorkspaceModifyOperation implements IThreadListener {
-		@Override
 		public void execute(final IProgressMonitor pm) {
 			//clients assume this would not deadlock because it runs in an asyncExec
 			Display.getDefault().asyncExec(new Runnable() {
-				@Override
 				public void run() {
 					ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
 					try {
 						dialog.run(true, false, new WorkspaceModifyOperation() {
-							@Override
 							protected void execute(IProgressMonitor monitor) {}
 						});
 					} catch (InvocationTargetException e) {
@@ -57,7 +54,6 @@ public class TestBug105491 extends TestCase {
 			});
 		}
 
-		@Override
 		public void threadChange(Thread thread) {
 			Platform.getJobManager().transferRule(workspace.getRoot(), thread);
 		}
@@ -78,7 +74,6 @@ public class TestBug105491 extends TestCase {
 	 */
 	public void testBug() throws CoreException {
 		workspace.run(new IWorkspaceRunnable() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell());
 				try {

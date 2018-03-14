@@ -25,12 +25,11 @@ public abstract class AbstractCSSPropertySWTHandler implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.core.css.dom.properties.ICSSPropertyHandler#applyCSSProperty(java.lang.Object,
 	 *      java.lang.String, org.w3c.dom.css.CSSValue, java.lang.String,
 	 *      org.eclipse.e4.ui.core.css.engine.CSSEngine)
 	 */
-	@Override
 	public boolean applyCSSProperty(Object element, String property,
 			CSSValue value, String pseudo, CSSEngine engine) throws Exception {
 		Control control = SWTElementHelpers.getControl(element);
@@ -45,12 +44,11 @@ public abstract class AbstractCSSPropertySWTHandler implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.e4.ui.core.css.dom.properties.ICSSPropertyHandler#retrieveCSSProperty(java.lang.Object,
 	 *      java.lang.String, org.eclipse.e4.ui.core.css.engine.CSSEngine)
 	 */
-	@Override
-	public String retrieveCSSProperty(Object element, String property, String pseudo,
+	public String retrieveCSSProperty(Object element, String property, String pseudo, 
 			CSSEngine engine) throws Exception {
 		Control control = SWTElementHelpers.getControl(element);
 		if (control != null) {
@@ -65,7 +63,7 @@ public abstract class AbstractCSSPropertySWTHandler implements
 	 * Apply CSS Property <code>property</code> (ex : background-color) with
 	 * CSSValue <code>value</code> (ex : red) into the SWT
 	 * <code>control</code> (ex : SWT Text, SWT Label).
-	 *
+	 * 
 	 * @param control
 	 * @param property
 	 * @param value
@@ -80,7 +78,7 @@ public abstract class AbstractCSSPropertySWTHandler implements
 	 * Retrieve CSS value (ex : red) of CSS Property <code>property</code> (ex :
 	 * background-color) from the SWT <code>control</code> (ex : SWT Text, SWT
 	 * Label).
-	 *
+	 * 
 	 * @param control
 	 * @param property
 	 * @param engine

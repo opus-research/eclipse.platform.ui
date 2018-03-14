@@ -23,14 +23,11 @@ public class AdaptableResourceWrapper implements IAdaptable {
     /*
      * @see IAdaptable#getAdapter(Class)
      */
-    @Override
-	public Object getAdapter(Class adapter) {
-        if (adapter == IResource.class) {
-			return resource;
-		}
-        if (adapter == IWorkbenchAdapter.class) {
-			return TestAdaptableWorkbenchAdapter.getInstance();
-		}
+    public Object getAdapter(Class adapter) {
+        if (adapter == IResource.class)
+            return resource;
+        if (adapter == IWorkbenchAdapter.class)
+            return TestAdaptableWorkbenchAdapter.getInstance();
         return null;
     }
 
@@ -43,9 +40,8 @@ public class AdaptableResourceWrapper implements IAdaptable {
     }
 
     public AdaptableResourceWrapper getParent() {
-        if (resource.getParent() != null) {
-			return new AdaptableResourceWrapper(resource.getParent());
-		}
+        if (resource.getParent() != null)
+            return new AdaptableResourceWrapper(resource.getParent());
         return null;
     }
 

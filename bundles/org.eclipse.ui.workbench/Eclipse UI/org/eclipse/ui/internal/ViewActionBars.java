@@ -35,10 +35,9 @@ public class ViewActionBars extends SubActionBars {
 	/**
 	 * Returns the menu manager. If items are added or removed from the manager
 	 * be sure to call <code>updateActionBars</code>.
-	 *
+	 * 
 	 * @return the menu manager
 	 */
-	@Override
 	public IMenuManager getMenuManager() {
 		E4Util.unsupported("ViewActionBars"); //$NON-NLS-1$
 		return null;
@@ -47,10 +46,9 @@ public class ViewActionBars extends SubActionBars {
 	/**
 	 * Returns the tool bar manager. If items are added or removed from the
 	 * manager be sure to call <code>updateActionBars</code>.
-	 *
+	 * 
 	 * @return the tool bar manager
 	 */
-	@Override
 	public IToolBarManager getToolBarManager() {
 		E4Util.unsupported("ViewActionBars"); //$NON-NLS-1$
 		return null;
@@ -60,7 +58,6 @@ public class ViewActionBars extends SubActionBars {
 	 * Commits all UI changes. This should be called after additions or
 	 * subtractions have been made to a menu, status line, or toolbar.
 	 */
-	@Override
 	public void updateActionBars() {
 		E4Util.unsupported("ViewActionBars"); //$NON-NLS-1$
 		getStatusLineManager().update(false);

@@ -23,9 +23,9 @@ import org.eclipse.ui.internal.WorkbenchPage;
  * <p>
  * Replacement for SaveAsAction
  * </p>
- *
+ * 
  * @since 3.7
- *
+ * 
  */
 public class SaveAsHandler extends AbstractSaveHandler {
 
@@ -33,18 +33,16 @@ public class SaveAsHandler extends AbstractSaveHandler {
 		registerEnablement();
 	}
 
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		ISaveablePart saveablePart = getSaveablePart(event);
 
 		if (saveablePart != null)
 			saveablePart.doSaveAs();
-
+		
 		return null;
 	}
 
-	@Override
 	protected EvaluationResult evaluate(IEvaluationContext context) {
 
 		IWorkbenchWindow window = InternalHandlerUtil.getActiveWorkbenchWindow(context);

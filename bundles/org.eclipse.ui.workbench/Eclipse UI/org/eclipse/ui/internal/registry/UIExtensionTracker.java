@@ -38,15 +38,13 @@ public class UIExtensionTracker extends ExtensionTracker {
 		this.display = display;
 	}
 
-	@Override
 	protected void applyRemove(final IExtensionChangeHandler handler, final IExtension removedExtension, final Object[] objects) {
 		if (display.isDisposed())
 			return;
 
 		display.syncExec(new Runnable() {
 
-            @Override
-			public void run() {
+            public void run() {
                 try {
                     handler.removeExtension(removedExtension, objects);
                 } catch (Exception e) {
@@ -56,14 +54,12 @@ public class UIExtensionTracker extends ExtensionTracker {
         });
     }
 
-    @Override
-	protected void applyAdd(final IExtensionChangeHandler handler, final IExtension addedExtension) {
+    protected void applyAdd(final IExtensionChangeHandler handler, final IExtension addedExtension) {
 		if (display.isDisposed())
 			return;
 
         display.syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 try {
                     handler.addExtension(UIExtensionTracker.this, addedExtension);
                 } catch (Exception e) {

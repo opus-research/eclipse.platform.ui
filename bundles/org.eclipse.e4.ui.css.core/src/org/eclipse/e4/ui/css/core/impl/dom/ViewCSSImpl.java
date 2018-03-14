@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,8 +8,6 @@
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
  *     IBM Corporation - ongoing development
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422702
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 458342
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.impl.dom;
 
@@ -49,43 +47,39 @@ public class ViewCSSImpl implements ViewCSS {
 	 * <b>DOM</b>: Implements {@link
 	 * org.w3c.dom.views.AbstractView#getDocument()}.
 	 */
-	@Override
 	public DocumentView getDocument() {
 		return null;
 	}
 
 	/**
-	 * Determines the relevant style declaration for an DOM element
+	 * <b>DOM</b>: Implements {@link
+	 * org.w3c.dom.css.ViewCSS#getComputedStyle(Element,String)}.
 	 */
-	@Override
 	public CSSStyleDeclaration getComputedStyle(Element elt, String pseudoElt) {
-		// Loop over the CSS styleSheet list
+		// Loop for CSS StyleSheet list parsed
 		StyleSheetList styleSheetList = documentCSS.getStyleSheets();
 		int l = styleSheetList.getLength();
-
-		List<CSSRule> combinedRuleList = new ArrayList<CSSRule>();
 		for (int i = 0; i < l; i++) {
 			CSSStyleSheet styleSheet = (CSSStyleSheet) styleSheetList.item(i);
-
-			CSSRuleList styleSheetRules = styleSheet.getCssRules();
-			int rulesSize = styleSheetRules.getLength();
-			for (int j = 0; j < rulesSize; j++) {
-				combinedRuleList.add(styleSheetRules.item(j));
-			}
+			CSSStyleDeclaration styleDeclaration = getComputedStyle(styleSheet,
+					elt, pseudoElt);
+			if (styleDeclaration != null)
+				return styleDeclaration;
 		}
-
-		CSSStyleDeclaration styleDeclaration = getComputedStyle(combinedRuleList, elt, pseudoElt);
-		return styleDeclaration;
+		return null;
 	}
 
-	public CSSStyleDeclaration getComputedStyle(List<CSSRule> ruleList, Element elt, String pseudoElt) {
-		List<StyleWrapper> styleDeclarations = null;
+	public CSSStyleDeclaration getComputedStyle(CSSStyleSheet styleSheet,
+			Element elt, String pseudoElt) {
+		List styleDeclarations = null;
 		StyleWrapper firstStyleDeclaration = null;
-		int length = ruleList.size();
+		CSSRuleList ruleList = styleSheet.getCssRules();
+		int length = ruleList.getLength();
 		int position = 0;
 		for (int i = 0; i < length; i++) {
-			CSSRule rule = ruleList.get(i);
-			if (rule.getType() == CSSRule.STYLE_RULE) {
+			CSSRule rule = ruleList.item(i);
+			switch (rule.getType()) {
+			case CSSRule.STYLE_RULE: {
 				CSSStyleRule styleRule = (CSSStyleRule) rule;
 				if (rule instanceof ExtendedCSSRule) {
 					ExtendedCSSRule r = (ExtendedCSSRule) rule;
@@ -93,7 +87,7 @@ public class ViewCSSImpl implements ViewCSS {
 					// Loop for SelectorList
 					int l = selectorList.getLength();
 					for (int j = 0; j < l; j++) {
-						Selector selector = selectorList.item(j);
+						Selector selector = (Selector) selectorList.item(j);
 						if (selector instanceof ExtendedSelector) {
 							ExtendedSelector extendedSelector = (ExtendedSelector) selector;
 							if (extendedSelector.match(elt, pseudoElt)) {
@@ -109,8 +103,9 @@ public class ViewCSSImpl implements ViewCSS {
 									// There is several Style Declarations which
 									// match the current element
 									if (styleDeclarations == null) {
-										styleDeclarations = new ArrayList<StyleWrapper>();
-										styleDeclarations.add(firstStyleDeclaration);
+										styleDeclarations = new ArrayList();
+										styleDeclarations
+												.add(firstStyleDeclaration);
 									}
 									styleDeclarations.add(wrapper);
 								}
@@ -124,6 +119,7 @@ public class ViewCSSImpl implements ViewCSS {
 					// TODO : CSS rule is not ExtendedCSSRule,
 					// Manage this case...
 				}
+			}
 			}
 		}
 		if (styleDeclarations != null) {

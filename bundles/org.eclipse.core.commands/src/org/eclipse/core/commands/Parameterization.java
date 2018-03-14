@@ -22,7 +22,7 @@ import org.eclipse.core.internal.commands.util.Util;
  * <code>ParameterizedCommand</code>, which is used to refer to a command
  * with a collection of parameterizations.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class Parameterization {
@@ -64,7 +64,7 @@ public final class Parameterization {
 
 	/**
 	 * Constructs a new instance of <code>Parameterization</code>.
-	 *
+	 * 
 	 * @param parameter
 	 *            The parameter that is being parameterized; must not be
 	 *            <code>null</code>.
@@ -81,6 +81,9 @@ public final class Parameterization {
 		this.value = value;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public final boolean equals(final Object object) {
 		if (this == object) {
 			return true;
@@ -101,7 +104,7 @@ public final class Parameterization {
 
 	/**
 	 * Returns the parameter that is being parameterized.
-	 *
+	 * 
 	 * @return The parameter; never <code>null</code>.
 	 */
 	public final IParameter getParameter() {
@@ -110,7 +113,7 @@ public final class Parameterization {
 
 	/**
 	 * Returns the value for the parameter in this parameterization.
-	 *
+	 * 
 	 * @return The value; may be <code>null</code>.
 	 */
 	public final String getValue() {
@@ -121,7 +124,7 @@ public final class Parameterization {
 	 * Returns the human-readable name for the current value, if any. If the
 	 * name cannot be found, then it simply returns the value. It also ensures
 	 * that any <code>null</code> values are converted into an empty string.
-	 *
+	 * 
 	 * @return The human-readable name of the value; never <code>null</code>.
 	 * @throws ParameterValuesException
 	 *             If the parameter needed to be initialized, but couldn't be.
@@ -147,6 +150,9 @@ public final class Parameterization {
 		return returnValue;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	public final int hashCode() {
 		if (hashCode == HASH_CODE_NOT_COMPUTED) {
 			hashCode = HASH_INITIAL * HASH_FACTOR + Util.hashCode(parameter);

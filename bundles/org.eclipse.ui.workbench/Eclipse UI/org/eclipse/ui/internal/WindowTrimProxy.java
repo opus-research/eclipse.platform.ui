@@ -19,7 +19,7 @@ import org.eclipse.ui.internal.layout.IWindowTrim;
  * A transition class for any control that wants to participate in the workbench
  * window trim. It must supply a unique ID so that it's position can be
  * saved/restored.
- *
+ * 
  * @since 3.2
  */
 public class WindowTrimProxy implements IWindowTrim {
@@ -33,14 +33,14 @@ public class WindowTrimProxy implements IWindowTrim {
 	private int fValidSides;
 
 	private boolean fIsResizeable = false;
-
+	
 	private int fWidthHint = SWT.DEFAULT;
-
+	
 	private int fHeightHint = SWT.DEFAULT;
 
 	/**
 	 * Create the trim proxy for a control.
-	 *
+	 * 
 	 * @param c
 	 *            the trim control
 	 * @param id
@@ -61,7 +61,7 @@ public class WindowTrimProxy implements IWindowTrim {
 
 	/**
 	 * Create a trim proxy for a control.
-	 *
+	 * 
 	 * @param c
 	 * @param id
 	 * @param displayName
@@ -74,12 +74,20 @@ public class WindowTrimProxy implements IWindowTrim {
 		fIsResizeable = resizeable;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#getControl()
+	 */
 	public Control getControl() {
 		return fTrimControl;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#getValidSides()
+	 */
 	public int getValidSides() {
 		return fValidSides;
 	}
@@ -87,38 +95,57 @@ public class WindowTrimProxy implements IWindowTrim {
 	/**
 	 * The default for a proxied window trim is to do nothing, as it can't be
 	 * moved around.
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.layout.IWindowTrim#dock(int)
 	 */
-	@Override
 	public void dock(int dropSide) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#getId()
+	 */
 	public String getId() {
 		return fId;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#getDisplayName()
+	 */
 	public String getDisplayName() {
 		return fDisplayName;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#isCloseable()
+	 */
 	public boolean isCloseable() {
 		return false;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.IWindowTrim#handleClose()
+	 */
 	public void handleClose() {
 		// nothing to do...
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getWidthHint()
+	 */
 	public int getWidthHint() {
 		return fWidthHint;
 	}
-
+	
 	/**
 	 * Update the width hint for this control.
 	 * @param w pixels, or SWT.DEFAULT
@@ -127,11 +154,15 @@ public class WindowTrimProxy implements IWindowTrim {
 		fWidthHint = w;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#getHeightHint()
+	 */
 	public int getHeightHint() {
 		return fHeightHint;
 	}
-
+	
 	/**
 	 * Update the height hint for this control.
 	 * @param h pixels, or SWT.DEFAULT
@@ -140,7 +171,11 @@ public class WindowTrimProxy implements IWindowTrim {
 		fHeightHint = h;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWindowTrim#isResizeable()
+	 */
 	public boolean isResizeable() {
 		return fIsResizeable;
 	}

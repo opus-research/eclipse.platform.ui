@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,61 +7,80 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442747
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
-import java.util.List;
 
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ICellModifier;
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * A simple TreeViewer to demonstrate usage of inline editing
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet038TreeViewerInlinelEditingOldAPI {
 	private class MyContentProvider implements ITreeContentProvider {
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+		 */
 		public Object[] getElements(Object inputElement) {
 			return ((MyModel) inputElement).child.toArray();
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+		 */
 		public void dispose() {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+		 *      java.lang.Object, java.lang.Object)
+		 */
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getChildren(java.lang.Object)
+		 */
 		public Object[] getChildren(Object parentElement) {
 			return getElements(parentElement);
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#getParent(java.lang.Object)
+		 */
 		public Object getParent(Object element) {
 			if (element == null) {
 				return null;
@@ -70,16 +89,22 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 			return ((MyModel) element).parent;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
+		 */
 		public boolean hasChildren(Object element) {
 			return ((MyModel) element).child.size() > 0;
 		}
 
 	}
 
-	private class MyModel {
+	public class MyModel {
 		public MyModel parent;
-		public List<MyModel> child = new ArrayList<MyModel>();
+
+		public ArrayList child = new ArrayList();
+
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {
@@ -87,74 +112,67 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			String rv = "Item ";
 			if (parent != null) {
 				rv = parent.toString() + ".";
 			}
+
 			rv += counter;
 
 			return rv;
 		}
 	}
 
-	private class MyColumnLabelProvider extends ColumnLabelProvider {
+	public class MyLabelProvider extends LabelProvider implements
+			ITableLabelProvider {
+		FontRegistry registry = new FontRegistry();
 
-		private int columnIndex;
-		private Tree tree;
-
-		public MyColumnLabelProvider(Tree tree, int columnIndex) {
-			this.tree = tree;
-			this.columnIndex = columnIndex;
+		public Image getColumnImage(Object element, int columnIndex) {
+			return null;
 		}
 
-		@Override
-		public String getText(Object element) {
-			return "Column " + tree.getColumnOrder()[columnIndex] + " => " + element.toString();
+		public String getColumnText(Object element, int columnIndex) {
+			return "Column " + columnIndex + " => " + element.toString();
 		}
-	}
-
-	private class MyEditingSupport extends EditingSupport {
-
-		public MyEditingSupport(ColumnViewer viewer) {
-			super(viewer);
-		}
-
-		@Override
-		protected CellEditor getCellEditor(Object element) {
-			return new TextCellEditor((Composite) getViewer().getControl());
-		}
-
-		@Override
-		protected boolean canEdit(Object element) {
-			return true;
-		}
-
-		@Override
-		protected Object getValue(Object element) {
-			return ((MyModel) element).counter + "";
-		}
-
-		@Override
-		protected void setValue(Object element, Object value) {
-			((MyModel) element).counter = Integer.parseInt(value.toString());
-			getViewer().update(element, null);
-		}
-
 	}
 
 	public Snippet038TreeViewerInlinelEditingOldAPI(Shell shell) {
-		final TreeViewer viewer = new TreeViewer(shell, SWT.FULL_SELECTION);
+		final TreeViewer v = new TreeViewer(shell,SWT.FULL_SELECTION);
+		
+		TreeColumn column = new TreeColumn(v.getTree(),SWT.NONE);
+		column.setWidth(200);
+		column.setText("Column 1");
+		
+		column = new TreeColumn(v.getTree(),SWT.NONE);
+		column.setWidth(200);
+		column.setText("Column 2");
+		
+		v.setCellEditors(new CellEditor[]{new TextCellEditor(v.getTree()), new TextCellEditor(v.getTree())});
+		v.setColumnProperties(new String[]{"col1","col2"});
+		v.setCellModifier(new ICellModifier() {
 
-		createColumnFor(viewer, "Column 1", 0);
-		createColumnFor(viewer, "Column 2", 1);
+			public boolean canModify(Object element, String property) {
+				return true;
+			}
 
-		viewer.setContentProvider(new MyContentProvider());
-		viewer.setInput(createModel());
+			public Object getValue(Object element, String property) {
+				return ((MyModel)element).counter+"";
+			}
+
+			public void modify(Object element, String property, Object value) {
+				((MyModel)((TreeItem)element).getData()).counter = Integer.parseInt(value.toString());
+				v.update(((TreeItem)element).getData(), null);
+			}
+			
+		});
+		v.setLabelProvider(new MyLabelProvider());
+		v.setContentProvider(new MyContentProvider());
+		v.setInput(createModel());
 	}
 
 	private MyModel createModel() {
+
 		MyModel root = new MyModel(0, null);
 		root.counter = 0;
 
@@ -166,16 +184,8 @@ public class Snippet038TreeViewerInlinelEditingOldAPI {
 				tmp.child.add(new MyModel(j, tmp));
 			}
 		}
+
 		return root;
-	}
-
-	private void createColumnFor(TreeViewer viewer, String label, int columnIndex) {
-		TreeViewerColumn viewerColumn = new TreeViewerColumn(viewer, SWT.NONE);
-		viewerColumn.getColumn().setWidth(200);
-		viewerColumn.getColumn().setText(label);
-
-		viewerColumn.setEditingSupport(new MyEditingSupport(viewer));
-		viewerColumn.setLabelProvider(new MyColumnLabelProvider(viewer.getTree(), columnIndex));
 	}
 
 	public static void main(String[] args) {

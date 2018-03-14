@@ -34,21 +34,32 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 
 	static final String CATEGORY_TEST_MARKER = "org.eclipse.ui.tests.categoryTestMarker";
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+	 */
 	public void dispose() {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+	 */
 	public void init(IWorkbenchWindow workbenchWindow) {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+	 */
 	public void run(IAction action) {
 
 		Job addJob = new Job("Add Markers") {
-			@Override
 			protected IStatus run(
 					org.eclipse.core.runtime.IProgressMonitor monitor) {
 				try {
@@ -84,7 +95,12 @@ public class AddMarkersAction implements IWorkbenchWindowActionDelegate {
 	}
 
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+	 *      org.eclipse.jface.viewers.ISelection)
+	 */
 	public void selectionChanged(IAction action, ISelection selection) {
 		// TODO Auto-generated method stub
 

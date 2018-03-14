@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 434189
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
@@ -69,18 +68,14 @@ public class MessageLine extends CLabel {
             if (message != null && message.length() > 0) {
                 setText(message);
                 setImage(findImage(status));
-				super.setBackground(JFaceColors.getErrorBackground(getDisplay()));
+                setBackground(JFaceColors.getErrorBackground(getDisplay()));
                 return;
             }
         }
-		setText(""); //$NON-NLS-1$
+        setText(""); //$NON-NLS-1$	
         setImage(null);
-		super.setBackground(fNormalMsgAreaBackground);
-	}
-
-	@Override
-	public void setBackground(Color color) {
-		fNormalMsgAreaBackground = color;
+        setBackground(fNormalMsgAreaBackground);
     }
+
 }
 

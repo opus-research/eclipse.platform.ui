@@ -48,8 +48,8 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 	MutableBoolean updateScheduled = new MutableBoolean();
 
     boolean debug;
-
-
+    
+   
     /**
      * The UpdatesInfo is a private class for keeping track of the updates
      * required.
@@ -70,7 +70,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
         /**
          * Add an add update
-         *
+         * 
          * @param addition
          */
         void add(JobTreeElement addition) {
@@ -79,7 +79,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
         /**
          * Add a remove update
-         *
+         * 
          * @param removal
          */
         void remove(JobTreeElement removal) {
@@ -88,7 +88,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
         /**
          * Add a refresh update
-         *
+         * 
          * @param refresh
          */
         void refresh(JobTreeElement refresh) {
@@ -130,14 +130,14 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
                         || additions.contains(treeElement)) {
 					obsoleteRefresh.add(treeElement);
 				}
-
+                
                 //Also check for groups that are being added
                Object parent = treeElement.getParent();
                if(parent != null && (deletions.contains(parent)
                        || additions.contains(parent))){
             	   obsoleteRefresh.add(treeElement);
                }
-
+               
                 if (!treeElement.isActive()) {
                     //If it is done then delete it
                     obsoleteRefresh.add(treeElement);
@@ -152,7 +152,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /**
      * Return a new instance of the receiver.
-     *
+     * 
      * @return ProgressViewUpdater
      */
    static ProgressViewUpdater getSingleton() {
@@ -165,7 +165,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     /**
      * Return whether or not there is a singleton for updates to avoid creating
      * extra listeners.
-     *
+     * 
      * @return boolean <code>true</code> if there is already
      * a singleton
      */
@@ -187,14 +187,14 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
         createUpdateJob();
         collectors = new IProgressUpdateCollector[0];
         ProgressManager.getInstance().addListener(this);
-        debug =
+        debug = 
         	PrefUtil.getAPIPreferenceStore().
         		getBoolean(IWorkbenchPreferenceConstants.SHOW_SYSTEM_JOBS);
     }
 
     /**
      * Add the new collector to the list of collectors.
-     *
+     * 
      * @param newCollector
      */
     void addCollector(IProgressUpdateCollector newCollector) {
@@ -206,7 +206,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /**
      * Remove the collector from the list of collectors.
-     *
+     * 
      * @param provider
      */
     void removeCollector(IProgressUpdateCollector provider) {
@@ -250,11 +250,10 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
         updateJob = new WorkbenchJob(ProgressMessages.ProgressContentProvider_UpdateProgressJob) {
             /*
              * (non-Javadoc)
-             *
+             * 
              * @see org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.runtime.IProgressMonitor)
              */
-            @Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
+            public IStatus runInUIThread(IProgressMonitor monitor) {
 				synchronized (updateScheduled) {
 					// updates requested while we are running should cause it to
 					// be rescheduled
@@ -308,10 +307,9 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
 			/*
 			 * (non-Javadoc)
-			 *
+			 * 
 			 * @see org.eclipse.core.runtime.jobs.Job#canceling()
 			 */
-			@Override
 			protected void canceling() {
 				synchronized (updateScheduled) {
 					updateScheduled.value = false;
@@ -326,7 +324,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /**
      * Get the updates info that we are using in the receiver.
-     *
+     * 
      * @return Returns the currentInfo.
      */
     UpdatesInfo getCurrentInfo() {
@@ -358,8 +356,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshJobInfo(org.eclipse.ui.internal.progress.JobInfo)
      */
-    @Override
-	public void refreshJobInfo(JobInfo info) {
+    public void refreshJobInfo(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
 			return;
@@ -376,8 +373,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshGroup(org.eclipse.ui.internal.progress.GroupInfo)
      */
-    @Override
-	public void refreshGroup(GroupInfo info) {
+    public void refreshGroup(GroupInfo info) {
         synchronized (updateLock) {
             currentInfo.refresh(info);
         }
@@ -389,8 +385,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#addGroup(org.eclipse.ui.internal.progress.GroupInfo)
      */
-    @Override
-	public void addGroup(GroupInfo info) {
+    public void addGroup(GroupInfo info) {
 
         synchronized (updateLock) {
             currentInfo.add(info);
@@ -401,11 +396,10 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#refreshAll()
      */
-    @Override
-	public void refreshAll() {
+    public void refreshAll() {
 
         synchronized (updateLock) {
             currentInfo.updateAll = true;
@@ -418,11 +412,10 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#add(org.eclipse.ui.internal.progress.JobInfo)
      */
-    @Override
-	public void addJob(JobInfo info) {
+    public void addJob(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
 			return;
@@ -443,11 +436,10 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeJob(org.eclipse.ui.internal.progress.JobInfo)
      */
-    @Override
-	public void removeJob(JobInfo info) {
+    public void removeJob(JobInfo info) {
 
         if (isUpdateJob(info.getJob())) {
 			return;
@@ -467,8 +459,7 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#removeGroup(org.eclipse.ui.internal.progress.GroupInfo)
      */
-    @Override
-	public void removeGroup(GroupInfo group) {
+    public void removeGroup(GroupInfo group) {
         synchronized (updateLock) {
             currentInfo.remove(group);
         }
@@ -478,20 +469,19 @@ class ProgressViewUpdater implements IJobProgressManagerListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.internal.progress.IJobProgressManagerListener#showsDebug()
      */
-    @Override
-	public boolean showsDebug() {
+    public boolean showsDebug() {
         return debug;
     }
 
     /**
      * Return whether or not this is the update job. This is used to determine
      * if a final refresh is required.
-     *
+     * 
      * @param job
-     * @return boolean <code>true</true> if this is the
+     * @return boolean <code>true</true> if this is the 
      * update job
      */
     boolean isUpdateJob(Job job) {

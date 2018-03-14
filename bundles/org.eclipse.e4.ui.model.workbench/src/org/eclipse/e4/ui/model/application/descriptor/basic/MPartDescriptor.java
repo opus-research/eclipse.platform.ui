@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *      IBM Corporation - initial API and implementation
  */
@@ -30,7 +30,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  * parts and is used in the e4 version of 'Show View'...
  * </p>
  * @since 1.0
- * @noimplement This interface is not intended to be implemented by clients.
  * <!-- end-model-doc -->
  *
  * <p>
@@ -44,7 +43,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#isDirtyable <em>Dirtyable</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getContributionURI <em>Contribution URI</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getDescription <em>Description</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor#getLocalizedDescription <em>Localized Description</em>}</li>
  * </ul>
  * </p>
  *
@@ -112,12 +110,12 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * <p>
-	 * This defines the list of the menus associated with the part represented by this descriptor.
+	 * This defines the list of the menus associated with the part represented by this descriptor. 
 	 * There are two specific menus that are managed by the core UI;
 	 * <ul>
-	 * <li>If the menu is the part's id prefixed with "menu:" then it will appear as the
+	 * <li>If the menu is the part's id prefixed with "menu:" then it will appear as the 
 	 * drop down menu available from the view's toolbar.</li>
-	 * <li>If the menu is the part's id prefixed with "popup:" then it will appear as the
+	 * <li>If the menu is the part's id prefixed with "popup:" then it will appear as the 
 	 * ddefault context menu for this view.</li>
 	 * </ul>
 	 * Other menus can be added here but have to be managed by the part itsefl...
@@ -263,11 +261,14 @@ public interface MPartDescriptor extends MApplicationElement, MUILabel, MHandler
 	void setDescription(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Localized Description</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Localized Description</em>' attribute.
-	 * @model transient="true" changeable="false" volatile="true" derived="true"
+	 * <!-- begin-model-doc -->
+	 * <p>
+	 * A method that will return the translated description.
+	 * </p>
+	 * <!-- end-model-doc -->
+	 * @model kind="operation"
 	 * @generated
 	 */
 	String getLocalizedDescription();

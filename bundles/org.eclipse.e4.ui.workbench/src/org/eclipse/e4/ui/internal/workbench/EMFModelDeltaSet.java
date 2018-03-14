@@ -26,7 +26,6 @@ public class EMFModelDeltaSet extends ModelDelta {
 		this.feature = feature;
 	}
 
-	@Override
 	public IStatus apply() {
 		EObject eObject = (EObject) getObject();
 		eObject.eSet(feature, getAttributeValue());

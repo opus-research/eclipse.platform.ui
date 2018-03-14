@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Tom Schindl and others.
+ * Copyright (c) 2008 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -66,7 +66,11 @@ abstract class AbstractComboBoxCellEditor extends CellEditor {
 	AbstractComboBoxCellEditor() {
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.CellEditor#activate(org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent)
+	 */
 	public void activate(ColumnViewerEditorActivationEvent activationEvent) {
 		super.activate(activationEvent);
 		if (activationStyle != SWT.NONE) {
@@ -88,7 +92,6 @@ abstract class AbstractComboBoxCellEditor extends CellEditor {
 			if (dropDown) {
 				getControl().getDisplay().asyncExec(new Runnable() {
 
-					@Override
 					public void run() {
 						((CCombo) getControl()).setListVisible(true);
 					}

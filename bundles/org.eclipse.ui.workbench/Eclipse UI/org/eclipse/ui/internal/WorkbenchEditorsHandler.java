@@ -21,13 +21,17 @@ import org.eclipse.ui.internal.dialogs.WorkbenchEditorsDialog;
 
 /**
  * Opens a dialog showing all open editors and the recently closed editors.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class WorkbenchEditorsHandler extends AbstractHandler {
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow workbenchWindow = HandlerUtil
 				.getActiveWorkbenchWindow(event);

@@ -20,20 +20,19 @@ import org.eclipse.swt.widgets.Menu;
 /**
  * A compound contribution is a contribution item consisting of a
  * dynamic list of contribution items.
- *
+ * 
  * @since 3.1
  */
 public abstract class CompoundContributionItem extends ContributionItem {
 
     private IMenuListener menuListener = new IMenuListener() {
-        @Override
-		public void menuAboutToShow(IMenuManager manager) {
+        public void menuAboutToShow(IMenuManager manager) {
             manager.markDirty();
         }
     };
-
+    
     private IContributionItem[] oldItems;
-
+    
     /**
      * Creates a compound contribution item with a <code>null</code> id.
      */
@@ -49,16 +48,15 @@ public abstract class CompoundContributionItem extends ContributionItem {
     protected CompoundContributionItem(String id) {
         super(id);
     }
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
      */
-    @Override
-	public void fill(Menu menu, int index) {
+    public void fill(Menu menu, int index) {
         if (index == -1) {
 			index = menu.getItemCount();
 		}
-
+        
         IContributionItem[] items = getContributionItemsToFill();
 		if (index > menu.getItemCount()) {
 			index = menu.getItemCount();
@@ -74,23 +72,17 @@ public abstract class CompoundContributionItem extends ContributionItem {
             index += numAdded;
         }
     }
-
+    
     /**
 	 * Return a list of contributions items that will replace this item in the
 	 * parent manager. The list must contain new contribution items every call
 	 * since the old ones will be disposed.
-	 *
+	 * 
 	 * @return an array list of items to display. Must not be <code>null</code>.
 	 */
     protected abstract IContributionItem[] getContributionItems();
-
+    
     private IContributionItem[] getContributionItemsToFill() {
-		disposeOldItems();
-		oldItems = getContributionItems();
-		return oldItems;
-	}
-
-	private void disposeOldItems() {
         if (oldItems != null) {
             for (int i = 0; i < oldItems.length; i++) {
                 IContributionItem oldItem = oldItems[i];
@@ -98,30 +90,29 @@ public abstract class CompoundContributionItem extends ContributionItem {
             }
             oldItems = null;
         }
+        oldItems = getContributionItems();
+        return oldItems;
     }
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.ContributionItem#isDirty()
      */
-    @Override
-	public boolean isDirty() {
+    public boolean isDirty() {
 		return true;
     }
-
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.ContributionItem#isDynamic()
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
-
-
+    
+    
     /* (non-Javadoc)
      * @see org.eclipse.jface.action.ContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
      */
-    @Override
-	public void setParent(IContributionManager parent) {
+    public void setParent(IContributionManager parent) {
         if (getParent() instanceof IMenuManager) {
             IMenuManager menuMgr = (IMenuManager) getParent();
             menuMgr.removeMenuListener(menuListener);
@@ -132,15 +123,4 @@ public abstract class CompoundContributionItem extends ContributionItem {
         }
         super.setParent(parent);
     }
-
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
-	@Override
-	public void dispose() {
-		disposeOldItems();
-		super.dispose();
-	}
 }

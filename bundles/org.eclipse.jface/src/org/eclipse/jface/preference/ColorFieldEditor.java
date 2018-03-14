@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Creates a color field editor.
-	 *
+	 * 
 	 * @param name
 	 *            the name of the preference this field editor works on
 	 * @param labelText
@@ -52,7 +52,9 @@ public class ColorFieldEditor extends FieldEditor {
 		super(name, labelText, parent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on FieldEditor.
+	 */
 	protected void adjustForNumColumns(int numColumns) {
 		((GridData) colorSelector.getButton().getLayoutData()).horizontalSpan = numColumns - 1;
 	}
@@ -62,11 +64,11 @@ public class ColorFieldEditor extends FieldEditor {
 	 * <p>
 	 * This is an internal method and should not be called by clients.
 	 * </p>
-	 *
+	 * 
 	 * @param window
 	 *            the window to create a GC on for calculation.
 	 * @return Point The image size
-	 *
+	 *  
 	 */
 	protected Point computeImageSize(Control window) {
 		// Make the image height as high as a corresponding character. This
@@ -83,7 +85,9 @@ public class ColorFieldEditor extends FieldEditor {
 	}
 
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doFillIntoGrid(org.eclipse.swt.widgets.Composite, int)
+	 */
 	protected void doFillIntoGrid(Composite parent, int numColumns) {
 		Control control = getLabelControl(parent);
 		GridData gd = new GridData();
@@ -92,11 +96,13 @@ public class ColorFieldEditor extends FieldEditor {
 
 		Button colorButton = getChangeControl(parent);
 		colorButton.setLayoutData(new GridData());
-
+		
 	}
 
-
-	@Override
+	
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoad()
+	 */
 	protected void doLoad() {
 		if (colorSelector == null) {
 			return;
@@ -105,7 +111,9 @@ public class ColorFieldEditor extends FieldEditor {
 				getPreferenceStore(), getPreferenceName()));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on FieldEditor.
+	 */
 	protected void doLoadDefault() {
 		if (colorSelector == null) {
 			return;
@@ -114,7 +122,9 @@ public class ColorFieldEditor extends FieldEditor {
 				getPreferenceStore(), getPreferenceName()));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on FieldEditor.
+	 */
 	protected void doStore() {
 		PreferenceConverter.setValue(getPreferenceStore(), getPreferenceName(),
 				colorSelector.getColorValue());
@@ -122,7 +132,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Get the color selector used by the receiver.
-	 *
+	 * 
 	 * @return ColorSelector/
 	 */
 	public ColorSelector getColorSelector() {
@@ -131,7 +141,7 @@ public class ColorFieldEditor extends FieldEditor {
 
 	/**
 	 * Returns the change button for this field editor.
-	 *
+	 * 
 	 * @param parent
 	 *            The control to create the button in if required.
 	 * @return the change button
@@ -141,7 +151,6 @@ public class ColorFieldEditor extends FieldEditor {
 			colorSelector = new ColorSelector(parent);
 			colorSelector.addListener(new IPropertyChangeListener() {
 				// forward the property change of the color selector
-				@Override
 				public void propertyChange(PropertyChangeEvent event) {
 					ColorFieldEditor.this.fireValueChanged(event.getProperty(),
 							event.getOldValue(), event.getNewValue());
@@ -155,12 +164,19 @@ public class ColorFieldEditor extends FieldEditor {
 		return colorSelector.getButton();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc) Method declared on FieldEditor.
+	 */
 	public int getNumberOfControls() {
 		return 2;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean,
+	 *      org.eclipse.swt.widgets.Composite)
+	 */
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		getChangeControl(parent).setEnabled(enabled);

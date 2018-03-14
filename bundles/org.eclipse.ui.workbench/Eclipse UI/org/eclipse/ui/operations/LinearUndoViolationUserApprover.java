@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * <p>
  * This class may be instantiated by clients.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class LinearUndoViolationUserApprover extends
@@ -48,7 +48,7 @@ public final class LinearUndoViolationUserApprover extends
 	/**
 	 * Create a LinearUndoViolationUserApprover associated with the specified
 	 * workbench part.
-	 *
+	 * 
 	 * @param context
 	 *            the undo context with the linear undo violation
 	 * @param part
@@ -63,13 +63,12 @@ public final class LinearUndoViolationUserApprover extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearRedoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IUndoContext,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected IStatus allowLinearRedoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 
@@ -82,7 +81,6 @@ public final class LinearUndoViolationUserApprover extends
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				// Show a dialog.
 				part.setFocus();
@@ -116,13 +114,12 @@ public final class LinearUndoViolationUserApprover extends
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearUndoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
 	 *      org.eclipse.core.commands.operations.IUndoContext,
 	 *      org.eclipse.core.commands.operations.IOperationHistory,
 	 *      org.eclipse.core.runtime.IAdaptable)
 	 */
-	@Override
 	protected IStatus allowLinearUndoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
 
@@ -135,7 +132,6 @@ public final class LinearUndoViolationUserApprover extends
 				getTitle(part), operation.getLabel());
 		final boolean [] proceed = new boolean[1];
 		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
-			@Override
 			public void run() {
 				// Show a dialog.
 				part.setFocus();

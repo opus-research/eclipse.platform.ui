@@ -18,15 +18,13 @@ import org.eclipse.ui.PlatformUI;
 /**
  * @author Prakash G.R.
  * @since 3.7
- *
+ * 
  */
 public class HelpContentsHandler extends AbstractHandler {
 
-	@Override
 	public Object execute(ExecutionEvent event) {
 
 		BusyIndicator.showWhile(null, new Runnable() {
-			@Override
 			public void run() {
 				PlatformUI.getWorkbench().getHelpSystem().displayHelp();
 			}

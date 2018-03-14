@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public class AnimatedTabFeedback extends ImageCycleFeedbackBase {
 
@@ -37,24 +37,23 @@ public class AnimatedTabFeedback extends ImageCycleFeedbackBase {
 		tabItem = item;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.AnimationFeedbackBase#initialize(org.eclipse.ui.internal.AnimationEngine)
+	 */
 	public void initialize(AnimationEngine engine) {
 		// TODO Auto-generated method stub
 		background = tabItem.getParent().getBackground();
 		display = tabItem.getParent().getDisplay();
 	}
 
-	@Override
 	public void saveStoppedImage() {
 		stoppedImage = tabItem.getImage();
 	}
 
-	@Override
 	public void setStoppedImage(Image image) {
 		tabItem.setImage(image);
 	}
 
-	@Override
 	public void showImage(Image image) {
 		if (tabItem.isDisposed())
 			return;

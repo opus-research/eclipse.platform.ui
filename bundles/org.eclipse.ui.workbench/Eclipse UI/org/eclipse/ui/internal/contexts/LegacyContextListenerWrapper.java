@@ -24,7 +24,7 @@ import org.eclipse.ui.contexts.IContext;
  * This wraps an old context listener so it supports the new API. This is used
  * to support attaching old-style listens to the new context objects.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public class LegacyContextListenerWrapper implements IContextListener,
@@ -49,7 +49,7 @@ public class LegacyContextListenerWrapper implements IContextListener,
 
 	/**
 	 * Constructs a new instance of <code>ContextListenerWrapper</code>.
-	 *
+	 * 
 	 * @param listener
 	 *            The listener to be wrapped. Must not be <code>null</code>.
 	 * @param contextManager
@@ -84,10 +84,9 @@ public class LegacyContextListenerWrapper implements IContextListener,
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.commands.contexts.IContextListener#contextChanged(org.eclipse.core.commands.contexts.ContextEvent)
 	 */
-	@Override
 	public final void contextChanged(final ContextEvent contextEvent) {
 		wrappedListener
 				.contextChanged(new org.eclipse.ui.contexts.ContextEvent(
@@ -98,7 +97,6 @@ public class LegacyContextListenerWrapper implements IContextListener,
 								.isParentIdChanged()));
 	}
 
-	@Override
 	public final void contextManagerChanged(final ContextManagerEvent event) {
 		final String contextId = context.getId();
 		final boolean enabledChanged;
@@ -127,7 +125,6 @@ public class LegacyContextListenerWrapper implements IContextListener,
 						context, false, enabledChanged, false, false));
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyContextListenerWrapper) {
 			final LegacyContextListenerWrapper other = (LegacyContextListenerWrapper) object;
@@ -142,7 +139,6 @@ public class LegacyContextListenerWrapper implements IContextListener,
 		return false;
 	}
 
-	@Override
 	public final int hashCode() {
 		return wrappedListener.hashCode();
 	}

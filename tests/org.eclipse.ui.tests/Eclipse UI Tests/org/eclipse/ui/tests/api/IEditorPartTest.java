@@ -34,7 +34,6 @@ public class IEditorPartTest extends IWorkbenchPartTest {
 	/**
 	 * @see IWorkbenchPartTest#openPart(IWorkbenchPage)
 	 */
-	@Override
 	protected MockPart openPart(IWorkbenchPage page) throws Throwable {
 		IProject proj = FileUtil.createProject("IEditorPartTest");
 		IFile file = FileUtil.createFile("IEditorPartTest.txt", proj);
@@ -45,7 +44,6 @@ public class IEditorPartTest extends IWorkbenchPartTest {
 	/**
 	 * @see IWorkbenchPartTest#closePart(IWorkbenchPage, MockWorkbenchPart)
 	 */
-	@Override
 	protected void closePart(IWorkbenchPage page, MockPart part)
 			throws Throwable {
 		page.closeEditor((IEditorPart) part, true);
@@ -54,7 +52,7 @@ public class IEditorPartTest extends IWorkbenchPartTest {
 	/**
 	 * Tests that the editor is closed without saving if isSaveOnCloseNeeded()
 	 * returns false.
-	 *
+	 * 
 	 * @see ISaveablePart#isSaveOnCloseNeeded()
 	 */
 	public void testOpenAndCloseSaveNotNeeded() throws Throwable {
@@ -77,7 +75,7 @@ public class IEditorPartTest extends IWorkbenchPartTest {
 		MockEditorWithState editor = (MockEditorWithState) fPage.openEditor(
 				new FileEditorInput(file), MockEditorWithState.ID);
 		closePart(fPage, editor);
-
+		
 		CallHistory history = editor.getCallHistory();
 		assertFalse(history.contains("saveState"));
 		assertFalse(history.contains("restoreState"));

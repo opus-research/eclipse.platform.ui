@@ -22,7 +22,7 @@ import org.eclipse.ui.tests.harness.util.UITestCase;
 
 /**
  * Tests Bug 43597
- *
+ * 
  * @since 3.0
  */
 public class Bug43597Test extends UITestCase {
@@ -31,7 +31,7 @@ public class Bug43597Test extends UITestCase {
 
 	/**
      * Constructor for Bug43597Test.
-     *
+     * 
      * @param name
      *            The name of the test
      */
@@ -75,8 +75,10 @@ public class Bug43597Test extends UITestCase {
         shell.close();
         shell.dispose();
     }
-
-	@Override
+    
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
+     */
 	protected void doTearDown() throws Exception {
 		if (textFont != null) {
 			textFont.dispose();

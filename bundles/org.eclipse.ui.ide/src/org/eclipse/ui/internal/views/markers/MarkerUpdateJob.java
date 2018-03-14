@@ -27,9 +27,9 @@ import org.osgi.framework.Bundle;
  * The MarkerUpdateJob processes marker updates.
  * Once the processing is complete it schedules an UI
  * update.
- *
+ * 
  * @since 3.6
- *
+ * 
  */
 class MarkerUpdateJob extends Job {
 
@@ -47,11 +47,10 @@ class MarkerUpdateJob extends Job {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @seeorg.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.
 	 * IProgressMonitor)
 	 */
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		monitor.beginTask(MarkerMessages.MarkerView_searching_for_markers,
 				IProgressMonitor.UNKNOWN);
@@ -61,7 +60,7 @@ class MarkerUpdateJob extends Job {
 
 	/**
 	 * gather all markers needed by the view.
-	 *
+	 * 
 	 * @param monitor
 	 */
 	void buildMarkers(IProgressMonitor monitor) {
@@ -81,7 +80,7 @@ class MarkerUpdateJob extends Job {
 		}
 		// builder.getUpdateScheduler().indicateStatus(
 		// MarkerMessages.MarkerView_processUpdates, false);
-
+		
 		monitor.setTaskName(MarkerMessages.MarkerView_processUpdates);
 		if (!processMarkerEntries(markerEntries, monitor)) {
 			return;
@@ -107,7 +106,7 @@ class MarkerUpdateJob extends Job {
 
 	/**
 	 * Collect the markers starting clean, all over again.
-	 * @param markerEntries
+	 * @param markerEntries 
 	 */
 	boolean clean(Collection markerEntries, IProgressMonitor monitor) {
 		MarkerContentGenerator generator = builder.getGenerator();
@@ -121,7 +120,7 @@ class MarkerUpdateJob extends Job {
 	/**
 	 * Process,sort and group the new marker entries in markerEntryList and
 	 * update the Markers object
-	 *
+	 * 
 	 * @param markerEntries
 	 *            the collection of new MarkerEntry(s)
 	 */
@@ -136,10 +135,9 @@ class MarkerUpdateJob extends Job {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.runtime.jobs.Job#shouldRun()
 	 */
-	@Override
 	public boolean shouldRun() {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return false;
@@ -151,10 +149,9 @@ class MarkerUpdateJob extends Job {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.core.runtime.jobs.Job#belongsTo(java.lang.Object)
 	 */
-	@Override
 	public boolean belongsTo(Object family) {
 		if (family.equals(builder.CACHE_UPDATE_FAMILY)) {
 			return true;
@@ -190,9 +187,9 @@ class MarkerUpdateJob extends Job {
 /**
  * The SortingJob is used to resort the existing markers. Once the sorting is
  * complete it schedules the an UI update
- *
+ * 
  * @since 3.6
- *
+ * 
  */
 class SortingJob extends MarkerUpdateJob {
 	public SortingJob(CachedMarkerBuilder builder) {
@@ -202,12 +199,11 @@ class SortingJob extends MarkerUpdateJob {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.ui.internal.views.markers.MarkerUpdateJob#run(org.eclipse
 	 * .core.runtime.IProgressMonitor)
 	 */
-	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		monitor.beginTask(MarkerMessages.MarkerView_19,
 				IProgressMonitor.UNKNOWN);

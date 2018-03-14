@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -46,7 +46,6 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -55,10 +54,9 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 		scale = delegate.scale;
 	}
 
-	@Override
 	protected IObservable doCreateObservable() {
 		return getObservableContractDelegate().createObservable(
-				DisplayRealm.getRealm(Display.getDefault()));
+				SWTObservables.getRealm(Display.getDefault()));
 	}
 
 	public void testGetValue() throws Exception {
@@ -88,24 +86,20 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 
 		Scale scale;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			scale = new Scale(shell, SWT.NONE);
 			scale.setMaximum(1000);
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.selection().observe(realm, scale);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			scale
 					.setSelection(createIntegerValue(
@@ -113,12 +107,10 @@ public class ScaleObservableValueSelectionTest extends ObservableDelegateTest {
 			scale.notifyListeners(SWT.Selection, null);
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return Integer.TYPE;
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return createIntegerValue(observable);
 		}

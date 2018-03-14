@@ -16,24 +16,21 @@ package org.eclipse.ui.commands;
  * <p>
  * This interface may be implemented by clients.
  * </p>
- *
+ * 
  * @since 3.0
  * @see ICommand#addCommandListener(ICommandListener)
  * @see ICommand#removeCommandListener(ICommandListener)
  * @see org.eclipse.core.commands.ICommandListener
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  */
-@Deprecated
-@SuppressWarnings("all")
 public interface ICommandListener {
 
     /**
      * Notifies that one or more properties of an instance of <code>ICommand</code>
      * have changed. Specific details are described in the <code>CommandEvent</code>.
-     *
+     * 
      * @param commandEvent
      *            the command event. Guaranteed not to be <code>null</code>.
      */
-	@Deprecated
     void commandChanged(CommandEvent commandEvent);
 }

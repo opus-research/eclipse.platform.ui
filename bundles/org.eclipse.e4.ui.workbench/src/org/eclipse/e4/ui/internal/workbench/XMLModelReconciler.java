@@ -108,7 +108,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * The version of the model deltas.
-	 *
+	 * 
 	 * <ul>
 	 * <li>1.1 - introduced direct references to binding contexts instead of using string ids (see
 	 * bug 320171 and bug 338444)</li>
@@ -156,17 +156,14 @@ public class XMLModelReconciler extends ModelReconciler {
 		}
 	}
 
-	@Override
 	public void recordChanges(Object object) {
 		Assert.isNotNull(object);
 		rootObject = (EObject) object;
 		changeRecorder = new ChangeRecorder(rootObject) {
-			@Override
 			protected boolean shouldRecord(EStructuralFeature feature, EObject eObject) {
 				return !feature.isTransient() && super.shouldRecord(feature, eObject);
 			}
 
-			@Override
 			protected boolean shouldRecord(EStructuralFeature feature, EReference containment,
 					Notification notification, EObject eObject) {
 				return !feature.isTransient()
@@ -187,7 +184,6 @@ public class XMLModelReconciler extends ModelReconciler {
 		return references;
 	}
 
-	@Override
 	public Collection<ModelDelta> constructDeltas(Object object, Object serializedState) {
 		rootObject = (EObject) object;
 		List<Object> references = getReferences(rootObject);
@@ -847,7 +843,6 @@ public class XMLModelReconciler extends ModelReconciler {
 		return changeDescription;
 	}
 
-	@Override
 	public Object serialize() {
 		calculateDeltas();
 
@@ -874,7 +869,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * Returns an XML representation of the changes that have occurred in the specified object. Or
 	 * <code>null</code> if changes pertaining to this object should not be persisted
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param entry
@@ -984,7 +979,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Retrieves the id of the object by querying for it from the resource.
-	 *
+	 * 
 	 * @param object
 	 *            the object to retrieve the id for
 	 * @param container
@@ -1034,7 +1029,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	/**
 	 * Retrieves the original containing parent object of the specified reference. If
 	 * <code>null</code> is returned, the object was not initially known by the change recorder.
-	 *
+	 * 
 	 * @param reference
 	 *            the object to find its original container for
 	 * @return the original parent container of the object, or <code>null</code> if it did not
@@ -1569,7 +1564,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * {@link #recordChanges(Object)}. The identifier for the object will be queried from the
 	 * resource. If the object did not exist was not known when changes began recording,
 	 * <code>null</code> will be returned.
-	 *
+	 * 
 	 * @param object
 	 *            the object to query an id for
 	 * @return an id suitable for looking up the object, or <code>null</code> if the object did not
@@ -1599,7 +1594,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates an XML element that will capture the delta that occurred in the object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param object
@@ -1666,7 +1661,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * there when the application started prior to the applying of any deltas. It should be noted
 	 * that an object that was originally referenced will not necessarily be dereferenced after any
 	 * deltas have been applied.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param reference
@@ -1691,7 +1686,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates a new element that defines a reference to another object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML document
 	 * @param eObject
@@ -1766,7 +1761,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Creates an element that describes the state of the feature in the specified object.
-	 *
+	 * 
 	 * @param document
 	 *            the root XML element document
 	 * @param object
@@ -1851,7 +1846,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * An example of a direct reference would be a window's main menu. The menu is "owned" by the
 	 * window and cannot be one of the menus in a part.
 	 * </p>
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the interested feature
 	 * @return <code>true</code> if this particular feature directly references and "owns" the
@@ -1880,7 +1875,7 @@ public class XMLModelReconciler extends ModelReconciler {
 	 * case, the element container's contains the active child in its list of children and both this
 	 * listing and the active child reference is a containment feature.
 	 * </p>
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the interested feature
 	 * @return <code>true</code> if this particular feature directly references and "owns" the
@@ -1902,7 +1897,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether the feature is a reference to another object.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature is a reference to another object,
@@ -1914,7 +1909,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether the feature is a list of object references.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature is referring to a list of object
@@ -1963,7 +1958,7 @@ public class XMLModelReconciler extends ModelReconciler {
 
 	/**
 	 * Returns whether this feature should be persisted.
-	 *
+	 * 
 	 * @param featureName
 	 *            the name of the feature
 	 * @return <code>true</code> if this particular feature should be persisted, <code>false</code>
