@@ -108,6 +108,9 @@ public class CheckboxCellEditor extends CellEditor {
         return value ? Boolean.TRUE : Boolean.FALSE;
     }
 
+    /* (non-Javadoc)
+     * Method declared on CellEditor.
+     */
     @Override
 	protected void doSetFocus() {
         // Ignore
