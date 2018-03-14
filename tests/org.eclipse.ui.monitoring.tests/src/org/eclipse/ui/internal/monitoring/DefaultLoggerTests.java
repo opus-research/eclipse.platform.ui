@@ -7,18 +7,10 @@
  *
  * Contributors:
  *     Marcus Eng (Google) - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 443391
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
@@ -26,13 +18,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
-import org.junit.Before;
-import org.junit.Test;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadInfo;
+import java.lang.management.ThreadMXBean;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * JUnit test for the {@link DefaultUiFreezeEventLogger}.
  */
-public class DefaultLoggerTests {
+public class DefaultLoggerTests extends TestCase {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 	private static final String RUNTIME_ID = "org.eclipse.core.runtime";
 	private static final long TIME = 120000000;
@@ -41,7 +37,7 @@ public class DefaultLoggerTests {
 	private ThreadInfo thread;
 	private IStatus loggedStatus;
 
-	@Before
+	@Override
 	public void setUp() {
 		logger = new DefaultUiFreezeEventLogger();
 		createLogListener();
@@ -67,8 +63,7 @@ public class DefaultLoggerTests {
 		return event;
 	}
 
-	@Test
-	public void testLogEvent() {
+	public void testLogEvent() throws Exception {
 		UiFreezeEvent event = createFreezeEvent();
 		String expectedTime = dateFormat.format(new Date(TIME));
 		String expectedHeader =
