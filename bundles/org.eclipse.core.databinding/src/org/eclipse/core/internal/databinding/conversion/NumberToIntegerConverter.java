@@ -20,11 +20,10 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * Class is thread safe.
  * </p>
- * 
  * @since 1.0
  */
 public class NumberToIntegerConverter extends NumberToNumberConverter implements
-		IConverter<Object, Object> {
+		IConverter {
 
 	/**
 	 * @param numberFormat
@@ -32,9 +31,8 @@ public class NumberToIntegerConverter extends NumberToNumberConverter implements
 	 * @param primitive
 	 */
 	public NumberToIntegerConverter(NumberFormat numberFormat,
-			Class<?> fromType, boolean primitive) {
-		super(numberFormat, fromType, (primitive) ? Integer.TYPE
-				: Integer.class);
+			Class fromType, boolean primitive) {
+		super(numberFormat, fromType, (primitive) ? Integer.TYPE : Integer.class);
 	}
 
 	@Override

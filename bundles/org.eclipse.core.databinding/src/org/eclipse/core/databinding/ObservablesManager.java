@@ -34,9 +34,9 @@ import org.eclipse.core.internal.databinding.Pair;
  */
 public class ObservablesManager {
 
-	private Set<IObservable> managedObservables = new IdentitySet<>();
-	private Set<IObservable> excludedObservables = new IdentitySet<>();
-	private Map<DataBindingContext, Pair> contexts = new HashMap<>();
+	private Set managedObservables = new IdentitySet();
+	private Set excludedObservables = new IdentitySet();
+	private Map contexts = new HashMap();
 
 	/**
 	 * Create a new observables manager.
@@ -109,19 +109,17 @@ public class ObservablesManager {
 	 * Disposes of this manager and all observables that it manages.
 	 */
 	public void dispose() {
-		Set<IObservable> observables = new IdentitySet<>();
+		Set observables = new IdentitySet();
 		observables.addAll(managedObservables);
-		for (Iterator<DataBindingContext> it = contexts.keySet().iterator(); it
-				.hasNext();) {
-			DataBindingContext context = it.next();
-			Pair trackModelsOrTargets = contexts.get(context);
+		for (Iterator it = contexts.keySet().iterator(); it.hasNext();) {
+			DataBindingContext context = (DataBindingContext) it.next();
+			Pair trackModelsOrTargets = (Pair) contexts.get(context);
 			boolean disposeTargets = ((Boolean) trackModelsOrTargets.a)
 					.booleanValue();
 			boolean disposeModels = ((Boolean) trackModelsOrTargets.b)
 					.booleanValue();
-			for (Iterator<Binding<?, ?>> it2 = context.getBindings().iterator(); it2
-					.hasNext();) {
-				Binding<?, ?> binding = it2.next();
+			for (Iterator it2 = context.getBindings().iterator(); it2.hasNext();) {
+				Binding binding = (Binding) it2.next();
 				if (disposeTargets) {
 					observables.add(binding.getTarget());
 				}
@@ -131,8 +129,8 @@ public class ObservablesManager {
 			}
 		}
 		observables.removeAll(excludedObservables);
-		for (Iterator<IObservable> it = observables.iterator(); it.hasNext();) {
-			IObservable observable = it.next();
+		for (Iterator it = observables.iterator(); it.hasNext();) {
+			IObservable observable = (IObservable) it.next();
 			observable.dispose();
 		}
 	}

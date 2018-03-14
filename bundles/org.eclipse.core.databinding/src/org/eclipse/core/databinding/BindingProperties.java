@@ -42,7 +42,7 @@ public class BindingProperties {
 	 * @return an {@link IListProperty} &lt; {@link Binding} &gt; for observing
 	 *         the bindings of a {@link DataBindingContext}.
 	 */
-	public static IListProperty<DataBindingContext, Binding<?, ?>> bindings() {
+	public static IListProperty bindings() {
 		return new DataBindingContextBindingsProperty();
 	}
 
@@ -53,7 +53,7 @@ public class BindingProperties {
 	 * @return an {@link IValueProperty} &lt; {@link IObservable} &gt; for
 	 *         observing the model of a {@link Binding}.
 	 */
-	public static IValueProperty<Binding<?, ?>, IObservable> model() {
+	public static IValueProperty model() {
 		return new BindingModelProperty();
 	}
 
@@ -64,7 +64,7 @@ public class BindingProperties {
 	 * @return an {@link IListProperty} &lt; {@link IObservable} &gt; for
 	 *         observing the models of a {@link ValidationStatusProvider}.
 	 */
-	public static IListProperty<ValidationStatusProvider, IObservable> models() {
+	public static IListProperty models() {
 		return new ValidationStatusProviderModelsProperty();
 	}
 
@@ -75,7 +75,7 @@ public class BindingProperties {
 	 * @return an {@link IValueProperty} &lt; {@link IObservable} &gt; for
 	 *         observing the target of a {@link Binding}.
 	 */
-	public static IValueProperty<Binding<?, ?>, IObservable> target() {
+	public static IValueProperty target() {
 		return new BindingTargetProperty();
 	}
 
@@ -86,7 +86,7 @@ public class BindingProperties {
 	 * @return an {@link IListProperty} &lt; {@link IObservable} &gt; for
 	 *         observing the targets of a {@link ValidationStatusProvider}.
 	 */
-	public static IListProperty<ValidationStatusProvider, IObservable> targets() {
+	public static IListProperty targets() {
 		return new ValidationStatusProviderTargetsProperty();
 	}
 
@@ -97,9 +97,9 @@ public class BindingProperties {
 	 * @return an {@link IValueProperty} &lt; {@link IStatus} &gt; for observing
 	 *         the validation status of a {@link ValidationStatusProvider}.
 	 */
-	public static IValueProperty<ValidationStatusProvider, IStatus> validationStatus() {
+	public static IValueProperty validationStatus() {
 		return new ValidationStatusProviderValidationStatusProperty()
-				.value(Properties.<IStatus> observableValue(IStatus.class));
+				.value(Properties.observableValue(IStatus.class));
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class BindingProperties {
 	 *         &gt; for observing the validation status providers of a
 	 *         {@link DataBindingContext}.
 	 */
-	public static IListProperty<DataBindingContext, ValidationStatusProvider> validationStatusProviders() {
+	public static IListProperty validationStatusProviders() {
 		return new DataBindingContextValidationStatusProvidersProperty();
 	}
 
@@ -131,8 +131,7 @@ public class BindingProperties {
 	 *
 	 * @since 1.4
 	 */
-	public static <S, T> IValueProperty<S, T> convertedValue(
-			IConverter<S, T> converter) {
-		return new ConverterValueProperty<>(converter);
+	public static IValueProperty convertedValue(IConverter converter) {
+		return new ConverterValueProperty(converter);
 	}
 }
