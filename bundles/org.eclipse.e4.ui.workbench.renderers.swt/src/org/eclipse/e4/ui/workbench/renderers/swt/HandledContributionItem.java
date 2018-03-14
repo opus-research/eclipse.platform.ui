@@ -435,11 +435,7 @@ public class HandledContributionItem extends ContributionItem {
 		String keyBindingText = null;
 		if (parmCmd != null) {
 			if (text == null || text.isEmpty()) {
-				try {
-					text = parmCmd.getName(model.getCommand().getLocalizedCommandName());
-				} catch (NotDefinedException e) {
-					e.printStackTrace();
-				}
+				text = model.getCommand().getLocalizedCommandName();
 			}
 			if (bindingService != null) {
 				TriggerSequence binding = bindingService
