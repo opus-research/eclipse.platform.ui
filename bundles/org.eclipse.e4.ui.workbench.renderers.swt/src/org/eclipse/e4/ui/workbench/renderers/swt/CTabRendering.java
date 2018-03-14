@@ -250,10 +250,7 @@ public class CTabRendering extends CTabFolderRenderer implements
 		// HEADER
 		Rectangle trim = computeTrim(PART_HEADER, state, 0, 0, 0, 0);
 		trim.width = bounds.width - trim.width;
-		
-		// The bug 425777 has been opened for cleaning up the 'magic' values
-		trim.height = (parent.getTabHeight() + (onBottom ? 7 : 4)) - trim.height;
-		
+		trim.height = (parent.getTabHeight() + 1 + header) - trim.height;
 		trim.x = -trim.x;
 		trim.y = onBottom ? bounds.height - parent.getTabHeight() - 1 - header
 				: -trim.y;
