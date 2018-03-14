@@ -122,7 +122,7 @@ public class DeferredTreeContentManager {
 	public DeferredTreeContentManager(AbstractTreeViewer viewer,
 			IWorkbenchPartSite site) {
 		this(viewer);
-		Object siteService = Adapters.adapt(site, IWorkbenchSiteProgressService.class);
+		Object siteService = Adapters.getAdapter(site, IWorkbenchSiteProgressService.class, true);
 		if (siteService != null) {
 			progressService = (IWorkbenchSiteProgressService) siteService;
 		}
@@ -200,7 +200,7 @@ public class DeferredTreeContentManager {
 	 * @return IDeferredWorkbenchAdapter or <code>null</code>
 	 */
 	protected IDeferredWorkbenchAdapter getAdapter(Object element) {
-		return Adapters.adapt(element, IDeferredWorkbenchAdapter.class);
+		return Adapters.getAdapter(element, IDeferredWorkbenchAdapter.class, true);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class DeferredTreeContentManager {
 			 *            The object we are adapting to.
 			 */
 			private IWorkbenchAdapter getWorkbenchAdapter(Object element) {
-				return Adapters.adapt(element, IWorkbenchAdapter.class);
+				return Adapters.getAdapter(element, IWorkbenchAdapter.class, true);
 			}
 		};
 		job.addJobChangeListener(new JobChangeAdapter() {

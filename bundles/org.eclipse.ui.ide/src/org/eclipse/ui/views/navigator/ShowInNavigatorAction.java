@@ -67,7 +67,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
 		for (Iterator<?> i = selection.iterator(); i.hasNext();) {
             Object o = i.next();
 
-			IResource resource = Adapters.adapt(o, IResource.class);
+			IResource resource = Adapters.getAdapter(o, IResource.class, true);
 			if (resource != null) {
 				v.add(resource);
             } else if (o instanceof IMarker) {

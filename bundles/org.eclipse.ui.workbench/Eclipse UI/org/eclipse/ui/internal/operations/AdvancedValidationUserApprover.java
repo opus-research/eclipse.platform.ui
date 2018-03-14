@@ -382,7 +382,7 @@ public class AdvancedValidationUserApprover implements IOperationApprover,
 	 */
 	Shell getShell(IAdaptable uiInfo) {
 		if (uiInfo != null) {
-			Shell shell = Adapters.adapt(uiInfo, Shell.class);
+			Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
 			if (shell != null) {
 				return shell;
 			}

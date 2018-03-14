@@ -85,7 +85,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			PropertySheet sheet = (PropertySheet) activePart;
 			return (PropertyShowInContext) sheet.getShowInContext();
 		}
-		IShowInSource adapter = Adapters.adapt(activePart, IShowInSource.class);
+		IShowInSource adapter = Adapters.getAdapter(activePart, IShowInSource.class, true);
 		if (adapter != null) {
 			ShowInContext showInContext = adapter.getShowInContext();
 			return new PropertyShowInContext(activePart, showInContext);

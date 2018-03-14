@@ -219,7 +219,7 @@ public class WebBrowserEditor extends EditorPart implements IBrowserViewerContai
 			if (oldImage != null && !oldImage.isDisposed())
 				oldImage.dispose();
 		} else {
-			IPathEditorInput pinput = Adapters.adapt(input, IPathEditorInput.class);
+			IPathEditorInput pinput = Adapters.getAdapter(input, IPathEditorInput.class, true);
 			if (pinput != null) {
 				init(site, pinput);
 			} else {

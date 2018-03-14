@@ -421,7 +421,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	private IShowInSource getShowInSource(IWorkbenchPart sourcePart) {
-		return Adapters.adapt(sourcePart, IShowInSource.class);
+		return Adapters.getAdapter(sourcePart, IShowInSource.class, true);
 	}
 
 	private ShowInContext getContext(IWorkbenchPart sourcePart) {
@@ -2414,7 +2414,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public String getLabel() {
         String label = WorkbenchMessages.WorkbenchPage_UnknownLabel;
-        IWorkbenchAdapter adapter = Adapters.adapt(input, IWorkbenchAdapter.class);
+        IWorkbenchAdapter adapter = Adapters.getAdapter(input, IWorkbenchAdapter.class, true);
         if (adapter != null) {
 			label = adapter.getLabel(input);
 		}
@@ -5282,7 +5282,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	private IPathEditorInput getPathEditorInput(IEditorInput input) {
 		if (input instanceof IPathEditorInput)
 			return (IPathEditorInput) input;
-		return Adapters.adapt(input, IPathEditorInput.class);
+		return Adapters.getAdapter(input, IPathEditorInput.class, true);
 	}
 
 	/**
@@ -5374,6 +5374,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 			}
 		}
 	};
+
+	/**
+	 * this should work with hide and show editors.
+	 */
+	public void resetHiddenEditors() {
+		E4Util.unsupported("resetHiddenEditors not supported yet"); //$NON-NLS-1$
+	}
 
 	public String getHiddenItems() {
 		MPerspective perspective = getCurrentPerspective();

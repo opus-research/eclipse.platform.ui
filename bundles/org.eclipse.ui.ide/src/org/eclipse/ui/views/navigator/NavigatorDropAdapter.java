@@ -154,7 +154,7 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
 			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
 
-				IResource r = Adapters.adapt(o, IResource.class);
+				IResource r = Adapters.getAdapter(o, IResource.class, true);
 				if (r != null) {
 					selectedResources.add(r);
                 }

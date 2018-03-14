@@ -167,7 +167,7 @@ public class ProjectReferencePage extends PropertyPage {
      * Initializes a ProjectReferencePage.
      */
     private void initialize() {
-		project = (IProject) Adapters.adapt(getElement(), IResource.class);
+		project = (IProject) Adapters.getAdapter(getElement(), IResource.class, true);
         noDefaultAndApplyButton();
         setDescription(NLS.bind(IDEWorkbenchMessages.ProjectReferencesPage_label, project.getName()));
     }
