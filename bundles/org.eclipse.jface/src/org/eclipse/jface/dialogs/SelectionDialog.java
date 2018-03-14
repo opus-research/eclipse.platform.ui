@@ -1,12 +1,11 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2014 vogella GmbH and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *     IBM Corporation - initial API and implementation
  *     Simon Scholz <scholzsimon@vogella.com> - Bug 446616
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
@@ -14,7 +13,6 @@ package org.eclipse.jface.dialogs;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -23,8 +21,8 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * The abstract implementation of a selection dialog. It can be primed with
- * initial selections (<code>setInitialSelections</code>), and returns the final
- * selection (via <code>getResult</code>) after completion.
+ * initial selections (<code>setInitialSelection</code>), and returns the final
+ * selection (via <code>getUserSelection</code>) after completion.
  * <p>
  * Clients may subclass this dialog to inherit its selection facilities.
  * </p>
@@ -41,7 +39,7 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	private Collection<T> result;
 
 	// a collection of the initially-selected elements
-	private Collection<T> initialSelections;
+	private Collection<T> initialSelection;
 
 	// title of dialog
 	private String title;
@@ -50,15 +48,13 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	private String message = ""; //$NON-NLS-1$
 
 	// dialog bounds strategy (since 3.2)
-	private int dialogBoundsStrategy = Dialog.DIALOG_PERSISTLOCATION
-			| Dialog.DIALOG_PERSISTSIZE;
+	private int dialogBoundsStrategy = Dialog.DIALOG_PERSISTLOCATION | Dialog.DIALOG_PERSISTSIZE;
 
 	// dialog settings for storing bounds (since 3.2)
 	private IDialogSettings dialogBoundsSettings = null;
 
 	/**
-	 * Creates a dialog instance. Note that the dialog will have no visual
-	 * representation (no widgets) until it is told to open.
+	 * Creates a dialog instance.
 	 *
 	 * @param parentShell
 	 *            the parent shell
@@ -73,14 +69,6 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 		if (title != null) {
 			shell.setText(title);
 		}
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
-				true);
-		createButton(parent, IDialogConstants.CANCEL_ID,
-				IDialogConstants.CANCEL_LABEL, false);
 	}
 
 	/**
@@ -108,11 +96,11 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	 *
 	 * @return Collection
 	 */
-	protected Collection<T> getInitialElementSelections() {
-		if (null == initialSelections) {
+	protected Collection<T> getInitialSelection() {
+		if (null == initialSelection) {
 			return Collections.emptyList();
 		}
-		return initialSelections;
+		return initialSelection;
 	}
 
 	/**
@@ -127,8 +115,8 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	/**
 	 * Returns the collection of selections made by the user.
 	 *
-	 * @return the array of selected elements, or <code>null</code> if no result
-	 *         was set
+	 * @return the collection of selected elements, or <code>null</code> if no
+	 *         result was set
 	 */
 	public Collection<T> getResult() {
 		return result;
@@ -139,10 +127,10 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	 * elements.
 	 *
 	 * @param selectedElements
-	 *            the array of elements to select
+	 *            the elements to select
 	 */
-	public void setInitialElementSelections(T... selectedElements) {
-		initialSelections = Arrays.asList(selectedElements);
+	public void setInitialSelection(T... selectedElements) {
+		initialSelection = Arrays.asList(selectedElements);
 	}
 
 	/**
@@ -152,8 +140,8 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	 * @param selectedElements
 	 *            the List of elements to select
 	 */
-	public void setInitialElementSelections(Collection<T> selectedElements) {
-		initialSelections = selectedElements;
+	public void setInitialSelection(Collection<T> selectedElements) {
+		initialSelection = selectedElements;
 	}
 
 	/**
@@ -170,15 +158,15 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	 * Set the selections made by the user, or <code>null</code> if the
 	 * selection was canceled.
 	 *
-	 * @param newResult
-	 *            list of selected elements, or <code>null</code> if Cancel was
-	 *            pressed
+	 * @param newUserSelection
+	 *            collection of selected elements, or <code>null</code> if
+	 *            Cancel was pressed
 	 */
-	protected void setResult(Set<T> newResult) {
-		if (newResult == null) {
-			result = Collections.emptySet();
+	protected void setResult(Collection<T> newUserSelection) {
+		if (newUserSelection == null) {
+			result = Collections.emptyList();
 		} else {
-			result = newResult;
+			result = newUserSelection;
 		}
 	}
 
@@ -189,14 +177,14 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 	 * The selections may accessed using <code>getResult</code>.
 	 * </p>
 	 *
-	 * @param newResult
+	 * @param newUserSelection
 	 *            - the new values
 	 */
-	protected void setResult(T... newResult) {
-		if (newResult == null) {
+	protected void setResult(T... newUserSelection) {
+		if (newUserSelection == null) {
 			result = Collections.emptyList();
 		} else {
-			result = Arrays.asList(newResult);
+			result = Arrays.asList(newUserSelection);
 		}
 	}
 
@@ -235,48 +223,16 @@ public abstract class SelectionDialog<T> extends TrayDialog {
 		dialogBoundsSettings = settings;
 	}
 
-	/**
-	 * Gets the dialog settings that should be used for remembering the bounds
-	 * of the dialog, according to the dialog bounds strategy. Overridden to
-	 * provide the dialog settings that were set using
-	 * {@link #setDialogBoundsSettings(IDialogSettings, int)}.
-	 *
-	 * @return the dialog settings used to store the dialog's location and/or
-	 *         size, or <code>null</code> if the dialog's bounds should not be
-	 *         stored.
-	 *
-	 * @since 3.2
-	 *
-	 * @see Dialog#getDialogBoundsStrategy()
-	 * @see #setDialogBoundsSettings(IDialogSettings, int)
-	 */
 	@Override
 	protected IDialogSettings getDialogBoundsSettings() {
 		return dialogBoundsSettings;
 	}
 
-	/**
-	 * Get the integer constant that describes the strategy for persisting the
-	 * dialog bounds. Overridden to provide the dialog bounds strategy that was
-	 * set using {@link #setDialogBoundsSettings(IDialogSettings, int)}.
-	 *
-	 * @return the constant describing the strategy for persisting the dialog
-	 *         bounds.
-	 *
-	 * @since 3.2
-	 * @see Dialog#DIALOG_PERSISTLOCATION
-	 * @see Dialog#DIALOG_PERSISTSIZE
-	 * @see Dialog#getDialogBoundsSettings()
-	 * @see #setDialogBoundsSettings(IDialogSettings, int)
-	 */
 	@Override
 	protected int getDialogBoundsStrategy() {
 		return dialogBoundsStrategy;
 	}
 
-	/**
-	 * @since 3.4
-	 */
 	@Override
 	protected boolean isResizable() {
 		return true;
