@@ -52,6 +52,17 @@ public class EventLoopMonitorThread extends Thread {
 	private static final String TRACE_PREFIX = "Event Loop Monitor"; //$NON-NLS-1$
 	private static final Tracer tracer =
 			Tracer.create(TRACE_PREFIX, PreferenceConstants.PLUGIN_ID + TRACE_EVENT_MONITOR);
+	// TODO(sprigogin): Move to a preference.
+	private static final FilterHandler NON_INTERESTING_THREAD_FILTER = new FilterHandler(
+			"java.*" //$NON-NLS-1$
+			+ ",sun.*" //$NON-NLS-1$
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.sleep" //$NON-NLS-1$
+			+ ",org.eclipse.core.internal.jobs.WorkerPool.startJob" //$NON-NLS-1$
+			+ ",org.eclipse.core.internal.jobs.Worker.run" //$NON-NLS-1$
+			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.getNextEvent" //$NON-NLS-1$
+			+ ",org.eclipse.osgi.framework.eventmgr.EventManager$EventThread.run" //$NON-NLS-1$
+			+ ",org.eclipse.equinox.internal.util.impl.tpt.timer.TimerImpl.run" //$NON-NLS-1$
+			+ ",org.eclipse.equinox.internal.util.impl.tpt.threadpool.Executor.run"); //$NON-NLS-1$
 
 	/* NOTE: All time-related values in this class are in milliseconds. */
 
@@ -127,7 +138,7 @@ public class EventLoopMonitorThread extends Thread {
 		 * {@link SWT#PreExternalEventDispatch PreExternalEventDispatch} event and popped from
 		 * the stack on {@link SWT#PostExternalEventDispatch PostExternalEventDispatch} event.
 		 */
-		private int[] nestingLevelStack = new int[32];
+		private int[] nestingLevelStack = new int[64];
 		private int nestingLevelStackSize;
 
 		@Override
@@ -158,6 +169,9 @@ public class EventLoopMonitorThread extends Thread {
 			 */
 			switch (event.type) {
 			case SWT.PreEvent:
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -166,6 +180,9 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(true, true);
 				break;
 			case SWT.PostEvent:
+				if (event.data instanceof Event && ((Event) event.data).type == SWT.Skin) {
+					break;  // Ignore Skin events since they may be produced during a UI freeze.
+				}
 				if (eventHistory != null) {
 					eventHistory.recordEvent(event.type);
 				}
@@ -190,18 +207,20 @@ public class EventLoopMonitorThread extends Thread {
 				handleEventTransition(false, nestingLevel > 0);
 				break;
 			default:
+				break;
 			}
 		}
 
 		private void saveAndResetNestingLevel() {
-			if (nestingLevelStackSize >= nestingLevelStack.length) {
+			if (nestingLevelStackSize < nestingLevelStack.length) {
+				nestingLevelStack[nestingLevelStackSize++] = nestingLevel;
+				nestingLevel = 0;
+			} else {
 				MonitoringPlugin.logError(
 						NLS.bind(Messages.EventLoopMonitorThread_max_event_loop_depth_exceeded_1,
 						nestingLevelStack.length), null);
 				shutdown();
 			}
-			nestingLevelStack[nestingLevelStackSize++] = nestingLevel;
-			nestingLevel = 0;
 		}
 
 		private void restoreNestingLevel() {
@@ -617,33 +636,45 @@ public class EventLoopMonitorThread extends Thread {
 	}
 
 	private ThreadInfo[] captureThreadStacks(boolean dumpAllThreads) {
-		ThreadInfo[] threadStacks;
 		if (dumpAllThreads) {
-			ThreadInfo[] rawThreadStacks =
+			ThreadInfo[] threadStacks =
 					threadMXBean.dumpAllThreads(dumpLockedMonitors, dumpLockedSynchronizers);
 			// Remove the info for the monitoring thread.
-			threadStacks = new ThreadInfo[rawThreadStacks.length - 1];
 			int index = 0;
-
-			for (int i = 0; i < rawThreadStacks.length; i++) {
-				ThreadInfo thread = rawThreadStacks[i];
+			for (int i = 0; i < threadStacks.length; i++) {
+				ThreadInfo thread = threadStacks[i];
 				long threadId = thread.getThreadId();
 				// Skip the stack trace of the event loop monitoring thread.
 				if (threadId != monitoringThreadId) {
-					if (threadId == uiThreadId && i != 0) {
-						// Swap the UI thread to first slot in the array if it is not
-						// there already.
-						thread = threadStacks[0];
-						threadStacks[0] = rawThreadStacks[i];
+					if (threadId == uiThreadId) {
+						// Swap the UI thread to first slot in the array if it is not there already.
+						if (index != 0) {
+							thread = threadStacks[0];
+							threadStacks[0] = threadStacks[i];
+						}
+					} else if (!isInteresting(thread)) {
+						continue; // Skip the non-interesting thread.
 					}
 					threadStacks[index++] = thread;
 				}
 			}
+			return Arrays.copyOf(threadStacks, index);
 		} else {
-			threadStacks =
-					new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
+			return new ThreadInfo[] { threadMXBean.getThreadInfo(uiThreadId, Integer.MAX_VALUE) };
 		}
-		return threadStacks;
+	}
+
+	/**
+	 * A thread is considered interesting if its stack trace includes at least one frame not
+	 * matching any of the methods in {@link #NON_INTERESTING_THREAD_FILTER}.
+	 */
+	private boolean isInteresting(ThreadInfo thread) {
+		for (StackTraceElement element : thread.getStackTrace()) {
+			if (!NON_INTERESTING_THREAD_FILTER.matchesFilter(element)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Display getDisplay() throws IllegalStateException {
@@ -689,11 +720,11 @@ public class EventLoopMonitorThread extends Thread {
 				if (object instanceof IUiFreezeEventLogger) {
 					externalLoggers.add((IUiFreezeEventLogger) object);
 				} else {
-					MonitoringPlugin.logWarning(String.format(
+					MonitoringPlugin.logWarning(NLS.bind(
 							Messages.EventLoopMonitorThread_invalid_logger_type_error_4,
-							object.getClass().getName(),
-							IUiFreezeEventLogger.class.getClass().getSimpleName(),
-							EXTENSION_ID, element.getContributor().getName()));
+							new Object[] { object.getClass().getName(),
+									IUiFreezeEventLogger.class.getClass().getSimpleName(),
+									EXTENSION_ID, element.getContributor().getName() }));
 				}
 			} catch (CoreException e) {
 				MonitoringPlugin.logError(e.getMessage(), e);

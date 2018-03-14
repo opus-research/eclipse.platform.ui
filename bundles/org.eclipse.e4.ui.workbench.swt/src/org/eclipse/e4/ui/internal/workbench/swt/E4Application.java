@@ -36,7 +36,6 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.core.internal.services.EclipseAdapter;
-import org.eclipse.e4.core.internal.services.ResourceBundleHelper;
 import org.eclipse.e4.core.services.adapter.Adapter;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.core.services.log.ILoggerProvider;
@@ -82,7 +81,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -202,7 +201,7 @@ public class E4Application implements IApplication {
 
 		IEclipseContext appContext = createDefaultContext();
 		appContext.set(Display.class, display);
-		appContext.set(Realm.class, SWTObservables.getRealm(display));
+		appContext.set(Realm.class, DisplayRealm.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
 			@Override
@@ -528,18 +527,22 @@ public class E4Application implements IApplication {
 		});
 
 		// translation
-		String defaultLocaleString = Locale.getDefault().toString();
-
-		// ensure the default Locale value is correct
-		Locale transformedLocale = ResourceBundleHelper.toLocale(
-				defaultLocaleString, Locale.ENGLISH);
-
-		appContext.set(TranslationService.LOCALE, transformedLocale);
-		TranslationService bundleTranslationProvider = TranslationProviderFactory
-				.bundleTranslationService(appContext);
-		appContext.set(TranslationService.class, bundleTranslationProvider);
+		initializeLocalization(appContext);
 
 		return appContext;
+	}
+
+	/**
+	 * Initializes the given context with the locale and the TranslationService
+	 * to use.
+	 *
+	 * @param appContext
+	 *            The application context to which the locale and the
+	 *            TranslationService should be set.
+	 */
+	private static void initializeLocalization(IEclipseContext appContext) {
+		appContext.set(TranslationService.LOCALE, Locale.getDefault());
+		appContext.set(TranslationService.class, TranslationProviderFactory.bundleTranslationService(appContext));
 	}
 
 	/**

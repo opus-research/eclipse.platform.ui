@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.eclipse.core.commands.contexts.ContextManager;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.ListenerList;
@@ -169,6 +170,10 @@ public class PartServiceImpl implements EPartService {
 	@Inject
 	@Optional
 	private EContextService contextService;
+
+	@Inject
+	@Optional
+	private ContextManager contextManager;
 
 	private PartActivationHistory partActivationHistory;
 
@@ -641,6 +646,9 @@ public class PartServiceImpl implements EPartService {
 		if (contextService != null) {
 			contextService.deferUpdates(true);
 		}
+		if (contextManager != null) {
+			contextManager.deferUpdates(true);
+		}
 
 		MPart lastActivePart = activePart;
 		activePart = part;
@@ -672,6 +680,9 @@ public class PartServiceImpl implements EPartService {
 		} finally {
 			if (contextService != null) {
 				contextService.deferUpdates(false);
+			}
+			if (contextManager != null) {
+				contextManager.deferUpdates(false);
 			}
 		}
 	}
@@ -1108,7 +1119,8 @@ public class PartServiceImpl implements EPartService {
 			return addedPart;
 		case VISIBLE:
 			MPart activePart = getActivePart();
-			if (activePart == null || getParent(activePart) == getParent(addedPart)) {
+			if (activePart == null
+					|| (activePart != addedPart && getParent(activePart) == getParent(addedPart))) {
 				delegateBringToTop(addedPart);
 				activate(addedPart);
 			} else {
