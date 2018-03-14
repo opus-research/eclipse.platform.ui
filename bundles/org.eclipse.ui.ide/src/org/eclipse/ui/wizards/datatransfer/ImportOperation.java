@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -747,6 +747,10 @@ public class ImportOperation extends WorkspaceModifyOperation {
      */
 	void importRecursivelyFrom(Object fileSystemObject, int policy, IProgressMonitor mon) throws CoreException {
 		SubMonitor subMonitor = SubMonitor.convert(mon, 100);
+		if (subMonitor.isCanceled()) {
+			throw new OperationCanceledException();
+		}
+
         if (!provider.isFolder(fileSystemObject)) {
 			importFile(fileSystemObject, policy, subMonitor.split(100));
             return;

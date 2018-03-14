@@ -437,7 +437,7 @@ public class CopyFilesAndFoldersOperation {
 				IDEWorkbenchMessages.CopyFilesAndFoldersOperation_CopyResourcesTask, resources.length);
 
 		for (int i = 0; i < resources.length; i++) {
-			SubMonitor iterationMonitor = subMonitor.split(1).setWorkRemaining(100);
+			SubMonitor iterationProgress = subMonitor.split(1).setWorkRemaining(100);
 			IResource source = resources[i];
 			IPath destinationPath = destination.append(source.getName());
 			IWorkspace workspace = source.getWorkspace();
@@ -449,45 +449,49 @@ public class CopyFilesAndFoldersOperation {
 				// children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationMonitor.split(100));
+					copy(children, destinationPath, iterationProgress.split(100));
 				} else {
 					// delete the destination folder, copying a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
-					delete(existing, iterationMonitor.split(10));
-					source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(90));
+					delete(existing, iterationProgress.split(10));
+					source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(90));
 				}
 			} else {
 				if (existing != null) {
 					if (homogenousResources(source, existing)) {
-						copyExisting(source, existing, iterationMonitor.split(100));
+						copyExisting(source, existing, iterationProgress.split(100));
 					} else {
 						if (existing != null) {
 							// Copying a linked resource over unlinked or vice
 							// versa.
 							// Can't use setContents here. Fixes bug 28772.
-							delete(existing, iterationMonitor.split(10));
+							delete(existing, iterationProgress.split(10));
 						}
-						iterationMonitor.setWorkRemaining(100);
+						iterationProgress.setWorkRemaining(100);
 
 						if ((createLinks || createVirtualFoldersAndLinks) && (source.isLinked() == false)
 								&& (source.isVirtual() == false)) {
 							if (source.getType() == IResource.FILE) {
 								IFile file = workspaceRoot.getFile(destinationPath);
 								file.createLink(createRelativePath(source.getLocationURI(), file), 0,
-										iterationMonitor.split(100));
+										iterationProgress.split(100));
 							} else {
 								IFolder folder = workspaceRoot.getFolder(destinationPath);
 								if (createVirtualFoldersAndLinks) {
-									folder.create(IResource.VIRTUAL, true, iterationMonitor.split(1));
+									folder.create(IResource.VIRTUAL, true, subMonitor.split(1));
 									IResource[] members = ((IContainer) source).members();
 									if (members.length > 0)
-										copy(members, destinationPath, iterationMonitor.split(99));
+										copy(members, destinationPath, iterationProgress.split(100));
 								} else
 									folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
-											iterationMonitor.split(100));
+											iterationProgress.split(100));
 							}
 						} else
-							source.copy(destinationPath, IResource.SHALLOW, iterationMonitor.split(100));
+							source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
+					}
+
+					if (subMonitor.isCanceled()) {
+						throw new OperationCanceledException();
 					}
 				}
 			}

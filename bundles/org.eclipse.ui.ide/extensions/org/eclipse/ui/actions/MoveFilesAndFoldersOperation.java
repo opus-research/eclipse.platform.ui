@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Shell;
@@ -89,8 +90,8 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 				// move the children of the folder.
 				if (homogenousResources(source, existing)) {
 					IResource[] children = ((IContainer) source).members();
-					copy(children, destinationPath, iterationMonitor.split(50));
-					delete(source, iterationMonitor.split(50));
+					copy(children, destinationPath, iterationMonitor.split(100));
+					delete(source, subMonitor);
 				} else {
 					// delete the destination folder, moving a linked folder
 					// over an unlinked one or vice versa. Fixes bug 28772.
@@ -114,6 +115,9 @@ public class MoveFilesAndFoldersOperation extends CopyFilesAndFoldersOperation {
 				} else {
 					source.move(destinationPath, IResource.SHALLOW | IResource.KEEP_HISTORY,
 							iterationMonitor.split(100));
+				}
+				if (subMonitor.isCanceled()) {
+					throw new OperationCanceledException();
 				}
 			}
 		}
