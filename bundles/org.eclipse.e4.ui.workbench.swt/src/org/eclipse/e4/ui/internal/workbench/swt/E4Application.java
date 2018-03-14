@@ -548,7 +548,7 @@ public class E4Application implements IApplication {
 		Locale transformedLocale = ResourceBundleHelper.toLocale(
 				defaultLocaleString, Locale.ENGLISH);
 
-		appContext.set(TranslationService.LOCALE, transformedLocale);
+		appContext.set(TranslationService.LOCALE, transformedLocale.toString());
 		TranslationService bundleTranslationProvider = TranslationProviderFactory
 				.bundleTranslationService(appContext);
 		appContext.set(TranslationService.class, bundleTranslationProvider);
