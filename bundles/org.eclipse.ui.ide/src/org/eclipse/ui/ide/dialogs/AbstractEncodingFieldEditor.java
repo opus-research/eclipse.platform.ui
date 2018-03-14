@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2009 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Daniel Megert daniel_megert@ch.ibm.com Bug 169696
+ *     Mickael Istria (Red Hat Inc.) - [108668] More about encodings
  *******************************************************************************/
 package org.eclipse.ui.ide.dialogs;
 
@@ -18,7 +19,6 @@ import java.util.List;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -215,6 +215,7 @@ public abstract class AbstractEncodingFieldEditor extends FieldEditor {
 		};
 
 		defaultEncodingButton = new Button(topControl, SWT.RADIO);
+		defaultEncodingButton.setToolTipText(IDEWorkbenchMessages.WorkbenchPreference_defaultEncoding_tooltip);
 		defaultEnc = findDefaultEncoding();
 		defaultEncodingButton.setText(defaultButtonText());
 		data = new GridData();
