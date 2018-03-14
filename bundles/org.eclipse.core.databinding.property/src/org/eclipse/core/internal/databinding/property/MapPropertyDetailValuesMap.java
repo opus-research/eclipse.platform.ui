@@ -26,29 +26,19 @@ import org.eclipse.core.databinding.property.value.IValueProperty;
 import org.eclipse.core.internal.databinding.identity.IdentityMap;
 
 /**
- * @param <S>
- *            type of the source object
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
- * @param <T>
- *            type of the elements in the list, being the type of the value of
- *            the detail property
  * @since 3.3
  *
  */
-public class MapPropertyDetailValuesMap<S, K, V, T> extends
-		MapProperty<S, K, T> {
-	private final IMapProperty<S, K, V> masterProperty;
-	private final IValueProperty<? super V, T> detailProperty;
+public class MapPropertyDetailValuesMap extends MapProperty {
+	private final IMapProperty masterProperty;
+	private final IValueProperty detailProperty;
 
 	/**
 	 * @param masterProperty
 	 * @param detailProperty
 	 */
-	public MapPropertyDetailValuesMap(IMapProperty<S, K, V> masterProperty,
-			IValueProperty<? super V, T> detailProperty) {
+	public MapPropertyDetailValuesMap(IMapProperty masterProperty,
+			IValueProperty detailProperty) {
 		this.masterProperty = masterProperty;
 		this.detailProperty = detailProperty;
 	}
@@ -64,34 +54,36 @@ public class MapPropertyDetailValuesMap<S, K, V, T> extends
 	}
 
 	@Override
-	protected Map<K, T> doGetMap(S source) {
-		Map<K, V> masterMap = masterProperty.getMap(source);
-		Map<K, T> detailMap = new IdentityMap<K, T>();
-		for (Map.Entry<K, V> entry : masterMap.entrySet()) {
-			detailMap.put(entry.getKey(),
-					detailProperty.getValue(entry.getValue()));
+	protected Map doGetMap(Object source) {
+		Map masterMap = masterProperty.getMap(source);
+		Map detailMap = new IdentityMap();
+		for (Iterator it = masterMap.entrySet().iterator(); it.hasNext();) {
+			Map.Entry entry = (Map.Entry) it.next();
+			detailMap.put(entry.getKey(), detailProperty.getValue(entry
+					.getValue()));
 		}
 		return detailMap;
 	}
 
-	protected void doUpdateMap(S source, MapDiff<K, T> diff) {
+	@Override
+	protected void doUpdateMap(Object source, MapDiff diff) {
 		if (!diff.getAddedKeys().isEmpty())
 			throw new UnsupportedOperationException(toString()
 					+ " does not support entry additions"); //$NON-NLS-1$
 		if (!diff.getRemovedKeys().isEmpty())
 			throw new UnsupportedOperationException(toString()
 					+ " does not support entry removals"); //$NON-NLS-1$
-		Map<K, V> masterMap = masterProperty.getMap(source);
-		for (Iterator<K> it = diff.getChangedKeys().iterator(); it.hasNext();) {
-			K key = it.next();
-			V masterValue = masterMap.get(key);
+		Map masterMap = masterProperty.getMap(source);
+		for (Iterator it = diff.getChangedKeys().iterator(); it.hasNext();) {
+			Object key = it.next();
+			Object masterValue = masterMap.get(key);
 			detailProperty.setValue(masterValue, diff.getNewValue(key));
 		}
 	}
 
 	@Override
-	public IObservableMap<K, T> observe(Realm realm, S source) {
-		IObservableMap<K, V> masterMap;
+	public IObservableMap observe(Realm realm, Object source) {
+		IObservableMap masterMap;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -100,16 +92,14 @@ public class MapPropertyDetailValuesMap<S, K, V, T> extends
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableMap<K, T> detailMap = detailProperty
-				.observeDetail(masterMap);
+		IObservableMap detailMap = detailProperty.observeDetail(masterMap);
 		PropertyObservableUtil.cascadeDispose(detailMap, masterMap);
 		return detailMap;
 	}
 
 	@Override
-	public <U extends S> IObservableMap<K, T> observeDetail(
-			IObservableValue<U> master) {
-		IObservableMap<K, V> masterMap;
+	public IObservableMap observeDetail(IObservableValue master) {
+		IObservableMap masterMap;
 
 		ObservableTracker.setIgnore(true);
 		try {
@@ -118,8 +108,7 @@ public class MapPropertyDetailValuesMap<S, K, V, T> extends
 			ObservableTracker.setIgnore(false);
 		}
 
-		IObservableMap<K, T> detailMap = detailProperty
-				.observeDetail(masterMap);
+		IObservableMap detailMap = detailProperty.observeDetail(masterMap);
 		PropertyObservableUtil.cascadeDispose(detailMap, masterMap);
 		return detailMap;
 	}
