@@ -11,21 +11,22 @@
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers.interactive;
 
+import org.eclipse.jface.tests.viewers.TestElement;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 public class ResetSorterAction extends TestBrowserAction {
 
-    public ResetSorterAction(String label, TestBrowser browser) {
-        super(label, browser);
-    }
+	public ResetSorterAction(String label, TestBrowser browser) {
+		super(label, browser);
+	}
 
-    @Override
+	@Override
 	public void run() {
-        Viewer viewer = getBrowser().getViewer();
-        if (viewer instanceof StructuredViewer) {
-            StructuredViewer v = (StructuredViewer) viewer;
-            v.setSorter(null);
-        }
-    }
+		Viewer<TestElement> viewer = getBrowser().getViewer();
+		if (viewer instanceof StructuredViewer) {
+			StructuredViewer<TestElement, TestElement> v = (StructuredViewer<TestElement, TestElement>) viewer;
+			v.setSorter(null);
+		}
+	}
 }

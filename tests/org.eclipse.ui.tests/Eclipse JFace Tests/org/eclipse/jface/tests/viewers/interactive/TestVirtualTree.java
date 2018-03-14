@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.TreeItem;
 public class TestVirtualTree extends TestTree {
 
 	@Override
-	public Viewer createViewer(Composite parent) {
+	public Viewer<TestElement> createViewer(Composite parent) {
 		Tree tree = new Tree(parent, SWT.VIRTUAL);
 		tree.addListener(SWT.SetData, new Listener() {
 			private String getPosition(TreeItem item) {
@@ -45,7 +45,7 @@ public class TestVirtualTree extends TestTree {
 				System.out.println("updating " + position);
 			}
 		});
-		TreeViewer viewer = new TreeViewer(tree);
+		TreeViewer<TestElement,TestElement> viewer = new TreeViewer<TestElement,TestElement>(tree);
 		viewer.setContentProvider(new TestModelContentProvider());
 		viewer.setUseHashlookup(true);
 

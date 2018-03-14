@@ -22,7 +22,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public class TestTree extends TestBrowser {
 
-	protected TreeViewer fViewer2;
+	protected TreeViewer<TestElement, TestElement> fViewer2;
+
 	private Action fExpandAllAction;
 
 	public TestTree() {
@@ -31,8 +32,9 @@ public class TestTree extends TestBrowser {
 	}
 
 	@Override
-	public Viewer createViewer(Composite parent) {
-		TreeViewer viewer = new TreeViewer(parent);
+	public Viewer<TestElement> createViewer(Composite parent) {
+		TreeViewer<TestElement, TestElement> viewer = new TreeViewer<TestElement, TestElement>(
+				parent);
 		viewer.setContentProvider(new TestModelContentProvider());
 		viewer.setUseHashlookup(true);
 
