@@ -34,7 +34,6 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -161,13 +160,13 @@ public class EModelServiceFindTest extends TestCase {
 				MToolBarElement.class, EModelService.ANYWHERE
 						| EModelService.IN_MAIN_MENU | EModelService.IN_PART,
 				getSelector(MToolBarElement.class));
-		assertEquals(3, elements.size());
+		assertEquals(2, elements.size());
 
 		// Should find all the elements
 		elements = modelService.findElements(application, null,
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART, getSelector());
-		assertEquals(42, elements.size());
+		assertEquals(40, elements.size());
 
 		// Should match 0 since String is not an MUIElement
 		List<String> strings = modelService.findElements(application, null,
@@ -297,51 +296,19 @@ public class EModelServiceFindTest extends TestCase {
 		Class<? extends MApplicationElement> clazz;
 		List<? extends MApplicationElement> elements;
 
-		// Toolbar
-		clazz = MToolBar.class;
+		clazz = MToolBarElement.class;
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(1, elements.size());
+		assertEquals(0, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
 		assertEquals(0, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.ANYWHERE, getSelector(clazz));
 		assertEquals(2, elements.size());
-
-		// ToolbarElement
-		clazz = MToolBarElement.class;
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_PART,
-				getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.ANYWHERE, getSelector(clazz));
-		assertEquals(3, elements.size());
 
 		clazz = MMenuElement.class;
 		elements = modelService.findElements(application, clazz,
@@ -370,10 +337,6 @@ public class EModelServiceFindTest extends TestCase {
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_MAIN_MENU, getSelector(clazz));
 		assertEquals(9, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(4, elements.size());
 	}
 
 	public void testFindHandler() {
