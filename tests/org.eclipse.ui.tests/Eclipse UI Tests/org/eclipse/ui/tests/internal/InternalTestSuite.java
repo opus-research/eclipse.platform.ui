@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,10 @@
  *******************************************************************************/
 package org.eclipse.ui.tests.internal;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.eclipse.ui.tests.api.TrimLayoutTest;
 import org.eclipse.ui.tests.markers.Bug75909Test;
 import org.eclipse.ui.tests.markers.DeclarativeFilterActivityTest;
 import org.eclipse.ui.tests.markers.DeclarativeFilterDeclarationTest;
@@ -18,9 +22,6 @@ import org.eclipse.ui.tests.markers.MarkerSupportRegistryTests;
 import org.eclipse.ui.tests.markers.MarkerTesterTest;
 import org.eclipse.ui.tests.markers.MarkerViewTests;
 import org.eclipse.ui.tests.markers.ResourceMappingMarkersTest;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Test all areas of the UI Implementation.
@@ -39,6 +40,7 @@ public class InternalTestSuite extends TestSuite {
      * Construct the test suite.
      */
     public InternalTestSuite() {
+        addTest(new TestSuite(TrimLayoutTest.class));
         addTest(new TestSuite(AnimationEngineTest.class));
         addTest(new TestSuite(EditorActionBarsTest.class));
         addTest(new TestSuite(ActionSetExpressionTest.class));
@@ -62,6 +64,5 @@ public class InternalTestSuite extends TestSuite {
         addTest(new TestSuite(StickyViewManagerTest.class));
         addTest(new TestSuite(FileEditorMappingTest.class));
         addTest(new TestSuite(WorkbenchSiteProgressServiceModelTagsTest.class));
-		addTest(new TestSuite(WorkbenchPageTest.class));
     }
 }

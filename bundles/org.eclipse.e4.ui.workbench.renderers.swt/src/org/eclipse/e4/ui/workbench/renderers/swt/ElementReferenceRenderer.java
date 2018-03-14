@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -35,10 +34,10 @@ import org.eclipse.swt.widgets.Control;
 public class ElementReferenceRenderer extends SWTPartRenderer {
 	@Inject
 	@Named(WorkbenchRendererFactory.SHARED_ELEMENTS_STORE)
-	private Map<MUIElement, Set<MPlaceholder>> renderedMap;
+	Map<MUIElement, Set<MPlaceholder>> renderedMap;
 
 	@Inject
-	private IPresentationEngine renderingEngine;
+	IPresentationEngine renderingEngine;
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
@@ -48,7 +47,7 @@ public class ElementReferenceRenderer extends SWTPartRenderer {
 
 		Set<MPlaceholder> renderedRefs = renderedMap.get(ref);
 		if (renderedRefs == null) {
-			renderedRefs = new HashSet<>();
+			renderedRefs = new HashSet<MPlaceholder>();
 			renderedMap.put(ref, renderedRefs);
 		}
 

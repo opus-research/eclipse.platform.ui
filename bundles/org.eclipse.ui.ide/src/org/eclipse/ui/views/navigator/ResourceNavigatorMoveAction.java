@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.actions.MoveResourceAction;
  * The ResourceNavigatorMoveAction is a resource move that aso updates the navigator
  * to show the result of the move.
  * It also delegates to MoveProjectAction as needed.
- *
+ * 
  * @since 2.0
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
@@ -54,6 +54,9 @@ public class ResourceNavigatorMoveAction extends MoveResourceAction {
         this.moveProjectAction = new MoveProjectAction(shell);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void run() {
         if (moveProjectAction.isEnabled()) {

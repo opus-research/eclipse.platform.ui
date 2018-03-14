@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.accessibility.AccessibleListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -47,7 +46,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchImages;
-import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.eclipse.ui.progress.IProgressConstants2;
 import org.eclipse.ui.statushandlers.StatusAdapter;
@@ -78,18 +76,16 @@ public class ProgressAnimationItem extends AnimationItem implements
 	// ProgressBar flags
 	private int flags;
 
-	private AccessibleListener currentAccessibleListener;
-
 	/**
 	 * Create an instance of the receiver in the supplied region.
-	 *
+	 * 
 	 * @param region
 	 *            The ProgressRegion that contains the receiver.
 	 * @param flags
 	 *            flags to use for creation of the progress bar
 	 */
 	ProgressAnimationItem(ProgressRegion region, int flags) {
-		super((WorkbenchWindow) region.workbenchWindow);
+		super(region.workbenchWindow);
 		this.flags = flags;
 		FinishedJobs.getInstance().addListener(this);
 
@@ -118,7 +114,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 						StatusAdapter statusAdapter = StatusAdapterHelper
 								.getInstance().getStatusAdapter(ji);
 
-						if (statusAdapter == null)
+						if (statusAdapter == null) 
 							statusAdapter = new StatusAdapter(status);
 
 						StatusManager.getManager().handle(statusAdapter,
@@ -267,18 +263,20 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-
-		if (currentAccessibleListener != null)
-			toolbar.getAccessible().removeAccessibleListener(currentAccessibleListener);
-		currentAccessibleListener = new AccessibleAdapter() {
-			@Override
+		
+    	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+        	@Override
 			public void getName(AccessibleEvent e) {
-				e.result = tt;
-			}
-		};
-		toolbar.getAccessible().addAccessibleListener(currentAccessibleListener);
+        		e.result = tt;
+        	}
+        });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createAnimationItem(Composite parent) {
 
@@ -361,11 +359,21 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return (flags & SWT.HORIZONTAL) != 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
+	 */
 	@Override
 	public Control getControl() {
 		return top;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
+	 */
 	@Override
 	void animationDone() {
 		super.animationDone();
@@ -384,6 +392,11 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return animationRunning;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
+	 */
 	@Override
 	void animationStart() {
 		super.animationStart();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 IBM Corporation and others.
+ * Copyright (c) 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,9 +19,9 @@ import org.eclipse.ui.views.markers.MarkerItem;
 /**
  * AllMarkersSeverityAndDescriptionFieldFilter is a
  * {@link SeverityAndDescriptionFieldFilter} that handles the no severity case.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class AllMarkersSeverityAndDescriptionFieldFilter extends
 		SeverityAndDescriptionFieldFilter {
@@ -36,6 +36,11 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
+	 */
 	@Override
 	public boolean select(MarkerItem item) {
 		if (filterOnSeverity) {
@@ -52,7 +57,7 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 
 	/**
 	 * Return whether or not we are filtering on severity.
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean getFilterOnSeverity() {
@@ -61,7 +66,7 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 
 	/**
 	 * Set the whether or not we are filtering on severity
-	 *
+	 * 
 	 * @param filter
 	 */
 	void setFilterOnSeverity(boolean filter) {
@@ -69,6 +74,11 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#loadSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void loadSettings(IMemento memento) {
 		super.loadSettings(memento);
@@ -78,12 +88,22 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 			filterOnSeverity = filtering.booleanValue();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#saveSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveSettings(IMemento memento) {
 		super.saveSettings(memento);
 		memento.putBoolean(FILTER_ON_SEVERITY, filterOnSeverity);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);

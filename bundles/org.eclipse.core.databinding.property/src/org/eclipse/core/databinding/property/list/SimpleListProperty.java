@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 194734)
  *     Matthew Hall - bugs 195222, 247997, 265561
  *     Ovidio Mallo - bug 301774
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  ******************************************************************************/
 
 package org.eclipse.core.databinding.property.list;
@@ -32,37 +31,33 @@ import org.eclipse.core.internal.databinding.property.list.SimplePropertyObserva
  * <p>
  * Subclasses must implement these methods:
  * <ul>
- * <li>{@link #getElementType()}
- * <li>{@link #doGetList(Object)}
- * <li>{@link #doSetList(Object, List, ListDiff)}
- * <li>{@link #adaptListener(ISimplePropertyListener)}
+ * <li> {@link #getElementType()}
+ * <li> {@link #doGetList(Object)}
+ * <li> {@link #doSetList(Object, List, ListDiff)}
+ * <li> {@link #adaptListener(ISimplePropertyListener)}
  * </ul>
  * <p>
  * In addition, we recommended overriding {@link #toString()} to return a
  * description suitable for debugging purposes.
- *
- * @param <S>
- *            type of the source object
- * @param <E>
- *            type of the elements in the list
+ * 
  * @since 1.2
  */
-public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
+public abstract class SimpleListProperty extends ListProperty {
 	@Override
-	public IObservableList<E> observe(Realm realm, S source) {
-		return new SimplePropertyObservableList<S, E>(realm, source, this);
+	public IObservableList observe(Realm realm, Object source) {
+		return new SimplePropertyObservableList(realm, source, this);
 	}
 
 	// Accessors
 
 	@Override
-	protected abstract List<E> doGetList(S source);
+	protected abstract List doGetList(Object source);
 
 	// Mutators
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param list
@@ -70,9 +65,8 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 * @param diff
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
-	 * @since 1.6
 	 */
-	public final void setList(S source, List<E> list, ListDiff<E> diff) {
+	public final void setList(Object source, List list, ListDiff diff) {
 		if (source != null && !diff.isEmpty()) {
 			doSetList(source, list, diff);
 		}
@@ -80,7 +74,7 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 
 	/**
 	 * Updates the property on the source with the specified change.
-	 *
+	 * 
 	 * @param source
 	 *            the property source
 	 * @param list
@@ -89,17 +83,17 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 *            a diff describing the change
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	protected abstract void doSetList(S source, List<E> list, ListDiff<E> diff);
+	protected abstract void doSetList(Object source, List list, ListDiff diff);
 
 	@Override
-	protected void doSetList(S source, List<E> list) {
-		ListDiff<E> diff = Diffs.computeLazyListDiff(doGetList(source), list);
+	protected void doSetList(Object source, List list) {
+		ListDiff diff = Diffs.computeLazyListDiff(doGetList(source), list);
 		doSetList(source, list, diff);
 	}
 
 	@Override
-	protected void doUpdateList(S source, ListDiff<E> diff) {
-		List<E> list = new ArrayList<>(doGetList(source));
+	protected void doUpdateList(Object source, ListDiff diff) {
+		List list = new ArrayList(doGetList(source));
 		diff.applyTo(list);
 		doSetList(source, list, diff);
 	}
@@ -112,7 +106,7 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 * <p>
 	 * This method returns null if the source object has no listener APIs for
 	 * this property.
-	 *
+	 * 
 	 * @param listener
 	 *            the property listener to receive events
 	 * @return a native listener which parlays property change events to the
@@ -120,5 +114,6 @@ public abstract class SimpleListProperty<S, E> extends ListProperty<S, E> {
 	 *         APIs for this property.
 	 * @noreference This method is not intended to be referenced by clients.
 	 */
-	public abstract INativePropertyListener<S> adaptListener(ISimplePropertyListener<S, ListDiff<E>> listener);
+	public abstract INativePropertyListener adaptListener(
+			ISimplePropertyListener listener);
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <!--
-    Copyright (c) 2005, 2015 IBM Corporation and others.
+    Copyright (c) 2005, 2011 IBM Corporation and others.
     All rights reserved. This program and the accompanying materials
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
@@ -51,15 +51,11 @@
 
    <extension point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.ui.internal.browser.WebBrowserEditor"
-            contributorClass="org.eclipse.ui.internal.browser.WebBrowserEditorActionBarContributor"
-            icon="$nl$/icons/obj16/internal_browser.gif"
-            id="org.eclipse.ui.browser.editor"
-            name="%viewWebBrowserTitle">
-         <contentTypeBinding
-               contentTypeId="org.eclipse.ui.content-type.images">
-         </contentTypeBinding>
-      </editor>
+         class="org.eclipse.ui.internal.browser.WebBrowserEditor"
+         contributorClass="org.eclipse.ui.internal.browser.WebBrowserEditorActionBarContributor"
+         icon="$nl$/icons/obj16/internal_browser.gif"
+         id="org.eclipse.ui.browser.editor"
+         name="%viewWebBrowserTitle"/>
       <editor
          extensions="htm,html,shtml"
          icon="$nl$/icons/obj16/internal_browser.gif"
@@ -97,13 +93,6 @@
          <location>
             usr/bin/firefox
          </location>
-      </browser>
-      <browser
-         id="org.eclipse.ui.browser.chrome"
-         name="%browserChrome"
-         os="linux,aix,hpux,solaris"
-         executable="google-chrome">
-         <location>usr/bin/google-chrome</location>
       </browser>
       <browser
          id="org.eclipse.ui.browser.konqueror"
@@ -150,9 +139,6 @@
          os="Win32"
          executable="chrome.exe">
          <location>%%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe</location>
-         <location>%%ProgramFiles%\Google\Chrome\Application\chrome.exe</location>
-         <location>%%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe</location>
-         <location>%%ProgramW6432%\Google\Chrome\Application\chrome.exe</location>
       </browser>
       <browser
          id="org.eclipse.ui.browser.opera"
@@ -234,14 +220,5 @@
             class="org.eclipse.ui.internal.browser.WebBrowserEditorInput"
             id="org.eclipse.ui.browser.elementFactory">
       </factory>
-   </extension>
-   <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            file-extensions="png,jpg,jpeg,gif,bmp,ico"
-            id="org.eclipse.ui.content-type.images"
-            name="%contentType_images"
-            priority="normal">
-      </content-type>
    </extension>
 </plugin>

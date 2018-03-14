@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 Tom Schindl and others.
+ * Copyright (c) 2006, 2014 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     Tom Schindl - initial API and implementation
  *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 475361
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -114,7 +113,7 @@ public class Snippet045TableViewerFillFromBackgroundThread {
 		column.setWidth(200);
 		column.setText("Column 2");
 
-		final List<MyModel> model = new ArrayList<>();
+		final List<MyModel> model = new ArrayList<MyModel>();
 		v.setInput(model);
 		v.setComparator(new ViewerComparator() {
 			@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
  * </p>
- *
+ * 
  * @deprecated should use NewWizardMenu to populate a New submenu instead (see Navigator view)
  * @noextend This class is not intended to be subclassed by clients.
  */
@@ -45,27 +45,32 @@ public class CreateFileAction extends SelectionListenerAction {
      * The shell in which to show any dialogs.
      */
     protected IShellProvider shellProvider;
-
+   
     /**
      * Creates a new action for creating a file resource.
      *
      * @param shell the shell for any dialogs
-     *
+     * 
      * @deprecated {@link #CreateFileAction(IShellProvider)}
      */
     @Deprecated
 	public CreateFileAction(final Shell shell) {
         super(IDEWorkbenchMessages.CreateFileAction_text);
         Assert.isNotNull(shell);
-        shellProvider = () -> shell;
+        shellProvider = new IShellProvider(){
+        	@Override
+			public Shell getShell(){
+        		return shell;
+        	}
+        };
         initAction();
     }
 
     /**
      * Creates a new action for creating a file resource.
-     *
+     * 
      * @param provider the shell for any dialogs
-     *
+     * 
      * @deprecated see deprecated tag on class
      * @since 3.4
      */

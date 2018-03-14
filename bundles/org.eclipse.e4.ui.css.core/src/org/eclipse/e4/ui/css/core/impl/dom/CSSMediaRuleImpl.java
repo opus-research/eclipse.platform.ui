@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Angelo Zerr and others.
+ * Copyright (c) 2008, 2013 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,6 +27,10 @@ public class CSSMediaRuleImpl extends CSSRuleImpl implements CSSMediaRule {
 		// TODO Auto-generated constructor stub
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRule#getType()
+	 */
 	@Override
 	public short getType() {
 		return CSSRule.MEDIA_RULE;
@@ -61,7 +65,7 @@ public class CSSMediaRuleImpl extends CSSRuleImpl implements CSSMediaRule {
 
 	// Additional methods
 
-	public void setRuleList(CSSRuleList rules) {
+	public void setRuleList(CSSRuleListImpl rules) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import org.eclipse.ui.keys.NaturalKey;
 /**
  * A key formatter providing a special compact format for displaying key
  * bindings.
- *
+ * 
  * @since 3.0
  */
 public class CompactKeyFormatter extends NativeKeyFormatter {

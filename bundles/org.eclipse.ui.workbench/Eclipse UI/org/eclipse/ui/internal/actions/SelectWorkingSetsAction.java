@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ import org.eclipse.ui.internal.dialogs.SimpleWorkingSetSelectionDialog;
 
 /**
  * Action to select the visible working sets for a given workbench page.
- *
+ * 
  * @since 3.2
  */
 public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate  {
@@ -59,7 +59,7 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 
 		@Override
 		public void runWithEvent(Event event) {
-
+			
 			Set newList = new HashSet(Arrays.asList(getWindow().getActivePage()
 					.getWorkingSets()));
 
@@ -69,8 +69,8 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 				// additive.
 				boolean modified = (event.stateMask & KeyLookupFactory
 						.getDefault().formalModifierLookup(IKeyLookup.M1_NAME)) != 0;
-
-				if (modified)
+				
+				if (modified) 
 					newList.clear();
 				newList.add(set);
 			} else {
@@ -137,14 +137,14 @@ public class SelectWorkingSetsAction extends AbstractWorkingSetPulldownDelegate 
 class ConfigureWindowWorkingSetsDialog extends SimpleWorkingSetSelectionDialog {
 
 	private IWorkbenchWindow window;
-
+	
 	protected ConfigureWindowWorkingSetsDialog(IWorkbenchWindow window) {
 		super(window.getShell(), null, window.getActivePage().getWorkingSets(), true);
 		this.window = window;
 		setTitle(WorkbenchMessages.WorkingSetSelectionDialog_title_multiSelect);
 		setMessage(WorkbenchMessages.WorkingSetSelectionDialog_message_multiSelect);
 	}
-
+	
 	@Override
 	protected void okPressed() {
 		super.okPressed();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -57,7 +57,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/**
 	 * Table of queries for marker resolutions
 	 */
-	private Map<MarkerQuery, Map> resolutionQueries = new LinkedHashMap<>();
+	private Map resolutionQueries = new LinkedHashMap();
 
 	/**
 	 * Help context id attribute in configuration element
@@ -70,6 +70,9 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	private static final String ATT_CLASS = "class"; //$NON-NLS-1$
 
 	private class QueryComparator implements Comparator {
+		/*
+		 * (non-Javadoc) Method declared on Object.
+		 */
 		@Override
 		public boolean equals(Object o) {
 			if (!(o instanceof QueryComparator)) {
@@ -78,6 +81,9 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 			return true;
 		}
 
+		/*
+		 * (non-Javadoc) Method declared on Comparator.
+		 */
 		@Override
 		public int compare(Object o1, Object o2) {
 			// more attribues come first
@@ -97,6 +103,9 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
+	 */
 	@Override
 	public String getHelp(IMarker marker) {
 		if (sortedHelpQueries == null) {
@@ -130,15 +139,19 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IMarkerHelpRegistry.
+	 */
 	@Override
 	public boolean hasResolutions(IMarker marker) {
 		// Detect a match
-		for (Entry<MarkerQuery, Map> entry : resolutionQueries.entrySet()) {
-			MarkerQuery query = entry.getKey();
+		for (Iterator iter = resolutionQueries.keySet().iterator(); iter
+				.hasNext();) {
+			MarkerQuery query = (MarkerQuery) iter.next();
 			MarkerQueryResult result = query.performQuery(marker);
 			if (result != null) {
 				// See if a matching result is registered
-				Map resultsTable = entry.getValue();
+				Map resultsTable = (Map) resolutionQueries.get(query);
 
 				if (resultsTable.containsKey(result)) {
 
@@ -160,7 +173,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	/**
 	 * Return whether or not this configuration element has a resolution for the
 	 * marker.
-	 *
+	 * 
 	 * @param marker
 	 * @param element
 	 * @return boolean <code>true</code> if there is a resolution.
@@ -209,6 +222,9 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IMarkerHelpRegistry#getResolutions(org.eclipse.core.resources.IMarker)
+	 */
 	@Override
 	public IMarkerResolution[] getResolutions(IMarker marker) {
 		// Collect all matches
@@ -255,7 +271,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 
 	/**
 	 * Adds a help query to the registry.
-	 *
+	 * 
 	 * @param query
 	 *            a marker query
 	 * @param result
@@ -271,7 +287,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 
 	/**
 	 * Adds a resolution query to the registry.
-	 *
+	 * 
 	 * @param query
 	 *            a marker query
 	 * @param result
@@ -287,7 +303,7 @@ public class MarkerHelpRegistry implements IMarkerHelpRegistry {
 
 	/**
 	 * Adds a query to the given table.
-	 *
+	 * 
 	 * @param table
 	 *            the table to which the query is added
 	 * @param query

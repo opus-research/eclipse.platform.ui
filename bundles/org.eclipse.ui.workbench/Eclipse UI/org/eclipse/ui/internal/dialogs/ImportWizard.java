@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Alain Bernard <alain.bernard1224@gmail.com> - Bug 281490
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -62,8 +61,8 @@ public class ImportWizard extends Wizard {
                 }
             };
         }
-
-
+        
+        
     }
 
     private IStructuredSelection selection;
@@ -76,7 +75,7 @@ public class ImportWizard extends Wizard {
     @Override
 	public void addPages() {
         addPage(new SelectionPage(this.workbench, this.selection,
-                getAvailableImportWizards(), WorkbenchMessages.ImportWizard_selectWizard));
+                getAvailableImportWizards(), WorkbenchMessages.ImportWizard_selectSource)); 
     }
 
     /**
@@ -98,7 +97,7 @@ public class ImportWizard extends Wizard {
 
     /**
      * Initializes the wizard.
-     *
+     * 
      * @param aWorkbench the workbench
      * @param currentSelection the current selection
      */
@@ -107,7 +106,7 @@ public class ImportWizard extends Wizard {
         this.workbench = aWorkbench;
         this.selection = currentSelection;
 
-        setWindowTitle(WorkbenchMessages.ImportWizard_title);
+        setWindowTitle(WorkbenchMessages.ImportWizard_title); 
         setDefaultPageImageDescriptor(WorkbenchImages
                 .getImageDescriptor(IWorkbenchGraphicConstants.IMG_WIZBAN_IMPORT_WIZ));
         setNeedsProgressMonitor(true);

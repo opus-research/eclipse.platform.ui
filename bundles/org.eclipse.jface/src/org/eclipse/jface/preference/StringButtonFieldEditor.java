@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -44,14 +46,14 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
     private String changeButtonText;
 
     /**
-     * Creates a new string button field editor
+     * Creates a new string button field editor 
      */
     protected StringButtonFieldEditor() {
     }
 
     /**
      * Creates a string button field editor.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -115,7 +117,12 @@ public abstract class StringButtonFieldEditor extends StringFieldEditor {
                     }
                 }
             });
-            changeButton.addDisposeListener(event -> changeButton = null);
+            changeButton.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    changeButton = null;
+                }
+            });
         } else {
             checkParent(changeButton, parent);
         }

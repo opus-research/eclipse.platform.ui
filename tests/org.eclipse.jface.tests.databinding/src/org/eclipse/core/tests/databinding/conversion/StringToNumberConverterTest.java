@@ -29,6 +29,11 @@ public class StringToNumberConverterTest extends TestCase {
 	private NumberFormat numberFormat;
 	private NumberFormat numberIntegerFormat;
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -94,7 +99,7 @@ public class StringToNumberConverterTest extends TestCase {
 		if(icuBigDecimal != null && icuBigDecimalCtr != null) {
 			// ICU Big Decimal constructor available
 			Number icubd = (Number) icuBigDecimalCtr.newInstance(
-					new Object[] { javabd.unscaledValue(), Integer.valueOf(javabd.scale()) });
+					new Object[] { javabd.unscaledValue(), new Integer(javabd.scale()) });
 			return numberFormat.format(icubd);
 		}
 		throw new IllegalArgumentException("ICU not present. Cannot reliably format large BigDecimal values; needed for testing. Java platforms prior to 1.5 fail to format/parse these decimals correctly.");
@@ -124,7 +129,7 @@ public class StringToNumberConverterTest extends TestCase {
 	}
 
 	public void testConvertsToInteger() throws Exception {
-		Integer input = Integer.valueOf(1000);
+		Integer input = new Integer(1000);
 
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
 		Integer result = (Integer) converter.convert(numberIntegerFormat.format(input
@@ -163,7 +168,7 @@ public class StringToNumberConverterTest extends TestCase {
 	}
 
 	public void testConvertedToIntegerPrimitive() throws Exception {
-		Integer input = Integer.valueOf(1000);
+		Integer input = new Integer(1000);
 
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(true);
 		Integer result = (Integer) converter.convert(numberIntegerFormat.format(input
@@ -214,7 +219,7 @@ public class StringToNumberConverterTest extends TestCase {
 			throws Exception {
 		StringToNumberConverter converter = StringToNumberConverter.toInteger(false);
 		try {
-			converter.convert(Integer.valueOf(1));
+			converter.convert(new Integer(1));
 			fail("exception should have been thrown");
 		} catch (IllegalArgumentException e) {
 		}

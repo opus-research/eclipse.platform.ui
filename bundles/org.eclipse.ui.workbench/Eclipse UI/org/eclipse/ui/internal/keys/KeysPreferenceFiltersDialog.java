@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,9 @@ import org.eclipse.ui.preferences.ViewSettingsDialog;
 /**
  * Creates a dialog box for applying filter selection of When combo box in
  * NewKeysPreferencePage
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 
@@ -45,7 +45,7 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	void setFilterInternal(boolean b) {
 		filterInternal = b;
 	}
-
+	
 	void setFilterUncategorized(boolean b) {
 		filterUncategorized = b;
 	}
@@ -57,7 +57,7 @@ public class KeysPreferenceFiltersDialog extends ViewSettingsDialog {
 	boolean getFilterInternal() {
 		return filterInternal;
 	}
-
+	
 	boolean getFilterUncategorized() {
 		return filterUncategorized;
 	}

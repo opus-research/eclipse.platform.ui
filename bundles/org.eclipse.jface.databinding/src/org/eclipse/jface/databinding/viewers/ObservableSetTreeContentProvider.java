@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -33,7 +33,7 @@ import org.eclipse.jface.viewers.Viewer;
  * elements of a tree. Objects of this class listen for changes to each
  * {@link IObservableSet} created by the factory, and will insert and remove
  * viewer elements to reflect the observed changes.
- *
+ * 
  * @noextend This class is not intended to be subclassed by clients.
  * @since 1.2
  */
@@ -125,7 +125,7 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 	/**
 	 * Constructs an ObservableListTreeContentProvider using the given list
 	 * factory. Must be called from the display thread.
-	 *
+	 * 
 	 * @param setFactory
 	 *            observable factory that produces an IObservableSet of children
 	 *            for a given parent element. Observable sets created by this
@@ -191,7 +191,7 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 	 * before the viewer sees the added element, and notified about removals
 	 * after the element was removed from the viewer. This is intended for use
 	 * by label providers, as it will always return the items that need labels.
-	 *
+	 * 
 	 * @return readableSet of items that will need labels
 	 */
 	public IObservableSet getKnownElements() {
@@ -202,7 +202,7 @@ public class ObservableSetTreeContentProvider implements ITreeContentProvider {
 	 * Returns the set of known elements which have been realized in the viewer.
 	 * Clients may track this set in order to perform custom actions on elements
 	 * while they are known to be present in the viewer.
-	 *
+	 * 
 	 * @return the set of known elements which have been realized in the viewer.
 	 * @since 1.3
 	 */

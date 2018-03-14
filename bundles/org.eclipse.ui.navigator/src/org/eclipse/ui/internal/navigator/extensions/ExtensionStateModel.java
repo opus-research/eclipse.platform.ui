@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.navigator.IExtensionStateModel;
 
 /**
- *
- *
+ * 
+ * 
  * @since 3.2
  * @see IExtensionStateModel
  */
@@ -36,7 +36,7 @@ public class ExtensionStateModel extends EventManager implements
 	/**
 	 * Create an extension state model for the given extension (anId) associated
 	 * with the given viewer (aViewerId).
-	 *
+	 * 
 	 * @param anId
 	 *            The id of the extension this state model is used for.
 	 * @param aViewerId
@@ -102,7 +102,7 @@ public class ExtensionStateModel extends EventManager implements
 	@Override
 	public void setIntProperty(String aPropertyName, int aPropertyValue) {
 		Integer oldValue = (Integer) values.get(aPropertyName);
-		Integer newValue = Integer.valueOf(aPropertyValue);
+		Integer newValue = new Integer(aPropertyValue);
 		if (hasPropertyChanged(oldValue, newValue)) {
 			values.put(aPropertyName, newValue);
 			firePropertyChangeEvent(new PropertyChangeEvent(this,
@@ -136,7 +136,7 @@ public class ExtensionStateModel extends EventManager implements
 					aPropertyName, oldValue, newValue));
 		}
 	}
-
+ 
 	private boolean hasPropertyChanged(Object oldValue, Object newValue) {
 		return oldValue == null || !oldValue.equals(newValue);
 	}

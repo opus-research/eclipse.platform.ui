@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -57,7 +56,7 @@ public class TreeManager {
 	private static ICheckStateListener viewerCheckListener = null;
 	private static ITreeContentProvider treeContentProvider = null;
 
-	private List<CheckListener> listeners = new ArrayList<>();
+	private List<CheckListener> listeners = new ArrayList<CheckListener>();
 	private LocalResourceManager resourceManager = new LocalResourceManager(JFaceResources.getResources());
 
 	/**
@@ -141,18 +140,12 @@ public class TreeManager {
 	public static class TreeItemLabelProvider extends LabelProvider {
 		@Override
 		public String getText(Object element) {
-			if (element instanceof TreeItem) {
-				return ((TreeItem) element).getLabel();
-			}
-			return super.getText(element);
+			return ((TreeItem)element).getLabel();
 		}
 
 		@Override
 		public Image getImage(Object element) {
-			if (element instanceof TreeItem) {
-				return ((TreeItem) element).getImage();
-			}
-			return super.getImage(element);
+			return ((TreeItem)element).getImage();
 		}
 	}
 
@@ -241,11 +234,12 @@ public class TreeManager {
 		private TreeItem parent;
 		private List<TreeItem> children;
 		private int checkState;
-		private boolean changedByUser;
+
+		private boolean changedByUser = false;
 
 		public TreeItem(String label) {
 			this.label = label;
-			this.children = new ArrayList<>();
+			this.children = new ArrayList<TreeItem>();
 		}
 
 		public String getLabel() {
@@ -278,10 +272,6 @@ public class TreeManager {
 
 		public List<TreeItem> getChildren() {
 			return children;
-		}
-
-		public int getChildrenCount() {
-			return children.size();
 		}
 
 		public TreeItem getParent() {
@@ -376,9 +366,6 @@ public class TreeManager {
 				// if the new state is 'GRAY' then -ALL- the parents are gray
 				while (changedItem.parent != null && changedItem.parent.checkState != CHECKSTATE_GRAY) {
 					changedItem.parent.internalSetCheckState(CHECKSTATE_GRAY);
-					if (changedItem.isChangedByUser()) {
-						changedItem.parent.setChangedByUser(true);
-					}
 					changedItem = changedItem.parent;
 				}
 			} else {
@@ -412,9 +399,6 @@ public class TreeManager {
 					changedItem.parent.internalSetCheckState(CHECKSTATE_UNCHECKED);
 				}
 				if(oldState != changedItem.parent.checkState) {
-					if (changedItem.isChangedByUser()) {
-						changedItem.parent.setChangedByUser(true);
-					}
 					synchParents(changedItem.parent);
 				}
 			}
@@ -433,19 +417,13 @@ public class TreeManager {
 		public boolean isChangedByUser() {
 			return changedByUser;
 		}
-
-		@Override
-		public String toString() {
-			return label + ", check=" + getState() + ", changed=" + changedByUser; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
 	}
 
 	/**
 	 * Creates a new {@link TreeManager}.
 	 */
 	public TreeManager() {
-		listeners = new ArrayList<>();
+		listeners = new ArrayList<CheckListener>();
 	}
 
 	/**

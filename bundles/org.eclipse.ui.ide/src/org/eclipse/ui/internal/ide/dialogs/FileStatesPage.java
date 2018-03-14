@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ public class FileStatesPage extends PreferencePage implements
     private long STATE_SIZE_MAXIMUM = 100;
 
     private static final int INDENT = 20;
-
+    
     /**
      * This method takes the string for the title of a text field and the value for the
      * text of the field.
@@ -326,7 +326,7 @@ public class FileStatesPage extends PreferencePage implements
     /**
      * Validate a text entry for a long field. Return the result if there are
      * no errors, otherwise return -1 and set the entry field error.
-     * @param scale the scale (factor by which the value is multiplied when it is persisted)
+     * @param scale the scale (factor by which the value is multiplied when it is persisted) 
      * @return long
      */
     private long validateLongTextEntry(Text text, long scale) {

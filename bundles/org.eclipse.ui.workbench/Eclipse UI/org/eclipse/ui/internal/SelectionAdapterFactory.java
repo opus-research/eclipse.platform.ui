@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import org.eclipse.core.expressions.ICountable;
 import org.eclipse.core.expressions.IIterable;
 import org.eclipse.core.runtime.IAdapterFactory;
@@ -23,7 +24,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 /**
  * Adapts ISelection instances to either IIterable or ICountable. For use with
  * core expressions.
- *
+ * 
  * @since 3.3
  */
 public class SelectionAdapterFactory implements IAdapterFactory {
@@ -53,12 +54,12 @@ public class SelectionAdapterFactory implements IAdapterFactory {
 			ICountable.class };
 
 	@Override
-	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+	public Object getAdapter(Object adaptableObject, Class adapterType) {
 		if (adaptableObject instanceof ISelection) {
 			if (adapterType == IIterable.class) {
-				return adapterType.cast(iterable((ISelection) adaptableObject));
+				return iterable((ISelection) adaptableObject);
 			} else if (adapterType == ICountable.class) {
-				return adapterType.cast(countable((ISelection) adaptableObject));
+				return countable((ISelection) adaptableObject);
 			}
 		}
 		return null;

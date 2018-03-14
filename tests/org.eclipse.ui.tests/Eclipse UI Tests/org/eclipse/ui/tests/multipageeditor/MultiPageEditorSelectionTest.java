@@ -88,22 +88,6 @@ public class MultiPageEditorSelectionTest extends UITestCase {
 		assertFalse(tree.getItemCount() == 0);
 	}
 
-	public void testPropertiesView2() throws Exception {
-		IWorkbenchWindow window = openTestWindow();
-		IEditorPart part = openEditor(window, MTEST01_FILE);
-
-		window.getActivePage().activate(part);
-		MultiPageResourceEditor editor = (MultiPageResourceEditor) part;
-		editor.updateSelection();
-
-		PropertySheet propertiewView = (PropertySheet) window.getActivePage().showView(IPageLayout.ID_PROP_SHEET);
-		processUiEvents();
-
-		Tree tree = (Tree) propertiewView.getCurrentPage().getControl();
-
-		assertFalse(tree.getItemCount() == 0);
-	}
-
 	private IEditorPart openEditor(IWorkbenchWindow window, String filename)
 			throws CoreException, PartInitException {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -125,11 +109,5 @@ public class MultiPageEditorSelectionTest extends UITestCase {
 				MultiPageResourceEditor.EDITOR_ID);
 		assertTrue(part instanceof MultiPageResourceEditor);
 		return part;
-	}
-
-	private void processUiEvents() {
-		while (fWorkbench.getDisplay().readAndDispatch()) {
-			;
-		}
 	}
 }

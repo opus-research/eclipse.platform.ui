@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,8 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -50,9 +52,9 @@ import org.eclipse.ui.preferences.SettingsTransfer;
 /**
  * The ChooseWorkspaceWithSettingsDialog is the dialog used to switch workspaces
  * with an optional settings export.
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
@@ -77,7 +79,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Open a new instance of the receiver.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param launchData
 	 * @param suppressAskAgain
@@ -102,12 +104,18 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Create the controls for selecting the controls we are going to export.
-	 *
+	 * 
 	 * @param workArea
 	 */
 	private void createSettingsControls(Composite workArea) {
 		final FormToolkit toolkit = new FormToolkit(workArea.getDisplay());
-		workArea.addDisposeListener(e -> toolkit.dispose());
+		workArea.addDisposeListener(new DisposeListener() {
+
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				toolkit.dispose();
+				
+			}});
 		final ScrolledForm form = toolkit.createScrolledForm(workArea);
 		form.setBackground(workArea.getBackground());
 		form.getBody().setLayout(new GridLayout());
@@ -164,7 +172,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Create the buttons for the settings transfer.
-	 *
+	 * 
 	 * @param toolkit
 	 * @param sectionClient
 	 * @return boolean <code>true</code> if any were selected
@@ -219,7 +227,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Get the settings for the receiver based on the entries in section.
-	 *
+	 * 
 	 * @param section
 	 * @return String[] or <code>null</code>
 	 */
@@ -267,7 +275,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Save the ids of the selected elements.
-	 *
+	 * 
 	 * @param selectionIDs
 	 */
 	private void saveSettings(String[] selectionIDs) {
@@ -284,7 +292,7 @@ public class ChooseWorkspaceWithSettingsDialog extends ChooseWorkspaceDialog {
 
 	/**
 	 * Take the values from element and execute the class for path.
-	 *
+	 * 
 	 * @param elem
 	 * @param path
 	 * @return IStatus the result of the settings transfer.

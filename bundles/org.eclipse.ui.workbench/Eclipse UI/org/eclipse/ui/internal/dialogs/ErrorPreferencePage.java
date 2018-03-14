@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2005 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
 /**
  * A page that is used to indicate an error in loading a page within the
  * workbench.
- *
+ * 
  * @since 3.0
  */
 public class ErrorPreferencePage extends EmptyPreferencePage {
@@ -31,7 +31,7 @@ public class ErrorPreferencePage extends EmptyPreferencePage {
         text.setForeground(JFaceColors.getErrorText(text.getDisplay()));
         text.setBackground(text.getDisplay().getSystemColor(
                 SWT.COLOR_WIDGET_BACKGROUND));
-        text.setText(WorkbenchMessages.ErrorPreferencePage_errorMessage);
+        text.setText(WorkbenchMessages.ErrorPreferencePage_errorMessage); 
         return text;
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -27,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * An abstract field editor that manages a list of input values.
+ * An abstract field editor that manages a list of input values. 
  * The editor displays a list containing the values, buttons for
  * adding and removing values, and Up and Down buttons to adjust
  * the order of elements in the list.
@@ -77,14 +79,14 @@ public abstract class ListEditor extends FieldEditor {
     private SelectionListener selectionListener;
 
     /**
-     * Creates a new list field editor
+     * Creates a new list field editor 
      */
     protected ListEditor() {
     }
 
     /**
      * Creates a list field editor.
-     *
+     * 
      * @param name the name of the preference this field editor works on
      * @param labelText the label text of the field editor
      * @param parent the parent of the field editor's control
@@ -133,7 +135,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Combines the given list of items into a single string.
-     * This method is the converse of <code>parseString</code>.
+     * This method is the converse of <code>parseString</code>. 
      * <p>
      * Subclasses must implement this method.
      * </p>
@@ -146,7 +148,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Helper method to create a push button.
-     *
+     * 
      * @param parent the parent control
      * @param key the resource name used to supply the button's label text
      * @return Button
@@ -261,13 +263,16 @@ public abstract class ListEditor extends FieldEditor {
             layout.marginWidth = 0;
             buttonBox.setLayout(layout);
             createButtons(buttonBox);
-            buttonBox.addDisposeListener(event -> {
-			    addButton = null;
-			    removeButton = null;
-			    upButton = null;
-			    downButton = null;
-			    buttonBox = null;
-			});
+            buttonBox.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    addButton = null;
+                    removeButton = null;
+                    upButton = null;
+                    downButton = null;
+                    buttonBox = null;
+                }
+            });
 
         } else {
             checkParent(buttonBox, parent);
@@ -289,7 +294,12 @@ public abstract class ListEditor extends FieldEditor {
                     | SWT.H_SCROLL);
             list.setFont(parent.getFont());
             list.addSelectionListener(getSelectionListener());
-            list.addDisposeListener(event -> list = null);
+            list.addDisposeListener(new DisposeListener() {
+                @Override
+				public void widgetDisposed(DisposeEvent event) {
+                    list = null;
+                }
+            });
         } else {
             checkParent(list, parent);
         }
@@ -342,7 +352,7 @@ public abstract class ListEditor extends FieldEditor {
 
     /**
      * Splits the given string into a list of strings.
-     * This method is the converse of <code>createList</code>.
+     * This method is the converse of <code>createList</code>. 
      * <p>
      * Subclasses must implement this method.
      * </p>
@@ -368,17 +378,17 @@ public abstract class ListEditor extends FieldEditor {
 
 	/**
 	 * Invoked when the selection in the list has changed.
-	 *
+	 * 
 	 * <p>
 	 * The default implementation of this method utilizes the selection index
 	 * and the size of the list to toggle the enablement of the up, down and
 	 * remove buttons.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * Sublcasses may override.
 	 * </p>
-	 *
+	 * 
 	 * @since 3.5
 	 */
     protected void selectionChanged() {
@@ -438,50 +448,50 @@ public abstract class ListEditor extends FieldEditor {
         upButton.setEnabled(enabled);
         downButton.setEnabled(enabled);
     }
-
+    
     /**
-     * Return the Add button.
-     *
+     * Return the Add button.  
+     * 
      * @return the button
      * @since 3.5
      */
     protected Button getAddButton() {
     	return addButton;
     }
-
+    
     /**
-     * Return the Remove button.
-     *
+     * Return the Remove button.  
+     * 
      * @return the button
      * @since 3.5
      */
     protected Button getRemoveButton() {
     	return removeButton;
     }
-
+    
     /**
-     * Return the Up button.
-     *
+     * Return the Up button.  
+     * 
      * @return the button
      * @since 3.5
      */
     protected Button getUpButton() {
     	return upButton;
     }
-
+    
     /**
-     * Return the Down button.
-     *
+     * Return the Down button.  
+     * 
      * @return the button
      * @since 3.5
      */
     protected Button getDownButton() {
     	return downButton;
     }
-
+    
     /**
      * Return the List.
-     *
+     * 
      * @return the list
      * @since 3.5
      */

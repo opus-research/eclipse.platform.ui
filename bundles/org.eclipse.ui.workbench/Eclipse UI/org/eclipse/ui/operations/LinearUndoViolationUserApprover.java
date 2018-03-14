@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.WorkbenchMessages;
  * <p>
  * This class may be instantiated by clients.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class LinearUndoViolationUserApprover extends
@@ -48,7 +48,7 @@ public final class LinearUndoViolationUserApprover extends
 	/**
 	 * Create a LinearUndoViolationUserApprover associated with the specified
 	 * workbench part.
-	 *
+	 * 
 	 * @param context
 	 *            the undo context with the linear undo violation
 	 * @param part
@@ -61,6 +61,14 @@ public final class LinearUndoViolationUserApprover extends
 		this.context = context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearRedoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IUndoContext,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	protected IStatus allowLinearRedoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {
@@ -106,6 +114,14 @@ public final class LinearUndoViolationUserApprover extends
 		return Status.CANCEL_STATUS;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.operations.LinearUndoViolationDetector#allowLinearUndoViolation(org.eclipse.core.commands.operations.IUndoableOperation,
+	 *      org.eclipse.core.commands.operations.IUndoContext,
+	 *      org.eclipse.core.commands.operations.IOperationHistory,
+	 *      org.eclipse.core.runtime.IAdaptable)
+	 */
 	@Override
 	protected IStatus allowLinearUndoViolation(IUndoableOperation operation,
 			IUndoContext context, IOperationHistory history, IAdaptable uiInfo) {

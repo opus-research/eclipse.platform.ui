@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2015 Matthew Hall and others.
+ * Copyright (c) 2008, 2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     Matthew Hall - initial API and implementation (bug 237703)
  *     Matthew Hall - bug 274081
  *     Abel Hegedus - bug 414297
- *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
  *******************************************************************************/
 package org.eclipse.core.databinding.observable.set;
 
@@ -41,14 +40,14 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * Example: compute the set of all primes greater than 1 and less than the value
  * of an {@link IObservableValue} &lt; {@link Integer} &gt;.
  * </p>
- *
+ * 
  * <pre>
  * final IObservableValue max = WritableValue.withValueType(Integer.TYPE);
- * max.setValue(Integer.valueOf(0));
+ * max.setValue(new Integer(0));
  * IObservableSet primes = new ComputedSet() {
  * 	protected Set calculate() {
  * 		int maxVal = ((Integer) max.getValue()).intValue();
- *
+ * 
  * 		Set result = new HashSet();
  * 		outer: for (int i = 2; i &lt; maxVal; i++) {
  * 			for (Iterator it = result.iterator(); it.hasNext();) {
@@ -56,25 +55,22 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
  * 				if (i % knownPrime.intValue() == 0)
  * 					continue outer;
  * 			}
- * 			result.add(Integer.valueOf(i));
+ * 			result.add(new Integer(i));
  * 		}
  * 		return result;
  * 	}
  * };
- *
+ * 
  * System.out.println(primes); // =&gt; &quot;[]&quot;
- *
- * max.setValue(Integer.valueOf(20));
+ * 
+ * max.setValue(new Integer(20));
  * System.out.println(primes); // =&gt; &quot;[2, 3, 5, 7, 11, 13, 17, 19]&quot;
  * </pre>
- *
- * @param <E>
- *            the type of the elements in this set
- *
+ * 
  * @since 1.2
  */
-public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
-	private Set<E> cachedSet = new HashSet<>();
+public abstract class ComputedSet extends AbstractObservableSet {
+	private Set cachedSet = new HashSet();
 
 	private boolean dirty = true;
 	private boolean stale = false;
@@ -92,7 +88,7 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 	/**
 	 * Creates a computed set in the default realm and with the given element
 	 * type.
-	 *
+	 * 
 	 * @param elementType
 	 *            the element type, may be <code>null</code> to indicate unknown
 	 *            element type
@@ -104,10 +100,10 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 	/**
 	 * Creates a computed set in given realm and with an unknown (null) element
 	 * type.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm
-	 *
+	 * 
 	 */
 	public ComputedSet(Realm realm) {
 		this(realm, null);
@@ -116,7 +112,7 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 	/**
 	 * Creates a computed set in the given realm and with the given element
 	 * type.
-	 *
+	 * 
 	 * @param realm
 	 *            the realm
 	 * @param elementType
@@ -133,21 +129,21 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 	 * public API. Each interface could have been implemented using a separate
 	 * anonymous class, but we combine them here to reduce the memory overhead
 	 * and number of classes.
-	 *
+	 * 
 	 * <p>
 	 * The Runnable calls calculate and stores the result in cachedSet.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The IChangeListener stores each observable in the dependencies list. This
 	 * is registered as the listener when calling ObservableTracker, to detect
 	 * every observable that is used by computeValue.
 	 * </p>
-	 *
+	 * 
 	 * <p>
 	 * The IChangeListener is attached to every dependency.
 	 * </p>
-	 *
+	 * 
 	 */
 	private class PrivateInterface implements Runnable, IChangeListener,
 			IStaleListener {
@@ -178,24 +174,24 @@ public abstract class ComputedSet<E> extends AbstractObservableSet<E> {
 		return doGetSet().size();
 	}
 
-	private final Set<E> getSet() {
+	private final Set getSet() {
 		getterCalled();
 		return doGetSet();
 	}
 
 	@Override
-	protected Set<E> getWrappedSet() {
+	protected Set getWrappedSet() {
 		return doGetSet();
 	}
 
-	final Set<E> doGetSet() {
+	final Set doGetSet() {
 		if (dirty) {
 			// This line will do the following:
 			// - Run the calculate method
 			// - While doing so, add any observable that is touched to the
 			// dependencies list
 			IObservable[] newDependencies = ObservableTracker.runAndMonitor(
-privateInterface, privateInterface, null);
+					privateInterface, privateInterface, null);
 
 			// If any dependencies are stale, a stale event will be fired here
 			// even if we were already stale before recomputing. This is in case
@@ -227,10 +223,10 @@ privateInterface, privateInterface, null);
 	 * dependencies used to calculate the set must be {@link IObservable}, and
 	 * implementers must use one of the interface methods tagged TrackedGetter
 	 * for ComputedSet to recognize it as a dependency.
-	 *
+	 * 
 	 * @return the object's set.
 	 */
-	protected abstract Set<E> calculate();
+	protected abstract Set calculate();
 
 	private void makeDirty() {
 		if (!dirty) {
@@ -240,29 +236,29 @@ privateInterface, privateInterface, null);
 			// bug 414297: moved before makeStale(), as cachedSet may be
 			// overwritten
 			// in makeStale() if a listener calls isStale()
-			final Set<E> oldSet = new HashSet<>(cachedSet);
+			final Set oldSet = new HashSet(cachedSet);
 			makeStale();
 
 			stopListening();
 
 			// Fire the "dirty" event. This implementation recomputes the new
 			// set lazily.
-			fireSetChange(new SetDiff<E>() {
-				SetDiff<E> delegate;
+			fireSetChange(new SetDiff() {
+				SetDiff delegate;
 
-				private SetDiff<E> getDelegate() {
+				private SetDiff getDelegate() {
 					if (delegate == null)
 						delegate = Diffs.computeSetDiff(oldSet, getSet());
 					return delegate;
 				}
 
 				@Override
-				public Set<E> getAdditions() {
+				public Set getAdditions() {
 					return getDelegate().getAdditions();
 				}
 
 				@Override
-				public Set<E> getRemovals() {
+				public Set getRemovals() {
 					return getDelegate().getRemovals();
 				}
 			});
@@ -309,8 +305,7 @@ privateInterface, privateInterface, null);
 	}
 
 	@Override
-	public synchronized void addSetChangeListener(
-			ISetChangeListener<? super E> listener) {
+	public synchronized void addSetChangeListener(ISetChangeListener listener) {
 		super.addSetChangeListener(listener);
 		// If somebody is listening, we need to make sure we attach our own
 		// listeners

@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *        IBM Corporation - initial API and implementation
+ *        IBM Corporation - initial API and implementation 
  *   Sebastian Davids <sdavids@gmx.de>
  *     - Fix for bug 20510 - Add Bookmark action has wrong label in navigator or
  *       packages view
@@ -60,10 +60,10 @@ public class AddBookmarkAction extends SelectionListenerAction {
 	/**
 	 * Creates a new bookmark action. By default, prompts the user for the
 	 * bookmark name.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
-	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)}
+	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)} 
 	 */
 	@Deprecated
 	public AddBookmarkAction(Shell shell) {
@@ -72,25 +72,29 @@ public class AddBookmarkAction extends SelectionListenerAction {
 
 	/**
 	 * Creates a new bookmark action.
-	 *
+	 * 
 	 * @param shell
 	 *            the shell for any dialogs
 	 * @param promptForName
 	 *            whether to ask the user for the bookmark name
-	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)}
+	 * @deprecated see {@link #AddBookmarkAction(IShellProvider, boolean)} 
 	 */
 	@Deprecated
 	public AddBookmarkAction(final Shell shell, boolean promptForName) {
 		super(IDEWorkbenchMessages.AddBookmarkLabel);
 		Assert.isNotNull(shell);
-		shellProvider = () -> shell;
-
+		shellProvider = new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			} };
+			
 		initAction(promptForName);
 	}
-
+	
 	/**
 	 * Creates a new bookmark action.
-	 *
+	 * 
 	 * @param provider
 	 *            the shell provider for any dialogs. Must not be
 	 *            <code>null</code>
@@ -121,7 +125,7 @@ public class AddBookmarkAction extends SelectionListenerAction {
 		if (getSelectedResources().isEmpty())
 			return;
 
-		IResource resource= getSelectedResources().get(0);
+		IResource resource= (IResource)getSelectedResources().get(0);
 		if (resource != null) {
 			if (promptForName) {
 				BookmarkPropertiesDialog dialog= new BookmarkPropertiesDialog(shellProvider.getShell());

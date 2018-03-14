@@ -33,7 +33,6 @@ public class IdentityMapTest extends TestCase {
 
 	Object key;
 	Object value;
-	Map.Entry entry;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -41,22 +40,6 @@ public class IdentityMapTest extends TestCase {
 		map = new IdentityMap();
 		key = new Object();
 		value = new Object();
-		entry = new Map.Entry() {
-			@Override
-			public Object getKey() {
-				return key;
-			}
-
-			@Override
-			public Object getValue() {
-				return value;
-			}
-
-			@Override
-			public Object setValue(Object arg0) {
-				throw new UnsupportedOperationException();
-			}
-		};
 	}
 
 	public void testConstructor_NullComparer() {
@@ -308,7 +291,7 @@ public class IdentityMapTest extends TestCase {
 
 	public void testEntrySet_Add() {
 		try {
-			map.entrySet().add(entry);
+			map.entrySet().add(key);
 			fail("Expected UnsupportedOperationException");
 		} catch (UnsupportedOperationException expected) {
 		}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ import org.eclipse.ui.internal.ide.actions.ToggleAutoBuildAction;
  * menu.add(closeProjectAction);
  * </pre>
  * </p>
- *
+ * 
  * @since 3.0
  */
 public final class IDEActionFactory {
@@ -71,9 +71,9 @@ public final class IDEActionFactory {
      * This action is a {@link RetargetAction}. This action maintains its enablement state.
      */
     public static final ActionFactory ADD_TASK = new ActionFactory("addTask", //$NON-NLS-1$
-    		IWorkbenchCommandConstants.EDIT_ADD_TASK) {
-
-		@Override
+    		IWorkbenchCommandConstants.EDIT_ADD_TASK) { 
+        /* (non-javadoc) method declared on ActionFactory */
+        @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
                 throw new IllegalArgumentException();
@@ -91,8 +91,8 @@ public final class IDEActionFactory {
      * This action is a {@link RetargetAction}. This action maintains its enablement state.
      */
     public static final ActionFactory BOOKMARK = new ActionFactory("bookmark", //$NON-NLS-1$
-    		IWorkbenchCommandConstants.EDIT_ADD_BOOKMARK) {
-
+    		IWorkbenchCommandConstants.EDIT_ADD_BOOKMARK) { 
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -112,7 +112,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory BUILD = new ActionFactory("build",  //$NON-NLS-1$
     		IWorkbenchCommandConstants.PROJECT_BUILD_ALL) {
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -139,7 +139,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory BUILD_CLEAN = new ActionFactory(
             "buildClean") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -156,8 +156,9 @@ public final class IDEActionFactory {
      * This action maintains its enablement state.
      * @since 3.0
      */
-    public static final ActionFactory BUILD_AUTOMATICALLY = new ActionFactory("buildAutomatically") { //$NON-NLS-1$
-
+    public static final ActionFactory BUILD_AUTOMATICALLY = new ActionFactory(
+            "buildAutomatically") { //$NON-NLS-1$
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -176,7 +177,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory BUILD_PROJECT = new ActionFactory(
             "buildProject", IWorkbenchCommandConstants.PROJECT_BUILD_PROJECT) { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -195,9 +196,9 @@ public final class IDEActionFactory {
      * IDE-specific workbench action (id: "closeProject", commandId: "org.eclipse.ui.project.closeProject"):
      * Close project. This action is a {@link RetargetAction}. This action maintains its enablement state.
      */
-	public static final ActionFactory CLOSE_PROJECT = new ActionFactory("closeProject", //$NON-NLS-1$
-			IWorkbenchCommandConstants.PROJECT_CLOSE_PROJECT) {
-
+    public static final ActionFactory CLOSE_PROJECT = new ActionFactory(
+            "closeProject", IWorkbenchCommandConstants.PROJECT_CLOSE_PROJECT) { //$NON-NLS-1$
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -216,11 +217,11 @@ public final class IDEActionFactory {
      * Close unrelated projects.
      * <p>
      * This action closes all projects that are unrelated to the selected projects. A
-     * project is unrelated if it is not directly or transitively referenced by one
+     * project is unrelated if it is not directly or transitively referenced by one 
      * of the selected projects, and does not directly or transitively reference
      * one of the selected projects.
      * </p>
-     * This action is a {@link RetargetAction} with
+     * This action is a {@link RetargetAction} with 
      * id "closeUnrelatedProjects". This action maintains its enablement state.
      * @see IProject#getReferencedProjects()
      * @see IProject#getReferencingProjects()
@@ -229,7 +230,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory CLOSE_UNRELATED_PROJECTS = new ActionFactory(
             "closeUnrelatedProjects", IWorkbenchCommandConstants.PROJECT_CLOSE_UNRELATED_PROJECTS) { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -238,7 +239,7 @@ public final class IDEActionFactory {
             RetargetAction action = new RetargetAction(getId(), IDEWorkbenchMessages.CloseUnrelatedProjectsAction_text);
             action.setToolTipText(IDEWorkbenchMessages.CloseUnrelatedProjectsAction_toolTip);
             window.getPartService().addPartListener(action);
-            action.setActionDefinitionId(getCommandId());
+            action.setActionDefinitionId(getCommandId()); 
             return action;
         }
     };
@@ -250,7 +251,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory NEW_WIZARD_DROP_DOWN = new ActionFactory(
             "newWizardDropDown") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -272,7 +273,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory OPEN_PROJECT = new ActionFactory(
             "openProject", IWorkbenchCommandConstants.PROJECT_OPEN_PROJECT) { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -281,7 +282,7 @@ public final class IDEActionFactory {
             RetargetAction action = new RetargetAction(getId(), IDEWorkbenchMessages.OpenResourceAction_text);
             action.setToolTipText(IDEWorkbenchMessages.OpenResourceAction_toolTip);
             window.getPartService().addPartListener(action);
-            action.setActionDefinitionId(getCommandId());
+            action.setActionDefinitionId(getCommandId()); 
             return action;
         }
     };
@@ -292,7 +293,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory OPEN_WORKSPACE = new ActionFactory(
             "openWorkspace") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -310,7 +311,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory OPEN_PROJECT_PROPERTIES = new ActionFactory(
             "projectProperties") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -325,13 +326,13 @@ public final class IDEActionFactory {
     /**
      * IDE-specific workbench action (id: "quickStart"): Quick start.
      * This action maintains its enablement state.
-     *
+     * 
      * @deprecated the IDE now uses the new intro mechanism
      */
     @Deprecated
 	public static final ActionFactory QUICK_START = new ActionFactory(
             "quickStart") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -346,13 +347,13 @@ public final class IDEActionFactory {
     /**
      * IDE-specific workbench action (id: "rebuildAll"): Full build.
      * This action maintains its enablement state.
-     *
+     * 
      * @deprecated as of 3.0, this action no longer appears in the UI (was deprecated in 3.1)
      */
     @Deprecated
 	public static final ActionFactory REBUILD_ALL = new ActionFactory(
             "rebuildAll") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -367,15 +368,15 @@ public final class IDEActionFactory {
 
     /**
      * IDE-specific workbench action (id: "rebuildProject"): Rebuild project.
-     * This action is a {@link RetargetAction} with
+     * This action is a {@link RetargetAction} with 
      * id "rebuildProject". This action maintains its enablement state.
-     *
+     * 
      * @deprecated as of 3.0, this action no longer appears in the UI (was deprecated in 3.1)
      */
     @Deprecated
 	public static final ActionFactory REBUILD_PROJECT = new ActionFactory(
             "rebuildProject") { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {
@@ -396,7 +397,7 @@ public final class IDEActionFactory {
      */
     public static final ActionFactory TIPS_AND_TRICKS = new ActionFactory(
             "tipsAndTricks", IWorkbenchCommandConstants.HELP_TIPS_AND_TRICKS) { //$NON-NLS-1$
-
+        /* (non-javadoc) method declared on ActionFactory */
         @Override
 		public IWorkbenchAction create(IWorkbenchWindow window) {
             if (window == null) {

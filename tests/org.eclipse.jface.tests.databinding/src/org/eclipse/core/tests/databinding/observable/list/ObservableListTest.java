@@ -48,6 +48,11 @@ public class ObservableListTest extends TestCase {
 		list = new ObservableListStub(new ArrayList(0), Object.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#tearDown()
+	 */
 	@Override
 	protected void tearDown() throws Exception {
 		RealmTester.setDefault(null);

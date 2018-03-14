@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,15 +22,16 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 
 public class BreakSegment extends ParagraphSegment {
-
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.forms.internal.widgets.ParagraphSegment#advanceLocator(org.eclipse.swt.graphics.GC, int, org.eclipse.ui.forms.internal.widgets.Locator, java.util.Hashtable)
+	 */
 	public boolean advanceLocator(GC gc, int wHint, Locator locator,
-			Hashtable<String, Object> objectTable, boolean computeHeightOnly) {
+			Hashtable objectTable, boolean computeHeightOnly) {
 		if (locator.rowHeight==0) {
 			FontMetrics fm = gc.getFontMetrics();
 			locator.rowHeight = fm.getHeight();
 		}
-		if (computeHeightOnly) locator.collectHeights();
+		if (computeHeightOnly) locator.collectHeights();		
 		locator.resetCaret();
 		locator.width = locator.x;
 		locator.y += locator.rowHeight;
@@ -39,23 +40,19 @@ public class BreakSegment extends ParagraphSegment {
 		return true;
 	}
 
-	@Override
-	public void paint(GC gc, boolean hover, Hashtable<String, Object> resourceTable, boolean selected, SelectionData selData, Rectangle repaintRegion) {
+	public void paint(GC gc, boolean hover, Hashtable resourceTable, boolean selected, SelectionData selData, Rectangle repaintRegion) {
 		//nothing to paint
 	}
-
-	@Override
 	public boolean contains(int x, int y) {
 		return false;
 	}
-
-	@Override
 	public boolean intersects(Rectangle rect) {
 		return false;
 	}
-
-	@Override
-	public void layout(GC gc, int width, Locator locator, Hashtable<String, Object> ResourceTable,
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#layout(org.eclipse.swt.graphics.GC, int, org.eclipse.ui.internal.forms.widgets.Locator, java.util.Hashtable, boolean, org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
+	public void layout(GC gc, int width, Locator locator, Hashtable ResourceTable,
 			boolean selected) {
 		locator.resetCaret();
 		if (locator.rowHeight==0) {
@@ -64,11 +61,13 @@ public class BreakSegment extends ParagraphSegment {
 		}
 		locator.y += locator.rowHeight;
 		locator.rowHeight = 0;
-		locator.rowCounter++;
+		locator.rowCounter++;		
 	}
 
-	@Override
-	public void computeSelection(GC gc, Hashtable<String, Object> resourceTable, SelectionData selData) {
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.internal.forms.widgets.ParagraphSegment#computeSelection(org.eclipse.swt.graphics.GC, java.util.Hashtable, boolean, org.eclipse.ui.internal.forms.widgets.SelectionData)
+	 */
+	public void computeSelection(GC gc, Hashtable resourceTable, SelectionData selData) {
 		selData.markNewLine();
 	}
 }

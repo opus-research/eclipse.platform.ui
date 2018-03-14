@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Matthew Hall and others.
+ * Copyright (c) 2009, 2010 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 /**
- *
+ * 
  */
 public class WidgetEnabledProperty extends WidgetDelegatingValueProperty {
 	IValueProperty control;
@@ -29,7 +29,7 @@ public class WidgetEnabledProperty extends WidgetDelegatingValueProperty {
 	IValueProperty toolItem;
 
 	/**
-	 *
+	 * 
 	 */
 	public WidgetEnabledProperty() {
 		super(Boolean.TYPE);

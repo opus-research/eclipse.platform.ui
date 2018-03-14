@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  *******************************************************************************/
 
 package org.eclipse.ui.internal.services;
@@ -46,7 +45,7 @@ import org.eclipse.ui.services.IEvaluationService;
 
 /**
  * @since 3.3
- *
+ * 
  */
 public final class EvaluationService implements IEvaluationService {
 	public static final String DEFAULT_VAR = "org.eclipse.ui.internal.services.EvaluationService.default_var"; //$NON-NLS-1$
@@ -57,12 +56,12 @@ public final class EvaluationService implements IEvaluationService {
 	private IEclipseContext ratContext;
 	private int notifying = 0;
 
-	private ListenerList<IPropertyChangeListener> serviceListeners = new ListenerList<>(ListenerList.IDENTITY);
-	ArrayList<ISourceProvider> sourceProviders = new ArrayList<>();
-	LinkedList<EvaluationReference> refs = new LinkedList<>();
+	private ListenerList serviceListeners = new ListenerList(ListenerList.IDENTITY);
+	ArrayList<ISourceProvider> sourceProviders = new ArrayList<ISourceProvider>();
+	LinkedList<EvaluationReference> refs = new LinkedList<EvaluationReference>();
 	private ISourceProviderListener contextUpdater;
 
-	private HashSet<String> ratVariables = new HashSet<>();
+	private HashSet<String> ratVariables = new HashSet<String>();
 	private RunAndTrack ratUpdater = new RunAndTrack() {
 		@Override
 		public boolean changed(IEclipseContext context) {
@@ -84,7 +83,7 @@ public final class EvaluationService implements IEvaluationService {
 		}
 	};
 
-	private HashSet<String> variableFilter = new HashSet<>();
+	private HashSet<String> variableFilter = new HashSet<String>();
 	private IEventBroker eventBroker;
 
 	public EvaluationService(IEclipseContext c) {
@@ -150,6 +149,13 @@ public final class EvaluationService implements IEvaluationService {
 			legacyContext.addVariable(name, value);
 		}
 	}
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#addSourceProvider(org.eclipse
+	 * .ui.ISourceProvider)
+	 */
 	@Override
 	public void addSourceProvider(ISourceProvider provider) {
 		sourceProviders.add(provider);
@@ -174,6 +180,13 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IServiceWithSources#removeSourceProvider(org.
+	 * eclipse.ui.ISourceProvider)
+	 */
 	@Override
 	public void removeSourceProvider(ISourceProvider provider) {
 		provider.removeSourceProviderListener(contextUpdater);
@@ -189,6 +202,11 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IDisposable#dispose()
+	 */
 	@Override
 	public void dispose() {
 		for (EvaluationReference ref : refs) {
@@ -198,16 +216,38 @@ public final class EvaluationService implements IEvaluationService {
 		serviceListeners.clear();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addServiceListener(org.eclipse
+	 * .jface.util.IPropertyChangeListener)
+	 */
 	@Override
 	public void addServiceListener(IPropertyChangeListener listener) {
 		serviceListeners.add(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#removeServiceListener(org.
+	 * eclipse.jface.util.IPropertyChangeListener)
+	 */
 	@Override
 	public void removeServiceListener(IPropertyChangeListener listener) {
 		serviceListeners.remove(listener);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addEvaluationListener(org.
+	 * eclipse.core.expressions.Expression,
+	 * org.eclipse.jface.util.IPropertyChangeListener, java.lang.String)
+	 */
 	@Override
 	public IEvaluationReference addEvaluationListener(Expression expression,
 			IPropertyChangeListener listener, String property) {
@@ -217,6 +257,13 @@ public final class EvaluationService implements IEvaluationService {
 		return ref;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#addEvaluationReference(org
+	 * .eclipse.ui.services.IEvaluationReference)
+	 */
 	@Override
 	public void addEvaluationReference(IEvaluationReference ref) {
 		EvaluationReference eref = (EvaluationReference) ref;
@@ -254,16 +301,31 @@ public final class EvaluationService implements IEvaluationService {
 		contextEvaluate();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.services.IEvaluationService#removeEvaluationListener(org
+	 * .eclipse.ui.services.IEvaluationReference)
+	 */
 	@Override
 	public void removeEvaluationListener(IEvaluationReference ref) {
 		invalidate(ref, true);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.services.IEvaluationService#getCurrentState()
+	 */
 	@Override
 	public IEvaluationContext getCurrentState() {
 		return legacyContext;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.services.IEvaluationService#requestEvaluation(java.lang.String)
+	 */
 	@Override
 	public void requestEvaluation(String propertyName) {
 		// Trigger evaluation of properties via context
@@ -324,7 +386,9 @@ public final class EvaluationService implements IEvaluationService {
 
 	private void fireServiceChange(final String property, final Object oldValue,
 			final Object newValue) {
-		for (final IPropertyChangeListener listener : serviceListeners) {
+		Object[] listeners = serviceListeners.getListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			final IPropertyChangeListener listener = (IPropertyChangeListener) listeners[i];
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {

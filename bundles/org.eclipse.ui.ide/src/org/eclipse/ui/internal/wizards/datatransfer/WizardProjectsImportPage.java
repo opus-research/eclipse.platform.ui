@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,11 +16,10 @@
  *     		- Bug 210568 [Import/Export] Refresh button does not update list of projects
  *     Matt Hurne (matt@thehurnes.com)
  *     		- Bug 144610 [Import/Export] Import existing projects does not search subdirectories of found projects
- *     Christian Georgi (christian.georgi@sap.com)
+ *     Christian Georgi (christian.georgi@sap.com) 
  *     		- Bug 400399 [Import/Export] Project import wizard does not remember selected folder or archive
  *     Bob Meincke (bob.meincke@gmx.de)
  *      	- Bug 394900 - [Import/Export] Import existing projects broken by mal-formed .project file
- *     Manumitting Technologies Inc - improve operation in face of errors during import (bug 463016)
  *******************************************************************************/
 
 package org.eclipse.ui.internal.wizards.datatransfer;
@@ -49,16 +48,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -71,6 +73,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -108,17 +112,17 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * The import structure provider.
-	 *
+	 * 
 	 * @since 3.4
 	 */
 	private ILeveledImportStructureProvider structureProvider;
-
+	
 	/**
 	 * @since 3.5
 	 *
 	 */
 	private final class ProjectLabelProvider extends LabelProvider implements IColorProvider{
-
+		
 		@Override
 		public String getText(Object element) {
 			return ((ProjectRecord) element).getProjectLabel();
@@ -141,7 +145,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Class declared public only for test suite.
-	 *
+	 * 
 	 */
 	public class ProjectRecord {
 		File projectSystemFile;
@@ -153,7 +157,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		Object parent;
 
 		int level;
-
+		
 		boolean hasConflicts;
 
 		boolean isInvalid = false;
@@ -162,7 +166,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		/**
 		 * Create a record for a project based on the info in the file.
-		 *
+		 * 
 		 * @param file
 		 */
 		ProjectRecord(File file) {
@@ -244,7 +248,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		/**
 		 * Returns whether the given project description file path is in the
 		 * default location for a project
-		 *
+		 * 
 		 * @param path
 		 * 		The path to examine
 		 * @return Whether the given path is the default location for a project
@@ -261,7 +265,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		/**
 		 * Get the name of the project
-		 *
+		 * 
 		 * @return String
 		 */
 		public String getProjectName() {
@@ -280,7 +284,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		/**
 		 * Gets the label to be used when rendering this project record in the
 		 * UI.
-		 *
+		 * 
 		 * @return String the label
 		 * @since 3.4
 		 */
@@ -293,7 +297,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					DataTransferMessages.WizardProjectsImportPage_projectLabel,
 					projectName, path);
 		}
-
+		
 		/**
 		 * @return Returns the hasConflicts.
 		 */
@@ -320,7 +324,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
     private final static String STORE_ARCHIVES = "WizardProjectsImportPage.STORE_ARCHIVES";//$NON-NLS-1$
 
 	private final static String STORE_NESTED_PROJECTS = "WizardProjectsImportPage.STORE_NESTED_PROJECTS"; //$NON-NLS-1$
-
+	
 	private final static String STORE_COPY_PROJECT_ID = "WizardProjectsImportPage.STORE_COPY_PROJECT_ID"; //$NON-NLS-1$
 
 	private final static String STORE_ARCHIVE_SELECTED = "WizardProjectsImportPage.STORE_ARCHIVE_SELECTED"; //$NON-NLS-1$
@@ -330,12 +334,16 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	private CheckboxTreeViewer projectsList;
 
 	private Button nestedProjectsCheckbox;
-
+	
 	private boolean nestedProjects = false;
-
+	
+	private boolean lastNestedProjects = false;
+	
 	private Button copyCheckbox;
 
 	private boolean copyFiles = false;
+	
+	private boolean lastCopyFiles = false;
 
 	private ProjectRecord[] selectedProjects = new ProjectRecord[0];
 
@@ -357,8 +365,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	private Button browseArchivesButton;
 
-	// The last selected path; to minimize searches
-	private String lastPath;
+	private IProject[] wsProjects;
 
 	// constant from WizardArchiveFileResourceImportPage1
 	private static final String[] FILE_IMPORT_MASK = {
@@ -366,6 +373,12 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	// The initial path to set
 	private String initialPath;
+	
+	// The last selected path to minimize searches
+	private String lastPath;
+	// The last time that the file or folder at the selected path was modified
+	// to mimize searches
+	private long lastModified;
 
 	private WorkingSetGroup workingSetGroup;
 
@@ -377,7 +390,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Creates a new project creation wizard page.
-	 *
+	 * 
 	 */
 	public WizardProjectsImportPage() {
 		this("wizardExternalProjectsPage", null, null); //$NON-NLS-1$
@@ -385,16 +398,16 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Create a new instance of the receiver.
-	 *
+	 * 
 	 * @param pageName
 	 */
 	public WizardProjectsImportPage(String pageName) {
 		this(pageName,null, null);
 	}
-
+			
 	/**
 	 * More (many more) parameters.
-	 *
+	 * 
 	 * @param pageName
 	 * @param initialPath
 	 * @param currentSelection
@@ -451,13 +464,13 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			public void widgetSelected(SelectionEvent e) {
 				nestedProjects = nestedProjectsCheckbox.getSelection();
 				if (projectFromDirectoryRadio.getSelection()) {
-					updateProjectsList(directoryPathField.getText().trim(), true);
+					updateProjectsList(directoryPathField.getText().trim());
 				} else {
-					updateProjectsList(archivePathField.getText().trim(), true);
+					updateProjectsList(archivePathField.getText().trim());
 				}
 			}
 		});
-
+		
 		copyCheckbox = new Button(optionsGroup, SWT.CHECK);
 		copyCheckbox
 				.setText(DataTransferMessages.WizardProjectsImportPage_CopyProjectsIntoWorkspace);
@@ -492,7 +505,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Create the checkbox list for the found projects.
-	 *
+	 * 
 	 * @param workArea
 	 */
 	private void createProjectsList(Composite workArea) {
@@ -552,12 +565,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		projectsList.setLabelProvider(new ProjectLabelProvider());
 
-		projectsList.addCheckStateListener(event -> {
-			ProjectRecord element = (ProjectRecord) event.getElement();
-			if (element.hasConflicts || element.isInvalid) {
-				projectsList.setChecked(element, false);
+		projectsList.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				ProjectRecord element = (ProjectRecord) event.getElement();
+				if (element.hasConflicts || element.isInvalid) {
+					projectsList.setChecked(element, false);
+				}
+				setPageComplete(projectsList.getCheckedElements().length > 0);
 			}
-			setPageComplete(projectsList.getCheckedElements().length > 0);
 		});
 
 		projectsList.setInput(this);
@@ -567,7 +583,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Create the selection buttons in the listComposite.
-	 *
+	 * 
 	 * @param listComposite
 	 */
 	private void createSelectionButtons(Composite listComposite) {
@@ -617,9 +633,9 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (projectFromDirectoryRadio.getSelection()) {
-					updateProjectsList(directoryPathField.getText().trim(), true);
+					updateProjectsList(directoryPathField.getText().trim());
 				} else {
-					updateProjectsList(archivePathField.getText().trim(), true);
+					updateProjectsList(archivePathField.getText().trim());
 				}
 			}
 		});
@@ -629,7 +645,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Create the area where you select the root directory for the projects.
-	 *
+	 * 
 	 * @param workArea
 	 * 		Composite
 	 */
@@ -655,7 +671,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		GridData directoryPathData = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL);
 		directoryPathData.widthHint = new PixelConverter(directoryPathField).convertWidthInCharsToPixels(25);
 		directoryPathField.setLayoutData(directoryPathData);
-
+		
 		// browse button
 		browseDirectoriesButton = new Button(projectGroup, SWT.PUSH);
 		browseDirectoriesButton
@@ -697,11 +713,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		});
 
-		directoryPathField.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_RETURN) {
-				e.doit = false;
-				updateProjectsList(directoryPathField.getText().trim());
+		directoryPathField.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_RETURN) {
+					e.doit = false;
+					updateProjectsList(directoryPathField.getText().trim());
+				}
 			}
+
 		});
 
 		directoryPathField.addFocusListener(new FocusAdapter() {
@@ -719,11 +739,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			}
 		});
 
-		archivePathField.addTraverseListener(e -> {
-			if (e.detail == SWT.TRAVERSE_RETURN) {
-				e.doit = false;
-				updateProjectsList(archivePathField.getText().trim());
+		archivePathField.addTraverseListener(new TraverseListener() {
+			@Override
+			public void keyTraversed(TraverseEvent e) {
+				if (e.detail == SWT.TRAVERSE_RETURN) {
+					e.doit = false;
+					updateProjectsList(archivePathField.getText().trim());
+				}
 			}
+
 		});
 
 		archivePathField.addFocusListener(new FocusAdapter() {
@@ -799,14 +823,10 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	/**
 	 * Update the list of projects based on path. Method declared public only
 	 * for test suite.
-	 *
+	 * 
 	 * @param path
 	 */
 	public void updateProjectsList(final String path) {
-		updateProjectsList(path, false);
-	}
-
-	private void updateProjectsList(final String path, boolean forceUpdate) {
 		// on an empty path empty selectedProjects
 		if (path == null || path.length() == 0) {
 			setMessage(DataTransferMessages.WizardProjectsImportPage_ImportProjectsDescription);
@@ -819,97 +839,120 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 
 		final File directory = new File(path);
-		if (path.equals(lastPath) && !forceUpdate) {
-			// unchanged; lastPath is updated here and in the refresh
+		long modified = directory.lastModified();
+		if (path.equals(lastPath)
+				&& lastModified == modified
+				&& lastNestedProjects == nestedProjects
+				&& lastCopyFiles == copyFiles)
+		{
+			// since the file/folder was not modified and the path did not
+			// change, no refreshing is required
 			return;
 		}
+
+		lastPath = path;
+		lastModified = modified;
+		lastNestedProjects = nestedProjects;
+		lastCopyFiles = copyFiles;
 
 		// We can't access the radio button from the inner class so get the
 		// status beforehand
 		final boolean dirSelected = this.projectFromDirectoryRadio
 				.getSelection();
 		try {
-			getContainer().run(true, true, monitor -> {
+			getContainer().run(true, true, new IRunnableWithProgress() {
 
-				monitor
-						.beginTask(
-								DataTransferMessages.WizardProjectsImportPage_SearchingMessage,
-								100);
-				selectedProjects = new ProjectRecord[0];
-				Collection files = new ArrayList();
-				monitor.worked(10);
-				if (!dirSelected
-						&& ArchiveFileManipulations.isTarFile(path)) {
-					TarFile sourceTarFile = getSpecifiedTarSourceFile(path);
-					if (sourceTarFile == null) {
-						return;
-					}
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see
+				 * org.eclipse.jface.operation.IRunnableWithProgress#run(org
+				 * .eclipse.core.runtime.IProgressMonitor)
+				 */
+				@Override
+				public void run(IProgressMonitor monitor) {
 
-					structureProvider = new TarLeveledStructureProvider(
-							sourceTarFile);
-					Object child1 = structureProvider.getRoot();
-
-					if (!collectProjectFilesFromProvider(files, child1, 0,
-							monitor)) {
-						return;
-					}
-					Iterator filesIterator1 = files.iterator();
-					selectedProjects = new ProjectRecord[files.size()];
-					int index1 = 0;
-					monitor.worked(50);
 					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
-					while (filesIterator1.hasNext()) {
-						selectedProjects[index1++] = (ProjectRecord) filesIterator1
-								.next();
-					}
-				} else if (!dirSelected
-						&& ArchiveFileManipulations.isZipFile(path)) {
-					ZipFile sourceFile = getSpecifiedZipSourceFile(path);
-					if (sourceFile == null) {
-						return;
-					}
-					structureProvider = new ZipLeveledStructureProvider(
-							sourceFile);
-					Object child2 = structureProvider.getRoot();
+							.beginTask(
+									DataTransferMessages.WizardProjectsImportPage_SearchingMessage,
+									100);
+					selectedProjects = new ProjectRecord[0];
+					Collection files = new ArrayList();
+					monitor.worked(10);
+					if (!dirSelected
+							&& ArchiveFileManipulations.isTarFile(path)) {
+						TarFile sourceTarFile = getSpecifiedTarSourceFile(path);
+						if (sourceTarFile == null) {
+							return;
+						}
 
-					if (!collectProjectFilesFromProvider(files, child2, 0,
-							monitor)) {
-						return;
+						structureProvider = new TarLeveledStructureProvider(
+								sourceTarFile);
+						Object child = structureProvider.getRoot();
+
+						if (!collectProjectFilesFromProvider(files, child, 0,
+								monitor)) {
+							return;
+						}
+						Iterator filesIterator = files.iterator();
+						selectedProjects = new ProjectRecord[files.size()];
+						int index = 0;
+						monitor.worked(50);
+						monitor
+								.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+						while (filesIterator.hasNext()) {
+							selectedProjects[index++] = (ProjectRecord) filesIterator
+									.next();
+						}
+					} else if (!dirSelected
+							&& ArchiveFileManipulations.isZipFile(path)) {
+						ZipFile sourceFile = getSpecifiedZipSourceFile(path);
+						if (sourceFile == null) {
+							return;
+						}
+						structureProvider = new ZipLeveledStructureProvider(
+								sourceFile);
+						Object child = structureProvider.getRoot();
+
+						if (!collectProjectFilesFromProvider(files, child, 0,
+								monitor)) {
+							return;
+						}
+						Iterator filesIterator = files.iterator();
+						selectedProjects = new ProjectRecord[files.size()];
+						int index = 0;
+						monitor.worked(50);
+						monitor
+								.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+						while (filesIterator.hasNext()) {
+							selectedProjects[index++] = (ProjectRecord) filesIterator
+									.next();
+						}
 					}
-					Iterator filesIterator2 = files.iterator();
-					selectedProjects = new ProjectRecord[files.size()];
-					int index2 = 0;
-					monitor.worked(50);
-					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
-					while (filesIterator2.hasNext()) {
-						selectedProjects[index2++] = (ProjectRecord) filesIterator2
-								.next();
+
+					else if (dirSelected && directory.isDirectory()) {
+
+						if (!collectProjectFilesFromDirectory(files, directory,
+								null, monitor)) {
+							return;
+						}
+						Iterator filesIterator = files.iterator();
+						selectedProjects = new ProjectRecord[files.size()];
+						int index = 0;
+						monitor.worked(50);
+						monitor
+								.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
+						while (filesIterator.hasNext()) {
+							File file = (File) filesIterator.next();
+							selectedProjects[index] = new ProjectRecord(file);
+							index++;
+						}
+					} else {
+						monitor.worked(60);
 					}
+					monitor.done();
 				}
 
-				else if (dirSelected && directory.isDirectory()) {
-
-					if (!collectProjectFilesFromDirectory(files, directory,
-							null, nestedProjects, monitor)) {
-						return;
-					}
-					Iterator filesIterator3 = files.iterator();
-					selectedProjects = new ProjectRecord[files.size()];
-					int index3 = 0;
-					monitor.worked(50);
-					monitor
-							.subTask(DataTransferMessages.WizardProjectsImportPage_ProcessingMessage);
-					while (filesIterator3.hasNext()) {
-						File file = (File) filesIterator3.next();
-						selectedProjects[index3] = new ProjectRecord(file);
-						index3++;
-					}
-				} else {
-					monitor.worked(60);
-				}
-				monitor.done();
 			});
 		} catch (InvocationTargetException e) {
 			IDEWorkbenchPlugin.log(e.getMessage(), e);
@@ -917,11 +960,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// Nothing to do if the user interrupts.
 		}
 
-		lastPath = path;
-		updateProjectsStatus();
-	}
-
-	private void updateProjectsStatus() {
 		projectsList.refresh(true);
 		ProjectRecord[] projects = getProjectRecords();
 
@@ -937,7 +975,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				projectsList.setChecked(project, true);
 			}
 		}
-
+		
 		if (displayConflictWarning && displayInvalidWarning) {
 			setMessage(DataTransferMessages.WizardProjectsImportPage_projectsInWorkspaceAndInvalid, WARNING);
 		} else if (displayConflictWarning) {
@@ -999,19 +1037,17 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Collect the list of .project files that are under directory into files.
-	 *
+	 * 
 	 * @param files
 	 * @param directory
 	 * @param directoriesVisited
-	 *            Set of canonical paths of directories, used as recursion guard
-	 * @param nestedProjects
-	 *            whether to look for nested projects
+	 * 		Set of canonical paths of directories, used as recursion guard
 	 * @param monitor
-	 *            The monitor to report to
+	 * 		The monitor to report to
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
-	static boolean collectProjectFilesFromDirectory(Collection<File> files, File directory,
-			Set<String> directoriesVisited, boolean nestedProjects, IProgressMonitor monitor) {
+	private boolean collectProjectFilesFromDirectory(Collection files,
+			File directory, Set directoriesVisited, IProgressMonitor monitor) {
 
 		if (monitor.isCanceled()) {
 			return false;
@@ -1026,7 +1062,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		// Initialize recursion guard for recursive symbolic links
 		if (directoriesVisited == null) {
-			directoriesVisited = new HashSet<>();
+			directoriesVisited = new HashSet();
 			try {
 				directoriesVisited.add(directory.getCanonicalPath());
 			} catch (IOException exception) {
@@ -1038,11 +1074,8 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 		// first look for project description files
 		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
-		List<File> directories = new ArrayList<>();
 		for (File file : contents) {
-			if(file.isDirectory()){
-				directories.add(file);
-			} else if (file.getName().equals(dotProject) && file.isFile()) {
+			if (file.isFile() && file.getName().equals(dotProject)) {
 				files.add(file);
 				if (!nestedProjects) {
 					// don't search sub-directories since we can't have nested
@@ -1053,22 +1086,24 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		}
 		// no project description found or search for nested projects enabled,
 		// so recurse into sub-directories
-		for (File dir : directories) {
-			if (!dir.getName().equals(METADATA_FOLDER)) {
-				try {
-					String canonicalPath = dir.getCanonicalPath();
-					if (!directoriesVisited.add(canonicalPath)) {
-						// already been here --> do not recurse
-						continue;
-					}
-				} catch (IOException exception) {
-					StatusManager.getManager().handle(
-							StatusUtil.newStatus(IStatus.ERROR, exception
-									.getLocalizedMessage(), exception));
+		for (int i = 0; i < contents.length; i++) {
+			if (contents[i].isDirectory()) {
+				if (!contents[i].getName().equals(METADATA_FOLDER)) {
+					try {
+						String canonicalPath = contents[i].getCanonicalPath();
+						if (!directoriesVisited.add(canonicalPath)) {
+							// already been here --> do not recurse
+							continue;
+						}
+					} catch (IOException exception) {
+						StatusManager.getManager().handle(
+								StatusUtil.newStatus(IStatus.ERROR, exception
+										.getLocalizedMessage(), exception));
 
+					}
+					collectProjectFilesFromDirectory(files, contents[i],
+							directoriesVisited, monitor);
 				}
-				collectProjectFilesFromDirectory(files, dir,
-						directoriesVisited, nestedProjects, monitor);
 			}
 		}
 		return true;
@@ -1076,7 +1111,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Collect the list of .project files that are under directory into files.
-	 *
+	 * 
 	 * @param files
 	 * @param monitor
 	 * 		The monitor to report to
@@ -1180,28 +1215,30 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Create the selected projects
-	 *
+	 * 
 	 * @return boolean <code>true</code> if all project creations were
 	 * 	successful.
 	 */
 	public boolean createProjects() {
 		saveWidgetValues();
-
+		
 		final Object[] selected = projectsList.getCheckedElements();
-		createdProjects = new ArrayList<>();
+		createdProjects = new ArrayList();
 		WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
 			@Override
-			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-				SubMonitor subMonitor = SubMonitor.convert(monitor, selected.length);
-				// Import as many projects as we can; accumulate errors to
-				// report to the user
-				MultiStatus status = new MultiStatus(IDEWorkbenchPlugin.IDE_WORKBENCH, 1,
-						DataTransferMessages.WizardProjectsImportPage_projectsInWorkspaceAndInvalid, null);
-				for (Object element : selected) {
-					status.add(createExistingProject((ProjectRecord) element, subMonitor.split(1)));
-				}
-				if (!status.isOK()) {
-					throw new InvocationTargetException(new CoreException(status));
+			protected void execute(IProgressMonitor monitor)
+					throws InvocationTargetException, InterruptedException {
+				try {
+					monitor.beginTask("", selected.length); //$NON-NLS-1$
+					if (monitor.isCanceled()) {
+						throw new OperationCanceledException();
+					}
+					for (Object element : selected) {
+						createExistingProject((ProjectRecord) element,
+								new SubProgressMonitor(monitor, 1));
+					}
+				} finally {
+					monitor.done();
 				}
 			}
 		};
@@ -1221,24 +1258,22 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				status = new Status(IStatus.ERROR,
 						IDEWorkbenchPlugin.IDE_WORKBENCH, 1, message, t);
 			}
-			// Update the visible status on error so the user can see what's
-			// been imported
-			updateProjectsStatus();
 			ErrorDialog.openError(getShell(), message, null, status);
 			return false;
-		} finally {
-			ArchiveFileManipulations.closeStructureProvider(structureProvider, getShell());
-
-			// Ensure the projects to the working sets
-			addToWorkingSets();
 		}
+		ArchiveFileManipulations.closeStructureProvider(structureProvider,
+				getShell());
+
+		// Adds the projects to the working sets
+		addToWorkingSets();
+		
 		return true;
 	}
 
 	List<IProject> createdProjects;
-
+	
 	private void addToWorkingSets() {
-
+		
 		IWorkingSet[] selectedWorkingSets = workingSetGroup.getSelectedWorkingSets();
 		if(selectedWorkingSets == null || selectedWorkingSets.length == 0)
 		 {
@@ -1259,15 +1294,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	}
 
 	/**
-	 * Create the project described in record.
-	 *
+	 * Create the project described in record. If it is successful return true.
+	 * 
 	 * @param record
-	 * @return status of the creation
+	 * @return boolean <code>true</code> if successful
 	 * @throws InterruptedException
 	 */
-	private IStatus createExistingProject(final ProjectRecord record, IProgressMonitor mon)
-			throws InterruptedException {
-		SubMonitor subMonitor = SubMonitor.convert(mon, 3);
+	private boolean createExistingProject(final ProjectRecord record,
+			IProgressMonitor monitor) throws InvocationTargetException,
+			InterruptedException {
 		String projectName = record.getProjectName();
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
@@ -1296,18 +1331,13 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 					.getFullPath(), structureProvider.getRoot(),
 					structureProvider, this, fileSystemObjects);
 			operation.setContext(getShell());
-			try {
-				operation.run(subMonitor.split(1));
-			} catch (InvocationTargetException e) {
-				if (e.getCause() instanceof CoreException) {
-					return ((CoreException) e.getCause()).getStatus();
-				}
-				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 2,
-						e.getCause().getLocalizedMessage(), e);
+			operation.run(monitor);
+			IStatus status = operation.getStatus();
+			if (!status.isOK()) {
+				throw new InvocationTargetException(new CoreException(status));
 			}
-			return operation.getStatus();
+			return true;
 		}
-
 		// import from file system
 		File importSource = null;
 		if (copyFiles) {
@@ -1321,9 +1351,9 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 				IStatus result = ResourcesPlugin.getWorkspace().validateProjectLocationURI(project,
 						locationURI);
 				if(!result.isOK()) {
-					return result;
+					throw new InvocationTargetException(new CoreException(result));
 				}
-
+				
 				importSource = new File(locationURI);
 				IProjectDescription desc = workspace
 						.newProjectDescription(projectName);
@@ -1338,16 +1368,19 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			}
 		}
 
-		subMonitor.setWorkRemaining((copyFiles && importSource != null) ? 2 : 1);
-
 		try {
-			SubMonitor subTask = subMonitor.split(1).setWorkRemaining(100);
-			subTask.setTaskName(DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask);
-			project.create(record.description, subTask.split(30));
-			project.open(IResource.BACKGROUND_REFRESH, subTask.split(70));
-			subTask.setTaskName(""); //$NON-NLS-1$
+			monitor
+					.beginTask(
+							DataTransferMessages.WizardProjectsImportPage_CreateProjectsTask,
+							100);
+			project.create(record.description, new SubProgressMonitor(monitor,
+					30));
+			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(
+					monitor, 70));
 		} catch (CoreException e) {
-			return e.getStatus();
+			throw new InvocationTargetException(e);
+		} finally {
+			monitor.done();
 		}
 
 		// import operation to import project files if copy checkbox is selected
@@ -1362,24 +1395,19 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			// .project, .classpath
 			// files
 			operation.setCreateContainerStructure(false);
-			try {
-				operation.run(subMonitor.split(1));
-			} catch (InvocationTargetException e) {
-				if (e.getCause() instanceof CoreException) {
-					return ((CoreException) e.getCause()).getStatus();
-				}
-				return new Status(IStatus.ERROR, IDEWorkbenchPlugin.IDE_WORKBENCH, 2,
-						e.getCause().getLocalizedMessage(), e);
+			operation.run(monitor);
+			IStatus status = operation.getStatus();
+			if (!status.isOK()) {
+				throw new InvocationTargetException(new CoreException(status));
 			}
-			return operation.getStatus();
 		}
 
-		return Status.OK_STATUS;
+		return true;
 	}
 
 	/**
 	 * Method used for test suite.
-	 *
+	 * 
 	 * @return Button the Import from Directory RadioButton
 	 */
 	public Button getProjectFromDirectoryRadio() {
@@ -1388,7 +1416,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Method used for test suite.
-	 *
+	 * 
 	 * @return CheckboxTreeViewer the viewer containing all the projects found
 	 */
 	public CheckboxTreeViewer getProjectsList() {
@@ -1397,12 +1425,15 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Retrieve all the projects in the current workspace.
-	 *
+	 * 
 	 * @return IProject[] array of IProject in the current workspace
 	 */
 	private IProject[] getProjectsInWorkspace() {
-		return IDEWorkbenchPlugin.getPluginWorkspace().getRoot()
-				.getProjects();
+		if (wsProjects == null) {
+			wsProjects = IDEWorkbenchPlugin.getPluginWorkspace().getRoot()
+					.getProjects();
+		}
+		return wsProjects;
 	}
 
 	/**
@@ -1410,14 +1441,14 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * source workspace or archive, selected by the user. If a project with the
 	 * same name exists in both the source workspace and the current workspace,
 	 * then the hasConflicts flag would be set on that project record.
-	 *
+	 * 
 	 * Method declared public for test suite.
-	 *
+	 * 
 	 * @return ProjectRecord[] array of projects that can be imported into the
 	 * 	workspace
 	 */
 	public ProjectRecord[] getProjectRecords() {
-		List<ProjectRecord> projectRecords = new ArrayList<>();
+		List<ProjectRecord> projectRecords = new ArrayList<ProjectRecord>();
 		for (int i = 0; i < selectedProjects.length; i++) {
 			String projectName = selectedProjects[i].getProjectName();
 			selectedProjects[i].hasConflicts = (isProjectInWorkspacePath(projectName) && copyFiles)
@@ -1430,7 +1461,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Determine if there is a directory with the project name in the workspace path.
-	 *
+	 * 
 	 * @param projectName the name of the project
 	 * @return true if there is a directory with the same name of the imported project
 	 */
@@ -1443,7 +1474,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Determine if the project with the given name is in the current workspace.
-	 *
+	 * 
 	 * @param projectName
 	 * 		String the project name to check
 	 * @return boolean true if the project with the given name is in this
@@ -1466,12 +1497,12 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * Use the dialog store to restore widget values to the values that they
 	 * held last time this wizard was used to completion, or alternatively,
 	 * if an initial path is specified, use it to select values.
-	 *
+	 * 
 	 * Method declared public only for use of tests.
 	 */
 	@Override
 	public void restoreWidgetValues() {
-
+				
 		// First, check to see if we have resore settings, and
 		// take care of the checkbox
 		IDialogSettings settings = getDialogSettings();
@@ -1482,16 +1513,18 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
             // checkbox
 			nestedProjects = settings.getBoolean(STORE_NESTED_PROJECTS);
 			nestedProjectsCheckbox.setSelection(nestedProjects);
-
+			lastNestedProjects = nestedProjects;
+			
 			// checkbox
 			copyFiles = settings.getBoolean(STORE_COPY_PROJECT_ID);
 			copyCheckbox.setSelection(copyFiles);
+			lastCopyFiles = copyFiles;
 		}
-
-		// Second, check to see if we don't have an initial path,
+				
+		// Second, check to see if we don't have an initial path, 
 		// and if we do have restore settings.  If so, set the
 		// radio selection properly to restore settings
-
+		
 		if (initialPath==null && settings!=null)
 		{
 			// radio selection
@@ -1504,7 +1537,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 			} else {
 				directoryRadioSelected();
 			}
-		}
+		}	
 		// Third, if we do have an initial path, set the proper
 		// path and radio buttons to the initial value. Move
 		// cursor to the end of the path so user can see the
@@ -1541,7 +1574,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	/**
 	 * Since Finish was pressed, write widget values to the dialog store so that
 	 * they will persist into the next invocation of this wizard page.
-	 *
+	 * 
 	 * Method declared public only for use of tests.
 	 */
 	@Override
@@ -1552,7 +1585,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
             saveInHistory(settings, STORE_ARCHIVES, archivePathField.getText());
 
             settings.put(STORE_NESTED_PROJECTS, nestedProjectsCheckbox.getSelection());
-
+			
 			settings.put(STORE_COPY_PROJECT_ID, copyCheckbox.getSelection());
 
 			settings.put(STORE_ARCHIVE_SELECTED, projectFromArchiveRadio
@@ -1571,16 +1604,16 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 
 	/**
 	 * Method used for test suite.
-	 *
+	 * 
 	 * @return Button copy checkbox
 	 */
 	public Button getCopyCheckbox() {
 		return copyCheckbox;
 	}
-
+	
 	/**
 	 * Method used for test suite.
-	 *
+	 * 
 	 * @return Button nested projects checkbox
 	 */
 	public Button getNestedProjectsCheckbox() {
@@ -1595,5 +1628,5 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	protected boolean allowNewContainerName() {
 		return true;
 	}
-
+	
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
+ * Copyright (c) 2010, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,8 +25,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 public class PartService implements IPageChangedListener, IPartListener, IPartListener2,
 		IPartService {
 
-	private ListenerList<IPartListener> partListeners = new ListenerList<>();
-	private ListenerList<IPartListener2> partListeners2 = new ListenerList<>();
+	private ListenerList partListeners = new ListenerList();
+	private ListenerList partListeners2 = new ListenerList();
 
 	private WorkbenchPage page;
 
@@ -76,11 +76,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partActivated(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partActivated(part);
+					((IPartListener) listener).partActivated(part);
 				}
 			});
 		}
@@ -88,11 +89,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partBroughtToTop(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(part);
+					((IPartListener) listener).partBroughtToTop(part);
 				}
 			});
 		}
@@ -100,11 +102,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partClosed(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partClosed(part);
+					((IPartListener) listener).partClosed(part);
 				}
 			});
 		}
@@ -112,11 +115,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partDeactivated(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(part);
+					((IPartListener) listener).partDeactivated(part);
 				}
 			});
 		}
@@ -124,11 +128,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partOpened(final IWorkbenchPart part) {
-		for (final IPartListener listener : partListeners) {
+		Object[] listeners = partListeners.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partOpened(part);
+					((IPartListener) listener).partOpened(part);
 				}
 			});
 		}
@@ -136,11 +141,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partActivated(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partActivated(partRef);
+					((IPartListener2) listener).partActivated(partRef);
 				}
 			});
 		}
@@ -148,11 +154,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partBroughtToTop(partRef);
+					((IPartListener2) listener).partBroughtToTop(partRef);
 				}
 			});
 		}
@@ -160,11 +167,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partClosed(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partClosed(partRef);
+					((IPartListener2) listener).partClosed(partRef);
 				}
 			});
 		}
@@ -172,11 +180,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partDeactivated(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partDeactivated(partRef);
+					((IPartListener2) listener).partDeactivated(partRef);
 				}
 			});
 		}
@@ -184,11 +193,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partOpened(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partOpened(partRef);
+					((IPartListener2) listener).partOpened(partRef);
 				}
 			});
 		}
@@ -196,11 +206,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partHidden(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partHidden(partRef);
+					((IPartListener2) listener).partHidden(partRef);
 				}
 			});
 		}
@@ -208,11 +219,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partVisible(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partVisible(partRef);
+					((IPartListener2) listener).partVisible(partRef);
 				}
 			});
 		}
@@ -220,11 +232,12 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void partInputChanged(final IWorkbenchPartReference partRef) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			SafeRunner.run(new SafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					listener.partInputChanged(partRef);
+					((IPartListener2) listener).partInputChanged(partRef);
 				}
 			});
 		}
@@ -232,7 +245,8 @@ public class PartService implements IPageChangedListener, IPartListener, IPartLi
 
 	@Override
 	public void pageChanged(final PageChangedEvent event) {
-		for (final IPartListener2 listener : partListeners2) {
+		Object[] listeners = partListeners2.getListeners();
+		for (final Object listener : listeners) {
 			if (listener instanceof IPageChangedListener) {
 				SafeRunner.run(new SafeRunnable() {
 					@Override

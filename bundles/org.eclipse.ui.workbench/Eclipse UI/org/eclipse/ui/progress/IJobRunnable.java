@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * Interface for runnables that can be run as jobs.
- *
+ * 
  * @since 3.3
  */
 public interface IJobRunnable {
@@ -30,7 +30,7 @@ public interface IJobRunnable {
 	 * status of severity <code>IStatus.CANCEL</code>. The singleton cancel
 	 * status <code>Status.CANCEL_STATUS</code> can be used for this purpose.
 	 * <p>
-	 *
+	 * 
 	 * @param monitor
 	 *            the monitor to be used for reporting progress and responding
 	 *            to cancelation. The monitor is never <code>null</code>

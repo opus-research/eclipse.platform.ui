@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, 2015 Manumitting Technologies Inc and others.
+ * Copyright (c) 2014 Manumitting Technologies Inc and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     Brian de Alwis (MTI) - initial API and implementation
- *     René Brandstetter - Bug 419749
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
+ *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -42,7 +41,7 @@ public class ExtensionsSort extends TopologicalSort<IExtension, Bundle> {
 
 	/**
 	 * Returns the bundles that the given bundle requires.
-	 *
+	 * 
 	 * @return An unmodifiable {@link Iterable} set of bundles currently required by the geiven
 	 *         bundle. An empty {@link Iterable} will be returned if the given {@code Bundle} object
 	 *         has become stale or there are no bundles required.
@@ -60,7 +59,7 @@ public class ExtensionsSort extends TopologicalSort<IExtension, Bundle> {
 	 * <p>
 	 * All re-exports will be followed and also be contained in the result.
 	 * </p>
-	 *
+	 * 
 	 * @param dependents
 	 *            the result which will contain all the bundles which require the given
 	 *            {@link BundleWiring}
@@ -97,7 +96,7 @@ public class ExtensionsSort extends TopologicalSort<IExtension, Bundle> {
 	 * bundles of the re-exporting bundle are included in the returned array as they transitively
 	 * depend on {@code bundle}.
 	 * </p>
-	 *
+	 * 
 	 * @return An unmodifiable {@link Iterable} set of bundles currently requiring {@code bundle}.
 	 *         An empty {@link Iterable} will be returned if the {@code bundle} has become stale or
 	 *         has no dependents.
@@ -111,7 +110,7 @@ public class ExtensionsSort extends TopologicalSort<IExtension, Bundle> {
 			return Collections.emptySet();
 		}
 
-		Set<Bundle> required = new HashSet<>();
+		Set<Bundle> required = new HashSet<Bundle>();
 		addDependents(required, providerWiring);
 		return Collections.unmodifiableSet(required);
 	}

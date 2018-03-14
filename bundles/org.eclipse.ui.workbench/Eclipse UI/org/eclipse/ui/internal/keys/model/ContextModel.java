@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class ContextModel extends CommonModel {
 	private static final String CONTEXT_ID_ACTION_SETS = "org.eclipse.ui.contexts.actionSet"; //$NON-NLS-1$
@@ -100,7 +100,7 @@ public class ContextModel extends CommonModel {
 	/**
 	 * Removes any contexts according to the parameters. The contexts are stored
 	 * in a {@link List} to they can be easily restored.
-	 *
+	 * 
 	 * @param actionSets
 	 *            <code>true</code> to filter action set contexts.
 	 * @param internal

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2016 IBM Corporation and others.
+ * Copyright (c) 2007, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Remy Chi Jian Suen <remy.suen@gmail.com>
+ *     Remy Chi Jian Suen <remy.suen@gmail.com> 
  * 			- Fix for Bug 214443 Problem view filter created even if I hit Cancel
- *     Robert Roth <robert.roth.off@gmail.com>
- *          - Fix for Bug 364736 Setting limit to 0 has no effect
  ******************************************************************************/
 
 package org.eclipse.ui.internal.views.markers;
@@ -26,16 +24,26 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.Util;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -59,16 +67,16 @@ import org.eclipse.ui.views.markers.internal.MarkerMessages;
 
 /**
  * FiltersConfigurationDialog is the dialog for configuring the filters for the
- *
+ * 
  * @since 3.3
- *
+ * 
  */
 public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private static final String SELECTED_FILTER_GROUP = "SELECTED_FILTER_GROUP"; //$NON-NLS-1$
 	private static final String PREV_SELECTED_ELEMENTS = "PREV_SELECTED_ELEMENTS"; //$NON-NLS-1$
 
-	private Collection<MarkerFieldFilterGroup> filterGroups;
+	private Collection filterGroups;
 
 	private CheckboxTableViewer configsTable;
 
@@ -76,11 +84,11 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	private MarkerContentGenerator generator;
 
-	private boolean andFilters;
+	private boolean andFilters = false;
 
 	private Button removeButton;
 	private Button renameButton;
-
+	
 	private Button allButton;
 	private Button andButton;
 	private Button orButton;
@@ -91,19 +99,19 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	private GroupFilterConfigurationArea scopeArea = new ScopeArea();
 	private ScrolledForm form;
 
-	private Collection<FilterConfigurationArea> configAreas;
+	private Collection configAreas;
 	private Label limitsLabel;
-
+	
 	private Object[] previouslyChecked = new Object[0];
-	private Group configComposite;
 
 	/**
 	 * Create a new instance of the receiver on builder.
-	 *
+	 * 
 	 * @param parentShell
 	 * @param generator
 	 */
-	public FiltersConfigurationDialog(Shell parentShell, MarkerContentGenerator generator) {
+	public FiltersConfigurationDialog(Shell parentShell,
+			MarkerContentGenerator generator) {
 		super(parentShell);
 		filterGroups = makeWorkingCopy(generator.getAllFilters());
 		this.generator = generator;
@@ -112,31 +120,49 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Return whether or not to AND the filters
-	 *
+	 * 
 	 * @return boolean
 	 */
 	boolean andFilters() {
 		return andFilters;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.ViewerSettingsAndStatusDialog#
+	 * configureShell(org.eclipse.swt.widgets.Shell)
+	 */
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
 		newShell.setText(MarkerMessages.configureFiltersDialog_title);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+	 */
 	@Override
 	protected boolean isResizable() {
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.views.markers.ViewerSettingsAndStatusDialog#
+	 * createDialogContentArea(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected Control createDialogArea(Composite parent) {
+
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout());
 		container.setLayoutData(new GridData(GridData.FILL_BOTH));
 		container.setFont(parent.getFont());
-
+		
 		Composite composite = new Composite(container, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.marginHeight = 0;
@@ -146,7 +172,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 		createAndOrButtons(composite);
 
-		configComposite = new Group(composite, SWT.NONE);
+		Group configComposite = new Group(composite, SWT.NONE);
 		configComposite.setText(MarkerMessages.MarkerConfigurationsLabel);
 
 		configComposite.setLayout(new GridLayout(3, false));
@@ -172,6 +198,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	}
 
 	private void initUI() {
+
 		configsTable.setInput(filterGroups);
 		IStructuredSelection selection = getInitialSelection();
 		configsTable.setSelection(selection);
@@ -179,9 +206,10 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			setFieldsEnabled(false);
 		}
 
-		Iterator<MarkerFieldFilterGroup> iterator = filterGroups.iterator();
+		Iterator iterator = filterGroups.iterator();
 		while (iterator.hasNext()) {
-			MarkerFieldFilterGroup group = iterator.next();
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) iterator
+					.next();
 			boolean enabled = group.isEnabled();
 			configsTable.setChecked(group, enabled);
 		}
@@ -196,46 +224,22 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		limitText.setEnabled(limitsEnabled);
 		limitText.setText(Integer.toString(limits));
 		configsTable.getTable().setFocus();
+
 	}
 
 	private void updateRadioButtonsFromTable() {
+
 		boolean showAll = isShowAll();
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-	}
-
-	private void updateConfigComposite(boolean enabled) {
-		recursivelySetEnabled(configComposite, enabled);
-		if (enabled)
-			updateButtonEnablement(getSelectionFromTable());
-	}
-
-	/**
-	 * Recursively walk through the tree of components and set enabled state of
-	 * each control.
-	 *
-	 * @param control
-	 *            The root control
-	 * @param enabled
-	 *            Whether or not we're enabled.
-	 */
-	private void recursivelySetEnabled(Control control, boolean enabled) {
-		if (control instanceof Composite) {
-			for (Control child : ((Composite) control).getChildren()) {
-				recursivelySetEnabled(child, enabled);
-			}
-		}
-		control.setEnabled(enabled);
 	}
 
 	private void updateShowAll(boolean showAll) {
+
 		allButton.setSelection(showAll);
 		andButton.setEnabled(!showAll);
 		orButton.setEnabled(!showAll);
-		updateConfigComposite(!showAll);
-
 		if (showAll) {
 			previouslyChecked = configsTable.getCheckedElements();
 			configsTable.setAllChecked(false);
@@ -260,6 +264,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	 * @param parent
 	 */
 	private void createMarkerLimits(Composite parent) {
+
 		limitButton = new Button(parent, SWT.CHECK);
 		limitButton.setText(MarkerMessages.MarkerPreferences_MarkerLimits);
 		limitButton.addSelectionListener(new SelectionAdapter() {
@@ -270,7 +275,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 				limitText.setEnabled(limitButton.getSelection());
 			}
 		});
-
+		
 		GridData limitData = new GridData();
 		limitData.verticalIndent = 5;
 		limitButton.setLayoutData(limitData);
@@ -291,34 +296,37 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		GridData textData = new GridData();
 		textData.widthHint = convertWidthInCharsToPixels(10);
 		limitText.setLayoutData(textData);
-		limitText.addVerifyListener(e -> {
-			if (e.character != 0 && e.keyCode != SWT.BS
-					&& e.keyCode != SWT.DEL
-					&& !Character.isDigit(e.character)) {
-				e.doit = false;
+		limitText.addVerifyListener(new VerifyListener() {
+
+			@Override
+			public void verifyText(VerifyEvent e) {
+				if (e.character != 0 && e.keyCode != SWT.BS
+						&& e.keyCode != SWT.DEL
+						&& !Character.isDigit(e.character)) {
+					e.doit = false;
+				}
 			}
 		});
 
-		limitText.addModifyListener(e -> {
-			boolean isInvalid = false;
-			try {
-				int value = Integer.parseInt(limitText.getText());
-				if (value <= 0) {
-					isInvalid = true;
+		limitText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				try {
+					Integer.parseInt(limitText.getText());
+				} catch (NumberFormatException ex) {
+					limitText.setText(Integer.toString(generator.getMarkerLimits()));
 				}
-			} catch (NumberFormatException ex) {
-				isInvalid = true;
-			}
-			if (isInvalid) {
-				limitText.setText(Integer.toString(generator.getMarkerLimits()));
 			}
 		});
+
 	}
 
 	/**
 	 * @param parent
 	 */
 	private void createConfigs(Composite parent) {
+
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout(2, false));
 		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -337,63 +345,76 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		});
 
-		configsTable.addCheckStateListener(event -> {
-			configsTable.setSelection(new StructuredSelection(event.getElement()));
-			updateRadioButtonsFromTable();
+		configsTable.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				configsTable.setSelection(new StructuredSelection(event
+						.getElement()));
+				updateRadioButtonsFromTable();
+			}
 		});
 
-		configsTable.addSelectionChangedListener(event -> {
-			storeConfiguration();
-			MarkerFieldFilterGroup group = getSelectionFromTable();
-			if (group == null) {
-				setFieldsEnabled(false);
-			} else {
-				setFieldsEnabled(true);
-			}
-			updateButtonEnablement(group);
-			updateConfigDesc(group);
-			selectedFilterGroup = group;
-		});
+		configsTable
+				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
+					public void selectionChanged(SelectionChangedEvent event) {
+						storeConfiguration();
+						MarkerFieldFilterGroup group = getSelectionFromTable();
+						if (group == null) {
+							setFieldsEnabled(false);
+						} else
+							setFieldsEnabled(true);
+						updateButtonEnablement(group);
+						updateConfigDesc(group);
+						selectedFilterGroup = group;
+					}
+				});
 
 		createButtons(composite);
+
 	}
 
 	private void storeConfiguration() {
-		if (selectedFilterGroup == null) {
+
+		if (selectedFilterGroup == null)
 			return;
-		}
 
 		scopeArea.applyToGroup(selectedFilterGroup);
-		Iterator<FilterConfigurationArea> areas = configAreas.iterator();
+		Iterator areas = configAreas.iterator();
 		while (areas.hasNext()) {
-			FilterConfigurationArea area = areas.next();
+			FilterConfigurationArea area = (FilterConfigurationArea) areas
+					.next();
 
 			// Handle the internal special cases
-			if (area instanceof GroupFilterConfigurationArea) {
-				((GroupFilterConfigurationArea) area).applyToGroup(selectedFilterGroup);
-			}
+			if (area instanceof GroupFilterConfigurationArea)
+				((GroupFilterConfigurationArea) area)
+						.applyToGroup(selectedFilterGroup);
 			area.apply(selectedFilterGroup.getFilter(area.getField()));
 		}
 		configsTable.refresh(selectedFilterGroup);
 	}
 
 	private void updateConfigDesc(MarkerFieldFilterGroup configuration) {
+
 		if (configuration == null) {
 			return;
 		}
 
 		scopeArea.initializeFromGroup(configuration);
-		Iterator<FilterConfigurationArea> areas = configAreas.iterator();
+		Iterator areas = configAreas.iterator();
 		while (areas.hasNext()) {
-			FilterConfigurationArea area = areas.next();
-			if (area instanceof GroupFilterConfigurationArea) {
-				((GroupFilterConfigurationArea) area).initializeFromGroup(configuration);
-			}
+			FilterConfigurationArea area = (FilterConfigurationArea) areas
+					.next();
+			if (area instanceof GroupFilterConfigurationArea)
+				((GroupFilterConfigurationArea) area)
+						.initializeFromGroup(configuration);
 			area.initialize(configuration.getFilter(area.getField()));
 		}
+
 	}
 
 	private void createConfigDesc(Composite parent) {
+
 		Label separator = new Label(parent, SWT.SEPARATOR | SWT.VERTICAL);
 		separator.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 
@@ -403,42 +424,53 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		descComposite.setBackground(parent.getBackground());
 
 		final FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-		parent.addDisposeListener(e -> toolkit.dispose());
+		parent.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(DisposeEvent e) {
+				toolkit.dispose();
+			}
+		});
 
 		form = toolkit.createScrolledForm(descComposite);
 		form.setBackground(parent.getBackground());
+
 		form.getBody().setLayout(new GridLayout());
 
 		configAreas = generator.createFilterConfigurationFields();
 
 		createFieldArea(toolkit, form, scopeArea, true);
-		Iterator<FilterConfigurationArea> areas = configAreas.iterator();
+		Iterator areas = configAreas.iterator();
 		while (areas.hasNext()) {
-			createFieldArea(toolkit, form, areas.next(), true);
+			createFieldArea(toolkit, form,
+					(FilterConfigurationArea) areas.next(), true);
 		}
+
 	}
 
 	/**
 	 * Create a field area in the form for the FilterConfigurationArea
-	 *
+	 * 
 	 * @param toolkit
-	 * @param scrolledForm
+	 * @param form
 	 * @param area
 	 * @param expand
 	 *            <code>true</code> if the area should be expanded by default
 	 */
-	private void createFieldArea(final FormToolkit toolkit, final ScrolledForm scrolledForm,
-			final FilterConfigurationArea area, boolean expand) {
-		final ExpandableComposite expandable = toolkit.createExpandableComposite(scrolledForm.getBody(),
-				ExpandableComposite.TWISTIE);
+	private void createFieldArea(final FormToolkit toolkit,
+			final ScrolledForm form, final FilterConfigurationArea area,
+			boolean expand) {
+		final ExpandableComposite expandable = toolkit
+				.createExpandableComposite(form.getBody(),
+						ExpandableComposite.TWISTIE);
 		expandable.setText(area.getTitle());
-		expandable.setBackground(scrolledForm.getBackground());
+		expandable.setBackground(form.getBackground());
 		expandable.setLayout(new GridLayout());
-		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, area.grabExcessVerticalSpace()));
+		expandable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, area
+				.grabExcessVerticalSpace()));
 		expandable.addExpansionListener(new ExpansionAdapter() {
 			@Override
 			public void expansionStateChanged(ExpansionEvent e) {
-				scrolledForm.reflow(true);
+				form.reflow(true);
 			}
 		});
 
@@ -446,12 +478,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.verticalSpacing = 3;
 		sectionClient.setLayout(gridLayout);
-		sectionClient.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		sectionClient.setBackground(scrolledForm.getBackground());
+		sectionClient.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true,
+				false));
+		sectionClient.setBackground(form.getBackground());
 
 		area.createContents(sectionClient);
 		expandable.setClient(sectionClient);
 		expandable.setExpanded(expand);
+
 	}
 
 	/**
@@ -486,7 +520,7 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 		removeButton.setEnabled(false);
 		setButtonLayoutData(removeButton);
-
+		
 		renameButton = new Button(buttons, SWT.PUSH);
 		renameButton.setText(MarkerMessages.MarkerFilter_renameName);
 		renameButton.addSelectionListener(new SelectionAdapter() {
@@ -497,36 +531,45 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		});
 		renameButton.setEnabled(false);
 		setButtonLayoutData(renameButton);
+
 	}
 
 	private void renameFilter() {
+		
 		MarkerFieldFilterGroup filterGroup = getSelectionFromTable();
+
 		IInputValidator nameValidator = getNameValidator(filterGroup.getName(), getCurrentConfigurationNames());
+		
 		InputDialog inputDialog = new InputDialog(getShell(),
 				MarkerMessages.MarkerFilterDialog_title,
 				MarkerMessages.MarkerFilterDialog_message,
 				filterGroup.getName(), nameValidator);
-
+		
 		if(inputDialog.open() == Window.OK) {
 			filterGroup.setName(inputDialog.getValue());
 			configsTable.refresh(filterGroup);
 		}
+				
 	}
 
-	private IInputValidator getNameValidator(final String currentName, final Collection<String> existingNames) {
-		return newText -> {
-			newText = newText.trim();
-			if (newText.length() == 0) {
-				return MarkerMessages.MarkerFilterDialog_emptyMessage;
+	private IInputValidator getNameValidator(final String currentName, final Collection existingNames) {
+		return new IInputValidator() {
+			
+			@Override
+			public String isValid(String newText) {
+				newText = newText.trim();
+				if (newText.length() == 0)
+					return MarkerMessages.MarkerFilterDialog_emptyMessage;
+				if(existingNames.contains(newText) && !currentName.equals(newText)) {
+					return NLS.bind(MarkerMessages.filtersDialog_conflictingName, newText);
+				}
+				return null;
 			}
-			if(existingNames.contains(newText) && !currentName.equals(newText)) {
-				return NLS.bind(MarkerMessages.filtersDialog_conflictingName, newText);
-			}
-			return null;
 		};
 	}
 
 	private void createAndOrButtons(Composite parent) {
+
 		allButton = new Button(parent, SWT.CHECK);
 		allButton.setText(MarkerMessages.ALL_Title);
 		allButton.addSelectionListener(new SelectionAdapter() {
@@ -559,24 +602,27 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		GridData orData = new GridData();
 		orData.horizontalIndent = 20;
 		orButton.setLayoutData(orData);
+
 	}
 
 	/**
 	 * Get a collection of names of the filters currently in the list
-	 *
+	 * 
 	 * @return Collection
 	 */
-	private Collection<String> getCurrentConfigurationNames() {
-		Collection<String> names = new ArrayList<>();
-		Iterator<MarkerFieldFilterGroup> filterIterator = filterGroups.iterator();
+	private Collection getCurrentConfigurationNames() {
+		Collection names = new ArrayList();
+		Iterator filterIterator = filterGroups.iterator();
 		while (filterIterator.hasNext()) {
-			names.add(filterIterator.next().getName());
+			names.add(((MarkerFieldFilterGroup) filterIterator.next())
+					.getName());
 		}
 		return names;
 	}
 
 	private void addConfiguration() {
-		String newName = getNewConfigurationName(getCurrentConfigurationNames(),
+		String newName = getNewConfigurationName(
+				getCurrentConfigurationNames(),
 				MarkerMessages.MarkerFilter_newFilterName);
 		MarkerFieldFilterGroup configuration = createConfiguration(newName);
 		filterGroups.add(configuration);
@@ -586,7 +632,9 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 		updateRadioButtonsFromTable();
 	}
 
-	private String getNewConfigurationName(final Collection<String> avoidNames, String initialName) {
+	private String getNewConfigurationName(final Collection avoidNames,
+			String initialName) {
+
 		String configName = initialName;
 		for (int i = 1; avoidNames.contains(configName); i++) {
 			configName = initialName + ' ' + i;
@@ -595,46 +643,54 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	}
 
 	private MarkerFieldFilterGroup createConfiguration(String newName) {
-		MarkerFieldFilterGroup config = new MarkerFieldFilterGroup(null, generator);
+
+		MarkerFieldFilterGroup config = new MarkerFieldFilterGroup(null,
+				generator);
 		config.setName(newName);
 		return config;
 	}
 
 	/**
 	 * Return the dialog settings for the receiver.
-	 *
+	 * 
 	 * @return IDialogSettings
 	 */
 	private IDialogSettings getDialogSettings() {
 		IDialogSettings settings = IDEWorkbenchPlugin.getDefault()
 				.getDialogSettings().getSection(this.getClass().getName());
+
 		if (settings == null) {
 			settings = IDEWorkbenchPlugin.getDefault().getDialogSettings()
 					.addNewSection(this.getClass().getName());
 		}
+
 		return settings;
 	}
 
 	/**
 	 * Return the filter groups modified by the receiver.
-	 *
+	 * 
 	 * @return Collection of {@link MarkerFieldFilterGroup}
 	 */
-	Collection<MarkerFieldFilterGroup> getFilters() {
+	Collection getFilters() {
 		return filterGroups;
 	}
 
 	private IStructuredSelection getInitialSelection() {
 		IDialogSettings settings = getDialogSettings();
+
 		String selectedGroupName = settings.get(SELECTED_FILTER_GROUP);
 
 		MarkerFieldFilterGroup selectedGroup = null;
 		if (selectedGroupName == null && filterGroups.size() > 0) {
-			selectedGroup = filterGroups.iterator().next();
+			selectedGroup = (MarkerFieldFilterGroup) filterGroups.iterator()
+					.next();
 		} else {
-			Iterator<MarkerFieldFilterGroup> groups = filterGroups.iterator();
+
+			Iterator groups = filterGroups.iterator();
 			while (groups.hasNext()) {
-				MarkerFieldFilterGroup group = groups.next();
+				MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) groups
+						.next();
 				if (group.getName().equals(selectedGroupName)) {
 					selectedGroup = group;
 					break;
@@ -642,14 +698,16 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 			}
 		}
 
-		String[] selectedElementNames = settings.getArray(PREV_SELECTED_ELEMENTS);
-		List<MarkerFieldFilterGroup> selectedElements = new ArrayList<>();
+		String[] selectedElementNames = settings
+				.getArray(PREV_SELECTED_ELEMENTS);
+		List selectedElements = new ArrayList();
 
 		if (selectedElementNames != null) {
 			for (int i = 0; i < selectedElementNames.length; i++) {
-				Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
+				Iterator filterGroupIterator = filterGroups.iterator();
 				while (filterGroupIterator.hasNext()) {
-					MarkerFieldFilterGroup group = filterGroupIterator.next();
+					MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filterGroupIterator
+							.next();
 					if (Util.equals(group.getName(), selectedElementNames[i])) {
 						selectedElements.add(group);
 						break;
@@ -667,41 +725,51 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Make a working copy of the groups.
-	 *
+	 * 
 	 * @param groups
 	 * @return Collection of MarkerFieldFilterGroup
 	 */
-	private Collection<MarkerFieldFilterGroup> makeWorkingCopy(Collection<MarkerFieldFilterGroup> groups) {
-		Iterator<MarkerFieldFilterGroup> initialFiltersIterator = groups.iterator();
-		Collection<MarkerFieldFilterGroup> returnFilters = new ArrayList<>(groups.size());
+	private Collection makeWorkingCopy(Collection groups) {
+		Iterator initialFiltersIterator = groups.iterator();
+		Collection returnFilters = new ArrayList(groups.size());
 		while (initialFiltersIterator.hasNext()) {
-			MarkerFieldFilterGroup group = initialFiltersIterator.next();
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) initialFiltersIterator
+					.next();
 			MarkerFieldFilterGroup copy = group.makeWorkingCopy();
-			if (copy != null) {
+			if (copy != null)
 				returnFilters.add(copy);
-			}
 		}
 		return returnFilters;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+	 */
 	@Override
 	protected void okPressed() {
+
 		generator.setMarkerLimitsEnabled(limitButton.getSelection());
 		generator.setMarkerLimits(Integer.parseInt(limitText.getText().trim()));
 
-		Iterator<MarkerFieldFilterGroup> filterGroupIterator = filterGroups.iterator();
+		Iterator filterGroupIterator = filterGroups.iterator();
 		while (filterGroupIterator.hasNext()) {
-			MarkerFieldFilterGroup group = filterGroupIterator.next();
+			MarkerFieldFilterGroup group = (MarkerFieldFilterGroup) filterGroupIterator
+					.next();
 			group.setEnabled(configsTable.getChecked(group));
 		}
 
 		storeConfiguration();
 		saveDialogSettings();
+
 		super.okPressed();
+
 	}
 
 	@Override
 	protected void performDefaults() {
+
 		andFilters = false;
 		andButton.setSelection(andFilters);
 		orButton.setSelection(!andFilters);
@@ -713,9 +781,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 				filterGroups.size() > 1 ? filterGroups.iterator().next()
 						: new Object[0]));
 
-		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault().getPreferenceStore();
-		boolean useMarkerLimits = preferenceStore.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
-		int markerLimits = useMarkerLimits ? preferenceStore.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
+		IPreferenceStore preferenceStore = IDEWorkbenchPlugin.getDefault()
+				.getPreferenceStore();
+		boolean useMarkerLimits = preferenceStore
+				.getBoolean(IDEInternalPreferences.USE_MARKER_LIMITS);
+		int markerLimits = useMarkerLimits ? preferenceStore
+				.getInt(IDEInternalPreferences.MARKER_LIMITS_VALUE) : 100;
 
 		limitButton.setSelection(useMarkerLimits);
 		limitsLabel.setEnabled(useMarkerLimits);
@@ -727,11 +798,12 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 
 	/**
 	 * Remove the filters in selection.
-	 *
+	 * 
 	 * @param selection
 	 */
 	private void removeFilters(ISelection selection) {
-		filterGroups.remove(((IStructuredSelection) selection).getFirstElement());
+		filterGroups.remove(((IStructuredSelection) selection)
+				.getFirstElement());
 		configsTable.refresh();
 		updateRadioButtonsFromTable();
 	}
@@ -740,16 +812,18 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	 * Save the dialog settings for the receiver.
 	 */
 	private void saveDialogSettings() {
+		
 		IDialogSettings settings = getDialogSettings();
-		if (selectedFilterGroup != null) {
+
+		if (selectedFilterGroup != null)
 			settings.put(SELECTED_FILTER_GROUP, selectedFilterGroup.getName());
-		}
 
 		String[] selectedNames = new String[previouslyChecked.length];
 		for (int i = 0; i < selectedNames.length; i++) {
 			selectedNames[i] = ((MarkerFieldFilterGroup)previouslyChecked[i]).getName();
 		}
 		settings.put(PREV_SELECTED_ELEMENTS, selectedNames);
+		
 	}
 
 	private void updateButtonEnablement(MarkerFieldFilterGroup group) {
@@ -759,13 +833,14 @@ public class FiltersConfigurationDialog extends ViewSettingsDialog {
 	}
 
 	private MarkerFieldFilterGroup getSelectionFromTable() {
-		IStructuredSelection selection = (IStructuredSelection) configsTable.getSelection();
+		IStructuredSelection selection = (IStructuredSelection) configsTable
+				.getSelection();
 		return (MarkerFieldFilterGroup) selection.getFirstElement();
 	}
 
 	/**
 	 * Set the control and all of it's visibility state to visible.
-	 *
+	 * 
 	 * @param enabled
 	 * @param control
 	 */

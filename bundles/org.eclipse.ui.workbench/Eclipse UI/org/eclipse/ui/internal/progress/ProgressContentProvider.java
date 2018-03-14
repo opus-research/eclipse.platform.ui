@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,14 +27,14 @@ public abstract class ProgressContentProvider implements
 
     /**
      * Create a new instance of the receiver with all of the
-     * default values.
+     * default values.  
      */
     public ProgressContentProvider() {
     	ProgressViewUpdater.getSingleton().addCollector(this);
     }
 
     /**
-     * Create a new instance of the receiver with a flag to
+     * Create a new instance of the receiver with a flag to 
      * indicate if there will be debug info shown or not.
      * @param debug If true debug information will be shown
      * if the debug flag in the ProgressManager is true.
@@ -44,22 +44,38 @@ public abstract class ProgressContentProvider implements
     	canShowDebug = debug;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
+     */
     @Override
 	public Object[] getElements(Object inputElement) {
 
         return ProgressManager.getInstance().getRootElements(debug());
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#dispose()
+     */
     @Override
 	public void dispose() {
         ProgressViewUpdater.getSingleton().removeCollector(this);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
+     *      java.lang.Object, java.lang.Object)
+     */
     @Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         //No change when input changes
     }
-
+    
     /**
      * Return whether or not we are debugging. Check the
      * system settings unless we are overiding them.
@@ -71,7 +87,7 @@ public abstract class ProgressContentProvider implements
 			return false;
 		}
     	return ProgressViewUpdater.getSingleton().debug;
-
+    	
     }
 
 }

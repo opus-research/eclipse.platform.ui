@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 479181
  *******************************************************************************/
 package org.eclipse.ui.internal.keys;
 
@@ -60,7 +58,7 @@ import org.eclipse.ui.keys.IBindingService;
  * currently active bindings, as well as the current state of the binding
  * architecture.
  * </p>
- *
+ * 
  * @since 3.1
  */
 public final class BindingService implements IBindingService {
@@ -89,10 +87,10 @@ public final class BindingService implements IBindingService {
 
 	private BindingPersistence bp;
 
-	private Map<String, MBindingContext> bindingContexts = new HashMap<>();
+	private Map<String, MBindingContext> bindingContexts = new HashMap<String, MBindingContext>();
 
 	private String[] activeSchemeIds;
-
+	
 	/**
 	 * Key assist dialog for workbench key bindings, lazily created and cached
 	 */
@@ -208,7 +206,7 @@ public final class BindingService implements IBindingService {
 	@Override
 	public Map getPartialMatches(TriggerSequence trigger) {
 		final Collection<Binding> partialMatches = bindingService.getPartialMatches(trigger);
-		final Map<TriggerSequence, Binding> result = new HashMap<>(
+		final Map<TriggerSequence, Binding> result = new HashMap<TriggerSequence, Binding>(
 				partialMatches.size());
 
 		for (Binding binding : partialMatches) {
@@ -290,11 +288,12 @@ public final class BindingService implements IBindingService {
 
 		// weeds out any of the deleted system bindings using the binding
 		// manager
-		HashSet<Binding> activeBindings = new HashSet<Binding>(manager.getActiveBindingsDisregardingContextFlat());
+		HashSet<Binding> activeBindings = new HashSet<Binding>(
+				manager.getActiveBindingsDisregardingContextFlat());
 
 		// get all of the (active) model bindings that point to the actual runtime
 		// bindings
-		HashMap<Binding, MKeyBinding> bindingToKey = new HashMap<>();
+		HashMap<Binding, MKeyBinding> bindingToKey = new HashMap<Binding, MKeyBinding>();
 		for (MBindingTable table : application.getBindingTables()) {
 			for (MKeyBinding modelBinding : table.getBindings()) {
 				final Object obj = modelBinding.getTransientData().get(
@@ -307,7 +306,7 @@ public final class BindingService implements IBindingService {
 
 		// go through each of the (active) bindings in the model to see if there are any
 		// bindings that we should remove
-		final HashSet<Binding> deleted = new HashSet<>(bindingToKey.keySet());
+		final HashSet<Binding> deleted = new HashSet<Binding>(bindingToKey.keySet());
 		deleted.removeAll(activeBindings);
 		for (Binding binding : deleted) {
 			if (binding.getType() == Binding.USER) {
@@ -319,7 +318,7 @@ public final class BindingService implements IBindingService {
 				}
 			}
 		}
-
+		
 		// go through each of the active bindings (from the binding manager) to
 		// see if there are any bindings that we should add to the runtime
 		for (Binding binding : activeBindings) {
@@ -381,7 +380,7 @@ public final class BindingService implements IBindingService {
 	}
 
 	private final String[] getSchemeIds(String schemeId) {
-		final List<String> strings = new ArrayList<>();
+		final List<String> strings = new ArrayList<String>();
 		while (schemeId != null) {
 			strings.add(schemeId);
 			try {
@@ -397,7 +396,7 @@ public final class BindingService implements IBindingService {
 	/*
 	 * Copied from
 	 * org.eclipse.jface.bindings.BindingManager.compareSchemes(String, String)
-	 *
+	 * 
 	 * Returns an in based on scheme 1 < scheme 2
 	 */
 	private final int compareSchemes(final String schemeId1, final String schemeId2) {
@@ -419,7 +418,7 @@ public final class BindingService implements IBindingService {
 
 	/**
 	 * Compare 2 bindings, taking into account Scheme and type.
-	 *
+	 * 
 	 * @param current
 	 *            the existing binding
 	 * @param addition
@@ -515,7 +514,7 @@ public final class BindingService implements IBindingService {
 	 * <p>
 	 * This method completes in amortized <code>O(1)</code>.
 	 * </p>
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be added; must not be <code>null</code>.
 	 */
@@ -595,7 +594,13 @@ public final class BindingService implements IBindingService {
 		ParameterizedCommand parmCmd = binding.getParameterizedCommand();
 
 		String id = parmCmd.getId();
-		MCommand cmd = application.getCommand(id);
+		MCommand cmd = null;
+		for (MCommand appCommand : application.getCommands()) {
+			if (id.equals(appCommand.getElementId())) {
+				cmd = appCommand;
+				break;
+			}
+		}
 		if (cmd == null) {
 			return null;
 		}
@@ -717,7 +722,7 @@ public final class BindingService implements IBindingService {
 	/**
 	 * Remove the specific binding by identity. Does nothing if the binding is
 	 * not in the manager.
-	 *
+	 * 
 	 * @param binding
 	 *            The binding to be removed; must not be <code>null</code>.
 	 */

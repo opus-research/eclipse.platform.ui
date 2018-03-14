@@ -21,20 +21,24 @@ import org.eclipse.ui.part.ViewPart;
 public class PerformanceViewPart extends ViewPart {
 
 	private Label control;
-
+	
 	/**
-	 *
+	 * 
 	 */
 	public PerformanceViewPart() {
 		super();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		control = new Label(parent, SWT.NONE);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IWorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		control.setFocus();
 	}

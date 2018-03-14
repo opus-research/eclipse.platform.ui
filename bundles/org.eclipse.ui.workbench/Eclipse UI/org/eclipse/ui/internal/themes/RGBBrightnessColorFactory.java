@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,12 +21,15 @@ import org.eclipse.ui.themes.IColorFactory;
 
 /**
  * @since 3.105
- *
+ * 
  */
 public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExtension {
 
 	String color, scaleFactor;
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.themes.IColorFactory#createColor()
+	 */
 	@Override
 	public RGB createColor() {
 		RGB rgb = ColorUtil.getColorValue(color);
@@ -48,7 +51,7 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 	 * either be RGB triples or SWT constants) and <code>scaleFactor</code>
 	 * which is the brightness scale factor with 1.0 having the same brightness
 	 * as the original color.
-	 *
+	 * 
 	 * @see org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime.IConfigurationElement,
 	 *      java.lang.String, java.lang.Object)
 	 */
@@ -58,7 +61,7 @@ public class RGBBrightnessColorFactory implements IColorFactory, IExecutableExte
 		if (data instanceof Hashtable) {
 			Hashtable table = (Hashtable) data;
 			color = (String) table.get("color"); //$NON-NLS-1$
-			scaleFactor = (String) table.get("scaleFactor"); //$NON-NLS-1$
+			scaleFactor = (String) table.get("scaleFactor"); //$NON-NLS-1$            
 		}
 	}
 
