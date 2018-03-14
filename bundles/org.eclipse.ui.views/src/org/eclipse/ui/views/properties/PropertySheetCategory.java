@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
@@ -21,7 +20,7 @@ import java.util.List;
 /*package*/class PropertySheetCategory {
     private String categoryName;
 
-	private List<IPropertySheetEntry> entries = new ArrayList<>();
+    private List entries = new ArrayList();
 
     private boolean shouldAutoExpand = true;
 
@@ -76,7 +75,8 @@ import java.util.List;
      * @return the entries in this category
      */
     public IPropertySheetEntry[] getChildEntries() {
-		return entries.toArray(new IPropertySheetEntry[entries.size()]);
+        return (IPropertySheetEntry[]) entries
+                .toArray(new IPropertySheetEntry[entries.size()]);
     }
 
     /**
@@ -84,6 +84,6 @@ import java.util.List;
      * Doing so allows us to reuse this category entry.
      */
     public void removeAllEntries() {
-		entries = new ArrayList<>();
+        entries = new ArrayList();
     }
 }
