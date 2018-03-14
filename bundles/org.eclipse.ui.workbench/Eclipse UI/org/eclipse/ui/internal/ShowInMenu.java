@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -45,7 +46,6 @@ import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.internal.services.IWorkbenchLocationService;
 import org.eclipse.ui.internal.services.WorkbenchSourceProvider;
@@ -167,7 +167,10 @@ public class ShowInMenu extends ContributionItem implements
 	 * Fills the menu with Show In actions.
 	 */
 	private void fillMenu(IMenuManager innerMgr) {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		IWorkbenchPage page = (IWorkbenchPage) locator.getService(IWorkbenchPage.class);
+		if (page == null) {
+			return;
+		}
 		WorkbenchPartReference r = (WorkbenchPartReference) page.getActivePartReference();
 		if (page != null && r != null && r.getModel() != null) {
 			((WorkbenchPage) page).updateShowInSources(r.getModel());
@@ -195,7 +198,7 @@ public class ShowInMenu extends ContributionItem implements
 			}
 		}
 		if (sourcePart != null && innerMgr instanceof MenuManager) {
-			ISourceProviderService sps = (ISourceProviderService) locator
+			ISourceProviderService sps = locator
 					.getService(ISourceProviderService.class);
 			ISourceProvider sp = sps
 					.getSourceProvider(ISources.SHOW_IN_SELECTION);
@@ -315,17 +318,14 @@ public class ShowInMenu extends ContributionItem implements
 	 * 
 	 * @return the source part or <code>null</code>
 	 */
-	private IWorkbenchPart getSourcePart() {
+	protected IWorkbenchPart getSourcePart() {
 		IWorkbenchWindow window = getWindow();
 
 		if (window == null)
 			return null;
 
 		IWorkbenchPage page = window.getActivePage();
-		if (page != null) {
-			return page.getActivePart();
-		}
-		return null;
+		return page != null ? page.getActivePart() : null;
 	}
 
 	/**
@@ -415,7 +415,7 @@ public class ShowInMenu extends ContributionItem implements
 	protected IWorkbenchWindow getWindow() {
 		if(locator == null) return null;
 		
-		IWorkbenchLocationService wls = (IWorkbenchLocationService) locator
+		IWorkbenchLocationService wls = locator
 				.getService(IWorkbenchLocationService.class);
 
 		if (window == null) {
