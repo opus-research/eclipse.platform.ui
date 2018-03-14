@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,29 +11,29 @@
 
 package org.eclipse.e4.ui.tests.reconciler;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
+import org.junit.Test;
 
 public abstract class ModelReconcilerPerspectiveTest extends
 		ModelReconcilerTest {
 
+	@Test
 	public void testPerspective_Windows_Add() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspective = ems.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspective);
 
 		saveModel();
@@ -41,7 +41,7 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		ModelReconciler reconciler = createModelReconciler();
 		reconciler.recordChanges(application);
 
-		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow nestedWindow = ems.createModelElement(MWindow.class);
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 
@@ -72,23 +72,22 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		assertEquals(perspective, perspectiveStack.getChildren().get(0));
 		assertEquals(1, perspective.getWindows().size());
 
-		nestedWindow = (MWindow) perspective.getWindows().get(0);
+		nestedWindow = perspective.getWindows().get(0);
 		assertEquals("nested", nestedWindow.getElementId());
 	}
 
+	@Test
 	public void testPerspective_Windows_Remove() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspective = ems.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspective);
 
-		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow nestedWindow = ems.createModelElement(MWindow.class);
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 
@@ -130,19 +129,18 @@ public abstract class ModelReconcilerPerspectiveTest extends
 		assertEquals(0, perspective.getWindows().size());
 	}
 
+	@Test
 	public void testPerspective_Windows_ChangeWindowAttribute() {
 		MApplication application = createApplication();
 		MWindow window = createWindow(application);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 
-		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspective = ems.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspective);
 
-		MWindow nestedWindow = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow nestedWindow = ems.createModelElement(MWindow.class);
 		nestedWindow.setElementId("nested");
 		perspective.getWindows().add(nestedWindow);
 
