@@ -145,7 +145,7 @@ public class CleanupAddon {
 	 * its last child becomes invisible. Defaults to false for unknown element
 	 * types
 	 */
-	boolean shouldReactToChildVisibilityChanges(MUIElement theElement) {
+	private static boolean shouldReactToChildVisibilityChanges(MUIElement theElement) {
 		return (theElement instanceof MPartSashContainer || theElement instanceof MPartStack);
 	}
 
