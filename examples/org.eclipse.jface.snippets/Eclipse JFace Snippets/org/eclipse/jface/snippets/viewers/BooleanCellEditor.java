@@ -88,7 +88,7 @@ public class BooleanCellEditor extends CellEditor {
 
 	@Override
 	protected Object doGetValue() {
-		return Boolean.valueOf(button.getSelection());
+		return new Boolean(button.getSelection());
 	}
 
 	@Override
