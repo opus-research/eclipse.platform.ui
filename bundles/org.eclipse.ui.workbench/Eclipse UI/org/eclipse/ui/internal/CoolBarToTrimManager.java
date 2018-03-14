@@ -606,7 +606,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBarElement toolBarElem = renderer.getToolElement(item);
 			if (toolBarElem != null) {
 				if (container.isVisible()) {
-					setChildVisible(toolBarElem, item, manager);
+					applyOverridenVisibility(toolBarElem, item, manager);
 					continue;
 				}
 				if (item.isSeparator() || item.isGroupMarker()) {
@@ -616,7 +616,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				// If the toolbar is hidden but one of the children is not,
 				// make both the child and the toolbar visible
 				if (isChildVisible(item, manager)) {
-					setChildVisible(toolBarElem, item, manager);
+					applyOverridenVisibility(toolBarElem, item, manager);
 					container.setVisible(true);
 				}
 				continue;
@@ -641,21 +641,13 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
-
 				if (manager instanceof ContributionManager) {
-					// set basic attributes to the item before adding to the manager
-					ci.setId(toolItem.getElementId());
-					ci.setVisible(toolItem.isVisible());
-
 					ContributionManager cm = (ContributionManager) manager;
 					cm.insert(index, ci);
 					cm.remove(item);
-
-					// explicitly dispose contribution since it is now
-					// disconnected from manager
-					item.dispose();
 				}
 				ci.setModel(toolItem);
+				ci.setVisible(toolItem.isVisible());
 				renderer.linkModelToContribution(toolItem, ci);
 				container.getChildren().add(toolItem);
 			} else {
@@ -672,7 +664,8 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 	}
 
-	private void setChildVisible(MToolBarElement modelItem, IContributionItem item, IContributionManager manager) {
+	private void applyOverridenVisibility(MToolBarElement modelItem, IContributionItem item,
+			IContributionManager manager) {
 		Boolean overridenVisibility = getOverridenVisibility(item, manager);
 		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
 
@@ -687,7 +680,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			modelItem.setVisible(prevChildVisible);
 			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
 		} else {
-			modelItem.setVisible(item.isVisible());
+			return;
 		}
 	}
 
