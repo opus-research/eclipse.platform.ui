@@ -7,6 +7,7 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426535 
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -63,6 +64,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
@@ -89,6 +93,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
 
 	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
+
+	/**
+	 * The context menu for this trim stack's items.
+	 */
+	private Menu toolbarMenu;
 
 	// @Inject
 	// private Logger logger;
@@ -311,7 +320,22 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 		}
 
+		createMenuToCloseToolbar(toolbarModel, renderedCtrl);
+
 		return renderedCtrl;
+	}
+
+	private void createMenuToCloseToolbar(final MToolBar toolbarModel,
+			Control renderedCtrl) {
+		toolbarMenu = new Menu(renderedCtrl);
+		MenuItem closeItem = new MenuItem(toolbarMenu, SWT.NONE);
+		closeItem.setText(Messages.ToolBarManagerRenderer_MenuCloseText);
+		closeItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(org.eclipse.swt.widgets.Event event) {
+				toolbarModel.setToBeRendered(false);
+			}
+		});
+		renderedCtrl.setMenu(toolbarMenu);
 	}
 
 	/**
@@ -433,6 +457,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		bar.addDisposeListener(new DisposeListener() {
 			public void widgetDisposed(DisposeEvent e) {
 				cleanUp((MToolBar) element);
+				toolbarMenu = null;
 			}
 		});
 		return bar;
@@ -897,4 +922,5 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	public void updateEnablement() {
 		enablementUpdater.updateContributionItems();
 	}
+
 }
