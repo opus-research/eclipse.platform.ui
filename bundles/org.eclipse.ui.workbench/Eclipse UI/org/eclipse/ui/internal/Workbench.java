@@ -606,16 +606,12 @@ public final class Workbench extends EventManager implements IWorkbench {
 					}
 					// run the legacy workbench once
 					returnCode[0] = workbench.runUI();
-					if (returnCode[0] == PlatformUI.RETURN_OK) {
-						// run the e4 event loop and instantiate ... well, stuff
-						e4Workbench.createAndRunUI(e4Workbench.getApplication());
-						WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext()
-								.get(IMenuService.class);
-						wms.dispose();
-					}
-					if (returnCode[0] != PlatformUI.RETURN_UNSTARTABLE) {
-						e4app.saveModel();
-					}
+					// run the e4 event loop and instantiate ... well, stuff
+					e4Workbench.createAndRunUI(e4Workbench.getApplication());
+					WorkbenchMenuService wms = (WorkbenchMenuService) e4Workbench.getContext().get(
+							IMenuService.class);
+					wms.dispose();
+					e4app.saveModel();
 					e4Workbench.close();
 					returnCode[0] = workbench.returnCode;
 				}
@@ -1603,8 +1599,8 @@ public final class Workbench extends EventManager implements IWorkbench {
 					// TODO compat: open the windows here/instantiate the model
 					// TODO compat: instantiate the WW around the model
 					initializationDone = true;
-					if (isClosing() || !advisor.openWindows()) {
-						// if (isClosing()) {
+					// if (isClosing() || !advisor.openWindows()) {
+					if (isClosing()) {
 						bail[0] = true;
 					}
 
@@ -2781,9 +2777,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// runEventLoop(handler, display);
 			}
 			returnCode = PlatformUI.RETURN_OK;
-			if (!initOK[0]) {
-				returnCode = PlatformUI.RETURN_UNSTARTABLE;
-			}
 		} catch (final Exception e) {
 			if (!display.isDisposed()) {
 				handler.handleException(e);
