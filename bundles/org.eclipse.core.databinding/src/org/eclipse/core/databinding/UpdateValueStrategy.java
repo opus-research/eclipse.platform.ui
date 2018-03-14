@@ -20,6 +20,8 @@ import java.util.HashMap;
 import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.validation.IValidator;
+import org.eclipse.core.databinding.validation.ValidationStatus;
+import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.internal.databinding.Pair;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigDecimalConverter;
 import org.eclipse.core.internal.databinding.conversion.NumberToBigIntegerConverter;
@@ -127,7 +129,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Policy constant denoting that the source observable's state should be
 	 * tracked, and that validation, conversion and updating the destination
-	 * observable's value should be performed automaticlly on every change of
+	 * observable's value should be performed automatically on every change of
 	 * the source observable value.
 	 */
 	public static int POLICY_UPDATE = notInlined(8);
@@ -148,6 +150,8 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	protected IValidator afterGetValidator;
 	protected IValidator afterConvertValidator;
 	protected IValidator beforeSetValidator;
+	protected IConverter converter;
+
 	private int updatePolicy;
 
 	private static ValidatorRegistry validatorRegistry = new ValidatorRegistry();
@@ -200,6 +204,20 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	public UpdateValueStrategy(boolean provideDefaults, int updatePolicy) {
 		this.provideDefaults = provideDefaults;
 		this.updatePolicy = updatePolicy;
+	}
+
+	/**
+	 * Converts the value from the source type to the destination type.
+	 * <p>
+	 * Default implementation will use the {@link #setConverter(IConverter)
+	 * converter} if one exists. If no converter exists no conversion occurs.
+	 * </p>
+	 *
+	 * @param value
+	 * @return the converted value
+	 */
+	public Object convert(Object value) {
+		return converter == null ? value : converter.convert(value);
 	}
 
 	/**
@@ -468,7 +486,11 @@ public class UpdateValueStrategy extends UpdateStrategy {
 		try {
 			observableValue.setValue(value);
 		} catch (Exception ex) {
-			return logErrorWhileSettingValue(ex);
+			return ValidationStatus
+					.error(
+							BindingMessages
+									.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE),
+							ex);
 		}
 		return Status.OK_STATUS;
 	}
