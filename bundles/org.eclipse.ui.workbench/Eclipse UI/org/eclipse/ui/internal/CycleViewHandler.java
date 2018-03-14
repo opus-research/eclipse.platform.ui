@@ -13,9 +13,13 @@
 
 package org.eclipse.ui.internal;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
+import org.eclipse.e4.ui.internal.workbench.PartServiceImpl;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -51,9 +55,11 @@ public class CycleViewHandler extends CycleBaseHandler {
 
 		boolean includeEditor = true;
 
-		List<MPart> parts = modelService.findElements(currentPerspective, null, MPart.class, null);
+		List<MPart> partsOfActivePerspective = modelService.findElements(currentPerspective, null, MPart.class, null);
 
-		for (MPart part : parts) {
+		Collection<MPart> sortedParts = getPartListSortedByActivation(partService, partsOfActivePerspective);
+
+		for (MPart part : sortedParts) {
 			if (!partService.isPartOrPlaceholderInPerspective(part.getElementId(), currentPerspective)) {
 				continue;
 			}
@@ -82,6 +88,28 @@ public class CycleViewHandler extends CycleBaseHandler {
 				item.setData(part);
 			}
 		}
+	}
+
+	private Collection<MPart> getPartListSortedByActivation(EPartService partService, List<MPart> parts) {
+		if (partService instanceof PartServiceImpl) {
+			PartServiceImpl partServiceImpl = (PartServiceImpl) partService;
+
+			List<MPart> activationList = partServiceImpl.getActivationList();
+			if (activationList.isEmpty()) {
+				return parts;
+			}
+			Set<MPart> partList = new LinkedHashSet<>(activationList);
+
+			// remove all parts, which are not in the part list of the current
+			// perspective
+			partList.retainAll(parts);
+
+			// add all remaining parts of the part list
+			partList.addAll(parts);
+			return partList;
+		}
+
+		return parts;
 	}
 
 	@Override
