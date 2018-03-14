@@ -42,9 +42,6 @@ AbstractCSSPropertySWTHandler {
 		} else if (value.getCssValueType() == CSSValue.CSS_VALUE_LIST) {
 			Gradient grad = (Gradient) engine.convert(value, Gradient.class,
 					control.getDisplay());
-			if (grad.getRGBs().isEmpty()) {
-				return;
-			}
 			Color[] colors = CSSSWTColorHelper.getSWTColors(grad,
 					folder.getDisplay(), engine);
 			int[] percents = CSSSWTColorHelper.getPercents(grad);

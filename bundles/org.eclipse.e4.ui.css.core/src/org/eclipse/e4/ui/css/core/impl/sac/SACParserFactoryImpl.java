@@ -12,7 +12,6 @@ package org.eclipse.e4.ui.css.core.impl.sac;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.e4.ui.css.core.SACConstants;
 import org.eclipse.e4.ui.css.core.sac.SACParserFactory;
 import org.w3c.css.sac.Parser;
@@ -41,14 +40,10 @@ public class SACParserFactoryImpl extends SACParserFactory {
 		super.setPreferredParserName(SACConstants.SACPARSER_BATIK);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.akrogen.tkui.core.css.sac.SACParserFactory#makeParser(java.lang.String)
-	 */
+	@Override
 	public Parser makeParser(String name) throws ClassNotFoundException,
-			IllegalAccessException, InstantiationException,
-			NullPointerException, ClassCastException {
+	IllegalAccessException, InstantiationException,
+	NullPointerException, ClassCastException {
 		String classNameParser = (String) parsers.get(name);
 		if (classNameParser != null) {
 			Class classParser = super.getClass().getClassLoader().loadClass(
