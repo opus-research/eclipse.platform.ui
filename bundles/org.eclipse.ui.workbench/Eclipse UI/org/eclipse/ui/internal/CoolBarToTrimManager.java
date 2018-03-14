@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -692,12 +692,11 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
-				boolean modelVisible = modelItem.isVisible();
-				boolean itemVisible = item.isVisible();
-				if (modelVisible != overridenVisibility || itemVisible != overridenVisibility) {
+				boolean oldVisible = modelItem.isVisible();
+				if (oldVisible != overridenVisibility) {
 					needUpdate = true;
 				}
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, itemVisible);
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
 				modelItem.setVisible(overridenVisibility);
 			} else {
 				return needUpdate;
