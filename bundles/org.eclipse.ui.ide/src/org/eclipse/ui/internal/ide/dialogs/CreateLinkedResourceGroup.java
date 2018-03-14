@@ -277,10 +277,7 @@ public class CreateLinkedResourceGroup {
 		BidiUtils.applyBidiProcessing(linkTargetField, StructuredTextTypeHandlerFactory.FILE);
 		linkTargetField.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				linkTarget = linkTargetField.getText();
-				if (isDefaultConfigurationSelected()) {
-					linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTarget, true);
-				}
+				linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTargetField.getText(), true);
 				resolveVariable();
 				if (updatableResourceName != null) {
 					String value = updatableResourceName.getValue();
@@ -462,8 +459,10 @@ public class CreateLinkedResourceGroup {
 	private void handleLinkTargetBrowseButtonPressed() {
 		IFileStore store = null;
 		String selection = null;
-		FileSystemConfiguration config= getSelectedConfiguration();
-		boolean isDefault = isDefaultConfigurationSelected();
+		FileSystemConfiguration config = getSelectedConfiguration();
+		boolean isDefault = config == null
+				|| (FileSystemSupportRegistry.getInstance()
+						.getDefaultConfiguration()).equals(config);
 
 		if (linkTarget.length() > 0) {
 			store = IDEResourceInfoUtils.getFileStore(linkTarget);
@@ -522,13 +521,6 @@ public class CreateLinkedResourceGroup {
 		if (selection != null) {
 			linkTargetField.setText(selection);
 		}
-	}
-
-	private boolean isDefaultConfigurationSelected() {
-		FileSystemConfiguration config = getSelectedConfiguration();
-		return config == null
-				|| (FileSystemSupportRegistry.getInstance()
-						.getDefaultConfiguration()).equals(config);
 	}
 
 	/**

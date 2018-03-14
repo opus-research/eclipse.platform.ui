@@ -446,10 +446,8 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             if (versionString != null) {
                 return Version.parseVersion(versionString);
             }
-            versionString= props.getProperty(WORKSPACE_CHECK_REFERENCE_BUNDLE_NAME_LEGACY);
-            if (versionString != null) {
-                return Version.parseVersion(versionString);
-            }
+
+            // be graceful if coming from legacy workspaces
             return null;
         } catch (IOException e) {
             IDEWorkbenchPlugin.log("Could not read version file " + versionFile, new Status( //$NON-NLS-1$
