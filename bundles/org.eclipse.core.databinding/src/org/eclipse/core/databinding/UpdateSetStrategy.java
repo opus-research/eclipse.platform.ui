@@ -38,14 +38,21 @@ import org.eclipse.core.runtime.Status;
  * is configured via policies provided on construction of the strategy (e.g.
  * {@link #POLICY_NEVER}, {@link #POLICY_ON_REQUEST}, {@link #POLICY_UPDATE}).
  * </p>
- *
- *
+ * 
+ * @param <S>
+ *            the type of the elements on the source side (i.e. the model side
+ *            if this is a model-to-target update and the target side if this is
+ *            a target-to-model update)
+ * @param <D>
+ *            the type of the elements on the destination side (i.e. the target
+ *            side if this is a model-to-target update and the model side if
+ *            this is a target-to-model update)
  * @see DataBindingContext#bindSet(IObservableSet, IObservableSet,
  *      UpdateSetStrategy, UpdateSetStrategy)
  * @see IConverter
  * @since 1.1
  */
-public class UpdateSetStrategy extends UpdateStrategy {
+public class UpdateSetStrategy<S, D> extends UpdateStrategy {
 
 	/**
 	 * Policy constant denoting that the source observable's state should not be
@@ -82,7 +89,7 @@ public class UpdateSetStrategy extends UpdateStrategy {
 		return i;
 	}
 
-	protected IConverter converter;
+	protected IConverter<S, D> converter;
 
 	private int updatePolicy;
 
@@ -141,8 +148,8 @@ public class UpdateSetStrategy extends UpdateStrategy {
 	 * @param element
 	 * @return the converted element
 	 */
-	public Object convert(Object element) {
-		return converter == null ? element : converter.convert(element);
+	public D convert(S element) {
+		return converter == null ? (D) element : converter.convert(element);
 	}
 
 	/**
@@ -150,13 +157,14 @@ public class UpdateSetStrategy extends UpdateStrategy {
 	 * @param source
 	 * @param destination
 	 */
-	protected void fillDefaults(IObservableSet source,
-			IObservableSet destination) {
+	protected void fillDefaults(IObservableSet<S> source,
+			IObservableSet<D> destination) {
 		Object sourceType = source.getElementType();
 		Object destinationType = destination.getElementType();
 		if (provideDefaults && sourceType != null && destinationType != null) {
 			if (converter == null) {
-				setConverter(createConverter(sourceType, destinationType));
+				setConverter((IConverter<S, D>) createConverter(sourceType,
+						destinationType));
 			}
 		}
 		if (converter != null) {
@@ -185,7 +193,7 @@ public class UpdateSetStrategy extends UpdateStrategy {
 	 * @param converter
 	 * @return the receiver, to enable method call chaining
 	 */
-	public UpdateSetStrategy setConverter(IConverter converter) {
+	public UpdateSetStrategy<S, D> setConverter(IConverter<S, D> converter) {
 		this.converter = converter;
 		return this;
 	}
@@ -198,7 +206,7 @@ public class UpdateSetStrategy extends UpdateStrategy {
 	 * @param element
 	 * @return a status
 	 */
-	protected IStatus doAdd(IObservableSet observableSet, Object element) {
+	protected <E> IStatus doAdd(IObservableSet<E> observableSet, E element) {
 		try {
 			observableSet.add(element);
 		} catch (Exception ex) {
@@ -217,7 +225,8 @@ public class UpdateSetStrategy extends UpdateStrategy {
 	 * @param element
 	 * @return a status
 	 */
-	protected IStatus doRemove(IObservableSet observableSet, Object element) {
+	protected <E> IStatus doRemove(IObservableSet<E> observableSet,
+			Object element) {
 		try {
 			observableSet.remove(element);
 		} catch (Exception ex) {

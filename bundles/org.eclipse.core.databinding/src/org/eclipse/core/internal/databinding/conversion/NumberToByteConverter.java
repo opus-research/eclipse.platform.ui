@@ -27,7 +27,7 @@ public class NumberToByteConverter extends NumberToNumberConverter {
 	 * @param fromType
 	 * @param primitive
 	 */
-	public NumberToByteConverter(NumberFormat numberFormat, Class fromType,
+	public NumberToByteConverter(NumberFormat numberFormat, Class<?> fromType,
 			boolean primitive) {
 		super(numberFormat, fromType, (primitive) ? Byte.TYPE : Byte.class);
 	}
