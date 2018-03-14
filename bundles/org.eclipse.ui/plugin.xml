@@ -98,6 +98,11 @@
             id="org.eclipse.ui.contexts.workbenchMenu"
             name="%context.workbenchMenu.name">
       </context>
+      <context
+			description="%context.workbench.description"
+			id="org.eclipse.ui.contexts.workbench"
+			name="%context.workbench.name">
+	  </context>
    </extension>
    
    <extension point="org.eclipse.ui.bindings">
