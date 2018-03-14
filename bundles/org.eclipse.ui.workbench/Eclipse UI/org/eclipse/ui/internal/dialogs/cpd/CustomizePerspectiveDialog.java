@@ -537,12 +537,23 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
-		String title = perspective.getDesc().getLabel();
 
+		String title = getPerspectiveTitle();
 		title = NLS.bind(WorkbenchMessages.ActionSetSelection_customize, title);
 		shell.setText(title);
 		window.getWorkbench().getHelpSystem().setHelp(shell,
 				IWorkbenchHelpContextIds.ACTION_SET_SELECTION_DIALOG);
+	}
+	
+	private String getPerspectiveTitle() {
+		IPerspectiveDescriptor descriptor = perspective.getDesc();
+		String title;
+		if (descriptor == null) {
+			title = WorkbenchMessages.MissingPerspective_title;
+		} else {
+			title = descriptor.getLabel();
+		}
+		return title;
 	}
 
 	@Override
@@ -595,8 +606,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Select... label
 		Label label = new Label(menusComposite, SWT.WRAP);
 		label.setText(NLS.bind(
-				WorkbenchMessages.Shortcuts_selectShortcutsLabel, perspective
-						.getDesc().getLabel()));
+				WorkbenchMessages.Shortcuts_selectShortcutsLabel, getPerspectiveTitle()));
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		label.setLayoutData(data);
 
@@ -764,7 +774,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		Label label = new Label(actionSetsComposite, SWT.WRAP);
 		label.setText(NLS.bind(
 				WorkbenchMessages.ActionSetSelection_selectActionSetsLabel,
-				perspective.getDesc().getLabel()));
+				getPerspectiveTitle()));
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		label.setLayoutData(data);
 
