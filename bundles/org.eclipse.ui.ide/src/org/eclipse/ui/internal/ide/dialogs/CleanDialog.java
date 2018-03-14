@@ -11,7 +11,6 @@
  *     Mark Melvin <mark_melvin@amis.com>
  *     Christian Georgi <christian.georgi@sap.com> -  [IDE] Clean dialog should scroll to reveal selected projects - http://bugs.eclipse.org/415522
  *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 462760
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -121,8 +120,8 @@ public class CleanDialog extends MessageDialog {
     public CleanDialog(IWorkbenchWindow window, IProject[] selection) {
         super(
                 window.getShell(),
-                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, 0,
-                	IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL);
+                IDEWorkbenchMessages.CleanDialog_title, null, getQuestion(), NONE, new String[] {
+                IDialogConstants.OK_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
         this.window = window;
         this.selection = selection;
         if (this.selection == null) {
