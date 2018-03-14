@@ -62,7 +62,6 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	 * @return An identifier used to determine whether the filter is visible.
 	 *         May not be unique.
 	 */
-	@Override
 	public String getId() {
 		return id;
 	}
@@ -71,7 +70,6 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	 * 
 	 * @return A translated name to identify the filter
 	 */
-	@Override
 	public String getName() {
 		return element.getAttribute(ATT_NAME);
 	}
@@ -81,7 +79,6 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	 * @return A translated description to explain to the user what the defined
 	 *         filter will hide from the view.
 	 */
-	@Override
 	public String getDescription() {
 		return element.getAttribute(ATT_DESCRIPTION);
 	}
@@ -90,7 +87,6 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 	 * 
 	 * @return Indicates the filter should be in an "Active" state by default.
 	 */
-	@Override
 	public boolean isActiveByDefault() {
 		return Boolean.valueOf(element.getAttribute(ATT_ACTIVE_BY_DEFAULT))
 				.booleanValue();
@@ -117,7 +113,6 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 		final ViewerFilter[] filter = new ViewerFilter[1];
 
 		SafeRunner.run(new NavigatorSafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				if (filterExpression != null) {
 					if (element.getAttribute(ATT_CLASS) != null) {
@@ -145,7 +140,11 @@ public class CommonFilterDescriptor implements ICommonFilterDescriptor,
 		return SkeletonViewerFilter.INSTANCE;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return "CommonFilterDescriptor[" + getName() + " (" + getId() + ")]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
 	}

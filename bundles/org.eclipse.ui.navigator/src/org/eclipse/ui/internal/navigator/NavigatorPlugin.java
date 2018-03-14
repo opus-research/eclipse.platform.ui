@@ -61,7 +61,6 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		
 		private ListenerList messages = new ListenerList() {
 			
-			@Override
 			public synchronized Object[] getListeners() {
 				Object[] mesgs = super.getListeners();
 				clear();
@@ -79,7 +78,9 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 			setSystem(true); 
 		}
 		
-		@Override
+		/* (non-Javadoc)
+		 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+		 */
 		protected IStatus run(IProgressMonitor monitor) {
 			
 			Object[] mesgs = messages.getListeners();
@@ -107,7 +108,6 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 	public static String PLUGIN_ID = "org.eclipse.ui.navigator"; //$NON-NLS-1$
 
 	private BundleListener bundleListener = new BundleListener() {
-		@Override
 		public void bundleChanged(BundleEvent event) {
 			NavigatorSaveablesService.bundleChanged(event);
 		}
@@ -237,12 +237,10 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		Expression expression;
 		IEvaluationContext scope;
 
-		@Override
 		public void handleException(Throwable exception) {
 			result = EvaluationResult.FALSE;
 		}
 
-		@Override
 		public void run() throws Exception {
 			result = expression.evaluate(scope);
 		}
@@ -290,14 +288,12 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 		return createStatus(IStatus.ERROR, aCode, aMessage, exception);
 	}
 
-	@Override
 	public void start(BundleContext context) throws Exception {
 		// System.out.println("Navigator plugin starting"); //$NON-NLS-1$
 		super.start(context);
 		context.addBundleListener(bundleListener);
 	}
 
-	@Override
 	public void stop(BundleContext context) throws Exception {
 		context.removeBundleListener(bundleListener);
 		super.stop(context);

@@ -22,7 +22,6 @@ import org.eclipse.ui.internal.views.navigator.ResourceNavigatorMessages;
  * The FilterSelectionAction opens the filters dialog.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class FilterSelectionAction extends ResourceNavigatorAction {
     private static final String FILTER_TOOL_TIP = ResourceNavigatorMessages.FilterSelection_toolTip;
 
@@ -47,8 +46,7 @@ public class FilterSelectionAction extends ResourceNavigatorAction {
     /*
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         IResourceNavigator navigator = getNavigator();
         ResourcePatternFilter filter = navigator.getPatternFilter();
         FiltersContentProvider contentProvider = new FiltersContentProvider(

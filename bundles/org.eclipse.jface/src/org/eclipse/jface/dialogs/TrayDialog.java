@@ -208,6 +208,9 @@ public abstract class TrayDialog extends Dialog {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.window.Window#handleShellCloseEvent()
+	 */
 	@Override
 	protected void handleShellCloseEvent() {
 		/*
@@ -221,6 +224,9 @@ public abstract class TrayDialog extends Dialog {
 		super.handleShellCloseEvent();
 	}
 	
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+     */
 	@Override
 	protected Control createButtonBar(Composite parent) {
     	Composite composite = new Composite(parent, SWT.NONE);
