@@ -27,6 +27,4 @@ Import-Package: javax.annotation;version="1.1.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.e4.ui.progress
-Require-Capability: osgi.extender;
- filter:="(&(osgi.extender=osgi.component)(version>=1.2)(!(version>=2.0)))"
 Service-Component: OSGI-INF/progress.xml
