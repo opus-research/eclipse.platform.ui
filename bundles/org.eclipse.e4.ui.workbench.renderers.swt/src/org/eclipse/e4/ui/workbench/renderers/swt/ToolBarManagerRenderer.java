@@ -56,6 +56,7 @@ import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManagerOverrides;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
@@ -169,8 +170,15 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					return;
 				}
 				ici.setVisible(itemModel.isVisible());
-				ToolBarManager parent = (ToolBarManager) ((ContributionItem) ici)
-						.getParent();
+
+				ToolBarManager parent = null;
+				if (ici instanceof ContributionItem) {
+					parent = (ToolBarManager) ((ContributionItem) ici)
+							.getParent();
+				} else if (ici instanceof MenuManager) {
+					parent = (ToolBarManager) ((MenuManager) ici).getParent();
+				}
+
 				if (parent != null) {
 					parent.markDirty();
 					parent.update(true);
