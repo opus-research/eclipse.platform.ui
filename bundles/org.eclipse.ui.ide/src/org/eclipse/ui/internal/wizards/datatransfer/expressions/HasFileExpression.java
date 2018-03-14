@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 Red Hat Inc., and others
+ * Copyright (c) 2014-2015 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,37 +21,16 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Path;
 
-/**
- * Expression to check whether a given container (IContainer or folder typed as
- * {@link File}) contains a file with provided name as a direct child.
- *
- * @since 3.12
- */
 public class HasFileExpression extends Expression {
 
-	/**
-	 * The name of the XML tag to use this rule in a plugin.xml
-	 */
 	public static final String TAG = "hasFile"; //$NON-NLS-1$
 
 	String path;
 
-	/**
-	 * Build expression with a path.
-	 *
-	 * @param path
-	 *            path where to look for a file under given container.
-	 */
 	public HasFileExpression(String path) {
 		this.path = path;
 	}
 
-	/**
-	 * Build expression retrieving the suffix as the 'path' attribute on the
-	 * provided {@link IConfigurationElement}.
-	 *
-	 * @param element
-	 */
 	public HasFileExpression(IConfigurationElement element) {
 		this(element.getAttribute("path")); //$NON-NLS-1$
 	}

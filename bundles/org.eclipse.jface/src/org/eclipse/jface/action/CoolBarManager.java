@@ -594,7 +594,7 @@ public class CoolBarManager extends ContributionManager implements
                 IContributionItem cbItem = rowIterator
                         .next();
                 if (displayedItems.contains(cbItem)) {
-					existingVisibleRows.add(Integer.valueOf(numRow));
+                    existingVisibleRows.add(new Integer(numRow));
                     break;
                 }
                 if (cbItem.isSeparator()) {
@@ -624,7 +624,7 @@ public class CoolBarManager extends ContributionManager implements
                     row++;
                 }
             } else {
-				itemLocation.put(item, Integer.valueOf(row));
+                itemLocation.put(item, new Integer(row));
             }
 
         }

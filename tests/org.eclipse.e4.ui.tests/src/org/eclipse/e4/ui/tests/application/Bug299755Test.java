@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,7 @@ public class Bug299755Test {
 	public void testBug299755() throws Exception {
 		// create a top-level context
 		IEclipseContext windowContext = EclipseContextFactory.create();
-		windowContext.set(Object.class, new Object());
+		windowContext.set(Object.class.getName(), new Object());
 		// put the event broker inside
 		windowContext.set(InjectionObject.class.getName(),
 				new ContextFunction() {

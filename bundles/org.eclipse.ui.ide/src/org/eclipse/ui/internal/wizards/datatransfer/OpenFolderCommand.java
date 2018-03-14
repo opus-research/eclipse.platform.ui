@@ -44,7 +44,7 @@ public class OpenFolderCommand extends AbstractHandler {
 		IWorkbench workbench = PlatformUI.getWorkbench();
 		this.shell = workbench.getActiveWorkbenchWindow().getShell();
 		DirectoryDialog directoryDialog = new DirectoryDialog(shell);
-		directoryDialog.setText(DataTransferMessages.SmartImportWizardPage_selectFolderOrArchiveToImport);
+		directoryDialog.setText(DataTransferMessages.selectFolderToImport);
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		directoryDialog.setFilterPath(workspaceRoot.getLocation().toFile().toString());
 		ISelection sel = workbench.getActiveWorkbenchWindow().getSelectionService().getSelection();
@@ -52,7 +52,7 @@ public class OpenFolderCommand extends AbstractHandler {
 		if (sel != null && sel instanceof IStructuredSelection) {
 			structuredSel = (IStructuredSelection)sel;
 			if (!structuredSel.isEmpty()) {
-				File selectedFile = SmartImportWizard.toFile(structuredSel.getFirstElement());
+				File selectedFile = EasymportWizard.toFile(structuredSel.getFirstElement());
 				if (selectedFile != null) {
 					directoryDialog.setFilterPath(selectedFile.getAbsolutePath());
 				}
@@ -62,9 +62,9 @@ public class OpenFolderCommand extends AbstractHandler {
 		if (res == null) {
 			return null;
 		}
-		SmartImportWizard wizard = new SmartImportWizard();
+		EasymportWizard wizard = new EasymportWizard();
 		final File directory = new File(res);
-		wizard.setInitialImportSource(directory);
+		wizard.setInitialDirectory(directory);
 		// inherit workingSets
 		final Path asPath = new Path(directory.getAbsolutePath());
 		IProject parentProject = null;
@@ -88,8 +88,7 @@ public class OpenFolderCommand extends AbstractHandler {
 		} else {
 			wizard.setInitialWorkingSets(initialWorkingSets);
 		}
-		new WizardDialog(workbench.getActiveWorkbenchWindow().getShell(), wizard).open();
-		return null;
+		return new WizardDialog(workbench.getActiveWorkbenchWindow().getShell(), wizard).open();
 	}
 
 }

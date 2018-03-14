@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 Red Hat Inc., and others
+ * Copyright (c) 2014-2015 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,13 +27,6 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 
-/**
- * A {@link ProjectConfigurator} that detects Eclipse projects (folder with
- * .project)
- *
- * @since 3.12
- *
- */
 public class EclipseProjectConfigurator implements ProjectConfigurator {
 
 	@Override

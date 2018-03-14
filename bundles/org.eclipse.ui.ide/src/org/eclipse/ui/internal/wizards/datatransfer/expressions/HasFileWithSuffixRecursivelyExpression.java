@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 Red Hat Inc., and others
+ * Copyright (c) 2014-2015 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,40 +16,20 @@ import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IConfigurationElement;
 
-/**
- * Expression to check whether a given {@link IContainer} contains a file with
- * provided suffix.
- *
- * @since 3.12
- */
 public class HasFileWithSuffixRecursivelyExpression extends Expression {
 
-	/**
-	 * The name of the XML tag to use this rule in a plugin.xml
-	 */
 	public static final String TAG = "hasFileWithSuffixRecursively"; //$NON-NLS-1$
 
 	private String suffix;
 
-	/**
-	 * Build expression with a suffix.
-	 *
-	 * @param suffix
-	 */
 	public HasFileWithSuffixRecursivelyExpression(String suffix) {
 		this.suffix = suffix;
 	}
 
-	/**
-	 * Build expression retrieving the suffix as the 'suffix' attribute on the
-	 * provided {@link IConfigurationElement}.
-	 *
-	 * @param element
-	 */
 	public HasFileWithSuffixRecursivelyExpression(IConfigurationElement element) {
 		this(element.getAttribute("suffix")); //$NON-NLS-1$
 	}
@@ -57,7 +37,12 @@ public class HasFileWithSuffixRecursivelyExpression extends Expression {
 	@Override
 	public EvaluationResult evaluate(IEvaluationContext context) throws CoreException {
 		Object root = context.getDefaultVariable();
-		IContainer container = Adapters.adapt(root, IContainer.class);
+		IContainer container = null;
+		if (root instanceof IContainer) {
+			container = (IContainer)root;
+		} else if (root instanceof IAdaptable) {
+			container = ((IAdaptable)root).getAdapter(IContainer.class);
+		}
 		if (container != null) {
 			RecursiveSuffixFileFinder finder = new RecursiveSuffixFileFinder();
 			container.accept(finder);
@@ -71,7 +56,7 @@ public class HasFileWithSuffixRecursivelyExpression extends Expression {
 		private boolean res = false;
 
 		@Override
-		public boolean visit(IResource resource) {
+		public boolean visit(IResource resource) throws CoreException {
 			if (resource.getType() == IResource.FILE && resource.getName().endsWith(HasFileWithSuffixRecursivelyExpression.this.suffix)) {
 				this.res = true;
 			}

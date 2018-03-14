@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -116,8 +116,6 @@ public class DataTransferMessages extends NLS {
 	public static String DataTransfer_exportProblems;
 
 	public static String ExportFile_overwriteExisting;
-	public static String ExportFile_resolveLinkedResources;
-
 	public static String FileExport_selectDestinationTitle;
 	public static String FileExport_selectDestinationMessage;
 	public static String FileExport_exportLocalFileSystem;
@@ -152,53 +150,59 @@ public class DataTransferMessages extends NLS {
 	public static String TarImport_invalid_tar_format;
 
 	// Smart import
-	public static String SmartImportWizardPage_selectFolderOrArchiveToImport;
-	public static String SmartImportProposals_alreadyImportedAsProject_title;
-	public static String SmartImportProposals_anotherProjectWithSameNameExists_description;
+	public static String selectFolderToImport;
+	public static String alreadyImportedAsProject_title;
+	public static String alreadyImportedAsProject_description;
+	public static String anotherProjectWithSameNameExists_title;
+	public static String anotherProjectWithSameNameExists_description;
+	public static String importProject;
 
-	public static String SmartImportWizardPage_importProjectsInFolderTitle;
-	public static String SmartImportWizardPage_importProjectsInFolderDescription;
-	public static String SmartImportWizardPage_selectRootDirectory;
-	public static String SmartImportWizardPage_incorrectRootDirectory;
-	public static String SmartImportWizardPage_browse;
-	public static String SmartImportWizardPage_workingSets;
-	public static String SmartImportWizardPage_detectNestedProjects;
-	public static String SmartImportWizardPage_configureProjects;
-	public static String SmartImportWizardPage_showAvailableDetectors;
-	public static String SmartImportWizardPage_availableDetectors_title;
-	public static String SmartImportWizardPage_availableDetectors_description;
-	public static String SmartImportWizardPage_selectArchiveButton;
-	public static String SmartImportWizardPage_selectArchiveTitle;
-	public static String SmartImportWizardPage_allSupportedArchives;
-	public static String SmartImportWizardPage_expandingArchive;
-	public static String SmartImportWizardPage_overwriteArchiveDirectory_title;
-	public static String SmartImportWizardPage_overwriteArchiveDirectory_message;
-	public static String SmartImportWizardPage_incompleteExpand_title;
-	public static String SmartImportWizardPage_incompleteExpand_message;
+	public static String eclipseProjectConfigurationLabel;
 
-	public static String SmartImportJob_discardRootProject_title;
-	public static String SmartImportJob_discardRootProject_description;
-	public static String SmartImportProposals_selectionSummary;
-	public static String SmartImportProposals_folder;
-	public static String SmartImportProposals_importAs;
+	public static String EasymportWizardPage_importProjectsInFolderTitle;
+	public static String EasymportWizardPage_importProjectsInFolderDescription;
+	public static String EasymportWizardPage_selectRootDirectory;
+	public static String EasymportWizardPage_incorrectRootDirectory;
+	public static String EasymportWizardPage_browse;
+	public static String EasymportWizardPage_workingSets;
+	public static String EasymportWizardPage_detectNestedProjects;
+	public static String EasymportWizardPage_importRawProject;
+	public static String EasymportWizardPage_importAndConfigureProject;
+	public static String EasymportWizardPage_showAvailableDetectors;
+	public static String EasymportWizardPage_availableDetectors_title;
+	public static String EasymportWizardPage_availableDetectors_description;
 
-	public static String SmartImportReport_importedProjects;
-	public static String SmartImportReport_importedProjectsWithCount;
-	public static String SmartImportReport_relativePath;
-	public static String SmartImportReport_project;
-	public static String SmartImportReport_natures;
-	public static String SmartImportReport_importErrors;
-	public static String SmartImportReport_error;
+	public static String preliminaryDetection_Title;
+	public static String preliminaryDetection_Description;
+	public static String discardRootProject_title;
+	public static String discardRootProject_description;
+	public static String didntFindImportProposals_title;
+	public static String didntFindImportProposals_message;
+	public static String selectionSummary;
+	public static String folder;
+	public static String importAs;
 
-	public static String SmartImportJob_detectAndConfigureProjects;
-	public static String SmartImportJob_configuringSelectedDirectories;
-	public static String SmartImportJob_configuring;
-	public static String SmartImportJob_crawling;
-	public static String SmartImportJob_continuingConfiguration;
-	public static String SmartImportJob_inspecting;
-	public static String SmartImportJob_importingProjectIntoWorkspace;
+	public static String EasymportWizardPage_importedProjects;
+	public static String EasymportWizardPage_importedProjectsWithCount;
+	public static String EasymportWizardPage_progressBarTooltip;
+	public static String EasymportWizardPage_relativePath;
+	public static String EasymportWizardPage_project;
+	public static String EasymportWizardPage_natures;
+	public static String EasymportWizardPage_importErrors;
+	public static String EasymportWizardPage_error;
+	public static String importReport_completed;
+	public static String importReport_aborted;
 
-
+	public static String importJob_detectAndConfigureProjects;
+	public static String importerJob_configuringSelectedDirectories;
+	public static String importerJob_configuring;
+	public static String importerJob_crawling;
+	public static String importerJob_continuingConfiguration;
+	public static String importerJob_inspecting;
+	public static String importerJob_importingProjectIntoWorkspace;
+	public static String importerProposals_additionalAnalysis;
+	public static String sorry;
+	public static String internalError;
 
 	static {
 		// load message values from bundle file

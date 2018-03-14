@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014-2016 Red Hat Inc., and others
+ * Copyright (c) 2014-2015 Red Hat Inc., and others
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,13 +32,6 @@ import org.eclipse.ui.internal.wizards.datatransfer.expressions.FileExpressionHa
 import org.eclipse.ui.wizards.datatransfer.ProjectConfigurator;
 import org.osgi.framework.Bundle;
 
-/**
- * Manages and requests the active {@link ProjectConfigurator} extensions for an
- * {@link SmartImportJob} execution.
- *
- * @since 3.12
- *
- */
 public class ProjectConfiguratorExtensionManager {
 
 	private static final String EXTENSION_POINT_ID = IDEWorkbenchPlugin.IDE_WORKBENCH + ".projectConfigurators"; //$NON-NLS-1$
@@ -141,7 +134,7 @@ public class ProjectConfiguratorExtensionManager {
 	 * @return The active connectors for given folder, order is important: top-priority are 1st
 	 */
 	public List<ProjectConfigurator> getAllActiveProjectConfigurators(File folder) {
-		Assert.isTrue(folder.isDirectory(), folder.getAbsolutePath());
+		Assert.isTrue(folder.isDirectory());
 		return this.getAllActiveProjectConfiguratorsUntyped(folder);
 	}
 
@@ -155,14 +148,11 @@ public class ProjectConfiguratorExtensionManager {
 				IDEWorkbenchPlugin.log(ex.getMessage(), ex);
 				return null;
 			}
+		} else {
+			return this.configuratorsByExtension.get(extension);
 		}
-		return this.configuratorsByExtension.get(extension);
 	}
 
-	/**
-	 *
-	 * @return the label of all known {@link ProjectConfigurator}s
-	 */
 	public static List<String> getAllExtensionLabels() {
 		IConfigurationElement[] extensions = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
 		List<String> res = new ArrayList<>(extensions.length);
@@ -172,11 +162,6 @@ public class ProjectConfiguratorExtensionManager {
 		return res;
 	}
 
-	/**
-	 *
-	 * @param configurator
-	 * @return the internationalized label for the provided configurator
-	 */
 	public static String getLabel(ProjectConfigurator configurator) {
 		IConfigurationElement[] extensions = Platform.getExtensionRegistry().getConfigurationElementsFor(EXTENSION_POINT_ID);
 		for (IConfigurationElement extension : extensions) {
