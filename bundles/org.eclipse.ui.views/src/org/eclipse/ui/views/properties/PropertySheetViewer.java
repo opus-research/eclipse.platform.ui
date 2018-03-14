@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
  *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
+ *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -114,7 +115,7 @@ class PropertySheetViewer extends Viewer {
 	private IStatusLineManager statusLineManager;
 
 	// Cell editor activation listeners
-	private ListenerList<ICellEditorActivationListener> activationListeners = new ListenerList<>();
+	private ListenerList activationListeners = new ListenerList();
 
 	// the property sheet sorter
 	private PropertySheetSorter sorter = new PropertySheetSorter();
@@ -358,7 +359,7 @@ class PropertySheetViewer extends Viewer {
 	 * its user data field, and adds a listener to the node if it is an entry.
 	 *
 	 * @param node
-	 *          the entry or category associated with this item
+	 *			the entry or category associated with this item
 	 * @param parent
 	 *			the parent widget
 	 * @param index
@@ -392,7 +393,8 @@ class PropertySheetViewer extends Viewer {
 
 		// add our listener
 		if (node instanceof IPropertySheetEntry) {
-			((IPropertySheetEntry) node).addPropertySheetEntryListener(entryListener);
+			((IPropertySheetEntry) node)
+					.addPropertySheetEntryListener(entryListener);
 		}
 
 		// update the visual presentation
@@ -424,7 +426,8 @@ class PropertySheetViewer extends Viewer {
 	 * listeners.
 	 */
 	private void entrySelectionChanged() {
-		SelectionChangedEvent changeEvent = new SelectionChangedEvent(this, getSelection());
+		SelectionChangedEvent changeEvent = new SelectionChangedEvent(this,
+				getSelection());
 		fireSelectionChanged(changeEvent);
 	}
 
@@ -492,8 +495,10 @@ class PropertySheetViewer extends Viewer {
 	 *			the activated cell editor
 	 */
 	private void fireCellEditorActivated(CellEditor activatedCellEditor) {
-		for (ICellEditorActivationListener listener : activationListeners) {
-			listener.cellEditorActivated(activatedCellEditor);
+		Object[] listeners = activationListeners.getListeners();
+		for (Object listener : listeners) {
+			((ICellEditorActivationListener) listener)
+					.cellEditorActivated(activatedCellEditor);
 		}
 	}
 
@@ -505,8 +510,10 @@ class PropertySheetViewer extends Viewer {
 	 *			the deactivated cell editor
 	 */
 	private void fireCellEditorDeactivated(CellEditor activatedCellEditor) {
-		for (ICellEditorActivationListener listener : activationListeners) {
-			listener.cellEditorDeactivated(activatedCellEditor);
+		Object[] listeners = activationListeners.getListeners();
+		for (Object listener : listeners) {
+			((ICellEditorActivationListener) listener)
+					.cellEditorDeactivated(activatedCellEditor);
 		}
 	}
 
@@ -539,7 +546,7 @@ class PropertySheetViewer extends Viewer {
 	 *  (element type <code>IPropertySheetEntry</code> or
 	 *  <code>PropertySheetCategory</code>)
 	 */
-	private List<?> getChildren(Object node) {
+	private List<Object> getChildren(Object node) {
 		// cast the entry or category
 		IPropertySheetEntry entry = null;
 		PropertySheetCategory category = null;
@@ -550,7 +557,7 @@ class PropertySheetViewer extends Viewer {
 		}
 
 		// get the child entries or categories
-		List<?> children;
+		List<Object> children;
 		if (category == null) {
 			children = getChildren(entry);
 		} else {
@@ -567,7 +574,7 @@ class PropertySheetViewer extends Viewer {
 	 * @return the children of the given entry (element type
 	 *		 <code>IPropertySheetEntry</code>)
 	 */
-	private List<?> getChildren(IPropertySheetEntry entry) {
+	private List<Object> getChildren(IPropertySheetEntry entry) {
 		// if the entry is the root and we are showing categories, and we have
 		// more than the
 		// defualt category, return the categories
@@ -576,7 +583,7 @@ class PropertySheetViewer extends Viewer {
 					|| (categories.length == 1 && !categories[0]
 							.getCategoryName().equals(
 									MISCELLANEOUS_CATEGORY_NAME))) {
-				return Arrays.asList(categories);
+				return Arrays.asList((Object[]) categories);
 			}
 		}
 
@@ -592,7 +599,7 @@ class PropertySheetViewer extends Viewer {
 	 * @return the children of the given category (element type
 	 *		 <code>IPropertySheetEntry</code>)
 	 */
-	private List<IPropertySheetEntry> getChildren(PropertySheetCategory category) {
+	private List<Object> getChildren(PropertySheetCategory category) {
 		return getSortedEntries(getFilteredEntries(category.getChildEntries()));
 	}
 
@@ -643,11 +650,11 @@ class PropertySheetViewer extends Viewer {
 	 *			unsorted list of <code>IPropertySheetEntry</code>
 	 * @return a sorted list of the specified entries
 	 */
-	private List<IPropertySheetEntry> getSortedEntries(List<IPropertySheetEntry> unsortedEntries) {
+	private List<Object> getSortedEntries(List<IPropertySheetEntry> unsortedEntries) {
 		IPropertySheetEntry[] propertySheetEntries = unsortedEntries
 				.toArray(new IPropertySheetEntry[unsortedEntries.size()]);
 		sorter.sort(propertySheetEntries);
-		return Arrays.asList(propertySheetEntries);
+		return Arrays.asList((Object[]) propertySheetEntries);
 	}
 
 
@@ -929,9 +936,9 @@ class PropertySheetViewer extends Viewer {
 		IStructuredSelection selection = (IStructuredSelection) getSelection();
 
 		// Iterate over entries and reset them
-		Iterator<IPropertySheetEntry> itr = selection.iterator();
+		Iterator<Object> itr = selection.iterator();
 		while (itr.hasNext()) {
-			itr.next().resetPropertyValue();
+			((IPropertySheetEntry) itr.next()).resetPropertyValue();
 		}
 	}
 
@@ -1117,7 +1124,8 @@ class PropertySheetViewer extends Viewer {
 				addMisc = true;
 				categoriesToRemove.remove(misc);
 			} else {
-				PropertySheetCategory category = categoryCache.get(categoryName);
+				PropertySheetCategory category = categoryCache
+						.get(categoryName);
 				if (category == null) {
 					category = new PropertySheetCategory(categoryName);
 					categoryCache.put(categoryName, category);
@@ -1136,7 +1144,7 @@ class PropertySheetViewer extends Viewer {
 		// Sort the categories.
 		// Rather than just sorting categoryCache.values(), we'd like the original order to be preserved
 		// (with misc added at the end, if needed) before passing to the sorter.
-		ArrayList<PropertySheetCategory> categoryList = new ArrayList<>();
+		List<PropertySheetCategory> categoryList = new ArrayList<>();
 		Set<String> seen = new HashSet<>(childEntries.size());
 		for (int i = 0; i < childEntries.size(); i++) {
 			IPropertySheetEntry childEntry = childEntries
@@ -1154,8 +1162,7 @@ class PropertySheetViewer extends Viewer {
 			categoryList.add(misc);
 		}
 
-		PropertySheetCategory[] categoryArray = categoryList
-			.toArray(new PropertySheetCategory[categoryList.size()]);
+		PropertySheetCategory[] categoryArray = categoryList.toArray(new PropertySheetCategory[categoryList.size()]);
 		sorter.sort(categoryArray);
 		categories = categoryArray;
 	}
@@ -1253,7 +1260,7 @@ class PropertySheetViewer extends Viewer {
 			// update the categories
 			updateCategories();
 		}
-		List<?> children = getChildren(node);
+		List<Object> children = getChildren(node);
 
 		// remove items
 		Set<Object> set = new HashSet<>(childItems.length * 2 + 1);
@@ -1401,27 +1408,5 @@ class PropertySheetViewer extends Viewer {
 			new TreeItem(item, SWT.NULL); // append a dummy to create the
 			// plus sign
 		}
-	}
-
-	void dispose() {
-		if (tree != null && !tree.isDisposed()) {
-			tree.dispose();
-		}
-		if (rootEntry != null) {
-			if (entryListener != null) {
-				rootEntry.removePropertySheetEntryListener(entryListener);
-			}
-			rootEntry = null;
-		}
-		activationListeners.clear();
-		entryToItemMap.clear();
-		cellEditor = null;
-		editorListener = null;
-		entryListener = null;
-		input = null;
-		sorter = null;
-		statusLineManager = null;
-		tree = null;
-		treeEditor = null;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.ui.internal.activities.ws;
 
 import java.util.ArrayList;
+
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -146,7 +147,7 @@ public class TriggerPointAdvisorRegistry {
 						IStatus status = new Status(
 								IStatus.ERROR,
 								elements[j].getDeclaringExtension()
-										.getNamespaceIdentifier(),
+										.getNamespace(),
 								IStatus.ERROR,
 								"triggerPointAdvisorId and productId must be defined.", new IllegalArgumentException()); //$NON-NLS-1$
 						WorkbenchPlugin

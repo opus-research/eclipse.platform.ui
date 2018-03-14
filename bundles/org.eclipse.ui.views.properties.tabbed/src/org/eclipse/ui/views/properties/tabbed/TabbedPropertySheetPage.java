@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -321,8 +321,8 @@ public class TabbedPropertySheetPage
 			 * Is the part is a IContributedContentsView for the contributor,
 			 * for example, outline view.
 			 */
-			IContributedContentsView view = (IContributedContentsView) Adapters.adapt(part,
-					IContributedContentsView.class);
+			IContributedContentsView view = (IContributedContentsView) Adapters.getAdapter(part,
+					IContributedContentsView.class, true);
 			if (view == null
 				|| (view.getContributingPart() != null && !view
 					.getContributingPart().equals(contributor))) {
@@ -868,7 +868,8 @@ public class TabbedPropertySheetPage
      * @return the TabbedPropertySheetPageContributor or null if not applicable
      */
 	private ITabbedPropertySheetPageContributor getTabbedPropertySheetPageContributor(Object object) {
-		return (ITabbedPropertySheetPageContributor) Adapters.adapt(object, ITabbedPropertySheetPageContributor.class);
+		return (ITabbedPropertySheetPageContributor) Adapters.getAdapter(object,
+				ITabbedPropertySheetPageContributor.class, true);
 	}
 
 	/**

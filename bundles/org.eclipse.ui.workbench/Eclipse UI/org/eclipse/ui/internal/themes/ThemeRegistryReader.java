@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -115,7 +115,7 @@ public class ThemeRegistryReader extends RegistryReader {
 		}
 
         return new ThemeElementCategory(name, id, parentId, description,
-				element.getNamespaceIdentifier(), element);
+                element.getNamespace(), element);
     }
 
     /**
@@ -162,7 +162,7 @@ public class ThemeRegistryReader extends RegistryReader {
 
         return new ColorDefinition(name, id, defaultMapping, value, categoryId,
                 isEditable, description, element.getDeclaringExtension()
-						.getNamespaceIdentifier());
+                        .getNamespace());
     }
 
     /**

@@ -12,10 +12,6 @@
 
 package org.eclipse.ui.tests.statushandlers;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -54,11 +50,8 @@ import org.eclipse.ui.statushandlers.AbstractStatusAreaProvider;
 import org.eclipse.ui.statushandlers.IStatusAdapterConstants;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ui.statushandlers.StatusManager.INotificationListener;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.eclipse.ui.statushandlers.WorkbenchStatusDialogManager;
-import org.eclipse.ui.tests.concurrency.FreezeMonitor;
-import org.eclipse.ui.tests.harness.util.UITestCase;
 
 import junit.framework.TestCase;
 
@@ -80,12 +73,11 @@ public class StatusDialogManagerTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();
 		automatedMode = ErrorDialog.AUTOMATED_MODE;
 		wsdm = new WorkbenchStatusDialogManager(null, null);
 		ErrorDialog.AUTOMATED_MODE = false;
 		wsdm.setProperty(IStatusDialogConstants.ANIMATION, Boolean.FALSE);
-		FreezeMonitor.expectCompletionIn(60_000);
+		super.setUp();
 	}
 
 	public void testBlockingAppearance() {
@@ -582,26 +574,10 @@ public class StatusDialogManagerTest extends TestCase {
 		// this verifies if support is opened for correct statusAdapter
 		openSupportArea(statusAdapter1, passed);
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertEquals(statusAdapter2, passed[0]);
-	}
-
-	private void processRemainingUiEvents() {
-		UITestCase.processEvents();
-		int count = 0;
-		while (count < 3 && (StatusDialogUtil.getStatusShell() != null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-	}
-
-	private void assertStatusShellOpen() {
-		int count = 0;
-		while (count < 42 && (StatusDialogUtil.getStatusShell() == null)) {
-			UITestCase.processEvents();
-			count++;
-		}
-		assertNotNull("Status shell was not shown!", StatusDialogUtil.getStatusShell());
 	}
 
 	/**
@@ -628,7 +604,10 @@ public class StatusDialogManagerTest extends TestCase {
 
 		assertNotNull(details[0]);
 		assertFalse(details[0].isDisposed());
-		processRemainingUiEvents();
+		//process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 
 		assertEquals(statusAdapter2, passed[0]);
 	}
@@ -654,7 +633,10 @@ public class StatusDialogManagerTest extends TestCase {
 
 		selectTable(table, 1);
 
-		processRemainingUiEvents();
+		// process all remaining events
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 
 		assertEquals(MESSAGE_2, titleLabel.getText());
 		assertEquals(JOB_NAME, table.getItem(1).getText());
@@ -764,7 +746,7 @@ public class StatusDialogManagerTest extends TestCase {
 	}
 
 	//error link present
-	public void testBug278965_1() {
+	public void testBug278965_1(){
 		final WorkbenchStatusDialogManager wsdm[] = new WorkbenchStatusDialogManager[] { null };
 		WorkbenchErrorHandler weh = new WorkbenchErrorHandler() {
 
@@ -778,22 +760,14 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW | StatusManager.LOG);
 		assertEquals(1, wsdm[0].getStatusAdapters().size());
-
-		assertStatusShellOpen();
-
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
 
 	//error link hidden
@@ -832,21 +806,14 @@ public class StatusDialogManagerTest extends TestCase {
 		};
 		weh.handle(createStatusAdapter(MESSAGE_1), StatusManager.SHOW);
 		weh.handle(createStatusAdapter(MESSAGE_2), StatusManager.SHOW | StatusManager.LOG);
-
-		assertStatusShellOpen();
-		Link errorLogLink = StatusDialogUtil.getErrorLogLink();
-		if (errorLogLink == null) {
-			// TODO test fails in Gerrit, but passes with GTK2/GTK3 locally
-			// The getErrorLogLink() can't find the link widget...
-			return;
-		}
-		assertNotNull("Link to error log should be present", errorLogLink);
+		assertNotNull("Link to error log should be present", StatusDialogUtil
+				.getErrorLogLink());
 		assertFalse("Link to error log should not be disposed",
-				errorLogLink.isDisposed());
+				StatusDialogUtil.getErrorLogLink().isDisposed());
 		assertTrue("Link to error log should be enabled",
-				errorLogLink.isEnabled());
+				StatusDialogUtil.getErrorLogLink().isEnabled());
 		assertTrue("Link to error log should be visible",
-				errorLogLink.isVisible());
+				StatusDialogUtil.getErrorLogLink().isVisible());
 	}
 
 	// two statuses, details, resize
@@ -960,11 +927,15 @@ public class StatusDialogManagerTest extends TestCase {
 
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNotNull("Tray should be opened", manager.getDialog().getTray());
 
 		selectTable(table, 0);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 	}
 
@@ -1001,7 +972,9 @@ public class StatusDialogManagerTest extends TestCase {
 
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull("Tray should not be opened", manager.getDialog().getTray());
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
@@ -1015,7 +988,9 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNull(StatusDialogUtil.getSupportLink());
 	}
 
@@ -1028,7 +1003,9 @@ public class StatusDialogManagerTest extends TestCase {
 		wsdm.addStatusAdapter(sa2, false);
 		Table table = StatusDialogUtil.getTable();
 		selectTable(table, 1);
-		processRemainingUiEvents();
+		while(Display.getCurrent().readAndDispatch() && (StatusDialogUtil.getStatusShell() != null)) {
+			;
+		}
 		assertNotNull(StatusDialogUtil.getSupportLink());
 	}
 
@@ -1057,100 +1034,6 @@ public class StatusDialogManagerTest extends TestCase {
 		assertTrue("Custom support area provider should be consulted", consulted[0]);
 	}
 
-	public void testDeadlockFromBug501681() throws Exception {
-		assertNotNull("Test must run in UI thread", Display.getCurrent());
-
-		final StatusAdapter statusAdapter = createStatusAdapter("Oops");
-		AtomicReference<StatusAdapter[]> reported = new AtomicReference<>();
-		INotificationListener listener = (type, adapters) -> {
-			reported.set(adapters);
-		};
-
-		AtomicReference<ReentrantLock> lock = new AtomicReference<>();
-		lock.set(new ReentrantLock());
-		final Semaphore semaphore = new Semaphore(0);
-
-		// This simulates a thread locked some shared resource
-		// It will release lock only if "wait" is set to "false"
-		Thread t = new Thread(() -> {
-			lock.get().lock();
-			try {
-				semaphore.acquire();
-			} catch (InterruptedException e) {
-				//
-			}
-			lock.get().unlock();
-		});
-		t.start();
-
-		// Wait for thread to acquire the lock
-		while (!lock.get().isLocked()) {
-			Thread.sleep(50);
-		}
-		assertTrue(lock.get().isLocked());
-
-		// Verify status handling works (without blocking)
-		StatusManager.getManager().addListener(listener);
-		StatusManager.getManager().handle(statusAdapter, StatusManager.SHOW | StatusManager.LOG);
-		assertSame(statusAdapter, reported.get()[0]);
-		Shell shell = StatusDialogUtil.getStatusShell();
-		if (shell != null) {
-			shell.dispose();
-		}
-		reported.set(null);
-
-		// Verify status handling works with blocking
-		final StatusAdapter statusAdapter2 = createStatusAdapter("Oops2");
-		try {
-			// this job will try to report some "blocking" status
-			// if it does NOT deadlock, the "wait" will be unset and lock will
-			// be released
-			Job badJob = new Job("Will report blocking error") {
-				@Override
-				protected IStatus run(IProgressMonitor monitor) {
-					StatusManager.getManager().handle(statusAdapter2, StatusManager.BLOCK | StatusManager.LOG);
-					// stop blocking thread
-					semaphore.release();
-					return Status.OK_STATUS;
-				}
-			};
-
-			// start later so that we have time to lock ourselves
-			badJob.schedule(100);
-
-			// This will now block UI until the lock is released
-			// Without the patch for bug 501681 this will never happen
-			// because the job we start in a moment will wait for UI thread to
-			// show the blocking dialog
-			lock.get().lock();
-
-			// make sure job was done
-			badJob.join();
-		} finally {
-			// Will "unblock" the blocking dialog shown by the job, must be
-			// posted with delay, because dialog is not yet shown
-			postUnblockingTask();
-
-			// Allow the blocking dialog to be shown
-			UITestCase.processEvents();
-			StatusManager.getManager().removeListener(listener);
-		}
-		assertFalse("Job should successfully finish", semaphore.hasQueuedThreads());
-		assertNotNull("Status adapter was not logged", reported.get());
-		assertSame(statusAdapter2, reported.get()[0]);
-	}
-
-	private void postUnblockingTask() {
-		Display.getCurrent().timerExec(100, () -> {
-			Shell shell = StatusDialogUtil.getStatusShellImmediately();
-			if (shell != null) {
-				shell.dispose();
-			} else {
-				// shell not shown yet? re-post
-				postUnblockingTask();
-			}
-		});
-	}
 
 	/**
 	 * Delivers custom support area.
@@ -1340,7 +1223,6 @@ public class StatusDialogManagerTest extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		Shell shell = StatusDialogUtil.getStatusShell();
-		FreezeMonitor.done();
 		if (shell != null) {
 			shell.dispose();
 			WorkbenchStatusDialogManagerImpl impl = (WorkbenchStatusDialogManagerImpl) wsdm
