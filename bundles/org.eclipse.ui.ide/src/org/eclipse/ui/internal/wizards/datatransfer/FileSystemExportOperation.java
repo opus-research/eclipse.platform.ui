@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,8 +64,6 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
     private boolean createContainerDirectories = true;
 
-	private boolean resolveLinks = false;
-
     /**
      *  Create an instance of this class.  Use this constructor if you wish to
      *  recursively export a single resource
@@ -104,8 +102,9 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
         int count = 0;
         if (parentResource.isAccessible()) {
-			for (IResource child : ((IContainer) parentResource).members()) {
-				count += countChildrenOf(child);
+            IResource[] children = ((IContainer) parentResource).members();
+            for (int i = 0; i < children.length; i++) {
+				count += countChildrenOf(children[i]);
 			}
         }
 
@@ -170,8 +169,9 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
      */
     protected void exportChildren(IResource[] children, IPath currentPath)
             throws InterruptedException {
-		for (IResource child : children) {
-			if (!child.isAccessible() || (!resolveLinks && child.isLinked())) {
+        for (int i = 0; i < children.length; i++) {
+            IResource child = children[i];
+            if (!child.isAccessible()) {
 				continue;
 			}
 
@@ -269,7 +269,7 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 
         while (resources.hasNext()) {
             IResource currentResource = (IResource) resources.next();
-			if (!currentResource.isAccessible() || (!resolveLinks && currentResource.isLinked())) {
+            if (!currentResource.isAccessible()) {
 				continue;
 			}
 
@@ -434,15 +434,4 @@ public class FileSystemExportOperation implements IRunnableWithProgress {
 			overwriteState = OVERWRITE_ALL;
 		}
     }
-
-	/**
-	 * Set this boolean indicating whether linked resources should be resolved
-	 * and exported (as opposed to simply ignored)
-	 *
-	 * @param value
-	 *            boolean
-	 */
-	public void setResolveLinks(boolean value) {
-		resolveLinks = value;
-	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -163,10 +163,12 @@ public final class IDEEncoding {
 			return new ArrayList();
 		}
 
+		String[] preferenceEncodings = encodings.split(PREFERENCE_SEPARATOR);
 		ArrayList result = new ArrayList();
 
 		//Drop any encodings that are not valid
-		for (String string : encodings.split(PREFERENCE_SEPARATOR)) {
+		for (int i = 0; i < preferenceEncodings.length; i++) {
+			String string = preferenceEncodings[i];
 			boolean isSupported;
 			try {
 				isSupported = Charset.isSupported(string);

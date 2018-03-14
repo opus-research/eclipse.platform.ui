@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -296,8 +296,9 @@ public class TextActionHandler {
         		boolean canPaste = false;
             	if (activeTextControl.getEditable()) {
             		Clipboard clipboard = new Clipboard(activeTextControl.getDisplay());
-					for (TransferData transferData : clipboard.getAvailableTypes()) {
-						if (TextTransfer.getInstance().isSupportedType(transferData)) {
+            		TransferData[] td = clipboard.getAvailableTypes();
+            		for (int i = 0; i < td.length; ++i) {
+            			if (TextTransfer.getInstance().isSupportedType(td[i])) {
             				canPaste = true;
             				break;
             			}

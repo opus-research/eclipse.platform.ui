@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -170,9 +170,10 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		// and trying to map the change to a remove and add is too dicey.
 		// The case is: folder A renamed to existing file B, answering yes to
 		// overwrite B.
-		IResourceDelta[] affectedChildren = delta.getAffectedChildren(IResourceDelta.CHANGED);
-		for (IResourceDelta affectedChild : affectedChildren) {
-			if ((affectedChild.getFlags() & IResourceDelta.TYPE) != 0) {
+		IResourceDelta[] affectedChildren = delta
+				.getAffectedChildren(IResourceDelta.CHANGED);
+		for (int i = 0; i < affectedChildren.length; i++) {
+			if ((affectedChildren[i].getFlags() & IResourceDelta.TYPE) != 0) {
 				runnables.add(getRefreshRunnable(resource));
 				return;
 			}
@@ -204,8 +205,8 @@ public class WorkbenchContentProvider extends BaseWorkbenchContentProvider
 		}
 
 		// Handle changed children .
-		for (IResourceDelta affectedChild : affectedChildren) {
-			processDelta(affectedChild, runnables);
+		for (int i = 0; i < affectedChildren.length; i++) {
+			processDelta(affectedChildren[i], runnables);
 		}
 
 		// @issue several problems here:

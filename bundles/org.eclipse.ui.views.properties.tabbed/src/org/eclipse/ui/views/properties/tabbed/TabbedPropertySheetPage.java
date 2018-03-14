@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -656,19 +656,19 @@ public class TabbedPropertySheetPage
 	protected void updateTabs(ITabDescriptor[] descriptors) {
 		Map newTabs = new HashMap(descriptors.length * 2);
 		boolean disposingCurrentTab = (currentTab != null);
-		for (ITabDescriptor descriptor : descriptors) {
+		for (int i = 0; i < descriptors.length; i++) {
 			TabContents tab = (TabContents) descriptorToTab
-					.remove(descriptor);
+					.remove(descriptors[i]);
 
 			if (tab != null && tab.controlsHaveBeenCreated()) {
 				if (tab == currentTab) {
 					disposingCurrentTab = false;
 				}
 			} else {
-				tab = createTab(descriptor);
+				tab = createTab(descriptors[i]);
 			}
 
-			newTabs.put(descriptor, tab);
+			newTabs.put(descriptors[i], tab);
 		}
 		if (disposingCurrentTab) {
 			/**

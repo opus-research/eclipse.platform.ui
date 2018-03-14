@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 Matthew Hall and others.
+ * Copyright (c) 2008-2009 Matthew Hall and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,15 +44,15 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 	@Override
 	public void handleEvent(Event event) {
 		if (staleEvents != null)
-			for (int staleEvent : staleEvents)
-				if (event.type == staleEvent) {
+			for (int i = 0; i < staleEvents.length; i++)
+				if (event.type == staleEvents[i]) {
 					fireStale(event.widget);
 					break;
 				}
 
 		if (changeEvents != null)
-			for (int changeEvent : changeEvents)
-				if (event.type == changeEvent) {
+			for (int i = 0; i < changeEvents.length; i++)
+				if (event.type == changeEvents[i]) {
 					fireChange(event.widget, null);
 					break;
 				}
@@ -62,14 +62,16 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 	protected void doAddTo(Object source) {
 		Widget widget = (Widget) source;
 		if (changeEvents != null) {
-			for (int event : changeEvents) {
+			for (int i = 0; i < changeEvents.length; i++) {
+				int event = changeEvents[i];
 				if (event != SWT.None) {
 					WidgetListenerUtil.asyncAddListener(widget, event, this);
 				}
 			}
 		}
 		if (staleEvents != null) {
-			for (int event : staleEvents) {
+			for (int i = 0; i < staleEvents.length; i++) {
+				int event = staleEvents[i];
 				if (event != SWT.None) {
 					WidgetListenerUtil.asyncAddListener(widget, event, this);
 				}
@@ -82,14 +84,16 @@ public class WidgetListener extends NativePropertyListener implements Listener {
 		Widget widget = (Widget) source;
 		if (!widget.isDisposed()) {
 			if (changeEvents != null) {
-				for (int event : changeEvents) {
+				for (int i = 0; i < changeEvents.length; i++) {
+					int event = changeEvents[i];
 					if (event != SWT.None)
 						WidgetListenerUtil.asyncRemoveListener(widget, event,
 								this);
 				}
 			}
 			if (staleEvents != null) {
-				for (int event : staleEvents) {
+				for (int i = 0; i < staleEvents.length; i++) {
+					int event = staleEvents[i];
 					if (event != SWT.None) {
 						WidgetListenerUtil.asyncRemoveListener(widget, event,
 								this);

@@ -19,12 +19,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.eclipse.core.runtime.CoreException;
@@ -202,26 +202,32 @@ public final class Util {
 		}
     }
 
-	public static void diff(Map<?, ?> left, Map<?, ?> right, Set leftOnly, Set different,
+    public static void diff(Map left, Map right, Set leftOnly, Set different,
             Set rightOnly) {
         if (left == null || right == null || leftOnly == null
                 || different == null || rightOnly == null) {
 			throw new NullPointerException();
 		}
 
-		for (Entry<?, ?> leftEntry : left.entrySet()) {
-			Object key = leftEntry.getKey();
+        Iterator iterator = left.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
 
             if (!right.containsKey(key)) {
 				leftOnly.add(key);
-			} else if (!Util.equals(leftEntry.getValue(), right.get(key))) {
+			} else if (!Util.equals(left.get(key), right.get(key))) {
 				different.add(key);
 			}
         }
 
-		for (Object rightKey : right.keySet()) {
-			if (!left.containsKey(rightKey)) {
-				rightOnly.add(rightKey);
+        iterator = right.keySet().iterator();
+
+        while (iterator.hasNext()) {
+            Object key = iterator.next();
+
+            if (!left.containsKey(key)) {
+				rightOnly.add(key);
 			}
         }
     }
@@ -600,6 +606,31 @@ public final class Util {
 	}
 
 	/**
+	 * Returns the result of converting a list of comma-separated tokens into an array.
+	 * Used as a replacement for <code>String.split(String)</code>, to allow compilation
+	 * against JCL Foundation (bug 80053).
+	 *
+	 * @param prop the initial comma-separated string
+	 * @param separator the separator characters
+	 * @return the array of string tokens
+	 * @since 3.1
+	 */
+	public static String[] getArrayFromList(String prop, String separator) {
+		if (prop == null || prop.trim().equals("")) { //$NON-NLS-1$
+			return new String[0];
+		}
+		ArrayList list = new ArrayList();
+		StringTokenizer tokens = new StringTokenizer(prop, separator);
+		while (tokens.hasMoreTokens()) {
+			String token = tokens.nextToken().trim();
+			if (!token.equals("")) { //$NON-NLS-1$
+				list.add(token);
+			}
+		}
+		return list.isEmpty() ? new String[0] : (String[]) list.toArray(new String[list.size()]);
+	}
+
+	/**
 	 * Two {@link String}s presented in a list form.
 	 * This method can be used to form a longer list by providing a list for
 	 * <code>item1</code> and an item to append to the list for
@@ -644,11 +675,11 @@ public final class Util {
 	 */
 	public static String createList(Object[] items) {
 		String list = null;
-		for (Object item : items) {
+		for (int i = 0; i < items.length; i++) {
 			if(list == null) {
-				list = item.toString();
+				list = items[i].toString();
 			} else {
-				list = createList(list, item.toString());
+				list = createList(list, items[i].toString());
 			}
 		}
 		return safeString(list);
@@ -697,7 +728,7 @@ public final class Util {
 		IWorkbenchWindow windowToParentOn = activeWindow == null ? (workbench
 				.getWorkbenchWindowCount() > 0 ? workbench
 				.getWorkbenchWindows()[0] : null) : activeWindow;
-		return windowToParentOn == null ? null : windowToParentOn.getShell();
+		return windowToParentOn == null ? null : activeWindow.getShell();
 	}
 
 	/**

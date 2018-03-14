@@ -23,6 +23,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.ESelectionService;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.IPostSelectionProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -148,23 +149,36 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 	/**
 	 * The action bar property listener.
 	 */
-	private IPropertyChangeListener actionBarPropListener = event -> {
-		if (event.getProperty().equals(SubActionBars.P_ACTION_HANDLERS)
-				&& activeRec != null
-				&& event.getSource() == activeRec.subActionBars) {
-			refreshGlobalActionHandlers();
+	private IPropertyChangeListener actionBarPropListener = new IPropertyChangeListener() {
+		@Override
+		public void propertyChange(PropertyChangeEvent event) {
+			if (event.getProperty().equals(SubActionBars.P_ACTION_HANDLERS)
+					&& activeRec != null
+					&& event.getSource() == activeRec.subActionBars) {
+				refreshGlobalActionHandlers();
+			}
 		}
 	};
 
 	/**
 	 * Selection change listener to listen for page selection changes
 	 */
-	private ISelectionChangedListener selectionChangedListener = event -> pageSelectionChanged(event);
+	private ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			pageSelectionChanged(event);
+		}
+	};
 
 	/**
 	 * Selection change listener to listen for page selection changes
 	 */
-	private ISelectionChangedListener postSelectionListener = event -> postSelectionChanged(event);
+	private ISelectionChangedListener postSelectionListener = new ISelectionChangedListener() {
+		@Override
+		public void selectionChanged(SelectionChangedEvent event) {
+			postSelectionChanged(event);
+		}
+	};
 
 	/**
 	 * Selection provider for this view's site
@@ -240,12 +254,13 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		 */
 		public void selectionChanged(final SelectionChangedEvent event) {
 			// pass on the notification to listeners
-			for (Object listener : getListeners()) {
-				final ISelectionChangedListener selectionChangedListener = (ISelectionChangedListener) listener;
+			Object[] listeners = getListeners();
+			for (int i = 0; i < listeners.length; ++i) {
+				final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 				SafeRunner.run(new SafeRunnable() {
 					@Override
 					public void run() {
-						selectionChangedListener.selectionChanged(event);
+						l.selectionChanged(event);
 					}
 				});
 			}
@@ -414,14 +429,14 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 			// for backward compability with IPage
 			rec.page.setActionBars(rec.subActionBars);
 
-			count = Integer.valueOf(0);
+			count = new Integer(0);
 		} else {
 			site = (IPageSite) mapPageToSite.get(rec.page);
 			rec.subActionBars = (SubActionBars) site.getActionBars();
 			count = ((Integer) mapPageToNumRecs.get(rec.page));
 		}
 
-		mapPageToNumRecs.put(rec.page, Integer.valueOf(count.intValue() + 1));
+		mapPageToNumRecs.put(rec.page, new Integer(count.intValue() + 1));
 	}
 
 	/**
@@ -857,7 +872,7 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 				((PageSite) site).dispose();
 			}
 		} else {
-			mapPageToNumRecs.put(rec.page, Integer.valueOf(newCount));
+			mapPageToNumRecs.put(rec.page, new Integer(newCount));
 		}
 	}
 
@@ -1100,8 +1115,8 @@ public abstract class PageBookView extends ViewPart implements IPartListener {
 		if (viewStack == null) {
 			return false;
 		}
-		for (IViewPart viewPart : viewStack) {
-			if (viewPart == part) {
+		for (int i = 0; i < viewStack.length; i++) {
+			if (viewStack[i] == part) {
 				return true;
 			}
 		}

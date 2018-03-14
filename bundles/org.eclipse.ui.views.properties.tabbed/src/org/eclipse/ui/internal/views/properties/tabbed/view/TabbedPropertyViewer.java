@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2015 IBM Corporation and others.
+ * Copyright (c) 2001, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -131,9 +131,9 @@ public class TabbedPropertyViewer extends StructuredViewer {
 		elements.clear();
 		Object[] children = getSortedChildren(getRoot());
 		list.removeAll();
-		for (Object child : children) {
-			elements.add(child);
-			mapElement(child, list);
+		for (int i = 0; i < children.length; i++) {
+			elements.add(children[i]);
+			mapElement(children[i], list);
 		}
 		list.setElements(children);
 	}

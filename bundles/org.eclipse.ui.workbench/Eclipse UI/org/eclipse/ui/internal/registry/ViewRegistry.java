@@ -45,8 +45,6 @@ import org.osgi.framework.Bundle;
 
 public class ViewRegistry implements IViewRegistry {
 
-	public static final String VIEW_TAG = "View"; //$NON-NLS-1$
-
 	/**
 	 * This constant is used as key for persisting the original class for a
 	 * legacy {@link ViewPart} in the persisted state of a
@@ -142,7 +140,7 @@ public class ViewRegistry implements IViewRegistry {
 		descriptor.setLabel(element.getAttribute(IWorkbenchRegistryConstants.ATT_NAME));
 
 		List<String> tags = descriptor.getTags();
-		tags.add(VIEW_TAG);
+		tags.add("View"); //$NON-NLS-1$
 
 		descriptor.setCloseable(true);
 		descriptor.setAllowMultiple(Boolean.parseBoolean(element
@@ -168,12 +166,6 @@ public class ViewRegistry implements IViewRegistry {
 			String viewClass = colonIndex == -1 ? clsSpec : clsSpec.substring(0, colonIndex);
 			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_CLASS, viewClass);
 			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_BUNDLE, bundle.getSymbolicName());
-
-			boolean useDependencyInjection = Boolean
-					.parseBoolean(element.getAttribute(IWorkbenchConstants.TAG_USE_DEPENDENCY_INJECTION));
-			if (useDependencyInjection) {
-				descriptor.getTags().add(IWorkbenchConstants.TAG_USE_DEPENDENCY_INJECTION);
-			}
 		}
 		descriptor.setContributionURI(implementationURI);
 

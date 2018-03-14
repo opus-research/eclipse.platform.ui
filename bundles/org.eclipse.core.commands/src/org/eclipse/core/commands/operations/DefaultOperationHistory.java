@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -114,7 +114,7 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	/**
 	 * the list of {@link IOperationApprover}s
 	 */
-	ListenerList<IOperationApprover> approvers = new ListenerList<>(ListenerList.IDENTITY);
+	ListenerList approvers = new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * a map of undo limits per context
@@ -124,7 +124,7 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	/**
 	 * the list of {@link IOperationHistoryListener}s
 	 */
-	ListenerList<IOperationHistoryListener> listeners = new ListenerList<>(ListenerList.IDENTITY);
+	ListenerList listeners = new ListenerList(ListenerList.IDENTITY);
 
 	/**
 	 * the list of operations available for redo, LIFO
@@ -189,8 +189,8 @@ public final class DefaultOperationHistory implements IOperationHistory {
 
 			// flush redo stack for related contexts
 			IUndoContext[] contexts = operation.getContexts();
-			for (IUndoContext context : contexts) {
-				flushRedo(context);
+			for (int i = 0; i < contexts.length; i++) {
+				flushRedo(contexts[i]);
 			}
 		} else {
 			// Dispose the operation since we will not have a reference to it.
@@ -272,13 +272,13 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	 */
 	private boolean checkRedoLimit(IUndoableOperation operation) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (IUndoContext context : contexts) {
-			int limit = getLimit(context);
+		for (int i = 0; i < contexts.length; i++) {
+			int limit = getLimit(contexts[i]);
 			if (limit > 0) {
-				forceRedoLimit(context, limit - 1);
+				forceRedoLimit(contexts[i], limit - 1);
 			} else {
 				// this context has a 0 limit
-				operation.removeContext(context);
+				operation.removeContext(contexts[i]);
 			}
 		}
 		return operation.getContexts().length > 0;
@@ -290,13 +290,13 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	 */
 	private boolean checkUndoLimit(IUndoableOperation operation) {
 		IUndoContext[] contexts = operation.getContexts();
-		for (IUndoContext context : contexts) {
-			int limit = getLimit(context);
+		for (int i = 0; i < contexts.length; i++) {
+			int limit = getLimit(contexts[i]);
 			if (limit > 0) {
-				forceUndoLimit(context, limit - 1);
+				forceUndoLimit(contexts[i], limit - 1);
 			} else {
 				// this context has a 0 limit
-				operation.removeContext(context);
+				operation.removeContext(contexts[i]);
 			}
 		}
 		return operation.getContexts().length > 0;
@@ -551,8 +551,8 @@ public final class DefaultOperationHistory implements IOperationHistory {
 		synchronized (undoRedoHistoryLock) {
 
 			Object[] filtered = filter(redoList, context);
-			for (Object element : filtered) {
-				IUndoableOperation operation = (IUndoableOperation) element;
+			for (int i = 0; i < filtered.length; i++) {
+				IUndoableOperation operation = (IUndoableOperation) filtered[i];
 				if (context == GLOBAL_UNDO_CONTEXT || operation.getContexts().length == 1) {
 					// remove the operation if it only has the context or we are
 					// flushing all
@@ -564,9 +564,10 @@ public final class DefaultOperationHistory implements IOperationHistory {
 					// It is not enough to simply remove the context. There could
 					// be one or more contexts that match the one we are trying to
 					// dispose.
-					for (IUndoContext undoContext : operation.getContexts()) {
-						if (undoContext.matches(context)) {
-							operation.removeContext(undoContext);
+					IUndoContext[] contexts = operation.getContexts();
+					for (int j = 0; j < contexts.length; j++) {
+						if (contexts[j].matches(context)) {
+							operation.removeContext(contexts[j]);
 						}
 					}
 					if (operation.getContexts().length == 0) {
@@ -590,8 +591,8 @@ public final class DefaultOperationHistory implements IOperationHistory {
 
 			// Get all operations that have the context (or one that matches)
 			Object[] filtered = filter(undoList, context);
-			for (Object element : filtered) {
-				IUndoableOperation operation = (IUndoableOperation) element;
+			for (int i = 0; i < filtered.length; i++) {
+				IUndoableOperation operation = (IUndoableOperation) filtered[i];
 				if (context == GLOBAL_UNDO_CONTEXT || operation.getContexts().length == 1) {
 					// remove the operation if it only has the context or we are
 					// flushing all
@@ -603,9 +604,10 @@ public final class DefaultOperationHistory implements IOperationHistory {
 					// It is not enough to simply remove the context. There could
 					// be one or more contexts that match the one we are trying to
 					// dispose.
-					for (IUndoContext undoContext : operation.getContexts()) {
-						if (undoContext.matches(context)) {
-							operation.removeContext(undoContext);
+					IUndoContext[] contexts = operation.getContexts();
+					for (int j = 0; j < contexts.length; j++) {
+						if (contexts[j].matches(context)) {
+							operation.removeContext(contexts[j]);
 						}
 					}
 					if (operation.getContexts().length == 0) {
@@ -722,7 +724,10 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	 */
 	private IStatus getRedoApproval(IUndoableOperation operation, IAdaptable info) {
 
-		for (IOperationApprover approver : approvers) {
+		final Object[] approverArray = approvers.getListeners();
+
+		for (int i = 0; i < approverArray.length; i++) {
+			IOperationApprover approver = (IOperationApprover) approverArray[i];
 			IStatus approval = approver.proceedRedoing(operation, this, info);
 			if (!approval.isOK()) {
 				if (DEBUG_OPERATION_HISTORY_APPROVAL) {
@@ -763,7 +768,10 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	 */
 	private IStatus getUndoApproval(IUndoableOperation operation, IAdaptable info) {
 
-		for (IOperationApprover approver : approvers) {
+		final Object[] approverArray = approvers.getListeners();
+
+		for (int i = 0; i < approverArray.length; i++) {
+			IOperationApprover approver = (IOperationApprover) approverArray[i];
 			IStatus approval = approver.proceedUndoing(operation, this, info);
 			if (!approval.isOK()) {
 				if (DEBUG_OPERATION_HISTORY_APPROVAL) {
@@ -806,9 +814,11 @@ public final class DefaultOperationHistory implements IOperationHistory {
 	 */
 	private IStatus getExecuteApproval(IUndoableOperation operation, IAdaptable info) {
 
-		for (IOperationApprover tmp : approvers) {
-			if (tmp instanceof IOperationApprover2) {
-				IOperationApprover2 approver = (IOperationApprover2) tmp;
+		final Object[] approverArray = approvers.getListeners();
+
+		for (int i = 0; i < approverArray.length; i++) {
+			if (approverArray[i] instanceof IOperationApprover2) {
+				IOperationApprover2 approver = (IOperationApprover2) approverArray[i];
 				IStatus approval = approver.proceedExecuting(operation, this, info);
 				if (!approval.isOK()) {
 					if (DEBUG_OPERATION_HISTORY_APPROVAL) {
@@ -853,7 +863,9 @@ public final class DefaultOperationHistory implements IOperationHistory {
 				}
 			});
 		}
-		for (final IOperationHistoryListener listener : listeners) {
+		final Object[] listenerArray = listeners.getListeners();
+		for (int i = 0; i < listenerArray.length; i++) {
+			final IOperationHistoryListener listener = (IOperationHistoryListener) listenerArray[i];
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void handleException(Throwable exception) {
@@ -1049,12 +1061,12 @@ public final class DefaultOperationHistory implements IOperationHistory {
 				undoList.remove(operation);
 				// notify listeners after the lock on undoList is released
 				ArrayList<IUndoContext> allContexts = new ArrayList<>(replacements.length);
-				for (IUndoableOperation replacement : replacements) {
-					IUndoContext[] opContexts = replacement.getContexts();
-					for (IUndoContext opContext : opContexts) {
-						allContexts.add(opContext);
+				for (int i = 0; i < replacements.length; i++) {
+					IUndoContext[] opContexts = replacements[i].getContexts();
+					for (int j = 0; j < opContexts.length; j++) {
+						allContexts.add(opContexts[j]);
 					}
-					undoList.add(index, replacement);
+					undoList.add(index, replacements[i]);
 					// notify listeners after the lock on the history is
 					// released
 				}
@@ -1069,8 +1081,8 @@ public final class DefaultOperationHistory implements IOperationHistory {
 		if (inUndo) {
 			// notify listeners of operations added and removed
 			internalRemove(operation);
-			for (IUndoableOperation replacement : replacements) {
-				notifyAdd(replacement);
+			for (int i = 0; i < replacements.length; i++) {
+				notifyAdd(replacements[i]);
 			}
 			return;
 		}
@@ -1085,12 +1097,12 @@ public final class DefaultOperationHistory implements IOperationHistory {
 			ArrayList<IUndoContext> allContexts = new ArrayList<>(replacements.length);
 			redoList.remove(operation);
 			// notify listeners after we release the lock on redoList
-			for (IUndoableOperation replacement : replacements) {
-				IUndoContext[] opContexts = replacement.getContexts();
-				for (IUndoContext opContext : opContexts) {
-					allContexts.add(opContext);
+			for (int i = 0; i < replacements.length; i++) {
+				IUndoContext[] opContexts = replacements[i].getContexts();
+				for (int j = 0; j < opContexts.length; j++) {
+					allContexts.add(opContexts[j]);
 				}
-				redoList.add(index, replacement);
+				redoList.add(index, replacements[i]);
 				// notify listeners after we release the lock on redoList
 			}
 			// recheck all the limits. We do this at the end so the index
@@ -1102,8 +1114,8 @@ public final class DefaultOperationHistory implements IOperationHistory {
 		}
 		// send listener notifications after we release the lock on the history
 		internalRemove(operation);
-		for (IUndoableOperation replacement : replacements) {
-			notifyAdd(replacement);
+		for (int i = 0; i < replacements.length; i++) {
+			notifyAdd(replacements[i]);
 		}
 	}
 
@@ -1118,7 +1130,7 @@ public final class DefaultOperationHistory implements IOperationHistory {
 		 * override this if a global limit is desired.
 		 */
 		Assert.isNotNull(context);
-		limits.put(context, Integer.valueOf(limit));
+		limits.put(context, new Integer(limit));
 		synchronized (undoRedoHistoryLock) {
 			forceUndoLimit(context, limit);
 			forceRedoLimit(context, limit);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,9 +22,6 @@ import org.eclipse.core.databinding.conversion.IConverter;
 import org.eclipse.core.databinding.conversion.NumberToStringConverter;
 import org.eclipse.core.databinding.conversion.StringToNumberConverter;
 import org.eclipse.core.databinding.util.Policy;
-import org.eclipse.core.databinding.validation.ValidationStatus;
-import org.eclipse.core.internal.databinding.Activator;
-import org.eclipse.core.internal.databinding.BindingMessages;
 import org.eclipse.core.internal.databinding.ClassLookupSupport;
 import org.eclipse.core.internal.databinding.Pair;
 import org.eclipse.core.internal.databinding.conversion.CharacterToStringConverter;
@@ -91,8 +88,6 @@ import com.ibm.icu.text.NumberFormat;
 		return clazz;
 	}
 
-	protected IConverter converter;
-
 	final protected void checkAssignable(Object toType, Object fromType,
 			String errorString) {
 		Boolean assignableFromModelToModelConverter = isAssignableFromTo(
@@ -139,12 +134,14 @@ import com.ibm.icu.text.NumberFormat;
 		Map converterMap = getConverterMap();
 		Class[] supertypeHierarchyFlattened = ClassLookupSupport
 				.getTypeHierarchyFlattened(fromClass);
-		for (Class currentFromClass : supertypeHierarchyFlattened) {
+		for (int i = 0; i < supertypeHierarchyFlattened.length; i++) {
+			Class currentFromClass = supertypeHierarchyFlattened[i];
 			if (currentFromClass == toType) {
 				// converting to toType is just a widening
 				return new IdentityConverter(fromClass, toClass);
 			}
-			Pair key = new Pair(getKeyForClass(fromType, currentFromClass), getKeyForClass(toType, toClass));
+			Pair key = new Pair(getKeyForClass(fromType, currentFromClass),
+					getKeyForClass(toType, toClass));
 			Object converterOrClassname = converterMap.get(key);
 			if (converterOrClassname instanceof IConverter) {
 				return (IConverter) converterOrClassname;
@@ -435,7 +432,8 @@ import com.ibm.icu.text.NumberFormat;
 	private static void addNumberToByteConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
 
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Byte.class) && !fromType.equals(byte.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -462,7 +460,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToShortConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Short.class) && !fromType.equals(short.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -488,7 +487,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToIntegerConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Integer.class)
 					&& !fromType.equals(int.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
@@ -514,7 +514,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToLongConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Long.class) && !fromType.equals(long.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -541,7 +542,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToFloatConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Float.class) && !fromType.equals(float.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -567,7 +569,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToDoubleConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(Double.class) && !fromType.equals(double.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -592,7 +595,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToBigIntegerConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(BigInteger.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -615,7 +619,8 @@ import com.ibm.icu.text.NumberFormat;
 	 */
 	private static void addNumberToBigDecimalConverters(Map map,
 			NumberFormat numberFormat, Class[] fromTypes) {
-		for (Class fromType : fromTypes) {
+		for (int i = 0; i < fromTypes.length; i++) {
+			Class fromType = fromTypes[i];
 			if (!fromType.equals(BigDecimal.class)) {
 				String fromName = (fromType.isPrimitive()) ? getKeyForClass(
 						fromType, null) : fromType.getName();
@@ -675,39 +680,6 @@ import com.ibm.icu.text.NumberFormat;
 					: Boolean.FALSE;
 		}
 		return null;
-	}
-
-	/**
-	 * @param ex
-	 *            the exception, that was caught
-	 * @return the validation status
-	 */
-	protected IStatus logErrorWhileSettingValue(Exception ex) {
-		IStatus errorStatus = ValidationStatus
-				.error(BindingMessages.getString(BindingMessages.VALUEBINDING_ERROR_WHILE_SETTING_VALUE), ex);
-		Policy.getLog().log(errorStatus);
-		return errorStatus;
-	}
-
-	/**
-	 * Converts the value from the source type to the destination type.
-	 * <p>
-	 * Default implementation will use the setConverter(IConverter), if one
-	 * exists. If no converter exists no conversion occurs.
-	 * </p>
-	 *
-	 * @param value
-	 * @return the converted value
-	 */
-	public Object convert(Object value) {
-		if (converter != null) {
-			try {
-				return converter.convert(value);
-			} catch (Exception ex) {
-				Policy.getLog().log(new Status(IStatus.ERROR, Activator.PLUGIN_ID, ex.getMessage(), ex));
-			}
-		}
-		return value;
 	}
 
 	/*

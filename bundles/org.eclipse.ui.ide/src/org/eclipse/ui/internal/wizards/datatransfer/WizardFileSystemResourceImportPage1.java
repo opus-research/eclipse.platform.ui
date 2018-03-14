@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -199,7 +198,7 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
         GridData buttonData = new GridData(GridData.FILL_HORIZONTAL);
         button.setLayoutData(buttonData);
 
-        button.setData(id);
+        button.setData(new Integer(id));
         button.setText(label);
 
         if (defaultButton) {
@@ -957,8 +956,8 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
 			}
 
             // set filenames history
-            for (String sourceName : sourceNames) {
-				sourceNameField.add(sourceName);
+            for (int i = 0; i < sourceNames.length; i++) {
+				sourceNameField.add(sourceNames[i]);
 			}
 
             // radio buttons and checkboxes
@@ -1121,11 +1120,11 @@ public class WizardFileSystemResourceImportPage1 extends WizardResourceImportPag
                 if (files == null) {
                     throw new InterruptedException();
                 }
-                for (Object file : files) {
+                for (int i = 0; i < files.length; i++) {
                     if (monitor.isCanceled()) {
 						throw new InterruptedException();
 					}
-                    checkFile(file);
+                    checkFile(files[i]);
                 }
             }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -134,16 +134,16 @@ public class MoveResourcesOperation extends
 					resourcesAtDestination, undoDestinationPaths, subMonitor.split(1), uiInfo, true);
 
 			// Accumulate the overwrites into the full list
-			for (ResourceDescription overwrite : overwrites) {
-				overwrittenResources.add(overwrite);
+			for (int j = 0; j < overwrites.length; j++) {
+				overwrittenResources.add(overwrites[j]);
 			}
 		}
 
 		// Are there any previously overwritten resources to restore now?
 		if (resourceDescriptions != null) {
-			for (ResourceDescription resourceDescription : resourceDescriptions) {
-				if (resourceDescription != null) {
-					resourceDescription.createResource(subMonitor.split(1));
+			for (int i = 0; i < resourceDescriptions.length; i++) {
+				if (resourceDescriptions[i] != null) {
+					resourceDescriptions[i].createResource(subMonitor.split(1));
 				}
 			}
 		}

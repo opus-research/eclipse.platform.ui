@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -394,17 +394,18 @@ public class PathVariableDialog extends TitleAreaDialog {
         	String resolveValue = URIUtil.toPath(resolvedURI).toOSString();
         	// Delete intermediate variables that might have been created as
         	// as a side effect of converting arbitrary relative paths to an internal string.
-			for (String newVariable : pathVariableManager2.getPathVariableNames()) {
+        	String[] newVariables = pathVariableManager2.getPathVariableNames();
+        	for (int i = 0; i < newVariables.length; i++) {
         		boolean found = false;
-            	for (String variable : variables) {
-            		if (variable.equals(newVariable)) {
+            	for (int j = 0; j < variables.length; j++) {
+            		if (variables[j].equals(newVariables[i])) {
             			found = true;
             			break;
             		}
             	}
             	if (!found) {
 					try {
-						pathVariableManager2.setURIValue(newVariable, null);
+						pathVariableManager2.setURIValue(newVariables[i], null);
 					} catch (CoreException e) {
 						// do nothing
 					}

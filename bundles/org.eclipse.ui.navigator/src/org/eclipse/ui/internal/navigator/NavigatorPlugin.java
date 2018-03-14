@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,8 +84,8 @@ public class NavigatorPlugin extends AbstractUIPlugin {
 
 			Object[] mesgs = messages.getListeners();
 			ILog pluginLog = getDefault().getLog();
-			for (Object mesg : mesgs) {
-				pluginLog.log((IStatus)mesg);
+			for (int i = 0; i < mesgs.length; i++) {
+				pluginLog.log((IStatus)mesgs[i]);
 			}
 			return Status.OK_STATUS;
 

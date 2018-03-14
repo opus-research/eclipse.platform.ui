@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -229,9 +229,9 @@ public class GlobalBuildAction extends Action implements
      */
     /* package */boolean verifyBuildersAvailable(IProject[] roots) {
         try {
-            for (IProject root : roots) {
-                if (root.isAccessible()) {
-					if (root.getDescription().getBuildSpec().length > 0) {
+            for (int i = 0; i < roots.length; i++) {
+                if (roots[i].isAccessible()) {
+					if (roots[i].getDescription().getBuildSpec().length > 0) {
 						return true;
 					}
 				}
@@ -275,7 +275,8 @@ public class GlobalBuildAction extends Action implements
                 IDEWorkbenchMessages.GlobalBuildAction_BuildRunningTitle,
                 IDEWorkbenchMessages.GlobalBuildAction_BuildRunningMessage);
         if (cancel) {
-            for (Job job : buildJobs) {
+            for (int i = 0; i < buildJobs.length; i++) {
+                Job job = buildJobs[i];
                 job.cancel();
             }
         }

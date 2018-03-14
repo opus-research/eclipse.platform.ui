@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -187,9 +187,9 @@ public class FileDescription extends AbstractResourceDescription {
 	 * the most recent copy of the file state is used.
 	 */
 	private IFileState getMatchingFileState(IFileState[] states) {
-		for (IFileState state : states) {
-			if (localTimeStamp == state.getModificationTime()) {
-				return state;
+		for (int i = 0; i < states.length; i++) {
+			if (localTimeStamp == states[i].getModificationTime()) {
+				return states[i];
 			}
 		}
 		return states[0];

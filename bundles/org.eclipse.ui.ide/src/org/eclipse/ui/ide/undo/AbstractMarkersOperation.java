@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -261,12 +261,12 @@ abstract class AbstractMarkersOperation extends AbstractWorkspaceOperation {
 			MarkerType taskType= MarkerTypesModel.getInstance().getType(IMarker.TASK);
 			MarkerType problemType= MarkerTypesModel.getInstance().getType(IMarker.PROBLEM);
 
-			for (String currentType : types) {
+			for (int i = 0; i < types.length; i++) {
 				// Marker type could be null if marker did not exist.
 				// This shouldn't happen, but can.
 				// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=158129
-				if (currentType != null) {
-					MarkerType type= MarkerTypesModel.getInstance().getType(currentType);
+				if (types[i] != null) {
+					MarkerType type= MarkerTypesModel.getInstance().getType(types[i]);
 					if (type == null) {
 						// type is not known, use the workspace undo context
 						addContext(WorkspaceUndoUtil.getWorkspaceUndoContext());

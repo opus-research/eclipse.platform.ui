@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -50,8 +50,8 @@ public class ContributorTrackingSet extends LinkedHashSet {
 	 */
 	public ContributorTrackingSet(NavigatorContentService aContentService, Object[] elements) {
 
-		for (Object element : elements)
-			super.add(element);
+		for (int i = 0; i < elements.length; i++)
+			super.add(elements[i]);
 
 		contentService = aContentService;
 	}
@@ -111,8 +111,8 @@ public class ContributorTrackingSet extends LinkedHashSet {
 	public void setContents(Object[] contents) {
 		super.clear();
 		if(contents != null)
-			for (Object content : contents)
-				add(content);
+			for (int i = 0; i < contents.length; i++)
+				add(contents[i]);
 
 	}
 

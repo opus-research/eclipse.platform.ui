@@ -104,11 +104,6 @@ public class WorkingSet extends AbstractWorkingSet {
 		return false;
 	}
 
-	@Override
-	public String toString() {
-		return "WS [name=" + getName() + ", elements=" + getElementsArray() + ", id=" + getId() + "]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -155,7 +150,8 @@ public class WorkingSet extends AbstractWorkingSet {
 		IMemento[] itemMementos = workingSetMemento
 				.getChildren(IWorkbenchConstants.TAG_ITEM);
 		final Set items = new HashSet();
-		for (final IMemento itemMemento : itemMementos) {
+		for (int i = 0; i < itemMementos.length; i++) {
+			final IMemento itemMemento = itemMementos[i];
 			final String factoryID = itemMemento
 					.getString(IWorkbenchConstants.TAG_FACTORY_ID);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -189,7 +189,8 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 			IResourceDelta delta = event.getDelta();
 			if (delta != null) {
 				IResourceDelta[] projDeltas = delta.getAffectedChildren(IResourceDelta.CHANGED);
-				for (IResourceDelta projDelta : projDeltas) {
+				for (int i = 0; i < projDeltas.length; ++i) {
+					IResourceDelta projDelta = projDeltas[i];
 					if ((projDelta.getFlags() & IResourceDelta.OPEN) != 0) {
 						if (sel.contains(projDelta.getResource())) {
 							selectionChanged(getStructuredSelection());
@@ -223,9 +224,6 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 			 * Opens a project along with all projects it references
 			 */
 			private void doOpenWithReferences(IProject project, IProgressMonitor mon) throws CoreException {
-				if (!project.exists() || project.isOpen()) {
-					return;
-				}
 				SubMonitor subMonitor = SubMonitor.convert(mon, openProjectReferences ? 2 : 1);
 				project.open(subMonitor.split(1));
 				final IProject[] references = project.getReferencedProjects();
@@ -253,8 +251,8 @@ public class OpenResourceAction extends WorkspaceAction implements IResourceChan
 				}
 				if (openProjectReferences) {
 					SubMonitor loopMonitor = subMonitor.split(1).setWorkRemaining(references.length);
-					for (IProject reference : references) {
-						doOpenWithReferences(reference, loopMonitor.split(1));
+					for (int i = 0; i < references.length; i++) {
+						doOpenWithReferences(references[i], loopMonitor.split(1));
 					}
 				}
 			}

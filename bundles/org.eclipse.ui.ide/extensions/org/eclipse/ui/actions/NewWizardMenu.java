@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -106,8 +106,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
         // Remove all.
         innerMgr.removeAll();
 
-		for (IContributionItem item : getContributionItems()) {
-            innerMgr.add(item);
+        IContributionItem[] items = getContributionItems();
+        for (int i = 0; i < items.length; i++) {
+            innerMgr.add(items[i]);
         }
     }
 
@@ -152,8 +153,9 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 				}
 			}
 		}
-		for (IWizardCategory wizardCategory : category.getCategories()) {
-			if (hasWizards(wizardCategory)) {
+		IWizardCategory[] categories = category.getCategories();
+		for (int i = 0; i < categories.length; i++) {
+			if (hasWizards(categories[i])) {
 				return true;
 			}
 		}
@@ -189,8 +191,8 @@ public class NewWizardMenu extends BaseNewWizardMenu {
 		if (action instanceof NewWizardShortcutAction) {
 			IWizardDescriptor wizardDescriptor= ((NewWizardShortcutAction) action).getWizardDescriptor();
 			String [] tags = wizardDescriptor.getTags();
-			for (String tag : tags) {
-				if (WorkbenchWizardElement.TAG_PROJECT.equals(tag)) {
+			for (int i = 0; i < tags.length; i++) {
+				if (WorkbenchWizardElement.TAG_PROJECT.equals(tags[i])) {
 					return true;
 				}
 			}

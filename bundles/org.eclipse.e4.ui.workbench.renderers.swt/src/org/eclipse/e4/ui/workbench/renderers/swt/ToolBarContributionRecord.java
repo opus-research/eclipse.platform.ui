@@ -24,6 +24,7 @@ import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
+import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContribution;
@@ -57,6 +58,9 @@ public class ToolBarContributionRecord {
 		return renderer.getManager(toolbarModel);
 	}
 
+	/**
+	 * @param context
+	 */
 	public void updateVisibility(IEclipseContext context) {
 		ExpressionContext exprContext = new ExpressionContext(context);
 		updateIsVisible(exprContext);
@@ -118,8 +122,10 @@ public class ToolBarContributionRecord {
 				currentVisibility = ((Boolean) rc).booleanValue();
 			}
 		}
-		if (currentVisibility && item.getVisibleWhen() != null) {
-			boolean val = ContributionsAnalyzer.isVisible(item.getVisibleWhen(), exprContext);
+		if (currentVisibility
+				&& item.getVisibleWhen() instanceof MCoreExpression) {
+			boolean val = ContributionsAnalyzer.isVisible(
+					(MCoreExpression) item.getVisibleWhen(), exprContext);
 			currentVisibility = val;
 		}
 		return currentVisibility;
@@ -150,16 +156,13 @@ public class ToolBarContributionRecord {
 		}
 
 		for (MToolBarElement child : childrenToInspect) {
-			if (requiresVisibilityCheck(child)) {
+			if (child.getVisibleWhen() != null
+					|| child.getPersistedState().get(
+							MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	private boolean requiresVisibilityCheck(MToolBarElement toolBarElement) {
-		return toolBarElement.getVisibleWhen() != null
-				|| toolBarElement.getPersistedState().get(MenuManagerRenderer.VISIBILITY_IDENTIFIER) != null;
 	}
 
 	public boolean mergeIntoModel() {
@@ -183,7 +186,7 @@ public class ToolBarContributionRecord {
 		for (MToolBarElement copy : copyElements) {
 			// if a visibleWhen clause is defined, the item should not be
 			// visible until the clause has been evaluated and returned 'true'
-			copy.setVisible(!requiresVisibilityCheck(copy));
+			copy.setVisible(!anyVisibleWhen());
 			if (copy instanceof MToolBarSeparator) {
 				MToolBarSeparator shared = findExistingSeparator(copy
 						.getElementId());

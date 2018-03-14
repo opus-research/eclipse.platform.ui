@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,8 @@
  *     Chris Gross (schtoo@schtoo.com) - patch for bug 16179
  *     Eugene Ostroukhov <eugeneo@symbian.org> - Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Paul Adams <padams@ittvis.com> - Bug 202534 - [Dialogs] SWT error in Wizard dialog when help is displayed and "Finish" is pressed
- *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
-
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -46,7 +43,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -79,7 +77,8 @@ import org.eclipse.swt.widgets.Shell;
  * required.
  * </p>
  */
-public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, IPageChangeProvider {
+public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
+		IPageChangeProvider {
 	/**
 	 * Image registry key for error message image (value
 	 * <code>"dialog_title_error_image"</code>).
@@ -142,13 +141,14 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 
 	private Button helpButton;
 
-	private SelectionListener cancelListener;
+	private SelectionAdapter cancelListener;
 
 	private boolean isMovingToPreviousPage = false;
 
 	private Composite pageContainer;
 
-	private PageContainerFillLayout pageContainerLayout = new PageContainerFillLayout(5, 5, 300, 225);
+	private PageContainerFillLayout pageContainerLayout = new PageContainerFillLayout(
+			5, 5, 300, 225);
 
 	private int pageWidth = SWT.DEFAULT;
 
@@ -166,9 +166,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 
 	private boolean lockedUI = false;
 
-	private ListenerList<IPageChangedListener> pageChangedListeners = new ListenerList<>();
+	private ListenerList pageChangedListeners = new ListenerList();
 
-	private ListenerList<IPageChangingListener> pageChangingListeners = new ListenerList<>();
+	private ListenerList pageChangingListeners = new ListenerList();
 
 	/**
 	 * A layout for a container which includes several pages, like a notebook,
@@ -226,8 +226,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 			Control[] children = composite.getChildren();
 			if (children.length > 0) {
 				result = new Point(0, 0);
-				for (Control element : children) {
-					Point cp = element.computeSize(wHint, hHint, force);
+				for (int i = 0; i < children.length; i++) {
+					Point cp = children[i].computeSize(wHint, hHint, force);
 					result.x = Math.max(result.x, cp.x);
 					result.y = Math.max(result.y, cp.y);
 				}
@@ -269,8 +269,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		public void layout(Composite composite, boolean force) {
 			Rectangle rect = getClientArea(composite);
 			Control[] children = composite.getChildren();
-			for (Control element : children) {
-				element.setBounds(rect);
+			for (int i = 0; i < children.length; i++) {
+				children[i].setBounds(rect);
 			}
 		}
 
@@ -311,7 +311,12 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		setWizard(newWizard);
 		// since VAJava can't initialize an instance var with an anonymous
 		// class outside a constructor we do it here:
-		cancelListener = widgetSelectedAdapter(e -> cancelPressed());
+		cancelListener = new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				cancelPressed();
+			}
+		};
 	}
 
 	/**
@@ -494,12 +499,14 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	protected void createButtonsForButtonBar(Composite parent) {
 		((GridLayout) parent.getLayout()).makeColumnsEqualWidth = false;
 		if (wizard.isHelpAvailable()) {
-			helpButton = createButton(parent, IDialogConstants.HELP_ID, IDialogConstants.HELP_LABEL, false);
+			helpButton = createButton(parent, IDialogConstants.HELP_ID,
+					IDialogConstants.HELP_LABEL, false);
 		}
 		if (wizard.needsPreviousAndNextButtons()) {
 			createPreviousAndNextButtons(parent);
 		}
-		finishButton = createButton(parent, IDialogConstants.FINISH_ID, IDialogConstants.FINISH_LABEL, true);
+		finishButton = createButton(parent, IDialogConstants.FINISH_ID,
+				IDialogConstants.FINISH_LABEL, true);
 		cancelButton = createCancelButton(parent);
 
 		if (parent.getDisplay().getDismissalAlignment() == SWT.RIGHT) {
@@ -540,7 +547,7 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		button.setText(IDialogConstants.CANCEL_LABEL);
 		setButtonLayoutData(button);
 		button.setFont(parent.getFont());
-		button.setData(Integer.valueOf(IDialogConstants.CANCEL_ID));
+		button.setData(new Integer(IDialogConstants.CANCEL_ID));
 		button.addSelectionListener(cancelListener);
 		return button;
 	}
@@ -688,7 +695,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		wizard.createPageControls(pageContainer);
 		// Ensure that all of the created pages are initially not visible
 		IWizardPage[] pages = wizard.getPages();
-		for (IWizardPage page : pages) {
+		for (int i = 0; i < pages.length; i++) {
+			IWizardPage page = pages[i];
 			if (page.getControl() != null) {
 				page.getControl().setVisible(false);
 			}
@@ -719,11 +727,14 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		layout.horizontalSpacing = 0;
 		layout.verticalSpacing = 0;
 		composite.setLayout(layout);
-		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER | GridData.VERTICAL_ALIGN_CENTER);
+		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_CENTER
+				| GridData.VERTICAL_ALIGN_CENTER);
 		composite.setLayoutData(data);
 		composite.setFont(parent.getFont());
-		backButton = createButton(composite, IDialogConstants.BACK_ID, IDialogConstants.BACK_LABEL, false);
-		nextButton = createButton(composite, IDialogConstants.NEXT_ID, IDialogConstants.NEXT_LABEL, false);
+		backButton = createButton(composite, IDialogConstants.BACK_ID,
+				IDialogConstants.BACK_LABEL, false);
+		nextButton = createButton(composite, IDialogConstants.NEXT_ID,
+				IDialogConstants.NEXT_LABEL, false);
 
 		// make sure screen readers skip visual '<', '>' chars on buttons:
 		final String backReaderText = IDialogConstants.BACK_LABEL.replace('<', ' ');
@@ -873,7 +884,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 *         successfully, <code>false</code> otherwise
 	 */
 	private boolean doPageChanging(IWizardPage targetPage) {
-		PageChangingEvent e = new PageChangingEvent(this, getCurrentPage(), targetPage);
+		PageChangingEvent e = new PageChangingEvent(this, getCurrentPage(),
+				targetPage);
 		firePageChanging(e);
 		// Prevent navigation if necessary
 		return e.doit;
@@ -959,8 +971,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 *
 	 */
 	@Override
-	public void run(boolean fork, boolean cancelable, IRunnableWithProgress runnable)
-			throws InvocationTargetException,
+	public void run(boolean fork, boolean cancelable,
+			IRunnableWithProgress runnable) throws InvocationTargetException,
 			InterruptedException {
 		// The operation can only be canceled if it is executed in a separate
 		// thread.
@@ -1008,7 +1020,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 *            <code>false</code> to disable it
 	 * @see #restoreEnableState(Control, Map, String)
 	 */
-	private void saveEnableStateAndSet(Control control, Map<String, Object> saveState, String key, boolean enabled) {
+	private void saveEnableStateAndSet(Control control, Map<String, Object> saveState, String key,
+			boolean enabled) {
 		if (control != null) {
 			saveState.put(key, control.getEnabled() ? Boolean.TRUE : Boolean.FALSE);
 			control.setEnabled(enabled);
@@ -1036,7 +1049,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		saveEnableStateAndSet(cancelButton, savedState,	"cancel", keepCancelEnabled); //$NON-NLS-1$
 		saveEnableStateAndSet(helpButton, savedState, "help", false); //$NON-NLS-1$
 		if (currentPage != null) {
-			savedState.put("page", ControlEnableState.disable(currentPage.getControl())); //$NON-NLS-1$
+			savedState
+					.put(
+							"page", ControlEnableState.disable(currentPage.getControl())); //$NON-NLS-1$
 		}
 		return savedState;
 	}
@@ -1050,8 +1065,8 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 */
 	private void setDisplayCursor(Cursor c) {
 		Shell[] shells = getShell().getDisplay().getShells();
-		for (Shell shell : shells) {
-			shell.setCursor(c);
+		for (int i = 0; i < shells.length; i++) {
+			shells[i].setCursor(c);
 		}
 	}
 
@@ -1186,9 +1201,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 			page.createControl(pageContainer);
 			// the page is responsible for ensuring the created control is
 			// accessible via getControl.
-			Assert.isNotNull(page.getControl(),
-					JFaceResources.format(JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
-							page.getName()));
+			Assert.isNotNull(page.getControl(), JFaceResources.format(
+					JFaceResources.getString("WizardDialog.missingSetControl"), //$NON-NLS-1$
+					new Object[] { page.getName() }));
 			// ensure the dialog is large enough for this page
 			updateSize(page);
 		}
@@ -1283,11 +1298,13 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 		boolean canFlipToNextPage = false;
 		boolean canFinish = wizard.canFinish();
 		if (backButton != null) {
-			boolean backEnabled = currentPage != null && currentPage.getPreviousPage() != null;
+			boolean backEnabled = currentPage != null
+					&& currentPage.getPreviousPage() != null;
 			backButton.setEnabled(backEnabled);
 		}
 		if (nextButton != null) {
-			canFlipToNextPage = currentPage != null && currentPage.canFlipToNextPage();
+			canFlipToNextPage = currentPage != null
+					&& currentPage.canFlipToNextPage();
 			nextButton.setEnabled(canFlipToNextPage);
 		}
 		finishButton.setEnabled(canFinish);
@@ -1392,9 +1409,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	private void updateSizeForWizard(IWizard sizingWizard) {
 		Point delta = new Point(0, 0);
 		IWizardPage[] pages = sizingWizard.getPages();
-		for (IWizardPage page : pages) {
+		for (int i = 0; i < pages.length; i++) {
 			// ensure the page container is large enough
-			Point pageDelta = calculatePageSizeDelta(page);
+			Point pageDelta = calculatePageSizeDelta(pages[i]);
 			delta.x = Math.max(delta.x, pageDelta.x);
 			delta.y = Math.max(delta.y, pageDelta.y);
 		}
@@ -1464,7 +1481,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 * @since 3.1
 	 */
 	protected void firePageChanged(final PageChangedEvent event) {
-		for (IPageChangedListener l : pageChangedListeners) {
+		Object[] listeners = pageChangedListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangedListener l = (IPageChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {
@@ -1511,7 +1530,9 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2, 
 	 * @since 3.3
 	 */
 	protected void firePageChanging(final PageChangingEvent event) {
-		for (IPageChangingListener l : pageChangingListeners) {
+		Object[] listeners = pageChangingListeners.getListeners();
+		for (int i = 0; i < listeners.length; ++i) {
+			final IPageChangingListener l = (IPageChangingListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
 				@Override
 				public void run() {

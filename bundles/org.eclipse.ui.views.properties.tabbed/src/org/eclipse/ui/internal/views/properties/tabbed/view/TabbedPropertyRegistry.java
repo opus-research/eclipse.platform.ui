@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2001, 2016 IBM Corporation and others.
+ * Copyright (c) 2001, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.internal.views.properties.tabbed.view;
 
@@ -17,15 +16,19 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import com.ibm.icu.text.MessageFormat;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewPlugin;
 import org.eclipse.ui.internal.views.properties.tabbed.TabbedPropertyViewStatusCodes;
@@ -37,8 +40,6 @@ import org.eclipse.ui.views.properties.tabbed.ISectionDescriptorProvider;
 import org.eclipse.ui.views.properties.tabbed.ITabDescriptor;
 import org.eclipse.ui.views.properties.tabbed.ITabDescriptorProvider;
 import org.eclipse.ui.views.properties.tabbed.ITypeMapper;
-
-import com.ibm.icu.text.MessageFormat;
 
 /**
  * Provides information about the tabbed property extension points. Each tabbed
@@ -114,7 +115,8 @@ public class TabbedPropertyRegistry {
 		this.contributorId = id;
 		this.propertyCategories = new ArrayList();
 		IConfigurationElement[] extensions = getConfigurationElements(EXTPT_CONTRIBUTOR);
-		for (IConfigurationElement configurationElement : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement configurationElement = extensions[i];
 			String contributor = configurationElement
 					.getAttribute(ATT_CONTRIBUTOR_ID);
 			if (contributor == null || !id.equals(contributor)) {
@@ -173,7 +175,8 @@ public class TabbedPropertyRegistry {
 			IConfigurationElement configurationElement) {
 		IConfigurationElement[] elements = configurationElement
 				.getChildren(ELEMENT_PROPERTY_CATEGORY);
-		for (IConfigurationElement element : elements) {
+		for (int i = 0; i < elements.length; i++) {
+			IConfigurationElement element = elements[i];
 			propertyCategories.add(element.getAttribute(ATT_CATEGORY));
 		}
 	}
@@ -188,7 +191,8 @@ public class TabbedPropertyRegistry {
 	 *            an optional CoreException
 	 */
 	private void handleConfigurationError(String id, CoreException exception) {
-		String message = MessageFormat.format(CONTRIBUTOR_ERROR, id);
+		String message = MessageFormat.format(CONTRIBUTOR_ERROR,
+				new Object[] { id });
 		IStatus status = new Status(IStatus.ERROR, TabbedPropertyViewPlugin
 				.getPlugin().getBundle().getSymbolicName(),
 				TabbedPropertyViewStatusCodes.CONTRIBUTOR_ERROR, message,
@@ -203,10 +207,12 @@ public class TabbedPropertyRegistry {
 	protected ISectionDescriptor[] readSectionDescriptors() {
 		List result = new ArrayList();
 		IConfigurationElement[] extensions = getConfigurationElements(EXTPT_SECTIONS);
-		for (IConfigurationElement extension : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement extension = extensions[i];
 			IConfigurationElement[] sections = extension
 					.getChildren(ELEMENT_SECTION);
-			for (IConfigurationElement section : sections) {
+			for (int j = 0; j < sections.length; j++) {
+				IConfigurationElement section = sections[j];
 				ISectionDescriptor descriptor = new SectionDescriptor(section,
 						typeMapper);
 				result.add(descriptor);
@@ -232,7 +238,8 @@ public class TabbedPropertyRegistry {
 								.getSymbolicName(), extensionPointId);
 		IConfigurationElement[] extensions = point.getConfigurationElements();
 		List unordered = new ArrayList(extensions.length);
-		for (IConfigurationElement extension : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement extension = extensions[i];
 			if (!extension.getName().equals(extensionPointId)) {
 				continue;
 			}
@@ -294,11 +301,11 @@ public class TabbedPropertyRegistry {
 			ITabDescriptor[] descriptors, IWorkbenchPart part,
 			ISelection selection) {
 		List result = new ArrayList();
-		for (ITabDescriptor descriptor : descriptors) {
-			ITabDescriptor filteredDescriptor = adaptDescriptorFor(descriptor,
+		for (int i = 0; i < descriptors.length; i++) {
+			ITabDescriptor descriptor = adaptDescriptorFor(descriptors[i],
 					part, selection);
-			if (!filteredDescriptor.getSectionDescriptors().isEmpty()) {
-				result.add(filteredDescriptor);
+			if (!descriptor.getSectionDescriptors().isEmpty()) {
+				result.add(descriptor);
 			}
 		}
 		if (result.size() == 0) {
@@ -351,9 +358,11 @@ public class TabbedPropertyRegistry {
 	protected List readTabDescriptors() {
 		List result = new ArrayList();
 		IConfigurationElement[] extensions = getConfigurationElements(EXTPT_TABS);
-		for (IConfigurationElement extension : extensions) {
+		for (int i = 0; i < extensions.length; i++) {
+			IConfigurationElement extension = extensions[i];
 			IConfigurationElement[] tabs = extension.getChildren(ELEMENT_TAB);
-			for (IConfigurationElement tab : tabs) {
+			for (int j = 0; j < tabs.length; j++) {
+				IConfigurationElement tab = tabs[j];
 				TabDescriptor descriptor = new TabDescriptor(tab);
 				if (getIndex(propertyCategories.toArray(), descriptor
 						.getCategory()) == -1) {
@@ -378,7 +387,8 @@ public class TabbedPropertyRegistry {
 		} else {
 			sections = readSectionDescriptors();
 		}
-		for (ISectionDescriptor section : sections) {
+		for (int i = 0; i < sections.length; i++) {
+			ISectionDescriptor section = sections[i];
 			appendToTabDescriptor(section, aTabDescriptors);
 		}
 	}
@@ -540,9 +550,9 @@ public class TabbedPropertyRegistry {
 		}
 
 		if (tabDescriptors != null) {
-			for (ITabDescriptor tabDescriptor : tabDescriptors) {
-				if (tabDescriptor instanceof TabDescriptor)
-					((TabDescriptor)tabDescriptor).dispose();
+			for (int i= 0; i < tabDescriptors.length; i++) {
+				if (tabDescriptors[i] instanceof TabDescriptor)
+					((TabDescriptor)tabDescriptors[i]).dispose();
 			}
 		}
 	}

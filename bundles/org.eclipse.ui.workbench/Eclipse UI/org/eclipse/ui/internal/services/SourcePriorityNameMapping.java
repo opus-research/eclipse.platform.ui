@@ -13,6 +13,7 @@ package org.eclipse.ui.internal.services;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.ui.ISources;
@@ -113,7 +114,7 @@ public final class SourcePriorityNameMapping implements ISources {
 		}
 
 		if (!sourcePrioritiesByName.containsKey(sourceName)) {
-			final Integer priority = Integer.valueOf(sourcePriority);
+			final Integer priority = new Integer(sourcePriority);
 
 			sourcePrioritiesByName.put(sourceName, priority);
 		}
@@ -149,7 +150,8 @@ public final class SourcePriorityNameMapping implements ISources {
 
 		// Add all of the reference variables.
 		final String[] sourceNames = info.getAccessedVariableNames();
-		for (final String sourceName : sourceNames) {
+		for (int i = 0; i < sourceNames.length; i++) {
+			final String sourceName = sourceNames[i];
 			sourcePriority |= getMapping(sourceName);
 		}
 

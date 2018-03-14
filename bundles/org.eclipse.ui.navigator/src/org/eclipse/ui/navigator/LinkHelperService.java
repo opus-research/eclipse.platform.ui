@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,8 +64,8 @@ public class LinkHelperService {
 		}
 
 		Set helpers = new LinkedHashSet();
-		for (LinkHelperDescriptor descriptor : descriptors) {
-			helpers.add(getLinkHelper(descriptor));
+		for (int i = 0; i < descriptors.length; i++) {
+			helpers.add(getLinkHelper(descriptors[i]));
 		}
 		if (helpers.size() == 0)
 			return CANT_GET_NO_HELP;
@@ -88,8 +88,8 @@ public class LinkHelperService {
 		}
 
 		Set helpers = new LinkedHashSet();
-		for (LinkHelperDescriptor descriptor : descriptors) {
-			helpers.add(getLinkHelper(descriptor));
+		for (int i = 0; i < descriptors.length; i++) {
+			helpers.add(getLinkHelper(descriptors[i]));
 		}
 		if (helpers.size() == 0)
 			return CANT_GET_NO_HELP;
@@ -122,8 +122,8 @@ public class LinkHelperService {
 		IStructuredSelection selection = StructuredSelection.EMPTY;
 		IStructuredSelection newSelection = StructuredSelection.EMPTY;
 
-		for (ILinkHelper helper : helpers) {
-			selection = helper.findSelection(input);
+		for (int i = 0; i < helpers.length; i++) {
+			selection = helpers[i].findSelection(input);
 			if (selection != null && !selection.isEmpty()) {
 				newSelection = mergeSelection(newSelection, selection);
 			}

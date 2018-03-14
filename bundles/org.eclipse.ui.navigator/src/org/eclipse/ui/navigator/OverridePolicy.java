@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,9 +80,9 @@ public final class OverridePolicy {
 	 *         InvokeAlwaysRegardlessOfSuppressedExt if aLiteral is invalid
 	 */
 	public static OverridePolicy get(String aLiteral) {
-		for (OverridePolicy policy : ENUM_ARRAY) {
-			if (policy.getLiteral().equals(aLiteral)) {
-				return policy;
+		for (int i = 0; i < ENUM_ARRAY.length; i++) {
+			if (ENUM_ARRAY[i].getLiteral().equals(aLiteral)) {
+				return ENUM_ARRAY[i];
 			}
 		}
 		return InvokeAlwaysRegardlessOfSuppressedExt;

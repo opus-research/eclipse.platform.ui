@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -167,8 +167,8 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 			createMenuGroups();
 		}
 
-		for (IContributionItem menuGroup : menuGroups) {
-			aMenu.add(menuGroup);
+		for (int i = 0; i < menuGroups.length; i++) {
+			aMenu.add(menuGroups[i]);
 		}
 
 		addCommonActionProviderMenu(aMenu);
@@ -214,8 +214,8 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 		final CommonActionProviderDescriptor[] providerDescriptors = CommonActionDescriptorManager
 				.getInstance().findRelevantActionDescriptors(contentService, getContext());
 		if (providerDescriptors.length > 0) {
-			for (CommonActionProviderDescriptor providerDescriptor : providerDescriptors) {
-				final CommonActionProviderDescriptor providerDescriptorLocal = providerDescriptor;
+			for (int i = 0; i < providerDescriptors.length; i++) {
+				final CommonActionProviderDescriptor providerDescriptorLocal = providerDescriptors[i];
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override
 					public void run() throws Exception {
@@ -252,8 +252,8 @@ public final class NavigatorActionService extends ActionGroup implements IMement
 		final CommonActionProviderDescriptor[] providerDescriptors = CommonActionDescriptorManager
 				.getInstance().findRelevantActionDescriptors(contentService, context);
 		if (providerDescriptors.length > 0) {
-			for (CommonActionProviderDescriptor providerDescriptor : providerDescriptors) {
-				final CommonActionProviderDescriptor providerDesciptorLocal = providerDescriptor;
+			for (int i = 0; i < providerDescriptors.length; i++) {
+				final CommonActionProviderDescriptor providerDesciptorLocal = providerDescriptors[i];
 				final ActionContext actionContextLocal = context;
 				SafeRunner.run(new NavigatorSafeRunnable() {
 					@Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -889,8 +889,8 @@ public class ImportOperation extends WorkspaceModifyOperation {
            		errorTable.add(status);
            		ArrayList filteredFiles = new ArrayList();
 
-           		for (IFile file : files) {
-           			filteredFiles.add(file.getFullPath());
+           		for (int i = 0; i < files.length; i++) {
+           			filteredFiles.add(files[i].getFullPath());
            		}
            		return filteredFiles;
            }

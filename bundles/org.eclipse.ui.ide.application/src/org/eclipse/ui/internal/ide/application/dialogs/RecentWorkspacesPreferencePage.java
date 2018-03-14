@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 Eric Rizzo and others.
+ * Copyright (c) 2009, 2010 Eric Rizzo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -146,7 +146,8 @@ public class RecentWorkspacesPreferencePage extends PreferencePage
 			});
 
 		String[] recentWorkspaces = workspacesData.getRecentWorkspaces();
-		for (String aWorkspace : recentWorkspaces) {
+		for (int i = 0; i < recentWorkspaces.length; i++) {
+			String aWorkspace = recentWorkspaces[i];
 			if (aWorkspace != null) {
 				workspacesList.add(TextProcessor.process(aWorkspace));
 			}

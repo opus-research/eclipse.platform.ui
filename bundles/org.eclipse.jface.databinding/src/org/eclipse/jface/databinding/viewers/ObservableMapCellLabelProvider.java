@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2015 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -72,15 +72,15 @@ public class ObservableMapCellLabelProvider extends CellLabelProvider {
 		System.arraycopy(attributeMaps, 0,
 				this.attributeMaps = new IObservableMap[attributeMaps.length],
 				0, attributeMaps.length);
-		for (IObservableMap attributeMap : attributeMaps) {
-			attributeMap.addMapChangeListener(mapChangeListener);
+		for (int i = 0; i < attributeMaps.length; i++) {
+			attributeMaps[i].addMapChangeListener(mapChangeListener);
 		}
 	}
 
 	@Override
 	public void dispose() {
-		for (IObservableMap attributeMap : attributeMaps) {
-			attributeMap.removeMapChangeListener(mapChangeListener);
+		for (int i = 0; i < attributeMaps.length; i++) {
+			attributeMaps[i].removeMapChangeListener(mapChangeListener);
 		}
 		super.dispose();
 		this.attributeMaps = null;
