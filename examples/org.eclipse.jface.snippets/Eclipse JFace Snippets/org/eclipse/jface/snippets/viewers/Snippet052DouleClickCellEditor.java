@@ -12,9 +12,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -105,7 +102,8 @@ public class Snippet052DouleClickCellEditor {
 		for (String label : labels) {
 			createColumnFor(viewer, label);
 		}
-		viewer.setInput(createModel());
+		MyModel[] model = createModel();
+		viewer.setInput(model);
 		viewer.getTable().setLinesVisible(true);
 		viewer.getTable().setHeaderVisible(true);
 	}
@@ -121,11 +119,11 @@ public class Snippet052DouleClickCellEditor {
 		return column;
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[10];
 
-		for (int i = 0; i < 10; i++) {
-			elements.add(new MyModel(i));
+		for (int i = 0; i < elements.length; i++) {
+			elements[i] = new MyModel(i);
 		}
 		return elements;
 	}

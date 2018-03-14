@@ -13,9 +13,6 @@
 
 package org.eclipse.jface.snippets.viewers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -58,21 +55,23 @@ public class Snippet063ComboViewer {
 		v.setLabelProvider(new LabelProvider());
 		v.setContentProvider(ArrayContentProvider.getInstance());
 
-		List<MyModel> model = createModel();
+		MyModel[] model = createModel();
 		v.setInput(model);
 
 		// Select the initial Element
-		if (model.size() > 0) {
-			v.setSelection(new StructuredSelection(model.get(0)));
+		if (model.length > 0) {
+			v.setSelection(new StructuredSelection(model[0]));
 		}
 	}
 
-	private List<MyModel> createModel() {
-		List<MyModel> elements = new ArrayList<MyModel>();
+	private MyModel[] createModel() {
+		MyModel[] elements = new MyModel[11];
 
-		for (int i = 0; i < 10; i++) {
-			elements.add(new MyModel(i));
+		for (int i = 0; i < elements.length - 1; i++) {
+			elements[i] = new MyModel(i);
 		}
+		elements[elements.length - 1] = new MyModel(42);
+
 		return elements;
 	}
 

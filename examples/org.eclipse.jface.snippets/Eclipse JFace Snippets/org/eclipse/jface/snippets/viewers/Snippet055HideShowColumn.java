@@ -14,7 +14,6 @@
 package org.eclipse.jface.snippets.viewers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -213,7 +212,7 @@ public class Snippet055HideShowColumn {
 	public class MyModel {
 
 		public MyModel parent;
-		public List<MyModel> child = new ArrayList<MyModel>();
+		public ArrayList<MyModel> child = new ArrayList<MyModel>();
 		public int counter;
 
 		public MyModel(int counter, MyModel parent) {
