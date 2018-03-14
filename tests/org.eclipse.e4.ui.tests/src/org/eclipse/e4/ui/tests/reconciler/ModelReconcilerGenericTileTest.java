@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.util.Collection;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.modeling.ModelDelta;
 import org.eclipse.e4.ui.workbench.modeling.ModelReconciler;
 import org.junit.Test;
@@ -31,8 +30,7 @@ public abstract class ModelReconcilerGenericTileTest extends
 
 		MWindow window = createWindow(application);
 
-		MPartSashContainer partSashContainer = BasicFactoryImpl.eINSTANCE
-				.createPartSashContainer();
+		MPartSashContainer partSashContainer = ems.createModelElement(MPartSashContainer.class);
 		window.getChildren().add(partSashContainer);
 
 		partSashContainer.setHorizontal(applicationState);
