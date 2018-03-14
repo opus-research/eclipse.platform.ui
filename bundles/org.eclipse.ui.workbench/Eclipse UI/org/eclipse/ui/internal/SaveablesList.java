@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -350,38 +350,31 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	public Object preCloseParts(List partsToClose, boolean save, IShellProvider shellProvider,
 			final IWorkbenchWindow window) {
-		return preCloseParts(partsToClose, false, save, shellProvider, window);
-	}
-
-	public Object preCloseParts(List partsToClose, boolean addNonPartSources, boolean save,
-			IShellProvider shellProvider, final IWorkbenchWindow window) {
 		// reference count (how many occurrences of a model will go away?)
 		PostCloseInfo postCloseInfo = new PostCloseInfo();
 		for (Iterator it = partsToClose.iterator(); it.hasNext();) {
 			IWorkbenchPart part = (IWorkbenchPart) it.next();
 			postCloseInfo.partsClosing.add(part);
-			if (save) {
-				if (part instanceof ISaveablePart) {
-					ISaveablePart saveablePart = (ISaveablePart) part;
-					if (!saveablePart.isSaveOnCloseNeeded()) {
-						// pretend for now that this part is not closing
-						continue;
-					}
+			if (part instanceof ISaveablePart) {
+				ISaveablePart saveablePart = (ISaveablePart) part;
+				if (save && !saveablePart.isSaveOnCloseNeeded()) {
+					// pretend for now that this part is not closing
+					continue;
 				}
-				if (part instanceof ISaveablePart2) {
-					ISaveablePart2 saveablePart2 = (ISaveablePart2) part;
-					// TODO show saveablePart2 before prompting, see
-					// EditorManager.saveAll
-					int response = SaveableHelper.savePart(saveablePart2, window, true);
-					if (response == ISaveablePart2.CANCEL) {
-						// user canceled
-						return null;
-					} else if (response != ISaveablePart2.DEFAULT) {
-						// only include this part in the following logic if it
-						// returned
-						// DEFAULT
-						continue;
-					}
+			}
+			if (save && part instanceof ISaveablePart2) {
+				ISaveablePart2 saveablePart2 = (ISaveablePart2) part;
+				// TODO show saveablePart2 before prompting, see
+				// EditorManager.saveAll
+				int response = SaveableHelper.savePart(saveablePart2, window,
+						true);
+				if (response == ISaveablePart2.CANCEL) {
+					// user canceled
+					return null;
+				} else if (response != ISaveablePart2.DEFAULT) {
+					// only include this part in the following logic if it returned
+					// DEFAULT
+					continue;
 				}
 			}
 			Saveable[] modelsFromSource = getSaveables(part);
@@ -392,16 +385,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		}
 		fillModelsClosing(postCloseInfo.modelsClosing,
 				postCloseInfo.modelsDecrementing);
-		if (addNonPartSources) {
-			for (ISaveablesSource nonPartSource : getNonPartSources()) {
-				Saveable[] saveables = nonPartSource.getSaveables();
-				for (Saveable saveable : saveables) {
-					if (saveable.isDirty()) {
-						postCloseInfo.modelsClosing.add(saveable);
-					}
-				}
-			}
-		}
 		if (save) {
 			boolean canceled = promptForSavingIfNecessary(shellProvider, window,
 					postCloseInfo.modelsClosing, postCloseInfo.modelsDecrementing, true);
@@ -426,9 +409,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	private boolean promptForSavingIfNecessary(IShellProvider shellProvider,
 			IWorkbenchWindow window, Set modelsClosing, Map modelsDecrementing, boolean canCancel) {
-		List<Saveable> modelsToOptionallySave = new ArrayList<Saveable>();
-		for (Iterator<Saveable> it = modelsDecrementing.keySet().iterator(); it.hasNext();) {
-			Saveable modelDecrementing = it.next();
+		List modelsToOptionallySave = new ArrayList();
+		for (Iterator it = modelsDecrementing.keySet().iterator(); it.hasNext();) {
+			Saveable modelDecrementing = (Saveable) it.next();
 			if (modelDecrementing.isDirty() && !modelsClosing.contains(modelDecrementing)) {
 				modelsToOptionallySave.add(modelDecrementing);
 			}
@@ -441,9 +424,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			return true;
 		}
 
-		List<Saveable> modelsToSave = new ArrayList<Saveable>();
-		for (Iterator<Saveable> it = modelsClosing.iterator(); it.hasNext();) {
-			Saveable modelClosing = it.next();
+		List modelsToSave = new ArrayList();
+		for (Iterator it = modelsClosing.iterator(); it.hasNext();) {
+			Saveable modelClosing = (Saveable) it.next();
 			if (modelClosing.isDirty()) {
 				modelsToSave.add(modelClosing);
 			}
@@ -616,40 +599,15 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 
 	/**
 	 * Save the given models.
-	 *
-	 * @param finalModels
-	 *            the list of models to be saved
-	 * @param shellProvider
-	 *            the provider used to obtain a shell in prompting is required.
-	 *            Clients can use a workbench window for this.
-	 * @param runnableContext
-	 *            a runnable context that will be used to provide a progress
-	 *            monitor while the save is taking place. Clients can use a
-	 *            workbench window for this.
+	 * @param finalModels the list of models to be saved
+	 * @param shellProvider the provider used to obtain a shell in prompting is
+	 *            required. Clients can use a workbench window for this.
+	 * @param runnableContext a runnable context that will be used to provide a
+	 *            progress monitor while the save is taking place. Clients can
+	 *            use a workbench window for this.
 	 * @return <code>true</code> if the operation was canceled
 	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext) {
-		return saveModels(finalModels, shellProvider, runnableContext, true);
-	}
-
-	/**
-	 * Save the given models.
-	 *
-	 * @param finalModels
-	 *            the list of models to be saved
-	 * @param shellProvider
-	 *            the provider used to obtain a shell in prompting is required.
-	 *            Clients can use a workbench window for this.
-	 * @param runnableContext
-	 *            a runnable context that will be used to provide a progress
-	 *            monitor while the save is taking place. Clients can use a
-	 *            workbench window for this.
-	 * @param blockUntilSaved
-	 * @return <code>true</code> if the operation was canceled
-	 */
-	public boolean saveModels(final List finalModels, final IShellProvider shellProvider,
-			IRunnableContext runnableContext, final boolean blockUntilSaved) {
+	public boolean saveModels(final List finalModels, final IShellProvider shellProvider, IRunnableContext runnableContext) {
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
@@ -664,8 +622,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						monitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1),
-							shellProvider, blockUntilSaved);
+					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1), shellProvider, true);
 					if (monitorWrap.isCanceled())
 						break;
 				}
