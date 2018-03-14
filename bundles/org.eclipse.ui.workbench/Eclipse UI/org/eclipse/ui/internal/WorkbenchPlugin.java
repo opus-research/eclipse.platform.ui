@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Replace deprecated API usage in WorkbenchPlugin#createExtension - http://bugs.eclipse.org/400714 
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 400714, 441267
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
