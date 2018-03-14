@@ -28,12 +28,18 @@ public class CSSRuleListImpl implements CSSRuleList {
 
 	// W3C CSSRuleList API methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRuleList#getLength()
+	 */
 	public int getLength() {
 		return ruleList.size();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSRuleList#item(int)
+	 */
 	public CSSRule item(int position) {
 		return ruleList.get(position);
 	}

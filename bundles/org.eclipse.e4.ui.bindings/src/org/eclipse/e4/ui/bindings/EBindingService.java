@@ -30,7 +30,6 @@ public interface EBindingService {
 	public static final String TYPE_ATTR_TAG = "type"; //$NON-NLS-1$
 	public static final String DELETED_BINDING_TAG = "deleted"; //$NON-NLS-1$
 
-
 	Binding createBinding(TriggerSequence sequence, ParameterizedCommand command, String contextId,
 			Map<String, String> attributes);
 

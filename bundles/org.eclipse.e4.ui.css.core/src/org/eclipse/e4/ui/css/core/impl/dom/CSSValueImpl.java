@@ -24,18 +24,27 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 
 	// W3C CSSValue API methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssText()
+	 */
 	public String getCssText() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#getCssValueType()
+	 */
 	public short getCssValueType() {
 		return CSS_PRIMITIVE_VALUE;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSValue#setCssText(java.lang.String)
+	 */
 	public void setCssText(String cssText) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -43,40 +52,61 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 
 	// W3C CSSPrimitiveValue API methods
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getPrimitiveType()
+	 */
 	public short getPrimitiveType() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getCounterValue()
+	 */
 	public Counter getCounterValue() throws DOMException {
 		throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR, DOMExceptionImpl.COUNTER_ERROR);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getRGBColorValue()
+	 */
 	public RGBColor getRGBColorValue() throws DOMException {
 		throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR, DOMExceptionImpl.RGBCOLOR_ERROR);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getRectValue()
+	 */
 	public Rect getRectValue() throws DOMException {
 		throw new DOMExceptionImpl(DOMException.INVALID_ACCESS_ERR, DOMExceptionImpl.RECT_ERROR);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#getStringValue()
+	 */
 	public String getStringValue() throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#setFloatValue(short, float)
+	 */
 	public void setFloatValue(short arg0, float arg1) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.w3c.dom.css.CSSPrimitiveValue#setStringValue(short, java.lang.String)
+	 */
 	public void setStringValue(short arg0, String arg1) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
@@ -84,7 +114,6 @@ public abstract class CSSValueImpl extends AbstractCSSNode implements CSSPrimiti
 
 	// Additional methods
 
-	@Override
 	public float getFloatValue(short valueType) throws DOMException {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("NOT YET IMPLEMENTED");
