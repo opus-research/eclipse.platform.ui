@@ -1435,7 +1435,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * On a change to availability, updates the appropriate widgets.
 	 */
 	private void actionSetAvailabilityChanged() {
-		actionSetAvailabilityTable.refresh();
+		actionSetAvailabilityTable.refresh(this);
 		actionSetMenuViewer.refresh();
 		actionSetToolbarViewer.refresh();
 
