@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2014 IBM Corporation and others.
+ * Copyright (c) 2007, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -700,14 +700,17 @@ import com.ibm.icu.text.NumberFormat;
 			this.fromType = fromType;
 		}
 
+		@Override
 		public Object convert(Object fromObject) {
 			return fromObject;
 		}
 
+		@Override
 		public Object getFromType() {
 			return fromType;
 		}
 
+		@Override
 		public Object getToType() {
 			return toType;
 		}

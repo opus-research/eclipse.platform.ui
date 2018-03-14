@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2012 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -32,7 +33,7 @@ public class ActionUtil {
 
     /**
      * Runs an action contribution.
-     * 
+     *
      * @param test the current test case
      * @param item an action contribution item
      */
@@ -43,7 +44,7 @@ public class ActionUtil {
 
     /**
      * Runs the first action found in a menu manager with a
-     * particular label. 
+     * particular label.
      *
      * @param test the current test case
      * @param mgr the containing menu manager
@@ -52,8 +53,7 @@ public class ActionUtil {
     public static void runActionWithLabel(TestCase test, IMenuManager mgr,
             String label) {
         IContributionItem[] items = mgr.getItems();
-        for (int nX = 0; nX < items.length; nX++) {
-            IContributionItem item = items[nX];
+		for (IContributionItem item : items) {
             if (item instanceof SubContributionItem)
                 item = ((SubContributionItem) item).getInnerItem();
             if (item instanceof ActionContributionItem) {
@@ -69,8 +69,8 @@ public class ActionUtil {
 
     /**
      * Runs the first action found in a window with a
-     * particular label. 
-     * 
+     * particular label.
+     *
      * @param test the current test case
      * @param win the containing window
      * @param label the action label
@@ -83,9 +83,9 @@ public class ActionUtil {
     }
 
     /**
-     * Runs an action identified by an id path in a 
+     * Runs an action identified by an id path in a
      * menu manager.
-     * 
+     *
      * @param test the current test case
      * @param mgr the containing menu manager
      * @param label the action label
@@ -98,9 +98,9 @@ public class ActionUtil {
     }
 
     /**
-     * Runs an action identified by an id path in a 
+     * Runs an action identified by an id path in a
      * window.
-     * 
+     *
      * @param test the current test case
      * @param win the containing window
      * @param label the action label
@@ -114,7 +114,7 @@ public class ActionUtil {
 
     /**
      * Returns the first action found in a menu manager with a
-     * particular label. 
+     * particular label.
      *
      * @param mgr the containing menu manager
      * @param label the action label
@@ -123,8 +123,7 @@ public class ActionUtil {
      */
     public static IAction getActionWithLabel(IMenuManager mgr, String label) {
         IContributionItem[] items = mgr.getItems();
-        for (int nX = 0; nX < items.length; nX++) {
-            IContributionItem item = items[nX];
+		for (IContributionItem item : items) {
             if (item instanceof SubContributionItem)
                 item = ((SubContributionItem) item).getInnerItem();
             if (item instanceof ActionContributionItem) {
@@ -140,13 +139,13 @@ public class ActionUtil {
     /**
      * Fire the "handleAboutToShow" method in a menu manager.
      * This triggers the same behavior as when a user opens a menu.
-     * The menu to be populated with actions and those 
+     * The menu to be populated with actions and those
      * actions to be enacted in SWT widgets.
-     * 
+     *
      * @param mgr the menu manager to open
      */
     public static void fireAboutToShow(MenuManager mgr) throws Throwable {
-        Class clazz = mgr.getClass();
+		Class<?> clazz = mgr.getClass();
         Method method = clazz.getDeclaredMethod("handleAboutToShow",
                 new Class[0]);
         method.setAccessible(true);
