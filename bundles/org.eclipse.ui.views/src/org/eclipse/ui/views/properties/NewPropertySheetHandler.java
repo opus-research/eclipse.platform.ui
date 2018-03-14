@@ -85,7 +85,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			PropertySheet sheet = (PropertySheet) activePart;
 			return (PropertyShowInContext) sheet.getShowInContext();
 		}
-		IShowInSource adapter = Adapters.getAdapter(activePart, IShowInSource.class, true);
+		IShowInSource adapter = Adapters.adapt(activePart, IShowInSource.class);
 		if (adapter != null) {
 			ShowInContext showInContext = adapter.getShowInContext();
 			return new PropertyShowInContext(activePart, showInContext);
@@ -114,8 +114,7 @@ public class NewPropertySheetHandler extends AbstractHandler {
 			secondaryId = Long.toString(System.currentTimeMillis());
 		} else {
 			IViewReference[] refs = page.getViewReferences();
-			for (int i = 0; i < refs.length; i++) {
-				IViewReference viewReference = refs[i];
+			for (IViewReference viewReference : refs) {
 				if (IPageLayout.ID_PROP_SHEET.equals(viewReference.getId())) {
 					secondaryId = Long.toString(System.currentTimeMillis());
 					PropertySheet sheet = (PropertySheet) viewReference
