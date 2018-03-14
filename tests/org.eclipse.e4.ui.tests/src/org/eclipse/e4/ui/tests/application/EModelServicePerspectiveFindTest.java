@@ -17,14 +17,17 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.ui.internal.workbench.ModelServiceImpl;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.model.application.MApplication;
+import org.eclipse.e4.ui.model.application.impl.ApplicationFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.Selector;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.ElementMatcher;
@@ -65,7 +68,7 @@ public class EModelServicePerspectiveFindTest {
 	@Before
 	public void setUp() {
 		applicationContext = E4Application.createDefaultContext();
-		modelService = applicationContext.get(EModelService.class);
+		modelService = new ModelServiceImpl(applicationContext);
 		selectAll = new ElementMatcher(null, null, (String) null);
 		if (simple) {
 			setupSimpleApplication();
@@ -83,9 +86,9 @@ public class EModelServicePerspectiveFindTest {
 	 * A simpler form of application setup as might be found in a new E4 app
 	 */
 	private void setupSimpleApplication() {
-		app = modelService.createModelElement(MApplication.class);
+		app = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		app.setContext(applicationContext);
-		window = modelService.createModelElement(MWindow.class);
+		window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setElementId("singleValidId");
 		app.getChildren().add(window);
 
@@ -104,9 +107,9 @@ public class EModelServicePerspectiveFindTest {
 	 * The form of application as might be found with an E3.x-based compat layer
 	 */
 	private void setupWorkbenchApplication() {
-		app = modelService.createModelElement(MApplication.class);
+		app = ApplicationFactoryImpl.eINSTANCE.createApplication();
 		app.setContext(applicationContext);
-		window = modelService.createModelElement(MWindow.class);
+		window = BasicFactoryImpl.eINSTANCE.createWindow();
 		window.setElementId("singleValidId");
 		app.getChildren().add(window);
 
