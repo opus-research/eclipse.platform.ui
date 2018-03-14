@@ -208,7 +208,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 	}
 
-	public String getToolTip(MUILabel element) {
+	protected String getToolTip(MUILabel element) {
 		String overrideTip = (String) ((MUIElement) element).getTransientData()
 				.get(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
 		return overrideTip == null ? element.getLocalizedTooltip()
