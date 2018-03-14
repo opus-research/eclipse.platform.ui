@@ -33,7 +33,7 @@ class DynamicContributionContributionItem extends ContributionItem {
 
 	/**
 	 * Create the item and associated model;
-	 *
+	 * 
 	 * @param item
 	 */
 	public DynamicContributionContributionItem(MDynamicMenuContribution item) {

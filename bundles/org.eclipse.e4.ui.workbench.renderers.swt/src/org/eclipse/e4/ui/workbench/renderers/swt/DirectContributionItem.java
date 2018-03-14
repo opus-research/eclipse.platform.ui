@@ -7,7 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards
+ *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards 
  *     to toolbar always displays icon and text
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
@@ -480,7 +480,7 @@ public class DirectContributionItem extends ContributionItem {
 	 * Return the execution context for the @CanExecute and @Execute methods.
 	 * This should be the same as the execution context used by the
 	 * EHandlerService.
-	 *
+	 * 
 	 * @param context
 	 *            the context for this item
 	 * @return the execution context
@@ -516,7 +516,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 *
+	 * 
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -528,7 +528,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 *
+	 * 
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy
