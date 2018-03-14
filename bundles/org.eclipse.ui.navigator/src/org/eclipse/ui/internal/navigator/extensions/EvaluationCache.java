@@ -21,7 +21,10 @@ import org.eclipse.ui.internal.navigator.VisibilityAssistant;
 import org.eclipse.ui.internal.navigator.VisibilityAssistant.VisibilityListener;
 
 /**
- * A cache for evaluated {@link NavigatorContentDescriptor}.
+ * A cache for evaluated {@link NavigatorContentDescriptor
+ * NavigatorContentDescriptors}.
+ *
+ * @since 3.3
  */
 public class EvaluationCache implements VisibilityListener {
 	// TODO Have an LRU cache with max size as well as SoftReferences, to help
@@ -135,8 +138,7 @@ public class EvaluationCache implements VisibilityListener {
 		// checking reflective data) to be worth it.
 		EvaluationReference<Object> key = new EvaluationReference<>(anElement, queue);
 		EvaluationValueReference<NavigatorContentDescriptor[]> newValue =
- new EvaluationValueReference<>(theDescriptors,
-				key, queue);
+				new EvaluationValueReference<NavigatorContentDescriptor[]>(theDescriptors, key, queue);
 		EvaluationValueReference<NavigatorContentDescriptor[]> oldValue = map.put(key, newValue);
 		if (oldValue != null) {
 			// "Swap" the correct key instance when swapping the value, or else the above, temporary
@@ -163,11 +165,10 @@ public class EvaluationCache implements VisibilityListener {
 			boolean toComputeOverrides) {
 		cleanUpStaleEntries();
 		if (anElement != null) {
-			if (toComputeOverrides) {
+			if (toComputeOverrides)
 				setDescriptorsInMap(anElement, theDescriptors, evaluations, evaluationsQueue);
-			} else {
+			else
 				setDescriptorsInMap(anElement, theDescriptors, evaluationsWithOverrides, evaluationsWithOverridesQueue);
-			}
 		}
 	}
 
