@@ -12,6 +12,7 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
+ *     Marc-Andre Laperle <marc-andre.laperle@ericsson.com> - Bug 463245
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -211,7 +212,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			parent.markDirty();
 			parent.update(true);
 			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
+			if (tb != null && tb.getLayout() != null && !tb.isDisposed()) {
 				tb.pack(true);
 				if (tb.getParent() != null) {
 					tb.getParent().pack(true);
