@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.ui.internal.util.Util;
 
@@ -25,18 +26,19 @@ public final class ActivityDefinition implements Comparable {
     private final static int HASH_INITIAL = ActivityDefinition.class.getName()
             .hashCode();
 
-	static Map<String, ActivityDefinition> activityDefinitionsById(
-			Collection<ActivityDefinition> activityDefinitions,
+    static Map activityDefinitionsById(Collection activityDefinitions,
             boolean allowNullIds) {
         if (activityDefinitions == null) {
 			throw new NullPointerException();
 		}
 
-		Map<String, ActivityDefinition> map = new HashMap<String, ActivityDefinition>();
-		Iterator<ActivityDefinition> iterator = activityDefinitions.iterator();
+        Map map = new HashMap();
+        Iterator iterator = activityDefinitions.iterator();
 
         while (iterator.hasNext()) {
-			ActivityDefinition activityDefinition = iterator.next();
+            Object object = iterator.next();
+            Util.assertInstance(object, ActivityDefinition.class);
+            ActivityDefinition activityDefinition = (ActivityDefinition) object;
             String id = activityDefinition.getId();
 
             if (allowNullIds || id != null) {
