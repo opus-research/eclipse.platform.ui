@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2008, 2010, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -12,11 +12,13 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
@@ -34,9 +36,9 @@ public class IdClassLabelColorTest extends CSSSWTTestCase {
 	static final String CSS_CLASS_NAME = "makeItGreenClass";
 	static final String CSS_ID = "makeItBlueID";
 
-	@Override
 	protected Label createTestLabel(String styleSheet) {
-		engine = createEngine(styleSheet, display);
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(styleSheet, display);
 
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);

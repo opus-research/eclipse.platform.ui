@@ -13,10 +13,15 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
 public class LabelTest extends CSSSWTTestCase {
@@ -24,6 +29,31 @@ public class LabelTest extends CSSSWTTestCase {
 	static final RGB RED = new RGB(255, 0, 0);
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
+
+	CSSEngine engine;
+
+	protected Label createTestLabel(String styleSheet) {
+		Display display = Display.getDefault();
+		engine = createEngine(styleSheet, display);
+
+		// Create widgets
+		Shell shell = new Shell(display, SWT.SHELL_TRIM);
+		FillLayout layout = new FillLayout();
+		shell.setLayout(layout);
+
+		Composite panel = new Composite(shell, SWT.NONE);
+		panel.setLayout(new FillLayout());
+
+		Label labelToTest = new Label(panel, SWT.NONE);
+		labelToTest.setText("Some label text");
+
+		// Apply styles
+		engine.applyStyles(labelToTest, true);
+
+		shell.pack();
+		return labelToTest;
+	}
+
 
 	@Test
 	public void testColor() {

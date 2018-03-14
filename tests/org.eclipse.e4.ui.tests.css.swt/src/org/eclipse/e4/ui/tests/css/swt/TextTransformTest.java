@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,12 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
@@ -37,6 +39,7 @@ import org.junit.Test;
  */
 public abstract class TextTransformTest extends CSSSWTTestCase {
 
+	private CSSEngine engine;
 
 	/**
 	 * Retrieves the name of the widget that is being tested, must not be
@@ -77,6 +80,7 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 	protected abstract void setText(Control control, String string);
 
 	private Control createTestControl(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
@@ -123,5 +127,4 @@ public abstract class TextTransformTest extends CSSSWTTestCase {
 				+ " { text-transform: lowercase; }");
 		assertEquals("some label text", getText(controlToTest));
 	}
-
 }

@@ -15,17 +15,25 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.internal.preferences.EclipsePreferences;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.swt.widgets.Display;
+import org.junit.Before;
 import org.junit.Test;
 
 public class IEclipsePreferencesTest extends CSSSWTTestCase {
+	private Display display;
 
+	@Before
+	public void setUp() {
+		display = Display.getDefault();
+	}
 
 	@Test
 	public void testIEclipsePreferences() {
 		// given
 		IEclipsePreferences preferences = new EclipsePreferences(null, "org.eclipse.jdt.ui") {};
 
-		engine = createEngine(
+		CSSEngine engine = createEngine(
 				"IEclipsePreferences#org-eclipse-jdt-ui{preferences:"
 						+ "'semanticHighlighting.abstractClass.color=128,255,0',"
 						+ "'java_bracket=0,255,255',"

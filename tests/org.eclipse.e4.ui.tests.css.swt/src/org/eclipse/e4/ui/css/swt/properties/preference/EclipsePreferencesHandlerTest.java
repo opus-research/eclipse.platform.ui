@@ -58,7 +58,6 @@ public class EclipsePreferencesHandlerTest {
 
 		// then
 		verify(handler, times(1)).overrideProperty(preferences, value);
-		engine.dispose();
 	}
 
 	@Test
@@ -95,7 +94,6 @@ public class EclipsePreferencesHandlerTest {
 				any(IEclipsePreferences.class), any(CSSValue.class));
 		verify(handler, times(1)).overrideProperty(preferences, values[0]);
 		verify(handler, times(1)).overrideProperty(preferences, values[1]);
-		engine.dispose();
 	}
 
 	@Test

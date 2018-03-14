@@ -23,14 +23,21 @@ import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.themes.ColorDefinition;
+import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class ColorDefinitionTest extends CSSSWTTestCase {
+	private Display display;
 
+	@Before
+	public void setUp() {
+		display = Display.getDefault();
+	}
 
 	@Test
 	public void testColorDefinition() {
@@ -50,7 +57,6 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		assertEquals("categoryId", definition.getCategoryId());
 		assertTrue(definition.getDescription().startsWith("description"));
 		assertTrue(definition.isOverridden());
-		engine.dispose();
 	}
 
 	@Test
@@ -72,7 +78,6 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		assertEquals("categoryIdOverridden", definition.getCategoryId());
 		assertTrue(definition.getDescription().startsWith("descriptionOverridden"));
 		assertTrue(definition.isOverridden());
-		engine.dispose();
 	}
 
 	@Test
@@ -91,7 +96,6 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		//then
 		assertEquals(new RGB(0, 0, 0), definition.getValue());
 		assertFalse(definition.isOverridden());
-		engine.dispose();
 	}
 
 	@Test
@@ -111,7 +115,6 @@ public class ColorDefinitionTest extends CSSSWTTestCase {
 		//then
 		assertEquals(new RGB(255, 0, 0), label.getBackground().getRGB());
 
-		engine.dispose();
 		shell.dispose();
 	}
 

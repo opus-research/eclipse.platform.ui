@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2008, 2010, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -13,12 +13,14 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,8 +30,10 @@ public class ButtonTest extends CSSSWTTestCase {
 	static final RGB RED = new RGB(255, 0, 0);
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
+	CSSEngine engine;
 
 	protected Button createTestButton(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
@@ -51,6 +55,7 @@ public class ButtonTest extends CSSSWTTestCase {
 	}
 
 	protected Button createTestArrowButton(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets

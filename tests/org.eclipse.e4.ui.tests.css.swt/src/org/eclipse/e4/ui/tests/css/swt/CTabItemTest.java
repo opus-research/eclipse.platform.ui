@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Remy Chi Jian Suen and others.
+ * Copyright (c) 2009, 2013, 2014 Remy Chi Jian Suen and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.After;
 import org.junit.Ignore;
@@ -37,6 +38,7 @@ import org.junit.Test;
 
 public class CTabItemTest extends CSSSWTTestCase {
 
+	private CSSEngine engine;
 
 	private Shell shell;
 
@@ -53,6 +55,7 @@ public class CTabItemTest extends CSSSWTTestCase {
 	private void spinEventLoop() {
 		// Workaround for https://bugs.eclipse.org/418101 and https://bugs.eclipse.org/403234 :
 		// Add some delay to allow asynchronous events to come in, but don't get trapped in an endless Display#sleep().
+		Display display = shell.getDisplay();
 		for (int i = 0; i < 3; i++) {
 			while (display.readAndDispatch()) {
 				;
@@ -82,6 +85,7 @@ public class CTabItemTest extends CSSSWTTestCase {
 	}
 
 	private CTabFolder createTestTabFolder(boolean open) {
+		Display display = Display.getDefault();
 
 		// Create widgets
 		shell = new Shell(display, SWT.SHELL_TRIM);

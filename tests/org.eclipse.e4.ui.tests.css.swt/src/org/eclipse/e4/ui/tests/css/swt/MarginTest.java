@@ -13,6 +13,7 @@ package org.eclipse.e4.ui.tests.css.swt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.CSSSWTConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
@@ -20,12 +21,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
 public class MarginTest extends CSSSWTTestCase {
 
 	private static final RGB RED = new RGB(255, 0, 0);
+	CSSEngine engine;
 
 	private final static int TOP = 0;
 	private final static int RIGHT = 1;
@@ -33,6 +36,7 @@ public class MarginTest extends CSSSWTTestCase {
 	private final static int LEFT = 3;
 
 	protected Control createTestControl(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
@@ -58,6 +62,7 @@ public class MarginTest extends CSSSWTTestCase {
 	}
 
 	protected Control createBadControlNoLayout(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
@@ -72,6 +77,7 @@ public class MarginTest extends CSSSWTTestCase {
 	}
 
 	protected Control createBadControlNoComposite(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
@@ -84,6 +90,7 @@ public class MarginTest extends CSSSWTTestCase {
 	}
 
 	protected Control createBadControlNoKey(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets

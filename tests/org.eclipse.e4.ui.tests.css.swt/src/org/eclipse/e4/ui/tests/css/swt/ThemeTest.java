@@ -60,7 +60,6 @@ public class ThemeTest extends CSSSWTTestCase {
 	@Test
 	public void testThemeChangeNotification() {
 		// we don't call createEngine() as ThemeEngine creates its own engine
-
 		final Display display = Display.getDefault();
 		final IThemeEngine themer = getThemeEngine(display);
 

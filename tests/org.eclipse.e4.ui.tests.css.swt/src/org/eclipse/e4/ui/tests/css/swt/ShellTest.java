@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2008, 2012, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -15,12 +15,14 @@ import static org.junit.Assert.assertNotSame;
 
 import java.util.HashSet;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
@@ -31,7 +33,8 @@ public class ShellTest extends CSSSWTTestCase {
 	static final RGB BLUE = new RGB(0, 0, 255);
 
 	protected Shell createTestShell(String styleSheet) {
-		engine = createEngine(styleSheet, display);
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(styleSheet, display);
 
 		// Create widgets
 		Shell shell = new Shell(display, SWT.SHELL_TRIM);
@@ -87,7 +90,8 @@ public class ShellTest extends CSSSWTTestCase {
 	// bug 375069: ensure children aren't caught up in parent
 	@Test
 	public void test375069ChildShellDifferentiation() {
-		engine = createEngine("Shell.parent { font-style: italic; }", display);
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine("Shell.parent { font-style: italic; }", display);
 
 		Shell parent = new Shell(display, SWT.NONE);
 		WidgetElement.setCSSClass(parent, "parent");
@@ -111,7 +115,8 @@ public class ShellTest extends CSSSWTTestCase {
 	// bug 375069: ensure children shells are still captured by Shell
 	@Test
 	public void test375069AllShell() {
-		engine = createEngine("Shell { font-style: italic; }", display);
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine("Shell { font-style: italic; }", display);
 
 		Shell parent = new Shell(display, SWT.NONE);
 		WidgetElement.setCSSClass(parent, "parent");
@@ -134,7 +139,8 @@ public class ShellTest extends CSSSWTTestCase {
 	// bug 375069: ensure children shells are still captured by Shell
 	@Test
 	public void testShellParentage() {
-		engine = createEngine(
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(
 				"Shell[parentage='parent'] { font-style: italic; }", display);
 
 		Shell parent = new Shell(display, SWT.NONE);
@@ -157,7 +163,8 @@ public class ShellTest extends CSSSWTTestCase {
 
 	@Test
 	public void testShellUnparentedPseudoelement() {
-		engine = createEngine(
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(
 				"Shell:swt-unparented { font-style: italic; }", display);
 
 		Shell parent = new Shell(display, SWT.NONE);
@@ -180,7 +187,8 @@ public class ShellTest extends CSSSWTTestCase {
 
 	@Test
 	public void testShellParentedPseudoelement() {
-		engine = createEngine(
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(
 				"Shell:swt-parented { font-style: italic; }", display);
 
 		Shell parent = new Shell(display, SWT.NONE);
@@ -203,7 +211,8 @@ public class ShellTest extends CSSSWTTestCase {
 
 	@Test
 	public void testSwtDataClassAttribute() {
-		engine = createEngine(
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(
 				"Shell[swt-data-class ~= 'java.util.HashSet'] { font-style: italic; }",
 				display);
 

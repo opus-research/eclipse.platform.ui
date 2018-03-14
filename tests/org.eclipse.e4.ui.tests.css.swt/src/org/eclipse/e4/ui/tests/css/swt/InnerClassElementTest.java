@@ -6,22 +6,24 @@
  *
  * Contributors:
  *     Stefan Winkler <stefan@winklerweb.net> - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 443094
  *******************************************************************************/
 
 package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
 public class InnerClassElementTest extends CSSSWTTestCase {
 
+	CSSEngine engine;
 
 	// create an inner class to address via CSS
 	class CustomComposite extends Composite {
@@ -30,8 +32,8 @@ public class InnerClassElementTest extends CSSSWTTestCase {
 		}
 	}
 
-	@Override
 	protected Label createTestLabel(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets

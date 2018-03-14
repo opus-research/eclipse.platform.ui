@@ -12,8 +12,10 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -25,7 +27,8 @@ public class ShellActiveTest extends CSSSWTTestCase {
 	static final RGB BLUE = new RGB(0, 0, 255);
 
 	protected Shell createShell(String styleSheet) {
-		createEngine(styleSheet, display);
+		Display display = Display.getDefault();
+		CSSEngine engine = createEngine(styleSheet, display);
 
 		// Create widgets
 		Shell shell = new Shell(display, SWT.NONE);

@@ -20,7 +20,7 @@ import org.junit.Test;
 @SuppressWarnings("restriction")
 public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	@Test
-	public void testGetFontData() {
+	public void testGetFontData() throws Exception {
 		FontData result = getFontData(fontProperties("Times", 11, SWT.NORMAL),
 				new FontData());
 
@@ -30,7 +30,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenMissingFamilyInCss() {
+	public void testGetFontDataWhenMissingFamilyInCss() throws Exception {
 		FontData result = getFontData(fontProperties(null, 11, SWT.NORMAL),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -40,7 +40,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenMissingSizeInCss() {
+	public void testGetFontDataWhenMissingSizeInCss() throws Exception {
 		FontData result = getFontData(fontProperties("Arial", null, SWT.NORMAL),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -50,7 +50,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenMissingStyleInCss() {
+	public void testGetFontDataWhenMissingStyleInCss() throws Exception {
 		FontData result = getFontData(fontProperties("Times", 11, null),
 				new FontData("Courier", 5, SWT.ITALIC));
 
@@ -60,7 +60,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenFontFamilyFromDefinition() {
+	public void testGetFontDataWhenFontFamilyFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(
@@ -75,7 +75,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenFontFamilyAndSizeFromDefinition() {
+	public void testGetFontDataWhenFontFamilyAndSizeFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(
@@ -90,7 +90,7 @@ public class CSSSWTFontHelperTest extends CSSSWTHelperTestCase {
 	}
 
 	@Test
-	public void testGetFontDataWhenFontFamilySizeAndStyleFromDefinition() {
+	public void testGetFontDataWhenFontFamilySizeAndStyleFromDefinition() throws Exception {
 		registerFontProviderWith("org.eclipse.jface.bannerfont", "Arial", 15, SWT.ITALIC);
 
 		FontData result = getFontData(

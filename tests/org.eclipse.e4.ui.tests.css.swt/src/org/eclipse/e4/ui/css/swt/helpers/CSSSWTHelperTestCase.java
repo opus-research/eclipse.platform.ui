@@ -29,7 +29,7 @@ import org.w3c.dom.css.CSSValue;
 @SuppressWarnings("restriction")
 public abstract class CSSSWTHelperTestCase {
 	protected void registerFontProviderWith(String expectedSymbolicName,
- String family, int size, int style) {
+			String family, int size, int style) throws Exception {
 		IColorAndFontProvider provider = mock(IColorAndFontProvider.class);
 		doReturn(new FontData[] { new FontData(family, size, style) }).when(
 				provider).getFont(expectedSymbolicName);

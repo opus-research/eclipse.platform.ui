@@ -16,20 +16,27 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.internal.themes.ColorDefinition;
 import org.eclipse.ui.internal.themes.FontDefinition;
 import org.eclipse.ui.internal.themes.ThemesExtension;
+import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("restriction")
 public class ThemesExtensionTest extends CSSSWTTestCase {
+	private Display display;
+
+	@Before
+	public void setUp() {
+		display = Display.getDefault();
+	}
 
 	@Test
 	public void testThemesExtension() {
 		//given
-		engine = createEngine(
-				"ThemesExtension {font-definition: '#org-eclipse-ui-workbench-FONT_DEF_1',"
-						+
+		CSSEngine engine = createEngine("ThemesExtension {font-definition: '#org-eclipse-ui-workbench-FONT_DEF_1'," +
 				"'#org-eclipse-ui-workbench-FONT_DEF_2'; color-definition: '#org-eclipse-ui-workbench-COLOR_DEF_1';}", display);
 		ThemesExtension themesExtention = new ThemesExtension();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others. All rights reserved. This
+ * Copyright (c) 2009, 2012, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
@@ -22,6 +23,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
@@ -38,8 +40,10 @@ public class GradientTest extends CSSSWTTestCase {
 	static final RGB GREEN = new RGB(0, 255, 0);
 	static final RGB BLUE = new RGB(0, 0, 255);
 	static final RGB WHITE = new RGB(255, 255, 255);
+	static public CSSEngine engine;
 
 	protected CTabFolder createTestCTabFolder(String styleSheet) {
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
@@ -138,7 +142,7 @@ public class GradientTest extends CSSSWTTestCase {
 		assertEquals(RED, getSelectionBackgroundBegin(folderToTest).getRGB()); //gradient begin
 		assertEquals(BLUE, folderToTest.getSelectionBackground().getRGB()); //gradient end
 		assertArrayEquals(new int[] { 50, 100 }, getSelectionGradientPercents(folderToTest)); // default
-		// percent
+																								// percent
 	}
 
 	/*

@@ -13,12 +13,14 @@ package org.eclipse.e4.ui.tests.css.swt;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
@@ -29,9 +31,11 @@ public class DescendentTest extends CSSSWTTestCase {
 	static final RGB BLUE = new RGB(0, 0, 255);
 	static final RGB WHITE = new RGB(255, 255, 255);
 	static final RGB BLACK = new RGB(0, 0, 0);
+	static public CSSEngine engine;
 
 	protected Button[] createTestWidgets(String styleSheet) {
 
+		Display display = Display.getDefault();
 		engine = createEngine(styleSheet, display);
 
 		// Create widgets
