@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 441244
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -80,7 +79,11 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 		this.windowlessApp = windowlessApp;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#initialize(org.eclipse.ui.application.IWorkbenchConfigurer)
+	 */
 	public void initialize(IWorkbenchConfigurer configurer) {
 		super.initialize(configurer);
 
@@ -105,12 +108,15 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#getInitialWindowPerspectiveId()
+	 */
 	public String getInitialWindowPerspectiveId() {
 		return EmptyPerspective.PERSP_ID;
 	}
 
-	@Override
 	public void eventLoopIdle(final Display display) {
 		// Bug 107369: RCP test suite hangs on GTK
 		if (idleBeforeExit != -1 && --idleBeforeExit <= 0)
@@ -126,14 +132,15 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 			return;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
+	 */
 	public void preStartup() {
 		super.preStartup();
 		final Display display = Display.getCurrent();
 		if (display != null) {
 			display.asyncExec(new Runnable() {
 
-				@Override
 				public void run() {
 					if (isSTARTED())
 						asyncDuringStartup = Boolean.FALSE;
@@ -167,13 +174,14 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	private void setupSyncDisplayThread(final boolean callDisplayAccess, final Display display) {
 		Thread syncThread = new Thread() {
-			@Override
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
 			public void run() {
 				if (callDisplayAccess)
 					DisplayAccess.accessDisplayDuringStartup();
 				try {
 					display.syncExec(new Runnable() {
-						@Override
 						public void run() {
 							synchronized (RCPTestWorkbenchAdvisor.class) {
 								if (callDisplayAccess)
@@ -201,12 +209,13 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 	 */
 	private void setupAsyncDisplayThread(final boolean callDisplayAccess, final Display display) {
 		Thread asyncThread = new Thread() {
-			@Override
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
 			public void run() {
 				if (callDisplayAccess)
 					DisplayAccess.accessDisplayDuringStartup();
 				display.asyncExec(new Runnable() {
-					@Override
 					public void run() {
 						synchronized (RCPTestWorkbenchAdvisor.class) {
 							if (callDisplayAccess)
@@ -223,7 +232,11 @@ public class RCPTestWorkbenchAdvisor extends WorkbenchAdvisor {
 		asyncThread.start();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
+	 */
 	public void postStartup() {
 		super.postStartup();
 		synchronized (RCPTestWorkbenchAdvisor.class) {
