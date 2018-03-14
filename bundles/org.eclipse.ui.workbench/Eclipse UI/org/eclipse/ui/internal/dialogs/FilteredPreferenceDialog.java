@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2014 IBM Corporation and others.
+ * Copyright (c) 2003, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Oakland Software (Francis Upton) <francisu@ieee.org> - bug 219273
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -292,7 +291,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		} else {
 			treeViewer.setLabelProvider(new PreferenceBoldLabelProvider(filteredTree));
 		}
-		IContributionService cs = PlatformUI
+		IContributionService cs = (IContributionService) PlatformUI
 				.getWorkbench().getActiveWorkbenchWindow().getService(
 						IContributionService.class);
 		treeViewer.setComparator(cs.getComparatorFor(getContributionType()));
@@ -598,7 +597,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 		};
 		popupMenuAction.setToolTipText(WorkbenchMessages.FilteredPreferenceDialog_FilterToolTip);
 		historyManager.add(popupMenuAction);
-		IHandlerService service = PlatformUI.getWorkbench()
+		IHandlerService service = (IHandlerService) PlatformUI.getWorkbench()
 				.getService(IHandlerService.class);
 		showViewHandler = service
 				.activateHandler(
@@ -713,7 +712,7 @@ public abstract class FilteredPreferenceDialog extends PreferenceDialog
 	@Override
 	public boolean close() {
 		if (showViewHandler != null) {
-			IHandlerService service = PlatformUI
+			IHandlerService service = (IHandlerService) PlatformUI
 					.getWorkbench().getService(IHandlerService.class);
 			service.deactivateHandler(showViewHandler);
 			showViewHandler.getHandler().dispose();

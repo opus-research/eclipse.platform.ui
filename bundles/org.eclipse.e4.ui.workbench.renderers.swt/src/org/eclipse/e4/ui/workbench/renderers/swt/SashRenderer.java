@@ -1,13 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 441150
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -29,10 +28,6 @@ import org.eclipse.swt.widgets.Layout;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
-/**
- * Default SWT renderer responsible for a MPartSashContainer. See
- * {@link WorkbenchRendererFactory}
- */
 public class SashRenderer extends SWTPartRenderer {
 
 	@Inject
@@ -43,7 +38,10 @@ public class SashRenderer extends SWTPartRenderer {
 
 	private EventHandler sashOrientationHandler;
 	private EventHandler sashWeightHandler;
-	private int processedContent = 0;
+
+	public SashRenderer() {
+		super();
+	}
 
 	@PostConstruct
 	void postConstruct() {
@@ -85,9 +83,6 @@ public class SashRenderer extends SWTPartRenderer {
 	 * @param pscModel
 	 */
 	protected void forceLayout(MElementContainer<MUIElement> pscModel) {
-		if (processedContent != 0) {
-			return;
-		}
 		// layout the containing Composite
 		while (!(pscModel.getWidget() instanceof Composite))
 			pscModel = pscModel.getParent();
@@ -150,6 +145,14 @@ public class SashRenderer extends SWTPartRenderer {
 		return sashComposite;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#childAdded(
+	 * org.eclipse.e4.ui.model.application.MPart,
+	 * org.eclipse.e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void childRendered(MElementContainer<MUIElement> parentElement,
 			MUIElement element) {
@@ -164,19 +167,14 @@ public class SashRenderer extends SWTPartRenderer {
 		forceLayout(parentElement);
 	}
 
-	@Override
-	public void processContents(MElementContainer<MUIElement> container) {
-		try {
-			processedContent++;
-			super.processContents(container);
-		} finally {
-			processedContent--;
-			if (processedContent == 0) {
-				forceLayout(container);
-			}
-		}
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#hideChild
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer,
+	 * org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public void hideChild(MElementContainer<MUIElement> parentElement,
 			MUIElement child) {
@@ -185,6 +183,13 @@ public class SashRenderer extends SWTPartRenderer {
 		forceLayout(parentElement);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		// OK, find the 'root' of the sash container
@@ -199,6 +204,10 @@ public class SashRenderer extends SWTPartRenderer {
 		return null;
 	}
 
+	/**
+	 * @param element
+	 * @return
+	 */
 	private static int getWeight(MUIElement element) {
 		String info = element.getContainerData();
 		if (info == null || info.length() == 0) {
