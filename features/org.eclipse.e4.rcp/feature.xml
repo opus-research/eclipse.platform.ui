@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.e4.rcp"
       label="%featureName"
-      version="1.5.0.qualifier"
+      version="1.6.0.qualifier"
       provider-name="%providerName"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
@@ -166,6 +166,13 @@
 
    <plugin
          id="org.apache.batik.util.gui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.xml"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -357,21 +364,21 @@
          version="0.0.0"
          unpack="false"/>
 
-   <plugin
-         id="org.eclipse.equinox.launcher.gtk.solaris.sparc"
+  <plugin
+         id="org.eclipse.equinox.launcher.gtk.solaris.x86_64"
          os="solaris"
          ws="gtk"
-         arch="sparc"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
          fragment="true"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.gtk.solaris.x86"
+         id="org.eclipse.equinox.launcher.gtk.solaris.sparcv9"
          os="solaris"
          ws="gtk"
-         arch="x86"
+         arch="sparcv9"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -570,10 +577,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.gtk.solaris.sparc"
+         id="org.eclipse.swt.gtk.solaris.x86_64"
          os="solaris"
          ws="gtk"
-         arch="sparc"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -581,10 +588,10 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.swt.gtk.solaris.x86"
+         id="org.eclipse.swt.gtk.solaris.sparcv9"
          os="solaris"
          ws="gtk"
-         arch="x86"
+         arch="sparcv9"
          download-size="0"
          install-size="0"
          version="0.0.0"

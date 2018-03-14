@@ -6,7 +6,7 @@
     are made available under the terms of the Eclipse Public License v1.0
     which accompanies this distribution, and is available at
     http://www.eclipse.org/legal/epl-v10.html
-   
+
     Contributors:
          IBM Corporation - initial API and implementation
           Martin Oberhuber (Wind River) - [292882] Default Browser on Solaris
@@ -31,7 +31,7 @@
       <keyword
          label="%preferenceKeywords"
          id="org.eclipse.ui.browser.preferenceKeywords"/>
-   </extension>  
+   </extension>
 
    <extension point="org.eclipse.ui.browserSupport">
       <support
@@ -44,21 +44,25 @@
          allowMultiple="true"
          category="org.eclipse.ui"
          class="org.eclipse.ui.internal.browser.WebBrowserView"
-         icon="$nl$/icons/obj16/internal_browser.gif"
+         icon="$nl$/icons/obj16/internal_browser.png"
          id="org.eclipse.ui.browser.view"
          name="%viewWebBrowserTitle"/>
    </extension>
 
    <extension point="org.eclipse.ui.editors">
       <editor
-         class="org.eclipse.ui.internal.browser.WebBrowserEditor"
-         contributorClass="org.eclipse.ui.internal.browser.WebBrowserEditorActionBarContributor"
-         icon="$nl$/icons/obj16/internal_browser.gif"
-         id="org.eclipse.ui.browser.editor"
-         name="%viewWebBrowserTitle"/>
+            class="org.eclipse.ui.internal.browser.WebBrowserEditor"
+            contributorClass="org.eclipse.ui.internal.browser.WebBrowserEditorActionBarContributor"
+            icon="$nl$/icons/obj16/internal_browser.png"
+            id="org.eclipse.ui.browser.editor"
+            name="%viewWebBrowserTitle">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.ui.content-type.images">
+         </contentTypeBinding>
+      </editor>
       <editor
          extensions="htm,html,shtml"
-         icon="$nl$/icons/obj16/internal_browser.gif"
+         icon="$nl$/icons/obj16/internal_browser.png"
          id="org.eclipse.ui.browser.editorSupport"
          launcher="org.eclipse.ui.internal.browser.BrowserLauncher"
          name="%viewWebBrowserSupportTitle"/>
@@ -75,7 +79,7 @@
         toolbarPath="browser"
         label="%actionSetOpenWebBrowser"
         tooltip="%actionSetOpenWebBrowser"
-        icon="icons/obj16/internal_browser.gif"
+        icon="icons/obj16/internal_browser.png"
         class="org.eclipse.ui.internal.browser.OpenBrowserWorkbenchAction"/>
     </actionSet>
   </extension>
@@ -102,20 +106,29 @@
          <location>usr/bin/google-chrome</location>
       </browser>
       <browser
+         id="org.eclipse.ui.browser.chromium"
+         name="%browserChromium"
+         os="linux"
+         executable="chromium-browser">
+         <location>usr/bin/chromium-browser</location>
+      </browser>
+      <browser
          id="org.eclipse.ui.browser.konqueror"
          name="%browserKonqueror"
          os="linux,aix,hpux,solaris"
          executable="konqueror">
-         <location>opt/kde3/bin/konqueror</location>
+         <location>usr/bin/konqueror</location>
       </browser>
       <browser
-         id="org.eclipse.ui.browser.galeon"
-         name="%browserGaleon"
-         os="linux,aix,hpux,solaris"
-         executable="galeon">
-         <location>opt/usr/gnome/bin/galeon</location>
+         id="org.eclipse.ui.browser.epiphany"
+         name="%browserEpiphany"
+         os="linux"
+         executable="epiphany">
+         <location>
+         	usr/bin/epiphany
+         </location>
       </browser>
-      
+
       <!-- Windows -->
       <browser
          id="org.eclipse.ui.browser.firefox"
@@ -126,7 +139,7 @@
          <location>%%ProgramFiles%\mozilla.org\Firefox\firefox.exe</location>
          <location>%%ProgramFiles(x86)%\mozilla.org\Firefox\firefox.exe</location>
          <location>%%ProgramW6432%\mozilla.org\Firefox\firefox.exe</location>
-         
+
          <location>%%ProgramFiles%\Mozilla Firefox\firefox.exe</location>
          <location>%%ProgramFiles(x86)%\Mozilla Firefox\firefox.exe</location>
          <location>%%ProgramW6432%\Mozilla Firefox\firefox.exe</location>
@@ -159,7 +172,7 @@
          <location>%%ProgramFiles(x86)%\Opera\opera.exe</location>
          <location>%%ProgramW6432%\Opera\opera.exe</location>
       </browser>
-      
+
       <!-- Mac -->
       <browser
          id="org.eclipse.ui.browser.firefox"
@@ -222,7 +235,7 @@
          point="org.eclipse.ui.commandImages">
       <image
             commandId="org.eclipse.ui.browser.openBrowser"
-            icon="$nl$/icons/obj16/internal_browser.gif"/>
+            icon="$nl$/icons/obj16/internal_browser.png"/>
    </extension>
    <extension
          point="org.eclipse.ui.elementFactories">
@@ -230,5 +243,14 @@
             class="org.eclipse.ui.internal.browser.WebBrowserEditorInput"
             id="org.eclipse.ui.browser.elementFactory">
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            file-extensions="png,jpg,jpeg,gif,bmp,ico"
+            id="org.eclipse.ui.content-type.images"
+            name="%contentType_images"
+            priority="normal">
+      </content-type>
    </extension>
 </plugin>
