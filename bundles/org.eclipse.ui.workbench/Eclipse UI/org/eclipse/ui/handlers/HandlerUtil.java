@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 420479
  *******************************************************************************/
 
 package org.eclipse.ui.handlers;
@@ -18,6 +19,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.State;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -33,6 +36,8 @@ import org.eclipse.ui.IWorkbenchWindow;
  * </p>
  *
  * @since 3.3
+ * @noextend This class is not intended to be subclassed by clients.
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public class HandlerUtil {
 	private static void noVariableFound(ExecutionEvent event, String name)
@@ -427,6 +432,25 @@ public class HandlerUtil {
 			return (ISelection) o;
 		}
 		return null;
+	}
+
+	/**
+	 * Return the current structured selection, or <code>StructuredSelection.EMPTY</code>
+	 * if the current selection is not a structured selection or <code>null</code>.
+	 *
+	 * @param event
+	 *            The execution event that contains the application context
+	 * @return the current IStructuredSelection, or
+	 *         <code>StructuredSelection.EMPTY</code>.
+	 * @since 3.108
+	 *
+	 */
+	public static IStructuredSelection getCurrentStructuredSelection(ExecutionEvent event) {
+		ISelection selection = getCurrentSelection(event);
+		if (selection instanceof IStructuredSelection) {
+			return (IStructuredSelection) selection;
+		}
+		return StructuredSelection.EMPTY;
 	}
 
 	/**

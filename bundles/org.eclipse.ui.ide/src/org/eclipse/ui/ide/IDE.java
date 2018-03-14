@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 485201
+ *     Mickael Istria (Red Hat Inc.) - Bug 90292 (default editor) and family
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -42,6 +44,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SafeRunner;
@@ -72,7 +75,7 @@ import org.eclipse.ui.internal.ide.EditorAssociationOverrideDescriptor;
 import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy;
-import org.eclipse.ui.internal.ide.UnknownEditorStrategyRegistry;
+import org.eclipse.ui.internal.ide.UnassociatedEditorStrategyRegistry;
 import org.eclipse.ui.internal.ide.model.StandardPropertiesAdapterFactory;
 import org.eclipse.ui.internal.ide.model.WorkbenchAdapterFactory;
 import org.eclipse.ui.internal.ide.registry.MarkerHelpRegistry;
@@ -137,12 +140,12 @@ public final class IDE {
 	public static final String RESOURCE_PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective"; //$NON-NLS-1$
 
 	/**
-	 * A preference key to decide which {@link IUnknownEditorStrategy} to use
+	 * A preference key to decide which {@link IUnassociatedEditorStrategy} to use
 	 * when trying to open files without associated editors.
 	 *
 	 * @since 3.12
 	 */
-	public static final String UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY = "unknownEditorStrategy";//$NON-NLS-1$
+	public static final String UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY = "unassociatedEditorStrategy";//$NON-NLS-1$
 
 	/**
 	 * Marker help registry mapping markers to help context ids and resolutions;
@@ -363,6 +366,7 @@ public final class IDE {
 	 * @param activate
 	 *            if <code>true</code> the editor will be activated opened
 	 * @return an open editor or <code>null</code> if an external editor was
+	 *         opened
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
 	 *
@@ -503,7 +507,7 @@ public final class IDE {
 	 * @param activate
 	 *            if <code>true</code> the editor will be activated
 	 * @return an open editor or <code>null</code> if an external editor was
-	 *         opened
+	 *         opened or if opening was canceled
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
 	 * @see org.eclipse.ui.IWorkbenchPage#openEditor(org.eclipse.ui.IEditorInput,
@@ -534,7 +538,7 @@ public final class IDE {
 	 * @param determineContentType
 	 *            attempt to resolve the content type for this file
 	 * @return an open editor or <code>null</code> if an external editor was
-	 *         opened
+	 *         opened or if opening was canceled
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
 	 * @see org.eclipse.ui.IWorkbenchPage#openEditor(org.eclipse.ui.IEditorInput,
@@ -550,8 +554,12 @@ public final class IDE {
 		}
 
 		// open the editor on the file
-		IEditorDescriptor editorDesc = getEditorDescriptor(input,
-				determineContentType);
+		IEditorDescriptor editorDesc;
+		try {
+			editorDesc = getEditorDescriptor(input, determineContentType, true);
+		} catch (OperationCanceledException ex) {
+			return null;
+		}
 		return page.openEditor(new FileEditorInput(input), editorDesc.getId(),
 				activate);
 	}
@@ -570,7 +578,7 @@ public final class IDE {
 	 * @param input
 	 *            the editor input
 	 * @return an open editor or <code>null</code> if an external editor was
-	 *         opened
+	 *         opened or if opening was canceled
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
 	 * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
@@ -583,7 +591,12 @@ public final class IDE {
 		}
 
 		// open the editor on the file
-		IEditorDescriptor editorDesc = getEditorDescriptor(input);
+		IEditorDescriptor editorDesc;
+		try {
+			editorDesc = getEditorDescriptor(input, true, true);
+		} catch (OperationCanceledException ex) {
+			return null;
+		}
 		return page.openEditor(new FileEditorInput(input), editorDesc.getId());
 	}
 
@@ -681,9 +694,11 @@ public final class IDE {
 	 * @return an editor descriptor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
+	 * @deprecated Since 3.12, use
+	 *             {@link IDE#getEditorDescriptor(IFile, boolean, boolean)}
 	 */
-	public static IEditorDescriptor getEditorDescriptor(IFile file)
-			throws PartInitException {
+	@Deprecated
+	public static IEditorDescriptor getEditorDescriptor(IFile file) throws PartInitException {
 		return getEditorDescriptor(file, true);
 	}
 
@@ -721,9 +736,12 @@ public final class IDE {
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 * @since 3.1
+	 * @deprecated Since 3.12, use
+	 *             {@link IDE#getEditorDescriptor(IFile, boolean, boolean)}
+	 *             instead.
 	 */
-	public static IEditorDescriptor getEditorDescriptor(IFile file,
-			boolean determineContentType) throws PartInitException {
+	@Deprecated
+	public static IEditorDescriptor getEditorDescriptor(IFile file, boolean determineContentType) throws PartInitException {
 
 		if (file == null) {
 			throw new IllegalArgumentException();
@@ -735,8 +753,62 @@ public final class IDE {
 	}
 
 	/**
-	 * Returns an editor id appropriate for opening the given file
-	 * store.
+	 * Returns an editor descriptor appropriate for opening the given file
+	 * resource.
+	 * <p>
+	 * The editor descriptor is determined using a multi-step process. This
+	 * method will attempt to resolve the editor based on content-type bindings
+	 * as well as traditional name/extension bindings if
+	 * <code>determineContentType</code>is <code>true</code>.
+	 * </p>
+	 * <ol>
+	 * <li>The <code>IResource</code> is consulted for a persistent property
+	 * named <code>IDE.EDITOR_KEY</code> containing the preferred editor id to
+	 * be used.</li>
+	 * <li>The workbench editor registry is consulted to determine if an editor
+	 * extension has been registered for the file type. If so, an instance of
+	 * the editor extension is opened on the file. See
+	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
+	 * <li>The preferred {@link IUnassociatedEditorStrategy} is consulted.</li>
+	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
+	 * behavior is
+	 * <ol>
+	 * <li>The operating system is consulted to determine if an in-place
+	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
+	 * <li>The operating system is consulted to determine if an external editor
+	 * is available.</li>
+	 * <li>The workbench editor registry is consulted to determine if the
+	 * default text editor is available.</li></li>
+	 * </ol>
+	 * </ol>
+	 * </p>
+	 *
+	 * @param file
+	 *            the file
+	 * @param determineContentType
+	 *            query the content type system for the content type of the file
+	 * @param allowInteractive
+	 *            whether we allow user interactions
+	 * @return an editor descriptor, appropriate for opening the file
+	 * @throws PartInitException
+	 *             if no editor can be found
+	 * @throws OperationCanceledException
+	 *             in case descriptor lookup was canceled by the user
+	 * @since 3.12
+	 */
+	public static IEditorDescriptor getEditorDescriptor(IFile file, boolean determineContentType, boolean allowInteractive)
+			throws PartInitException, OperationCanceledException {
+
+		if (file == null) {
+			throw new IllegalArgumentException();
+		}
+
+		return getEditorDescriptor(file.getName(), PlatformUI.getWorkbench().getEditorRegistry(),
+				getDefaultEditor(file, determineContentType), allowInteractive);
+	}
+
+	/**
+	 * Returns an editor id appropriate for opening the given file store.
 	 * <p>
 	 * The editor descriptor is determined using a multi-step process. This
 	 * method will attempt to resolve the editor based on content-type bindings
@@ -747,22 +819,29 @@ public final class IDE {
 	 * extension has been registered for the file type. If so, an instance of
 	 * the editor extension is opened on the file. See
 	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
+	 * <li>The preferred {@link IUnknownEditorStrategy} is consulted.</li>
+	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
+	 * behavior is
+	 * <ol>
 	 * <li>The operating system is consulted to determine if an in-place
 	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
 	 * <li>The operating system is consulted to determine if an external editor
 	 * is available.</li>
 	 * <li>The workbench editor registry is consulted to determine if the
-	 * default text editor is available.</li>
+	 * default text editor is available.</li></li>
+	 * </ol>
 	 * </ol>
 	 * </p>
 	 *
 	 * @param fileStore
 	 *            the file store
+	 * @param allowInteractive
+	 *            Whether user interactions are allowed
 	 * @return the id of an editor, appropriate for opening the file
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 */
-	private static String getEditorId(IFileStore fileStore) throws PartInitException {
+	private static String getEditorId(IFileStore fileStore, boolean allowInteractive) throws PartInitException {
 		String name = fileStore.fetchInfo().getName();
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -788,10 +867,11 @@ public final class IDE {
 		IEditorRegistry editorReg = PlatformUI.getWorkbench().getEditorRegistry();
 
 		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
-		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType, defaultEditor);
-		return getEditorDescriptor(name, editorReg, defaultEditor).getId();
+		defaultEditor = overrideDefaultEditorAssociation(new FileStoreEditorInput(fileStore), contentType,
+				defaultEditor);
+		return getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive).getId();
 	}
-
+	
 	/**
 	 * Applies the <code>org.eclipse.ui.ide.editorAssociationOverride</code> extensions to the given
 	 * input.
@@ -930,7 +1010,11 @@ public final class IDE {
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 * @since 3.1
+	 * @deprecated Since 3.12, use
+	 *             {@link IDE#getEditorDescriptor(String, boolean, boolean)}
+	 *             instead.
 	 */
+	@Deprecated
 	public static IEditorDescriptor getEditorDescriptor(String name)
 			throws PartInitException {
 		return getEditorDescriptor(name, true);
@@ -967,9 +1051,13 @@ public final class IDE {
 	 * @throws PartInitException
 	 *             if no editor can be found
 	 * @since 3.1
+	 * @deprecated Since 3.12, use
+	 *             {@link IDE#getEditorDescriptor(String, boolean, boolean)}
+	 *             instead.
 	 */
-	public static IEditorDescriptor getEditorDescriptor(String name,
-			boolean inferContentType) throws PartInitException {
+	@Deprecated
+	public static IEditorDescriptor getEditorDescriptor(String name, boolean inferContentType)
+			throws PartInitException {
 
 		if (name == null) {
 			throw new IllegalArgumentException();
@@ -986,6 +1074,111 @@ public final class IDE {
 	}
 
 	/**
+	 * Returns an editor descriptor appropriate for opening a file resource with
+	 * the given name.
+	 * <p>
+	 * The editor descriptor is determined using a multi-step process. This
+	 * method will attempt to infer the content type of the file if
+	 * <code>inferContentType</code> is <code>true</code>.
+	 * </p>
+	 * <ol>
+	 * <li>The workbench editor registry is consulted to determine if an editor
+	 * extension has been registered for the file type. If so, an instance of
+	 * the editor extension is opened on the file. See
+	 * <code>IEditorRegistry.getDefaultEditor(String)</code>.</li>
+	 * <li>The preferred {@link IUnassociatedEditorStrategy} is consulted.</li>
+	 * <li>The {@link SystemEditorOrTextEditorStrategy} is consulted, whose
+	 * behavior is
+	 * <ol>
+	 * <li>The operating system is consulted to determine if an in-place
+	 * component editor is available (e.g. OLE editor on Win32 platforms).</li>
+	 * <li>The operating system is consulted to determine if an external editor
+	 * is available.</li>
+	 * <li>The workbench editor registry is consulted to determine if the
+	 * default text editor is available.</li></li>
+	 * </ol>
+	 * </ol>
+	 * </p>
+	 *
+	 * @param name
+	 *            the file name
+	 * @param inferContentType
+	 *            attempt to infer the content type from the file name if this
+	 *            is <code>true</code>
+	 * @param allowInteractive
+	 *            whether we allow user interactions.
+	 * @return an editor descriptor, appropriate for opening the file
+	 * @throws PartInitException
+	 *             if no editor can be found
+	 * @throws OperationCanceledException
+	 *             in case descriptor lookup was canceled by the user
+	 * @since 3.12
+	 */
+	public static IEditorDescriptor getEditorDescriptor(String name, boolean inferContentType, boolean allowInteractive)
+			throws PartInitException, OperationCanceledException {
+
+		if (name == null) {
+			throw new IllegalArgumentException();
+		}
+
+		IContentType contentType = inferContentType ? Platform
+				.getContentTypeManager().findContentTypeFor(name) : null;
+		IEditorRegistry editorReg = PlatformUI.getWorkbench()
+				.getEditorRegistry();
+
+		IEditorDescriptor defaultEditor = editorReg.getDefaultEditor(name, contentType);
+		defaultEditor = getEditorDescriptor(name, editorReg, defaultEditor, allowInteractive);
+		return overrideDefaultEditorAssociation(name, contentType, defaultEditor);
+	}
+
+	/**
+	 * Get the editor descriptor for a given name using the editorDescriptor
+	 * passed in as a default as a starting point. It may delegate computation
+	 * to the active {@link IUnknownEditorStrategy}.
+	 *
+	 * @param name
+	 *            The name of the element to open.
+	 * @param editorReg
+	 *            The editor registry to do the lookups from.
+	 * @param defaultDescriptor
+	 *            IEditorDescriptor or <code>null</code>
+	 * @param allowInteractive
+	 *            Whether we ask selected {@link IUnknownEditorStrategy}, that
+	 *            can be interactive.
+	 * @return IEditorDescriptor
+	 * @throws PartInitException
+	 *             if no valid editor can be found
+	 * @throws OperationCanceledException
+	 *             in case descriptor lookup was canceled by the user
+	 *
+	 * @since 3.12
+	 */
+	private static IEditorDescriptor getEditorDescriptor(String name, IEditorRegistry editorReg,
+			IEditorDescriptor defaultDescriptor, boolean allowInteractive)
+					throws PartInitException, OperationCanceledException {
+
+		if (defaultDescriptor != null) {
+			return defaultDescriptor;
+		}
+
+		IUnassociatedEditorStrategy strategy = getUnassociatedEditorStrategy(allowInteractive);
+		IEditorDescriptor editorDesc;
+		try {
+			editorDesc = strategy.getEditorDescriptor(name, editorReg);
+		} catch (CoreException e) {
+			throw new PartInitException(IDEWorkbenchMessages.IDE_noFileEditorFound, e);
+		}
+
+		// if no valid editor found, bail out
+		if (editorDesc == null) {
+			throw new PartInitException(
+					IDEWorkbenchMessages.IDE_noFileEditorFound);
+		}
+
+		return editorDesc;
+	}
+	
+	/**
 	 * Get the editor descriptor for a given name using the editorDescriptor
 	 * passed in as a default as a starting point.
 	 *
@@ -1000,7 +1193,9 @@ public final class IDE {
 	 *             if no valid editor can be found
 	 *
 	 * @since 3.1
+	 * @deprecated Since 3.12, use {@link IDE#getEditorDescriptor(String, boolean, boolean)} instead
 	 */
+	@Deprecated
 	private static IEditorDescriptor getEditorDescriptor(String name,
 			IEditorRegistry editorReg, IEditorDescriptor defaultDescriptor)
 			throws PartInitException {
@@ -1009,8 +1204,26 @@ public final class IDE {
 			return defaultDescriptor;
 		}
 
-		IUnknownEditorStrategy strategy = getUnknowEditorStrategy();
-		IEditorDescriptor editorDesc = strategy.getEditorDescriptor(name, editorReg);
+		IEditorDescriptor editorDesc = defaultDescriptor;
+
+		// next check the OS for in-place editor (OLE on Win32)
+		if (editorReg.isSystemInPlaceEditorAvailable(name)) {
+			editorDesc = editorReg
+					.findEditor(IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID);
+		}
+
+		// next check with the OS for an external editor
+		if (editorDesc == null
+				&& editorReg.isSystemExternalEditorAvailable(name)) {
+			editorDesc = editorReg
+					.findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
+		}
+
+		// next lookup the default text editor
+		if (editorDesc == null) {
+			editorDesc = editorReg
+					.findEditor(IDEWorkbenchPlugin.DEFAULT_TEXT_EDITOR_ID);
+		}
 
 		// if no valid editor found, bail out
 		if (editorDesc == null) {
@@ -1022,14 +1235,19 @@ public final class IDE {
 	}
 
 	/**
+	 * @param allowInteractive
+	 *            Whether interactive strategies are considered
 	 * @return The strategy to use in order to open unknown file. Either as set
-	 *         by preference, or a {@link SystemEditorOrTextEditorStrategy} if none is
-	 *         explicitly configured.
+	 *         by preference, or a {@link SystemEditorOrTextEditorStrategy} if
+	 *         none is explicitly configured. Never returns {@code null}.
 	 */
-	private static IUnknownEditorStrategy getUnknowEditorStrategy() {
+	private static IUnassociatedEditorStrategy getUnassociatedEditorStrategy(boolean allowInteractive) {
 		String preferedStrategy = IDEWorkbenchPlugin.getDefault().getPreferenceStore()
-				.getString(UNKNOWN_EDITOR_STRATEGY_PREFERENCE_KEY);
-		IUnknownEditorStrategy res = UnknownEditorStrategyRegistry.getStrategy(preferedStrategy);
+				.getString(UNASSOCIATED_EDITOR_STRATEGY_PREFERENCE_KEY);
+		IUnassociatedEditorStrategy res = null;
+		if (allowInteractive || !UnassociatedEditorStrategyRegistry.isInteractive(preferedStrategy)) {
+			res = UnassociatedEditorStrategyRegistry.getStrategy(preferedStrategy);
+		}
 		if (res == null) {
 			res = new SystemEditorOrTextEditorStrategy();
 		}
@@ -1086,7 +1304,8 @@ public final class IDE {
 	 *            the marker to open
 	 * @param activate
 	 *            if <code>true</code> the editor will be activated
-	 * @return an open editor or <code>null</code> not possible
+	 * @return an open editor or <code>null</code> if not possible or if opening
+	 *         was canceled
 	 * @exception PartInitException
 	 *                if the editor could not be initialized
 	 */
@@ -1136,27 +1355,28 @@ public final class IDE {
 	}
 
     /**
-     * Opens an editor on the given IFileStore object.
-     * <p>
+	 * Opens an editor on the given IFileStore object.
+	 * <p>
      * Unlike the other <code>openEditor</code> methods, this one
      * can be used to open files that reside outside the workspace
      * resource set.
-     * </p>
-     * <p>
-     * If the page already has an editor open on the target object then that
-     * editor is brought to front; otherwise, a new editor is opened.
-     * </p>
-     *
-     * @param page
-     *            the page in which the editor will be opened
-     * @param fileStore
-     *            the IFileStore representing the file to open
-     * @return an open editor or <code>null</code> if an external editor was opened
-     * @exception PartInitException
-     *                if the editor could not be initialized
-     * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
-     * @since 3.3
-     */
+	 * </p>
+	 * <p>
+	 * If the page already has an editor open on the target object then that
+	 * editor is brought to front; otherwise, a new editor is opened.
+	 * </p>
+	 *
+	 * @param page
+	 *            the page in which the editor will be opened
+	 * @param fileStore
+	 *            the IFileStore representing the file to open
+	 * @return an open editor or <code>null</code> if an external editor was
+	 *         opened or if opening was canceled
+	 * @exception PartInitException
+	 *                if the editor could not be initialized
+	 * @see org.eclipse.ui.IWorkbenchPage#openEditor(IEditorInput, String)
+	 * @since 3.3
+	 */
 	public static IEditorPart openEditorOnFileStore(IWorkbenchPage page, IFileStore fileStore) throws PartInitException {
         //sanity checks
         if (page == null) {
@@ -1164,7 +1384,12 @@ public final class IDE {
 		}
 
         IEditorInput input = getEditorInput(fileStore);
-        String editorId = getEditorId(fileStore);
+		String editorId;
+		try {
+			editorId = getEditorId(fileStore, true);
+		} catch (OperationCanceledException ex) {
+			return null;
+		}
 
         // open the editor on the file
         return page.openEditor(input, editorId);
