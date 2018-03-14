@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Andreas Buchen <andreas.buchen@sap.com> - Bug 206584
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440975, 431862
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 445538
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -40,14 +39,11 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.Util;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageListener;
-import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
@@ -223,7 +219,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
     private IPropertyChangeListener propPrefListener;
 
     private IPageListener pageListener;
-	private IPartListener partListener;
 
     private IResourceChangeListener resourceListener;
 
@@ -275,37 +270,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         };
         getWindow().addPageListener(pageListener);
 
-		partListener = new IPartListener() {
-
-			@Override
-			public void partOpened(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partDeactivated(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partClosed(IWorkbenchPart part) {
-			}
-
-			@Override
-			public void partActivated(IWorkbenchPart part) {
-				if (!(part instanceof IEditorPart)) {
-					return;
-				}
-				// update the "toggled" state based on the current editor
-				ICommandService commandService = window.getService(ICommandService.class);
-				commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
-			}
-
-			@Override
-			public void partBroughtToTop(IWorkbenchPart part) {
-			}
-
-		};
-		getWindow().getPartService().addPartListener(partListener);
-
         prefListener = new Preferences.IPropertyChangeListener() {
             @Override
 			public void propertyChange(Preferences.PropertyChangeEvent event) {
@@ -328,12 +292,10 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
                     if (window.getShell() != null
                             && !window.getShell().isDisposed()) {
                         // this property change notification could be from a non-ui thread
-						window.getShell().getDisplay().asyncExec(new Runnable() {
+                        window.getShell().getDisplay().syncExec(new Runnable() {
                             @Override
 							public void run() {
-								if (window.getShell() != null && !window.getShell().isDisposed()) {
-									updatePinActionToolbar();
-								}
+                                updatePinActionToolbar();
                             }
                         });
                     }
@@ -671,24 +633,7 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
         openPreferencesItem.setVisible(!Util.isMac());
         menu.add(openPreferencesItem);
 
-		// Workaround for bug 461311. Radio buttons in the main menu can cause
-		// Eclipse to crash on window managers like unity that use menu proxies.
-		String menuProxy = System.getenv("UBUNTU_MENUPROXY"); //$NON-NLS-1$
-		String desktopSession = System.getenv("DESKTOP_SESSION"); //$NON-NLS-1$
-		String os = Platform.getOS();
-		String ws = Platform.getWS();
-		// Setting this property to false disables the workaround. Omitting the
-		// property or setting it to any other value
-		// enables the workaround
-		boolean workaroundEnabled = !"false".equals(System.getProperty("eclipse.workaround.bug461311")); //$NON-NLS-1$ //$NON-NLS-2$
-
-		boolean radioButtonsMightCauseCrash = ((menuProxy == null) || !menuProxy.equals("0")) //$NON-NLS-1$
-				&& Platform.WS_GTK.equals(ws) && Platform.OS_LINUX.equals(os)
-				&& (desktopSession == null || desktopSession.equals("ubuntu")) //$NON-NLS-1$
-				&& workaroundEnabled;
-		if (!radioButtonsMightCauseCrash) {
-			menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
-		}
+        menu.add(ContributionItemFactory.OPEN_WINDOWS.create(getWindow()));
         return menu;
     }
 
@@ -853,10 +798,6 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             window.removePageListener(pageListener);
             pageListener = null;
         }
-		if (partListener != null) {
-			window.getPartService().removePartListener(partListener);
-			partListener = null;
-		}
         if (prefListener != null) {
             ResourcesPlugin.getPlugin().getPluginPreferences()
                     .removePropertyChangeListener(prefListener);
@@ -1434,24 +1375,9 @@ public final class WorkbenchActionBuilder extends ActionBarAdvisor {
             IDEWorkbenchPlugin.log("Navigate toolbar is missing"); //$NON-NLS-1$
             return;
         }
-		IPreferenceStore store = WorkbenchPlugin.getDefault().getPreferenceStore();
-		boolean reuseEditors = store.getBoolean(IPreferenceConstants.REUSE_EDITORS_BOOLEAN);
-		IContributionItem pinItem = toolBarManager.find(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR);
-		if (pinItem != null) {
-			pinItem.setVisible(reuseEditors);
-		}
-		toolBarManager.markDirty();
+
         toolBarManager.update(false);
         toolBarItem.update(ICoolBarManager.SIZE);
-		window.getShell().getDisplay().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				if (window.getShell() != null && !window.getShell().isDisposed()) {
-					ICommandService commandService = window.getService(ICommandService.class);
-					commandService.refreshElements(IWorkbenchCommandConstants.WINDOW_PIN_EDITOR, null);
-				}
-			}
-		});
     }
 
     private IContributionItem getPinEditorItem() {

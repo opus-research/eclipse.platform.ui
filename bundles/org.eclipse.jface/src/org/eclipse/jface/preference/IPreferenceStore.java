@@ -272,15 +272,15 @@ public interface IPreferenceStore {
     public float getFloat(String name);
 
     /**
-	 * Returns the current value of the integer-valued preference with the given
-	 * name. Returns the default-default value (<code>0</code>) if there is no
-	 * preference with the given name, or if the current value cannot be treated
-	 * as an integer.
-	 *
-	 * @param name
-	 *            the name of the preference
-	 * @return the int-valued preference
-	 */
+     * Returns the current value of the integer-valued preference with the
+     * given name.
+     * Returns the default-default value (<code>0</code>) if there
+     * is no preference with the given name, or if the current value
+     * cannot be treated as an integter.
+     *
+     * @param name the name of the preference
+     * @return the int-valued preference
+     */
     public int getInt(String name);
 
     /**
@@ -346,7 +346,7 @@ public interface IPreferenceStore {
 	/**
 	 * Removes the given listener from this preference store. Has no effect if the listener is not
 	 * registered.
-	 *
+	 * 
 	 * @param listener a property change listener, must not be <code>null</code>
 	 */
     public void removePropertyChangeListener(IPropertyChangeListener listener);

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476, 461573
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588, 388476
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -136,11 +136,6 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	 * preferences
 	 */
 	public static final String MRU_CONTROLLED_BY_CSS_KEY = "MRUControlledByCSS"; //$NON-NLS-1$
-
-	/**
-	 * Default default value for MRU behavior.
-	 */
-	public static final boolean MRU_DEFAULT = true;
 
 	/*
 	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
@@ -676,7 +671,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	}
 
 	private boolean getMRUValueFromPreferences() {
-		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, MRU_DEFAULT);
+		boolean initialMRUValue = preferences.getBoolean(MRU_KEY_DEFAULT, true);
 		boolean actualValue = preferences.getBoolean(MRU_KEY, initialMRUValue);
 		return actualValue;
 	}
@@ -847,9 +842,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 			part = (MPart) element;
 		else if (element instanceof MPlaceholder) {
 			part = (MPart) ((MPlaceholder) element).getRef();
-			if (part != null) {
-				part.setCurSharedRef((MPlaceholder) element);
-			}
+			part.setCurSharedRef((MPlaceholder) element);
 		}
 
 		CTabFolder ctf = (CTabFolder) stack.getWidget();
@@ -1311,9 +1304,10 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		// Ensure that the newly selected control is correctly sized
 		if (cti.getControl() instanceof Composite) {
 			Composite ctiComp = (Composite) cti.getControl();
-			// see bug 461573: call below is still needed to make view
-			// descriptions visible after unhiding the view with changed bounds
-			ctiComp.layout(false, true);
+			// Do not call layout(true, true) because it forces all
+			// subcomponents to relayout as well
+			// ctiComp.layout(true, true);
+			ctiComp.setBounds(ctf.getClientArea());
 		}
 		ctf.setSelection(cti);
 		ignoreTabSelChanges = false;
@@ -1415,7 +1409,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		tabMenu.setVisible(true);
 	}
 
-	protected boolean isClosable(MPart part) {
+	private boolean isClosable(MPart part) {
 		// if it's a shared part check its current ref
 		if (part.getCurSharedRef() != null) {
 			return !(part.getCurSharedRef().getTags()
@@ -1438,19 +1432,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 		}
 
 		final Menu menu = cachedMenu;
-		populateTabMenu(menu, part);
-		return menu;
-	}
 
-	/**
-	 * Populate the tab's context menu for the given part.
-	 *
-	 * @param menu
-	 *            the menu to be populated
-	 * @param part
-	 *            the relevant part
-	 */
-	protected void populateTabMenu(final Menu menu, MPart part) {
 		int closeableElements = 0;
 		if (isClosable(part)) {
 			MenuItem menuItemClose = new MenuItem(menu, SWT.NONE);
@@ -1523,6 +1505,8 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 				});
 			}
 		}
+
+		return menu;
 	}
 
 	private MElementContainer<MUIElement> getParent(MPart part) {

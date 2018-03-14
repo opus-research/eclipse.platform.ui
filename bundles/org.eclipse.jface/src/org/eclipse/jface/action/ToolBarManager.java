@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 457211
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457214
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -296,8 +295,17 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 			}
 		}
 
+		// Turn redraw off if the number of items to be added
+		// is above a certain threshold, to minimize flicker,
+		// otherwise the toolbar can be seen to redraw after each item.
+		// Do this before any modifications are made.
+		// We assume each contribution item will contribute at least one
+		// toolbar item.
+		boolean useRedraw = (clean.size() - (mi.length - toRemove.size())) >= 3;
 		try {
-			toolBar.setRedraw(false);
+			if (useRedraw) {
+				toolBar.setRedraw(false);
+			}
 
 			// remove obsolete items
 			for (int i = toRemove.size(); --i >= 0;) {
@@ -365,7 +373,9 @@ public class ToolBarManager extends ContributionManager implements IToolBarManag
 
 			// turn redraw back on if we turned it off above
 		} finally {
-			toolBar.setRedraw(true);
+			if (useRedraw) {
+				toolBar.setRedraw(true);
+			}
 		}
 
 		int newCount = toolBar.getItemCount();

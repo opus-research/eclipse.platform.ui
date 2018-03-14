@@ -120,7 +120,6 @@ Import-Package: com.ibm.icu.text,
  org.eclipse.e4.ui.internal.workbench.swt,
  org.eclipse.e4.ui.services,
  org.eclipse.e4.ui.workbench,
- org.eclipse.e4.ui.workbench.lifecycle,
  org.eclipse.e4.ui.workbench.modeling,
  org.eclipse.e4.ui.workbench.renderers.swt,
  org.eclipse.emf.common.util,
@@ -130,5 +129,5 @@ Import-Package: com.ibm.icu.text,
  org.w3c.dom,
  org.w3c.dom.css;version="2.0.0",
  org.xml.sax
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Service-Component: OSGI-INF/ColorAndFontProvider.xml
