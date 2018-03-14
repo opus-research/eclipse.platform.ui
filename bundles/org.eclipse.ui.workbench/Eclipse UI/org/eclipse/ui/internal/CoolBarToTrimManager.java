@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -647,13 +647,21 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
+
 				if (manager instanceof ContributionManager) {
+					// set basic attributes to the item before adding to the manager
+					ci.setId(toolItem.getElementId());
+					ci.setVisible(toolItem.isVisible());
+
 					ContributionManager cm = (ContributionManager) manager;
 					cm.insert(index, ci);
 					cm.remove(item);
+
+					// explicitly dispose contribution since it is now
+					// disconnected from manager
+					item.dispose();
 				}
 				ci.setModel(toolItem);
-				ci.setVisible(toolItem.isVisible());
 				renderer.linkModelToContribution(toolItem, ci);
 				container.getChildren().add(toolItem);
 			} else {
@@ -683,11 +691,12 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 
 		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
-				boolean oldVisible = modelItem.isVisible();
-				if (oldVisible != overridenVisibility) {
+				boolean modelVisible = modelItem.isVisible();
+				boolean itemVisible = item.isVisible();
+				if (modelVisible != overridenVisibility || itemVisible != overridenVisibility) {
 					needUpdate = true;
 				}
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, itemVisible);
 				modelItem.setVisible(overridenVisibility);
 			} else {
 				return needUpdate;
