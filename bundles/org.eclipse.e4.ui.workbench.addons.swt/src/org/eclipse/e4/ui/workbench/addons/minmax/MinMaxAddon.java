@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 331690
- *     Fabio Zadrozny (fabiofz@gmail.com) - Bug 436763
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.addons.minmax;
@@ -328,12 +327,6 @@ public class MinMaxAddon {
 			public void run() {
 				if (!winShell.isDisposed()) {
 					winShell.layout(true, true);
-					Shell[] shells = winShell.getShells();
-					for (Shell shell : shells) {
-						if (!shell.isDisposed()) {
-							shell.layout(true, true);
-						}
-					}
 				}
 			}
 		});
