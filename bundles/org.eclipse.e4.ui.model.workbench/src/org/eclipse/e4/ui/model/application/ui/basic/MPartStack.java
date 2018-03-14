@@ -29,5 +29,5 @@ import org.eclipse.e4.ui.model.application.ui.MGenericStack;
  * @model
  * @generated
  */
-public interface MPartStack extends MGenericStack<MStackElement>, MPartSashContainerElement, MWindowElement, MDialogElement {
+public interface MPartStack extends MGenericStack<MStackElement>, MPartSashContainerElement, MWindowElement {
 } // MPartStack

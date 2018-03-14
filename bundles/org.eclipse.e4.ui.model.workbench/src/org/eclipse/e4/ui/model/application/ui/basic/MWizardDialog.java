@@ -29,5 +29,5 @@ package org.eclipse.e4.ui.model.application.ui.basic;
  * @model
  * @generated
  */
-public interface MWizardDialog extends MFrame<MWizardElement> {
+public interface MWizardDialog extends MDialog {
 } // MWizardDialog

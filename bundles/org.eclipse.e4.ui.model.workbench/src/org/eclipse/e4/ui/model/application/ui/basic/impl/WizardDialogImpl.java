@@ -12,7 +12,6 @@ package org.eclipse.e4.ui.model.application.ui.basic.impl;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
 
-import org.eclipse.e4.ui.model.application.ui.basic.MWizardElement;
 import org.eclipse.emf.ecore.EClass;
 
 /**
@@ -22,7 +21,7 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public class WizardDialogImpl extends FrameImpl<MWizardElement> implements MWizardDialog {
+public class WizardDialogImpl extends DialogImpl implements MWizardDialog {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

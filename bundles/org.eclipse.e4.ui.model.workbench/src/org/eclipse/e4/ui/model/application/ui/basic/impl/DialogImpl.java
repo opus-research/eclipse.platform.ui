@@ -12,7 +12,6 @@ package org.eclipse.e4.ui.model.application.ui.basic.impl;
 
 import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 
-import org.eclipse.e4.ui.model.application.ui.basic.MDialogElement;
 import org.eclipse.emf.ecore.EClass;
 
 /**
@@ -22,7 +21,7 @@ import org.eclipse.emf.ecore.EClass;
  *
  * @generated
  */
-public class DialogImpl extends FrameImpl<MDialogElement> implements MDialog {
+public class DialogImpl extends WindowImpl implements MDialog {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

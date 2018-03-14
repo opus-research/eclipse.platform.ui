@@ -22,7 +22,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MDialog;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuContributions;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarContributions;
 import org.eclipse.e4.ui.model.application.ui.menu.MTrimContributions;
@@ -60,7 +59,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MTrimContributions;
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getAddons <em>Addons</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getCategories <em>Categories</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getDialogs <em>Dialogs</em>}</li>
- *   <li>{@link org.eclipse.e4.ui.model.application.MApplication#getWizards <em>Wizards</em>}</li>
  * </ul>
  *
  * @model
@@ -139,26 +137,5 @@ public interface MApplication extends MElementContainer<MWindow>, MContext, MHan
 	 * @generated
 	 */
 	List<MDialog> getDialogs();
-
-	/**
-	 * Returns the value of the '<em><b>Wizards</b></em>' containment reference list.
-	 * The list contents are of type {@link org.eclipse.e4.ui.model.application.ui.basic.MWizardDialog}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Wizards</em>' containment reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * <p>
-	 * This is the ordered list of MDialogs for this model.
-	 * </p>
-	 * @since 1.1
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Wizards</em>' containment reference list.
-	 * @model containment="true"
-	 * @generated
-	 */
-	List<MWizardDialog> getWizards();
 
 } // MApplication
