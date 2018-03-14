@@ -18,6 +18,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Node;
 
@@ -26,6 +27,8 @@ import org.w3c.dom.Node;
  *
  */
 public class CTabFolderElement extends CompositeElement {
+	private final static String BACKGROUND_SET_BY_TAB_RENDERER = "bgSetByTabRenderer"; //$NON-NLS-1$
+
 	public CTabFolderElement(CTabFolder tabFolder, CSSEngine engine) {
 		super(tabFolder, engine);
 	}
@@ -83,7 +86,9 @@ public class CTabFolderElement extends CompositeElement {
 		folder.setSelectionBackground((Color) null);
 		folder.setSelectionForeground((Color) null);
 		folder.setSelectionBackground((Image) null);
+
 		folder.setBackground(null, null);
+		resetChildrenBackground(folder);
 
 		if (folder.getRenderer() instanceof ICTabRendering) {
 			ICTabRendering renderer = (ICTabRendering) folder
@@ -96,6 +101,39 @@ public class CTabFolderElement extends CompositeElement {
 			renderer.setShadowColor(null);
 		}
 		super.reset();
+	}
+
+	private void resetChildrenBackground(Composite composite) {
+		for (Control control : composite.getChildren()) {
+			resetChildBackground(control);
+			if (control instanceof Composite) {
+				resetChildrenBackground((Composite) control);
+			}
+		}
+	}
+
+	private void resetChildBackground(Control control) {
+		Color backgroundSetByRenderer = (Color) control
+				.getData(BACKGROUND_SET_BY_TAB_RENDERER);
+		if (backgroundSetByRenderer != null) {
+			if (control.getBackground() == backgroundSetByRenderer) {
+				control.setBackground(null);
+			}
+			control.setData(BACKGROUND_SET_BY_TAB_RENDERER, null);
+		}
+	}
+
+	public static void setBackgroundOverriddenDuringRenderering(
+			Composite composite, Color background) {
+		composite.setBackground(background);
+		composite.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
+
+		for (Control control : composite.getChildren()) {
+			if (!CompositeElement.hasBackgroundOverriddenByCSS(control)) {
+				control.setBackground(background);
+				control.setData(BACKGROUND_SET_BY_TAB_RENDERER, background);
+			}
+		}
 	}
 }
 
