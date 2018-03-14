@@ -44,7 +44,7 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
 
     /**
      * Create a new instance of this class.
-     *
+     * 
      * @param page the page
      * @param viewer the viewer
      */
@@ -72,7 +72,8 @@ public class ShowInNavigatorAction extends SelectionProviderAction {
                 IResource resource = ((IMarker) o).getResource();
                 v.add(resource);
             } else if (o instanceof IAdaptable) {
-                IResource resource = ((IAdaptable) o).getAdapter(IResource.class);
+                IResource resource = (IResource) ((IAdaptable) o)
+                        .getAdapter(IResource.class);
                 if (resource != null) {
                     v.add(resource);
                 }

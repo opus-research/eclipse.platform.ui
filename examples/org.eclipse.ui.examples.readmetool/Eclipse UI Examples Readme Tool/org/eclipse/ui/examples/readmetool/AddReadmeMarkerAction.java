@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,17 +20,15 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
-
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
-
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.osgi.framework.Bundle;
 
 /**
- * Action for creating a readme marker with a specfic id
+ * Action for creating a readme marker with a specfic id 
  * attribute value.
  */
 public class AddReadmeMarkerAction extends Action {
@@ -61,9 +59,8 @@ public class AddReadmeMarkerAction extends Action {
     /*
      * @see IAction#run()
      */
-    @Override
-	public void run() {
-        Map<Object, Object> attributes = new HashMap<>(11);
+    public void run() {
+        Map attributes = new HashMap(11);
 
         ITextSelection selection = (ITextSelection) textEditor
                 .getSelectionProvider().getSelection();
@@ -110,8 +107,8 @@ public class AddReadmeMarkerAction extends Action {
         }
     }
 
-    /**
-     * Returns the resource on which to create the marker,
+    /** 
+     * Returns the resource on which to create the marker, 
      * or <code>null</code> if there is no applicable resource. This
      * queries the editor's input using <code>getAdapter(IResource.class)</code>.
      *
@@ -119,6 +116,6 @@ public class AddReadmeMarkerAction extends Action {
      */
     protected IResource getResource() {
         IEditorInput input = textEditor.getEditorInput();
-        return ((IAdaptable) input).getAdapter(IResource.class);
+        return (IResource) ((IAdaptable) input).getAdapter(IResource.class);
     }
 }

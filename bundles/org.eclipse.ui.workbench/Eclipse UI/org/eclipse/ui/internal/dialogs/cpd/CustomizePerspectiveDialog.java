@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 407522 - Perspective reset not working correctly
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040, 431992
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956, 424638, 460503
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 456729, 404348, 421178, 420956
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs.cpd;
 
@@ -66,7 +66,6 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -211,10 +210,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	private TabItem actionSetTab;
 
 	private CheckboxTableViewer actionSetAvailabilityTable;
-
-	private TreeViewer actionSetMenuViewer;
-
-	private TreeViewer actionSetToolbarViewer;
 
 	private CheckboxTreeViewer menuStructureViewer1;
 
@@ -873,7 +868,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_menubarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetMenuViewer = new TreeViewer(menubarGroup);
+		final TreeViewer actionSetMenuViewer = new TreeViewer(menubarGroup);
 		actionSetMenuViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetMenuViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -899,7 +894,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		label.setText(WorkbenchMessages.ActionSetSelection_toolbarActions);
 		label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		actionSetToolbarViewer = new TreeViewer(toolbarGroup);
+		final TreeViewer actionSetToolbarViewer = new TreeViewer(toolbarGroup);
 		actionSetToolbarViewer
 				.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 		actionSetToolbarViewer.getControl().setLayoutData(
@@ -1062,10 +1057,8 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
-							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(menuStructureViewer2,
 										initSelectCI);
@@ -1219,10 +1212,11 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 								initSelectAS = (ActionSet) actionSetViewer
 										.getElementAt(0);
 							}
-							if (initSelectAS != null) {
-								setSelectionOn(actionSetViewer, initSelectAS);
-								actionSetViewer.reveal(initSelectAS);
+							if (initSelectAS == null) {
+								return;
 							}
+							setSelectionOn(actionSetViewer, initSelectAS);
+							actionSetViewer.reveal(initSelectAS);
 							if (initSelectCI != null) {
 								setSelectionOn(toolbarStructureViewer2,
 										initSelectCI);
@@ -1343,14 +1337,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * @param selected
 	 */
 	private static void setSelectionOn(Viewer viewer, final Object selected) {
-		ISelection selection;
-		if (selected == null) {
-			selection = StructuredSelection.EMPTY;
-		} else {
-			selection = new StructuredSelection(selected);
-		}
-		boolean reveal = selection != StructuredSelection.EMPTY;
-		viewer.setSelection(selection, reveal);
+		viewer.setSelection(new StructuredSelection(selected), true);
 	}
 
 	/**
@@ -1435,10 +1422,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 	 * On a change to availability, updates the appropriate widgets.
 	 */
 	private void actionSetAvailabilityChanged() {
-		actionSetAvailabilityTable.refresh();
-		actionSetMenuViewer.refresh();
-		actionSetToolbarViewer.refresh();
-
 		menuStructureViewer1.refresh();
 		menuStructureViewer2.refresh();
 		toolbarStructureViewer1.refresh();
@@ -1944,9 +1927,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			} else {
 				contributionItem = menuMngrRenderer.getContribution(menuItem);
 			}
-			if (contributionItem == null) {
-				return dynamicEntry;
-			}
 			if (dynamicEntry != null
 					&& contributionItem.equals(dynamicEntry.getIContributionItem())) {
 				// If the last item added is the item meant to go before the
@@ -2169,9 +2149,6 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 			if (text == null) {
 				text = item.getToolTipText();
 			}
-			if (text == null) {
-				text = item.getText();
-			}
 			if (iconDescriptor == null) {
 				Image image = item.getImage();
 				if (image != null) {
@@ -2346,7 +2323,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Remove explicitly 'visible' elements from the current list
 		for (String id : changedAndVisible) {
 			String itemId = prefix + id;
-			if (currentHidden.contains(itemId + ",")) { //$NON-NLS-1$
+			if (currentHidden.contains(itemId)) {
 				hasChanges = true;
 				windowPage.removeHiddenItems(itemId);
 			}
@@ -2355,7 +2332,7 @@ public class CustomizePerspectiveDialog extends TrayDialog {
 		// Add explicitly 'hidden' elements to the current list
 		for (String id : changedAndInvisible) {
 			String itemId = prefix + id;
-			if (!currentHidden.contains(itemId + ",")) { //$NON-NLS-1$
+			if (!currentHidden.contains(itemId)) {
 				hasChanges = true;
 				windowPage.addHiddenItems(itemId);
 			}

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,9 +21,9 @@ import org.eclipse.core.resources.IMarker;
 /**
  * EditablePropertyTester is a property tester for the editable property of the
  * selected marker.
- *
+ * 
  * @since 3.4
- *
+ * 
  */
 public class EditablePropertyTester extends PropertyTester {
 
@@ -36,30 +36,31 @@ public class EditablePropertyTester extends PropertyTester {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.expressions.IPropertyTester#test(java.lang.Object, java.lang.String, java.lang.Object[], java.lang.Object)
+	 */
 	@Override
 	public boolean test(Object receiver, String property, Object[] args,
 			Object expectedValue) {
 		if (property.equals(EDITABLE)) {
 			MarkerSupportItem item = (MarkerSupportItem) receiver;
-			Set<IMarker> markers = new HashSet<>();
+			Set/*<IMarker>*/ markers = new HashSet();
 			if (item.isConcrete()) {
 				markers.add(((MarkerEntry) receiver).getMarker());
 			} else {
 				MarkerSupportItem[] children = item.getChildren();
 				for (int i = 0; i < children.length; i++) {
-					if (children[i].isConcrete()) {
+					if (children[i].isConcrete())
 						markers.add(((MarkerEntry) children[i]).getMarker());
-					}
 				}
 			}
 
 			if (!markers.isEmpty()) {
-				Iterator<IMarker> elements = markers.iterator();
+				Iterator elements = markers.iterator();
 				while (elements.hasNext()) {
-					IMarker marker = elements.next();
-					if (!marker.getAttribute(IMarker.USER_EDITABLE, true)) {
+					IMarker marker = (IMarker) elements.next();
+					if (!marker.getAttribute(IMarker.USER_EDITABLE, true))
 						return false;
-					}
 				}
 				return true;
 			}
