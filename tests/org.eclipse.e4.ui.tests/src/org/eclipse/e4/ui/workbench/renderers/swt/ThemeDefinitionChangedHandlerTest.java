@@ -7,10 +7,13 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -23,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import junit.framework.TestCase;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.resources.IResourcesRegistry;
@@ -37,13 +39,15 @@ import org.eclipse.e4.ui.workbench.renderers.swt.WBWRenderer.ThemeDefinitionChan
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Resource;
+import org.junit.Test;
 import org.osgi.service.event.Event;
 
 /**
  *
  */
-public class ThemeDefinitionChangedHandlerTest extends TestCase {
-	public void testHandleEventWhenThemeChanged() throws Exception {
+public class ThemeDefinitionChangedHandlerTest {
+	@Test
+	public void testHandleEventWhenThemeChanged() {
 		// given
 		final MApplication application = ApplicationFactoryImpl.eINSTANCE
 				.createApplication();
@@ -98,7 +102,8 @@ public class ThemeDefinitionChangedHandlerTest extends TestCase {
 		verify(resource2, never()).dispose();
 	}
 
-	public void testHandleEventWhenElementIsNotMApplication() throws Exception {
+	@Test
+	public void testHandleEventWhenElementIsNotMApplication() {
 		// given
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(IEventBroker.DATA, MBasicFactory.INSTANCE.createWindow());
@@ -119,8 +124,8 @@ public class ThemeDefinitionChangedHandlerTest extends TestCase {
 		assertEquals(0, handler.getUnusedResources().size());
 	}
 
-	public void testHandleEventWhenCSSEngineNotFoundForWidget()
-			throws Exception {
+	@Test
+	public void testHandleEventWhenCSSEngineNotFoundForWidget() {
 		// given
 		MWindow window1 = MBasicFactory.INSTANCE.createWindow();
 		MWindow window2 = MBasicFactory.INSTANCE.createWindow();
@@ -153,7 +158,8 @@ public class ThemeDefinitionChangedHandlerTest extends TestCase {
 		assertEquals(0, handler.getUnusedResources().size());
 	}
 
-	public void testDisposeHandler() throws Exception {
+	@Test
+	public void testDisposeHandler() {
 		// given
 		ThemeDefinitionChangedHandlerTestable handler = spy(new ThemeDefinitionChangedHandlerTestable());
 
