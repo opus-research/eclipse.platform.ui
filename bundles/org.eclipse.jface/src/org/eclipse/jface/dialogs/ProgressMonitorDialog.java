@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 436923
  *******************************************************************************/
 package org.eclipse.jface.dialogs;
 
@@ -388,13 +389,13 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		if (shell != null && !shell.isDisposed()) {
 			shell.setCursor(null);
 		}
-		if (arrowCursor != null) {
-			arrowCursor.dispose();
+		if (getArrowCursor() != null) {
+			getArrowCursor().dispose();
 		}
 		if (waitCursor != null) {
 			waitCursor.dispose();
 		}
-		arrowCursor = null;
+		setArrowCursor(null);
 		waitCursor = null;
 	}
 
@@ -445,10 +446,10 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 	protected void createCancelButton(Composite parent) {
 		cancel = createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, true);
-		if (arrowCursor == null) {
-			arrowCursor = new Cursor(cancel.getDisplay(), SWT.CURSOR_ARROW);
+		if (getArrowCursor() == null) {
+			setArrowCursor(new Cursor(cancel.getDisplay(), SWT.CURSOR_ARROW));
 		}
-		cancel.setCursor(arrowCursor);
+		cancel.setCursor(getArrowCursor());
 		setOperationCancelButtonEnabled(enableCancelButton);
 	}
 
@@ -705,5 +706,22 @@ public class ProgressMonitorDialog extends IconAndMessageDialog implements
 		else
 			setMessage(task, true);
 		return result;
+	}
+
+	/**
+	 * @return Returns the arrowCursor or null if not set.
+	 */
+	public Cursor getArrowCursor() {
+		return arrowCursor;
+	}
+
+	/**
+	 * @param arrowCursor The arrowCursor to set.  The previous cursor will be disposed if set.
+	 */
+	public void setArrowCursor(Cursor arrowCursor) {
+		if (this.arrowCursor != null) {
+			this.arrowCursor.dispose();
+		}
+		this.arrowCursor = arrowCursor;
 	}
 }
