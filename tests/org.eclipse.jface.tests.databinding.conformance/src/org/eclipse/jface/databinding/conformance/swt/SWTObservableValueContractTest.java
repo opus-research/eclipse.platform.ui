@@ -20,7 +20,7 @@ import org.eclipse.jface.databinding.conformance.ObservableValueContractTest;
 import org.eclipse.jface.databinding.conformance.delegate.IObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.util.DelegatingRealm;
 import org.eclipse.jface.databinding.conformance.util.SuiteBuilder;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Display;
  * and not final in order to allow for consumers to turn off a test if needed by
  * subclassing.
  * </p>
- *
+ * 
  * @since 3.2
  */
 public class SWTObservableValueContractTest extends ObservableValueContractTest {
@@ -54,7 +54,7 @@ public class SWTObservableValueContractTest extends ObservableValueContractTest 
 
 	/**
 	 * Creates a new observable passing the realm for the current display.
-	 *
+	 * 
 	 * @return observable
 	 */
 	@Override
@@ -64,7 +64,7 @@ public class SWTObservableValueContractTest extends ObservableValueContractTest 
 			display = new Display();
 		}
 		DelegatingRealm delegateRealm = new DelegatingRealm(
-				DisplayRealm.getRealm(display));
+				SWTObservables.getRealm(display));
 		delegateRealm.setCurrent(true);
 
 		return delegate.createObservable(delegateRealm);

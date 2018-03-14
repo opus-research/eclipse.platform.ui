@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.internal.util;
 
@@ -140,10 +139,10 @@ public class VerifyDialog extends TitleAreaDialog {
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         group.setLayoutData(data);
 
-		for (IDialogTestPass dialogTest : _dialogTests) {
+        for (int i = 0; i < _dialogTests.length; i++) {
             Button radio = new Button(group, SWT.RADIO);
-			radio.setText(dialogTest.label());
-			final int testID = dialogTest.getID();
+            radio.setText(_dialogTests[i].label());
+            final int testID = _dialogTests[i].getID();
             radio.addSelectionListener(new SelectionAdapter() {
                 @Override
 				public void widgetSelected(SelectionEvent e) {
@@ -152,7 +151,7 @@ public class VerifyDialog extends TitleAreaDialog {
                     _yesButton.setEnabled(true);
                 }
             });
-			if (TEST_TYPE == dialogTest.getID()) {
+            if (TEST_TYPE == _dialogTests[i].getID()) {
                 radio.setSelection(true);
             }
         }
@@ -197,8 +196,8 @@ public class VerifyDialog extends TitleAreaDialog {
      */
     private void checkYesEnable() {
         boolean enable = true;
-		for (Button checkButton : _checkList) {
-			if (!checkButton.getSelection()) {
+        for (int i = 0; i < _checkList.length; i++) {
+            if (!_checkList[i].getSelection()) {
                 enable = false;
             }
         }
@@ -212,17 +211,17 @@ public class VerifyDialog extends TitleAreaDialog {
         IDialogTestPass test = _dialogTests[TEST_TYPE];
         setTitle(test.title());
         setMessage(test.description());
-		Iterator<?> iterator = test.checkListTexts().iterator();
-		for (Button checkButton : _checkList) {
+        Iterator iterator = test.checkListTexts().iterator();
+        for (int i = 0; i < _checkList.length; i++) {
             if (iterator.hasNext()) {
-				checkButton.setText(iterator.next().toString());
-				checkButton.setVisible(true);
-				checkButton.update();
+                _checkList[i].setText(iterator.next().toString());
+                _checkList[i].setVisible(true);
+                _checkList[i].update();
             } else {
-				checkButton.setVisible(false);
-				checkButton.update();
+                _checkList[i].setVisible(false);
+                _checkList[i].update();
             }
-			checkButton.setSelection(true);
+            _checkList[i].setSelection(true);
         }
         _queryLabel.setText(test.queryText());
     }

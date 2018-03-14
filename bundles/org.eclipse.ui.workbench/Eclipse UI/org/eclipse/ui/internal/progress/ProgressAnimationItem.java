@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2015 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,6 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.accessibility.AccessibleAdapter;
 import org.eclipse.swt.accessibility.AccessibleEvent;
-import org.eclipse.swt.accessibility.AccessibleListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -77,11 +76,9 @@ public class ProgressAnimationItem extends AnimationItem implements
 	// ProgressBar flags
 	private int flags;
 
-	private AccessibleListener currentAccessibleListener;
-
 	/**
 	 * Create an instance of the receiver in the supplied region.
-	 *
+	 * 
 	 * @param region
 	 *            The ProgressRegion that contains the receiver.
 	 * @param flags
@@ -117,7 +114,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 						StatusAdapter statusAdapter = StatusAdapterHelper
 								.getInstance().getStatusAdapter(ji);
 
-						if (statusAdapter == null)
+						if (statusAdapter == null) 
 							statusAdapter = new StatusAdapter(status);
 
 						StatusManager.getManager().handle(statusAdapter,
@@ -126,12 +123,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 						removeTopElement(ji);
 					}
 
-					// To fix a bug (335543) introduced in 3.6.1.
-					// doAction() should return if progress region button was
-					// selected to open a job result action or command.
-					if (execute(ji, job)) {
-						return;
-					}
+					execute(ji, job);
 				}
 			}
 		}
@@ -143,16 +135,14 @@ public class ProgressAnimationItem extends AnimationItem implements
 	/**
 	 * @param ji
 	 * @param job
-	 * @return <code>true</code> if Action or Command is executed
 	 */
-	private boolean execute(JobInfo ji, Job job) {
+	private void execute(JobInfo ji, Job job) {
 
 		Object prop = job.getProperty(IProgressConstants.ACTION_PROPERTY);
 		if (prop instanceof IAction && ((IAction) prop).isEnabled()) {
 			IAction action = (IAction) prop;
 			action.run();
 			removeTopElement(ji);
-			return true;
 		}
 
 		prop = job.getProperty(IProgressConstants2.COMMAND_PROPERTY);
@@ -181,9 +171,8 @@ public class ProgressAnimationItem extends AnimationItem implements
 				StatusManager.getManager().handle(status,
 						StatusManager.LOG | StatusManager.SHOW);
 			}
-			return true;
+
 		}
-		return false;
 	}
 
 	/**
@@ -266,21 +255,18 @@ public class ProgressAnimationItem extends AnimationItem implements
 		toolButton.setToolTipText(tt);
     	toolbar.setVisible(true);
 		toolbar.getParent().layout(); // must layout
-
-		if (currentAccessibleListener != null)
-			toolbar.getAccessible().removeAccessibleListener(currentAccessibleListener);
-		currentAccessibleListener = new AccessibleAdapter() {
-			@Override
+		
+    	toolbar.getAccessible().addAccessibleListener(new AccessibleAdapter() {
+        	@Override
 			public void getName(AccessibleEvent e) {
-				e.result = tt;
-			}
-		};
-		toolbar.getAccessible().addAccessibleListener(currentAccessibleListener);
+        		e.result = tt;
+        	}
+        });
 	}
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
@@ -367,7 +353,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
 	 */
 	@Override
@@ -377,7 +363,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
 	 */
 	@Override
@@ -400,7 +386,7 @@ public class ProgressAnimationItem extends AnimationItem implements
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
 	 */
 	@Override
