@@ -229,7 +229,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 	protected void okPressed() {
 
 		if (contentExtensionsTab != null) {
-			List<String> checkedExtensions = new ArrayList<String>();
+			List checkedExtensions = new ArrayList();
 			TableItem[] tableItems = contentExtensionsTab.getTable().getItems();
 			INavigatorContentDescriptor descriptor;
 			for (int i = 0; i < tableItems.length; i++) {
@@ -240,7 +240,7 @@ public class CommonFilterSelectionDialog extends TrayDialog {
 					checkedExtensions.add(descriptor.getId());
 				}
 			}
-			String[] contentExtensionIdsToActivate = checkedExtensions
+			String[] contentExtensionIdsToActivate = (String[]) checkedExtensions
 					.toArray(new String[checkedExtensions.size()]);
 			UpdateActiveExtensionsOperation updateExtensions = new UpdateActiveExtensionsOperation(
 					commonViewer, contentExtensionIdsToActivate);
