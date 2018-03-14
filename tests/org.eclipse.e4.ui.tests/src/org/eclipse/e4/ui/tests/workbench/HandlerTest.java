@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2010 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,11 +7,16 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -23,11 +28,14 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *
  */
-public class HandlerTest extends TestCase {
+public class HandlerTest {
 	private static final String HELP_COMMAND_ID = "org.eclipse.ui.commands.help";
 	private static final String HELP_COMMAND1_ID = HELP_COMMAND_ID + "1";
 	private IEclipseContext appContext;
@@ -59,8 +67,8 @@ public class HandlerTest extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 	}
@@ -70,12 +78,13 @@ public class HandlerTest extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@Override
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() {
 		appContext.dispose();
 	}
 
-	public void testOneCommand() throws Exception {
+	@Test
+	public void testOneCommand() {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -96,7 +105,8 @@ public class HandlerTest extends TestCase {
 		assertNull(service.executeHandler(help1Command));
 	}
 
-	public void testTwoCommands() throws Exception {
+	@Test
+	public void testTwoCommands() {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -117,7 +127,8 @@ public class HandlerTest extends TestCase {
 		assertTrue(handler1.ran);
 	}
 
-	public void testTwoHandlers() throws Exception {
+	@Test
+	public void testTwoHandlers() {
 		defineCommands(appContext);
 
 		ParameterizedCommand helpCommand = getCommand(appContext,
@@ -158,7 +169,8 @@ public class HandlerTest extends TestCase {
 		return new ParameterizedCommand(cmd, null);
 	}
 
-	public void testCanExecute() throws Exception {
+	@Test
+	public void testCanExecute() {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -185,7 +197,8 @@ public class HandlerTest extends TestCase {
 		assertTrue(windowService.canExecute(helpCommand));
 	}
 
-	public void testThreeContexts() throws Exception {
+	@Test
+	public void testThreeContexts() {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -212,7 +225,8 @@ public class HandlerTest extends TestCase {
 		assertEquals(windowRC, service.executeHandler(helpCommand));
 	}
 
-	public void testDifferentExecutionContexts() throws Exception {
+	@Test
+	public void testDifferentExecutionContexts() {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
