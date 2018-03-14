@@ -118,7 +118,6 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 		 */
-		@Override
 		public String getText(Object element) {
 			if (element instanceof Team)
 				return ((Team)element).name;
@@ -136,7 +135,6 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			if (inputElement instanceof Team){
 				return ((Team)inputElement).members;
@@ -147,14 +145,12 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 		}
 
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			if (oldInput != null){
 				((Team) oldInput).removeListener(this);;
@@ -165,8 +161,7 @@ public abstract class ViewerComparatorTest extends ViewerTestCase {
 	        }
 		}
 
-	    @Override
-		public void modelChanged(ComparatorModelChange change) {
+	    public void modelChanged(ComparatorModelChange change) {
 	        switch (change.getKind()) {
 	        case TestModelChange.INSERT:
 	            doInsert(change);
