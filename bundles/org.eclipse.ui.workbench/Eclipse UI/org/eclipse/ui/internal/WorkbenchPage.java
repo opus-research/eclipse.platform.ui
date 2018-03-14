@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,9 +9,9 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 431340, 431348, 426535, 433234, 431868
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -30,8 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.PostConstruct;
@@ -194,12 +192,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 		public void partActivated(MPart part) {
 			// update the workbench window's current selection with the active
 			// part's selection
-			SelectionService service = (SelectionService) getWorkbenchWindow()
-					.getSelectionService();
-			service.updateSelection(getWorkbenchPart(part));
+			IWorkbenchPart workbenchPart = getWorkbenchPart(part);
+			selectionService.updateSelection(workbenchPart);
 
 			updateActivations(part);
 			firePartActivated(part);
+			selectionService.notifyListeners(workbenchPart);
 		}
 
 		@Override
@@ -529,11 +527,6 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     private Composite composite;
     
-	private List<ISelectionListener> selectionListeners = new ArrayList<ISelectionListener>();
-	private List<ISelectionListener> postSelectionListeners = new ArrayList<ISelectionListener>();
-	private Map<String, List<ISelectionListener>> targetedSelectionListeners = new HashMap<String, List<ISelectionListener>>();
-	private Map<String, List<ISelectionListener>> targetedPostSelectionListeners = new HashMap<String, List<ISelectionListener>>();
-
     private ListenerList propertyChangeListeners = new ListenerList();
 
     private IActionBars actionBars;
@@ -840,6 +833,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	private EPartService partService;
 
+	private SelectionService selectionService;
+
 	private MApplication application;
 
 	private MWindow window;
@@ -1014,37 +1009,23 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public void addSelectionListener(ISelectionListener listener) {
-		selectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(listener);
+		selectionService.addSelectionListener(listener);
     }
 
     @Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedSelectionListeners.get(partId);
-		if (listeners == null) {
-			listeners = new ArrayList<ISelectionListener>();
-			targetedSelectionListeners.put(partId, listeners);
-		}
-		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addSelectionListener(partId, listener);
+		selectionService.addSelectionListener(partId, listener);
     }
 
     @Override
 	public void addPostSelectionListener(ISelectionListener listener) {
-		postSelectionListeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
+		selectionService.addPostSelectionListener(listener);
     }
 
     @Override
 	public void addPostSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
-		if (listeners == null) {
-			listeners = new ArrayList<ISelectionListener>();
-			targetedPostSelectionListeners.put(partId, listeners);
-		}
-		listeners.add(listener);
-		getWorkbenchWindow().getSelectionService().addPostSelectionListener(partId, listener);
+		selectionService.addPostSelectionListener(partId, listener);
     }
     
     /**
@@ -1816,39 +1797,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 			broker.unsubscribe(childrenHandler);
 			partEvents.clear();
 
-			ISelectionService selectionService = getWorkbenchWindow().getSelectionService();
-			for (ISelectionListener listener : selectionListeners) {
-				selectionService.removeSelectionListener(listener);
-			}
-
-			for (Entry<String, List<ISelectionListener>> entries : targetedSelectionListeners
-					.entrySet()) {
-				String partId = entries.getKey();
-				for (ISelectionListener listener : entries.getValue()) {
-					selectionService.removeSelectionListener(partId, listener);
-				}
-			}
-
-			for (ISelectionListener listener : postSelectionListeners) {
-				selectionService.removePostSelectionListener(listener);
-			}
-
-			for (Entry<String, List<ISelectionListener>> entries : targetedPostSelectionListeners
-					.entrySet()) {
-				String partId = entries.getKey();
-				for (ISelectionListener listener : entries.getValue()) {
-					selectionService.removePostSelectionListener(partId, listener);
-				}
-			}
-
 			partListenerList.clear();
 			partListener2List.clear();
 			propertyChangeListeners.clear();
 
-			selectionListeners.clear();
-			postSelectionListeners.clear();
-			targetedSelectionListeners.clear();
-			targetedPostSelectionListeners.clear();
+			selectionService.dispose();
 
 			ContextInjectionFactory.uninject(this, window.getContext());
 		}
@@ -2491,12 +2444,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public ISelection getSelection() {
-		return getWorkbenchWindow().getSelectionService().getSelection();
+		return selectionService.getSelection();
     }
 
     @Override
 	public ISelection getSelection(String partId) {
-		return getWorkbenchWindow().getSelectionService().getSelection(partId);
+		return selectionService.getSelection(partId);
     }
 
 	/**
@@ -2545,12 +2498,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspective perspective = getCurrentPerspective();
 		if (perspective != null) {
 			int scope = allPerspectives ? WINDOW_SCOPE : EModelService.PRESENTATION;
-			List<MPart> parts = modelService.findElements(window, null, MPart.class, null, scope);
+			List<MPlaceholder> placeholders = modelService.findElements(window, null,
+					MPlaceholder.class, null, scope);
 			List<IViewReference> visibleReferences = new ArrayList<IViewReference>();
 			for (ViewReference reference : viewReferences) {
-				for (MPart part : parts) {
-					if (reference.getId().equals(part.getElementId())
-							&& partService.isPartOrPlaceholderInPerspective(part.getElementId(), perspective)) {
+				for (MPlaceholder placeholder : placeholders) {
+					if (reference.getModel() == placeholder.getRef()
+							&& placeholder.isToBeRendered()) {
 						// only rendered placeholders are valid view references
 						visibleReferences.add(reference);
 					}
@@ -2561,9 +2515,9 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return new IViewReference[0];
 	}
 
-    /**
-     * See IWorkbenchPage.
-     */
+	/**
+	 * See IWorkbenchPage.
+	 */
     @Override
 	public IViewPart[] getViews() {
 		IViewReference[] viewReferences = getViewReferences();
@@ -2679,6 +2633,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		this.broker = broker;
 		this.window = window;
 		this.partService = partService;
+		selectionService = ContextInjectionFactory.make(SelectionService.class, window.getContext());
 
 		partService.addPartListener(e4PartListener);
 
@@ -3337,34 +3292,24 @@ public class WorkbenchPage implements IWorkbenchPage {
 
     @Override
 	public void removeSelectionListener(ISelectionListener listener) {
-		selectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(listener);
+		selectionService.removeSelectionListener(listener);
     }
 
     @Override
 	public void removeSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedSelectionListeners.get(partId);
-		if (listeners != null) {
-			listeners.remove(listener);
-		}
-		getWorkbenchWindow().getSelectionService().removeSelectionListener(partId, listener);
+		selectionService.removeSelectionListener(partId, listener);
     }
 
     @Override
 	public void removePostSelectionListener(ISelectionListener listener) {
-		postSelectionListeners.remove(listener);
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(listener);
+		selectionService.removePostSelectionListener(listener);
     }
 
     @Override
 	public void removePostSelectionListener(String partId,
             ISelectionListener listener) {
-		List<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
-		if (listeners != null) {
-			listeners.remove(listener);
-		}
-		getWorkbenchWindow().getSelectionService().removePostSelectionListener(partId, listener);
+		selectionService.removePostSelectionListener(partId, listener);
     }
 
 
@@ -3992,6 +3937,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 		perspectives.setSelectedElement(modelPerspective);
 
 		modelPerspective.getContext().activate();
+		modelPerspective.getContext().set(ISelectionService.class, selectionService);
 
 		legacyWindow.firePerspectiveOpened(this, perspective);
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_OPENED, modelPerspective);
