@@ -10,7 +10,6 @@
  *     Markus Alexander Kuppe, Versant GmbH - bug 215797
  *     Sascha Zak - bug 282874
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810, 440136
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 404348, 421178, 456727
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -48,34 +47,10 @@ public class Perspective {
 
 	public void initActionSets() {
 		if (descriptor != null) {
-			List<String> alwaysOn = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
-
-			// read explicitly disabled sets.
-			String hiddenIDs = page.getHiddenItems();
-			List<String> alwaysOff = new ArrayList<String>();
-
-			String[] hiddenIds = hiddenIDs.split(","); //$NON-NLS-1$
-			for (String id : hiddenIds) {
-				if (!id.startsWith(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX)) {
-					continue;
-				}
-				id = id.substring(ModeledPageLayout.HIDDEN_ACTIONSET_PREFIX.length());
-				if (!alwaysOff.contains(id)) {
-					alwaysOff.add(id);
-				}
-			}
-
-			alwaysOn.removeAll(alwaysOff);
-
-			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOn)) {
+			List<String> ids = ModeledPageLayout.getIds(layout, ModeledPageLayout.ACTION_SET_TAG);
+			for (IActionSetDescriptor descriptor : createInitialActionSets(ids)) {
 				if (!alwaysOnActionSets.contains(descriptor)) {
 					alwaysOnActionSets.add(descriptor);
-				}
-			}
-
-			for (IActionSetDescriptor descriptor : createInitialActionSets(alwaysOff)) {
-				if (!alwaysOffActionSets.contains(descriptor)) {
-					alwaysOffActionSets.add(descriptor);
 				}
 			}
 		}
@@ -230,9 +205,11 @@ public class Perspective {
 				}
 			}
 			addAlwaysOff(toRemove);
-			// doesn't make sense to *remove* tag, it is "disabled" now
-			// String tag = ModeledPageLayout.ACTION_SET_TAG + id;
-			// layout.getTags().remove(tag);
+			// remove tag
+			String tag = ModeledPageLayout.ACTION_SET_TAG + id;
+			if (layout.getTags().contains(tag)) {
+				layout.getTags().remove(tag);
+			}
 		} finally {
 			service.deferUpdates(false);
 		}
