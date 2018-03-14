@@ -15,7 +15,6 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 422533, 440136, 445724, 366708
  *     Terry Parker <tparker@google.com> - Bug 416673
  *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450187
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1966,7 +1965,7 @@ UIEvents.Context.TOPIC_CONTEXT,
 		if (!found) {
 			MPartDescriptor descriptor = org.eclipse.e4.ui.model.application.descriptor.basic.impl.BasicFactoryImpl.eINSTANCE
 					.createPartDescriptor();
-			descriptor.getTags().add(IPresentationEngine.EDITOR_TAG);
+			descriptor.getTags().add("Editor"); //$NON-NLS-1$
 			descriptor.setCloseable(true);
 			descriptor.setAllowMultiple(true);
 			descriptor.setElementId(CompatibilityEditor.MODEL_ELEMENT_ID);
