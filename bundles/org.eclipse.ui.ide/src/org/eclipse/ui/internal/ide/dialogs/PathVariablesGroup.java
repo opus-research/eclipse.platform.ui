@@ -73,8 +73,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import com.ibm.icu.text.Collator;
-
 /**
  * A widget group that displays path variables.
  * Includes buttons to edit, remove existing variables and create new ones.
@@ -170,8 +168,7 @@ public class PathVariablesGroup {
         pathVariableManager = ResourcesPlugin.getWorkspace()
                 .getPathVariableManager();
         removedVariableNames = new HashSet();
-        Collator ignoreCaseComparator = Collator.getInstance();
-        tempPathVariables = new TreeMap(ignoreCaseComparator);
+        tempPathVariables = new TreeMap();
         // initialize internal model
         initTemporaryState();
     }
