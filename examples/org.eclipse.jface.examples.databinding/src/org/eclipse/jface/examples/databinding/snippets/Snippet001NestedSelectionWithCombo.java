@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Observables;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
@@ -93,7 +93,7 @@ public class Snippet001NestedSelectionWithCombo {
 	}
 
 	// The data model class. This is normally a persistent class of some sort.
-	// 
+	//
 	// This example implements full JavaBeans bound properties so that changes
 	// to instances of this class will automatically be propogated to the UI.
 	public static class Person extends AbstractModelObject {
@@ -135,7 +135,7 @@ public class Snippet001NestedSelectionWithCombo {
 	// The ViewModel is responsible for getting the objects to edit from the
 	// DAO. Since this snippet doesn't have any persistent objects to
 	// retrieve, this ViewModel just instantiates some objects to edit.
-	// 
+	//
 	// This ViewModel also implements JavaBean bound properties.
 	static class ViewModel extends AbstractModelObject {
 		// The model to bind
@@ -183,9 +183,9 @@ public class Snippet001NestedSelectionWithCombo {
 			Combo city = new Combo(shell, SWT.BORDER | SWT.READ_ONLY);
 
 			ListViewer peopleListViewer = new ListViewer(peopleList);
-			IObservableMap attributeMap = BeansObservables.observeMap(
+			IObservableMap attributeMap = BeanProperties.value(Person.class, "name").observeDetail(
 					Observables.staticObservableSet(realm, new HashSet(
-							viewModel.getPeople())), Person.class, "name");
+							viewModel.getPeople())));
 			peopleListViewer.setLabelProvider(new ObservableMapLabelProvider(
 					attributeMap));
 			peopleListViewer.setContentProvider(new ArrayContentProvider());
@@ -194,9 +194,14 @@ public class Snippet001NestedSelectionWithCombo {
 			DataBindingContext dbc = new DataBindingContext(realm);
 			IObservableValue selectedPerson = ViewersObservables
 					.observeSingleSelection(peopleListViewer);
-			dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(name),
-					BeansObservables.observeDetailValue(selectedPerson,
-							"name", String.class));
+			Class selectedPersonValueType = null;
+			if (selectedPerson.getValueType() instanceof Class<?>) {
+				selectedPersonValueType = (Class) selectedPerson.getValueType();
+			}
+			dbc.bindValue(
+					WidgetProperties.text(SWT.Modify).observe(name),
+					BeanProperties.value(selectedPersonValueType, "name", String.class)
+					.observeDetail(selectedPerson));
 
 			ComboViewer cityViewer = new ComboViewer(city);
 			cityViewer.setContentProvider(new ArrayContentProvider());
@@ -204,8 +209,8 @@ public class Snippet001NestedSelectionWithCombo {
 
 			IObservableValue citySelection = ViewersObservables
 					.observeSingleSelection(cityViewer);
-			dbc.bindValue(citySelection, BeansObservables.observeDetailValue(
-					selectedPerson, "city", String.class));
+			dbc.bindValue(citySelection, BeanProperties.value(selectedPersonValueType, "city", String.class)
+					.observeDetail(selectedPerson));
 
 			GridLayoutFactory.swtDefaults().applyTo(shell);
 			// Open and return the Shell
