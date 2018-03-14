@@ -28,6 +28,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -119,6 +120,7 @@ import org.eclipse.jface.bindings.IBindingManagerListener;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -154,6 +156,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISaveableFilter;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISaveablesLifecycleListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.ISourceProvider;
@@ -1361,15 +1364,36 @@ public final class Workbench extends EventManager implements IWorkbench,
 	}
 
 	private boolean saveAllEditors(boolean confirm, boolean closing) {
-		for (IWorkbenchWindow window : getWorkbenchWindows()) {
-			IWorkbenchPage page = window.getActivePage();
+		Set<ISaveablePart> dirtyParts = new HashSet<ISaveablePart>();
+		IWorkbenchWindow[] windows = getWorkbenchWindows();
+		for (IWorkbenchWindow window : windows) {
+			WorkbenchPage page = (WorkbenchPage) window.getActivePage();
 			if (page != null) {
-				if (!((WorkbenchPage) page).saveAllEditors(confirm, closing, false)) {
-					return false;
-				}
+				Collections.addAll(dirtyParts, page.getDirtyParts());
 			}
 		}
-		return true;
+
+		IShellProvider shellProvider;
+		IRunnableContext runnableContext;
+		IWorkbenchWindow window = getActiveWorkbenchWindow();
+		if (window == null && windows.length > 0) {
+			window = windows[0];
+		}
+		if (window != null) {
+			shellProvider = window;
+			runnableContext = window;
+		} else {
+			shellProvider = new IShellProvider() {
+				@Override
+				public Shell getShell() {
+					return null;
+				}
+			};
+			runnableContext = new ProgressMonitorDialog(null);
+		}
+
+		return WorkbenchPage.saveAll(new ArrayList<ISaveablePart>(dirtyParts), confirm, closing,
+				true, runnableContext, shellProvider);
 	}
 
 	/*
