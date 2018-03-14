@@ -46,13 +46,11 @@ public class NavigationHistory implements INavigationHistory {
 
     private int ignoreEntries;
 
-	private ArrayList<NavigationHistoryEntry> history = new ArrayList<NavigationHistoryEntry>(
-			CAPACITY);
+    private ArrayList history = new ArrayList(CAPACITY);
     
-	Map<Object, PerTabHistory> perTabHistoryMap = new HashMap<Object, PerTabHistory>();
+    Map perTabHistoryMap = new HashMap();
 
-	private ArrayList<NavigationHistoryEditorInfo> editors = new ArrayList<NavigationHistoryEditorInfo>(
-			CAPACITY);
+    private ArrayList editors = new ArrayList(CAPACITY);
 
     private IWorkbenchPage page;
 
@@ -66,25 +64,32 @@ public class NavigationHistory implements INavigationHistory {
     public NavigationHistory(final IWorkbenchPage page) {
         this.page = page;
         page.addPartListener(new IPartListener2() {
-            public void partActivated(IWorkbenchPartReference partRef) {
+            @Override
+			public void partActivated(IWorkbenchPartReference partRef) {
             }
 
-            public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            @Override
+			public void partBroughtToTop(IWorkbenchPartReference partRef) {
             }
 
-            public void partDeactivated(IWorkbenchPartReference partRef) {
+            @Override
+			public void partDeactivated(IWorkbenchPartReference partRef) {
             }
 
-            public void partOpened(IWorkbenchPartReference partRef) {
+            @Override
+			public void partOpened(IWorkbenchPartReference partRef) {
             }
 			
-            public void partHidden(IWorkbenchPartReference partRef) {
+            @Override
+			public void partHidden(IWorkbenchPartReference partRef) {
             }
 			
-            public void partVisible(IWorkbenchPartReference partRef) {
+            @Override
+			public void partVisible(IWorkbenchPartReference partRef) {
             }
 
-            public void partClosed(IWorkbenchPartReference partRef) {
+            @Override
+			public void partClosed(IWorkbenchPartReference partRef) {
             	if (isPerTabHistoryEnabled() && partRef instanceof EditorReference) {
             		if (!((EditorReference)partRef).isDisposed()) {
 						Object editorTabCookie = ((EditorReference) partRef).getModel().getWidget();
@@ -95,6 +100,7 @@ public class NavigationHistory implements INavigationHistory {
 				updateNavigationHistory(partRef, true);
             }
 			
+			@Override
 			public void partInputChanged(IWorkbenchPartReference partRef) {
 				updateNavigationHistory(partRef, false);
 			}
@@ -104,7 +110,7 @@ public class NavigationHistory implements INavigationHistory {
                     IEditorPart editor = (IEditorPart) partRef.getPart(false);
                     IEditorInput input = editor.getEditorInput();
                     String id = editor.getSite().getId();
-					Iterator<NavigationHistoryEditorInfo> e = editors.iterator();
+                    Iterator e = editors.iterator();
                     NavigationHistoryEditorInfo info = null;
                     NavigationHistoryEditorInfo currentInfo = null;
                     NavigationHistoryEntry current = getEntry(activeEntry);
@@ -112,7 +118,7 @@ public class NavigationHistory implements INavigationHistory {
 						currentInfo = current.editorInfo;
 					}
                     while (e.hasNext()) {
-						info = e.next();
+                        info = (NavigationHistoryEditorInfo) e.next();
                         if (id.equals(info.editorID)
                                 && input.equals(info.editorInput)) {
                             if (partClosed && info != currentInfo) {
@@ -126,10 +132,11 @@ public class NavigationHistory implements INavigationHistory {
 						return;
 					}
                     boolean isEntryDisposed = false;
-					Iterator<NavigationHistoryEntry> e1 = history.iterator();
+                    e = history.iterator();
                     int i = 0;
-					while (e1.hasNext()) {
-						NavigationHistoryEntry entry = e1.next();
+                    while (e.hasNext()) {
+                        NavigationHistoryEntry entry = (NavigationHistoryEntry) e
+                                .next();
                         if (entry.editorInfo == info) {
 							if (!entry.handlePartClosed()) {
                                 // update the active entry since we are removing an item
@@ -144,7 +151,7 @@ public class NavigationHistory implements INavigationHistory {
                                     i++;
                                 }
                                 isEntryDisposed = true;
-								e1.remove();
+                                e.remove();
                                 disposeEntry(entry);
                             } else {
                                 i++;
@@ -184,7 +191,8 @@ public class NavigationHistory implements INavigationHistory {
          * extra entry when using Open Declaration (F3) that opens another editor. */
         ignoreEntries++;
         getDisplay().asyncExec(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
                 if (--ignoreEntries == 0) {
 	                if (part.getEditorSite() instanceof EditorSite) {
 						EditorSite site = (EditorSite) part.getEditorSite();
@@ -204,8 +212,12 @@ public class NavigationHistory implements INavigationHistory {
         });
     }
 
-	@Override
-    public void markLocation(IEditorPart part) {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
+    @Override
+	public void markLocation(IEditorPart part) {
         addEntry(part);
     }
 
@@ -250,18 +262,26 @@ public class NavigationHistory implements INavigationHistory {
         return entries;
     }
 
-	@Override
-    public INavigationLocation[] getLocations() {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
+    @Override
+	public INavigationLocation[] getLocations() {
         INavigationLocation result[] = new INavigationLocation[history.size()];
         for (int i = 0; i < result.length; i++) {
-			NavigationHistoryEntry e = history.get(i);
+            NavigationHistoryEntry e = (NavigationHistoryEntry) history.get(i);
             result[i] = e.location;
         }
         return result;
     }
 
-	@Override
-    public INavigationLocation getCurrentLocation() {
+    /*
+     * (non-Javadoc)
+     * Method declared on INavigationHistory.
+     */
+    @Override
+	public INavigationLocation getCurrentLocation() {
         NavigationHistoryEntry entry = getEntry(activeEntry);
         return entry == null ? null : entry.location;
     }
@@ -271,9 +291,9 @@ public class NavigationHistory implements INavigationHistory {
      */
     public void dispose() {
     	disposeHistoryForTabs();
-		Iterator<NavigationHistoryEntry> e = history.iterator();
+        Iterator e = history.iterator();
         while (e.hasNext()) {
-			NavigationHistoryEntry entry = e.next();
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) e.next();
             disposeEntry(entry);
         }
     }
@@ -307,7 +327,7 @@ public class NavigationHistory implements INavigationHistory {
      */
     private NavigationHistoryEntry getEntry(int index) {
         if (0 <= index && index < history.size()) {
-			return history.get(index);
+			return (NavigationHistoryEntry) history.get(index);
 		}
         return null;
     }
@@ -318,7 +338,8 @@ public class NavigationHistory implements INavigationHistory {
     private void add(NavigationHistoryEntry entry) {
         removeForwardEntries();
         if (history.size() == CAPACITY) {
-			NavigationHistoryEntry e = history.remove(0);
+            NavigationHistoryEntry e = (NavigationHistoryEntry) history
+                    .remove(0);
             disposeEntry(e);
         }
         history.add(entry);
@@ -331,7 +352,8 @@ public class NavigationHistory implements INavigationHistory {
     private void removeForwardEntries() {
         int length = history.size();
         for (int i = activeEntry + 1; i < length; i++) {
-			NavigationHistoryEntry e = history.remove(activeEntry + 1);
+            NavigationHistoryEntry e = (NavigationHistoryEntry) history
+                    .remove(activeEntry + 1);
             disposeEntry(e);
         }
     }
@@ -533,33 +555,35 @@ public class NavigationHistory implements INavigationHistory {
 			return;
 		}
 
-        ArrayList<NavigationHistoryEditorInfo> editors = (ArrayList<NavigationHistoryEditorInfo>) this.editors.clone();
-		for (Iterator<NavigationHistoryEditorInfo> iter = editors.iterator(); iter.hasNext();) {
-			NavigationHistoryEditorInfo info = iter.next();
+        ArrayList editors = (ArrayList) this.editors.clone();
+        for (Iterator iter = editors.iterator(); iter.hasNext();) {
+            NavigationHistoryEditorInfo info = (NavigationHistoryEditorInfo) iter
+                    .next();
             if (!info.isPersistable()) {
 				iter.remove();
 			}
         }
         IMemento editorsMem = memento
                 .createChild(IWorkbenchConstants.TAG_EDITORS);
-		for (Iterator<NavigationHistoryEditorInfo> iter = editors.iterator(); iter.hasNext();) {
-			NavigationHistoryEditorInfo info = iter.next();
+        for (Iterator iter = editors.iterator(); iter.hasNext();) {
+            NavigationHistoryEditorInfo info = (NavigationHistoryEditorInfo) iter
+                    .next();
             info.saveState(editorsMem
                     .createChild(IWorkbenchConstants.TAG_EDITOR));
         }
 
-		ArrayList<NavigationHistoryEntry> list = new ArrayList<NavigationHistoryEntry>(
-				history.size());
+        ArrayList list = new ArrayList(history.size());
         int size = history.size();
         for (int i = 0; i < size; i++) {
-			NavigationHistoryEntry entry = history.get(i);
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) history
+                    .get(i);
             if (entry.editorInfo.isPersistable()) {
 				list.add(entry);
 			}
         }
         size = list.size();
         for (int i = 0; i < size; i++) {
-			NavigationHistoryEntry entry = list.get(i);
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) list.get(i);
             IMemento childMem = memento
                     .createChild(IWorkbenchConstants.TAG_ITEM);
             if (entry == cEntry) {
@@ -613,6 +637,7 @@ public class NavigationHistory implements INavigationHistory {
                     .findEditor(entry.editorInfo.editorInput)) {
             	StartupThreading.runWithoutExceptions(new StartupRunnable() {
 
+					@Override
 					public void runWithException() throws Throwable {
 						gotoEntry(entry);
 					}});
@@ -625,8 +650,8 @@ public class NavigationHistory implements INavigationHistory {
         String editorID = part.getSite().getId();
         IEditorInput editorInput = part.getEditorInput();
         NavigationHistoryEditorInfo info = null;
-		for (Iterator<NavigationHistoryEditorInfo> iter = editors.iterator(); iter.hasNext();) {
-			info = iter.next();
+        for (Iterator iter = editors.iterator(); iter.hasNext();) {
+            info = (NavigationHistoryEditorInfo) iter.next();
             if (editorID.equals(info.editorID)
                     && editorInput.equals(info.editorInput)) {
                 info.refCount++;
@@ -658,8 +683,8 @@ public class NavigationHistory implements INavigationHistory {
         if (info.editorInput == null) {
 			return;
 		}
-		for (Iterator<NavigationHistoryEditorInfo> iter = editors.iterator(); iter.hasNext();) {
-			dup = iter.next();
+        for (Iterator iter = editors.iterator(); iter.hasNext();) {
+            dup = (NavigationHistoryEditorInfo) iter.next();
             if (info != dup && info.editorID.equals(dup.editorID)
                     && info.editorInput.equals(dup.editorInput)) {
 				break;
@@ -669,8 +694,8 @@ public class NavigationHistory implements INavigationHistory {
         if (dup == null) {
 			return;
 		}
-		for (Iterator<NavigationHistoryEntry> iter = history.iterator(); iter.hasNext();) {
-			NavigationHistoryEntry entry = iter.next();
+        for (Iterator iter = history.iterator(); iter.hasNext();) {
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) iter.next();
             if (entry.editorInfo == dup) {
                 entry.editorInfo = info;
                 info.refCount++;
@@ -685,9 +710,9 @@ public class NavigationHistory implements INavigationHistory {
     
     
     private static class PerTabHistory {
-		LinkedList<NavigationHistoryEntry> backwardEntries = new LinkedList<NavigationHistoryEntry>();
+    	LinkedList backwardEntries = new LinkedList();
     	NavigationHistoryEntry currentEntry = null;
-		LinkedList<NavigationHistoryEntry> forwardEntries = new LinkedList<NavigationHistoryEntry>();
+    	LinkedList forwardEntries = new LinkedList();
     }
     
     private void setNewCurrentEntryForTab(PerTabHistory perTabHistory, NavigationHistoryEntry entry) {
@@ -724,7 +749,8 @@ public class NavigationHistory implements INavigationHistory {
 				location = ((INavigationLocationProvider) part)
 						.createNavigationLocation();
 			}
-			PerTabHistory perTabHistory = perTabHistoryMap.get(tabCookie);
+			PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap
+					.get(tabCookie);
 			if (perTabHistory == null) {
 				perTabHistory = new PerTabHistory();
 				perTabHistoryMap.put(tabCookie, perTabHistory);
@@ -749,7 +775,7 @@ public class NavigationHistory implements INavigationHistory {
     	if (newCookie.equals(oldCookie)) {
     		return;
     	}
-		PerTabHistory perTabHistory = perTabHistoryMap.remove(oldCookie);
+    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.remove(oldCookie);
     	if (perTabHistory != null) {
     		perTabHistoryMap.put(newCookie, perTabHistory);
     	}
@@ -758,12 +784,10 @@ public class NavigationHistory implements INavigationHistory {
     private void gotoEntryForTab(NavigationHistoryEntry target, boolean forward) {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
-			PerTabHistory perTabHistory = perTabHistoryMap.get(editorTabCookie);
+	    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.get(editorTabCookie);
 	    	if (perTabHistory != null) {
-				LinkedList<NavigationHistoryEntry> source = forward ? perTabHistory.forwardEntries
-						: perTabHistory.backwardEntries;
-				LinkedList<NavigationHistoryEntry> destination = forward ? perTabHistory.backwardEntries
-						: perTabHistory.forwardEntries;
+	    		LinkedList source = forward ? perTabHistory.forwardEntries : perTabHistory.backwardEntries;
+	    		LinkedList destination = forward ? perTabHistory.backwardEntries : perTabHistory.forwardEntries;
 				if (perTabHistory.currentEntry != null) {
 					if (perTabHistory.currentEntry.location != null) {
 						perTabHistory.currentEntry.location.update();
@@ -772,7 +796,8 @@ public class NavigationHistory implements INavigationHistory {
 				}
 				NavigationHistoryEntry newCurrent = null;
 	    		while (!source.isEmpty() && newCurrent==null) {
-					NavigationHistoryEntry entry = source.removeFirst();
+		    		NavigationHistoryEntry entry = (NavigationHistoryEntry) source
+							.removeFirst();
 		    		if (entry.equals(target)) {
 		    			newCurrent = entry;
 		    		} else {
@@ -799,9 +824,10 @@ public class NavigationHistory implements INavigationHistory {
 	private void forwardForTab() {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
-			PerTabHistory perTabHistory = perTabHistoryMap.get(editorTabCookie);
+	    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.get(editorTabCookie);
 	    	if (perTabHistory != null && !perTabHistory.forwardEntries.isEmpty()) {
-				NavigationHistoryEntry newCurrent = perTabHistory.forwardEntries.removeFirst();
+	    		NavigationHistoryEntry newCurrent = (NavigationHistoryEntry) perTabHistory.forwardEntries
+						.removeFirst();
 	    		if (perTabHistory.currentEntry != null) {
 	    			final INavigationLocation location = perTabHistory.currentEntry.location;
 	    			if (location!=null) {
@@ -828,9 +854,10 @@ public class NavigationHistory implements INavigationHistory {
     private void backwardForTab() {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
-			PerTabHistory perTabHistory = perTabHistoryMap.get(editorTabCookie);
+	    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.get(editorTabCookie);
 	    	if (perTabHistory != null && !perTabHistory.backwardEntries.isEmpty()) {
-				NavigationHistoryEntry newCurrent = perTabHistory.backwardEntries.removeFirst();
+	    		NavigationHistoryEntry newCurrent = (NavigationHistoryEntry) perTabHistory.backwardEntries
+	    				.removeFirst();
 	    		if (perTabHistory.currentEntry != null) {
 	    			perTabHistory.currentEntry.location.update();
 	    			perTabHistory.forwardEntries.addFirst(perTabHistory.currentEntry);
@@ -854,10 +881,9 @@ public class NavigationHistory implements INavigationHistory {
     private boolean hasEntriesForTab(boolean forward) {
     	Object editorTabCookie = getCookieForTab(page.getActiveEditor());
     	if (editorTabCookie!=null) {
-			PerTabHistory perTabHistory = perTabHistoryMap.get(editorTabCookie);
+	    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.get(editorTabCookie);
 	    	if (perTabHistory != null) {
-				LinkedList<NavigationHistoryEntry> entries = forward ? perTabHistory.forwardEntries
-						: perTabHistory.backwardEntries;
+		    	LinkedList entries = forward ? perTabHistory.forwardEntries : perTabHistory.backwardEntries;
 		    	return !entries.isEmpty();
 	    	}
     	}
@@ -873,11 +899,13 @@ public class NavigationHistory implements INavigationHistory {
     private NavigationHistoryEntry[] getEntriesForTab(boolean forward) {
 		Object editorTabCookie = getCookieForTab(page.getActiveEditor());
 		if (editorTabCookie != null) {
-			PerTabHistory perTabHistory = perTabHistoryMap.get(editorTabCookie);
+			PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap
+					.get(editorTabCookie);
 			if (perTabHistory != null) {
-				LinkedList<NavigationHistoryEntry> entries = forward ? perTabHistory.forwardEntries
+				LinkedList entries = forward ? perTabHistory.forwardEntries
 						: perTabHistory.backwardEntries;
-				return entries.toArray(new NavigationHistoryEntry[entries.size()]);
+				return (NavigationHistoryEntry[]) entries
+				.toArray(new NavigationHistoryEntry[entries.size()]);
 			}
 		}
 		return new NavigationHistoryEntry[0];
@@ -891,7 +919,7 @@ public class NavigationHistory implements INavigationHistory {
     }
 
     void disposeHistoryForTab(Object editorTabCookie) {
-    	PerTabHistory perTabHistory = perTabHistoryMap.remove(editorTabCookie);
+    	PerTabHistory perTabHistory = (PerTabHistory) perTabHistoryMap.remove(editorTabCookie);
     	if (perTabHistory != null) {
     		if (perTabHistory.currentEntry != null) {
     			disposeEntry(perTabHistory.currentEntry);
@@ -902,9 +930,9 @@ public class NavigationHistory implements INavigationHistory {
     	}
     }
 
-	private void removeEntriesForTab(LinkedList<NavigationHistoryEntry> entries) {
-		for (Iterator<NavigationHistoryEntry> it = entries.iterator(); it.hasNext();) {
-			NavigationHistoryEntry entry = it.next();
+	private void removeEntriesForTab(LinkedList entries) {
+		for (Iterator it = entries.iterator(); it.hasNext();) {
+			NavigationHistoryEntry entry = (NavigationHistoryEntry) it.next();
 			disposeEntry(entry);
 			it.remove();
 		}

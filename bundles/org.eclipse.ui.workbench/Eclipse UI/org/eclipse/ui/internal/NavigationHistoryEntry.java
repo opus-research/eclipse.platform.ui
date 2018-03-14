@@ -12,6 +12,7 @@
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
+
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.INavigationLocation;
@@ -37,14 +38,8 @@ public class NavigationHistoryEntry {
     private IMemento locationMemento;
 
     /**
-	 * Constructs a new HistoryEntry and intializes its editor input and editor
-	 * id.
-	 * 
-	 * @param editorInfo
-	 * @param page
-	 * @param part
-	 * @param location
-	 */
+     * Constructs a new HistoryEntry and intializes its editor input and editor id.
+     */
     public NavigationHistoryEntry(NavigationHistoryEditorInfo editorInfo,
             IWorkbenchPage page, IEditorPart part, INavigationLocation location) {
         this.editorInfo = editorInfo;
@@ -108,8 +103,9 @@ public class NavigationHistoryEntry {
                 historyText = text;
             }
             return text;
+        } else {
+            return historyText;
         }
-		return historyText;
     }
 
     /** 
@@ -153,8 +149,12 @@ public class NavigationHistoryEntry {
         locationMemento = mem.getChild(IWorkbenchConstants.TAG_POSITION);
     }
 
-	@Override
-    public String toString() {
+    /*
+     * (non-Javadoc)
+     * Method declared on Object.
+     */
+    @Override
+	public String toString() {
         return "Input<" + editorInfo.editorInput + "> Details<" + location + ">"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
 
@@ -181,8 +181,9 @@ public class NavigationHistoryEntry {
                     currentEntry.location = location;
                     location = null;
                     return true;
+                } else {
+                    return location.mergeInto(currentEntry.location);
                 }
-				return location.mergeInto(currentEntry.location);
             } else if (currentEntry.location == null) {
                 return true;
             }

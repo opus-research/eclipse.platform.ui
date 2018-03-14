@@ -13,6 +13,7 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -43,20 +44,20 @@ public class NavigationHistoryAction extends PageEventAction {
     private int MAX_HISTORY_LENGTH = 9;
 
     private class MenuCreator implements IMenuCreator {
-		@Override
-        public void dispose() {
+        @Override
+		public void dispose() {
         }
 
-		@Override
-        public Menu getMenu(Menu parent) {
+        @Override
+		public Menu getMenu(Menu parent) {
         	setMenu(new Menu(parent));
         	fillMenu(historyMenu);
             initMenu();
             return historyMenu;
         }
 
-		@Override
-        public Menu getMenu(Control parent) {
+        @Override
+		public Menu getMenu(Control parent) {
         	setMenu(new Menu(parent));
         	fillMenu(historyMenu);
             initMenu();
@@ -71,8 +72,8 @@ public class NavigationHistoryAction extends PageEventAction {
     
     private void initMenu() {
     	historyMenu.addMenuListener(new MenuAdapter() {
-			@Override
-    		public void menuShown(MenuEvent e) {
+    		@Override
+			public void menuShown(MenuEvent e) {
     			if (recreateMenu) {
 					Menu m = (Menu) e.widget;
 					MenuItem[] items = m.getItems();
@@ -117,8 +118,8 @@ public class NavigationHistoryAction extends PageEventAction {
     			}
     			item.setText(text);
     			item.addSelectionListener(new SelectionAdapter() {
-					@Override
-    				public void widgetSelected(SelectionEvent e) {
+    				@Override
+					public void widgetSelected(SelectionEvent e) {
     					history
     					.shiftCurrentEntry(
     							(NavigationHistoryEntry) e.widget
@@ -130,8 +131,8 @@ public class NavigationHistoryAction extends PageEventAction {
     	recreateMenu = false;
     }
     
-	@Override
-    public void dispose() {
+    @Override
+	public void dispose() {
     	super.dispose();
     	if (historyMenu != null) {
     		for (int i = 0; i < historyMenu.getItemCount(); i++) {
@@ -183,20 +184,22 @@ public class NavigationHistoryAction extends PageEventAction {
         setMenuCreator(new MenuCreator());
     }
 
-	@Override
-    public void pageClosed(IWorkbenchPage page) {
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
+    @Override
+	public void pageClosed(IWorkbenchPage page) {
         super.pageClosed(page);
         setEnabled(false);
     }
 
     private NavigationHistoryEntry[] collapseEntries(
             NavigationHistoryEntry[] entries, int entriesCount[]) {
-		ArrayList<NavigationHistoryEntry> allEntries = new ArrayList<NavigationHistoryEntry>(
-				Arrays.asList(entries));
+        ArrayList allEntries = new ArrayList(Arrays.asList(entries));
         NavigationHistoryEntry previousEntry = null;
         int i = -1;
-		for (Iterator<NavigationHistoryEntry> iter = allEntries.iterator(); iter.hasNext();) {
-			NavigationHistoryEntry entry = iter.next();
+        for (Iterator iter = allEntries.iterator(); iter.hasNext();) {
+            NavigationHistoryEntry entry = (NavigationHistoryEntry) iter.next();
             if (previousEntry != null) {
                 String text = previousEntry.getHistoryText();
                 if (text != null) {
@@ -212,11 +215,14 @@ public class NavigationHistoryAction extends PageEventAction {
             i++;
         }
         entries = new NavigationHistoryEntry[allEntries.size()];
-		return allEntries.toArray(entries);
+        return (NavigationHistoryEntry[]) allEntries.toArray(entries);
     }
 
-	@Override
-    public void pageActivated(IWorkbenchPage page) {
+    /* (non-Javadoc)
+     * Method declared on PageEventAction.
+     */
+    @Override
+	public void pageActivated(IWorkbenchPage page) {
         super.pageActivated(page);
         NavigationHistory nh = (NavigationHistory) page.getNavigationHistory();
         if (forward) {
@@ -226,8 +232,11 @@ public class NavigationHistoryAction extends PageEventAction {
         }
     }
 
-	@Override
-    public void run() {
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
+    @Override
+	public void run() {
         if (getWorkbenchWindow() == null) {
             // action has been disposed
             return;
