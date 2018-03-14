@@ -65,11 +65,11 @@ import java.util.Map;
  *            ID
  */
 public abstract class TopologicalSort<T, ID> {
-	private final Map<ID, Collection<T>> mappedObjects = new HashMap<ID, Collection<T>>();
+	private final Map<ID, Collection<T>> mappedObjects = new HashMap<>();
 	// Captures the bundles that are listed as requirements for a particular bundle.
-	private final Map<ID, Collection<ID>> requires = new HashMap<ID, Collection<ID>>();
+	private final Map<ID, Collection<ID>> requires = new HashMap<>();
 	// Captures the bundles that list a particular bundle as a requirement
-	private final Map<ID, Collection<ID>> depends = new HashMap<ID, Collection<ID>>();
+	private final Map<ID, Collection<ID>> depends = new HashMap<>();
 
 	/**
 	 * Return the identifier for the given object. The implementation properly tracks where multiple
@@ -129,7 +129,7 @@ public abstract class TopologicalSort<T, ID> {
 		// In case of a cycle, one of the nodes involved in the cycle should have
 		// higher in-degree from some other non-cyclic node
 		int resultsIndex = 0;
-		List<ID> sortedByOutdegree = new ArrayList<ID>(requires.keySet());
+		List<ID> sortedByOutdegree = new ArrayList<>(requires.keySet());
 		Comparator<ID> outdegreeSorter = new Comparator<ID>() {
 			@Override
 			public int compare(ID o1, ID o2) {
@@ -150,7 +150,7 @@ public abstract class TopologicalSort<T, ID> {
 			if (!requires.get(sortedByOutdegree.get(0)).isEmpty()) {
 				Collections.sort(sortedByOutdegree, outdegreeSorter);
 			}
-			LinkedList<ID> cycleToBeDone = new LinkedList<ID>();
+			LinkedList<ID> cycleToBeDone = new LinkedList<>();
 			cycleToBeDone.add(sortedByOutdegree.remove(0));
 			while (!cycleToBeDone.isEmpty()) {
 				ID bundleId = cycleToBeDone.removeFirst();
@@ -184,7 +184,7 @@ public abstract class TopologicalSort<T, ID> {
 			ID id = getId(o);
 			Collection<T> exts = mappedObjects.get(id);
 			if (exts == null) {
-				mappedObjects.put(id, exts = new HashSet<T>());
+				mappedObjects.put(id, exts = new HashSet<>());
 			}
 			exts.add(o);
 		}
