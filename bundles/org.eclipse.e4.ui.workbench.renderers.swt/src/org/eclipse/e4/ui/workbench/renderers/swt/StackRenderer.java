@@ -209,9 +209,6 @@ public class StackRenderer extends LazyStackRenderer {
 	@Optional
 	private void handleTransientDataEvents(
 			@UIEventTopic(UIEvents.ApplicationElement.TOPIC_TRANSIENTDATA) org.osgi.service.event.Event event) {
-		if (!(event instanceof MUIElement))
-			return;
-
 		MUIElement changedElement = (MUIElement) event
 				.getProperty(UIEvents.EventTags.ELEMENT);
 

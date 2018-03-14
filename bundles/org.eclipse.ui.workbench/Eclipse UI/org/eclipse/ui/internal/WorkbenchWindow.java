@@ -53,7 +53,6 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
-import org.eclipse.e4.ui.internal.workbench.ModelAssembler;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.PartServiceSaveHandler;
 import org.eclipse.e4.ui.internal.workbench.URIHelper;
@@ -751,14 +750,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		} finally {
 			HandlerServiceImpl.pop();
 		}
-
-		// re-run the fragment and processor additions
-		ModelAssembler contribProcessor = ContextInjectionFactory.make(ModelAssembler.class,
-				model.getContext());
-		contribProcessor.processModel();
-		// hack, remove once Bug has been fixed
-		model.getMainMenu().setToBeRendered(false);
-		model.getMainMenu().setToBeRendered(true);
 	}
 
 	private void configureShell(Shell shell, IEclipseContext context) {
