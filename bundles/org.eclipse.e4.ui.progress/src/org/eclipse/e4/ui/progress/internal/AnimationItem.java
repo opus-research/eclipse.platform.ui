@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,13 +41,17 @@ public abstract class AnimationItem {
 
     //Create a containter that does nothing by default
     IAnimationContainer animationContainer = new IAnimationContainer() {
-        @Override
-		public void animationDone() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationDone()
+         */
+        public void animationDone() {
             //Do nothing by default
         }
 
-        @Override
-		public void animationStart() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.progress.AnimationItem.IAnimationContainer#animationStart()
+         */
+        public void animationStart() {
             //Do nothing by default
         }
     };
@@ -72,24 +76,35 @@ public abstract class AnimationItem {
         Control animationItem = createAnimationItem(parent);
 
         animationItem.addMouseListener(new MouseListener() {
-            @Override
-			public void mouseDoubleClick(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseDoubleClick(MouseEvent arg0) {
                 ProgressManagerUtil.openProgressView();
             }
 
-            @Override
-			public void mouseDown(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseDown(MouseEvent arg0) {
                 //Do nothing
             }
 
-            @Override
-			public void mouseUp(MouseEvent arg0) {
+            /*
+             * (non-Javadoc)
+             *
+             * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
+             */
+            public void mouseUp(MouseEvent arg0) {
                 //Do nothing
             }
         });
         animationItem.addDisposeListener(new DisposeListener() {
-            @Override
-			public void widgetDisposed(DisposeEvent e) {
+            public void widgetDisposed(DisposeEvent e) {
                 animationManager.removeItem(AnimationItem.this);
             }
         });

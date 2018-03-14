@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -109,19 +110,22 @@ public class ContainerSelectionDialog extends SelectionDialog {
         // create composite
         Composite area = (Composite) super.createDialogArea(parent);
 
-        Listener listener = event -> {
-		    if (statusMessage != null && validator != null) {
-		        String errorMsg = validator.isValid(group
-		                .getContainerFullPath());
-		        if (errorMsg == null || errorMsg.equals(EMPTY_STRING)) {
-		            statusMessage.setText(EMPTY_STRING);
-		            getOkButton().setEnabled(true);
-		        } else {
-		            statusMessage.setText(errorMsg);
-		            getOkButton().setEnabled(false);
-		        }
-		    }
-		};
+        Listener listener = new Listener() {
+            @Override
+			public void handleEvent(Event event) {
+                if (statusMessage != null && validator != null) {
+                    String errorMsg = validator.isValid(group
+                            .getContainerFullPath());
+                    if (errorMsg == null || errorMsg.equals(EMPTY_STRING)) {
+                        statusMessage.setText(EMPTY_STRING);
+                        getOkButton().setEnabled(true);
+                    } else {
+                        statusMessage.setText(errorMsg);
+                        getOkButton().setEnabled(false);
+                    }
+                }
+            }
+        };
 
         // container selection group
         group = new ContainerSelectionGroup(area, listener,

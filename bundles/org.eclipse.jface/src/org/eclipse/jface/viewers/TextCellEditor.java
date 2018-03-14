@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -161,12 +163,15 @@ public class TextCellEditor extends CellEditor {
                 checkSelectable();
             }
         });
-        text.addTraverseListener(e -> {
-		    if (e.detail == SWT.TRAVERSE_ESCAPE
-		            || e.detail == SWT.TRAVERSE_RETURN) {
-		        e.doit = false;
-		    }
-		});
+        text.addTraverseListener(new TraverseListener() {
+            @Override
+			public void keyTraversed(TraverseEvent e) {
+                if (e.detail == SWT.TRAVERSE_ESCAPE
+                        || e.detail == SWT.TRAVERSE_RETURN) {
+                    e.doit = false;
+                }
+            }
+        });
         // We really want a selection listener but it is not supported so we
         // use a key listener and a mouse listener to know when selection changes
         // may have occurred
@@ -270,7 +275,12 @@ public class TextCellEditor extends CellEditor {
      */
     private ModifyListener getModifyListener() {
         if (modifyListener == null) {
-			modifyListener = this::editOccured;
+            modifyListener = new ModifyListener() {
+                @Override
+				public void modifyText(ModifyEvent e) {
+                    editOccured(e);
+                }
+            };
         }
         return modifyListener;
     }
