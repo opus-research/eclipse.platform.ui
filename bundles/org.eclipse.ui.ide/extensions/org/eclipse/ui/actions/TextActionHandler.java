@@ -91,22 +91,19 @@ public class TextActionHandler {
 	private IActionBars actionBars;
 
     private MouseAdapter mouseAdapter = new MouseAdapter() {
-        @Override
-		public void mouseUp(MouseEvent e) {
+        public void mouseUp(MouseEvent e) {
             updateActionsEnableState();
         }
     };
 
     private KeyAdapter keyAdapter = new KeyAdapter() {
-        @Override
-		public void keyReleased(KeyEvent e) {
+        public void keyReleased(KeyEvent e) {
             updateActionsEnableState();
         }
     };
 
     private class TextControlListener implements Listener {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             switch (event.type) {
             case SWT.Activate:
                 activeTextControl = (Text) event.widget;
@@ -130,8 +127,7 @@ public class TextActionHandler {
             this.actionHandler = actionHandler;
         }
 
-        @Override
-		public void propertyChange(PropertyChangeEvent event) {
+        public void propertyChange(PropertyChangeEvent event) {
             if (activeTextControl != null) {
 				return;
 			}
@@ -151,8 +147,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_DELETE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
 			if (activeTextControl != null && !activeTextControl.isDisposed()) {
 				Point selection = activeTextControl.getSelection();
 				if (selection.y == selection.x
@@ -199,8 +194,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_CUT_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.cut();
                 updateActionsEnableState();
@@ -237,8 +231,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_COPY_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.copy();
                 updateActionsEnableState();
@@ -275,8 +268,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_PASTE_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.paste();
                 updateActionsEnableState();
@@ -327,8 +319,7 @@ public class TextActionHandler {
 					IIDEHelpContextIds.TEXT_SELECT_ALL_ACTION);
         }
 
-        @Override
-		public void runWithEvent(Event event) {
+        public void runWithEvent(Event event) {
             if (activeTextControl != null && !activeTextControl.isDisposed()) {
                 activeTextControl.selectAll();
                 updateActionsEnableState();

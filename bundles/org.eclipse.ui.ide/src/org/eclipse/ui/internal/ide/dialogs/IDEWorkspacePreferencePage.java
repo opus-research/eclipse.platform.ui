@@ -91,8 +91,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
      * 
      * @see org.eclipse.jface.preference.PreferencePage
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
@@ -225,8 +224,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
         saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
 
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
+            public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(saveInterval.isValid());
 				}
@@ -306,7 +304,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 			 */
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(encodingEditor.isValid());
@@ -363,7 +360,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		systemExplorer.load();
 
 		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(systemExplorer.isValid());
@@ -416,7 +412,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         return composite;
     }
 	
-	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
         //no-op
     }
@@ -424,8 +419,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The default button has been pressed.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
 
         // core holds onto this preference.
         boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
@@ -467,8 +461,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();
