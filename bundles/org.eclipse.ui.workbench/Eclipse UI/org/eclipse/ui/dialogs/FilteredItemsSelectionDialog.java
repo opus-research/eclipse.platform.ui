@@ -1922,7 +1922,7 @@ public abstract class FilteredItemsSelectionDialog extends
 
 			return NLS
 					.bind(
-WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
+							WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 							new Object[] {
 									message,
 									new Integer(
@@ -2457,25 +2457,6 @@ WorkbenchMessages.FilteredItemsSelectionDialog_taskProgressMessage,
 		 */
 		public abstract boolean isConsistentItem(Object item);
 
-	}
-
-	/**
-	 * This {@link ItemsFilter} automatically inserts a wildcard (*) in front of
-	 * the text, which is checked for a match.
-	 * 
-	 * @since 3.107
-	 */
-	protected abstract class WildcardItemsFilter extends ItemsFilter {
-
-		@Override
-		protected boolean matches(String text) {
-			String pattern = patternMatcher.getPattern();
-			if (pattern.indexOf("*") != 0 & pattern.indexOf("?") != 0 & pattern.indexOf(".") != 0) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				pattern = "*" + pattern; //$NON-NLS-1$
-				patternMatcher.setPattern(pattern);
-			}
-			return patternMatcher.matches(text);
-		}
 	}
 
 	/**
