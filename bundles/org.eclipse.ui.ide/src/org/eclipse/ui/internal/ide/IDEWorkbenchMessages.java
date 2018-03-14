@@ -18,6 +18,7 @@
  * Lars Vogel <Lars.Vogel@vogella.com> - Bug 431862
  * Christian Georgi (SAP SE)           - bug 432480, bug 458811
  * Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 411578
+ * Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
@@ -32,6 +33,7 @@ public class IDEWorkbenchMessages extends NLS {
 	public static String IDEWorkbenchAdvisor_preHistoryCompaction;
 	public static String IDEWorkbenchAdvisor_postHistoryCompaction;
 
+	public static String IDE_noFileEditorChoose;
 	public static String IDE_noFileEditorFound;
 	public static String IDE_coreExceptionFileStore;
 

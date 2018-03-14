@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     Mickael Istria (Red Hat Inc.) - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 485201
  *******************************************************************************/
 package org.eclipse.ui.internal.ide;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.PlatformUI;
@@ -22,14 +24,24 @@ import org.eclipse.ui.ide.IUnknownEditorStrategy;
  */
 public class AskUserViaPopupUnknownEditorStrategy implements IUnknownEditorStrategy {
 
+	private boolean userCancelled = false;
+
 	@Override
 	public IEditorDescriptor getEditorDescriptor(String fileName, IEditorRegistry editorRegistry) {
 		EditorSelectionDialog dialog = new EditorSelectionDialog(
 				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell());
 		dialog.setFileName(fileName);
 		dialog.setBlockOnOpen(true);
-		dialog.open();
+		int retVal = dialog.open();
+		userCancelled = retVal == IDialogConstants.CANCEL_ID;
 		return dialog.getSelectedEditor();
+	}
+
+	/**
+	 * @return Returns true if user cancelled the operation.
+	 */
+	public boolean isUserCancelled() {
+		return userCancelled;
 	}
 
 }
