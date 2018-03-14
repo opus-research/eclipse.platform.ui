@@ -35,15 +35,11 @@ import org.eclipse.core.runtime.AssertionFailedException;
  * the {@link Realm#isCurrent() current realm}. Methods for adding and removing
  * listeners may be invoked from any thread.
  * </p>
- * 
- * @param <K>
- *            type of the keys to the map
- * @param <V>
- *            type of the values in the map
+ *
  * @since 1.0
  */
-public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
-		implements IObservableMap<K, V> {
+public abstract class AbstractObservableMap extends AbstractMap implements
+		IObservableMap {
 
 	private final class PrivateChangeSupport extends ChangeSupport {
 		private PrivateChangeSupport(Realm realm) {
@@ -101,16 +97,14 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 	}
 
 	@Override
-	public synchronized void addMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void addMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.addListener(MapChangeEvent.TYPE, listener);
 		}
 	}
 
 	@Override
-	public synchronized void removeMapChangeListener(
-			IMapChangeListener<K, V> listener) {
+	public synchronized void removeMapChangeListener(IMapChangeListener listener) {
 		if (!disposed) {
 			changeSupport.removeListener(MapChangeEvent.TYPE, listener);
 		}
@@ -251,10 +245,10 @@ public abstract class AbstractObservableMap<K, V> extends AbstractMap<K, V>
 	 *
 	 * @param diff
 	 */
-	protected void fireMapChange(MapDiff<K, V> diff) {
+	protected void fireMapChange(MapDiff diff) {
 		checkRealm();
 		fireChange();
-		changeSupport.fireEvent(new MapChangeEvent<K, V>(this, diff));
+		changeSupport.fireEvent(new MapChangeEvent(this, diff));
 	}
 
 	/**

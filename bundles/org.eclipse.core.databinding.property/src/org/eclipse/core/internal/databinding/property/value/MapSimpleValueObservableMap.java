@@ -31,8 +31,8 @@ import org.eclipse.core.databinding.observable.map.MapDiff;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.core.databinding.observable.set.SetChangeEvent;
-import org.eclipse.core.databinding.observable.value.ValueDiff;
 import org.eclipse.core.databinding.property.INativePropertyListener;
+import org.eclipse.core.databinding.property.IProperty;
 import org.eclipse.core.databinding.property.IPropertyObservable;
 import org.eclipse.core.databinding.property.ISimplePropertyListener;
 import org.eclipse.core.databinding.property.SimplePropertyEvent;
@@ -43,32 +43,23 @@ import org.eclipse.core.internal.databinding.identity.IdentitySet;
 import org.eclipse.core.internal.databinding.property.Util;
 
 /**
- * @param <S>
- *            type of the source object
- * @param <K>
- *            type of the keys to the map
- * @param <I>
- *            type of the intermediate values
- * @param <V>
- *            type of the values in the map
  * @since 1.2
  *
  */
-public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
-		AbstractObservableMap<K, V> implements
-		IPropertyObservable<SimpleValueProperty<S, V>> {
-	private IObservableMap<K, I> masterMap;
-	private SimpleValueProperty<S, V> detailProperty;
+public class MapSimpleValueObservableMap extends AbstractObservableMap
+		implements IPropertyObservable {
+	private IObservableMap masterMap;
+	private SimpleValueProperty detailProperty;
 
-	private IObservableSet<I> knownMasterValues;
-	private Map<I, V> cachedValues;
-	private Set<I> staleMasterValues;
+	private IObservableSet knownMasterValues;
+	private Map cachedValues;
+	private Set staleMasterValues;
 
 	private boolean updating = false;
 
-	private IMapChangeListener<K, I> masterListener = new IMapChangeListener<K, I>() {
+	private IMapChangeListener masterListener = new IMapChangeListener() {
 		@Override
-		public void handleMapChange(final MapChangeEvent<K, I> event) {
+		public void handleMapChange(final MapChangeEvent event) {
 			if (!isDisposed()) {
 				updateKnownValues();
 				if (!updating)
@@ -77,40 +68,40 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 
 		private void updateKnownValues() {
-			Set<I> knownValues = new IdentitySet<>(masterMap.values());
+			Set knownValues = new IdentitySet(masterMap.values());
 			knownMasterValues.retainAll(knownValues);
 			knownMasterValues.addAll(knownValues);
 		}
 
-		private MapDiff<K, V> convertDiff(MapDiff<K, I> diff) {
-			Map<K, V> oldValues = new IdentityMap<>();
-			Map<K, V> newValues = new IdentityMap<>();
+		private MapDiff convertDiff(MapDiff diff) {
+			Map oldValues = new IdentityMap();
+			Map newValues = new IdentityMap();
 
-			Set<K> addedKeys = diff.getAddedKeys();
-			for (Iterator<K> it = addedKeys.iterator(); it.hasNext();) {
-				K key = it.next();
-				I newSource = diff.getNewValue(key);
-				V newValue = detailProperty.getValue(newSource);
+			Set addedKeys = diff.getAddedKeys();
+			for (Iterator it = addedKeys.iterator(); it.hasNext();) {
+				Object key = it.next();
+				Object newSource = diff.getNewValue(key);
+				Object newValue = detailProperty.getValue(newSource);
 				newValues.put(key, newValue);
 			}
 
-			Set<K> removedKeys = diff.getRemovedKeys();
-			for (Iterator<K> it = removedKeys.iterator(); it.hasNext();) {
-				K key = it.next();
-				I oldSource = diff.getOldValue(key);
-				V oldValue = detailProperty.getValue(oldSource);
+			Set removedKeys = diff.getRemovedKeys();
+			for (Iterator it = removedKeys.iterator(); it.hasNext();) {
+				Object key = it.next();
+				Object oldSource = diff.getOldValue(key);
+				Object oldValue = detailProperty.getValue(oldSource);
 				oldValues.put(key, oldValue);
 			}
 
-			Set<K> changedKeys = new IdentitySet<>(diff.getChangedKeys());
-			for (Iterator<K> it = changedKeys.iterator(); it.hasNext();) {
-				K key = it.next();
+			Set changedKeys = new IdentitySet(diff.getChangedKeys());
+			for (Iterator it = changedKeys.iterator(); it.hasNext();) {
+				Object key = it.next();
 
-				I oldSource = diff.getOldValue(key);
-				I newSource = diff.getNewValue(key);
+				Object oldSource = diff.getOldValue(key);
+				Object newSource = diff.getNewValue(key);
 
-				V oldValue = detailProperty.getValue(oldSource);
-				V newValue = detailProperty.getValue(newSource);
+				Object oldValue = detailProperty.getValue(oldSource);
+				Object newValue = detailProperty.getValue(newSource);
 
 				if (Util.equals(oldValue, newValue)) {
 					it.remove();
@@ -132,34 +123,30 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 	};
 
-	private INativePropertyListener<S> detailListener;
+	private INativePropertyListener detailListener;
 
 	/**
 	 * @param map
 	 * @param valueProperty
 	 */
-	public MapSimpleValueObservableMap(IObservableMap<K, I> map,
-			SimpleValueProperty<S, V> valueProperty) {
+	public MapSimpleValueObservableMap(IObservableMap map,
+			SimpleValueProperty valueProperty) {
 		super(map.getRealm());
 		this.masterMap = map;
 		this.detailProperty = valueProperty;
 
-		ISimplePropertyListener<ValueDiff<V>> listener = new ISimplePropertyListener<ValueDiff<V>>() {
+		ISimplePropertyListener listener = new ISimplePropertyListener() {
 			@Override
-			public void handleEvent(
-					final SimplePropertyEvent<ValueDiff<V>> event) {
+			public void handleEvent(final SimplePropertyEvent event) {
 				if (!isDisposed() && !updating) {
 					getRealm().exec(new Runnable() {
 						@Override
 						public void run() {
-							// TODO should we type the source, too?
-							@SuppressWarnings("unchecked")
-							I source = (I) event.getSource();
 							if (event.type == SimplePropertyEvent.CHANGE) {
-								notifyIfChanged(source);
+								notifyIfChanged(event.getSource());
 							} else if (event.type == SimplePropertyEvent.STALE) {
 								boolean wasStale = !staleMasterValues.isEmpty();
-								staleMasterValues.add(source);
+								staleMasterValues.add(event.getSource());
 								if (!wasStale)
 									fireStale();
 							}
@@ -185,27 +172,27 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 	protected void firstListenerAdded() {
 		ObservableTracker.setIgnore(true);
 		try {
-			knownMasterValues = new IdentityObservableSet<>(getRealm(), null);
+			knownMasterValues = new IdentityObservableSet(getRealm(), null);
 		} finally {
 			ObservableTracker.setIgnore(false);
 		}
 
-		cachedValues = new IdentityMap<>();
-		staleMasterValues = new IdentitySet<>();
-		knownMasterValues.addSetChangeListener(new ISetChangeListener<I>() {
+		cachedValues = new IdentityMap();
+		staleMasterValues = new IdentitySet();
+		knownMasterValues.addSetChangeListener(new ISetChangeListener() {
 			@Override
-			public void handleSetChange(SetChangeEvent<I> event) {
-				for (Iterator<I> it = event.diff.getRemovals().iterator(); it
+			public void handleSetChange(SetChangeEvent event) {
+				for (Iterator it = event.diff.getRemovals().iterator(); it
 						.hasNext();) {
-					I key = it.next();
+					Object key = it.next();
 					if (detailListener != null)
 						detailListener.removeFrom(key);
 					cachedValues.remove(key);
 					staleMasterValues.remove(key);
 				}
-				for (Iterator<I> it = event.diff.getAdditions().iterator(); it
+				for (Iterator it = event.diff.getAdditions().iterator(); it
 						.hasNext();) {
-					I key = it.next();
+					Object key = it.next();
 					cachedValues.put(key, detailProperty.getValue(key));
 					if (detailListener != null)
 						detailListener.addTo(key);
@@ -238,21 +225,21 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		staleMasterValues = null;
 	}
 
-	private Set<Map.Entry<K, V>> entrySet;
+	private Set entrySet;
 
 	@Override
-	public Set<Map.Entry<K, V>> entrySet() {
+	public Set entrySet() {
 		getterCalled();
 		if (entrySet == null)
 			entrySet = new EntrySet();
 		return entrySet;
 	}
 
-	class EntrySet extends AbstractSet<Map.Entry<K, V>> {
+	class EntrySet extends AbstractSet {
 		@Override
-		public Iterator<Map.Entry<K, V>> iterator() {
-			return new Iterator<Map.Entry<K, V>>() {
-				Iterator<Map.Entry<K, I>> it = masterMap.entrySet().iterator();
+		public Iterator iterator() {
+			return new Iterator() {
+				Iterator it = masterMap.entrySet().iterator();
 
 				@Override
 				public boolean hasNext() {
@@ -261,9 +248,9 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 				}
 
 				@Override
-				public Map.Entry<K, V> next() {
+				public Object next() {
 					getterCalled();
-					Map.Entry<K, I> next = it.next();
+					Map.Entry next = (Map.Entry) it.next();
 					return new MapEntry(next.getKey());
 				}
 
@@ -280,21 +267,21 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 	}
 
-	class MapEntry implements Map.Entry<K, V> {
-		private K key;
+	class MapEntry implements Map.Entry {
+		private Object key;
 
-		MapEntry(K key) {
+		MapEntry(Object key) {
 			this.key = key;
 		}
 
 		@Override
-		public K getKey() {
+		public Object getKey() {
 			getterCalled();
 			return key;
 		}
 
 		@Override
-		public V getValue() {
+		public Object getValue() {
 			getterCalled();
 			if (!masterMap.containsKey(key))
 				return null;
@@ -302,12 +289,12 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 
 		@Override
-		public V setValue(V value) {
+		public Object setValue(Object value) {
 			if (!masterMap.containsKey(key))
 				return null;
-			I source = masterMap.get(key);
+			Object source = masterMap.get(key);
 
-			V oldValue = detailProperty.getValue(source);
+			Object oldValue = detailProperty.getValue(source);
 
 			updating = true;
 			try {
@@ -330,7 +317,7 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 				return false;
 			if (!(o instanceof Map.Entry))
 				return false;
-			Map.Entry<?, ?> that = (Map.Entry<?, ?>) o;
+			Map.Entry that = (Map.Entry) o;
 			return Util.equals(this.getKey(), that.getKey())
 					&& Util.equals(this.getValue(), that.getValue());
 		}
@@ -352,69 +339,69 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 	}
 
 	@Override
-	public V get(Object key) {
+	public Object get(Object key) {
 		getterCalled();
 
 		return detailProperty.getValue(masterMap.get(key));
 	}
 
 	@Override
-	public V put(K key, V value) {
+	public Object put(Object key, Object value) {
 		if (!masterMap.containsKey(key))
 			return null;
-		I masterValue = masterMap.get(key);
-		V oldValue = detailProperty.getValue(masterValue);
+		Object masterValue = masterMap.get(key);
+		Object oldValue = detailProperty.getValue(masterValue);
 		detailProperty.setValue(masterValue, value);
 		notifyIfChanged(masterValue);
 		return oldValue;
 	}
 
 	@Override
-	public V remove(Object key) {
+	public Object remove(Object key) {
 		checkRealm();
 
-		I masterValue = masterMap.get(key);
-		V oldValue = detailProperty.getValue(masterValue);
+		Object masterValue = masterMap.get(key);
+		Object oldValue = detailProperty.getValue(masterValue);
 
 		masterMap.remove(key);
 
 		return oldValue;
 	}
 
-	private void notifyIfChanged(I masterValue) {
+	private void notifyIfChanged(Object masterValue) {
 		if (cachedValues != null) {
-			final Set<K> keys = keysFor(masterValue);
+			final Set keys = keysFor(masterValue);
 
-			final V oldValue = cachedValues.get(masterValue);
-			final V newValue = detailProperty.getValue(masterValue);
+			final Object oldValue = cachedValues.get(masterValue);
+			final Object newValue = detailProperty.getValue(masterValue);
 
 			if (!Util.equals(oldValue, newValue)
 					|| staleMasterValues.contains(masterValue)) {
 				cachedValues.put(masterValue, newValue);
 				staleMasterValues.remove(masterValue);
-				fireMapChange(new MapDiff<K, V>() {
+				fireMapChange(new MapDiff() {
 					@Override
-					public Set<K> getAddedKeys() {
-						return Collections.emptySet();
+					public Set getAddedKeys() {
+						return Collections.EMPTY_SET;
 					}
 
 					@Override
-					public Set<K> getChangedKeys() {
+					public Set getChangedKeys() {
 						return keys;
 					}
 
 					@Override
-					public Set<K> getRemovedKeys() {
-						return Collections.emptySet();
+					public Set getRemovedKeys() {
+						return Collections.EMPTY_SET;
 					}
 
 					@Override
-					public V getNewValue(Object key) {
+					public Object getNewValue(Object key) {
 						return newValue;
 					}
 
 					@Override
-					public V getOldValue(Object key) {
+					public Object getOldValue(Object key) {
 						return oldValue;
 					}
 				});
@@ -422,10 +409,11 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 		}
 	}
 
-	private Set<K> keysFor(I value) {
-		Set<K> keys = new IdentitySet<K>();
+	private Set keysFor(Object value) {
+		Set keys = new IdentitySet();
 
-		for (Map.Entry<K, I> entry : masterMap.entrySet()) {
+		for (Iterator it = masterMap.entrySet().iterator(); it.hasNext();) {
+			Map.Entry entry = (Entry) it.next();
 			if (entry.getValue() == value) {
 				keys.add(entry.getKey());
 			}
@@ -451,7 +439,7 @@ public class MapSimpleValueObservableMap<S, K, I extends S, V> extends
 	}
 
 	@Override
-	public SimpleValueProperty<S, V> getProperty() {
+	public IProperty getProperty() {
 		return detailProperty;
 	}
 

@@ -40,20 +40,17 @@ import org.eclipse.core.databinding.observable.value.ValueDiff;
  * Note that this class will not forward {@link ValueChangingEvent} events from
  * a wrapped {@link IVetoableValue}.
  *
- * @param <T>
- *            the type of the object being observed
- *
  * @since 1.2
  */
-public class DelayedObservableValue<T> extends AbstractObservableValue<T>
-		implements IStaleListener, IValueChangeListener<T> {
+public class DelayedObservableValue extends AbstractObservableValue implements
+		IStaleListener, IValueChangeListener {
 	class ValueUpdater implements Runnable {
-		private final T oldValue;
+		private final Object oldValue;
 
 		boolean cancel = false;
 		boolean running = false;
 
-		ValueUpdater(T oldValue) {
+		ValueUpdater(Object oldValue) {
 			this.oldValue = oldValue;
 		}
 
@@ -74,10 +71,10 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	private final int delay;
-	private IObservableValue<T> observable;
+	private IObservableValue observable;
 
 	private boolean dirty = true;
-	private T cachedValue = null;
+	private Object cachedValue = null;
 
 	private boolean updating = false;
 
@@ -94,8 +91,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	 * @throws IllegalArgumentException
 	 *             if <code>updateEventType</code> is an incorrect type.
 	 */
-	public DelayedObservableValue(int delayMillis,
-			IObservableValue<T> observable) {
+	public DelayedObservableValue(int delayMillis, IObservableValue observable) {
 		super(observable.getRealm());
 		this.delay = delayMillis;
 		this.observable = observable;
@@ -107,7 +103,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	public void handleValueChange(ValueChangeEvent<T> event) {
+	public void handleValueChange(ValueChangeEvent event) {
 		if (!updating)
 			makeDirty();
 	}
@@ -119,7 +115,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	protected T doGetValue() {
+	protected Object doGetValue() {
 		if (dirty) {
 			cachedValue = observable.getValue();
 			dirty = false;
@@ -134,7 +130,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 	}
 
 	@Override
-	protected void doSetValue(T value) {
+	protected void doSetValue(Object value) {
 		updating = true;
 		try {
 			// Principle of least surprise: setValue overrides any pending
@@ -142,7 +138,7 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 			dirty = false;
 			cancelScheduledUpdate();
 
-			T oldValue = cachedValue;
+			Object oldValue = cachedValue;
 			observable.setValue(value);
 			// Bug 215297 - target observable could veto or override value
 			// passed to setValue(). Make sure we cache whatever is set.
@@ -203,16 +199,16 @@ public class DelayedObservableValue<T> extends AbstractObservableValue<T>
 		getRealm().timerExec(delay, updater);
 	}
 
-	private void internalFireValueChange(final T oldValue) {
+	private void internalFireValueChange(final Object oldValue) {
 		cancelScheduledUpdate();
-		fireValueChange(new ValueDiff<T>() {
+		fireValueChange(new ValueDiff() {
 			@Override
-			public T getOldValue() {
+			public Object getOldValue() {
 				return oldValue;
 			}
 
 			@Override
-			public T getNewValue() {
+			public Object getNewValue() {
 				return getValue();
 			}
 		});
