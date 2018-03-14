@@ -24,7 +24,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Control;
@@ -204,14 +203,6 @@ public abstract class PartSite implements IWorkbenchPartSite {
 					}
 				}, e4Context);
 		initializeDefaultServices();
-
-		e4Context.set(IWorkbenchPart.class, part);
-		e4Context.set(IStatusLineManager.class.getName(), new ContextFunction() {
-			@Override
-			public Object compute(IEclipseContext context, String contextKey) {
-				return getActionBars().getStatusLineManager();
-			}
-		});
 	}
 
 	void setExtensionId(String extensionId) {
@@ -245,7 +236,6 @@ public abstract class PartSite implements IWorkbenchPartSite {
 						getWorkbenchWindow(), this, null, null, 2));
 		// added back for legacy reasons
 		serviceLocator.registerService(IWorkbenchPartSite.class, this);
-		serviceLocator.registerService(IWorkbenchPart.class, getPart());
 
 		e4Context.set(IWorkbenchSiteProgressService.class.getName(), new ContextFunction() {
 			@Override

@@ -12,9 +12,7 @@ package org.eclipse.ui.internal;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
@@ -29,15 +27,8 @@ public class ViewSite extends PartSite implements IViewSite {
 	public ViewSite(MPart model, IWorkbenchPart part, IWorkbenchPartReference ref,
 			IConfigurationElement element) {
 		super(model, part, ref, element);
-		initializeDefaultServices();
-	}
-
-	private void initializeDefaultServices() {
 		setActionBars(new ActionBars(((WorkbenchPage) getPage()).getActionBars(), serviceLocator,
 				model));
-		serviceLocator.registerService(IStatusLineManager.class, getActionBars()
-				.getStatusLineManager());
-		serviceLocator.registerService(IViewPart.class, (IViewPart) getPart());
 	}
 
 	/*

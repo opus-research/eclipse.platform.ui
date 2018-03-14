@@ -13,7 +13,6 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.ui.IActionBars2;
@@ -56,7 +55,6 @@ public class EditorSite extends PartSite implements IEditorSite {
 		// EditorSite.
 		final IDragAndDropService editorDTService = new EditorSiteDragAndDropServiceImpl();
 		serviceLocator.registerService(IDragAndDropService.class, editorDTService);
-		serviceLocator.registerService(IEditorPart.class, (IEditorPart) getPart());
 	}
 	
     public void setActionBars(SubActionBars bars) {
@@ -67,8 +65,6 @@ public class EditorSite extends PartSite implements IEditorSite {
         } else {
             ab = new SubActionBars(bars, this);
         }
-		serviceLocator.registerService(IStatusLineManager.class,
-				(IStatusLineManager) bars.getStatusLineManager());
     }
     
     public void activateActionBars(boolean forceVisibility) {
