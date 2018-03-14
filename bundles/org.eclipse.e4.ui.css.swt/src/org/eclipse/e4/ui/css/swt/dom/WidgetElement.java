@@ -315,9 +315,4 @@ public class WidgetElement extends ElementAdapter implements NodeList {
 
 	public void reset() {
 	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + ": " + getWidget();
-	}
 }
