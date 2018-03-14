@@ -27,7 +27,6 @@ import org.eclipse.ui.internal.util.Util;
  * @deprecated Please use the "org.eclipse.core.commands" plug-in instead.
  * @see org.eclipse.core.commands.contexts.ContextManagerEvent
  */
-@Deprecated
 public final class ContextManagerEvent {
 
     /**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,11 +40,8 @@ public class TabbedPropertySheetTitleProvider extends LabelProvider {
 		IWorkbenchPart part = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getActivePage().findView(ProjectExplorer.VIEW_ID);
 
-		INavigatorContentService contentService = null;
-		if (part != null) {
-			contentService = (INavigatorContentService) part
+		INavigatorContentService contentService = (INavigatorContentService) part
 				.getAdapter(INavigatorContentService.class);
-		}
 
 		if (contentService != null) {
 			labelProvider = contentService.createCommonLabelProvider();
@@ -60,7 +57,6 @@ public class TabbedPropertySheetTitleProvider extends LabelProvider {
 	/**
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
 	 */
-	@Override
 	public Image getImage(Object object) {
 		return labelProvider != null ? labelProvider.getImage(object) : null;
 	}
@@ -68,7 +64,6 @@ public class TabbedPropertySheetTitleProvider extends LabelProvider {
 	/**
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 */
-	@Override
 	public String getText(Object object) {
 		return descriptionProvider != null ? descriptionProvider
 				.getDescription(object) : null;

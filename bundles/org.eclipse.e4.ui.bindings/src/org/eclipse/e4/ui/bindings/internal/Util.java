@@ -1,18 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2013 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package org.eclipse.e4.ui.bindings.internal;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import org.eclipse.swt.SWT;
 
 /**
@@ -23,6 +16,13 @@ import org.eclipse.swt.SWT;
  * @since 3.1
  */
 public final class Util {
+
+	/**
+	 * An unmodifiable, empty, sorted set. This value is guaranteed to never change and never be
+	 * <code>null</code>.
+	 */
+	public static final SortedSet EMPTY_SORTED_SET = Collections
+			.unmodifiableSortedSet(new TreeSet());
 
 	/**
 	 * A common zero-length string. It avoids needing write <code>NON-NLS</code> next to code
@@ -38,7 +38,7 @@ public final class Util {
 	 * @param c
 	 *            The class which the object should be; must not be <code>null</code>.
 	 */
-	public static final void assertInstance(final Object object, final Class<?> c) {
+	public static final void assertInstance(final Object object, final Class c) {
 		assertInstance(object, c, false);
 	}
 
@@ -53,7 +53,7 @@ public final class Util {
 	 * @param allowNull
 	 *            Whether the object is allowed to be <code>null</code>.
 	 */
-	private static final void assertInstance(final Object object, final Class<?> c,
+	private static final void assertInstance(final Object object, final Class c,
 			final boolean allowNull) {
 		if (object == null && allowNull) {
 			return;
@@ -98,8 +98,6 @@ public final class Util {
 	/**
 	 * Compares to comparable objects -- defending against <code>null</code>.
 	 * 
-	 * @param <T>
-	 * 
 	 * @param left
 	 *            The left object to compare; may be <code>null</code>.
 	 * @param right
@@ -107,8 +105,7 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value.
 	 */
-	@SuppressWarnings("unchecked")
-	public static final <T> int compare(final Comparable<T> left, final Comparable<T> right) {
+	public static final int compare(final Comparable left, final Comparable right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -116,7 +113,7 @@ public final class Util {
 		} else if (right == null) {
 			return 1;
 		} else {
-			return left.compareTo((T) right);
+			return left.compareTo(right);
 		}
 	}
 
@@ -130,7 +127,7 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value. A shorter array is considered less than a longer array.
 	 */
-	public static final <T> int compare(final Comparable<T>[] left, final Comparable<T>[] right) {
+	public static final int compare(final Comparable[] left, final Comparable[] right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -170,8 +167,7 @@ public final class Util {
 	 * @return The result of the comparison. <code>null</code> is considered to be the least
 	 *         possible value. A shorter list is considered less than a longer list.
 	 */
-	public static final <T> int compare(final List<Comparable<T>> left,
-			final List<Comparable<T>> right) {
+	public static final int compare(final List left, final List right) {
 		if (left == null && right == null) {
 			return 0;
 		} else if (left == null) {
@@ -187,7 +183,7 @@ public final class Util {
 			}
 
 			for (int i = 0; i < l; i++) {
-				int compareTo = compare(left.get(i), right.get(i));
+				int compareTo = compare((Comparable) left.get(i), (Comparable) right.get(i));
 
 				if (compareTo != 0) {
 					return compareTo;

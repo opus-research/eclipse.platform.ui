@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -153,8 +153,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * Creates the page's UI content.
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
         imagesToDispose = new ArrayList();
         editorsToImages = new HashMap(50);
 
@@ -288,8 +287,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * (i.e fonts, cursors, etc). Subclasses should reimplement this method to 
      * release their own allocated SWT resources.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         if (imagesToDispose != null) {
             for (Iterator e = imagesToDispose.iterator(); e.hasNext();) {
@@ -309,8 +307,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * Hook method to get a page specific preference store. Reimplement this
      * method if a page don't want to use its parent's preference store.
      */
-    @Override
-	protected IPreferenceStore doGetPreferenceStore() {
+    protected IPreferenceStore doGetPreferenceStore() {
         return WorkbenchPlugin.getDefault().getPreferenceStore();
     }
 
@@ -437,8 +434,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
         return null;
     }
 
-    @Override
-	public void handleEvent(Event event) {
+    public void handleEvent(Event event) {
         if (event.widget == addResourceTypeButton) {
             promptForResourceType();
         } else if (event.widget == removeResourceTypeButton) {
@@ -460,8 +456,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
     /**
      * @see IWorkbenchPreferencePage
      */
-    @Override
-	public void init(IWorkbench aWorkbench) {
+    public void init(IWorkbench aWorkbench) {
         this.workbench = aWorkbench;
         noDefaultAndApplyButton();
     }
@@ -496,8 +491,7 @@ public class FileEditorsPreferencePage extends PreferencePage implements
      * For example reimplement this method if you want to save the 
      * page's data into the preference bundle.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         TableItem[] items = resourceTypeTable.getItems();
         FileEditorMapping[] resourceTypes = new FileEditorMapping[items.length];
         for (int i = 0; i < items.length; i++) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,8 +92,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getColorOverrides()
      */
-    @Override
-	public ColorDefinition[] getColors() {
+    public ColorDefinition[] getColors() {
         ColorDefinition[] defs = (ColorDefinition[]) colors
                 .toArray(new ColorDefinition[colors.size()]);
         Arrays.sort(defs, IThemeRegistry.ID_COMPARATOR);
@@ -103,16 +102,14 @@ public class ThemeDescriptor implements IThemeDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeElementDefinition#getDescription()
      */
-    @Override
-	public String getDescription() {
+    public String getDescription() {
         return description;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getFontOverrides()
      */
-    @Override
-	public FontDefinition[] getFonts() {
+    public FontDefinition[] getFonts() {
         FontDefinition[] defs = (FontDefinition[]) fonts
                 .toArray(new FontDefinition[fonts.size()]);
         Arrays.sort(defs, IThemeRegistry.ID_COMPARATOR);
@@ -122,16 +119,14 @@ public class ThemeDescriptor implements IThemeDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getID()
      */
-    @Override
-	public String getId() {
+    public String getId() {
         return id;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.registry.IThemeDescriptor#getName()
      */
-    @Override
-	public String getName() {
+    public String getName() {
     	if (name == null)
     		return getId();
         return name;
@@ -160,8 +155,7 @@ public class ThemeDescriptor implements IThemeDescriptor {
     /* (non-Javadoc)
      * @see org.eclipse.ui.internal.themes.IThemeDescriptor#getData()
      */
-    @Override
-	public Map getData() {
+    public Map getData() {
         return Collections.unmodifiableMap(dataMap);
     }
 }

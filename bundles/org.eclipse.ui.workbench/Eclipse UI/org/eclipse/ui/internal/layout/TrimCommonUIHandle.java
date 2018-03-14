@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -100,8 +100,7 @@ public class TrimCommonUIHandle extends Composite {
      * This listener brings up the context menu
      */
     private Listener menuListener = new Listener() {
-        @Override
-		public void handleEvent(Event event) {
+        public void handleEvent(Event event) {
             Point loc = new Point(event.x, event.y);
             if (event.type == SWT.MenuDetect) {
                 showDockTrimPopup(loc);
@@ -114,11 +113,9 @@ public class TrimCommonUIHandle extends Composite {
      * Coolbar and CoolItem to match.
      */
     private ControlListener controlListener = new ControlListener() {
-		@Override
 		public void controlMoved(ControlEvent e) {
 		}
 
-		@Override
 		public void controlResized(ControlEvent e) {
 			if (e.widget instanceof TrimCommonUIHandle) {
 				TrimCommonUIHandle ctrl = (TrimCommonUIHandle) e.widget;
@@ -318,7 +315,6 @@ public class TrimCommonUIHandle extends Composite {
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
 		Point ctrlPrefSize = trim.getControl().computeSize(wHint, hHint);
 		if (orientation == SWT.HORIZONTAL) {
@@ -339,8 +335,7 @@ public class TrimCommonUIHandle extends Composite {
 	public ContributionItem getDockingContribution() {
     	if (dockContributionItem == null) {
     		dockContributionItem = new ContributionItem() {
-    			@Override
-				public void fill(Menu menu, int index) {
+    			public void fill(Menu menu, int index) {
     				// populate from superclass
     				super.fill(menu, index);
     				
@@ -350,12 +345,10 @@ public class TrimCommonUIHandle extends Composite {
 	    				closeItem.setText(WorkbenchMessages.TrimCommon_Close);
 	    				
 	    				closeItem.addSelectionListener(new SelectionListener() {
-							@Override
 							public void widgetSelected(SelectionEvent e) {
 								handleCloseTrim();
 							}
 
-							@Override
 							public void widgetDefaultSelected(SelectionEvent e) {
 							}
 	    				});
@@ -397,8 +390,7 @@ public class TrimCommonUIHandle extends Composite {
 
     		    	// if the radioVal changes it means that the User wants to change the docking location
     		    	radioVal.addChangeListener(new IChangeListener() {
-    					@Override
-						public void update(boolean changed) {
+    					public void update(boolean changed) {
     						if (changed) {
 								handleShowOnChange();
 							}
@@ -469,8 +461,7 @@ public class TrimCommonUIHandle extends Composite {
     /* (non-Javadoc)
      * @see org.eclipse.swt.widgets.Widget#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         if (radioButtons != null) {
             radioButtons.dispose();
         }

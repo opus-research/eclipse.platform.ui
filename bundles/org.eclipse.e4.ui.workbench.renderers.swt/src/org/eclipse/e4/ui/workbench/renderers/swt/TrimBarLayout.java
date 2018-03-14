@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2013 IBM Corporation and others.
+ * Copyright (c) 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Christian Walther (Indel AG) - Bug 399458: Fix layout overlap in line-wrapped trim bar
- *     Christian Walther (Indel AG) - Bug 389012: Fix division by zero in TrimBarLayout
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -90,7 +88,6 @@ public class TrimBarLayout extends Layout {
 	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
 	 * , int, int, boolean)
 	 */
-	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
 		// Clear the current cache
@@ -158,10 +155,8 @@ public class TrimBarLayout extends Layout {
 		Point ctrlSize = ctrl.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
 		// Hack! the StatusLine doesn't compute a useable size
-		if (isStatusLine(ctrl)) {
+		if (isStatusLine(ctrl))
 			ctrlSize.x = 375;
-			ctrlSize.y = 26;
-		}
 
 		return ctrlSize;
 	}
@@ -200,7 +195,6 @@ public class TrimBarLayout extends Layout {
 		return !barVisible;
 	}
 
-	@Override
 	protected void layout(Composite composite, boolean flushCache) {
 		Rectangle bounds = composite.getBounds();
 
@@ -236,48 +230,42 @@ public class TrimBarLayout extends Layout {
 	private void tileLine(TrimLine curLine, Rectangle bounds) {
 		int curX = bounds.x;
 		int curY = bounds.y;
-		int remainingExtraSpace = curLine.extraSpace;
-		int remainingSpacerCount = curLine.spacerCount;
 		for (Control ctrl : curLine.ctrls) {
 			if (ctrl.isDisposed()) {
 				continue;
 			}
 			Point ctrlSize = curLine.sizeMap.get(ctrl);
-			int ctrlWidth = ctrlSize.x;
-			int ctrlHeight = ctrlSize.y;
-			boolean zeroSize = ctrlWidth == 0 && ctrlHeight == 0;
+			boolean zeroSize = ctrlSize.x == 0 && ctrlSize.y == 0;
 
 			// If its a 'spacer' then add any available 'extra' space to it
 			if (isSpacer(ctrl)) {
-				int extra = remainingExtraSpace / remainingSpacerCount;
+				int extra = curLine.extraSpace / curLine.spacerCount--;
 				if (horizontal) {
-					ctrlWidth += extra;
-					// leave out 4 pixels at the bottom to avoid overlapping the
-					// 1px bottom border of the toolbar (bug 389941)
-					ctrl.setBounds(curX, curY, ctrlWidth, curLine.minor - 4);
+					ctrlSize.x += extra;
+					ctrl.setBounds(curX, curY, ctrlSize.x, bounds.height - 4);
 				} else {
-					ctrlHeight += extra;
-					ctrl.setBounds(curX, curY, curLine.minor, ctrlHeight);
+					ctrlSize.y += extra;
+					ctrl.setBounds(curX, curY, bounds.width, extra);
 				}
 				zeroSize = false;
-				remainingExtraSpace -= extra;
-				remainingSpacerCount--;
+				curLine.extraSpace -= extra;
+				curLine.spacerCount--;
 			}
 
 			if (horizontal) {
-				int offset = (curLine.minor - ctrlHeight) / 2;
+				int offset = (curLine.minor - ctrlSize.y) / 2;
 				if (!isSpacer(ctrl)) {
 					if (!zeroSize)
-						ctrl.setBounds(curX, curY + offset, ctrlWidth,
-								ctrlHeight);
+						ctrl.setBounds(curX, curY + offset, ctrlSize.x,
+								ctrlSize.y);
 					else
 						ctrl.setBounds(curX, curY, 0, 0);
 				}
-				curX += ctrlWidth;
+				curX += ctrlSize.x;
 			} else {
-				int offset = (curLine.minor - ctrlWidth) / 2;
-				ctrl.setBounds(curX + offset, curY, ctrlWidth, ctrlHeight);
-				curY += ctrlHeight;
+				int offset = (curLine.minor - ctrlSize.x) / 2;
+				ctrl.setBounds(curX + offset, curY, ctrlSize.x, ctrlSize.y);
+				curY += ctrlSize.y;
 			}
 		}
 	}
@@ -314,15 +302,12 @@ public class TrimBarLayout extends Layout {
 	 * @param trimPos
 	 * @return
 	 */
-	public Control ctrlFromPoint(Composite trimComp, Point trimPos) {
-		if (trimComp == null || trimComp.isDisposed() || lines == null
-				|| lines.size() == 0)
+	public Control ctrlFromPoint(Point trimPos) {
+		if (lines == null || lines.size() == 0)
 			return null;
 
-		Control[] kids = trimComp.getChildren();
+		Control[] kids = lines.get(0).ctrls.get(0).getParent().getChildren();
 		for (int i = 0; i < kids.length; i++) {
-			if (kids[i].isDisposed())
-				continue;
 			if (kids[i].getBounds().contains(trimPos))
 				return kids[i];
 		}

@@ -208,7 +208,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * This method must be called on the UI thread.
 	 * </p>
 	 */
-	@Override
 	public void handleLifecycleEvent(SaveablesLifecycleEvent event) {
 		if (!(event.getSource() instanceof IWorkbenchPart)) {
 			// just update the set of non-part sources. No prompting necessary.
@@ -500,7 +499,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					MessageDialogWithToggle dialogWithToggle = new MessageDialogWithToggle(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION, buttons, 0, WorkbenchMessages.EditorManager_closeWithoutPromptingOption, false) {
-						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
 									| SWT.TITLE | SWT.BORDER
@@ -517,7 +515,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 					dialog = new MessageDialog(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
 							MessageDialog.QUESTION, buttons, 0) {
-						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
 									| SWT.TITLE | SWT.BORDER
@@ -609,7 +606,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 */
 	public boolean saveModels(final List finalModels, final IShellProvider shellProvider, IRunnableContext runnableContext) {
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
-			@Override
 			public void run(IProgressMonitor monitor) {
 				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(
 						monitor);
@@ -755,7 +751,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			return dontPromptSelection;
 		}
 
-		@Override
 		protected void createButtonsForButtonBar(Composite parent) {
 			createButton(parent, IDialogConstants.OK_ID,
 					IDialogConstants.OK_LABEL, true);
@@ -765,7 +760,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			}
 		}
 		
-		@Override
 		protected Control createDialogArea(Composite parent) {
 			 Composite dialogAreaComposite = (Composite) super.createDialogArea(parent);
 			 
@@ -775,7 +769,6 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 				 
 				 checkbox = new Button(checkboxComposite, SWT.CHECK);
 				 checkbox.addSelectionListener(new SelectionAdapter() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						dontPromptSelection = checkbox.getSelection();
 					}

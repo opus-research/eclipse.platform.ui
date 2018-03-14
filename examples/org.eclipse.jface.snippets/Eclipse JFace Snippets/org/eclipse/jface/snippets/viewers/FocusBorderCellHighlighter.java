@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2014 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
  *******************************************************************************/
 package org.eclipse.jface.snippets.viewers;
 
@@ -52,7 +51,6 @@ public class FocusBorderCellHighlighter extends FocusCellHighlighter {
 
 		Listener listener = new Listener() {
 
-			@Override
 			public void handleEvent(Event event) {
 				if ((event.detail & SWT.SELECTED) > 0) {
 					ViewerCell focusCell = getFocusCell();
@@ -96,10 +94,9 @@ public class FocusBorderCellHighlighter extends FocusCellHighlighter {
 
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.eclipse.jface.viewers.FocusCellHighlighter#focusCellChanged(org.eclipse.jface.viewers.ViewerCell)
 	 */
-	@Override
 	protected void focusCellChanged(ViewerCell cell) {
 		super.focusCellChanged(cell);
 

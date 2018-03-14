@@ -49,8 +49,7 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
      *            The key to format; must not be <code>null</code>.
      * @return The key formatted as a string; should not be <code>null</code>.
      */
-    @Override
-	public String format(Key key) {
+    public String format(Key key) {
         if (key instanceof ModifierKey) {
             String formattedName = Util.translateString(RESOURCE_BUNDLE, key
                     .toString(), null, false, false);
@@ -67,8 +66,7 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyDelimiter()
      */
-    @Override
-	protected String getKeyDelimiter() {
+    protected String getKeyDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_DELIMITER_KEY,
                 KeyStroke.KEY_DELIMITER, false, false);
     }
@@ -78,8 +76,7 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
      */
-    @Override
-	protected String getKeyStrokeDelimiter() {
+    protected String getKeyStrokeDelimiter() {
         return Util.translateString(RESOURCE_BUNDLE, KEY_STROKE_DELIMITER_KEY,
                 KeySequence.KEY_STROKE_DELIMITER, false, false);
     }
@@ -89,8 +86,7 @@ public class EmacsKeyFormatter extends AbstractKeyFormatter {
      * 
      * @see org.eclipse.ui.keys.AbstractKeyFormatter#getModifierKeyComparator()
      */
-    @Override
-	protected Comparator getModifierKeyComparator() {
+    protected Comparator getModifierKeyComparator() {
         return EMACS_MODIFIER_KEY_COMPARATOR;
     }
 

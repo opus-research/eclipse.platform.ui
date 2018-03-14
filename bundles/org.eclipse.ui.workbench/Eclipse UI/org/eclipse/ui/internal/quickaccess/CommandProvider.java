@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.expressions.IEvaluationContext;
-import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -45,18 +44,15 @@ public class CommandProvider extends QuickAccessProvider {
 	public CommandProvider() {
 	}
 
-	@Override
 	public String getId() {
 		return "org.eclipse.ui.commands"; //$NON-NLS-1$
 	}
 
-	@Override
 	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return (CommandElement) idToElement.get(id);
 	}
 
-	@Override
 	public QuickAccessElement[] getElements() {
 		if (idToElement == null) {
 			idToElement = new HashMap();
@@ -90,13 +86,11 @@ public class CommandProvider extends QuickAccessProvider {
 				new QuickAccessElement[idToElement.values().size()]);
 	}
 
-	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return WorkbenchImages
 				.getImageDescriptor(IWorkbenchGraphicConstants.IMG_OBJ_NODE);
 	}
 
-	@Override
 	public String getName() {
 		return QuickAccessMessages.QuickAccess_Commands;
 	}
@@ -113,12 +107,8 @@ public class CommandProvider extends QuickAccessProvider {
 		return currentSnapshot;
 	}
 
-	@Override
 	protected void doReset() {
 		idToElement = null;
-		if (currentSnapshot instanceof ExpressionContext) {
-			((ExpressionContext) currentSnapshot).eclipseContext.dispose();
-		}
 		currentSnapshot = null;
 	}
 }

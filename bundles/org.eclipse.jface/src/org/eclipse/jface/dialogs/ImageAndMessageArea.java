@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Text;
  * @deprecated As of 3.3, this class is no longer necessary.
  * 
  */
-@Deprecated
 public class ImageAndMessageArea extends Composite {
 
 	private int BORDER_MARGIN = IDialogConstants.HORIZONTAL_SPACING / 2;
@@ -96,7 +95,6 @@ public class ImageAndMessageArea extends Composite {
 			 * 
 			 * @see org.eclipse.swt.events.PaintListener#paintControl(org.eclipse.swt.events.PaintEvent)
 			 */
-			@Override
 			public void paintControl(PaintEvent e) {
 				onPaint(e);
 			}
@@ -111,7 +109,6 @@ public class ImageAndMessageArea extends Composite {
 			 * @see org.eclipse.swt.widgets.Layout#layout(org.eclipse.swt.widgets.Composite,
 			 *      boolean)
 			 */
-			@Override
 			public void layout(Composite parent, boolean changed) {
 				Rectangle carea = getClientArea();
 				container.setBounds(carea.x + BORDER_MARGIN, carea.y
@@ -125,7 +122,6 @@ public class ImageAndMessageArea extends Composite {
 			 * @see org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite,
 			 *      int, int, boolean)
 			 */
-			@Override
 			public Point computeSize(Composite parent, int wHint, int hHint,
 					boolean changed) {
 				Point size;
@@ -146,7 +142,6 @@ public class ImageAndMessageArea extends Composite {
 	 * 
 	 * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
 	 */
-	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		messageField.getLayoutControl().setBackground(bg);
@@ -201,7 +196,6 @@ public class ImageAndMessageArea extends Composite {
 	 * 
 	 * @see org.eclipse.swt.widgets.Control#setFont(org.eclipse.swt.graphics.Font)
 	 */
-	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		((Text) messageField.getControl()).setFont(font);
@@ -212,7 +206,6 @@ public class ImageAndMessageArea extends Composite {
 	 * 
 	 * @see org.eclipse.swt.widgets.Control#setToolTipText(java.lang.String)
 	 */
-	@Override
 	public void setToolTipText(String text) {
 		super.setToolTipText(text);
 		((Text) messageField.getControl()).setToolTipText(text);
