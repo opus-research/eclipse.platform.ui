@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -112,9 +112,7 @@ public class ModalContext {
 			this.callingThread = Thread.currentThread();
 		}
 
-		/*
-		 * (non-Javadoc) Method declared on Thread.
-		 */
+		@Override
 		public void run() {
 			try {
 				if (runnable != null) {
@@ -146,6 +144,7 @@ public class ModalContext {
 				// Make sure that all events in the asynchronous event queue
 				// are dispatched.
 				display.syncExec(new Runnable() {
+					@Override
 					public void run() {
 						// do nothing
 					}

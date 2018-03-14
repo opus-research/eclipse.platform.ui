@@ -232,7 +232,8 @@ public interface IWorkingSetManager {
      * @return the dialog
      * @deprecated use createWorkingSetSelectionDialog(parent, true) instead
      */
-    public IWorkingSetSelectionDialog createWorkingSetSelectionDialog(
+    @Deprecated
+	public IWorkingSetSelectionDialog createWorkingSetSelectionDialog(
             Shell parent);
 
     /**
@@ -296,10 +297,10 @@ public interface IWorkingSetManager {
     public IWorkingSet getWorkingSet(String name);
 
     /**
-	 * Returns an array of all working sets stored in the receiver. Any working
-	 * set whose {@link IWorkingSet#isVisible()} method returns false will not be
-	 * included in this array. For a complete list of working sets please use
-	 * {@link #getAllWorkingSets()}.
+	 * Returns an array of all working sets stored in the receiver. The array is
+	 * sorted by names. Any working set whose {@link IWorkingSet#isVisible()}
+	 * method returns false will not be included in this array. For a complete
+	 * list of working sets please use {@link #getAllWorkingSets()}.
 	 * 
 	 * @return the working sets stored in the receiver
 	 */

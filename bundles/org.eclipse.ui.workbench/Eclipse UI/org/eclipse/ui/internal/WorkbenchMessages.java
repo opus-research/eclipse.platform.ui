@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,9 @@ public class WorkbenchMessages extends NLS {
 	private static final String BUNDLE_NAME = "org.eclipse.ui.internal.messages";//$NON-NLS-1$
 
 
-	public static String ThemeChangeWarningText;
+	public static String ThemingDisabled;
 
-	public static String ThemeChangeWarningTitle;
+	public static String ThemeChangeWarningText;
 
 	public static String BundleSigningTray_Cant_Find_Service;
 
@@ -88,6 +88,7 @@ public class WorkbenchMessages extends NLS {
 	public static String SaveAll_toolTip;
 	public static String Workbench_revert;
 	public static String Workbench_revertToolTip;
+	public static String Workbench_missingPropertyMessage;
 	public static String Workbench_move;
 
 	public static String Workbench_moveToolTip;
@@ -361,6 +362,7 @@ public class WorkbenchMessages extends NLS {
 	//--- Coolbar ---
 	public static String WorkbenchWindow_FileToolbar;
 	public static String WorkbenchWindow_NavigateToolbar;
+	public static String WorkbenchWindow_HelpToolbar;
 	public static String WorkbenchWindow_searchCombo_toolTip;
 	public static String WorkbenchWindow_searchCombo_text;
 
@@ -474,9 +476,9 @@ public class WorkbenchMessages extends NLS {
 	// public static String ViewsPreference_perspectiveBar_topLeft;
 	// public static String ViewsPreference_perspectiveBar_left;
 	// public static String ViewsPreference_traditionalTabs;
-	// public static String ViewsPreference_currentTheme;
-	// public static String ViewsPreference_currentThemeDescription;
-	// public static String ViewsPreference_currentThemeFormat;
+	public static String ViewsPreference_currentTheme;
+	public static String ViewsPreference_currentThemeDescription;
+	public static String ViewsPreference_currentThemeFormat;
 	public static String ViewsPreference_enableAnimations;
 	public static String ViewsPreference_useColoredLabels;
 	// public static String ViewsPreference_override;
@@ -555,6 +557,17 @@ public class WorkbenchMessages extends NLS {
 	public static String WorkbenchPreference_noEffectOnAllViews;
 	public static String WorkbenchPreference_HeapStatusButton;
 	public static String WorkbenchPreference_HeapStatusButtonToolTip;
+
+	// --- Globalization -----
+	public static String GlobalizationPreference_nlExtensions;
+	public static String GlobalizationPreference_layoutDirection;
+	public static String GlobalizationPreference_bidiSupport;
+	public static String GlobalizationPreference_textDirection;
+	public static String GlobalizationPreference_defaultDirection;
+	public static String GlobalizationPreference_ltrDirection;
+	public static String GlobalizationPreference_autoDirection;
+	public static String GlobalizationPreference_rtlDirection;
+	public static String GlobalizationPreference_restartWidget;
 
 	// --- Fonts ---
 	public static String FontsPreference_useSystemFont;
@@ -638,6 +651,7 @@ public class WorkbenchMessages extends NLS {
     public static String EditorManager_create_element_returned_null;
     public static String EditorManager_wrong_createElement_result;
     public static String EditorManager_backgroundSaveJobName;
+	public static String EditorManager_largeDocumentWarning;
     
 	public static String EditorPane_pinEditor;
 
@@ -1011,6 +1025,12 @@ public class WorkbenchMessages extends NLS {
 //	public static String ShowKyrsoftViewAction_KyrsoftNotInstalled;
 //	public static String ShowKyrsoftViewAction_OpenPerspectiveFirst;
 //	public static String ShowKyrsoftViewAction_ErrorShowingKyrsoftView;
+
+
+	public static String SplitValues_Horizontal;
+
+
+	public static String SplitValues_Vertical;
 
 
     // ==============================================================================

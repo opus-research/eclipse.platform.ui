@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Gunnar Wagenknecht - fix for bug 21756 [PropertiesView] property view sorting
+ *     Kevin Milburn - [Bug 423214] [PropertiesView] add support for IColorProvider and IFontProvider
  *******************************************************************************/
 
 package org.eclipse.ui.views.properties;
@@ -44,6 +45,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.events.TreeListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -231,7 +234,8 @@ class PropertySheetViewer extends Viewer {
         }
 
         tree.addControlListener(new ControlAdapter() {
-            public void controlResized(ControlEvent e) {
+            @Override
+			public void controlResized(ControlEvent e) {
                 Rectangle area = tree.getClientArea();
                 TreeColumn[] columns = tree.getColumns();
                 if (area.width > 0) {
@@ -296,16 +300,19 @@ class PropertySheetViewer extends Viewer {
      */
     private void createEditorListener() {
         editorListener = new ICellEditorListener() {
-            public void cancelEditor() {
+            @Override
+			public void cancelEditor() {
                 deactivateCellEditor();
             }
 
-            public void editorValueChanged(boolean oldValidState,
+            @Override
+			public void editorValueChanged(boolean oldValidState,
                     boolean newValidState) {
                 //Do nothing
             }
 
-            public void applyEditorValue() {
+            @Override
+			public void applyEditorValue() {
                 //Do nothing
             }
         };
@@ -316,7 +323,8 @@ class PropertySheetViewer extends Viewer {
      */
     private void createEntryListener() {
         entryListener = new IPropertySheetEntryListener() {
-            public void childEntriesChanged(IPropertySheetEntry entry) {
+            @Override
+			public void childEntriesChanged(IPropertySheetEntry entry) {
                 // update the children of the given entry
                 if (entry == rootEntry) {
 					updateChildrenOf(entry, tree);
@@ -328,7 +336,8 @@ class PropertySheetViewer extends Viewer {
                 }
             }
 
-            public void valueChanged(IPropertySheetEntry entry) {
+            @Override
+			public void valueChanged(IPropertySheetEntry entry) {
                 // update the given entry
                 TreeItem item = findItem(entry);
                 if (item != null) {
@@ -336,7 +345,8 @@ class PropertySheetViewer extends Viewer {
 				}
             }
 
-            public void errorMessageChanged(IPropertySheetEntry entry) {
+            @Override
+			public void errorMessageChanged(IPropertySheetEntry entry) {
                 // update the error message
                 setErrorMessage(entry.getErrorText());
             }
@@ -372,6 +382,7 @@ class PropertySheetViewer extends Viewer {
         // Always ensure that if the tree item goes away that it's
         // removed from the cache
         item.addDisposeListener(new DisposeListener() {
+			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				Object possibleEntry = e.widget.getData();
 				if (possibleEntry != null)
@@ -593,10 +604,8 @@ class PropertySheetViewer extends Viewer {
         return getSortedEntries(getFilteredEntries(category.getChildEntries()));
     }
 
-    /*
-     * (non-Javadoc) Method declared on Viewer.
-     */
-    public Control getControl() {
+    @Override
+	public Control getControl() {
         return tree;
     }
 
@@ -657,7 +666,8 @@ class PropertySheetViewer extends Viewer {
 	 * the viewer is currently showing properties. It returns an
 	 * <code>Object[]</code> or <code>null</code>.
 	 */
-    public Object getInput() {
+    @Override
+	public Object getInput() {
         return input;
     }
 
@@ -680,7 +690,8 @@ class PropertySheetViewer extends Viewer {
      * the selection (no categories).
      * </p>
      */
-    public ISelection getSelection() {
+    @Override
+	public ISelection getSelection() {
         if (tree.getSelectionCount() == 0) {
 			return StructuredSelection.EMPTY;
 		}
@@ -787,10 +798,8 @@ class PropertySheetViewer extends Viewer {
         // Part1: Double click only (allow traversal via keyboard without
         // activation
         tree.addSelectionListener(new SelectionAdapter() {
-            /* (non-Javadoc)
-             * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-             */
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
             	// The viewer only owns the status line when there is
             	// no 'active' cell editor
             	if (cellEditor == null || !cellEditor.isActivated()) {
@@ -798,9 +807,7 @@ class PropertySheetViewer extends Viewer {
 				}
 			}
 
-			/* (non-Javadoc)
-			 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				if (e.item instanceof TreeItem)
 					handleSelect((TreeItem) e.item);
@@ -808,7 +815,8 @@ class PropertySheetViewer extends Viewer {
         });
         // Part2: handle single click activation of cell editor
         tree.addMouseListener(new MouseAdapter() {
-            public void mouseDown(MouseEvent event) {
+            @Override
+			public void mouseDown(MouseEvent event) {
                 // only activate if there is a cell editor
                 Point pt = new Point(event.x, event.y);
                 TreeItem item = tree.getItem(pt);
@@ -821,18 +829,21 @@ class PropertySheetViewer extends Viewer {
         // Add a tree listener to expand and collapse which
         // allows for lazy creation of children
         tree.addTreeListener(new TreeListener() {
-            public void treeExpanded(final TreeEvent event) {
+            @Override
+			public void treeExpanded(final TreeEvent event) {
                 handleTreeExpand(event);
             }
 
-            public void treeCollapsed(final TreeEvent event) {
+            @Override
+			public void treeCollapsed(final TreeEvent event) {
                 handleTreeCollapse(event);
             }
         });
 
         // Refresh the tree when F5 pressed
         tree.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
+            @Override
+			public void keyReleased(KeyEvent e) {
                 if (e.character == SWT.ESC) {
 					deactivateCellEditor();
 				} else if (e.keyCode == SWT.F5) {
@@ -880,7 +891,8 @@ class PropertySheetViewer extends Viewer {
      * itself.
      * </p>
      */
-    public void refresh() {
+    @Override
+	public void refresh() {
         if (rootEntry != null) {
             updateChildrenOf(rootEntry, tree);
         }
@@ -957,7 +969,8 @@ class PropertySheetViewer extends Viewer {
      * @param newInput
      *            the input of this viewer, or <code>null</code> if none
      */
-    public void setInput(Object newInput) {
+    @Override
+	public void setInput(Object newInput) {
         // need to save any changed value when user clicks elsewhere
         applyEditorValue();
         // deactivate our cell editor
@@ -1020,11 +1033,8 @@ class PropertySheetViewer extends Viewer {
         setInput(input);
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection, boolean)
-     */
-    public void setSelection(ISelection selection, boolean reveal) {
+    @Override
+	public void setSelection(ISelection selection, boolean reveal) {
         //Do nothing by default
     }
 
@@ -1337,8 +1347,27 @@ class PropertySheetViewer extends Viewer {
         item.setText(1, entry.getValueAsString());
         Image image = entry.getImage();
         if (item.getImage(1) != image) {
-			item.setImage(1, image);
-		}
+            item.setImage(1, image);
+        }
+
+        if (entry instanceof PropertySheetEntry) {
+            PropertySheetEntry entry2 = (PropertySheetEntry) entry;
+
+            Color color = entry2.getForeground();
+			if (item.getForeground() != color) {
+                item.setForeground(color);
+                }
+
+            color = entry2.getBackground();
+			if (item.getBackground() != color) {
+                item.setBackground(color);
+            }
+
+            Font font = entry2.getFont();
+			if (item.getFont() != font) {
+                item.setFont(font);
+            }
+        }
 
         // update the "+" icon
         updatePlus(entry, item);

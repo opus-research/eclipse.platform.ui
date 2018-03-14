@@ -18,12 +18,13 @@ import org.eclipse.swt.widgets.DateTime;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class DateTimeSelectionPropertyTest extends AbstractSWTTestCase {
 	DateTime dateTime;
 	DateTimeSelectionProperty property;
 
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		dateTime = new DateTime(getShell(), SWT.DATE);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ class SafeRunnableDialog extends ErrorDialog {
 
 	private TableViewer statusListViewer;
 
-	private Collection statuses = new ArrayList();
+	private Collection<IStatus> statuses = new ArrayList<IStatus>();
 
 	/**
 	 * Create a new instance of the receiver on a status.
@@ -89,11 +89,7 @@ class SafeRunnableDialog extends ErrorDialog {
 		updateEnablements();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.ErrorDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
-	 */
+	@Override
 	protected Control createDialogArea(Composite parent) {
 		Control area = super.createDialogArea(parent);
 		createStatusList((Composite) area);
@@ -170,6 +166,7 @@ class SafeRunnableDialog extends ErrorDialog {
 		statusListViewer.setLabelProvider(getStatusListLabelProvider());
 		statusListViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
+					@Override
 					public void selectionChanged(SelectionChangedEvent event) {
 						handleSelectionChange();
 					}
@@ -185,11 +182,7 @@ class SafeRunnableDialog extends ErrorDialog {
 	 */
 	private CellLabelProvider getStatusListLabelProvider() {
 		return new CellLabelProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
-			 */
+			@Override
 			public void update(ViewerCell cell) {
 				cell.setText(((IStatus) cell.getElement()).getMessage());
 
@@ -204,30 +197,17 @@ class SafeRunnableDialog extends ErrorDialog {
 	 */
 	private IStructuredContentProvider getStatusContentProvider() {
 		return new IStructuredContentProvider() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
-			 */
+			@Override
 			public Object[] getElements(Object inputElement) {
 				return statuses.toArray();
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
-			 */
+			@Override
 			public void dispose() {
 
 			}
 
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput,
 					Object newInput) {
 
@@ -249,12 +229,7 @@ class SafeRunnableDialog extends ErrorDialog {
 	 */
 	private ViewerComparator getViewerComparator() {
 		return new ViewerComparator() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
-			 *      java.lang.Object, java.lang.Object)
-			 */
+			@Override
 			public int compare(Viewer testViewer, Object e1, Object e2) {
 				String message1 = ((IStatus) e1).getMessage();
 				String message2 = ((IStatus) e2).getMessage();
@@ -309,11 +284,7 @@ class SafeRunnableDialog extends ErrorDialog {
 		showDetailsArea();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.dialogs.ErrorDialog#shouldShowDetailsButton()
-	 */
+	@Override
 	protected boolean shouldShowDetailsButton() {
 		return true;
 	}

@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.beans.BeanProperties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.property.list.IListProperty;
 import org.eclipse.core.databinding.property.list.MultiListProperty;
-import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.databinding.swt.DisplayRealm;
 import org.eclipse.jface.databinding.viewers.ObservableListTreeContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @since 3.2
- * 
+ *
  */
 public class Snippet029TreeViewerMultiListProperty {
 	protected Shell shell;
@@ -43,7 +43,7 @@ public class Snippet029TreeViewerMultiListProperty {
 
 	/**
 	 * Launch the application
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -60,7 +60,8 @@ public class Snippet029TreeViewerMultiListProperty {
 	 */
 	public void open() {
 		final Display display = Display.getDefault();
-		Realm.runWithDefault(SWTObservables.getRealm(display), new Runnable() {
+		Realm.runWithDefault(DisplayRealm.getRealm(display), new Runnable() {
+			@Override
 			public void run() {
 				createContents();
 				shell.open();
@@ -216,6 +217,7 @@ public class Snippet029TreeViewerMultiListProperty {
 			Image catalogImage = createCatalogImage();
 			Image catalogItemImage = createCatalogItemImage();
 
+			@Override
 			public Image getImage(Object element) {
 				if (element instanceof Catalog)
 					return catalogImage;
@@ -224,6 +226,7 @@ public class Snippet029TreeViewerMultiListProperty {
 				return super.getImage(element);
 			}
 
+			@Override
 			public void dispose() {
 				catalogImage.dispose();
 				catalogItemImage.dispose();

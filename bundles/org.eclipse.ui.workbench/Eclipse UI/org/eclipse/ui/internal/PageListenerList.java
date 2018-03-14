@@ -11,7 +11,7 @@
 package org.eclipse.ui.internal;
 
 import org.eclipse.core.commands.common.EventManager;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -50,7 +50,7 @@ public class PageListenerList extends EventManager {
     		label = description + page.getLabel();
     		UIStats.start(UIStats.NOTIFY_PAGE_LISTENERS, label);
     	}
-    	Platform.run(runnable);
+    	SafeRunner.run(runnable);
     	if (UIStats.isDebugging(UIStats.NOTIFY_PAGE_LISTENERS)) {
 			UIStats.end(UIStats.NOTIFY_PAGE_LISTENERS, listener, label);
 		}
@@ -64,7 +64,8 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.pageActivated(page);
                 }
             }, l, page, "activated::"); //$NON-NLS-1$
@@ -79,7 +80,8 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < array.length; i++) {
             final IPageListener l = (IPageListener) array[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.pageClosed(page);
                 }
             }, l, page, "closed::"); //$NON-NLS-1$
@@ -94,7 +96,8 @@ public class PageListenerList extends EventManager {
         for (int i = 0; i < listeners.length; i++) {
             final IPageListener l = (IPageListener) listeners[i];
             fireEvent(new SafeRunnable() {
-                public void run() {
+                @Override
+				public void run() {
                     l.pageOpened(page);
                 }
             }, l, page, "opened::"); //$NON-NLS-1$

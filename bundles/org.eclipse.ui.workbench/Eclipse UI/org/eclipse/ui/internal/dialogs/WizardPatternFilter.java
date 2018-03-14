@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
+import java.util.ArrayList;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.dialogs.PatternFilter;
 
@@ -21,7 +22,6 @@ import org.eclipse.ui.dialogs.PatternFilter;
  * 
  */
 public class WizardPatternFilter extends PatternFilter {
-
 	/**
 	 * Create a new instance of a WizardPatternFilter 
 	 * @param isMatchItem
@@ -30,18 +30,12 @@ public class WizardPatternFilter extends PatternFilter {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementSelectable(java.lang.Object)
-	 */
+	@Override
 	public boolean isElementSelectable(Object element) {
 		return element instanceof WorkbenchWizardElement;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.internal.dialogs.PatternFilter#isElementMatch(org.eclipse.jface.viewers.Viewer, java.lang.Object)
-	 */
+	@Override
 	protected boolean isLeafMatch(Viewer viewer, Object element) {
 		if (element instanceof WizardCollectionElement) {
 			return false;
@@ -63,4 +57,22 @@ public class WizardPatternFilter extends PatternFilter {
 		return false;
 	}
 
+	@Override
+	public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
+		ArrayList<Object> result = new ArrayList<Object>();
+
+		for (Object elem : super.filter(viewer, parent, elements)) {
+			if (elem instanceof WizardCollectionElement) {
+				Object wizardCollection = WizardCollectionElement.filter(viewer, this,
+						(WizardCollectionElement) elem);
+				if (wizardCollection != null) {
+					result.add(wizardCollection);
+				}
+			} else {
+				result.add(elem);
+			}
+		}
+
+		return result.toArray();
+	}
 }

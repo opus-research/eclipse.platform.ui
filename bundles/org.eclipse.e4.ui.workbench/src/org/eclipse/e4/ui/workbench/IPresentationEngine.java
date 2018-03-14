@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 BestSolution.at and others.
+ * Copyright (c) 2009, 2014 BestSolution.at and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,6 +46,14 @@ public interface IPresentationEngine {
 	public static final String NO_CLOSE = "NoClose"; //$NON-NLS-1$
 
 	/**
+	 * Declare the stack as containing a singe 'standalone' view. These stacks will not allow either
+	 * dragging the view out of the stack nor dragging other views in.
+	 * 
+	 * @since 1.1
+	 */
+	public static final String STANDALONE = "Standalone"; //$NON-NLS-1$
+
+	/**
 	 * Don't remove the element from the display even if it has no displayable children
 	 */
 	public static final String NO_AUTO_COLLAPSE = "NoAutoCollapse"; //$NON-NLS-1$
@@ -54,6 +62,45 @@ public interface IPresentationEngine {
 	 * When applied as a tag to an MUIElement inhibits moving the element (ie. through DnD...
 	 */
 	public static final String NO_MOVE = "NoMove"; //$NON-NLS-1$
+
+	/**
+	 * This tag can be used by the renderer implementation to decide that the user interface element
+	 * has been hidden.
+	 *
+	 * @since 1.1
+	 */
+	public static final String HIDDEN_EXPLICITLY = "HIDDEN_EXPLICITLY"; //$NON-NLS-1$
+
+	/**
+	 * This key is used to store information in the 'persistentData' map which will be used to
+	 * override the initial style of an element at rendering time. For example the SWT renderer will
+	 * expect to see an integer (as a string) which defines the initial SWT style bits.
+	 * 
+	 * @since 1.1
+	 */
+	public static String STYLE_OVERRIDE_KEY = "styleOverride"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to minimize the resulting control.
+	 * 
+	 * @since 1.1
+	 */
+	public static String WINDOW_MINIMIZED_TAG = "shellMinimized"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to maximize the resulting control.
+	 * 
+	 * @since 1.1
+	 */
+	public static String WINDOW_MAXIMIZED_TAG = "shellMaximized"; //$NON-NLS-1$
+
+	/**
+	 * When applied to an MWindow causes the renderer to render the resulting control as a top level
+	 * window
+	 *
+	 * @since 1.3
+	 */
+	public static String WINDOW_TOP_LEVEL = "shellTopLevel"; //$NON-NLS-1$
 
 	/**
 	 * When added to an element's 'tags' this should cause the presentation to move that element to
@@ -93,6 +140,22 @@ public interface IPresentationEngine {
 	public static String ORIENTATION_VERTICAL = "Vertical"; //$NON-NLS-1$
 
 	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be split with the result being side by side.
+	 * 
+	 * @since 1.1
+	 */
+	public static String SPLIT_HORIZONTAL = "Split Horizontal"; //$NON-NLS-1$
+
+	/**
+	 * This tag can be applied to an element (usually an MPart) to indicate that the element should
+	 * be split with the result being one above the other.
+	 * 
+	 * @since 1.1
+	 */
+	public static String SPLIT_VERTICAL = "Split Vertical"; //$NON-NLS-1$
+
+	/**
 	 * This key should be used to add an optional String to an element that is a URI to the elements
 	 * disabled icon. This is used, for example, by Toolbar Items which, in Eclipse SDK, provide a
 	 * unique icon for disabled tool items that look better than the OS default graying on the
@@ -106,6 +169,8 @@ public interface IPresentationEngine {
 	 * This key should be used to add an optional org.eclipse.swt.graphics.Image to an elements
 	 * TRANSIENTDATA. If present, the image will be used to override that elements iconURI. An
 	 * example is drawing the error icon on a minimized problems view stack.
+	 * 
+	 * NOTE: This image must be checked to ensure that it hasn't been disposed on retrieval.
 	 */
 	public static final String OVERRIDE_ICON_IMAGE_KEY = "e4_override_icon_image_key"; //$NON-NLS-1$
 
@@ -117,6 +182,14 @@ public interface IPresentationEngine {
 	public static final String OVERRIDE_TITLE_TOOL_TIP_KEY = "e4_override_title_tool_tip_key"; //$NON-NLS-1$
 
 	/**
+	 * This is a Tag that when applied to an MUILabel element will cause whatever Image is to be
+	 * shown to be adorned with the 'pinned' affordance.
+	 * 
+	 * @since 1.1
+	 */
+	public static final String ADORNMENT_PIN = "Pin Adornment"; //$NON-NLS-1$
+
+	/**
 	 * This is a <b>Boolean</b> preference used to control animations in the application
 	 */
 	public static final String ANIMATIONS_ENABLED = "Animations Enabled"; //$NON-NLS-1$
@@ -126,6 +199,21 @@ public interface IPresentationEngine {
 	 * ABstractPartRenderer that is to be used to render the element
 	 */
 	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
+
+	/**
+	 * This is the tag name that enables the DND support for the element. The element's tags list
+	 * has to be updated with the tag in order to enable the DND processing.
+	 *
+	 * @since 1.1
+	 */
+	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$
+
+	/**
+	 * This is the tag name that indicates that the model element is active.
+	 *
+	 * @since 1.3
+	 */
+	public static final String ACTIVE = "active"; //$NON-NLS-1$
 
 	/**
 	 * Creates and returns the UI element for the given model element.

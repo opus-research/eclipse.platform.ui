@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,11 +8,11 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - Bug 12116 [Contributions] widgets: MenuManager.setImageDescriptor() method needed
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440252
  *******************************************************************************/
 package org.eclipse.jface.action;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.ListenerList;
@@ -155,10 +155,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         this.id = id;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#addMenuListener(org.eclipse.jface.action.IMenuListener)
-     */
-    public void addMenuListener(IMenuListener listener) {
+    @Override
+	public void addMenuListener(IMenuListener listener) {
         listeners.add(listener);
     }
 
@@ -210,7 +208,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return the menu control
      * @deprecated use <code>createMenuBar(Decorations)</code> instead.
      */
-    public Menu createMenuBar(Shell parent) {
+    @Deprecated
+	public Menu createMenuBar(Shell parent) {
         return createMenuBar((Decorations) parent);
     }
 
@@ -220,7 +219,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * this menu manager and its associated contribution items. Use {@link #removeAll()} for that
      * purpose, but note that will not dispose the items.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         if (menuExist()) {
 			menu.dispose();
 		}
@@ -232,31 +232,25 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         }
 
         disposeOldImages();
-        
+
         IContributionItem[] items = getItems();
-        for (int i = 0; i < items.length; i++) {
-            items[i].dispose();
+        for (IContributionItem item : items) {
+            item.dispose();
         }
-        
+
         markDirty();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Composite)
-     */
-    public void fill(Composite parent) {
+    @Override
+	public void fill(Composite parent) {
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.CoolBar, int)
-     */
-    public void fill(CoolBar parent, int index) {
+    @Override
+	public void fill(CoolBar parent, int index) {
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.Menu, int)
-     */
-    public void fill(Menu parent, int index) {
+    @Override
+	public void fill(Menu parent, int index) {
         if (menuItem == null || menuItem.isDisposed()) {
             if (index >= 0) {
 				menuItem = new MenuItem(parent, SWT.CASCADE, index);
@@ -290,16 +284,12 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#fill(org.eclipse.swt.widgets.ToolBar, int)
-     */
-    public void fill(ToolBar parent, int index) {
+    @Override
+	public void fill(ToolBar parent, int index) {
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#findMenuUsingPath(java.lang.String)
-     */
-    public IMenuManager findMenuUsingPath(String path) {
+    @Override
+	public IMenuManager findMenuUsingPath(String path) {
         IContributionItem item = findUsingPath(path);
         if (item instanceof IMenuManager) {
 			return (IMenuManager) item;
@@ -307,10 +297,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#findUsingPath(java.lang.String)
-     */
-    public IContributionItem findUsingPath(String path) {
+    @Override
+	public IContributionItem findUsingPath(String path) {
         String id = path;
         String rest = null;
         int separator = path.indexOf('/');
@@ -339,8 +327,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void fireAboutToShow(IMenuManager manager) {
         Object[] listeners = this.listeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-            ((IMenuListener) listeners[i]).menuAboutToShow(manager);
+        for (Object listener : listeners) {
+            ((IMenuListener) listener).menuAboutToShow(manager);
         }
     }
 
@@ -353,9 +341,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void fireAboutToHide(IMenuManager manager) {
         final Object[] listeners = this.listeners.getListeners();
-        for (int i = 0; i < listeners.length; ++i) {
-        	final Object listener = listeners[i];
-			if (listener instanceof IMenuListener2) {
+        for (final Object listener : listeners) {
+        	if (listener instanceof IMenuListener2) {
 				final IMenuListener2 listener2 = (IMenuListener2) listener;
 				listener2.menuAboutToHide(manager);
 			}
@@ -365,10 +352,11 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     /**
 	 * Returns the menu id. The menu id is used when creating a contribution
 	 * item for adding this menu as a sub menu of another.
-	 * 
+	 *
 	 * @return the menu id
 	 */
-    public String getId() {
+    @Override
+	public String getId() {
         return id;
     }
 
@@ -413,29 +401,32 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     	return image;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionManager#getOverrides()
-     */
-    public IContributionManagerOverrides getOverrides() {
+    @Override
+	public IContributionManagerOverrides getOverrides() {
         if (overrides == null) {
             if (parent == null) {
                 overrides = new IContributionManagerOverrides() {
-                    public Integer getAccelerator(IContributionItem item) {
+                    @Override
+					public Integer getAccelerator(IContributionItem item) {
                         return null;
                     }
 
-                    public String getAcceleratorText(IContributionItem item) {
+                    @Override
+					public String getAcceleratorText(IContributionItem item) {
                         return null;
                     }
 
-                    public Boolean getEnabled(IContributionItem item) {
+                    @Override
+					public Boolean getEnabled(IContributionItem item) {
                         return null;
                     }
 
-                    public String getText(IContributionItem item) {
+                    @Override
+					public String getText(IContributionItem item) {
                         return null;
                     }
-    				public Boolean getVisible(IContributionItem item) {
+    				@Override
+					public Boolean getVisible(IContributionItem item) {
     					return null;
     				}
                 };
@@ -457,10 +448,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         return parent;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#getRemoveAllWhenShown()
-     */
-    public boolean getRemoveAllWhenShown() {
+    @Override
+	public boolean getRemoveAllWhenShown() {
         return removeAllWhenShown;
     }
 
@@ -471,9 +460,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         if (removeAllWhenShown) {
 			removeAll();
 		}
-        MenuManagerEventHelper.showEventPreHelper(this);
+        MenuManagerEventHelper.getInstance().showEventPreHelper(this);
         fireAboutToShow(this);
-        MenuManagerEventHelper.showEventPostHelper(this);
+        MenuManagerEventHelper.getInstance().showEventPostHelper(this);
         update(false, false);
     }
 
@@ -481,9 +470,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * Notifies all listeners that this menu is about to disappear.
      */
     private void handleAboutToHide() {
-    	MenuManagerEventHelper.hideEventPreHelper(this);
+    	MenuManagerEventHelper.getInstance().hideEventPreHelper(this);
         fireAboutToHide(this);
-        MenuManagerEventHelper.hideEventPostHelper(this);
+        MenuManagerEventHelper.getInstance().hideEventPostHelper(this);
     }
 
     /**
@@ -491,12 +480,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      */
     private void initializeMenu() {
         menu.addMenuListener(new MenuAdapter() {
-            public void menuHidden(MenuEvent e) {
+            @Override
+			public void menuHidden(MenuEvent e) {
                 //			ApplicationWindow.resetDescription(e.widget);
             	handleAboutToHide();
             }
 
-            public void menuShown(MenuEvent e) {
+            @Override
+			public void menuShown(MenuEvent e) {
                 handleAboutToShow();
             }
         });
@@ -504,10 +495,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         // Always do it lazily in handleAboutToShow().
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isDynamic()
-     */
-    public boolean isDynamic() {
+    @Override
+	public boolean isDynamic() {
         return false;
     }
 
@@ -522,21 +511,18 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @return <code>true</code> if enabled, and
      *   <code>false</code> if disabled
      */
-    public boolean isEnabled() {
+    @Override
+	public boolean isEnabled() {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isGroupMarker()
-     */
-    public boolean isGroupMarker() {
+    @Override
+	public boolean isGroupMarker() {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isSeparator()
-     */
-    public boolean isSeparator() {
+    @Override
+	public boolean isSeparator() {
         return false;
     }
 
@@ -548,14 +534,13 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @deprecated this method is no longer a part of the 
      *   {@link org.eclipse.jface.action.IContributionItem} API.
      */
-    public boolean isSubstituteFor(IContributionItem item) {
+    @Deprecated
+	public boolean isSubstituteFor(IContributionItem item) {
         return this.equals(item);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#isVisible()
-     */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         if (!visible) {
 			return false; // short circuit calculations in this case
 		}
@@ -585,7 +570,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * 
      * @since 3.1
      */
-    public void markDirty() {
+    @Override
+	public void markDirty() {
         super.markDirty();
         // Can't optimize by short-circuiting when the first dirty manager is encountered,
         // since non-visible children are not even processed.
@@ -612,17 +598,13 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         return menu != null && !menu.isDisposed();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#removeMenuListener(org.eclipse.jface.action.IMenuListener)
-     */
-    public void removeMenuListener(IMenuListener listener) {
+    @Override
+	public void removeMenuListener(IMenuListener listener) {
         listeners.remove(listener);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#saveWidgetState()
-     */
-    public void saveWidgetState() {
+    @Override
+	public void saveWidgetState() {
     }
 
     /**
@@ -631,29 +613,24 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * @param newOverrides the overrides for the items of this manager
      * @since 2.0
      */
-    public void setOverrides(IContributionManagerOverrides newOverrides) {
+    @Override
+	public void setOverrides(IContributionManagerOverrides newOverrides) {
         overrides = newOverrides;
         super.setOverrides(overrides);
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#setParent(org.eclipse.jface.action.IContributionManager)
-     */
-    public void setParent(IContributionManager manager) {
+    @Override
+	public void setParent(IContributionManager manager) {
         parent = manager;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#setRemoveAllWhenShown(boolean)
-     */
-    public void setRemoveAllWhenShown(boolean removeAll) {
+    @Override
+	public void setRemoveAllWhenShown(boolean removeAll) {
         this.removeAllWhenShown = removeAll;
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#setVisible(boolean)
-     */
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         this.visible = visible;
     }
     
@@ -670,10 +647,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     	this.definitionId = definitionId; 
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#update()
-     */
-    public void update() {
+    @Override
+	public void update() {
         updateMenuItem();
     }
 
@@ -683,7 +658,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      *
      * @see #updateAll
      */
-    public void update(boolean force) {
+    @Override
+	public void update(boolean force) {
         update(force, false);
     }
 
@@ -747,29 +723,31 @@ public class MenuManager extends ContributionManager implements IMenuManager {
     }
 
     /**
-     * Incrementally builds the menu from the contribution items.
-     * This method leaves out double separators and separators in the first 
-     * or last position.
-     *
-     * @param force <code>true</code> means update even if not dirty,
-     *   and <code>false</code> for normal incremental updating
-     * @param recursive <code>true</code> means recursively update 
-     *   all submenus, and <code>false</code> means just this menu
-     */
+	 * Incrementally builds the menu from the contribution items. This method
+	 * leaves out double separators and separators in the first or last
+	 * position.
+	 *
+	 * @param force
+	 *            <code>true</code> means update even if not dirty, and
+	 *            <code>false</code> for normal incremental updating
+	 * @param recursive
+	 *            <code>true</code> means recursively update all submenus, and
+	 *            <code>false</code> means just this menu
+	 */
     protected void update(boolean force, boolean recursive) {
         if (isDirty() || force) {
             if (menuExist()) {
                 // clean contains all active items without double separators
                 IContributionItem[] items = getItems();
-                List clean = new ArrayList(items.length);
+                List<IContributionItem> clean = new ArrayList<IContributionItem>(items.length);
                 IContributionItem separator = null;
-                for (int i = 0; i < items.length; ++i) {
-                    IContributionItem ci = items[i];
+                for (IContributionItem item : items) {
+                    IContributionItem ci = item;
                     if (!isChildVisible(ci)) {
 						continue;
 					}
                     if (ci.isSeparator()) {
-                        // delay creation until necessary 
+						// delay creation until necessary
                         // (handles both adjacent separators, and separator at end)
                         separator = ci;
                     } else {
@@ -786,15 +764,15 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 // remove obsolete (removed or non active)
                 Item[] mi = getMenuItems();
 
-                for (int i = 0; i < mi.length; i++) {
-                    Object data = mi[i].getData();
+                for (Item element : mi) {
+                    Object data = element.getData();
 
                     if (data == null || !clean.contains(data)) {
-                        mi[i].dispose();
+                        element.dispose();
                     } else if (data instanceof IContributionItem
                             && ((IContributionItem) data).isDynamic()
                             && ((IContributionItem) data).isDirty()) {
-                        mi[i].dispose();
+                        element.dispose();
                     }
                 }
 
@@ -803,8 +781,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
                 int srcIx = 0;
                 int destIx = 0;
 
-                for (Iterator e = clean.iterator(); e.hasNext();) {
-                    IContributionItem src = (IContributionItem) e.next();
+                for (IContributionItem src : clean) {
                     IContributionItem dest;
 
                     // get corresponding item in SWT widget
@@ -861,8 +838,7 @@ public class MenuManager extends ContributionManager implements IMenuManager {
             // I am not dirty. Check if I must recursivly walk down the hierarchy.
             if (recursive) {
                 IContributionItem[] items = getItems();
-                for (int i = 0; i < items.length; ++i) {
-                    IContributionItem ci = items[i];
+                for (IContributionItem ci : items) {
                     if (ci instanceof IMenuManager) {
                         IMenuManager mm = (IMenuManager) ci;
                         if (isChildVisible(mm)) {
@@ -875,16 +851,14 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         updateMenuItem();
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IContributionItem#update(java.lang.String)
-     */
-    public void update(String property) {
+    @Override
+	public void update(String property) {
         IContributionItem items[] = getItems();
 
-        for (int i = 0; i < items.length; i++) {
-			items[i].update(property);
+        for (IContributionItem item : items) {
+			item.update(property);
 		}
-        
+
         if (menu != null && !menu.isDisposed() && menu.getParentItem() != null) {
         	if (IAction.TEXT.equals(property)) {
                 String text = getOverrides().getText(this);
@@ -947,10 +921,8 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 		}
 	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.action.IMenuManager#updateAll(boolean)
-     */
-    public void updateAll(boolean force) {
+    @Override
+	public void updateAll(boolean force) {
         update(force, true);
     }
 
@@ -1003,4 +975,27 @@ public class MenuManager extends ContributionManager implements IMenuManager {
 		}
 		return item.isVisible();
 	}
+
+	/**
+	 * @param menuText The text (label) of the menu.
+	 * @since 3.10
+	 */
+	public void setMenuText(String menuText) {
+		this.menuText = menuText;
+	}
+
+	/**
+	 * @param imageDescriptor The image descriptor to set.
+	 * @since 3.10
+	 */
+	public void setImageDescriptor(ImageDescriptor imageDescriptor) {
+		this.image = imageDescriptor;
+	}
+
+	@Override
+	public String toString() {
+		return "MenuManager [" + (menuText != null ? "text=" + menuText + ", " : "") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				+ (id != null ? "id=" + id + ", " : "") + "visible=" + visible + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+	}
+
 }

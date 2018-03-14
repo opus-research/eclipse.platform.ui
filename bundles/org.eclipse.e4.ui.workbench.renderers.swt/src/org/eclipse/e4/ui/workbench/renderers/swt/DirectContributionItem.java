@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2013 IBM Corporation and others.
+ * Copyright (c) 2010, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards 
+ *     Joseph Carroll <jdsalingerjr@gmail.com> - Bug 385414 Contributing wizards
  *     to toolbar always displays icon and text
+ *     Bruce Skingle <Bruce.Skingle@immutify.com> - Bug 443092
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -19,10 +20,13 @@ import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
+import org.eclipse.e4.core.services.log.Logger;
 import org.eclipse.e4.ui.internal.workbench.Activator;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.Policy;
+import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.model.application.MContribution;
 import org.eclipse.e4.ui.model.application.ui.MContext;
@@ -30,7 +34,6 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.menu.ItemType;
 import org.eclipse.e4.ui.model.application.ui.menu.MItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
@@ -90,7 +93,12 @@ public class DirectContributionItem extends ContributionItem {
 		resUtils = (ISWTResourceUtilities) utils;
 	}
 
+	@Inject
+	@Optional
+	private Logger logger;
+
 	private IMenuListener menuListener = new IMenuListener() {
+		@Override
 		public void menuAboutToShow(IMenuManager manager) {
 			update(null);
 		}
@@ -102,13 +110,6 @@ public class DirectContributionItem extends ContributionItem {
 		updateVisible();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .Menu, int)
-	 */
 	@Override
 	public void fill(Menu menu, int index) {
 		if (model == null) {
@@ -143,13 +144,6 @@ public class DirectContributionItem extends ContributionItem {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.action.ContributionItem#fill(org.eclipse.swt.widgets
-	 * .ToolBar, int)
-	 */
 	@Override
 	public void fill(ToolBar parent, int index) {
 		if (model == null) {
@@ -197,21 +191,11 @@ public class DirectContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update()
-	 */
 	@Override
 	public void update() {
 		update(null);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#update(java.lang.String)
-	 */
 	@Override
 	public void update(String id) {
 		updateIcons();
@@ -312,6 +296,7 @@ public class DirectContributionItem extends ContributionItem {
 	private Listener getItemListener() {
 		if (menuItemListener == null) {
 			menuItemListener = new Listener() {
+				@Override
 				public void handleEvent(Event event) {
 					switch (event.type) {
 					case SWT.Dispose:
@@ -349,11 +334,6 @@ public class DirectContributionItem extends ContributionItem {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.action.ContributionItem#dispose()
-	 */
 	@Override
 	public void dispose() {
 		if (widget != null) {
@@ -418,12 +398,12 @@ public class DirectContributionItem extends ContributionItem {
 			return (Menu) obj;
 		}
 		// this is a temporary passthrough of the IMenuCreator
-		if (mmenu instanceof MRenderedMenu) {
-			obj = ((MRenderedMenu) mmenu).getContributionManager();
+		if (RenderedElementUtil.isRenderedMenu(mmenu)) {
+			obj = RenderedElementUtil.getContributionManager(mmenu);
 			if (obj instanceof IContextFunction) {
 				final IEclipseContext lclContext = getContext(mmenu);
 				obj = ((IContextFunction) obj).compute(lclContext, null);
-				((MRenderedMenu) mmenu).setContributionManager(obj);
+				RenderedElementUtil.setContributionManager(mmenu, obj);
 			}
 			if (obj instanceof IMenuCreator) {
 				final IMenuCreator creator = (IMenuCreator) obj;
@@ -431,10 +411,11 @@ public class DirectContributionItem extends ContributionItem {
 						.getShell());
 				if (menu != null) {
 					toolItem.addDisposeListener(new DisposeListener() {
+						@Override
 						public void widgetDisposed(DisposeEvent e) {
 							if (menu != null && !menu.isDisposed()) {
 								creator.dispose();
-								((MRenderedMenu) mmenu).setWidget(null);
+								mmenu.setWidget(null);
 							}
 						}
 					});
@@ -442,6 +423,17 @@ public class DirectContributionItem extends ContributionItem {
 					menu.setData(AbstractPartRenderer.OWNING_ME, menu);
 					return menu;
 				}
+			}
+		} else {
+			final IEclipseContext lclContext = getContext(model);
+			IPresentationEngine engine = lclContext
+					.get(IPresentationEngine.class);
+			obj = engine.createGui(mmenu, toolItem.getParent(), lclContext);
+			if (obj instanceof Menu) {
+				return (Menu) obj;
+			}
+			if (logger != null) {
+				logger.debug("Rendering returned " + obj); //$NON-NLS-1$
 			}
 		}
 		return null;
@@ -489,12 +481,15 @@ public class DirectContributionItem extends ContributionItem {
 	 * Return the execution context for the @CanExecute and @Execute methods.
 	 * This should be the same as the execution context used by the
 	 * EHandlerService.
-	 * 
+	 *
 	 * @param context
 	 *            the context for this item
 	 * @return the execution context
 	 */
 	private IEclipseContext getExecutionContext(IEclipseContext context) {
+		if (context == null)
+			return null;
+
 		return context.getActiveLeaf();
 	}
 
@@ -510,6 +505,7 @@ public class DirectContributionItem extends ContributionItem {
 		return contrib.getObject() != null;
 	}
 
+	@Override
 	public void setParent(IContributionManager parent) {
 		if (getParent() instanceof IMenuManager) {
 			IMenuManager menuMgr = (IMenuManager) getParent();
@@ -524,7 +520,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a parent context for this part.
-	 * 
+	 *
 	 * @param element
 	 *            the part to start searching from
 	 * @return the parent's closest context, or global context if none in the
@@ -536,7 +532,7 @@ public class DirectContributionItem extends ContributionItem {
 
 	/**
 	 * Return a context for this part.
-	 * 
+	 *
 	 * @param part
 	 *            the part to start searching from
 	 * @return the closest context, or global context if none in the hierarchy

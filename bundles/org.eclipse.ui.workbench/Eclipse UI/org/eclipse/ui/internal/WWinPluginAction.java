@@ -82,7 +82,8 @@ public class WWinPluginAction extends PluginAction implements
 			}
             retargetAction
                     .addPropertyChangeListener(new IPropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent event) {
+                        @Override
+						public void propertyChange(PropertyChangeEvent event) {
                             if (event.getProperty().equals(IAction.ENABLED)) {
                                 Object val = event.getNewValue();
                                 if (val instanceof Boolean) {
@@ -123,7 +124,8 @@ public class WWinPluginAction extends PluginAction implements
         addToActionList(this);
 
         super.setHelpListener(new HelpListener() {
-            public void helpRequested(HelpEvent e) {
+            @Override
+			public void helpRequested(HelpEvent e) {
                 HelpListener listener = null;
                 if (retargetAction != null) {
 					listener = retargetAction.getHelpListener();
@@ -168,10 +170,8 @@ public class WWinPluginAction extends PluginAction implements
         }
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginAction.
-     */
-    protected IActionDelegate validateDelegate(Object obj)
+    @Override
+	protected IActionDelegate validateDelegate(Object obj)
             throws WorkbenchException {
         if (obj instanceof IWorkbenchWindowActionDelegate) {
 			return (IWorkbenchWindowActionDelegate) obj;
@@ -181,10 +181,8 @@ public class WWinPluginAction extends PluginAction implements
                 "Action must implement IWorkbenchWindowActionDelegate"); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * Method declared on PluginAction.
-     */
-    protected void initDelegate() {
+    @Override
+	protected void initDelegate() {
         super.initDelegate();
         ((IWorkbenchWindowActionDelegate) getDelegate()).init(window);
     }
@@ -192,7 +190,8 @@ public class WWinPluginAction extends PluginAction implements
     /**
      * Disposes of the action and any resources held.
      */
-    public void dispose() {
+    @Override
+	public void dispose() {
         removeFromActionList(this);
         if (retargetAction != null) {
             window.getPartService().removePartListener(retargetAction);
@@ -206,7 +205,8 @@ public class WWinPluginAction extends PluginAction implements
     /**
      * Returns the action set id.
      */
-    public String getActionSetId() {
+    @Override
+	public String getActionSetId() {
         return actionSetId;
     }
 
@@ -216,15 +216,14 @@ public class WWinPluginAction extends PluginAction implements
      * before the window is stored.  We cannot create the delegate
      * at that time.
      */
-    public boolean isOkToCreateDelegate() {
+    @Override
+	public boolean isOkToCreateDelegate() {
         return super.isOkToCreateDelegate() && window != null
                 && retargetAction == null;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IActionDelegate2.
-     */
-    public void runWithEvent(Event event) {
+    @Override
+	public void runWithEvent(Event event) {
         if (retargetAction == null) {
             super.runWithEvent(event);
             return;
@@ -240,7 +239,8 @@ public class WWinPluginAction extends PluginAction implements
     /**
      * Sets the action set id.
      */
-    public void setActionSetId(String newActionSetId) {
+    @Override
+	public void setActionSetId(String newActionSetId) {
         actionSetId = newActionSetId;
     }
 
@@ -250,14 +250,13 @@ public class WWinPluginAction extends PluginAction implements
      * a local field. The supplied listener is only used if there is
      * no retarget action.
      */
-    public void setHelpListener(HelpListener listener) {
+    @Override
+	public void setHelpListener(HelpListener listener) {
         localHelpListener = listener;
     }
 
-    /* (non-Javadoc)
-     * Method declared on IAction.
-     */
-    public void setChecked(boolean checked) {
+    @Override
+	public void setChecked(boolean checked) {
         super.setChecked(checked);
         // This call may come from the SWT control event handler
         // itself, so notify the retarget action to keep things
@@ -274,4 +273,13 @@ public class WWinPluginAction extends PluginAction implements
         ISelection selection = window.getSelectionService().getSelection();
         selectionChanged(selection);
     }
+
+	@Override
+	public String toString() {
+		return "WWinPluginAction [" //$NON-NLS-1$
+				+ "id=" + getId() //$NON-NLS-1$
+				+ ", enabled=" + isEnabled() + //$NON-NLS-1$
+				(actionSetId != null ? ", actionSet=" + actionSetId : "") //$NON-NLS-1$ //$NON-NLS-2$
+				+ "]"; //$NON-NLS-1$
+	}
 }
