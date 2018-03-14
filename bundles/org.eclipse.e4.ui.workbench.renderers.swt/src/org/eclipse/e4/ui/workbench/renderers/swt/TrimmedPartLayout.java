@@ -99,6 +99,13 @@ public class TrimmedPartLayout extends Layout {
 		clientArea.setLayout(new FillLayout());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
+	 * , int, int, boolean)
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {

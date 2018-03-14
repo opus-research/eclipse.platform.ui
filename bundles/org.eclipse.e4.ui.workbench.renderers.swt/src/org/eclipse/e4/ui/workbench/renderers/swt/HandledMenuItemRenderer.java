@@ -135,6 +135,13 @@ public class HandledMenuItemRenderer extends MenuItemRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#hookControllerLogic
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public void hookControllerLogic(MUIElement me) {
 		// If the item is a CHECK or RADIO update the model's state to match

@@ -315,6 +315,13 @@ MenuManagerEventHelper.getInstance()
 		context.remove(MenuManagerRenderer.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
@@ -575,6 +582,13 @@ MenuManagerEventHelper.getInstance()
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
