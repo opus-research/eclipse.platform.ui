@@ -126,7 +126,7 @@ public final class ResourceUtil {
 		if (element instanceof IResource) {
 			return (IResource) element;
 		}
-		return getAdapter(element, IResource.class, true);
+		return Adapters.adapt(element, IResource.class);
     }
 
     /**
@@ -154,13 +154,13 @@ public final class ResourceUtil {
 		}
 
 		// try for IFile adapter (before IResource adapter, since it's more specific)
-		Object adapter = getAdapter(element, IFile.class, true);
+		Object adapter = Adapters.adapt(element, IFile.class);
 		if (adapter instanceof IFile) {
 			return (IFile) adapter;
 		}
 
 		// try for IResource adapter
-		adapter = getAdapter(element, IResource.class, true);
+		adapter = Adapters.adapt(element, IResource.class);
 		if (adapter instanceof IFile) {
 			return (IFile) adapter;
 		}
@@ -186,7 +186,7 @@ public final class ResourceUtil {
 		}
 
 		// try for ResourceMapping adapter
-		Object adapter = getAdapter(element, ResourceMapping.class, true);
+		Object adapter = Adapters.adapt(element, ResourceMapping.class);
 		if (adapter instanceof ResourceMapping) {
 			return (ResourceMapping) adapter;
 		}
@@ -224,7 +224,7 @@ public final class ResourceUtil {
 	    		return null;
 	    	}
 	    	ResourceTraversal traversal = traversals[0];
-	    	// TODO: need to honour traversal flags
+			// TODO: need to honor traversal flags
 	    	IResource[] resources = traversal.getResources();
 	    	if (resources.length != 1) {
 	    		return null;
@@ -242,12 +242,10 @@ public final class ResourceUtil {
 	 *
 	 * @since 3.2
 	 *
-	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)}
-	 *             instead
+	 * @deprecated Use {@link Adapters#adapt(Object, Class, boolean)} instead.
 	 */
 	@Deprecated
 	public static <T> T getAdapter(Object element, Class<T> adapterType, boolean forceLoad) {
 		return Adapters.adapt(element, adapterType, forceLoad);
 	}
-
 }
