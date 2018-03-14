@@ -278,7 +278,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Optional
 	private void subscribeTopicUpdateToolbarEnablement(
 			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
-		final Object v = eventData.getProperty(IEventBroker.DATA);
+		final Object v = eventData != null ? eventData.getProperty(IEventBroker.DATA) : UIEvents.ALL_ELEMENT_ID;
 		Selector s;
 		if (v instanceof Selector) {
 			s = (Selector) v;
@@ -421,6 +421,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(toolbarModel);
+					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
+					if (dispose instanceof Runnable) {
+						((Runnable) dispose).run();
+					}
+					transientData.remove(POST_PROCESSING_DISPOSE);
 					transientData.remove(DISPOSE_ADDED);
 				}
 			});
