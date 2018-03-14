@@ -70,7 +70,6 @@ public class EventBroker implements IEventBroker {
 		// placeholder
 	}
 
-	@Override
 	public boolean send(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
@@ -82,7 +81,6 @@ public class EventBroker implements IEventBroker {
 		return true;
 	}
 
-	@Override
 	public boolean post(String topic, Object data) {
 		Event event = constructEvent(topic, data);
 		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
@@ -111,12 +109,10 @@ public class EventBroker implements IEventBroker {
 		return event;
 	}
 
-	@Override
 	public boolean subscribe(String topic, EventHandler eventHandler) {
 		return subscribe(topic, null, eventHandler, false);
 	}
-
-	@Override
+	
 	public boolean subscribe(String topic, String filter, EventHandler eventHandler, boolean headless) {
 		BundleContext bundleContext = Activator.getDefault().getBundleContext();
 		if (bundleContext == null) {
@@ -141,7 +137,6 @@ public class EventBroker implements IEventBroker {
 		return true;
 	}
 
-	@Override
 	public boolean unsubscribe(EventHandler eventHandler) {
 		Collection<ServiceRegistration<?>> handled = registrations
 				.remove(eventHandler);

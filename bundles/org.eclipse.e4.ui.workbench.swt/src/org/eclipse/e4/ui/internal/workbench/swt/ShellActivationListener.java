@@ -51,7 +51,6 @@ public class ShellActivationListener implements Listener {
 		this.application = application;
 	}
 
-	@Override
 	public void handleEvent(Event event) {
 		if (!(event.widget instanceof Shell)) {
 			return;
@@ -89,13 +88,11 @@ public class ShellActivationListener implements Listener {
 			shell.setData(ECLIPSE_CONTEXT_SHELL_CONTEXT, local);
 
 			SafeRunner.run(new ISafeRunnable() {
-				@Override
 				public void run() throws Exception {
 					// reconstruct the active chain for this mwindow
 					local.activateBranch();
 				}
 
-				@Override
 				public void handleException(Throwable exception) {
 					WorkbenchSWTActivator.trace("/trace/workbench",
 							"failed correcting context chain", exception);
@@ -118,13 +115,11 @@ public class ShellActivationListener implements Listener {
 				parentContext);
 
 		SafeRunner.run(new ISafeRunnable() {
-			@Override
 			public void run() throws Exception {
 				// activate this shell
 				shellContext.activate();
 			}
 
-			@Override
 			public void handleException(Throwable exception) {
 				WorkbenchSWTActivator.trace("/trace/workbench",
 						"failed setting dialog child", exception);
@@ -176,7 +171,6 @@ public class ShellActivationListener implements Listener {
 		contextService.activateContext(EBindingService.DIALOG_CONTEXT_ID);
 
 		shell.addDisposeListener(new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				deactivate(shell);
 				context.dispose();

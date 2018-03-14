@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Christian Janz  - <christian.janz@gmail.com> Fix for Bug 385592
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, Bug 426535
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -57,6 +56,7 @@ import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
@@ -64,7 +64,7 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindowElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -1246,23 +1246,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			break;
 		case VIEW_CREATE:
 			partService.showPart(part, PartState.CREATE);
-
-			// Report the visibility of the created part
-			MStackElement sElement = part;
-			if (part.getCurSharedRef() != null)
-				sElement = part.getCurSharedRef();
-			MUIElement parentElement = sElement.getParent();
-			if (parentElement instanceof MPartStack) {
-				MPartStack partStack = (MPartStack) parentElement;
-				if (partStack.getSelectedElement() == sElement
-						&& !partStack.getTags().contains(IPresentationEngine.MINIMIZED)) {
-					firePartVisible(part);
-				} else {
-					firePartHidden(part);
-				}
-			} else {
-				firePartVisible(part); // Stand-alone part
-			}
 			break;
 		}
 		return part;
@@ -2725,7 +2708,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			IPerspectiveDescriptor desc = getWorkbenchWindow().getWorkbench()
 					.getPerspectiveRegistry().findPerspectiveWithId(id);
 			if (desc != null) {
-				MPerspective temporary = modelService.createModelElement(MPerspective.class);
+				MPerspective temporary = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 				ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
 						partService, temporary, desc, this, true);
 
@@ -2742,7 +2725,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		IPerspectiveDescriptor desc = getWorkbenchWindow().getWorkbench().getPerspectiveRegistry()
 				.findPerspectiveWithId(id);
 		if (desc != null) {
-			MPerspective temporary = modelService.createModelElement(MPerspective.class);
+			MPerspective temporary = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 			ModeledPageLayout modelLayout = new ModeledPageLayout(window, modelService,
 					partService, temporary, desc, this, true);
 
@@ -3315,7 +3298,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 
 		if (dummyPerspective == null) {
 			// instantiate a dummy perspective perspective
-			dummyPerspective = modelService.createModelElement(MPerspective.class);
+			dummyPerspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 			dummyPerspective.setElementId(persp.getElementId());
 
 			IPerspectiveFactory factory = ((PerspectiveDescriptor) desc).createFactory();
@@ -3374,15 +3357,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		List<String> tags = persp.getTags();
 		tags.clear();
 		tags.addAll(dummyPerspective.getTags());
-
-		// remove HIDDEN_BY_USER tags from toolbar
-		// need to reset all window / perspective relevant elements if
-		// HIDDEN_BY_USER
-		// get implemented by more renderer
-		List<MToolBar> toolBars = modelService.findElements(window, null, MToolBar.class, null);
-		for (MToolBar mToolBar : toolBars) {
-			mToolBar.getTags().remove("HIDDEN_BY_USER"); //$NON-NLS-1$
-		}
 
 		partService.requestActivation();
 
@@ -3905,7 +3879,7 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 		if (modelPerspective == null) {
 
 			// couldn't find the perspective, create a new one
-			modelPerspective = modelService.createModelElement(MPerspective.class);
+			modelPerspective = AdvancedFactoryImpl.eINSTANCE.createPerspective();
 
 			// tag it with the same id
 			modelPerspective.setElementId(perspective.getId());
@@ -3961,9 +3935,6 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 	 * @return the stack of perspectives of this page's containing window
 	 */
 	private MPerspectiveStack getPerspectiveStack() {
-		if (_perspectiveStack != null) {
-			return _perspectiveStack;
-		}
 		List<MPerspectiveStack> theStack = modelService.findElements(window, null,
 				MPerspectiveStack.class, null);
 		if (theStack.size() > 0) {
@@ -3978,15 +3949,13 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 			}
 		}
 
-		MPartSashContainer stickySash = modelService.createModelElement(MPartSashContainer.class);
+		MPartSashContainer stickySash = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 		stickySash.setHorizontal(true);
 
-		MPerspectiveStack perspectiveStack = modelService
-				.createModelElement(MPerspectiveStack.class);
-		perspectiveStack.setElementId(IWorkbenchConstants.PERSPECTIVE_STACK_ID);
+		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE.createPerspectiveStack();
 		perspectiveStack.setContainerData("7500"); //$NON-NLS-1$
 
-		MPartStack stickyFolder = modelService.createModelElement(MPartStack.class);
+		MPartStack stickyFolder = BasicFactoryImpl.eINSTANCE.createPartStack();
 		stickyFolder.setContainerData("2500"); //$NON-NLS-1$
 		stickyFolder.setElementId("stickyFolderRight"); //$NON-NLS-1$
 		stickyFolder.setToBeRendered(false);

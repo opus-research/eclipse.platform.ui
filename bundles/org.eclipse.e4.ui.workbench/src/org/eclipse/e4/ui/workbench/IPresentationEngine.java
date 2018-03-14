@@ -184,10 +184,8 @@ public interface IPresentationEngine {
 	 */
 	public static final String CUSTOM_RENDERER_KEY = "Custom Renderer"; //$NON-NLS-1$	
 
+	/* When added to an element's 'tags' it enables the DND support for the element */
 	/**
-	 * This is the tag name that enables the DND support for the element. The element's tags list
-	 * has to be updated with the tag in order to enable the DND processing.
-	 *
 	 * @since 1.1
 	 */
 	public static final String DRAGGABLE = "Draggable"; //$NON-NLS-1$

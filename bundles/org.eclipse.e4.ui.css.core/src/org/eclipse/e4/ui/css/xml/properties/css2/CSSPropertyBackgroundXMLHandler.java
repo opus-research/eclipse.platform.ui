@@ -36,35 +36,30 @@ AbstractCSSPropertyBackgroundHandler {
 		return false;
 	}
 
-	@Override
 	public String retrieveCSSPropertyBackgroundAttachment(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyBackgroundColor(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyBackgroundImage(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyBackgroundPosition(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public String retrieveCSSPropertyBackgroundRepeat(Object element,
 			String pseudo, CSSEngine engine) throws Exception {
 		// TODO Auto-generated method stub

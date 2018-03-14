@@ -54,7 +54,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.Condition#getConditionType()}.
 	 */
-	@Override
 	public short getConditionType() {
 		return SAC_ID_CONDITION;
 	}
@@ -63,7 +62,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getNamespaceURI()}.
 	 */
-	@Override
 	public String getNamespaceURI() {
 		return namespaceURI;
 	}
@@ -72,7 +70,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getLocalName()}.
 	 */
-	@Override
 	public String getLocalName() {
 		return localName;
 	}
@@ -81,7 +78,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	 * <b>SAC</b>: Implements {@link
 	 * org.w3c.css.sac.AttributeCondition#getSpecified()}.
 	 */
-	@Override
 	public boolean getSpecified() {
 		return true;
 	}
@@ -89,7 +85,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Tests whether this condition matches the given element.
 	 */
-	@Override
 	public boolean match(Element e, String pseudoE) {
 		String id = null;
 		if (e instanceof CSSStylableElement) {
@@ -105,7 +100,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Fills the given set with the attribute names found in this selector.
 	 */
-	@Override
 	public void fillAttributeSet(Set attrSet) {
 		attrSet.add(localName);
 	}
@@ -113,7 +107,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Returns the specificity of this condition.
 	 */
-	@Override
 	public int getSpecificity() {
 		return 1 << 16;
 	}
@@ -121,7 +114,6 @@ public class CSSIdConditionImpl extends AbstractAttributeCondition {
 	/**
 	 * Returns a text representation of this object.
 	 */
-	@Override
 	public String toString() {
 		return '#' + getValue();
 	}

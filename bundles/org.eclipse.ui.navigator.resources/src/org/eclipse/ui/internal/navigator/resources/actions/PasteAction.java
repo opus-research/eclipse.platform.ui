@@ -114,8 +114,7 @@ import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMess
     /**
      * Implementation of method defined on <code>IAction</code>.
      */
-    @Override
-	public void run() {
+    public void run() {
         // try a resource transfer
         ResourceTransfer resTransfer = ResourceTransfer.getInstance();
         IResource[] resourceData = (IResource[]) clipboard
@@ -176,16 +175,14 @@ import org.eclipse.ui.internal.navigator.resources.plugin.WorkbenchNavigatorMess
      * -Files and folders may be pasted to a single selected folder in open 
      * 	project or multiple selected files in the same folder 
      */
-    @Override
-	protected boolean updateSelection(IStructuredSelection selection) {
+    protected boolean updateSelection(IStructuredSelection selection) {
         if (!super.updateSelection(selection)) {
 			return false;
 		}
 
         final IResource[][] clipboardData = new IResource[1][];
         shell.getDisplay().syncExec(new Runnable() {
-            @Override
-			public void run() {
+            public void run() {
                 // clipboard must have resources or files
                 ResourceTransfer resTransfer = ResourceTransfer.getInstance();
                 clipboardData[0] = (IResource[]) clipboard

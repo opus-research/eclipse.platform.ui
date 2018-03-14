@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2012 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,13 @@ public class ContextContextService implements EContextService {
 				.getName());
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.services.EContextService#activateContext(java.lang.
+	 * String)
+	 */
 	public void activateContext(String id) {
 		if (deferUpdates) {
 			deferActivateContext(id);
@@ -73,7 +79,6 @@ public class ContextContextService implements EContextService {
 	 * 
 	 * @since 4.2.2
 	 */
-	@Override
 	public void deferUpdates(boolean defer) {
 		if(defer) {
 			cachingRef ++;
@@ -129,7 +134,13 @@ public class ContextContextService implements EContextService {
 		eclipseContext.set(LOCAL_CONTEXTS, locals.clone());
 	}
 	
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.services.EContextService#deactivateContext(java.lang
+	 * .String)
+	 */
 	public void deactivateContext(String id) {
 		if (deferUpdates) {
 			deferDeactivateContext(id);
@@ -156,7 +167,11 @@ public class ContextContextService implements EContextService {
 		locals.add(id);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.ui.services.EContextService#getActiveContextIds()
+	 */
 	public Collection<String> getActiveContextIds() {
 		Set<String> set = (Set<String>) eclipseContext
 				.get(IServiceConstants.ACTIVE_CONTEXTS);
@@ -166,7 +181,12 @@ public class ContextContextService implements EContextService {
 		return set;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.services.EContextService#getContext(java.lang.String)
+	 */
 	public Context getContext(String id) {
 		Context ctx = contextManager.getContext(id);
 		return ctx;
