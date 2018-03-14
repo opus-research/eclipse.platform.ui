@@ -17,9 +17,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import org.eclipse.e4.core.commands.ExpressionContext;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
@@ -28,6 +28,7 @@ import org.eclipse.e4.core.contexts.RunAndTrack;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.RenderedElementUtil;
+import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.MCoreExpression;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
@@ -76,6 +77,9 @@ public class MenuManagerRenderer
 	public static final String VISIBILITY_IDENTIFIER = "IIdentifier"; //$NON-NLS-1$
 	private static final String NO_LABEL = "UnLabled"; //$NON-NLS-1$
 	public static final String GROUP_MARKER = "org.eclipse.jface.action.GroupMarker.GroupMarker(String)"; //$NON-NLS-1$
+
+	@Inject
+	private MApplication application;
 
 	private EventHandler itemUpdater = new EventHandler() {
 		@Override
@@ -377,8 +381,7 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
-		Collection<ContributionRecord> vals = getModelContributionToRecord()
-				.values();
+		Collection<ContributionRecord> vals = getList(menuModel);
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
 		for (ContributionRecord record : vals
 				.toArray(new ContributionRecord[vals.size()])) {
@@ -396,18 +399,17 @@ MenuManagerEventHelper.getInstance()
 			}
 		}
 
-		Iterator<Entry<MMenuElement, ContributionRecord>> iterator = getModelContributionToRecord()
-				.entrySet().iterator();
+		Iterator<ContributionRecord> iterator = vals.iterator();
 		for (; iterator.hasNext();) {
-			Entry<MMenuElement, ContributionRecord> entry = iterator.next();
-			ContributionRecord record = entry.getValue();
-			if (disposedRecords.contains(record))
+			ContributionRecord record = iterator.next();
+			if (disposedRecords.contains(record)) {
 				iterator.remove();
+			}
 		}
 	}
 
 	public void cleanUpCopy(ContributionRecord record, MMenuElement copy) {
-		getModelContributionToRecord().remove(copy);
+		removeContributionRecord(copy);
 		if (copy instanceof MMenu) {
 			MMenu menuCopy = (MMenu) copy;
 			cleanUp(menuCopy);
@@ -794,17 +796,17 @@ MenuManagerEventHelper.getInstance()
 		return null;
 	}
 
-	public MMenu getMenuModel(MenuManager manager) {
-		return super.getModel(manager);
-	}
-
-	public MMenuElement getMenuElement(IContributionItem item) {
-		return super.getModelElement(item);
-	}
-
 	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
+	}
+
+	public MMenu getMenuModel(MenuManager manager) {
+		return getModel(manager);
+	}
+
+	public MMenuElement getMenuElement(IContributionItem item) {
+		return getModelElement(item);
 	}
 
 	/**
