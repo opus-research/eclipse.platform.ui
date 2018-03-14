@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,9 +23,7 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IContextFunction;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.contexts.RunAndTrack;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSRenderingUtils;
@@ -44,7 +42,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolControl;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
-import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.emf.ecore.EObject;
@@ -84,8 +81,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	private Map<MToolBarElement, ToolBarContributionRecord> modelContributionToRecord = new HashMap<MToolBarElement, ToolBarContributionRecord>();
 
 	private Map<MToolBarElement, ArrayList<ToolBarContributionRecord>> sharedElementToRecord = new HashMap<MToolBarElement, ArrayList<ToolBarContributionRecord>>();
-
-	private ToolItemUpdater enablementUpdater = new ToolItemUpdater();
 
 	// @Inject
 	// private Logger logger;
@@ -225,13 +220,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
-	@Inject
-	@Optional
-	void dirtyChanged(
-			@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
-		updateEnablement();
-	}
-
 	@PostConstruct
 	public void init() {
 		eventBroker.subscribe(UIEvents.UILabel.TOPIC_ALL, itemUpdater);
@@ -244,24 +232,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 		context.set(ToolBarManagerRenderer.class, this);
 
-		final String[] vars = {
-				"org.eclipse.ui.internal.services.EvaluationService.evaluate", //$NON-NLS-1$
-				IServiceConstants.ACTIVE_CONTEXTS,
-				IServiceConstants.ACTIVE_PART,
-				IServiceConstants.ACTIVE_SELECTION,
-				IServiceConstants.ACTIVE_SHELL };
-		RunAndTrack enablementUpdater = new RunAndTrack() {
-
-			@Override
-			public boolean changed(IEclipseContext context) {
-				for (String var : vars) {
-					context.get(var);
-				}
-				updateEnablement();
-				return true;
-			}
-		};
-		context.runAndTrack(enablementUpdater);
 	}
 
 	@PreDestroy
@@ -379,7 +349,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 						public void run() {
 							manager.update(false);
-							updateEnablement();
 						}
 					});
 					// disposeToolbarIfNecessary(toolbarModel);
@@ -642,7 +611,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
-		itemModel.setRenderer(this);
 		AbstractGroupMarker marker = null;
 		if (itemModel.isVisible()
 				&& !itemModel.getTags().contains(
@@ -670,7 +638,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
-		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		ToolControlContribution ci = ContextInjectionFactory.make(
 				ToolControlContribution.class, lclContext);
@@ -690,7 +657,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
-		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		DirectContributionItem ci = ContextInjectionFactory.make(
 				DirectContributionItem.class, lclContext);
@@ -710,7 +676,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
-		itemModel.setRenderer(this);
 		final IEclipseContext lclContext = getContext(itemModel);
 		HandledContributionItem ci = ContextInjectionFactory.make(
 				HandledContributionItem.class, lclContext);
@@ -726,7 +691,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		if (ici != null) {
 			return;
 		}
-		itemModel.setRenderer(this);
 		Object obj = itemModel.getOpaqueItem();
 		if (obj instanceof IContributionItem) {
 			ici = (IContributionItem) obj;
@@ -890,13 +854,5 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
-	}
-
-	ToolItemUpdater getUpdater() {
-		return enablementUpdater;
-	}
-
-	public void updateEnablement() {
-		enablementUpdater.updateContributionItems();
 	}
 }
