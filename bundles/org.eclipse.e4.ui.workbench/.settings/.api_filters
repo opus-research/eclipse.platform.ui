@@ -158,6 +158,15 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/eclipse/e4/ui/workbench/modeling/EModelService.java" type="org.eclipse.e4.ui.workbench.modeling.EModelService">
+        <filter id="388194388">
+            <message_arguments>
+                <message_argument value="org.eclipse.e4.ui.workbench.modeling.EModelService"/>
+                <message_argument value="ANYWHERE"/>
+                <message_argument value="29"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/eclipse/e4/ui/workbench/modeling/EObjModelHandler.java" type="org.eclipse.e4.ui.workbench.modeling.EObjModelHandler">
         <filter comment="Bug 411257 - .api_description files in Kepler release do not contain @noreference" id="338944126">
             <message_arguments>
