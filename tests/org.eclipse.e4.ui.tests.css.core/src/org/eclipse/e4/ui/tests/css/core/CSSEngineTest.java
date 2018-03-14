@@ -10,10 +10,6 @@
  *******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -22,24 +18,24 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.dom.IElementProvider;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.impl.engine.CSSEngineImpl;
 import org.eclipse.e4.ui.tests.css.core.util.TestElement;
-import org.junit.Test;
 import org.w3c.css.sac.SelectorList;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class CSSEngineTest {
+public class CSSEngineTest extends TestCase {
 	private static class TestCSSEngine extends CSSEngineImpl {
 		public void setWidgetProvider(Class clazz, IElementProvider provider) {
 			widgetsMap.put(clazz.getName(), provider);
 		}
 
-		@Override
 		public void reapply() {
 		}
 	}
@@ -49,47 +45,39 @@ public class CSSEngineTest {
 			super(object, engine);
 		}
 
-		@Override
 		public Node getParentNode() {
 			return null;
 		}
 
-		@Override
 		public NodeList getChildNodes() {
 			return null;
 		}
 
-		@Override
 		public String getNamespaceURI() {
 			return null;
 		}
 
-		@Override
 		public String getCSSId() {
 			return null;
 		}
 
-		@Override
 		public String getCSSClass() {
 			return null;
 		}
 
-		@Override
 		public String getCSSStyle() {
 			return null;
 		}
 
-		@Override
 		public String getLocalName() {
 			return null;
 		}
 
-		@Override
 		public String getAttribute(String arg0) {
 			return null;
 		}
 	}
-
+	
 	public static class CollectionElement extends BaseElement {
 		public CollectionElement(Collection control, CSSEngine engine) {
 			super(control, engine);
@@ -102,19 +90,16 @@ public class CSSEngineTest {
 		}
 	}
 
-	@Test
 	public void testBug363053() {
 		TestCSSEngine engine = new TestCSSEngine();
 		// must be class not interface
 		engine.setWidgetProvider(AbstractCollection.class,
 				new IElementProvider() {
-			@Override
 			public Element getElement(Object element, CSSEngine engine) {
 				return new CollectionElement((Collection) element, engine);
 			}
 		});
 		engine.setWidgetProvider(AbstractSet.class, new IElementProvider() {
-			@Override
 			public Element getElement(Object element, CSSEngine engine) {
 				return new SetElement((Set) element, engine);
 			}
@@ -130,12 +115,10 @@ public class CSSEngineTest {
 		assertTrue(element instanceof SetElement);
 	}
 
-	@Test
-	public void testSelectorMatch() throws IOException {
+	public void testSelectorMatch() throws Exception {
 		TestCSSEngine engine = new TestCSSEngine();
 		SelectorList list = engine.parseSelectors("Date");
 		engine.setElementProvider(new IElementProvider() {
-			@Override
 			public Element getElement(Object element, CSSEngine engine) {
 				return new TestElement(element.getClass().getSimpleName(),
 						engine);
