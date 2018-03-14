@@ -19,7 +19,10 @@ import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -81,32 +84,35 @@ public class SashLayout extends Layout {
 			}
 		});
 
-		host.addMouseMoveListener(e -> {
-			if (!draggingSashes) {
-				// Set the cursor feedback
-				List<SashRect> sashList = getSashRects(e.x, e.y);
-				if (sashList.size() == 0) {
-					host.setCursor(host.getDisplay().getSystemCursor(
-							SWT.CURSOR_ARROW));
-				} else if (sashList.size() == 1) {
-					if (sashList.get(0).container.isHorizontal())
+		host.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(final MouseEvent e) {
+				if (!draggingSashes) {
+					// Set the cursor feedback
+					List<SashRect> sashList = getSashRects(e.x, e.y);
+					if (sashList.size() == 0) {
 						host.setCursor(host.getDisplay().getSystemCursor(
-								SWT.CURSOR_SIZEWE));
-					else
+								SWT.CURSOR_ARROW));
+					} else if (sashList.size() == 1) {
+						if (sashList.get(0).container.isHorizontal())
+							host.setCursor(host.getDisplay().getSystemCursor(
+									SWT.CURSOR_SIZEWE));
+						else
+							host.setCursor(host.getDisplay().getSystemCursor(
+									SWT.CURSOR_SIZENS));
+					} else {
 						host.setCursor(host.getDisplay().getSystemCursor(
-								SWT.CURSOR_SIZENS));
+								SWT.CURSOR_SIZEALL));
+					}
 				} else {
-					host.setCursor(host.getDisplay().getSystemCursor(
-							SWT.CURSOR_SIZEALL));
-				}
-			} else {
-				try {
-					layoutUpdateInProgress = true;
-					adjustWeights(sashesToDrag, e.x, e.y);
-					host.layout();
-					host.update();
-				} finally {
-					layoutUpdateInProgress = false;
+					try {
+						layoutUpdateInProgress = true;
+						adjustWeights(sashesToDrag, e.x, e.y);
+						host.layout();
+						host.update();
+					} finally {
+						layoutUpdateInProgress = false;
+					}
 				}
 			}
 		});
@@ -136,17 +142,20 @@ public class SashLayout extends Layout {
 			}
 		});
 
-		host.addPaintListener(e -> {
-			// for (SashRect sr : sashes) {
-			// Color color;
-			// if (sr.container.isHorizontal())
-			// color = e.display.getSystemColor(SWT.COLOR_MAGENTA);
-			// else
-			// color = e.display.getSystemColor(SWT.COLOR_CYAN);
-			// e.gc.setForeground(color);
-			// e.gc.setBackground(color);
-			// e.gc.fillRectangle(sr.rect);
-			// }
+		host.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				// for (SashRect sr : sashes) {
+				// Color color;
+				// if (sr.container.isHorizontal())
+				// color = e.display.getSystemColor(SWT.COLOR_MAGENTA);
+				// else
+				// color = e.display.getSystemColor(SWT.COLOR_CYAN);
+				// e.gc.setForeground(color);
+				// e.gc.setBackground(color);
+				// e.gc.fillRectangle(sr.rect);
+				// }
+			}
 		});
 	}
 

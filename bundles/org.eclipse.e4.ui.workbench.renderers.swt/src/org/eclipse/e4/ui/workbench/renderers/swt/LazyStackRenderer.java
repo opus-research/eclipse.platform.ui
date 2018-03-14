@@ -33,6 +33,7 @@ import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 /**
@@ -46,27 +47,30 @@ import org.osgi.service.event.EventHandler;
  *
  */
 public abstract class LazyStackRenderer extends SWTPartRenderer {
-	private EventHandler lazyLoader = event -> {
-		Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
+	private EventHandler lazyLoader = new EventHandler() {
+		@Override
+		public void handleEvent(Event event) {
+			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 
-		if (!(element instanceof MGenericStack<?>))
-			return;
+			if (!(element instanceof MGenericStack<?>))
+				return;
 
-		@SuppressWarnings("unchecked")
-		MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
-		if (stack.getRenderer() != LazyStackRenderer.this)
-			return;
-		LazyStackRenderer lsr = (LazyStackRenderer) stack.getRenderer();
+			@SuppressWarnings("unchecked")
+			MGenericStack<MUIElement> stack = (MGenericStack<MUIElement>) element;
+			if (stack.getRenderer() != LazyStackRenderer.this)
+				return;
+			LazyStackRenderer lsr = (LazyStackRenderer) stack.getRenderer();
 
-		// Gather up the elements that are being 'hidden' by this change
-		MUIElement oldSel = (MUIElement) event
-				.getProperty(UIEvents.EventTags.OLD_VALUE);
-		if (oldSel != null) {
-			hideElementRecursive(oldSel);
+			// Gather up the elements that are being 'hidden' by this change
+			MUIElement oldSel = (MUIElement) event
+					.getProperty(UIEvents.EventTags.OLD_VALUE);
+			if (oldSel != null) {
+				hideElementRecursive(oldSel);
+			}
+
+			if (stack.getSelectedElement() != null)
+				lsr.showTab(stack.getSelectedElement());
 		}
-
-		if (stack.getSelectedElement() != null)
-			lsr.showTab(stack.getSelectedElement());
 	};
 
 	public void init(IEventBroker eventBroker) {

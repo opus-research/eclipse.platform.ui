@@ -93,7 +93,12 @@ public class HandledContributionItem extends AbstractContributionItem {
 
 	private Runnable unreferenceRunnable;
 
-	private IStateListener stateListener = (state, oldValue) -> updateState();
+	private IStateListener stateListener = new IStateListener() {
+		@Override
+		public void handleStateChange(State state, Object oldValue) {
+			updateState();
+		}
+	};
 
 	private IEclipseContext infoContext;
 
