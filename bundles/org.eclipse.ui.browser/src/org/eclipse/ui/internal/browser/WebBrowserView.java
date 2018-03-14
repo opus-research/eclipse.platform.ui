@@ -43,7 +43,6 @@ public class WebBrowserView extends ViewPart implements
 
 	protected ISelectionListener listener;
 
-	@Override
 	public void createPartControl(Composite parent) {
 		int style = WebBrowserUtil.decodeStyle(getViewSite().getSecondaryId());
 		viewer = new BrowserViewer(parent, style);
@@ -60,7 +59,6 @@ public class WebBrowserView extends ViewPart implements
 		initDragAndDrop();
 	}
 
-	@Override
 	public void dispose() {
 		if (viewer!=null)
 			viewer.setContainer(null);
@@ -73,12 +71,10 @@ public class WebBrowserView extends ViewPart implements
 			viewer.setURL(url);
 	}
 
-	@Override
 	public void setFocus() {
 		viewer.setFocus();
 	}
 
-	@Override
 	public boolean close() {
 		try {
 			getSite().getPage().hideView(this);
@@ -88,12 +84,10 @@ public class WebBrowserView extends ViewPart implements
 		}
 	}
 
-	@Override
 	public IActionBars getActionBars() {
 		return getViewSite().getActionBars();
 	}
 
-	@Override
 	public void openInExternalBrowser(String url) {
 		try {
 			URL theURL = new URL(url);
@@ -112,7 +106,6 @@ public class WebBrowserView extends ViewPart implements
 			return;
 
 		listener = new ISelectionListener() {
-			@Override
 			public void selectionChanged(IWorkbenchPart part,
 					ISelection selection) {
 				onSelectionChange(selection);
@@ -184,7 +177,6 @@ public class WebBrowserView extends ViewPart implements
 		dropTarget.addDropListener(new WebBrowserViewDropAdapter(viewer));
 	}
 
-	@Override
 	public void selectReveal(ISelection selection) {
 		onSelectionChange(selection);
 	}
