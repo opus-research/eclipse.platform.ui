@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Erik Chou <ekchou@ymail.com> - Bug 425962
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 445664
  *******************************************************************************/
 
 package org.eclipse.ui.internal.dialogs;
@@ -42,6 +41,7 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -139,6 +139,7 @@ public class ViewsPreferencePage extends PreferencePage implements
 				} else {
 					themeComboDecorator.hide();
 				}
+				engine.setTheme(selection, false);
 				try {
 					((PreferencePageEnhancer) Tweaklets.get(PreferencePageEnhancer.KEY))
 							.setSelection(selection);
