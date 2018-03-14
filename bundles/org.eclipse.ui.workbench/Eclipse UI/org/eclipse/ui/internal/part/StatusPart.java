@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
@@ -48,8 +49,10 @@ public class StatusPart {
     private Composite detailsArea;
     private Control details = null;
 	private IStatus reason;
+	private IWorkbenchSite site;
 
-    public StatusPart(final Composite parent, IStatus reason_) {
+	public StatusPart(IWorkbenchSite site, final Composite parent, IStatus reason_) {
+		this.site = site;
     	Color bgColor= parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
 		Color fgColor= parent.getDisplay().getSystemColor(SWT.COLOR_LIST_FOREGROUND);
 
@@ -197,7 +200,7 @@ public class StatusPart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
+					site.getWorkbenchWindow().getActivePage().showView(LOG_VIEW_ID);
 				} catch (CoreException ce) {
 					StatusManager.getManager().handle(ce, WorkbenchPlugin.PI_WORKBENCH);
 				}

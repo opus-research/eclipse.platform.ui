@@ -55,7 +55,7 @@ public class ErrorEditorPart extends EditorPart {
 	public void createPartControl(Composite parent) {
 		this.parentControl = parent;
 		if (error != null) {
-			new StatusPart(parent, error);
+			new StatusPart(getSite(), parent, error);
 		}
 	}
 
