@@ -23,7 +23,6 @@ import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
-import org.eclipse.e4.ui.model.application.commands.MKeyBinding;
 import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MSnippetContainer;
@@ -161,7 +160,7 @@ public class ModelServiceImpl implements EModelService {
 					children.addAll(app.getCommands());
 				} else if (clazz.equals(MBindingContext.class)) {
 					children.addAll(app.getBindingContexts());
-				} else if (clazz.equals(MBindingTable.class) || clazz.equals(MKeyBinding.class)) {
+				} else if (clazz.equals(MBindingTable.class)) {
 					children.addAll(app.getBindingTables());
 				}
 				// } else { only look for these if specifically asked.
@@ -179,13 +178,6 @@ public class ModelServiceImpl implements EModelService {
 		if (searchRoot instanceof MBindingContext && (searchFlags == ANYWHERE)) {
 			MBindingContext bindingContext = (MBindingContext) searchRoot;
 			for (MBindingContext child : bindingContext.getChildren()) {
-				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
-			}
-		}
-
-		if (searchRoot instanceof MBindingTable) {
-			MBindingTable bindingTable = (MBindingTable) searchRoot;
-			for (MKeyBinding child : bindingTable.getBindings()) {
 				findElementsRecursive(child, clazz, matcher, elements, searchFlags);
 			}
 		}
