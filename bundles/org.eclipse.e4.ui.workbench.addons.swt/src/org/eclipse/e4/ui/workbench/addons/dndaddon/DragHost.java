@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 483842
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.addons.dndaddon;
 
@@ -16,7 +17,6 @@ import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MBasicFactory;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
@@ -108,7 +108,7 @@ class DragHost {
 		// add the window as a child of the base window
 		baseWindow.getWindows().add(dragWindow);
 
-		getShell().layout(getShell().getChildren(), SWT.CHANGED | SWT.DEFER);
+		getShell().requestLayout();
 		getShell().setVisible(true);
 	}
 
@@ -128,8 +128,7 @@ class DragHost {
 			ToolItem ti = (ToolItem) dragElement.getWidget();
 			ToolBar tb = ti.getParent();
 			tb.layout(true);
-			tb.getParent()
-					.layout(new Control[] { tb }, SWT.CHANGED | SWT.DEFER);
+			tb.requestLayout();
 		}
 
 		baseWindow.getChildren().remove(dragWindow);
