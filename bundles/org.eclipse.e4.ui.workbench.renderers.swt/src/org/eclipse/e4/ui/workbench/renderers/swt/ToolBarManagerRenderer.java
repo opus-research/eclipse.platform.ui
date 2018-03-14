@@ -12,7 +12,6 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990, Bug 400217
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -387,10 +386,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		Control renderedCtrl = newTB;
 		MUIElement parentElement = element.getParent();
 		if (parentElement instanceof MTrimBar) {
-			boolean draggable = !element.getTags().contains(IPresentationEngine.NO_MOVE);
-			if(draggable){
-				element.getTags().add(IPresentationEngine.DRAGGABLE);
-			}
+			element.getTags().add(IPresentationEngine.DRAGGABLE);
 
 			setCSSInfo(element, newTB);
 
@@ -400,7 +396,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IEclipseContext parentContext = getContextForParent(element);
 			CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
 			if (cssUtils != null) {
-				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, draggable);
+				renderedCtrl = cssUtils.frameMeIfPossible(newTB, null, vertical, true);
 			}
 		}
 
