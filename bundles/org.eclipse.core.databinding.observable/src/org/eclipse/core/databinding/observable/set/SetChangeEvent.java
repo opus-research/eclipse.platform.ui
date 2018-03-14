@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  ******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
@@ -38,7 +37,7 @@ public class SetChangeEvent<E> extends ObservableEvent {
 	 * Description of the change to the source observable set. Listeners must
 	 * not change this field.
 	 */
-	public SetDiff<E> diff;
+	public SetDiff<? extends E> diff;
 
 	/**
 	 * Creates a new set change event.
@@ -48,7 +47,7 @@ public class SetChangeEvent<E> extends ObservableEvent {
 	 * @param diff
 	 *            the set change
 	 */
-	public SetChangeEvent(IObservableSet<E> source, SetDiff<E> diff) {
+	public SetChangeEvent(IObservableSet<E> source, SetDiff<? extends E> diff) {
 		super(source);
 		this.diff = diff;
 	}

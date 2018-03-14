@@ -9,13 +9,11 @@
  *     Matthew Hall - initial API and implementation (bug 237718)
  *     Matthew Hall - bug 246626
  *     Stefan Xenos <sxenos@gmail.com> - Bug 335792
- *     Stefan Xenos <sxenos@gmail.com> - Bug 474065
  *******************************************************************************/
 
 package org.eclipse.core.databinding.observable.set;
 
 import org.eclipse.core.databinding.observable.DecoratingObservableCollection;
-import org.eclipse.core.databinding.observable.Diffs;
 
 /**
  * An observable set which decorates another observable set.
@@ -64,7 +62,7 @@ public class DecoratingObservableSet<E> extends
 		removeListener(SetChangeEvent.TYPE, listener);
 	}
 
-	protected void fireSetChange(SetDiff<E> diff) {
+	protected void fireSetChange(SetDiff<? extends E> diff) {
 		// fire general change event first
 		super.fireChange();
 		fireEvent(new SetChangeEvent<>(this, diff));
@@ -109,7 +107,7 @@ public class DecoratingObservableSet<E> extends
 	 *            the change event received from the decorated observable
 	 */
 	protected void handleSetChange(final SetChangeEvent<? extends E> event) {
-		fireSetChange(Diffs.unmodifiableDiff(event.diff));
+		fireSetChange(event.diff);
 	}
 
 	@Override

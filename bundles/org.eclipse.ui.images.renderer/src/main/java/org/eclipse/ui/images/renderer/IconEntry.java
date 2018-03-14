@@ -53,7 +53,6 @@ class IconEntry implements Comparable<IconEntry> {
         this.disabledPath = disabledPath;
     }
 
-	@Override
 	public int compareTo(IconEntry o) {
 		return nameBase.compareTo(o.nameBase);
 	}

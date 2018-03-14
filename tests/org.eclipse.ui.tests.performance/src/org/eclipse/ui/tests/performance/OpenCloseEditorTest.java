@@ -30,7 +30,6 @@ public class OpenCloseEditorTest extends BasicPerformanceTest {
 		this.extension = extension;
 	}
 
-	@Override
 	protected void runTest() throws Throwable {
 		final IFile file = getProject().getFile("1." + extension);
 		assertTrue(file.exists());
@@ -39,8 +38,7 @@ public class OpenCloseEditorTest extends BasicPerformanceTest {
 		final IWorkbenchPage activePage = window.getActivePage();
 
         exercise(new TestRunnable() {
-            @Override
-			public void run() throws Exception {
+            public void run() throws Exception {
                 startMeasuring();
                 for (int j = 0; j < 10; j++) {
                     IEditorPart part = IDE.openEditor(activePage, file, true);
