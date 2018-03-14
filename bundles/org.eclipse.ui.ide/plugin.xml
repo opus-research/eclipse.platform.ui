@@ -1054,11 +1054,6 @@
             sequence="M2+M3+W"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
       <key
-            commandId="org.eclipse.ui.ide.showInSystemExplorer"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+M3+E"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
-      <key
             platform="carbon"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M2+M3+W"
@@ -1676,11 +1671,17 @@
          point="org.eclipse.ui.menus">
          <menuContribution
             locationURI="menu:window?after=org.eclipse.ui.editors">
-         <command
-               commandId="org.eclipse.ui.ToggleCoolbarAction"
-               tooltip="%menu.toggleCoolbar.tooltip"
-               style="push">
-         </command>
+         <menu
+               id="org.eclipse.ui.appearance"
+               label="%menu.window.appearance.label"
+               mnemonic="%menu.window.appearance.mnemonic"
+               tooltip="%menu.window.appearance.tooltip">
+            <command
+                  commandId="org.eclipse.ui.ToggleCoolbarAction"
+                  style="push"
+                  tooltip="%menu.toggleCoolbar.tooltip">
+            </command>
+         </menu>
       </menuContribution>
 
 
@@ -2254,12 +2255,9 @@
             class="org.eclipse.ui.internal.ide.handlers.ShowInSystemExplorerHandler"
             commandId="org.eclipse.ui.ide.showInSystemExplorer">
          <enabledWhen>
-            <or>
-	            <reference
-	                  definitionId="org.eclipse.ui.ide.showInDefinition">
-	            </reference>
-	            <adapt type="org.eclipse.core.resources.IResource"/>
-	        </or>
+            <reference
+                  definitionId="org.eclipse.ui.ide.showInDefinition">
+            </reference>
          </enabledWhen>
       </handler>
    </extension>
