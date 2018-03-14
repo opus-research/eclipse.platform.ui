@@ -150,20 +150,13 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 				if (applicationContext.getActiveChild() == context) {
 					application.getContext().set(ISources.ACTIVE_CURRENT_SELECTION_NAME, selection);
 				}
-			}
-		}
-	}
-
-	public void notifyListeners(IWorkbenchPart activePart) {
-		if (activePart != null) {
-			ISelectionProvider selectionProvider = activePart.getSite().getSelectionProvider();
-			if (selectionProvider != null) {
-				ISelection selection = selectionProvider.getSelection();
 
 				notifyListeners(activePart, selection, listeners);
-				notifyListeners(activePart, selection, activePart.getSite().getId(), targetedListeners);
+				notifyListeners(activePart, selection, activePart.getSite().getId(),
+						targetedListeners);
 				notifyListeners(activePart, selection, postSelectionListeners);
-				notifyListeners(activePart, selection, activePart.getSite().getId(), targetedPostSelectionListeners);
+				notifyListeners(activePart, selection, activePart.getSite().getId(),
+						targetedPostSelectionListeners);
 			}
 		}
 	}

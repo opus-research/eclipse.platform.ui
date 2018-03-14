@@ -40,7 +40,6 @@ public class CustomizationTab extends Composite {
 
 	private ICheckStateListener checkListener = new ICheckStateListener() {
 
-		@Override
 		public void checkStateChanged(CheckStateChangedEvent event) {
 			if(event.getChecked())
 				checkedItems.add(event.getElement());
@@ -84,7 +83,9 @@ public class CustomizationTab extends Composite {
 
 	} 
 	
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
 	public void dispose() { 
 		tableViewer.removeCheckStateListener(checkListener);
 		super.dispose();

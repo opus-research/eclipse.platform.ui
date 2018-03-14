@@ -12,7 +12,7 @@ package org.eclipse.ui.internal;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.ISafeRunnable;
-import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
@@ -92,6 +92,9 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
         overrideActionId = actionElement.getAttribute(ATT_OVERRIDE_ACTION_ID);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PluginAction.
+     */
     @Override
 	protected void initDelegate() {
         super.initDelegate();
@@ -111,7 +114,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 					// Do nothing.
 				}
 			};
-			SafeRunner.run(runnable);
+			Platform.run(runnable);
 		}
 	}
 
@@ -150,7 +153,7 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
 					// Do nothing.
 				}
 			};
-			SafeRunner.run(runnable);
+			Platform.run(runnable);
 		}
 	}
 
@@ -164,6 +167,9 @@ public class ObjectPluginAction extends PluginAction implements IPartListener2 {
         return overrideActionId;
     }
     
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.PluginAction#dispose()
+     */
     @Override
 	public void dispose() {
     	if (activePart!=null) {

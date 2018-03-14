@@ -21,7 +21,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.conformance.ObservableDelegateTest;
 import org.eclipse.jface.databinding.conformance.delegate.AbstractObservableValueContractDelegate;
 import org.eclipse.jface.databinding.conformance.swt.SWTMutableObservableValueContractTest;
-import org.eclipse.jface.databinding.swt.DisplayRealm;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -44,7 +44,6 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 		super(testName, new Delegate());
 	}
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -53,10 +52,9 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 		label = delegate.label;
 	}
 
-	@Override
 	protected IObservable doCreateObservable() {
 		return getObservableContractDelegate().createObservable(
-				DisplayRealm.getRealm(Display.getDefault()));
+				SWTObservables.getRealm(Display.getDefault()));
 	}
 
 	public void testSetValue() throws Exception {
@@ -85,34 +83,28 @@ public class LabelObservableValueTest extends ObservableDelegateTest {
 
 		Label label;
 
-		@Override
 		public void setUp() {
 			shell = new Shell();
 			label = new Label(shell, SWT.NONE);
 		}
 
-		@Override
 		public void tearDown() {
 			shell.dispose();
 		}
 
-		@Override
 		public IObservableValue createObservableValue(Realm realm) {
 			return WidgetProperties.text().observe(realm, label);
 		}
 
-		@Override
 		public void change(IObservable observable) {
 			IObservableValue value = (IObservableValue) observable;
 			value.setValue(value.getValue() + "a");
 		}
 
-		@Override
 		public Object getValueType(IObservableValue observable) {
 			return String.class;
 		}
 
-		@Override
 		public Object createValue(IObservableValue observable) {
 			return observable.getValue() + "a";
 		}

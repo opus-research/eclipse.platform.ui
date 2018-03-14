@@ -58,6 +58,11 @@ public class GlobalizationPreferencePage extends PreferencePage implements IWork
 	private static final String AUTO_DIR = WorkbenchMessages.GlobalizationPreference_autoDirection;
 	private static final String RTL_DIR = WorkbenchMessages.GlobalizationPreference_rtlDirection;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.PreferencePage
+	 */
 	@Override
 	protected Control createContents(Composite parent) {
 		PlatformUI.getWorkbench().getHelpSystem()

@@ -708,7 +708,7 @@ public class BindingPersistence extends PreferencePersistence {
 
 		logWarnings(
 				warningsToLog,
-				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' and 'org.eclipse.ui.bindings' extension point"); //$NON-NLS-1$
+				"Warnings while parsing the key bindings from the 'org.eclipse.ui.commands' extension point"); //$NON-NLS-1$
 	}
 	
 	private static List applyModifiers(KeySequence keySequence, String keySequenceText,

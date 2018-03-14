@@ -39,13 +39,11 @@ public class BeanObservableSetDecorator extends DecoratingObservableSet
 		this.propertyDescriptor = propertyDescriptor;
 	}
 
-	@Override
 	public synchronized void dispose() {
 		this.propertyDescriptor = null;
 		super.dispose();
 	}
 
-	@Override
 	public Object getObserved() {
 		IObservable decorated = getDecorated();
 		if (decorated instanceof IObserving)
@@ -53,7 +51,6 @@ public class BeanObservableSetDecorator extends DecoratingObservableSet
 		return null;
 	}
 
-	@Override
 	public PropertyDescriptor getPropertyDescriptor() {
 		return propertyDescriptor;
 	}

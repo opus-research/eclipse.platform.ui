@@ -106,6 +106,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 		return super.format(key);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyDelimiter()
+	 */
 	@Override
 	protected String getKeyDelimiter() {
 		// We must do the look up every time, as our locale might change.
@@ -118,6 +123,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeyStroke.KEY_DELIMITER);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#getKeyStrokeDelimiter()
+	 */
 	@Override
 	protected String getKeyStrokeDelimiter() {
 		// We must do the look up every time, as our locale might change.
@@ -131,6 +141,11 @@ public final class NativeKeyFormatter extends AbstractKeyFormatter {
 				KeySequence.KEY_STROKE_DELIMITER);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.bindings.keys.AbstractKeyFormatter#sortModifierKeys(int)
+	 */
 	@Override
 	protected int[] sortModifierKeys(final int modifierKeys) {
 		final IKeyLookup lookup = KeyLookupFactory.getDefault();
