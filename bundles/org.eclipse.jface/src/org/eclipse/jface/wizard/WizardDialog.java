@@ -1376,10 +1376,13 @@ public class WizardDialog extends TitleAreaDialog implements IWizardContainer2,
 		boolean canFlipToNextPage = false;
 		boolean canFinish = wizard.canFinish();
 		if (backButton != null) {
-			backButton.setEnabled(currentPage.getPreviousPage() != null);
+			boolean test = currentPage == null ? false : currentPage
+					.getPreviousPage() != null;
+			backButton.setEnabled(test);
 		}
 		if (nextButton != null) {
-			canFlipToNextPage = currentPage.canFlipToNextPage();
+			canFlipToNextPage = currentPage == null ? false : currentPage
+					.canFlipToNextPage();
 			nextButton.setEnabled(canFlipToNextPage);
 		}
 		finishButton.setEnabled(canFinish);
