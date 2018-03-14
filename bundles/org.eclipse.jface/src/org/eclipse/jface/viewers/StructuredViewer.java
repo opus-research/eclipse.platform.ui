@@ -26,7 +26,6 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.TableTreeItem;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTarget;
@@ -270,39 +269,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			clear();
 		}
 
-		@Override
-		public void applyFontsAndColors(TableTreeItem control) {
-
-			if(colorProvider == null){
-				if(usedDecorators){
-					//If there is no provider only apply set values
-					if(background != null) {
-						control.setBackground(background);
-					}
-
-					if(foreground != null) {
-						control.setForeground(foreground);
-					}
-				}
-			}
-			else{
-				//Always set the value if there is a provider
-				control.setBackground(background);
-				control.setForeground(foreground);
-			}
-
-			if(fontProvider == null){
-				if(usedDecorators && font != null) {
-					control.setFont(font);
-				}
-			} else {
-				control.setFont(font);
-			}
-
-			clear();
-		}
-
-
 	}
 
 	/**
@@ -386,29 +352,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		 * @param control
 		 */
 		public void applyFontsAndColors(TreeItem control) {
-			if(usedDecorators){
-				//If there is no provider only apply set values
-				if(background != null) {
-					control.setBackground(background);
-				}
-
-				if(foreground != null) {
-					control.setForeground(foreground);
-				}
-
-				if(font != null) {
-					control.setFont(font);
-				}
-			}
-			clear();
-		}
-
-		/**
-		 * Apply the fonts and colors to the control if
-		 * required.
-		 * @param control
-		 */
-		public void applyFontsAndColors(TableTreeItem control) {
 			if(usedDecorators){
 				//If there is no provider only apply set values
 				if(background != null) {
