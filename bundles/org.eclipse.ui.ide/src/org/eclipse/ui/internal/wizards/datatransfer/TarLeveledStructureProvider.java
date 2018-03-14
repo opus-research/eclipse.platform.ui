@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Red Hat, Inc - Was TarFileStructureProvider, performed changes from
  *     IImportStructureProvider to ILeveledImportStructureProvider
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.wizards.datatransfer;
 
@@ -104,6 +103,9 @@ public class TarLeveledStructureProvider implements
 		childList.add(entry);
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public List getChildren(Object element) {
 		if (children == null) {
@@ -113,6 +115,9 @@ public class TarLeveledStructureProvider implements
 		return ((List) children.get(element));
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public InputStream getContents(Object element) {
 		try {
@@ -140,11 +145,17 @@ public class TarLeveledStructureProvider implements
 		return attributes;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public String getFullPath(Object element) {
 		return stripPath(((TarEntry) element).getName());
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public String getLabel(Object element) {
 		if (element.equals(root)) {
@@ -173,6 +184,10 @@ public class TarLeveledStructureProvider implements
 		return tarFile;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.internal.wizards.datatransfer.ILeveledImportStructureProvider#closeArchive()
+	 */
 	@Override
 	public boolean closeArchive(){
 		try {
@@ -213,6 +228,9 @@ public class TarLeveledStructureProvider implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IImportStructureProvider
+	 */
 	@Override
 	public boolean isFolder(Object element) {
 		return (((TarEntry) element).getFileType() == TarEntry.DIRECTORY);
@@ -222,7 +240,7 @@ public class TarLeveledStructureProvider implements
 	 * Strip the leading directories from the path
 	 */
 	private String stripPath(String path) {
-		String pathOrig = path;
+		String pathOrig = new String(path);
 		for (int i = 0; i < stripLevel; i++) {
 			int firstSep = path.indexOf('/');
 			// If the first character was a seperator we must strip to the next

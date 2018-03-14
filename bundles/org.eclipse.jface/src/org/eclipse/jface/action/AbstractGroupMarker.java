@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Robert Roth <robert.roth.off@gmail.com> - bug 33184
  *******************************************************************************/
 package org.eclipse.jface.action;
 
@@ -49,21 +48,11 @@ public abstract class AbstractGroupMarker extends ContributionItem {
     }
 
     /**
-     * Always return <code>false</code> as group markers (including separators)
-     * are only there for visual separation, not meant to be actionable.
+     * The <code>AbstractGroupMarker</code> implementation of this <code>IContributionItem</code>
+     * method returns <code>true</code> iff the id is not <code>null</code>. Subclasses may override.
      */
     @Override
-    public boolean isEnabled() {
-        return false;
-    }
-
-    /**
-     * The <code>AbstractGroupMarker</code> implementation of this
-     * <code>IContributionItem</code> method returns <code>true</code> iff the
-     * id is not <code>null</code>. Subclasses may override.
-     */
-    @Override
-    public boolean isGroupMarker() {
+	public boolean isGroupMarker() {
         return getId() != null;
     }
 }

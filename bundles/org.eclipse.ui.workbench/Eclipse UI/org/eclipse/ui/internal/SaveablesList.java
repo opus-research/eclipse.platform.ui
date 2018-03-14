@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2016 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,6 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 490700
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -26,7 +25,7 @@ import org.eclipse.core.runtime.AssertionFailedException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
@@ -134,9 +133,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Integer refCount = referenceMap.get(key);
 		if (refCount == null) {
 			result = true;
-			refCount = Integer.valueOf(0);
+			refCount = new Integer(0);
 		}
-		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
+		referenceMap.put(key, new Integer(refCount.intValue() + 1));
 		return result;
 	}
 
@@ -156,7 +155,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 			referenceMap.remove(key);
 			result = true;
 		} else {
-			referenceMap.put(key, Integer.valueOf(refCount.intValue() - 1));
+			referenceMap.put(key, new Integer(refCount.intValue() - 1));
 		}
 		return result;
 	}
@@ -456,9 +455,8 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param modelsDecrementing
 	 */
 	private void fillModelsClosing(Set<Saveable> modelsClosing, Map<Saveable, Integer> modelsDecrementing) {
-		for (Entry<Saveable, Integer> entry : modelsDecrementing.entrySet()) {
-			Saveable model = entry.getKey();
-			if (entry.getValue().equals(modelRefCounts.get(model))) {
+		for (Saveable model : modelsDecrementing.keySet()) {
+			if (modelsDecrementing.get(model).equals(modelRefCounts.get(model))) {
 				modelsClosing.add(model);
 			}
 		}
@@ -532,7 +530,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 									model.getName());
 					dialog = new MessageDialog(shellProvider.getShell(),
 							WorkbenchMessages.Save_Resource, null, message,
-							MessageDialog.QUESTION, 0, buttons) {
+							MessageDialog.QUESTION, buttons, 0) {
 						@Override
 						protected int getShellStyle() {
 							return (canCancel ? SWT.CLOSE : SWT.NONE)
@@ -654,19 +652,19 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		IRunnableWithProgress progressOp = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) {
-				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(monitor);
-				SubMonitor subMonitor = SubMonitor.convert(monitorWrap, WorkbenchMessages.Saving_Modifications,
-						finalModels.size());
+				IProgressMonitor monitorWrap = new EventLoopProgressMonitor(
+						monitor);
+				monitorWrap.beginTask(WorkbenchMessages.Saving_Modifications, finalModels.size());
 				for (Saveable model : finalModels) {
 					// handle case where this model got saved as a result of
 					// saving another
 					if (!model.isDirty()) {
-						subMonitor.worked(1);
+						monitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, subMonitor.split(1),
+					SaveableHelper.doSaveModel(model, new SubProgressMonitor(monitorWrap, 1),
 							shellProvider, blockUntilSaved);
-					if (subMonitor.isCanceled())
+					if (monitorWrap.isCanceled())
 						break;
 				}
 				monitorWrap.done();

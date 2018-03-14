@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,8 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440149, 472654
- *     Patrik Suzzi <psuzzi@gmail.com> - Bug 496319
+ *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440149
  *******************************************************************************/
 package org.eclipse.ui.internal.dialogs;
 
@@ -47,13 +46,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.contexts.IContextActivation;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
 import org.eclipse.ui.internal.ProductProperties;
 import org.eclipse.ui.internal.WorkbenchMessages;
@@ -73,25 +69,19 @@ public class AboutDialog extends TrayDialog {
 
     private final static int DETAILS_ID = IDialogConstants.CLIENT_ID + 1;
 
-	/** Id for the context associated to this dialog */
-	private static final String ID_CONTEXT = "org.eclipse.ui.contexts.aboutDialog"; //$NON-NLS-1$
-
     private String productName;
 
     private IProduct product;
 
     private AboutBundleGroupData[] bundleGroupInfos;
 
-    private ArrayList<Image> images = new ArrayList<>();
+    private ArrayList<Image> images = new ArrayList<Image>();
 
     private AboutFeaturesButtonManager buttonManager = new AboutFeaturesButtonManager();
 
     private StyledText text;
 
     private AboutTextManager aboutTextManager;
-
-	// represents the activated context
-	private IContextActivation contextActivation;
 
     /**
      * Create an instance of the AboutDialog for the given window.
@@ -110,7 +100,7 @@ public class AboutDialog extends TrayDialog {
 
         // create a descriptive object for each BundleGroup
         IBundleGroupProvider[] providers = Platform.getBundleGroupProviders();
-		LinkedList<AboutBundleGroupData> groups = new LinkedList<>();
+		LinkedList<AboutBundleGroupData> groups = new LinkedList<AboutBundleGroupData>();
         if (providers != null) {
 			for (IBundleGroupProvider provider : providers) {
                 IBundleGroup[] bundleGroups = provider.getBundleGroups();
@@ -143,15 +133,16 @@ public class AboutDialog extends TrayDialog {
         }
     }
 
-	@Override
+    @Override
 	public boolean close() {
-		// dispose all images
-		for (int i = 0; i < images.size(); ++i) {
-			Image image = images.get(i);
-			image.dispose();
-		}
-		return super.close();
-	}
+        // dispose all images
+        for (int i = 0; i < images.size(); ++i) {
+            Image image = images.get(i);
+            image.dispose();
+        }
+
+        return super.close();
+    }
 
     @Override
 	protected void configureShell(Shell newShell) {
@@ -159,26 +150,6 @@ public class AboutDialog extends TrayDialog {
         newShell.setText(NLS.bind(WorkbenchMessages.AboutDialog_shellTitle,productName ));
         PlatformUI.getWorkbench().getHelpSystem().setHelp(newShell,
 				IWorkbenchHelpContextIds.ABOUT_DIALOG);
-
-		final IContextService contextService = PlatformUI.getWorkbench().getService(IContextService.class);
-		// Listens to activate/deactivate events, setting context id accordingly
-		final Listener listener = e -> {
-			if (SWT.Activate == e.type) {
-				// activate context
-				contextActivation = contextService.activateContext(ID_CONTEXT);
-			} else if (SWT.Deactivate == e.type) {
-				// deactivate context
-				contextService.deactivateContext(contextActivation);
-			}
-		};
-		newShell.addListener(SWT.Activate, listener);
-		newShell.addListener(SWT.Deactivate, listener);
-		newShell.addListener(SWT.Dispose, e -> {
-			// deactivate context and remove listeners
-			contextService.deactivateContext(contextActivation);
-			newShell.removeListener(SWT.Activate, listener);
-			newShell.removeListener(SWT.Deactivate, listener);
-		});
     }
 
     /**

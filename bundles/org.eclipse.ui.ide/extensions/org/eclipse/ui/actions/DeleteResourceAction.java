@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Benjamin Muskalla <b.muskalla@gmx.net> - Bug 172574
+ *     Benjamin Muskalla <b.muskalla@gmx.net>
+ *     - Fix for bug 172574 - [IDE] DeleteProjectDialog inconsequent selection behavior
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 41431, 462760
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472784
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.actions;
 
@@ -82,10 +81,10 @@ public class DeleteResourceAction extends SelectionListenerAction {
 			super(parentShell, getTitle(projects), null, // accept the
 					// default window
 					// icon
-					getMessage(projects), MessageDialog.QUESTION, 0,
+					getMessage(projects), MessageDialog.QUESTION, new String[] {
 							IDialogConstants.YES_LABEL,
-					IDialogConstants.NO_LABEL);
-
+							IDialogConstants.NO_LABEL }, 0); // yes is the
+			// default
 			this.projects = projects;
 			setShellStyle(getShellStyle() | SWT.SHEET);
 		}
@@ -245,7 +244,12 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		super(IDEWorkbenchMessages.DeleteResourceAction_text);
 		Assert.isNotNull(shell);
 		initAction();
-		setShellProvider(() -> shell);
+		setShellProvider(new IShellProvider() {
+			@Override
+			public Shell getShell() {
+				return shell;
+			}
+		});
 	}
 
 	/**
@@ -398,9 +402,14 @@ public class DeleteResourceAction extends SelectionListenerAction {
 		} else {
 			title = IDEWorkbenchMessages.DeleteResourceAction_titleN;
 			if (containsLinkedResource(resources)) {
-				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN, resources.size());
+				msg = NLS
+						.bind(
+								IDEWorkbenchMessages.DeleteResourceAction_confirmLinkedResourceN,
+						Integer.valueOf(resources.size()));
 			} else {
-				msg = NLS.bind(IDEWorkbenchMessages.DeleteResourceAction_confirmN, resources.size());
+				msg = NLS.bind(
+						IDEWorkbenchMessages.DeleteResourceAction_confirmN,
+						new Integer(resources.size()));
 			}
 		}
 		return MessageDialog.openQuestion(shellProvider.getShell(), title, msg);

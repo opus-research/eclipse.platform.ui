@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2016 IBM Corporation and others.
+ * Copyright (c) 2000, 2008 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 
 package org.eclipse.ui.views.markers.internal;
@@ -216,6 +215,11 @@ public class ProblemFilter extends MarkerFilter {
 		this.severity = severity;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#resetState()
+	 */
 	@Override
 	public void resetState() {
 		super.resetState();
@@ -225,6 +229,11 @@ public class ProblemFilter extends MarkerFilter {
 		severity = DEFAULT_SEVERITY;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.jface.dialogs.IDialogSettings)
+	 */
 	@Override
 	public void restoreFilterSettings(IDialogSettings settings) {
 
@@ -233,19 +242,19 @@ public class ProblemFilter extends MarkerFilter {
 		String setting = settings.get(TAG_CONTAINS);
 
 		if (setting != null) {
-			contains = Boolean.parseBoolean(setting);
+			contains = Boolean.valueOf(setting).booleanValue();
 		}
 
 		setting = settings.get(TAG_DESCRIPTION);
 
 		if (setting != null) {
-			description = setting;
+			description = new String(setting);
 		}
 
 		setting = settings.get(TAG_SELECT_BY_SEVERITY);
 
 		if (setting != null) {
-			selectBySeverity = Boolean.parseBoolean(setting);
+			selectBySeverity = Boolean.valueOf(setting).booleanValue();
 		}
 
 		setting = settings.get(TAG_SEVERITY);
@@ -259,6 +268,11 @@ public class ProblemFilter extends MarkerFilter {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#restoreFilterSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	protected void restoreFilterSettings(IMemento memento) {
 
@@ -267,19 +281,19 @@ public class ProblemFilter extends MarkerFilter {
 		String setting = memento.getString(TAG_CONTAINS);
 
 		if (setting != null) {
-			contains = Boolean.parseBoolean(setting);
+			contains = Boolean.valueOf(setting).booleanValue();
 		}
 
 		setting = memento.getString(TAG_DESCRIPTION);
 
 		if (setting != null) {
-			description = setting;
+			description = new String(setting);
 		}
 
 		setting = memento.getString(TAG_SELECT_BY_SEVERITY);
 
 		if (setting != null) {
-			selectBySeverity = Boolean.parseBoolean(setting);
+			selectBySeverity = Boolean.valueOf(setting).booleanValue();
 		}
 
 		Integer severitySetting = memento.getInteger(TAG_SEVERITY);
@@ -289,6 +303,11 @@ public class ProblemFilter extends MarkerFilter {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.markers.internal.MarkerFilter#saveFilterSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveFilterSettings(IMemento settings) {
 		super.saveFilterSettings(settings);
@@ -317,11 +336,21 @@ public class ProblemFilter extends MarkerFilter {
 		final String id = element.getAttribute(MarkerSupportInternalUtilities.ATTRIBUTE_ID);
 		final String namespace = element.getNamespace();
 		contributionDescriptor = new IPluginContribution() {
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.IPluginContribution#getLocalId()
+			 */
 			@Override
 			public String getLocalId() {
 				return id;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.ui.IPluginContribution#getPluginId()
+			 */
 			@Override
 			public String getPluginId() {
 				return namespace;
