@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -367,11 +368,9 @@ public class E4Application implements IApplication {
 		deltaRestore = value == null || Boolean.parseBoolean(value);
 		eclipseContext.set(E4Workbench.DELTA_RESTORE, Boolean.valueOf(deltaRestore));
 
-		String resourceHandler = getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false);
-
-		if (resourceHandler == null) {
-			resourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName();
-		}
+		String defaultResourceHandler = "bundleclass://org.eclipse.e4.ui.workbench/" + ResourceHandler.class.getName();
+		Optional<String> optionalResourceHandler = Optional.of(getArgValue(IWorkbench.MODEL_RESOURCE_HANDLER, appContext, false));
+		String resourceHandler = optionalResourceHandler.orElse(defaultResourceHandler);
 
 		IContributionFactory factory = eclipseContext.get(IContributionFactory.class);
 
