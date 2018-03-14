@@ -24,12 +24,8 @@ public interface IContentProvider {
      * The viewer should not be updated during this call, as it is in the process
      * of being disposed.
      * </p>
-     * <p>
-     * The default implementation does nothing.
-     * </p>
      */
-	default public void dispose() {
-	}
+    public void dispose();
 
     /**
      * Notifies this content provider that the given viewer's input
@@ -44,9 +40,6 @@ public interface IContentProvider {
      * The viewer should not be updated during this call, as it might be in the process
      * of being disposed.
      * </p>
-     * <p>
-     * The default implementation does nothing.
-     * </p>
      *
      * @param viewer the viewer
      * @param oldInput the old input element, or <code>null</code> if the viewer
@@ -54,6 +47,5 @@ public interface IContentProvider {
      * @param newInput the new input element, or <code>null</code> if the viewer
      *   does not have an input
      */
-	default public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-	}
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput);
 }
