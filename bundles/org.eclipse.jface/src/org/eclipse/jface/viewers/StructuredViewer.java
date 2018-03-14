@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,8 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Schindl - bug 151205
- *     Lars Voel <Lars.Vogel@gmail.com> - Bug 402439
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 402439, 475689
+ *     Thorsten Maack <tm@tmaack.de> - Bug 482163
  *******************************************************************************/
 package org.eclipse.jface.viewers;
 
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.internal.InternalPolicy;
-import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.util.SafeRunnable;
@@ -1269,12 +1269,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				handlePostSelect(e);
 			}
 		});
-		handler.addOpenListener(new IOpenEventListener() {
-			@Override
-			public void handleOpen(SelectionEvent e) {
-				StructuredViewer.this.handleOpen(e);
-			}
-		});
+		handler.addOpenListener(StructuredViewer.this::handleOpen);
 	}
 
 	/**
@@ -1520,12 +1515,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 *            the element
 	 */
 	public void refresh(final Object element) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRefresh(element);
-			}
-		});
+		preservingSelection(() -> internalRefresh(element));
 	}
 
 	/**
@@ -1548,12 +1538,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * @since 2.0
 	 */
 	public void refresh(final Object element, final boolean updateLabels) {
-		preservingSelection(new Runnable() {
-			@Override
-			public void run() {
-				internalRefresh(element, updateLabels);
-			}
-		});
+		preservingSelection(() -> internalRefresh(element, updateLabels));
 	}
 
 	/**
@@ -1638,10 +1623,10 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 * refiltering and resorting of the elements.
 	 *
 	 * @param filters
-	 *            an array of viewer filters
+	 *            an varargs of viewer filters
 	 * @since 3.3
 	 */
-	public void setFilters(ViewerFilter[] filters) {
+	public void setFilters(ViewerFilter... filters) {
 		if (filters.length == 0) {
 			resetFilters();
 		} else {
@@ -1670,6 +1655,15 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public abstract void reveal(Object element);
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The <code>StructuredViewer</code> implementation of this method calls
+	 * {@link #assertContentProviderType(IContentProvider)} to validate the
+	 * content provider. For a <code>StructuredViewer</code>, the content
+	 * provider must implement {@link IStructuredContentProvider}.
+	 * </p>
+	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
@@ -1781,13 +1775,15 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	/**
 	 * Sets this viewer's sorter and triggers refiltering and resorting of this
 	 * viewer's element. Passing <code>null</code> turns sorting off.
-     * <p>
-     * It is recommended to use <code>setComparator()</code> instead.
-     * </p>
+	 * <p>
+	 *
+	 * @deprecated use <code>setComparator()</code> instead.
+	 *             </p>
 	 *
 	 * @param sorter
 	 *            a viewer sorter, or <code>null</code> if none
 	 */
+	@Deprecated
 	public void setSorter(ViewerSorter sorter) {
 		if (this.sorter != sorter) {
 			this.sorter = sorter;
@@ -2132,12 +2128,9 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		}
 		if (needsRefilter) {
-			preservingSelection(new Runnable() {
-				@Override
-				public void run() {
-					internalRefresh(getRoot());
-					refreshOccurred = true;
-				}
+			preservingSelection(() -> {
+				internalRefresh(getRoot());
+				refreshOccurred = true;
 			});
 			return;
 		}

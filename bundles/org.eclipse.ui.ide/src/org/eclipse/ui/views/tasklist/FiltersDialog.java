@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -346,12 +346,7 @@ class FiltersDialog extends TrayDialog {
         }
     };
 
-    private ICheckStateListener checkStateListener = new ICheckStateListener() {
-        @Override
-		public void checkStateChanged(CheckStateChangedEvent event) {
-            FiltersDialog.this.checkStateChanged(event);
-        }
-    };
+    private ICheckStateListener checkStateListener = event -> FiltersDialog.this.checkStateChanged(event);
 
     /**
      * Creates a new filters dialog.
@@ -363,9 +358,6 @@ class FiltersDialog extends TrayDialog {
         initTypes();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected void buttonPressed(int buttonId) {
         if (RESET_ID == buttonId) {
@@ -392,9 +384,6 @@ class FiltersDialog extends TrayDialog {
         updateEnabledState();
     }
 
-    /* (non-Javadoc)
-     * Method declared on Window.
-     */
     @Override
 	protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
@@ -482,9 +471,6 @@ class FiltersDialog extends TrayDialog {
         return combo;
     }
 
-    /* (non-Javadoc)
-     * Method declared on Dialog.
-     */
     @Override
 	protected Control createDialogArea(Composite parent) {
         Composite composite = (Composite) super.createDialogArea(parent);

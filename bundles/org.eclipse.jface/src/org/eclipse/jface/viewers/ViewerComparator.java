@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -186,12 +186,7 @@ public class ViewerComparator {
      */
 	public void sort(final Viewer viewer, Object[] elements) {
 		try {
-			Arrays.sort(elements, new Comparator() {
-				@Override
-				public int compare(Object a, Object b) {
-					return ViewerComparator.this.compare(viewer, a, b);
-				}
-			});
+			Arrays.sort(elements, (a, b) -> ViewerComparator.this.compare(viewer, a, b));
 		} catch (IllegalArgumentException e) {
 			String msg = "Workaround for comparator violation:\n\t- set system property java.util.Arrays.useLegacyMergeSort=true\n\t- use a 1.6 JRE "  //$NON-NLS-1$
 					+ "\nmessage: " + e.getLocalizedMessage() //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 472654
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -57,8 +58,8 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 
 	private ListenerList listeners = new ListenerList();
 	private ListenerList postSelectionListeners = new ListenerList();
-	private Map<String, Set<ISelectionListener>> targetedListeners = new HashMap<String, Set<ISelectionListener>>();
-	private Map<String, Set<ISelectionListener>> targetedPostSelectionListeners = new HashMap<String, Set<ISelectionListener>>();
+	private Map<String, Set<ISelectionListener>> targetedListeners = new HashMap<>();
+	private Map<String, Set<ISelectionListener>> targetedPostSelectionListeners = new HashMap<>();
 
 	private org.eclipse.e4.ui.workbench.modeling.ISelectionListener listener = new org.eclipse.e4.ui.workbench.modeling.ISelectionListener() {
 		@Override
@@ -253,30 +254,16 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#addSelectionListener(org.eclipse.ui.
-	 * ISelectionListener)
-	 */
 	@Override
 	public void addSelectionListener(ISelectionListener listener) {
 		listeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#addSelectionListener(java.lang.String,
-	 * org.eclipse.ui.ISelectionListener)
-	 */
 	@Override
 	public void addSelectionListener(String partId, ISelectionListener listener) {
 		Set<ISelectionListener> listeners = targetedListeners.get(partId);
 		if (listeners == null) {
-			listeners = new HashSet<ISelectionListener>();
+			listeners = new HashSet<>();
 			targetedListeners.put(partId, listeners);
 		}
 		if (listeners.size() == 0 && selectionService != null) {
@@ -285,30 +272,16 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		listeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#addPostSelectionListener(org.eclipse
-	 * .ui.ISelectionListener)
-	 */
 	@Override
 	public void addPostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#addPostSelectionListener(java.lang.String
-	 * , org.eclipse.ui.ISelectionListener)
-	 */
 	@Override
 	public void addPostSelectionListener(String partId, ISelectionListener listener) {
 		Set<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
 		if (listeners == null) {
-			listeners = new HashSet<ISelectionListener>();
+			listeners = new HashSet<>();
 			targetedPostSelectionListeners.put(partId, listeners);
 		}
 		if (listeners.size() == 0 && selectionService != null) {
@@ -317,11 +290,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		listeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.ISelectionService#getSelection()
-	 */
 	@Override
 	public ISelection getSelection() {
 		if (activePart != null) {
@@ -337,11 +305,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		return new StructuredSelection(selection);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see org.eclipse.ui.ISelectionService#getSelection(java.lang.String)
-	 */
 	@Override
 	public ISelection getSelection(String partId) {
 		Object selection = selectionService.getSelection(partId);
@@ -351,25 +314,11 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		return new StructuredSelection(selection);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#removeSelectionListener(org.eclipse.
-	 * ui.ISelectionListener)
-	 */
 	@Override
 	public void removeSelectionListener(ISelectionListener listener) {
 		listeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#removeSelectionListener(java.lang.String
-	 * , org.eclipse.ui.ISelectionListener)
-	 */
 	@Override
 	public void removeSelectionListener(String partId, ISelectionListener listener) {
 		Set<ISelectionListener> listeners = targetedListeners.get(partId);
@@ -381,25 +330,11 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#removePostSelectionListener(org.eclipse
-	 * .ui.ISelectionListener)
-	 */
 	@Override
 	public void removePostSelectionListener(ISelectionListener listener) {
 		postSelectionListeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.ui.ISelectionService#removePostSelectionListener(java.lang
-	 * .String, org.eclipse.ui.ISelectionListener)
-	 */
 	@Override
 	public void removePostSelectionListener(String partId, ISelectionListener listener) {
 		Set<ISelectionListener> listeners = targetedPostSelectionListeners.get(partId);
@@ -411,13 +346,6 @@ public class SelectionService implements ISelectionChangedListener, ISelectionSe
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(
-	 * org.eclipse.jface.viewers.SelectionChangedEvent)
-	 */
 	@Override
 	public void selectionChanged(SelectionChangedEvent e) {
 		MPart part = page.findPart(activePart);
