@@ -744,9 +744,7 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 	private EventHandler themeRegistryRestyledHandler = new EventHandler() {
 		@Override
 		public void handleEvent(Event event) {
-			if (isAnyThemeChanged()) {
-				updateThemeInfo(workbench.getThemeManager());
-			}
+			updateThemeInfo(workbench.getThemeManager());
 			refreshCategory();
 			refreshAllLabels();
 
@@ -754,11 +752,6 @@ public final class ColorsAndFontsPreferencePage extends PreferencePage
 			previewMap.clear();
 			restoreTreeSelection();
 			updateControls();
-		}
-
-		private boolean isAnyThemeChanged() {
-			return currentTheme != workbench.getThemeManager().getCurrentTheme()
-					|| currentCSSTheme != themeEngine.getActiveTheme();
 		}
 	};
 
@@ -1200,17 +1193,15 @@ getPreferenceStore(),
 
     protected ColorDefinition getSelectedColorDefinition() {
         Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
-		if (o instanceof ColorDefinition) {
-			return themeRegistry.findColor(((ColorDefinition) o).getId());
-		}
+        if (o instanceof ColorDefinition)
+			return (ColorDefinition) o;
         return null;
     }
 
     protected FontDefinition getSelectedFontDefinition() {
         Object o = ((IStructuredSelection) tree.getViewer().getSelection()).getFirstElement();
-		if (o instanceof FontDefinition) {
-			return themeRegistry.findFont(((FontDefinition) o).getId());
-		}
+        if (o instanceof FontDefinition)
+			return (FontDefinition) o;
         return null;
     }
     
@@ -1406,8 +1397,7 @@ getPreferenceStore(),
 					return true;
             } else {
                 // a descendant is default if it's the same value as its ancestor
-				RGB rgb = getColorValue(definition);
-				if (rgb != null && rgb.equals(getColorAncestorValue(definition)))
+                if (getColorValue(definition).equals(getColorAncestorValue(definition)))
 					return true;
             }
         }
@@ -1522,7 +1512,8 @@ getPreferenceStore(),
     }
 
 	private String createPreferenceKey(ThemeElementDefinition definition) {
-		if (definition.isOverridden() || definition.isAddedByCss()) {
+		if (isAvailableInCurrentTheme(definition)
+				&& (definition.isOverridden() || definition.isAddedByCss())) {
 			return ThemeElementHelper.createPreferenceKey(currentCSSTheme, currentTheme,
 					definition.getId());
 		}
@@ -1616,14 +1607,12 @@ getPreferenceStore(),
 	protected boolean resetFont(FontDefinition definition, boolean force) {
 		if (force || !isDefault(definition)) {
             FontData[] newFD;
-			if (definition.isOverridden()) {
-				newFD = definition.getValue();
-			} else if (!force && definition.getDefaultsTo() != null) {
+			if (!force && definition.getDefaultsTo() != null)
                 newFD = getFontAncestorValue(definition);
-			} else {
+            else
 				newFD = PreferenceConverter.getDefaultFontDataArray(getPreferenceStore(),
 						createPreferenceKey(definition));
-			}
+
             if (newFD != null) {
 				setFontPreferenceValue(definition, newFD, true);
 				refreshElement(definition);
@@ -1718,7 +1707,7 @@ getPreferenceStore(),
         return null;
     }
 
-	private CascadingThemeExt getCascadingTheme() {
+    private ITheme getCascadingTheme() {
 		if (cascadingTheme == null) {
 			cascadingTheme = new CascadingThemeExt(currentTheme, colorRegistry, fontRegistry);
 		}
@@ -2210,12 +2199,12 @@ getPreferenceStore(),
 	}
 
 	private boolean isAvailableInCurrentTheme(ThemeElementDefinition definition) {
-		if (definition instanceof ColorDefinition) {
-			RGB value = ((ColorDefinition) definition).getValue();
-			return value != null && value != EMPTY_COLOR_VALUE
-					&& colorRegistry.get(definition.getId()) != null;
+		if (definition instanceof FontDefinition) {
+			return fontRegistry.get(definition.getId()) != null;
 		}
-		return true;
+		RGB value = ((ColorDefinition) definition).getValue();
+		return value != null && value != EMPTY_COLOR_VALUE
+				&& colorRegistry.get(definition.getId()) != null;
 	}
 
 	private String fomatDescription(ThemeElementDefinition definition) {
@@ -2241,7 +2230,7 @@ getPreferenceStore(),
 		
 		Object newValue = definition instanceof ColorDefinition ? 
 			((ColorDefinition) definition).getValue(): ((FontDefinition) definition).getValue();
-		getCascadingTheme().fire(new PropertyChangeEvent(this, definition.getId(), null, newValue));
+		cascadingTheme.fire(new PropertyChangeEvent(this, definition.getId(), null, newValue));
 	}
 
 	private static class CascadingThemeExt extends CascadingTheme {
