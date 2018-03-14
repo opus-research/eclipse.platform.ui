@@ -61,7 +61,7 @@ public class JFaceResources {
 	 * Map of Display onto DeviceResourceManager. Holds all the resources for
 	 * the associated display.
 	 */
-	private static final Map<Display,DeviceResourceManager> registries = new HashMap<>();
+	private static final Map<Display,DeviceResourceManager> registries = new HashMap<Display,DeviceResourceManager>();
 
 	/**
 	 * The symbolic font name for the banner font (value

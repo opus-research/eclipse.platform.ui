@@ -139,7 +139,7 @@ public abstract class FieldEditorPreferencePage extends PreferencePage
      */
     protected void addField(FieldEditor editor) {
         if (fields == null) {
-			fields = new ArrayList<>();
+			fields = new ArrayList<FieldEditor>();
 		}
         fields.add(editor);
     }
