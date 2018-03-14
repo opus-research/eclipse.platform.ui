@@ -10,14 +10,11 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080, 431464, 433336
  *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
  *     Brian de Alwis (MTI) - Bug 433053
- *     Steven Spungin <steve@spungin.tv> - Bug 438736 - [model assembler] Fragments are processed in the wrong order.
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,16 +74,6 @@ public class ModelAssembler {
 	public void processModel(boolean initial) {
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = new ExtensionsSort().sort(extPoint.getExtensions());
-
-		List<IExtension> list = new ArrayList<IExtension>(Arrays.asList(extensions));
-		// for (IExtension ext : extensions) {
-		// System.out.println(ext.getContributor().getName());
-		// }
-		Collections.reverse(list);
-		extensions = list.toArray(new IExtension[0]);
-		// for (IExtension ext : extensions) {
-		// System.out.println(ext.getContributor().getName());
-		// }
 
 		List<MApplicationElement> imports = new ArrayList<MApplicationElement>();
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
