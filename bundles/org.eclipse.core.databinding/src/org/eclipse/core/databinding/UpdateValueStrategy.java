@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2009 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -129,7 +129,7 @@ public class UpdateValueStrategy extends UpdateStrategy {
 	/**
 	 * Policy constant denoting that the source observable's state should be
 	 * tracked, and that validation, conversion and updating the destination
-	 * observable's value should be performed automaticlly on every change of
+	 * observable's value should be performed automatically on every change of
 	 * the source observable value.
 	 */
 	public static int POLICY_UPDATE = notInlined(8);

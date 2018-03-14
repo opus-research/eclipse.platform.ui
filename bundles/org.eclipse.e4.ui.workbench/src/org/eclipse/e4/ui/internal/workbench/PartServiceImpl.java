@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@vogella.com) - Bug 416082,  472654, 395825
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 450411, 486876, 461063
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463962
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
@@ -66,6 +66,11 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
 public class PartServiceImpl implements EPartService {
+
+	/**
+	 * The part activation time of a part is stored in it's transient data.
+	 */
+	public static final String PART_ACTIVATION_TIME = "partActivationTime"; //$NON-NLS-1$
 
 	private EventHandler selectedHandler = new EventHandler() {
 		@Override
@@ -183,7 +188,7 @@ public class PartServiceImpl implements EPartService {
 
 	private MPart activePart;
 
-	private ListenerList listeners = new ListenerList();
+	private ListenerList<IPartListener> listeners = new ListenerList<>();
 
 	private boolean constructed = false;
 
@@ -238,11 +243,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartActivated(final MPart part) {
-		for (final Object listener : listeners.getListeners()) {
+		for (final IPartListener listener : listeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					((IPartListener) listener).partActivated(part);
+					listener.partActivated(part);
 				}
 
 				@Override
@@ -254,11 +259,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartDeactivated(final MPart part) {
-		for (final Object listener : listeners.getListeners()) {
+		for (final IPartListener listener : listeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					((IPartListener) listener).partDeactivated(part);
+					listener.partDeactivated(part);
 				}
 
 				@Override
@@ -270,11 +275,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartHidden(final MPart part) {
-		for (final Object listener : listeners.getListeners()) {
+		for (final IPartListener listener : listeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					((IPartListener) listener).partHidden(part);
+					listener.partHidden(part);
 				}
 
 				@Override
@@ -286,11 +291,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartVisible(final MPart part) {
-		for (final Object listener : listeners.getListeners()) {
+		for (final IPartListener listener : listeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					((IPartListener) listener).partVisible(part);
+					listener.partVisible(part);
 				}
 
 				@Override
@@ -302,11 +307,11 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	private void firePartBroughtToTop(final MPart part) {
-		for (final Object listener : listeners.getListeners()) {
+		for (final IPartListener listener : listeners) {
 			SafeRunner.run(new ISafeRunnable() {
 				@Override
 				public void run() throws Exception {
-					((IPartListener) listener).partBroughtToTop(part);
+					listener.partBroughtToTop(part);
 				}
 
 				@Override
@@ -480,13 +485,25 @@ public class PartServiceImpl implements EPartService {
 				}
 			}
 
-			if (parent instanceof MPartStack) {
-				return parent.getSelectedElement() == element;
+			if (parent instanceof MPartStack && parent.getSelectedElement() != element) {
+				return false;
 			}
-
-			return element.isVisible();
+			if (!element.isVisible()) {
+				return false;
+			}
+			if (isMinimized(parent) || isMinimized(element)) {
+				return false;
+			}
+			return true;
 		}
 		return false;
+	}
+
+	private boolean isMinimized(MUIElement elt) {
+		List<String> tags = elt.getTags();
+		return (tags.contains(IPresentationEngine.MINIMIZED)
+				|| tags.contains(IPresentationEngine.MINIMIZED_BY_ZOOM))
+				&& !tags.contains(IPresentationEngine.ACTIVE);
 	}
 
 	private boolean isInActivePerspective(MUIElement element) {
@@ -643,13 +660,16 @@ public class PartServiceImpl implements EPartService {
 	}
 
 	@Override
-	public void switchPerspective(String perspectiveId) {
+	public java.util.Optional<MPerspective> switchPerspective(String perspectiveId) {
 		List<MPerspective> result = modelService.findElements(getWindow(), perspectiveId, MPerspective.class, null);
 		if (!result.isEmpty()) {
-			switchPerspective(result.get(0));
-			return;
+			MPerspective perspective = result.get(0);
+			switchPerspective(perspective);
+			return java.util.Optional.of(perspective);
 		}
 		logger.error("Perspective with ID " + perspectiveId + " not found in the current window."); //$NON-NLS-1$ //$NON-NLS-2$
+
+		return java.util.Optional.empty();
 	}
 
 	@Override
@@ -730,6 +750,9 @@ public class PartServiceImpl implements EPartService {
 				IPresentationEngine pe = part.getContext().get(IPresentationEngine.class);
 				pe.focusGui(part);
 			}
+
+			// store the activation time to sort the parts in MRU order
+			part.getTransientData().put(PART_ACTIVATION_TIME, Long.valueOf(System.currentTimeMillis()));
 
 			firePartActivated(part);
 			UIEvents.publishEvent(UIEvents.UILifeCycle.ACTIVATE, part);

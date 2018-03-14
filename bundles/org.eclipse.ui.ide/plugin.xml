@@ -12,6 +12,7 @@
    <extension-point id="markerSupport" name="%ExtPoint.markerSupport" schema="schema/markerSupport.exsd"/>
    <extension-point id="filesystemSupport" name="%ExtPoint.fileSystemSupport" schema="schema/filesystemSupport.exsd"/>
    <extension-point id="editorAssociationOverride" name="%ExtPoint.editorAssociationOverride" schema="schema/editorAssociationOverride.exsd"/>
+   <extension-point id="unassociatedEditorStrategy" name="%ExtPoint.unassociatedEditorStrategy" schema="schema/unassociatedEditorStrategy.exsd"/>
 
    <extension
          point="org.eclipse.ui.importWizards">
@@ -540,6 +541,9 @@
       <keyword
             id="org.eclipse.ui.ide.settings"
             label="%PreferenceKeywords.Settings"/>
+      <keyword
+            id="org.eclipse.ui.ide.unassociated"
+            label="%PreferenceKeywords.unassociated"/>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -583,10 +587,11 @@
       <page
             name="%PreferencePages.FileEditors"
             category="org.eclipse.ui.preferencePages.Editors"
-            class="org.eclipse.ui.ExtensionFactory:fileAssociationsPreferencePage"
+            class="org.eclipse.ui.internal.ide.ExtendedFileEditorsPreferencePage"
             id="org.eclipse.ui.preferencePages.FileEditors">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
+         <keywordReference id="org.eclipse.ui.ide.unassociated"/>
       </page>
       <page
             name="%PreferencePages.Views"
@@ -1671,11 +1676,17 @@
          point="org.eclipse.ui.menus">
          <menuContribution
             locationURI="menu:window?after=org.eclipse.ui.editors">
-         <command
-               commandId="org.eclipse.ui.ToggleCoolbarAction"
-               tooltip="%menu.toggleCoolbar.tooltip"
-               style="push">
-         </command>
+         <menu
+               id="org.eclipse.ui.appearance"
+               label="%menu.window.appearance.label"
+               mnemonic="%menu.window.appearance.mnemonic"
+               tooltip="%menu.window.appearance.tooltip">
+            <command
+                  commandId="org.eclipse.ui.ToggleCoolbarAction"
+                  style="push"
+                  tooltip="%menu.toggleCoolbar.tooltip">
+            </command>
+         </menu>
       </menuContribution>
 
 
@@ -2395,6 +2406,27 @@
          <hiddenToolBarItem id="print">
          </hiddenToolBarItem>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.unassociatedEditorStrategy">
+      <strategy
+            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
+            id="org.eclipse.ui.ide.systemEditorThenTextEditor"
+            interactive="false"
+            label="%systemEditorThenTextEditor">
+      </strategy>
+      <strategy
+            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
+            id="org.eclipse.ui.ide.textEditor"
+            interactive="false"
+            label="%textEditor">
+      </strategy>
+      <strategy
+            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnassociatedEditorStrategy"
+            id="org.eclipse.ui.ide.askUserForUnassociatedEditor"
+            interactive="true"
+            label="%askUserViaPopup">
+      </strategy>
    </extension>
 
 </plugin>

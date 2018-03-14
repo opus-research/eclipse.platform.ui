@@ -15,17 +15,14 @@
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
 import javax.inject.Inject;
-import org.eclipse.e4.core.commands.internal.ICommandHelpService;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.EclipseContextFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.contributions.IContributionFactory;
 import org.eclipse.e4.ui.internal.workbench.ContributionsAnalyzer;
 import org.eclipse.e4.ui.model.application.MContribution;
-import org.eclipse.e4.ui.services.help.EHelpService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
@@ -39,15 +36,6 @@ public class DirectContributionItem extends AbstractContributionItem {
 	private static final Object missingExecute = new Object();
 
 	private IEclipseContext infoContext;
-
-	@Inject
-	@Optional
-	private EHelpService helpService;
-
-	@Inject
-	@Optional
-	@SuppressWarnings("restriction")
-	private ICommandHelpService commandHelpService;
 
 	@Inject
 	private IContributionFactory contribFactory;
@@ -191,14 +179,7 @@ public class DirectContributionItem extends AbstractContributionItem {
 
 	@Override
 	protected void handleHelpRequest() {
-		if (helpService == null || commandHelpService == null) {
-			return;
-		}
-
-		String contextHelpId = commandHelpService.getHelpContextId(getModel().getElementId(), getContext(getModel()));
-		if (contextHelpId != null) {
-			helpService.displayHelp(contextHelpId);
-		}
+		// Do nothing, as direct items have currently no help ID
 	}
 
 }

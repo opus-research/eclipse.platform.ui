@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2013 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,11 +31,9 @@ import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspectiveStack;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
-import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
-import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.services.IServiceConstants;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService.PartState;
@@ -48,16 +46,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testGetSelection() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -68,14 +66,10 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceA = (ESelectionService) contextA
-				.get(ESelectionService.class.getName());
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceA = contextA.get(ESelectionService.class);
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selection1 = new Object();
 		Object selection2 = new Object();
@@ -101,16 +95,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testGetSelection_Id() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -121,12 +115,9 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceA = (ESelectionService) contextA
-				.get(ESelectionService.class.getName());
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
+		ESelectionService serviceA = contextA.get(ESelectionService.class);
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
 
 		Object selection1 = new Object();
 		Object selection2 = new Object();
@@ -152,16 +143,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -171,12 +162,9 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selection = new Object();
 
@@ -208,16 +196,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener2() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -228,14 +216,10 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceA = (ESelectionService) contextA
-				.get(ESelectionService.class.getName());
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceA = contextA.get(ESelectionService.class);
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selectionA = new Object();
 		Object selectionB = new Object();
@@ -283,16 +267,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener3() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -302,12 +286,9 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextA = partA.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceA = (ESelectionService) contextA
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceA = contextA.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selectionA = new Object();
 		Object selectionB = new Object();
@@ -341,7 +322,7 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug314538() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
@@ -349,37 +330,32 @@ public class ESelectionServiceTest extends UITest {
 		getEngine().createGui(window);
 
 		IEclipseContext windowContext = window.getContext();
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		SelectionListener listener = new SelectionListener();
 		windowService.addSelectionListener(listener);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspective = ems.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		perspective.getChildren().add(partA);
 		perspective.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		perspective.getChildren().add(partB);
 
 		IEclipseContext contextB = partB.getContext();
 
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
 
 		Object selection = new Object();
 
@@ -408,16 +384,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -428,14 +404,10 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceA = (ESelectionService) contextA
-				.get(ESelectionService.class.getName());
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceA = contextA.get(ESelectionService.class);
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selectionA = new Object();
 		Object selectionB = new Object();
@@ -476,16 +448,16 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id2() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		window.getChildren().add(partB);
 
@@ -495,12 +467,9 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext contextB = partB.getContext();
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService serviceB = (ESelectionService) contextB
-				.get(ESelectionService.class.getName());
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService serviceB = contextB.get(ESelectionService.class);
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selectionB = new Object();
 
@@ -521,20 +490,20 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testSelectionListener_Id3() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		partA.setElementId("partA"); //$NON-NLS-1$
 		window.getChildren().add(partA);
 		window.setSelectedElement(partA);
 
-		MPartStack partStack = BasicFactoryImpl.eINSTANCE.createPartStack();
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPartStack partStack = ems.createModelElement(MPartStack.class);
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB"); //$NON-NLS-1$
 		partStack.getChildren().add(partB);
-		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = ems.createModelElement(MPart.class);
 		partC.setElementId("partC"); //$NON-NLS-1$
 		partStack.getChildren().add(partC);
 		partStack.setSelectedElement(partB);
@@ -545,10 +514,8 @@ public class ESelectionServiceTest extends UITest {
 
 		IEclipseContext windowContext = window.getContext();
 
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selection = new Object();
 
@@ -561,8 +528,7 @@ public class ESelectionServiceTest extends UITest {
 		assertNull(listener.getSelection());
 
 		IEclipseContext contextC = partC.getContext();
-		ESelectionService serviceC = (ESelectionService) contextC
-				.get(ESelectionService.class.getName());
+		ESelectionService serviceC = contextC.get(ESelectionService.class);
 
 		listener.reset();
 		serviceC.setSelection(selection);
@@ -576,8 +542,7 @@ public class ESelectionServiceTest extends UITest {
 
 		@Inject
 		@Optional
-		public void setInput(
-				@Named(IServiceConstants.ACTIVE_SELECTION) Object current) {
+		public void setInput(@Named(IServiceConstants.ACTIVE_SELECTION) Object current) {
 			input = current;
 		}
 	}
@@ -607,19 +572,18 @@ public class ESelectionServiceTest extends UITest {
 		public Object selection;
 
 		@Execute
-		public void execute(
-				@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Object s) {
+		public void execute(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Object s) {
 			selection = s;
 		}
 	}
 
 	@Test
 	public void testOnePartSelection() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = ems.createModelElement(MPart.class);
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -641,13 +605,13 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testTwoPartHandlerExecute() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 
@@ -672,62 +636,53 @@ public class ESelectionServiceTest extends UITest {
 		UseSelectionHandler handler = new UseSelectionHandler();
 		assertNull(handler.selection);
 
-		ContextInjectionFactory.invoke(handler, Execute.class,
-				applicationContext, null);
+		ContextInjectionFactory.invoke(handler, Execute.class, applicationContext, null);
 		assertEquals(selection, handler.selection);
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, windowContext,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, windowContext, null);
 		assertEquals(selection, handler.selection);
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, partContextA,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, partContextA, null);
 		assertEquals(selection, handler.selection);
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, partContextB,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, partContextB, null);
 		// assertNull(handler.selection); // incorrect: should be the window
 		// selection
 
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		EPartService partService = windowContext.get(EPartService.class);
 		partService.activate(partB);
 
-		ContextInjectionFactory.invoke(handler, Execute.class,
-				applicationContext, null);
+		ContextInjectionFactory.invoke(handler, Execute.class, applicationContext, null);
 		// assertNull(handler.selection); // partB does not post a selection
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, windowContext,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, windowContext, null);
 		// assertNull(handler.selection); // partB does not post a selection
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, partContextA,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, partContextA, null);
 		// assertEquals(selection, handler.selection); // incorrect;
 		// selection is at window level and active part did not change
 		handler.selection = null;
 
-		ContextInjectionFactory.invoke(handler, Execute.class, partContextB,
-				null);
+		ContextInjectionFactory.invoke(handler, Execute.class, partContextB, null);
 		// assertNull(handler.selection); // incorrect; should be selection
 	}
 
 	@Test
 	public void testThreePartSelection() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
-		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = ems.createModelElement(MPart.class);
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
 
@@ -748,10 +703,8 @@ public class ESelectionServiceTest extends UITest {
 		ProviderPart partThreeImpl = new ProviderPart();
 		ContextInjectionFactory.inject(partThreeImpl, partContextC);
 
-		ESelectionService windowService = (ESelectionService) windowContext
-				.get(ESelectionService.class.getName());
-		EPartService partService = (EPartService) windowContext
-				.get(EPartService.class.getName());
+		ESelectionService windowService = windowContext.get(ESelectionService.class);
+		EPartService partService = windowContext.get(EPartService.class);
 
 		Object selection = new Object();
 		Object selection2 = new Object();
@@ -790,15 +743,15 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testPartOneTracksPartThree() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
-		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = ems.createModelElement(MPart.class);
 		partC.setElementId("partC");
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
@@ -834,8 +787,7 @@ public class ESelectionServiceTest extends UITest {
 		partContextC.runAndTrack(new RunAndTrack() {
 			@Override
 			public boolean changed(IEclipseContext context) {
-				ESelectionService s = (ESelectionService) partContextA
-						.get(ESelectionService.class.getName());
+				ESelectionService s = partContextA.get(ESelectionService.class);
 				partOneImpl.setOtherSelection(s.getSelection("partC"));
 				return true;
 			}
@@ -861,15 +813,15 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testPartOneTracksPartThree2() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
-		MPart partC = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partC = ems.createModelElement(MPart.class);
 		partC.setElementId("partC");
 		window.getChildren().add(partC);
 		window.setSelectedElement(partA);
@@ -901,15 +853,13 @@ public class ESelectionServiceTest extends UITest {
 		// assertNull(partTwoImpl.input); // incorrect
 		// assertEquals(selection2, partThreeImpl.input); // incorrect
 
-		ESelectionService selectionService = (ESelectionService) partContextA
-				.get(ESelectionService.class.getName());
-		selectionService.addSelectionListener(partC.getElementId(),
-				new ISelectionListener() {
-					@Override
-					public void selectionChanged(MPart part, Object selection) {
-						partOneImpl.setOtherSelection(selection);
-					}
-				});
+		ESelectionService selectionService = partContextA.get(ESelectionService.class);
+		selectionService.addSelectionListener(partC.getElementId(), new ISelectionListener() {
+			@Override
+			public void selectionChanged(MPart part, Object selection) {
+				partOneImpl.setOtherSelection(selection);
+			}
+		});
 
 		partThreeImpl.setSelection(selection3);
 
@@ -942,21 +892,20 @@ public class ESelectionServiceTest extends UITest {
 		Object selection;
 
 		@Inject
-		void setSelection(
-				@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Target selection) {
+		void setSelection(@Optional @Named(IServiceConstants.ACTIVE_SELECTION) Target selection) {
 			this.selection = selection;
 		}
 	}
 
 	@Test
 	public void testInjection() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 
@@ -969,13 +918,10 @@ public class ESelectionServiceTest extends UITest {
 
 		EPartService partService = windowContext.get(EPartService.class);
 		partService.activate(partA);
-		ESelectionService selectionServiceA = partContextA
-				.get(ESelectionService.class);
-		ESelectionService selectionServiceB = partContextB
-				.get(ESelectionService.class);
+		ESelectionService selectionServiceA = partContextA.get(ESelectionService.class);
+		ESelectionService selectionServiceB = partContextB.get(ESelectionService.class);
 
-		InjectPart injectPart = ContextInjectionFactory.make(InjectPart.class,
-				partContextA);
+		InjectPart injectPart = ContextInjectionFactory.make(InjectPart.class, partContextA);
 		assertNull(injectPart.selection);
 
 		Object o = new Target("");
@@ -984,8 +930,7 @@ public class ESelectionServiceTest extends UITest {
 		assertEquals(o, injectPart.selection);
 
 		partService.activate(partB);
-		assertEquals("Part B doesn't post a selection, no change", o,
-				injectPart.selection);
+		assertEquals("Part B doesn't post a selection, no change", o, injectPart.selection);
 
 		partService.activate(partA);
 		assertEquals(o, injectPart.selection);
@@ -1004,21 +949,19 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug343003() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPerspectiveStack perspectiveStack = AdvancedFactoryImpl.eINSTANCE
-				.createPerspectiveStack();
+		MPerspectiveStack perspectiveStack = ems.createModelElement(MPerspectiveStack.class);
 		window.getChildren().add(perspectiveStack);
 		window.setSelectedElement(perspectiveStack);
 
-		MPerspective perspective = AdvancedFactoryImpl.eINSTANCE
-				.createPerspective();
+		MPerspective perspective = ems.createModelElement(MPerspective.class);
 		perspectiveStack.getChildren().add(perspective);
 		perspectiveStack.setSelectedElement(perspective);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		perspective.getChildren().add(partA);
 		perspective.setSelectedElement(partA);
 
@@ -1027,24 +970,21 @@ public class ESelectionServiceTest extends UITest {
 
 		window.getContext().get(EPartService.class).activate(partA);
 
-		ESelectionService selectionServiceA = partA.getContext().get(
-				ESelectionService.class);
+		ESelectionService selectionServiceA = partA.getContext().get(ESelectionService.class);
 		SelectionListener listener = new SelectionListener();
 		selectionServiceA.addSelectionListener("partB", listener); //$NON-NLS-1$
 
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		partB.setElementId("partB");
 		window.getSharedElements().add(partB);
 
-		MPlaceholder placeholder = AdvancedFactoryImpl.eINSTANCE
-				.createPlaceholder();
+		MPlaceholder placeholder = ems.createModelElement(MPlaceholder.class);
 		placeholder.setRef(partB);
 		partB.setCurSharedRef(placeholder);
 		perspective.getChildren().add(placeholder);
 
 		Object o = new Object();
-		ESelectionService selectionServiceB = partB.getContext().get(
-				ESelectionService.class);
+		ESelectionService selectionServiceB = partB.getContext().get(ESelectionService.class);
 		selectionServiceB.setSelection(o);
 
 		assertEquals(partB, listener.getPart());
@@ -1053,11 +993,11 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug343984() throws Exception {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart part = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart part = ems.createModelElement(MPart.class);
 		window.getChildren().add(part);
 		window.setSelectedElement(part);
 
@@ -1068,8 +1008,7 @@ public class ESelectionServiceTest extends UITest {
 		IEclipseContext context = part.getContext();
 		Bug343984Listener listener = new Bug343984Listener();
 		listener.context = context;
-		ESelectionService selectionService = context
-				.get(ESelectionService.class);
+		ESelectionService selectionService = context.get(ESelectionService.class);
 		selectionService.addSelectionListener(listener);
 
 		selectionService.setSelection(new Object());
@@ -1084,13 +1023,13 @@ public class ESelectionServiceTest extends UITest {
 
 	@Test
 	public void testBug393137() {
-		MWindow window = BasicFactoryImpl.eINSTANCE.createWindow();
+		MWindow window = ems.createModelElement(MWindow.class);
 		application.getChildren().add(window);
 		application.setSelectedElement(window);
 
-		MPart partA = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partA = ems.createModelElement(MPart.class);
 		window.getChildren().add(partA);
-		MPart partB = BasicFactoryImpl.eINSTANCE.createPart();
+		MPart partB = ems.createModelElement(MPart.class);
 		window.getChildren().add(partB);
 		window.setSelectedElement(partA);
 
@@ -1102,8 +1041,7 @@ public class ESelectionServiceTest extends UITest {
 
 		EPartService partService = windowContext.get(EPartService.class);
 		partService.activate(partA);
-		ESelectionService selectionServiceB = partContextB
-				.get(ESelectionService.class);
+		ESelectionService selectionServiceB = partContextB.get(ESelectionService.class);
 
 		Object o = new Target("");
 		selectionServiceB.setSelection(o);
@@ -1119,7 +1057,7 @@ public class ESelectionServiceTest extends UITest {
 	}
 
 	private void initialize() {
-		applicationContext.set(MApplication.class.getName(), application);
+		applicationContext.set(MApplication.class, application);
 		applicationContext.set(UISynchronize.class, new UISynchronize() {
 			@Override
 			public void syncExec(Runnable runnable) {
