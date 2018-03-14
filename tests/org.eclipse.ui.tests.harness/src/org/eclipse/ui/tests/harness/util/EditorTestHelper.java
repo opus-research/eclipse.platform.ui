@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
@@ -67,12 +66,12 @@ public class EditorTestHelper {
 
 	public static void closeAllEditors() {
 		IWorkbenchWindow[] windows= PlatformUI.getWorkbench().getWorkbenchWindows();
-		for (IWorkbenchWindow window : windows) {
-			IWorkbenchPage[] pages = window.getPages();
-			for (IWorkbenchPage page : pages) {
-				IEditorReference[] editorReferences = page.getEditorReferences();
-				for (IEditorReference editorReference : editorReferences)
-					closeEditor(editorReference.getEditor(false));
+		for (int i= 0; i < windows.length; i++) {
+			IWorkbenchPage[] pages= windows[i].getPages();
+			for (int j= 0; j < pages.length; j++) {
+				IEditorReference[] editorReferences= pages[j].getEditorReferences();
+				for (int k= 0; k < editorReferences.length; k++)
+					closeEditor(editorReferences[k].getEditor(false));
 			}
 		}
 	}
@@ -172,7 +171,6 @@ public class EditorTestHelper {
 		runEventQueue(minTime);
 
 		DisplayHelper helper= new DisplayHelper() {
-			@Override
 			public boolean condition() {
 				return allJobsQuiet();
 			}
@@ -192,7 +190,8 @@ public class EditorTestHelper {
 	public static boolean allJobsQuiet() {
 		IJobManager jobManager= Job.getJobManager();
 		Job[] jobs= jobManager.find(null);
-		for (Job job : jobs) {
+		for (int i= 0; i < jobs.length; i++) {
+			Job job= jobs[i];
 			int state= job.getState();
 			if (state == Job.RUNNING || state == Job.WAITING) {
 				return false;
@@ -234,20 +233,20 @@ public class EditorTestHelper {
 
 
 	public static IFile[] findFiles(IResource resource) throws CoreException {
-		List<IResource> files= new ArrayList<IResource>();
+		List files= new ArrayList();
 		findFiles(resource, files);
-		return files.toArray(new IFile[files.size()]);
+		return (IFile[]) files.toArray(new IFile[files.size()]);
 	}
 
-	private static void findFiles(IResource resource, List<IResource> files) throws CoreException {
+	private static void findFiles(IResource resource, List files) throws CoreException {
 		if (resource instanceof IFile) {
 			files.add(resource);
 			return;
 		}
 		if (resource instanceof IContainer) {
 			IResource[] resources= ((IContainer) resource).members();
-			for (IResource resourceItem : resources)
-				findFiles(resourceItem, files);
+			for (int i= 0; i < resources.length; i++)
+				findFiles(resources[i], files);
 		}
 	}
 
