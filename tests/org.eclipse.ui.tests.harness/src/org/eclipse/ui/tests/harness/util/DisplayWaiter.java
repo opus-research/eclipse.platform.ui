@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,15 +7,15 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.harness.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.Assert;
-
 import org.eclipse.swt.widgets.Display;
+import org.junit.Assert;
 
 /**
  * Implements the thread that will wait for the timeout and wake up the display
@@ -215,6 +215,7 @@ final class DisplayWaiter {
 			/*
 			 * @see java.lang.Runnable#run()
 			 */
+			@Override
 			public void run() {
 				try {
 					run2();
@@ -360,9 +361,10 @@ final class DisplayWaiter {
 	/**
 	 * Implements state consistency checking.
 	 *
-	 * @param states the allowed states
-	 * @throws junit.framework.AssertionFailedError if the current state is not
-	 *         in <code>states</code>
+	 * @param states
+	 *            the allowed states
+	 * @throws org.junit.AssertionError
+	 *             if the current state is not in <code>states</code>
 	 */
 	private void assertStates(int states) {
 		Assert.assertTrue("illegal state", isState(states)); //$NON-NLS-1$
