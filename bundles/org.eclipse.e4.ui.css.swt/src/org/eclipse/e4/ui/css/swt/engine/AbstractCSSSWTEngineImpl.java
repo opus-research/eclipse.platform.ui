@@ -183,10 +183,38 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 			public void handleEvent(Event event) {
 				if (event.widget.getData(NEEDS_REDRAW) != null) {
 					event.widget.setData(NEEDS_REDRAW, null);
-					if (event.widget instanceof Control) {
+
+					if (needsToBeRedrawn(event.widget, event.item)) {
 						((Control) event.widget).redraw();
 					}
 				}
+			}
+
+			private boolean needsToBeRedrawn(Widget widget, Widget item) {
+				if (!(widget instanceof Tree)) {
+					return false;
+				}
+
+				Tree tree = (Tree) widget;
+
+				// The same single selection
+				if (tree.getSelectionCount() == 1
+						&& tree.getSelection()[0] == item) {
+					return true;
+				}
+
+				// For multi selection we always redraw the entire Widget for
+				// simplicity (selection with M1 or M2 keys)
+				if (tree.getSelectionCount() > 1) {
+					return true;
+				}
+
+				// Previous selection gets unselected (selection with M1 key)
+				if (tree.getSelectionCount() == 0) {
+					return true;
+				}
+
+				return false;
 			}
 		};
 		widget.addListener(SWT.Selection, selectionChangedListener);
