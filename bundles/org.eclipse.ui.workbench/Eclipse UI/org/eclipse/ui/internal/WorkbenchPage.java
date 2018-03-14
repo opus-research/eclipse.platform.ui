@@ -13,6 +13,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 411639, 372799
+ *     Thibault Le Ouay <thibaultleouay@gmail.com> Bug 374132
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -4555,16 +4556,26 @@ public class WorkbenchPage implements IWorkbenchPage {
 
 	@Override
 	public void showEditor(IEditorReference ref) {
-		// FIXME compat showEditor
-		E4Util.unsupported("showEditor"); //$NON-NLS-1$
-
+		if (ref != null) {
+			for (IEditorReference reference : getEditorReferences()) {
+				if (reference == ref) {
+					activate(((EditorReference) ref).getPart(true));
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
 	public void hideEditor(IEditorReference ref) {
-		// FIXME compat hideEditor
-		E4Util.unsupported("hideEditor"); //$NON-NLS-1$
-
+		if (ref != null) {
+			for (IEditorReference reference : getEditorReferences()) {
+				if (reference == ref) {
+					hidePart(((EditorReference) ref).getModel(), true, true, false);
+					break;
+				}
+			}
+		}
 	}
 
 	private String getEditorImageURI(EditorReference reference) {
