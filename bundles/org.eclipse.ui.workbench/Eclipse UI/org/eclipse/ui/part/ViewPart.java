@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 20014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,13 +12,18 @@ package org.eclipse.ui.part;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartConstants;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.internal.ViewReference;
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -77,6 +82,73 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
             }
         }
     };
+
+	private IPartListener2 partListener = new IPartListener2() {
+
+        public void partVisible(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partOpened(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partInputChanged(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partHidden(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partDeactivated(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partClosed(IWorkbenchPartReference partRef) {
+            if (partRef instanceof ViewReference) {
+                ((ViewReference) partRef).persist();
+            }
+        }
+
+        public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void partActivated(IWorkbenchPartReference partRef) {
+            // TODO Auto-generated method stub
+
+        }
+    };
+
+    IWorkbenchPage page;
+
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets
+     * .Composite)
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        IWorkbenchPartSite site = getSite();
+        if (site != null) {
+            IWorkbenchPage page = site.getPage();
+            if (page != null) {
+                this.page = page;
+                page.addPartListener(partListener);
+            }
+        }
+    }
+	
 
     /**
      * Creates a new view.
@@ -190,4 +262,17 @@ public abstract class ViewPart extends WorkbenchPart implements IViewPart {
         super.checkSite(site);
         Assert.isTrue(site instanceof IViewSite, "The site for a view must be an IViewSite"); //$NON-NLS-1$
     }    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+     */
+    @Override
+    public void dispose() {
+		if (page != null) {
+			page.removePartListener(partListener);
+		}
+        super.dispose();
+    }
 }
