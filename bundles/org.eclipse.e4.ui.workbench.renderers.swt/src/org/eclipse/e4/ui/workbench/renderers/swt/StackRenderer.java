@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,8 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728, 430166, 441150, 442285
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 429728, 430166, 441150, 442285
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 337588
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,6 +24,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.e4.ui.internal.workbench.OpaqueElementUtil;
 import org.eclipse.e4.ui.internal.workbench.renderers.swt.BasicPartList;
@@ -44,15 +46,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
 import org.eclipse.e4.ui.workbench.modeling.ISaveHandler;
-import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.LegacyActionTools;
 import org.eclipse.jface.action.MenuManager;
@@ -109,7 +108,7 @@ import org.w3c.dom.css.CSSValue;
  */
 public class StackRenderer extends LazyStackRenderer {
 	/**
-	 * 
+	 *
 	 */
 	private static final String THE_PART_KEY = "thePart"; //$NON-NLS-1$
 
@@ -134,19 +133,13 @@ public class StackRenderer extends LazyStackRenderer {
 	// Minimum characters in for stacks inside the shared area
 	private static int MIN_EDITOR_CHARS = 15;
 
-	Image viewMenuImage;
+	private Image viewMenuImage;
 
 	@Inject
-	IStylingEngine stylingEngine;
+	private IEventBroker eventBroker;
 
 	@Inject
-	IEventBroker eventBroker;
-
-	@Inject
-	IPresentationEngine renderer;
-
-	@Inject
-	EModelService modelService;
+	private IPresentationEngine renderer;
 
 	private EventHandler itemUpdater;
 
@@ -234,7 +227,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Handles changes in tags
-	 * 
+	 *
 	 * @param event
 	 */
 	@Inject
@@ -941,6 +934,7 @@ public class StackRenderer extends LazyStackRenderer {
 		if (!(me instanceof MElementContainer<?>))
 			return;
 
+		@SuppressWarnings("unchecked")
 		final MElementContainer<MUIElement> stack = (MElementContainer<MUIElement>) me;
 
 		// Match the selected TabItem to its Part
@@ -1117,7 +1111,6 @@ public class StackRenderer extends LazyStackRenderer {
 		final BasicPartList editorList = new BasicPartList(ctf.getShell(),
 				SWT.ON_TOP, SWT.V_SCROLL | SWT.H_SCROLL,
 				ctxt.get(EPartService.class), stack, this,
-				(ISWTResourceUtilities) ctxt.get(IResourceUtilities.class),
 				getInitialMRUValue(ctf));
 		editorList.setInput();
 
@@ -1174,7 +1167,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Closes the part that's backed by the given widget.
-	 * 
+	 *
 	 * @param widget
 	 *            the part that owns this widget
 	 * @param check
@@ -1399,6 +1392,34 @@ public class StackRenderer extends LazyStackRenderer {
 					}
 				});
 
+				int leftFrom = getCloseableSideParts(part, true).size();
+				if (leftFrom > 0) {
+					MenuItem menuItemLeft = new MenuItem(menu, SWT.NONE);
+					menuItemLeft.setText(SWTRenderersMessages.menuCloseLeft);
+					menuItemLeft.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeSideParts(part, true);
+						}
+					});
+				}
+
+				int rightFrom = getCloseableSideParts(part, false).size();
+				if (rightFrom > 0) {
+					MenuItem menuItemRight = new MenuItem(menu, SWT.NONE);
+					menuItemRight.setText(SWTRenderersMessages.menuCloseRight);
+					menuItemRight.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(SelectionEvent e) {
+							MPart part = (MPart) menu.getData(STACK_SELECTED_PART);
+							closeSideParts(part, false);
+						}
+					});
+				}
+
+				new MenuItem(menu, SWT.SEPARATOR);
+
 				MenuItem menuItemAll = new MenuItem(menu, SWT.NONE);
 				menuItemAll.setText(SWTRenderersMessages.menuCloseAll);
 				menuItemAll.addSelectionListener(new SelectionAdapter() {
@@ -1423,16 +1444,37 @@ public class StackRenderer extends LazyStackRenderer {
 		return parent;
 	}
 
-	private List<MPart> getCloseableSiblingParts(MPart part) {
-		// broken out from closeSiblingParts so it can be used to determine how
-		// many closeable siblings are available
+	private List<MPart> getCloseableSideParts(MPart part, boolean left) {
 		MElementContainer<MUIElement> container = getParent(part);
-		List<MPart> closeableSiblings = new ArrayList<MPart>();
-		if (container == null)
-			return closeableSiblings;
+		if (container == null) {
+			return new ArrayList<MPart>();
+		}
 
 		List<MUIElement> children = container.getChildren();
-		for (MUIElement child : children) {
+		int thisPartIdx = children.indexOf(part);
+		final int start = left ? 0 : thisPartIdx + 1;
+		final int end = left ? thisPartIdx : children.size();
+
+		return getCloseableSiblingParts(part, children, start, end);
+	}
+
+	private List<MPart> getCloseableSiblingParts(MPart part) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return new ArrayList<MPart>();
+		}
+
+		List<MUIElement> children = container.getChildren();
+		return getCloseableSiblingParts(part, children, 0, children.size());
+	}
+
+	private List<MPart> getCloseableSiblingParts(MPart part, List<MUIElement> children,
+			final int start, final int end) {
+		// broken out from closeSiblingParts so it can be used to determine how
+		// many closeable siblings are available
+		List<MPart> closeableSiblings = new ArrayList<MPart>();
+		for (int i = start; i < end; i++) {
+			MUIElement child = children.get(i);
 			// If the element isn't showing skip it
 			if (!child.isToBeRendered())
 				continue;
@@ -1456,12 +1498,26 @@ public class StackRenderer extends LazyStackRenderer {
 		return closeableSiblings;
 	}
 
+	private void closeSideParts(MPart part, boolean left) {
+		MElementContainer<MUIElement> container = getParent(part);
+		if (container == null) {
+			return;
+		}
+		List<MPart> others = getCloseableSideParts(part, left);
+		closeSiblingParts(part, others, true);
+	}
+
 	private void closeSiblingParts(MPart part, boolean skipThisPart) {
 		MElementContainer<MUIElement> container = getParent(part);
-		if (container == null)
+		if (container == null) {
 			return;
-
+		}
 		List<MPart> others = getCloseableSiblingParts(part);
+		closeSiblingParts(part, others, skipThisPart);
+	}
+
+	private void closeSiblingParts(MPart part, List<MPart> others, boolean skipThisPart) {
+		MElementContainer<MUIElement> container = getParent(part);
 
 		// add the current part last so that we unrender obscured items first
 		if (!skipThisPart && part.isToBeRendered() && isClosable(part)) {
@@ -1528,7 +1584,7 @@ public class StackRenderer extends LazyStackRenderer {
 
 	/**
 	 * Determine whether the given view menu has any visible menu items.
-	 * 
+	 *
 	 * @param viewMenu
 	 *            the view menu to check
 	 * @param part
@@ -1619,8 +1675,13 @@ public class StackRenderer extends LazyStackRenderer {
 				part.getTags().remove(CSSConstants.CSS_HIGHLIGHTED_CLASS);
 			}
 
+			String prevCssCls = WidgetElement.getCSSClass(cti);
 			setCSSInfo(part, cti);
-			reapplyStyles(cti.getParent());
+
+			if (prevCssCls == null
+					|| !prevCssCls.equals(WidgetElement.getCSSClass(cti))) {
+				reapplyStyles(cti.getParent());
+			}
 		}
 
 		public boolean validateElement(Object element) {

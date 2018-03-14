@@ -57,6 +57,13 @@ public class ActionSetMenuManager extends SubMenuManager {
         return item;
     }
 
+	/**
+	 * @return Returns the actionSetId.
+	 */
+	public String getActionSetId() {
+		return actionSetId;
+	}
+
     @Override
 	public IContributionItem[] getItems() {
         return getParentMenuManager().getItems();
@@ -71,4 +78,9 @@ public class ActionSetMenuManager extends SubMenuManager {
 	protected SubMenuManager wrapMenu(IMenuManager menu) {
         return new ActionSetMenuManager(menu, actionSetId);
     }
+
+	@Override
+	public String toString() {
+		return "ActionSetMenuManager [id=" + actionSetId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+	}
 }
