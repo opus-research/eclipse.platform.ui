@@ -9,6 +9,7 @@
  *     Tom Schindl<tom.schindl@bestsolution.at> - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430075, 430080
  *     René Brandstetter - Bug 419749 - [Workbench] [e4 Workbench] - Remove the deprecated PackageAdmin
+ *     Wim Jongman - Bug 376486 - IDE not extendable via fragments or processors
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench;
@@ -57,6 +58,22 @@ import org.osgi.framework.wiring.BundleWiring;
  *
  */
 public class ModelAssembler {
+
+	/**
+	 * The name of the extension point attribute.
+	 */
+	private static final String POST_MODEL_CREATION = "postmodelcreation"; //$NON-NLS-1$
+
+	/**
+	 * Indicates that the legacy workbench model is not yet created.
+	 */
+	public static final int DURING_MODEL_CREATION = 0;
+
+	/**
+	 * Indicates that the workbench model has been created.
+	 */
+	public static final int AFTER_MODEL_CREATION = 1;
+
 	@Inject
 	private Logger logger;
 
@@ -72,9 +89,16 @@ public class ModelAssembler {
 	final private static String extensionPointID = "org.eclipse.e4.workbench.model"; //$NON-NLS-1$
 
 	/**
-	 * Process the model
+	 * Process the model based on the step field which can be {@link #PURE_E4},
+	 * {@link #LEGACY_E4STEP} or {@link #LEGACY_E3STEP}.
+	 *
+	 * @param step
+	 * @see #PURE_E4
+	 * @see #LEGACY_E4STEP
+	 * @see #LEGACY_E3STEP
 	 */
-	public void processModel() {
+	public void processModel(int step) {
+
 		IExtensionPoint extPoint = registry.getExtensionPoint(extensionPointID);
 		IExtension[] extensions = topoSort(extPoint.getExtensions());
 
@@ -82,10 +106,10 @@ public class ModelAssembler {
 		List<MApplicationElement> addedElements = new ArrayList<MApplicationElement>();
 
 		// run processors which are marked to run before fragments
-		runProcessors(extensions, false);
-		processFragments(extensions, imports, addedElements);
+		runProcessors(extensions, false, step);
+		processFragments(extensions, imports, addedElements, step);
 		// run processors which are marked to run after fragments
-		runProcessors(extensions, true);
+		runProcessors(extensions, true, step);
 
 		resolveImports(imports, addedElements);
 	}
@@ -94,15 +118,18 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param imports
 	 * @param addedElements
+	 * @param step
 	 */
 	private void processFragments(IExtension[] extensions, List<MApplicationElement> imports,
-			List<MApplicationElement> addedElements) {
+			List<MApplicationElement> addedElements, int step) {
 
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				if ("fragment".equals(ce.getName())) { //$NON-NLS-1$
-					processFragment(ce, imports, addedElements);
+					if (isCorrectPhase(step, ce)) {
+						processFragment(ce, imports, addedElements);
+					}
 				}
 			}
 		}
@@ -209,17 +236,48 @@ public class ModelAssembler {
 	 * @param extensions
 	 * @param afterFragments
 	 */
-	private void runProcessors(IExtension[] extensions, Boolean afterFragments) {
+	private void runProcessors(IExtension[] extensions, Boolean afterFragments, int step) {
 		for (IExtension extension : extensions) {
 			IConfigurationElement[] ces = extension.getConfigurationElements();
 			for (IConfigurationElement ce : ces) {
 				boolean parseBoolean = Boolean.parseBoolean(ce.getAttribute("beforefragment")); //$NON-NLS-1$
 				if ("processor".equals(ce.getName()) && !afterFragments.equals(parseBoolean)) { //$NON-NLS-1$
-					runProcessor(ce);
+					if (isCorrectPhase(step, ce)) {
+						runProcessor(ce);
+					}
 				}
-
 			}
 		}
+	}
+
+	/**
+	 * Check if this configuration element must be run now based on the
+	 * <code>postmodelcreation</code> attribute which can be {@link #DURING_MODEL_CREATION} or
+	 * {@link #AFTER_MODEL_CREATION}.
+	 *
+	 * @param step
+	 * @param ce
+	 * @return true if the element must be processed now.
+	 */
+	private boolean isCorrectPhase(int step, IConfigurationElement ce) {
+
+		// Running before the workbench model is created
+		if (step == DURING_MODEL_CREATION) {
+			if (ce.getAttribute(POST_MODEL_CREATION) == null) {
+				return true;
+			}
+			return Boolean.FALSE.toString().equals(ce.getAttribute(POST_MODEL_CREATION));
+		}
+
+		// Running after the workbench model has been created
+		else if (step == AFTER_MODEL_CREATION) {
+			if (ce.getAttribute(POST_MODEL_CREATION) == null) {
+				return false;
+			}
+			return Boolean.TRUE.toString().equals(ce.getAttribute(POST_MODEL_CREATION));
+		}
+
+		return false;
 	}
 
 	private void runProcessor(IConfigurationElement ce) {
@@ -444,6 +502,7 @@ public class ModelAssembler {
 	 * If this required bundle is required and then re-exported by another bundle then all the
 	 * requiring bundles of the re-exporting bundle are included in the returned array.
 	 * </p>
+	 * 
 	 * @return An unmodifiable {@link Iterable} set of bundles currently requiring this required
 	 *         bundle. An empty {@link Iterable} will be returned if the given {@code Bundle} object
 	 *         has become stale or no bundles require the given bundle.
@@ -467,6 +526,7 @@ public class ModelAssembler {
 	 * <p>
 	 * All re-exports will be followed and also be contained in the result.
 	 * </p>
+	 * 
 	 * @param requiring
 	 *            the result which will contain all the bundles which require the given
 	 *            {@link BundleWiring}
