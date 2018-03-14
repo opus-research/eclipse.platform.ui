@@ -12,7 +12,6 @@
    <extension-point id="markerSupport" name="%ExtPoint.markerSupport" schema="schema/markerSupport.exsd"/>
    <extension-point id="filesystemSupport" name="%ExtPoint.fileSystemSupport" schema="schema/filesystemSupport.exsd"/>
    <extension-point id="editorAssociationOverride" name="%ExtPoint.editorAssociationOverride" schema="schema/editorAssociationOverride.exsd"/>
-   <extension-point id="unknownEditorStrategy" name="%ExtPoint.unknownEditorStrategy" schema="schema/unknownEditorStrategy.exsd"/>
 
    <extension
          point="org.eclipse.ui.importWizards">
@@ -584,7 +583,7 @@
       <page
             name="%PreferencePages.FileEditors"
             category="org.eclipse.ui.preferencePages.Editors"
-            class="org.eclipse.ui.internal.ide.ExtendedFileEditorsPreferencePage"
+            class="org.eclipse.ui.ExtensionFactory:fileAssociationsPreferencePage"
             id="org.eclipse.ui.preferencePages.FileEditors">
          <keywordReference id="org.eclipse.ui.ide.editing"/>
          <keywordReference id="org.eclipse.ui.ide.editors"/>
@@ -1672,17 +1671,11 @@
          point="org.eclipse.ui.menus">
          <menuContribution
             locationURI="menu:window?after=org.eclipse.ui.editors">
-         <menu
-               id="org.eclipse.ui.appearance"
-               label="%menu.window.appearance.label"
-               mnemonic="%menu.window.appearance.mnemonic"
-               tooltip="%menu.window.appearance.tooltip">
-            <command
-                  commandId="org.eclipse.ui.ToggleCoolbarAction"
-                  style="push"
-                  tooltip="%menu.toggleCoolbar.tooltip">
-            </command>
-         </menu>
+         <command
+               commandId="org.eclipse.ui.ToggleCoolbarAction"
+               tooltip="%menu.toggleCoolbar.tooltip"
+               style="push">
+         </command>
       </menuContribution>
 
 
@@ -2402,24 +2395,6 @@
          <hiddenToolBarItem id="print">
          </hiddenToolBarItem>
       </perspectiveExtension>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.unknownEditorStrategy">
-      <strategy
-            class="org.eclipse.ui.internal.ide.SystemEditorOrTextEditorStrategy"
-            id="org.eclipse.ui.ide.systemEditorThenTextEditor"
-            label="%systemEditorThenTextEditor">
-      </strategy>
-      <strategy
-            class="org.eclipse.ui.internal.ide.TextEditorStrategy"
-            id="org.eclipse.ui.ide.textEditor"
-            label="%textEditor">
-      </strategy>
-      <strategy
-            class="org.eclipse.ui.internal.ide.AskUserViaPopupUnknowEditorStrategy"
-            id="org.eclipse.ui.ide.askUserForUnknownEditor"
-            label="%askUserViaPopup">
-      </strategy>
    </extension>
 
 </plugin>

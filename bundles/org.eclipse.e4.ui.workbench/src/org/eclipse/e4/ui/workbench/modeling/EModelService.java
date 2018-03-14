@@ -377,7 +377,8 @@ public interface EModelService {
 	 * @param height
 	 *            The Height of the new window
 	 */
-	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y, int width, int height);
+	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y,
+			int width, int height);
 
 	/**
 	 * Get the top-level window containing this UI element. A <code>null</code> return value

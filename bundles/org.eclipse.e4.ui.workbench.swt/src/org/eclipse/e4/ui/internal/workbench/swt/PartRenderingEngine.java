@@ -1056,10 +1056,20 @@ public class PartRenderingEngine implements IPresentationEngine {
 					spinOnce = false; // loop until the app closes
 					theApp = (MApplication) uiRoot;
 					// long startTime = System.currentTimeMillis();
-					for (MWindow window : theApp.getChildren()) {
-						createGui(window);
+					MWindow selected = theApp.getSelectedElement();
+					if (selected == null) {
+						for (MWindow window : theApp.getChildren()) {
+							createGui(window);
+						}
+					} else {
+						// render the selected one first
+						createGui(selected);
+						for (MWindow window : theApp.getChildren()) {
+							if (selected != window) {
+								createGui(window);
+							}
+						}
 					}
-
 					// long endTime = System.currentTimeMillis();
 					// System.out.println("Render: " + (endTime - startTime));
 					// tell the app context we are starting so the splash is
