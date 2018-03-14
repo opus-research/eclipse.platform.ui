@@ -36,6 +36,11 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 		super();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#select(org.eclipse.ui.views.markers.MarkerItem)
+	 */
 	@Override
 	public boolean select(MarkerItem item) {
 		if (filterOnSeverity) {
@@ -69,6 +74,11 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#loadSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void loadSettings(IMemento memento) {
 		super.loadSettings(memento);
@@ -78,12 +88,22 @@ public class AllMarkersSeverityAndDescriptionFieldFilter extends
 			filterOnSeverity = filtering.booleanValue();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#saveSettings(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveSettings(IMemento memento) {
 		super.saveSettings(memento);
 		memento.putBoolean(FILTER_ON_SEVERITY, filterOnSeverity);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.views.markers.SeverityAndDescriptionFieldFilter#populateWorkingCopy(org.eclipse.ui.views.markers.MarkerFieldFilter)
+	 */
 	@Override
 	public void populateWorkingCopy(MarkerFieldFilter copy) {
 		super.populateWorkingCopy(copy);

@@ -108,18 +108,27 @@ public class LabelRetargetAction extends RetargetAction {
         updateImages(handler);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setDisabledImageDescriptor(ImageDescriptor image) {
         super.setDisabledImageDescriptor(image);
         defaultDisabledImage = image;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setHoverImageDescriptor(ImageDescriptor image) {
         super.setHoverImageDescriptor(image);
         defaultHoverImage = image;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IAction.
+     */
     @Override
 	public void setImageDescriptor(ImageDescriptor image) {
         super.setImageDescriptor(image);

@@ -82,6 +82,11 @@ public class LegacyContextListenerWrapper implements IContextListener,
 		this.context = context;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.core.commands.contexts.IContextListener#contextChanged(org.eclipse.core.commands.contexts.ContextEvent)
+	 */
 	@Override
 	public final void contextChanged(final ContextEvent contextEvent) {
 		wrappedListener

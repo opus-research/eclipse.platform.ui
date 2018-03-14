@@ -258,6 +258,11 @@ public final class ContextAuthority extends ExpressionAuthority {
 				 */
 				newShell.addDisposeListener(new DisposeListener() {
 
+					/*
+					 * (non-Javadoc)
+					 *
+					 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+					 */
 					@Override
 					public void widgetDisposed(DisposeEvent e) {
 						registeredWindows.remove(null);
@@ -559,6 +564,11 @@ public final class ContextAuthority extends ExpressionAuthority {
 		 */
 		final DisposeListener shellDisposeListener = new DisposeListener() {
 
+			/*
+			 * (non-Javadoc)
+			 *
+			 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+			 */
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				registeredWindows.remove(shell);

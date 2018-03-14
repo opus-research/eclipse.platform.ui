@@ -360,16 +360,25 @@ public class RenameResourceAction extends WorkspaceAction {
 		return actionResources;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getOperationMessage() {
 		return IDEWorkbenchMessages.RenameResourceAction_progress;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsMessage() {
 		return IDEWorkbenchMessages.RenameResourceAction_problemMessage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on WorkspaceAction.
+	 */
 	@Override
 	protected String getProblemsTitle() {
 		return IDEWorkbenchMessages.RenameResourceAction_problemTitle;
@@ -452,6 +461,10 @@ public class RenameResourceAction extends WorkspaceAction {
 		textEditor.setFocus();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction; overrides method on
+	 * WorkspaceAction.
+	 */
 	@Override
 	public void run() {
 		IResource currentResource = getCurrentResource();
@@ -633,6 +646,15 @@ public class RenameResourceAction extends WorkspaceAction {
 		this.modelProviderIds = modelProviderIds;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.actions.WorkspaceAction#createOperation(org.eclipse.core.runtime.IStatus[])
+	 *
+	 * Overridden to create and execute an undoable operation that performs the
+	 * rename.
+	 * @since 3.3
+	 */
 	@Override
 	protected IRunnableWithProgress createOperation(final IStatus[] errorStatus) {
 		return new IRunnableWithProgress() {
