@@ -473,9 +473,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
         if (removeAllWhenShown) {
 			removeAll();
 		}
-        MenuManagerEventHelper.getInstance().showEventPreHelper(this);
+        MenuManagerEventHelper.showEventPreHelper(this);
         fireAboutToShow(this);
-        MenuManagerEventHelper.getInstance().showEventPostHelper(this);
+        MenuManagerEventHelper.showEventPostHelper(this);
         update(false, false);
     }
 
@@ -483,9 +483,9 @@ public class MenuManager extends ContributionManager implements IMenuManager {
      * Notifies all listeners that this menu is about to disappear.
      */
     private void handleAboutToHide() {
-    	MenuManagerEventHelper.getInstance().hideEventPreHelper(this);
+    	MenuManagerEventHelper.hideEventPreHelper(this);
         fireAboutToHide(this);
-        MenuManagerEventHelper.getInstance().hideEventPostHelper(this);
+        MenuManagerEventHelper.hideEventPostHelper(this);
     }
 
     /**
