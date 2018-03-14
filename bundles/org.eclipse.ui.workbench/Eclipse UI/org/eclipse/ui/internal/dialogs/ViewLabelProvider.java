@@ -110,6 +110,7 @@ public class ViewLabelProvider extends ColumnLabelProvider {
 		return label;
 	}
 
+	@Override
 	public Color getForeground(Object element) {
 		if (element instanceof MPartDescriptor) {
 			String elementId = ((MPartDescriptor) element).getElementId();

@@ -58,6 +58,7 @@ public final class ShowViewHandler extends AbstractHandler {
 		// fast views are not supported in Eclipse 4
 	}
 
+	@Override
 	public final Object execute(final ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow workbenchWindow = HandlerUtil.getActiveWorkbenchWindowChecked(event);
 		Shell shell = HandlerUtil.getActiveShell(event);
