@@ -1561,7 +1561,11 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				// Reset the internal flags if window was not closed.
 				closing = false;
 				updateDisabled = false;
+			} else {
+				firePageClosed();
+				fireWindowClosed();
 			}
+
 		}
 
 		if (windowClosed && tracker != null) {
@@ -1938,10 +1942,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 					}
 				}
 			}
-			if (getActivePage() != null) {
-				firePageClosed();
-			}
-			fireWindowClosed();
 		} finally {
 
 			try {

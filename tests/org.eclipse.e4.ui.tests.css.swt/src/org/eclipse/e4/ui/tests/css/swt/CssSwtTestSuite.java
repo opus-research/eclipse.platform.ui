@@ -67,7 +67,6 @@ public class CssSwtTestSuite extends TestSuite {
 
 		//other
 		addTestSuite(DescendentTest.class);
-		addTestSuite(InheritTest.class);
 
 		addTestSuite(ThemeTest.class);
 		addTestSuite(Bug419482Test.class);
