@@ -14,9 +14,6 @@
                class="org.eclipse.swt.widgets.Button">
          </widget>
          <widget
-               class="org.eclipse.swt.widgets.Link">
-         </widget>
-         <widget
                class="org.eclipse.swt.widgets.Shell"></widget>
          <widget
                class="org.eclipse.swt.widgets.Scale"></widget>
@@ -115,14 +112,6 @@
          </property-name>
          <property-name
                name="text-transform">
-         </property-name>
-      </handler>
-      <handler
-            adapter="org.eclipse.e4.ui.css.swt.dom.LinkElement"
-            composite="false"
-            handler="org.eclipse.e4.ui.css.swt.properties.css2.CSSPropertyTextSWTHandler">
-         <property-name
-               name="color">
          </property-name>
       </handler>
       <handler
@@ -456,7 +445,10 @@
             composite="false"
             handler="org.eclipse.e4.ui.css.swt.properties.custom.CSSPropertyUnselectHotTabsColorBackgroundHandler">
          <property-name
-               name="unselected-hot-tab-color-background">
+               name="swt-unselected-hot-tab-color-background">
+         </property-name>
+         <property-name
+               name="unselected-hot-tab-color-background" deprecated="renamed as swt-unselected-hot-tab-color-background">
          </property-name>
       </handler>
       <handler

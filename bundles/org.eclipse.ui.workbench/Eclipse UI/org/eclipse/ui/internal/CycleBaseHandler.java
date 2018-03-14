@@ -10,7 +10,6 @@
  *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 276324
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 454143
- *     Conrad Groth <info@conrad-groth.de> - Bug 472748
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -49,7 +48,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -440,17 +439,13 @@ public abstract class CycleBaseHandler extends AbstractHandler implements
 		if (selectedItem != null) {
 			if (selectedItem instanceof MStackElement) {
 				EPartService partService = page.getWorkbenchWindow().getService(EPartService.class);
-				// don't use this branch for editors, because their elementId is
-				// ambiguous
 				partService.showPart(((MStackElement) selectedItem).getElementId(), PartState.ACTIVATE);
 
 				// the if conditions below do not need to be checked then
 				return;
 			}
-			if (selectedItem instanceof IEditorPart) {
+			if (selectedItem instanceof IEditorReference) {
 				page.setEditorAreaVisible(true);
-				page.activate((IEditorPart) selectedItem);
-				return;
 			}
 			if (selectedItem instanceof IWorkbenchPartReference) {
 				IWorkbenchPart part = ((IWorkbenchPartReference) selectedItem)

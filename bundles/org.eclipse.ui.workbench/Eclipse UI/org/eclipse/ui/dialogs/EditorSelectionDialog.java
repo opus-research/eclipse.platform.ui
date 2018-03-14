@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -353,7 +353,7 @@ public class EditorSelectionDialog extends Dialog {
 			return ""; //$NON-NLS-1$
 		}
 		int lastDot = fileName.lastIndexOf('.');
-		if (lastDot == -1 || lastDot >= fileName.length() - 2) {
+		if (lastDot == -1 || lastDot >= fileName.length() - 1) {
 			return ""; //$NON-NLS-1$
 		}
 		return fileName.substring(lastDot + 1, fileName.length());
@@ -382,7 +382,10 @@ public class EditorSelectionDialog extends Dialog {
 			editorTableViewer.setSelection(new StructuredSelection(newSelection), true);
 		} else {
 			// set focus to first element, but don't select it:
-			editorTableViewer.getTree().showItem(editorTableViewer.getTree().getItem(0));
+			Tree tree = editorTableViewer.getTree();
+			if (tree.getItemCount() > 0) {
+				tree.showItem(tree.getItem(0));
+			}
 		}
 		editorTable.setFocus();
 	}
