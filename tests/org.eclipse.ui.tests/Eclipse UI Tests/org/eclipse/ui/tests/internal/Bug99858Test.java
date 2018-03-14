@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 433603
  *******************************************************************************/
 package org.eclipse.ui.tests.internal;
 
@@ -170,6 +171,7 @@ public class Bug99858Test extends TestCase {
 			fTestingMode = true;
 		}
 
+		@Override
 		public void run() {
 			super.run();
 			fRan = true;
@@ -199,17 +201,19 @@ public class Bug99858Test extends TestCase {
 	/**
 	 * After an internal action, see if there are any outstanding SWT events.
 	 */
-	private void chewUpEvents() throws InterruptedException {
+	private void chewUpEvents() {
 		Display display = Display.getCurrent();
 		while (display.readAndDispatch())
 			;
 	}
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		AdvancedValidationUserApprover.AUTOMATED_MODE = true;
 	}
 	
+	@Override
 	protected void tearDown() throws Exception {
 		AdvancedValidationUserApprover.AUTOMATED_MODE = false;
 		super.tearDown();
