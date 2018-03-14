@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2005 IBM Corporation and others.
+ * Copyright (c) 2004, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 489250
  *******************************************************************************/
 package org.eclipse.ui.tests.browser.internal;
 
@@ -41,6 +42,7 @@ public class UITestHelper {
 		public PreferenceDialogWrapper(Shell parentShell, PreferenceManager manager) {
 			super(parentShell, manager);
 		}
+		@Override
 		protected boolean showPage(IPreferenceNode node) {
 			return super.showPage(node);
 		}
@@ -50,6 +52,7 @@ public class UITestHelper {
 		public PropertyDialogWrapper(Shell parentShell, PreferenceManager manager, ISelection selection) {
 			super(parentShell, manager, selection);
 		}
+		@Override
 		protected boolean showPage(IPreferenceNode node) {
 			return super.showPage(node);
 		}
@@ -100,7 +103,7 @@ public class UITestHelper {
 		if (!pages.hasNext())
 			return null;
 
-		title = MessageFormat.format("PropertyDialog.propertyMessage", new Object[] {name});
+		title = MessageFormat.format("PropertyDialog.propertyMessage", name);
 		dialog = new PropertyDialogWrapper(getShell(), manager, new StructuredSelection(element));
 		dialog.create();
 		dialog.getShell().setText(title);

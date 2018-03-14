@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2010 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -161,7 +161,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 
 		for (int i = 0; i < totalSize; i++) {
 			ProgressInfoItem item = createNewItem(infos[i]);
-			item.setColor(i);
+			item.setColor();
 		}
 
 		control.layout(true);
@@ -173,8 +173,10 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	 */
 	private void updateForShowingProgress() {
 		if (control.getChildren().length > 0) {
+			updateSize();
 			scrolled.setContent(control);
 		} else {
+			scrolled.setMinSize(null);
 			scrolled.setContent(noEntryArea);
 		}
 	}
@@ -314,7 +316,6 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 	protected void inputChanged(Object input, Object oldInput) {
 		super.inputChanged(input, oldInput);
 		refreshAll();
-		updateForShowingProgress();
 	}
 
 	@Override
@@ -334,12 +335,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		}
 		((ProgressInfoItem) widget).refresh();
 
-		// Update the minimum size
-		Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		size.x += IDialogConstants.HORIZONTAL_SPACING;
-		size.y += IDialogConstants.VERTICAL_SPACING;
-
-		scrolled.setMinSize(size);
+		updateSize();
 	}
 
 	@Override
@@ -372,7 +368,7 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		Control[] existingChildren = control.getChildren();
 		for (int i = 0; i < existingChildren.length; i++) {
 			ProgressInfoItem item = (ProgressInfoItem) existingChildren[i];
-			item.setColor(i);
+			item.setColor();
 		}
 		control.layout(true);
 		updateForShowingProgress();
@@ -426,12 +422,11 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		// Create new ones if required
 		for (int i = 0; i < maxLength; i++) {
 			ProgressInfoItem item = createNewItem((JobTreeElement) infos[i]);
-			item.setColor(i);
+			item.setColor();
 		}
 
 		control.layout(true);
 		updateForShowingProgress();
-
 	}
 
 	/**
@@ -445,8 +440,18 @@ public class DetailedProgressViewer extends AbstractProgressViewer {
 		for (int i = 0; i < children.length; i++) {
 			ProgressInfoItem item = (ProgressInfoItem) children[i];
 			item.setDisplayed(top, bottom);
-
 		}
+	}
+
+	/**
+	 * Update the minimum size for scrolled composite.
+	 */
+	private void updateSize() {
+		Point size = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		size.x += IDialogConstants.HORIZONTAL_SPACING;
+		size.y += IDialogConstants.VERTICAL_SPACING;
+
+		scrolled.setMinSize(size);
 	}
 
 	public ProgressInfoItem[] getProgressInfoItems() {

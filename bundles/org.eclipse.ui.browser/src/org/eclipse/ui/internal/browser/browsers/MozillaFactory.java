@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,7 +48,7 @@ public class MozillaFactory extends BrowserFactory {
 		}
 	}*/
 
-	/**
+	/*
 	 * On some OSes 0 is always returned by "which" command it is necessary to
 	 * examine ouput to find out failure.
 	 *
@@ -78,12 +78,12 @@ public class MozillaFactory extends BrowserFactory {
 		return false;
 	}*/
 
-	/*
-	 * @see BrowserFactory#createBrowser()
-	 */
+	@Override
 	public IWebBrowser createBrowser(String id, String location, String parameters) {
 		// Create single browser for all clients
-		if (browserInstance == null || !browserInstance.getExecutable().equals(location)) {
+		if (browserInstance == null
+				|| !browserInstance.getExecutable().equals(location)
+				|| !browserInstance.getParameters().equals(parameters)) {
 			browserInstance = new MozillaBrowser(id, location, parameters);
 		}
 		return browserInstance;

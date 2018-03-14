@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Manumitting Technologies Inc - Bug 380609
  ******************************************************************************/
 
 package org.eclipse.e4.ui.workbench.modeling;
@@ -21,6 +22,7 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.SideValue;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimBar;
 import org.eclipse.e4.ui.model.application.ui.basic.MTrimmedWindow;
@@ -344,17 +346,20 @@ public interface EModelService {
 			boolean leavePlaceholder);
 
 	/**
-	 * Inserts the given element into the UI Model by either creating a new sash or augmenting an
-	 * existing sash if the orientation permits.
+	 * Inserts the given element into the UI Model by either creating a new sash
+	 * or augmenting an existing sash if the orientation permits.
 	 *
 	 * @param toInsert
 	 *            The element to insert
 	 * @param relTo
 	 *            The element that the new one is to be relative to
 	 * @param where
-	 *            An SWT constant indicating where the inserted element should be placed
+	 *            Indication of where the inserted element should be placed:
+	 *            {@link #LEFT_OF}, {@link #RIGHT_OF}, {@link #ABOVE},
+	 *            {@link #BELOW}.
 	 * @param ratio
-	 *            The percentage of the area to be occupied by the inserted element
+	 *            The percentage of the area to be occupied by the inserted
+	 *            element; should be a number greater than 0 and less than 1
 	 */
 	public void insert(MPartSashContainerElement toInsert, MPartSashContainerElement relTo,
 			int where, float ratio);
@@ -373,8 +378,7 @@ public interface EModelService {
 	 * @param height
 	 *            The Height of the new window
 	 */
-	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y,
-			int width, int height);
+	public void detach(MPartSashContainerElement mPartSashContainerElement, int x, int y, int width, int height);
 
 	/**
 	 * Get the top-level window containing this UI element. A <code>null</code> return value
@@ -503,6 +507,17 @@ public interface EModelService {
 	 * @return The descriptor matching the id or <code>null</code> if none exists
 	 */
 	public MPartDescriptor getPartDescriptor(String id);
+
+	/**
+	 * Creates a new part from the given descriptor.
+	 *
+	 * @param descriptor
+	 *            a part descriptor, must not be <code>null</code>
+	 * @return a new part
+	 * @see EPartService#createPart(String)
+	 * @since 1.5
+	 */
+	public MPart createPart(MPartDescriptor descriptor);
 
 	/**
 	 * This method ensures that there will never be two placeholders for the same referenced element

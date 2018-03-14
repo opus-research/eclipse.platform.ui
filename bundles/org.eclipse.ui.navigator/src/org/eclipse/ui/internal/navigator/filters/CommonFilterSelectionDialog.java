@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2010 IBM Corporation and others.
+ * Copyright (c) 2003, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,8 +51,8 @@ import org.eclipse.ui.navigator.INavigatorViewerDescriptor;
  */
 public class CommonFilterSelectionDialog extends TrayDialog {
 
-	private static final String FILTER_ICON = "icons/full/elcl16/filter_ps.gif"; //$NON-NLS-1$
-	private static final String CONTENT_ICON = "icons/full/elcl16/content.gif"; //$NON-NLS-1$
+	private static final String FILTER_ICON = "icons/full/elcl16/filter_ps.png"; //$NON-NLS-1$
+	private static final String CONTENT_ICON = "icons/full/elcl16/content.png"; //$NON-NLS-1$
 
 	private static final int TAB_WIDTH_IN_DLUS = 300;
 

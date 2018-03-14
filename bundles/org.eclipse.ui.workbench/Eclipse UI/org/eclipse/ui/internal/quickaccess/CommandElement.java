@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2012 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     ARTAL Technologies <simon.chemouil@artal.fr> - Bug 293044 added keybindings display
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
+ *     Patrik Suzzi <psuzzi@gmail.com> - Bug 476045
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -21,6 +22,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandImageService;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.keys.BindingService;
 import org.eclipse.ui.internal.menus.CommandMessages;
@@ -84,7 +86,8 @@ public class CommandElement extends QuickAccessElement {
 
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		return null;
+		ICommandImageService imgService = ((CommandProvider) getProvider()).getCommandImageService();
+		return (imgService == null) ? null : imgService.getImageDescriptor(getId());
 	}
 
 	/**

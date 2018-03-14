@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 474581
  ******************************************************************************/
 
 package org.eclipse.core.commands;
@@ -33,5 +32,6 @@ public interface IParameterValues {
 	 * @return A map of the externalizable name of the parameter value (<code>String</code>)
 	 *         to the actual value of the parameter (<code>String</code>).
 	 */
-	public Map<String, String> getParameterValues();
+	@SuppressWarnings("rawtypes")
+	public Map getParameterValues();
 }

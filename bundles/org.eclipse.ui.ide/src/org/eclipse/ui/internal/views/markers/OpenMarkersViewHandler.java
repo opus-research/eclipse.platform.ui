@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2008 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,13 +71,10 @@ public class OpenMarkersViewHandler extends MarkerViewHandler {
 	 * @return IInputValidator
 	 */
 	private IInputValidator getValidator() {
-		return new IInputValidator() {
-			@Override
-			public String isValid(String newText) {
-				if (newText.length() > 0)
-					return null;
-				return MarkerMessages.MarkerFilterDialog_emptyMessage;
-			}
+		return newText -> {
+			if (newText.length() > 0)
+				return null;
+			return MarkerMessages.MarkerFilterDialog_emptyMessage;
 		};
 	}
 }
