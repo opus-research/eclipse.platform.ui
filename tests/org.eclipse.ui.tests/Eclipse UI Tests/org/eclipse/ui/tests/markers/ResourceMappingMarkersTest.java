@@ -36,7 +36,6 @@ public class ResourceMappingMarkersTest extends AbstractNavigatorTest {
 	 * 
 	 * @throws Exception
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();

@@ -8,7 +8,7 @@
  * Contributors:
  *     Matthew Hall - initial API and implementation (bug 124684)
  *     Matthew Hall - bugs 260329, 260337
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278, 434283
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 442278
  ******************************************************************************/
 
 package org.eclipse.jface.examples.databinding.snippets;
@@ -29,7 +29,6 @@ import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.value.ComputedValue;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.databinding.viewers.ViewerSupport;
 import org.eclipse.jface.databinding.viewers.ViewersObservables;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -349,12 +348,12 @@ public class Snippet018CheckboxTableViewerCheckedSelection {
 					return Boolean.valueOf(selectedPerson.getValue() != null);
 				}
 			};
-			dbc.bindValue(WidgetProperties.enabled().observe(removePersonButton),
+			dbc.bindValue(SWTObservables.observeEnabled(removePersonButton),
 					personSelected);
-			dbc.bindValue(WidgetProperties.enabled().observe(friendsViewer
+			dbc.bindValue(SWTObservables.observeEnabled(friendsViewer
 					.getTable()), personSelected);
 
-			dbc.bindValue(WidgetProperties.text(SWT.Modify).observe(personName),
+			dbc.bindValue(SWTObservables.observeText(personName, SWT.Modify),
 					BeansObservables.observeDetailValue(selectedPerson, "name",
 							String.class));
 

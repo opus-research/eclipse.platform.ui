@@ -26,7 +26,6 @@ public class TitleAreaDialogTest extends TestCase {
 	
 	private TitleAreaDialog dialog;
 	
-	@Override
 	protected void tearDown() throws Exception {
 		if (dialog != null) {
 			dialog.close();
@@ -45,7 +44,6 @@ public class TitleAreaDialogTest extends TestCase {
 		Shell shell = dialog.getShell();
 		shell.addDisposeListener(new DisposeListener() {
 
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				image.dispose();
 			}

@@ -78,7 +78,6 @@ public class MenuVisibilityTest extends UITestCase {
 			 * 
 			 * @see org.eclipse.jface.action.Action#run()
 			 */
-			@Override
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -96,7 +95,6 @@ public class MenuVisibilityTest extends UITestCase {
 			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
 			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
 			 */
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, activeContextExpr);
@@ -141,7 +139,6 @@ public class MenuVisibilityTest extends UITestCase {
 			 * 
 			 * @see org.eclipse.jface.action.Action#run()
 			 */
-			@Override
 			public void run() {
 				System.out.println("Hello action");
 			}
@@ -180,7 +177,6 @@ public class MenuVisibilityTest extends UITestCase {
 			 * @see org.eclipse.ui.menus.AbstractContributionFactory#createContributionItems(org.eclipse.ui.menus.IMenuService,
 			 *      org.eclipse.ui.menus.AbstractContributionFactory.IContributionList)
 			 */
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(aci, activeContextExpr[0]);
@@ -213,13 +209,11 @@ public class MenuVisibilityTest extends UITestCase {
 	}
 
 	private static class TestEnabled extends AbstractEnabledHandler {
-		@Override
 		public Object execute(ExecutionEvent event) {
 			System.out.println("go");
 			return null;
 		}
 
-		@Override
 		public void setEnabled(boolean isEnabled) {
 			super.setEnabled(isEnabled);
 		}
@@ -235,7 +229,6 @@ public class MenuVisibilityTest extends UITestCase {
 
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				LOCATION, TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				additions.addContributionItem(item, null);
@@ -280,7 +273,6 @@ public class MenuVisibilityTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 
@@ -301,7 +293,6 @@ public class MenuVisibilityTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		if (activeContext != null) {
 			contextService.deactivateContext(activeContext);

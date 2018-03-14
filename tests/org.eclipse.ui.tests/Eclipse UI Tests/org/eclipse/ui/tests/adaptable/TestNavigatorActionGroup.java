@@ -45,8 +45,7 @@ public class TestNavigatorActionGroup extends ActionGroup {
     /**
      * @see ActionGroup#fillContextMenu(IMenuManager)
      */
-    @Override
-	public void fillContextMenu(IMenuManager menu) {
+    public void fillContextMenu(IMenuManager menu) {
         IStructuredSelection selection = (IStructuredSelection) getContext()
                 .getSelection();
 
