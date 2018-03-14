@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2015 IBM Corporation and others.
+ * Copyright (c) 2005, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,19 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Tom Hochstein (Freescale) - Bug 393703 - NotHandledException selecting inactive command under 'Previous Choices' in Quick access
- *     Wayne Beaton (The Eclipse Foundation) - Bug 162006
  *******************************************************************************/
 package org.eclipse.ui.internal.quickaccess;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.IRegistryChangeEvent;
-import org.eclipse.core.runtime.IRegistryChangeListener;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -76,10 +69,6 @@ import org.eclipse.ui.themes.ColorUtil;
  */
 public abstract class QuickAccessContents {
 	/**
-	 * 
-	 */
-	static final String QUICK_ACCESS_EXTENSION_POINT = "org.eclipse.ui.workbench.quickAccess"; //$NON-NLS-1$
-	/**
 	 * When opened in a popup we were given the command used to open it. Now
 	 * that we have a shell, we are just using a hard coded command id.
 	 */
@@ -89,21 +78,7 @@ public abstract class QuickAccessContents {
 
 	protected Text filterText;
 
-	private QuickAccessProvider[] baseProviders;
 	private QuickAccessProvider[] providers;
-	private IEclipseContext context;
-
-	/**
-	 * When the extension registry changes, recompute the providers.
-	 */
-	private IRegistryChangeListener registryChangeListener = new IRegistryChangeListener() {
-		@Override
-		public void registryChanged(IRegistryChangeEvent event) {
-			// TODO Clean up the PreviousPicksProvider
-			computeProviders();
-			resetProviders();
-		}
-	};
 
 	protected Table table;
 	protected Label infoLabel;
@@ -123,33 +98,8 @@ public abstract class QuickAccessContents {
 	protected boolean resized = false;
 	private TriggerSequence keySequence;
 
-	public QuickAccessContents(QuickAccessProvider[] providers, IEclipseContext context) {
-		baseProviders = providers;
-		this.context = context;
-		computeProviders();
-
-		Platform.getExtensionRegistry().addRegistryChangeListener(registryChangeListener, "org.eclipse.ui.workbench"); //$NON-NLS-1$
-	}
-
-	/**
-	 * Computes the full set of providers starting with the base
-	 * (built-in/system) providers, then adding providers contributed via the
-	 * "quickAccess" extension point. This method destructively modifies the
-	 * {@link QuickAccessContents#providers} field with up-to-date information
-	 * based on information provided from the extension registry.
-	 */
-	private void computeProviders() {
-		List<QuickAccessProvider> extensionProviders = new ArrayList<QuickAccessProvider>();
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IConfigurationElement[] config = registry.getConfigurationElementsFor(QUICK_ACCESS_EXTENSION_POINT);
-		for (IConfigurationElement element : config) {
-			extensionProviders.add(new ExtensionQuickAccessProvider(element, context));
-		}
-
-		providers = new QuickAccessProvider[baseProviders.length + extensionProviders.size()];
-		System.arraycopy(baseProviders, 0, providers, 0, baseProviders.length);
-		for (int index = 0; index < extensionProviders.size(); index++)
-			providers[index + baseProviders.length] = extensionProviders.get(index);
+	public QuickAccessContents(QuickAccessProvider[] providers) {
+		this.providers = providers;
 	}
 
 	/**
@@ -164,10 +114,10 @@ public abstract class QuickAccessContents {
 
 	/**
 	 * Refreshes the contents of the quick access shell
-	 * 
+	 *
 	 * @param filter
 	 *            The filter text to apply to results
-	 * 
+	 *
 	 */
 	public void refresh(String filter) {
 		if (table != null) {
@@ -198,7 +148,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Allows the quick access content owner to mark a quick access element as
 	 * being a perfect match, putting it at the start of the table.
-	 * 
+	 *
 	 * @param filter
 	 *            the filter text used to find a match
 	 * @return an element to be put at the top of the table or <code>null</code>
@@ -208,19 +158,19 @@ public abstract class QuickAccessContents {
 	/**
 	 * Notifies the quick access content owner that the contents of the table
 	 * have been changed.
-	 * 
+	 *
 	 * @param filterTextEmpty
 	 *            whether the filter text used to calculate matches was empty
 	 * @param showAllMatches
 	 *            whether the results were constrained by the size of the dialog
-	 * 
+	 *
 	 */
 	protected abstract void updateFeedback(boolean filterTextEmpty, boolean showAllMatches);
 
 	/**
 	 * Sets whether to display all matches to the current filter or limit the
 	 * results. Will refresh the table contents and update the info label.
-	 * 
+	 *
 	 * @param showAll
 	 *            whether to display all matches
 	 */
@@ -231,7 +181,7 @@ public abstract class QuickAccessContents {
 			refresh(filterText.getText().toLowerCase());
 		}
 	}
-	
+
 	private void updateInfoLabel() {
 		if (infoLabel != null) {
 			TriggerSequence sequence = getTriggerSequence();
@@ -255,7 +205,7 @@ public abstract class QuickAccessContents {
 	 * Returns the trigger sequence that can be used to open the quick access
 	 * dialog as well as toggle the show all results feature. Can return
 	 * <code>null</code> if no trigger sequence is known.
-	 * 
+	 *
 	 * @return the trigger sequence used to open the quick access or
 	 *         <code>null</code>
 	 */
@@ -271,7 +221,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Return whether the shell is currently set to display all matches or limit
 	 * the results.
-	 * 
+	 *
 	 * @return whether all matches will be displayed
 	 */
 	public boolean getShowAllMatches() {
@@ -332,7 +282,7 @@ public abstract class QuickAccessContents {
 	 * match entry that should be given priority. The number of items returned
 	 * is affected by {@link #getShowAllMatches()} and the size of the table's
 	 * composite.
-	 * 
+	 *
 	 * @param filter
 	 *            the string text filter to apply, possibly empty
 	 * @param perfectMatch
@@ -374,7 +324,7 @@ public abstract class QuickAccessContents {
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
 					QuickAccessElement[] sortedElements = provider.getElementsSorted();
 					List<QuickAccessEntry> poorFilterMatches = new ArrayList<QuickAccessEntry>();
-					
+
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
@@ -480,9 +430,6 @@ public abstract class QuickAccessContents {
 			resourceManager.dispose();
 			resourceManager = null;
 		}
-
-		Platform.getExtensionRegistry().removeRegistryChangeListener(registryChangeListener);
-
 	}
 
 	protected IDialogSettings getDialogSettings() {
@@ -582,7 +529,7 @@ public abstract class QuickAccessContents {
 
 	/**
 	 * Creates the table providing the contents for the quick access dialog
-	 * 
+	 *
 	 * @param composite parent composite with {@link GridLayout}
 	 * @param defaultOrientation the window orientation to use for the table {@link SWT#RIGHT_TO_LEFT} or {@link SWT#LEFT_TO_RIGHT}
 	 * @return the created table
@@ -746,7 +693,7 @@ public abstract class QuickAccessContents {
 	/**
 	 * Creates a label which will display the key binding to expand
 	 * the search results.
-	 * 
+	 *
 	 * @param parent parent composite with {@link GridLayout}
 	 * @return the created label
 	 */
@@ -767,13 +714,6 @@ public abstract class QuickAccessContents {
 		for (QuickAccessProvider provider : providers) {
 			provider.reset();
 		}
-	}
-
-	/**
-	 * @return
-	 */
-	public QuickAccessProvider[] getProviders() {
-		return providers;
 	}
 
 }

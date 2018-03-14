@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,12 +7,12 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Tomasz Zarna <tomasz.zarna@tasktop.com> - Bug 37183
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -25,10 +25,10 @@ import org.eclipse.ui.internal.util.Util;
 
 /**
  * Abstract baseclass for IWorkingSet implementations.
- * 
+ *
  * @since 3.2
  */
-public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
+public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet, Cloneable {
 
 	protected static final String FACTORY_ID = "org.eclipse.ui.internal.WorkingSetFactory"; //$NON-NLS-1$
 
@@ -43,12 +43,12 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	protected IMemento workingSetMemento;
 
 	private String label;
-	
+
 	//Workspace wide unique id for workingsets
 	private String uniqueId;
-	
+
 	private static int counter;
-	
+
 	/**
 	 * Whether or not the label value should follow the name value. It should do
 	 * this until a call to setLabel() differentiates it from the name.
@@ -57,7 +57,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	/**
 	 * Create a new instance of this class
-	 * 
+	 *
 	 * @param name the unique name for this working set
 	 * @param label the user-friendly name for this working set
 	 */
@@ -67,14 +67,14 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 		this.label = label;
 		labelBoundToName = Util.equals(name, label);
 		uniqueId = Long.toString(System.currentTimeMillis()) + "_" + counter++; //$NON-NLS-1$
-	}	
+	}
 
 	/**
-	 * Returns the receiver if the requested type is either IWorkingSet 
+	 * Returns the receiver if the requested type is either IWorkingSet
 	 * or IPersistableElement.
-	 * 
+	 *
 	 * @param adapter the requested type
-	 * @return the receiver if the requested type is either IWorkingSet 
+	 * @return the receiver if the requested type is either IWorkingSet
 	 * 	or IPersistableElement.
 	 */
 	@Override
@@ -101,19 +101,20 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 						"working set with same name already registered"); //$NON-NLS-1$
 			}
 	    }
-	    
+
+	    AbstractWorkingSet oldWorkingSet = clone();
 	    name = newName;
 
-	    fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE, null);
-	    
+	    fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_NAME_CHANGE, oldWorkingSet);
+
 	    if (labelBoundToName) {
 	    		setLabel(newName);
 	    }
 	}
 
 	/**
-	 * Connect this working set to a manger. 
-	 * 
+	 * Connect this working set to a manger.
+	 *
 	 * @param manager the manager to connect to
 	 */
 	public void connect(IWorkingSetManager manager) {
@@ -122,7 +123,7 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	}
 
 	/**
-	 * Disconnet this working set from its manager, if any.
+	 * Disconnect this working set from its manager, if any.
 	 */
 	public void disconnect() {
 		this.manager= null;
@@ -137,14 +138,14 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	/**
 	 * Create a copy of the elements to store in the receiver.
-	 * 
-	 * @param elements the elements to store a copy of in the 
+	 *
+	 * @param elements the elements to store a copy of in the
 	 * 	receiver.
 	 */
 	protected void internalSetElements(IAdaptable[] newElements) {
 	    Assert.isNotNull(newElements,
 	            "Working set elements array must not be null"); //$NON-NLS-1$
-	
+
 	    elements = new ArrayList(newElements.length);
 	    for (int i = 0; i < newElements.length; i++) {
 	        elements.add(newElements[i]);
@@ -159,8 +160,8 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	/**
 	 * Returns the elements array list. Lazily restores the elements from
-	 * persistence memento. 
-	 * 
+	 * persistence memento.
+	 *
 	 * @return the elements array list
 	 */
 	protected ArrayList getElementsArray() {
@@ -170,9 +171,9 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	    }
 	    return elements;
 	}
-	
+
 	abstract void restoreWorkingSet();
-	
+
 	protected IWorkingSetManager getManager() {
 		return manager;
 	}
@@ -189,18 +190,19 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 
 	@Override
 	public void setLabel(String label) {
+		AbstractWorkingSet oldWorkingSet = clone();
+
 		this.label = label == null ? getName() : label;
 		labelBoundToName = Util.equals(label, name);  // rebind the label to the name
 		
-		fireWorkingSetChanged(
-				IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE, null);
+		fireWorkingSetChanged(IWorkingSetManager.CHANGE_WORKING_SET_LABEL_CHANGE, oldWorkingSet);
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return getElementsArray().isEmpty();
 	}
-	
+
     @Override
 	public final ImageDescriptor getImage() {
         return getImageDescriptor();
@@ -214,5 +216,16 @@ public abstract class AbstractWorkingSet implements IAdaptable, IWorkingSet {
 	/*package*/void setUniqueId(String uniqueId) {
 		this.uniqueId = uniqueId;
 	}
-       
+
+	@Override
+	protected AbstractWorkingSet clone() {
+		try {
+			AbstractWorkingSet clone = (AbstractWorkingSet) super.clone();
+			clone.disconnect();
+			return clone;
+		} catch (CloneNotSupportedException e) {
+			// ignore
+		}
+		return null;
+	}
 }
