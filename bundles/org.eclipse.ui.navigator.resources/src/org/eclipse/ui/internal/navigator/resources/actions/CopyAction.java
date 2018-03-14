@@ -98,7 +98,7 @@ import org.eclipse.ui.part.ResourceTransfer;
      * clipboard.
      */
     public void run() {
-        List<IResource> selectedResources = (List<IResource>)getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
         IResource[] resources =selectedResources
                 .toArray(new IResource[selectedResources.size()]);
 
@@ -185,7 +185,7 @@ import org.eclipse.ui.part.ResourceTransfer;
 			return false;
 		}
 
-        List<IResource> selectedResources = (List<IResource>)getSelectedResources();
+        List<IResource> selectedResources = getSelectedResources();
         if (selectedResources.size() == 0) {
 			return false;
 		}
