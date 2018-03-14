@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 429728
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -327,6 +326,21 @@ public class WBWRenderer extends SWTPartRenderer {
 		eventBroker.unsubscribe(themeDefinitionChanged);
 
 		themeDefinitionChanged.dispose();
+	}
+
+	/**
+	 * @param wbwModel
+	 * @return Returns the style override bits or -1 if there is no override
+	 */
+	private int getStyleOverride(MWindow wbwModel) {
+		String overrideStr = wbwModel.getPersistedState().get(
+				IPresentationEngine.STYLE_OVERRIDE_KEY);
+		if (overrideStr == null || overrideStr.length() == 0)
+			return -1;
+
+		int val = -1;
+		val = Integer.parseInt(overrideStr);
+		return val;
 	}
 
 	public Object createWidget(MUIElement element, Object parent) {
@@ -677,6 +691,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#getUIContainer
+	 * (org.eclipse.e4.ui.model.application.MUIElement)
+	 */
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		MUIElement parent = element.getParent();
@@ -691,6 +712,13 @@ public class WBWRenderer extends SWTPartRenderer {
 		return tpl.clientArea;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.PartFactory#postProcess(org.eclipse
+	 * .e4.ui.model.application.MPart)
+	 */
 	@Override
 	public void postProcess(MUIElement shellME) {
 		super.postProcess(shellME);
