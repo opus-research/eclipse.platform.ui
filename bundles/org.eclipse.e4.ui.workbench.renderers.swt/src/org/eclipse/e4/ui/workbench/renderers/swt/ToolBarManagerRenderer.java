@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654, 483842
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
@@ -166,7 +166,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					ToolBar tb = parent.getControl();
 					if (tb != null && !tb.isDisposed()) {
 						tb.pack(true);
-						tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+						tb.requestLayout();
 					}
 				}
 			} else {
@@ -218,7 +218,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				if (tb.getParent() != null) {
 					tb.getParent().pack(true);
 				}
-				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+				tb.requestLayout();
 			}
 		}
 	}
@@ -527,7 +527,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar bar = manager.createControl(parent);
 		bar.setData(manager);
 		bar.setData(AbstractPartRenderer.OWNING_ME, element);
-		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
+		bar.requestLayout();
 		return bar;
 	}
 
@@ -601,7 +601,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar tb = getToolbarFrom(container.getWidget());
 		if (tb != null) {
 			tb.pack(true);
-			tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+			tb.requestLayout();
 		}
 	}
 
@@ -651,7 +651,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
 				toolbar.pack(true);
-				toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -663,7 +663,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
 			toolbar.pack(true);
-			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+			toolbar.requestLayout();
 		}
 	}
 
