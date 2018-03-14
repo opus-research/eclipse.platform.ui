@@ -134,6 +134,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         RegistryFactory.getRegistry().addListener(this, EXT_POINT);
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageBookView.
+     * Returns the default property sheet page.
+     */
     @Override
 	protected IPage createDefaultPage(PageBook book) {
         IPageBookViewPage page = (IPageBookViewPage) ViewsPlugin.getAdapter(this,
@@ -177,6 +181,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 						IPropertiesHelpContextIds.PROPERTY_SHEET_VIEW);
     }
 
+    /* (non-Javadoc)
+     * Method declared on IWorkbenchPart.
+     */
     @Override
 	public void dispose() {
         // run super.
@@ -191,6 +198,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         pinPropertySheetAction = null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageBookView.
+     */
     @Override
 	protected PageRec doCreatePage(IWorkbenchPart part) {
         // Get a custom property sheet page but not if the part is also a
@@ -213,6 +223,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         return null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageBookView.
+     */
     @Override
 	protected void doDestroyPage(IWorkbenchPart part, PageRec rec) {
         IPropertySheetPage page = (IPropertySheetPage) rec.page;
@@ -220,6 +233,11 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         rec.dispose();
     }
 
+    /* (non-Javadoc)
+     * Method declared on PageBookView.
+     * Returns the active part on the same workbench page as this property
+     * sheet view.
+     */
     @Override
 	protected IWorkbenchPart getBootstrapPart() {
         IWorkbenchPage page = getSite().getPage();
@@ -230,12 +248,19 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         return null;
     }
 
+    /* (non-Javadoc)
+     * Method declared on IViewPart.
+     */
     @Override
 	public void init(IViewSite site) throws PartInitException {
    		site.getPage().addPostSelectionListener(this);
    		super.init(site);
     }
 
+    /* (non-Javadoc)
+	 * @see org.eclipse.ui.part.ViewPart#saveState(org.eclipse.ui.IMemento)
+	 * since 3.4
+	 */
 	@Override
 	public void saveState(IMemento memento) {
 		// close all but the primary/parent property sheet
@@ -247,6 +272,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		}
 	}
 
+    /* (non-Javadoc)
+     * Method declared on PageBookView.
+     * The property sheet may show properties for any view other than this view.
+     */
     @Override
 	protected boolean isImportant(IWorkbenchPart part) {
 		// Don't interfere with other property views
@@ -255,6 +284,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		return !isPinned() && !isPropertyView && !isViewIgnored(partID);
     }
 
+    /* (non-Javadoc)
+	 * @see org.eclipse.ui.part.PageBookView#partClosed(org.eclipse.ui.IWorkbenchPart)
+	 * since 3.4
+	 */
 	@Override
 	public void partClosed(IWorkbenchPart part) {
 		if (part.equals(currentPart)) {
@@ -265,11 +298,19 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		super.partClosed(part);
 	}
     
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.PageBookView#partVisible(org.eclipse.ui.IWorkbenchPart)
+	 * since 3.4
+	 */
 	@Override
 	protected void partVisible(IWorkbenchPart part) {
 	    super.partVisible(part);
 	}
 	
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.part.PageBookView#partHidden(org.eclipse.ui.IWorkbenchPart)
+     * since 3.4
+     */
     @Override
 	protected void partHidden(IWorkbenchPart part) {
     	// Explicitly ignore parts becoming hidden as this
@@ -314,6 +355,10 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         }
     }
 
+    /* (non-Javadoc)
+     * Method declared on ISelectionListener.
+     * Notify the current page that the selection has changed.
+     */
     @Override
 	public void selectionChanged(IWorkbenchPart part, ISelection sel) {
         // we ignore null selection, or if we are pinned, or our own selection or same selection

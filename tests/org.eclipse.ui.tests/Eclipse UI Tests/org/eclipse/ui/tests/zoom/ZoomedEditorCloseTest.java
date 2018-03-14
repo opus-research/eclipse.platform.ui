@@ -24,16 +24,25 @@ public class ZoomedEditorCloseTest extends CloseTest {
         super(name);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart1()
+     */
     @Override
 	public IWorkbenchPart getStackedPart1() {
         return editor1;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getStackedPart2()
+     */
     @Override
 	public IWorkbenchPart getStackedPart2() {
         return editor2;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.zoom.CloseTest#getUnstackedPart()
+     */
     @Override
 	public IWorkbenchPart getUnstackedPart() {
         return editor3;

@@ -32,6 +32,11 @@ public class HelloUpdateHandler extends AbstractHandler implements
 
 	private String myLabelState = null;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
@@ -46,6 +51,12 @@ public class HelloUpdateHandler extends AbstractHandler implements
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.commands.ICallbackUpdater#updateCallback(org.eclipse.core.runtime.IAdaptable,
+	 *      java.util.Map)
+	 */
 	@Override
 	public void updateElement(UIElement element, Map parameters) {
 		if (myLabelState == null) {

@@ -233,6 +233,9 @@ import org.eclipse.swt.widgets.Display;
 		}
 
         display.asyncExec(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
             @Override
 			public void run() {
                 ((IProgressMonitorWithBlocking) pm).clearBlocked();
@@ -252,6 +255,9 @@ import org.eclipse.swt.widgets.Display;
 		}
 
         display.asyncExec(new Runnable() {
+            /* (non-Javadoc)
+             * @see java.lang.Runnable#run()
+             */
             @Override
 			public void run() {
                 ((IProgressMonitorWithBlocking) pm).setBlocked(reason);

@@ -46,6 +46,9 @@ public class RawIViewPartTest extends UITestCase {
     boolean contentChangeEvent = false;
 
     private IPropertyListener propertyListener = new IPropertyListener() {
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.IPropertyListener#propertyChanged(java.lang.Object, int)
+         */
         @Override
 		public void propertyChanged(Object source, int propId) {
             switch (propId) {
@@ -77,6 +80,9 @@ public class RawIViewPartTest extends UITestCase {
         contentChangeEvent = false;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+     */
     @Override
 	protected void doTearDown() throws Exception {
         view.removePropertyListener(propertyListener);

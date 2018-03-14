@@ -44,7 +44,6 @@ public class PersonTests extends TestCase {
 		private int count;
 		private PropertyChangeEvent lastEvent;
 		
-		@Override
 		public void propertyChange(PropertyChangeEvent evt) {
 			count++;
 			this.lastEvent = evt;

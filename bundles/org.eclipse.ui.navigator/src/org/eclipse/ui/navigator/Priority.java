@@ -218,6 +218,9 @@ public final class Priority {
 		return value;
 	}
 	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "Priority ["+getLiteral()+"]";  //$NON-NLS-1$//$NON-NLS-2$

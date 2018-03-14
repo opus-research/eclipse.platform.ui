@@ -88,6 +88,9 @@ public class Snippet007FullSelection {
 
 		v.getTable().addListener(SWT.EraseItem, new Listener() {
 
+			/* (non-Javadoc)
+			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+			 */
 			@Override
 			public void handleEvent(Event event) {
 				event.detail &= ~SWT.SELECTED;
