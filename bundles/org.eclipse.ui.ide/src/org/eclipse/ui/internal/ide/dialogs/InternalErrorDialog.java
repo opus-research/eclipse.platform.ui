@@ -89,6 +89,9 @@ public class InternalErrorDialog extends MessageDialog {
         detailButtonID = index;
     }
 
+    /* (non-Javadoc)
+     * Method declared on Dialog.
+     */
     @Override
 	protected void buttonPressed(int buttonId) {
         if (buttonId == detailButtonID) {
