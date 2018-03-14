@@ -6,16 +6,18 @@
  *
  * Contributors:
  *   EclipseSource - initial API and implementation
- *   Stefan Winkler <stefan@winklerweb.net> - Bug 419482
+ *   Stefan Winkler <stefan@winklerweb.net> - Bugs 419482, 419377
  ******************************************************************************/
 package org.eclipse.e4.ui.tests.css.core.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.e4.ui.css.core.dom.ElementAdapter;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
-import org.eclipse.e4.ui.css.swt.engine.CSSSWTEngineImpl;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -29,15 +31,17 @@ public class TestElement extends ElementAdapter {
 	private String id;
 	private Map attrs = new HashMap();
 	private Node parentNode = null;
+	private List<Node> children = null;
 
 	public TestElement(String type, CSSEngine engine) {
 		super(null, engine);
 		this.typeName = type;
 	}
 
-	public TestElement(String type, TestElement parent, CSSSWTEngineImpl engine) {
+	public TestElement(String type, TestElement parent, CSSEngine engine) {
 		this(type, engine);
 		this.parentNode = parent;
+		parent.appendChild(this);
 	}
 
 	public void setClass(String className) {
@@ -66,7 +70,21 @@ public class TestElement extends ElementAdapter {
 
 	@Override
 	public NodeList getChildNodes() {
-		return null;
+		if (children == null) {
+			return null;
+		}
+
+		return new NodeList() {
+			@Override
+			public int getLength() {
+				return children.size();
+			}
+
+			@Override
+			public Node item(int index) {
+				return children.get(index);
+			}
+		};
 	}
 
 	@Override
@@ -92,5 +110,14 @@ public class TestElement extends ElementAdapter {
 	@Override
 	public String getCSSStyle() {
 		return null;
+	}
+
+	@Override
+	public Node appendChild(Node newChild) throws DOMException {
+		if (children == null) {
+			children = new ArrayList<Node>();
+		}
+		children.add(newChild);
+		return newChild;
 	}
 }
