@@ -640,9 +640,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			fillActionBars(FILL_ALL_ACTION_BARS);
 			firePageOpened();
 
-			getCoolBarManager2().add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-			getCoolBarManager2().add(new GroupMarker("afterAdditions")); //$NON-NLS-1$
-
 			populateTopTrimContributions();
 			populateBottomTrimContributions();
 
@@ -816,7 +813,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 		 * and so on, buttons which are normally placed at the beginning of the
 		 * trimbar (left) would be moved to the end of it (right).)
 		 */
-
 		MToolControl spacerControl = (MToolControl) modelService.find("PerspectiveSpacer", model); //$NON-NLS-1$
 		if (spacerControl == null) {
 			spacerControl = MenuFactoryImpl.eINSTANCE.createToolControl();
