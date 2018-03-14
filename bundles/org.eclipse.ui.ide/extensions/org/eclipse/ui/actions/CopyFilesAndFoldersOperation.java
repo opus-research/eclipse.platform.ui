@@ -478,16 +478,20 @@ public class CopyFilesAndFoldersOperation {
 							} else {
 								IFolder folder = workspaceRoot.getFolder(destinationPath);
 								if (createVirtualFoldersAndLinks) {
-									folder.create(IResource.VIRTUAL, true, iterationProgress.split(1));
+									folder.create(IResource.VIRTUAL, true, subMonitor.split(1));
 									IResource[] members = ((IContainer) source).members();
 									if (members.length > 0)
-										copy(members, destinationPath, iterationProgress.split(99));
+										copy(members, destinationPath, iterationProgress.split(100));
 								} else
 									folder.createLink(createRelativePath(source.getLocationURI(), folder), 0,
 											iterationProgress.split(100));
 							}
 						} else
 							source.copy(destinationPath, IResource.SHALLOW, iterationProgress.split(100));
+					}
+
+					if (subMonitor.isCanceled()) {
+						throw new OperationCanceledException();
 					}
 				}
 			}
