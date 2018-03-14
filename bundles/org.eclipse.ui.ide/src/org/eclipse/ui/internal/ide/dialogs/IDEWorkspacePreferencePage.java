@@ -12,7 +12,6 @@
  *     James Blackburn (Broadcom Corp.)   -  bug 340978
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
  *     Christian Georgi (SAP SE)          -  bug 458811
- *     Denis Zygann <d.zygann@web.de>      - Bug 458832
  *******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
@@ -23,9 +22,7 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.ConfigurationScope;
-import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.Preferences;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4Workbench;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -61,7 +58,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.LineDelimiterEditor;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * The IDEWorkspacePreferencePage is the page used to set IDE-specific preferences settings
@@ -92,7 +88,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	private ResourceEncodingFieldEditor encodingEditor;
 
 	private LineDelimiterEditor lineSeparatorEditor;
-	
+
     //A boolean to indicate if the user settings were cleared.
 	private boolean clearUserSettings = false;
 
@@ -134,17 +130,17 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		createSpace(composite);
 		createSystemExplorerGroup(composite);
 		createSpace(composite);
-		
+
 		Composite lower = new Composite(composite,SWT.NONE);
 		GridLayout lowerLayout = new GridLayout();
 		lowerLayout.marginWidth = 0;
 		lowerLayout.numColumns = 2;
 		lowerLayout.makeColumnsEqualWidth = true;
 		lower.setLayout(lowerLayout);
-		
+
 		lower.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		createEncodingEditorControls(lower);
 		createLineSeparatorEditorControls(lower);
 		applyDialogFont(composite);
@@ -239,7 +235,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     /**
      * Create a composite that contains entry fields specifying save interval
      * preference.
-     * 
+     *
      * @param composite the Composite the group is created in.
      */
     private void createSaveIntervalGroup(Composite composite) {
@@ -288,7 +284,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     /**
      * Create a composite that contains entry fields specifying the workspace name
      * preference.
-     * 
+     *
      * @param composite the Composite the group is created in.
      */
     private void createWindowTitleGroup(Composite composite) {
@@ -339,12 +335,12 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	 *
 	 * @param parent
 	 */
-    private void createEncodingEditorControls(Composite parent){    			
+    private void createEncodingEditorControls(Composite parent){
 		Composite encodingComposite = new Composite(parent,SWT.NONE);
 		encodingComposite.setLayout(new GridLayout());
 		encodingComposite.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		encodingEditor = new ResourceEncodingFieldEditor(IDEWorkbenchMessages.WorkbenchPreference_encoding, encodingComposite, ResourcesPlugin
 				.getWorkspace().getRoot());
 
@@ -360,10 +356,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 			}
 		});
     }
-    
+
     /**
      * Create a composite that contains the line delimiter controls
-     * 
+     *
      * @param parent
      */
     private void createLineSeparatorEditorControls(Composite parent){
@@ -375,14 +371,14 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		lineComposite.setLayoutData(new GridData(
                 GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
-		
+
 		lineSeparatorEditor = new LineDelimiterEditor(lineComposite);
 		lineSeparatorEditor.doLoad();
     }
 
 	/**
 	 * Create the widget for the system explorer command.
-	 * 
+	 *
 	 * @param composite
 	 */
 	protected void createSystemExplorerGroup(Composite composite) {
@@ -424,10 +420,10 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
     protected IPreferenceStore getIDEPreferenceStore() {
         return IDEWorkbenchPlugin.getDefault().getPreferenceStore();
     }
-	
+
 	/**
      * Creates a tab of one horizontal spans.
-     * 
+     *
      * @param parent
      *            the parent in which the tab should be created
      */
@@ -445,7 +441,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	/**
      * Creates the composite which will contain all the preference controls for
      * this page.
-     * 
+     *
      * @param parent
      *            the parent composite
      * @return the composite for this page
@@ -465,16 +461,16 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 	public void init(org.eclipse.ui.IWorkbench workbench) {
 		e4Context = workbench.getService(IEclipseContext.class);
     }
-    
+
     /**
      * The default button has been pressed.
      */
     @Override
-    protected void performDefaults() {
-        // core holds onto this preference.
-        IEclipsePreferences node = DefaultScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
+	protected void performDefaults() {
 
-        boolean autoBuild = node.getBoolean(ResourcesPlugin.PREF_AUTO_BUILDING, true);
+        // core holds onto this preference.
+        boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
+                .getDefaultBoolean(ResourcesPlugin.PREF_AUTO_BUILDING);
         autoBuildButton.setSelection(autoBuild);
 
         IPreferenceStore store = getIDEPreferenceStore();
@@ -482,25 +478,30 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
                 .setSelection(store
                         .getDefaultBoolean(IDEInternalPreferences.SAVE_ALL_BEFORE_BUILD));
         saveInterval.loadDefault();
-        showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
+		showLocationInWindowTitle.setSelection(store.getDefaultBoolean(IDEInternalPreferences.SHOW_LOCATION));
         workspaceName.loadDefault();
+
         boolean closeUnrelatedProj = store.getDefaultBoolean(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS);
         closeUnrelatedProjectButton.setSelection(closeUnrelatedProj);
 
-        boolean lightweightRefresh = node.getBoolean(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, false);
-        boolean autoRefresh = node.getBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, true);
-        lightweightRefreshButton.setSelection(lightweightRefresh);
+        boolean lightweightRefresh = ResourcesPlugin.getPlugin()
+                .getPluginPreferences().getDefaultBoolean(
+                		ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH);
+        boolean autoRefresh = ResourcesPlugin.getPlugin()
+		        .getPluginPreferences().getDefaultBoolean(
+		                ResourcesPlugin.PREF_AUTO_REFRESH);
         autoRefreshButton.setSelection(autoRefresh);
+        lightweightRefreshButton.setSelection(lightweightRefresh);
 
         clearUserSettings = true;
 
-        List encodings = WorkbenchEncoding.getDefinedEncodings();
-        Collections.sort(encodings);
+		List encodings = WorkbenchEncoding.getDefinedEncodings();
+		Collections.sort(encodings);
         encodingEditor.loadDefault();
-        lineSeparatorEditor.loadDefault();
-        openReferencesEditor.loadDefault();
+		lineSeparatorEditor.loadDefault();
+		openReferencesEditor.loadDefault();
 
-        systemExplorer.loadDefault();
+		systemExplorer.loadDefault();
 
         super.performDefaults();
     }
@@ -509,7 +510,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
     @Override
-    public boolean performOk() {
+	public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();
@@ -548,43 +549,37 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
                                 (int) newSaveInterval));
             } catch (CoreException e) {
                 IDEWorkbenchPlugin.log(
-                        "Error changing save interval preference", e//$NON-NLS-1$
+                        "Error changing save interval preference", e //$NON-NLS-1$
                                 .getStatus());
             }
         }
-        
-        store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
+
+		store.setValue(IDEInternalPreferences.SHOW_LOCATION, showLocationInWindowTitle.getSelection());
 
         workspaceName.store();
 
-        systemExplorer.store();
+		systemExplorer.store();
 
-        IEclipsePreferences node = ConfigurationScope.INSTANCE.getNode(ResourcesPlugin.PI_RESOURCES);
+        Preferences preferences = ResourcesPlugin.getPlugin()
+                .getPluginPreferences();
 
         boolean autoRefresh = autoRefreshButton.getSelection();
-        node.putBoolean(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
+        preferences.setValue(ResourcesPlugin.PREF_AUTO_REFRESH, autoRefresh);
         boolean lightweightRefresh = lightweightRefreshButton.getSelection();
-        node.putBoolean(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, lightweightRefresh);
-        
-        try {
-            node.flush();
-        } catch (BackingStoreException e) {
-            IDEWorkbenchPlugin.log(
-                    "Error saving autoRefresh and lightweightRefresh preferences.", e);//$NON-NLS-1$
-        }
+        preferences.setValue(ResourcesPlugin.PREF_LIGHTWEIGHT_AUTO_REFRESH, lightweightRefresh);
 
         boolean closeUnrelatedProj = closeUnrelatedProjectButton.getSelection();
         getIDEPreferenceStore().setValue(IDEInternalPreferences.CLOSE_UNRELATED_PROJECTS, closeUnrelatedProj);
-        
-        
-        if (clearUserSettings) {
-                IDEEncoding.clearUserEncodings();
-        }
-        encodingEditor.store();
-        lineSeparatorEditor.store();
-        openReferencesEditor.store();
 
-        return super.performOk();
+
+        if (clearUserSettings) {
+			IDEEncoding.clearUserEncodings();
+		}
+        encodingEditor.store();
+		lineSeparatorEditor.store();
+		openReferencesEditor.store();
+
+		return super.performOk();
     }
 
 }
