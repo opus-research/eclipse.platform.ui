@@ -15,6 +15,7 @@ package org.eclipse.ui.tests.forms;
 import org.eclipse.ui.tests.forms.layout.AllLayoutTests;
 import org.eclipse.ui.tests.forms.util.AllUtilityTests;
 import org.eclipse.ui.tests.forms.widgets.ExpandableCompositeTest;
+import org.eclipse.ui.tests.forms.widgets.SizeCacheTest;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -38,5 +39,6 @@ public class AllFormsTests extends TestSuite {
 		addTest(AllLayoutTests.suite());
 		addTest(AllUtilityTests.suite());
 		addTestSuite(ExpandableCompositeTest.class);
+		addTestSuite(SizeCacheTest.class);
 	}
 }
