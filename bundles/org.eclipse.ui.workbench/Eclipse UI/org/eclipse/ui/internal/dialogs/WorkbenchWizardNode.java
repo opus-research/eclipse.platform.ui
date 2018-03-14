@@ -76,8 +76,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardNode#dispose()
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         // Do nothing since the wizard wasn't created via reflection.
     }
 
@@ -91,16 +90,14 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardNode#getExtent()
      */
-    @Override
-	public Point getExtent() {
+    public Point getExtent() {
         return new Point(-1, -1);
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getLocalId()
      */
-    @Override
-	public String getLocalId() {
+    public String getLocalId() {
     	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
 				IPluginContribution.class);
 		if (contribution != null) {
@@ -112,8 +109,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /* (non-Javadoc)
      * @see org.eclipse.ui.IPluginContribution#getPluginId()
      */
-    @Override
-	public String getPluginId() {
+    public String getPluginId() {
        	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement,
 				IPluginContribution.class);
 		if (contribution != null) {
@@ -125,8 +121,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardNode#getWizard()
      */
-    @Override
-	public IWizard getWizard() {
+    public IWizard getWizard() {
         if (wizard != null) {
 			return wizard; // we've already created it
 		}
@@ -136,14 +131,12 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
         // Start busy indicator.
         BusyIndicator.showWhile(parentWizardPage.getShell().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         SafeRunner.run(new SafeRunnable() {
                             /**
                              * Add the exception details to status is one happens.
                              */
-                            @Override
-							public void handleException(Throwable e) {
+                            public void handleException(Throwable e) {
                                	IPluginContribution contribution = (IPluginContribution) Util.getAdapter(wizardElement, IPluginContribution.class);
                                 statuses[0] = new Status(
                                         IStatus.ERROR,
@@ -153,8 +146,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                                         e);
                             }
 
-                            @Override
-							public void run() {
+                            public void run() {
                                 try {
                                     workbenchWizard[0] = createWizard();
                                     // create instance of target wizard
@@ -215,8 +207,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
     /* (non-Javadoc)
      * @see org.eclipse.jface.wizard.IWizardNode#isContentCreated()
      */
-    @Override
-	public boolean isContentCreated() {
+    public boolean isContentCreated() {
         return wizard != null;
     }
 }

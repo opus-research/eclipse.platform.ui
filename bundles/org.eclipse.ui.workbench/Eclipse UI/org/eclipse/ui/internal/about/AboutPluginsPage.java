@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2009 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@
  *		IBM Corporation - initial API and implementation 
  *  	Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  * 		font should be activated and used by other components.
- *      Robin Stocker <robin@nibor.org> - Add filter text field
  *******************************************************************************/
 package org.eclipse.ui.internal.about;
 
@@ -28,7 +27,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.util.ConfigureColumns;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -41,12 +39,9 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -58,7 +53,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.IWorkbenchHelpContextIds;
@@ -66,7 +60,6 @@ import org.eclipse.ui.internal.WorkbenchImages;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.internal.misc.StatusUtil;
-import org.eclipse.ui.internal.misc.StringMatcher;
 import org.eclipse.ui.internal.util.BundleUtility;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -75,7 +68,7 @@ import org.osgi.framework.Bundle;
 /**
  * Displays information about the product plugins.
  * 
- * PRIVATE this class is internal to the IDE
+ * PRIVATE this class is internal to the ide
  */
 public class AboutPluginsPage extends ProductInfoPage {
 
@@ -85,12 +78,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 		/**
 		 * Queue containing bundle signing info to be resolved.
 		 */
-		private LinkedList<AboutBundleData> resolveQueue = new LinkedList<AboutBundleData>();
+		private LinkedList resolveQueue = new LinkedList();
 
 		/**
 		 * Queue containing bundle data that's been resolve and needs updating.
 		 */
-		private List<AboutBundleData> updateQueue = new ArrayList<AboutBundleData>();
+		private List updateQueue = new ArrayList();
 
 		/*
 		 * this job will attempt to discover the signing state of a given bundle
@@ -102,7 +95,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 				setPriority(Job.SHORT);
 			}
 
-			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				while (true) {
 					// If the UI has not been created, nothing to do.
@@ -118,7 +110,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 					synchronized (resolveQueue) {
 						if (resolveQueue.isEmpty())
 							return Status.OK_STATUS;
-						data = resolveQueue.removeFirst();
+						data = (AboutBundleData) resolveQueue.removeFirst();
 					}
 					try {
 						// following is an expensive call
@@ -155,7 +147,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 			 * org.eclipse.ui.progress.UIJob#runInUIThread(org.eclipse.core.
 			 * runtime.IProgressMonitor)
 			 */
-			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				while (true) {
 					Control page = getControl();
@@ -167,7 +158,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 						if (updateQueue.isEmpty())
 							return Status.OK_STATUS;
 
-						data = updateQueue
+						data = (AboutBundleData[]) updateQueue
 								.toArray(new AboutBundleData[updateQueue.size()]);
 						updateQueue.clear();
 
@@ -185,7 +176,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnImage(java
 		 * .lang.Object, int)
 		 */
-		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 0) {
 				if (element instanceof AboutBundleData) {
@@ -215,7 +205,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		 * org.eclipse.jface.viewers.ITableLabelProvider#getColumnText(java.
 		 * lang.Object, int)
 		 */
-		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			if (element instanceof AboutBundleData) {
 				AboutBundleData data = (AboutBundleData) element;
@@ -283,7 +272,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		this.helpContextId = id;
 	}
 
-	@Override
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -313,7 +301,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		}
 	}
 
-	@Override
 	public void createPageButtons(Composite parent) {
 
 		moreInfo = createButton(parent, MORE_ID,
@@ -328,13 +315,12 @@ public class AboutPluginsPage extends ProductInfoPage {
 				WorkbenchMessages.AboutPluginsDialog_columns);
 	}
 
-	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
 
 		// create a data object for each bundle, remove duplicates, and include
 		// only resolved bundles (bug 65548)
-		Map<String, AboutBundleData> map = new HashMap<String, AboutBundleData>();
+		Map map = new HashMap();
 		for (int i = 0; i < bundles.length; ++i) {
 			AboutBundleData data = new AboutBundleData(bundles[i]);
 			if (BundleUtility.isReady(data.getState())
@@ -342,7 +328,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 				map.put(data.getVersionedId(), data);
 			}
 		}
-		bundleInfos = map.values().toArray(
+		bundleInfos = (AboutBundleData[]) map.values().toArray(
 				new AboutBundleData[0]);
 		WorkbenchPlugin.class.getSigners();
 
@@ -375,11 +361,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 	 *            the parent composite to contain the dialog area
 	 */
 	protected void createTable(Composite parent) {
-		final Text filterText = new Text(parent, SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
-		filterText.setLayoutData(GridDataFactory.fillDefaults().create());
-		filterText.setMessage(WorkbenchMessages.AboutPluginsDialog_filterTextMessage);
-		filterText.setFocus();
-
 		vendorInfo = new TableViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL
 				| SWT.SINGLE | SWT.FULL_SELECTION | SWT.BORDER);
 		vendorInfo.setUseHashlookup(true);
@@ -388,7 +369,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		vendorInfo.getTable().setFont(parent.getFont());
 		vendorInfo.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				checkEnablement();
 			}
@@ -414,7 +394,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 			column.setText(columnTitles[i]);
 			final int columnIndex = i;
 			column.addSelectionListener(new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					updateTableSorting(columnIndex);
 				}
@@ -423,16 +402,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 
 		vendorInfo.setContentProvider(new ArrayContentProvider());
 		vendorInfo.setLabelProvider(new BundleTableLabelProvider());
-
-		final BundlePatternFilter searchFilter = new BundlePatternFilter();
-		filterText.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				searchFilter.setPattern(filterText.getText());
-				vendorInfo.refresh();
-			}
-		});
-		vendorInfo.addFilter(searchFilter);
 
 		GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
 				true);
@@ -465,7 +434,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 	}
 
 	/**
-	 * Return an URL to the plugin's about.html file (what is shown when
+	 * Return an url to the plugin's about.html file (what is shown when
 	 * "More info" is pressed) or null if no such file exists. The method does
 	 * nl lookup to allow for i18n.
 	 * 
@@ -473,7 +442,7 @@ public class AboutPluginsPage extends ProductInfoPage {
 	 *            the bundle info
 	 * @param makeLocal
 	 *            whether to make the about content local
-	 * @return the URL or <code>null</code>
+	 * @return the url or <code>null</code>
 	 */
 	private URL getMoreInfoURL(AboutBundleData bundleInfo, boolean makeLocal) {
 		Bundle bundle = Platform.getBundle(bundleInfo.getId());
@@ -515,7 +484,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 	 * 
 	 * @see org.eclipse.ui.internal.about.ProductInfoPage#getId()
 	 */
-	@Override
 	String getId() {
 		return ID;
 	}
@@ -539,7 +507,6 @@ public class AboutPluginsPage extends ProductInfoPage {
 		}
 	}
 
-	@Override
 	protected void buttonPressed(int buttonId) {
 		switch (buttonId) {
 		case MORE_ID:
@@ -628,7 +595,6 @@ class TableComparator extends ViewerComparator {
 	 * org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.
 	 * viewers.Viewer, java.lang.Object, java.lang.Object)
 	 */
-	@Override
 	public int compare(Viewer viewer, Object e1, Object e2) {
 		if (sortColumn == 0 && e1 instanceof AboutBundleData
 				&& e2 instanceof AboutBundleData) {
@@ -735,33 +701,5 @@ class TableComparator extends ViewerComparator {
 	 */
 	public void setAscending(boolean ascending) {
 		this.ascending = ascending;
-	}
-}
-
-class BundlePatternFilter extends ViewerFilter {
-
-	private StringMatcher matcher;
-
-	public void setPattern(String searchPattern) {
-		if (searchPattern == null || searchPattern.length() == 0) {
-			this.matcher = null;
-		} else {
-			String pattern = "*" + searchPattern + "*"; //$NON-NLS-1$//$NON-NLS-2$
-			this.matcher = new StringMatcher(pattern, true, false);
-		}
-	}
-
-	@Override
-	public boolean select(Viewer viewer, Object parentElement, Object element) {
-		if (matcher == null) {
-			return true;
-		}
-
-		if (element instanceof AboutBundleData) {
-			AboutBundleData data = (AboutBundleData) element;
-			return matcher.match(data.getName()) || matcher.match(data.getProviderName())
-					|| matcher.match(data.getId());
-		}
-		return true;
 	}
 }

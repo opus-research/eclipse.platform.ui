@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -191,8 +191,7 @@ public class ReopenEditorMenu extends ContributionItem {
      * Fills the given menu with
      * menu items for all windows.
      */
-    @Override
-	public void fill(final Menu menu, int index) {
+    public void fill(final Menu menu, int index) {
         if (window.getActivePage() == null
                 || window.getActivePage().getPerspective() == null) {
             return;
@@ -223,22 +222,19 @@ public class ReopenEditorMenu extends ContributionItem {
             final EditorHistoryItem item = historyItems[i];
             final int historyIndex = i;
             SafeRunner.run(new SafeRunnable() {
-                @Override
-				public void run() throws Exception {
+                public void run() throws Exception {
                     String text = calcText(historyIndex, item);
                     MenuItem mi = new MenuItem(menu, SWT.PUSH, menuIndex[0]);
                     ++menuIndex[0];
                     mi.setText(text);
                     mi.addSelectionListener(new SelectionAdapter() {
-                        @Override
-						public void widgetSelected(SelectionEvent e) {
+                        public void widgetSelected(SelectionEvent e) {
                             open(item);
                         }
                     });
                 }
 
-                @Override
-				public void handleException(Throwable e) {
+                public void handleException(Throwable e) {
                     // just skip the item if there's an error,
                     // e.g. in the calculation of the shortened name
                     WorkbenchPlugin.log(getClass(), "fill", e); //$NON-NLS-1$
@@ -250,8 +246,7 @@ public class ReopenEditorMenu extends ContributionItem {
     /**
      * Overridden to always return true and force dynamic menu building.
      */
-    @Override
-	public boolean isDynamic() {
+    public boolean isDynamic() {
         return true;
     }
 
@@ -268,7 +263,7 @@ public class ReopenEditorMenu extends ContributionItem {
                 }
                 IEditorInput input = item.getInput();
                 IEditorDescriptor desc = item.getDescriptor();
-				if (input == null || !input.exists() || desc == null) {
+                if (input == null || desc == null) {
                     String title = WorkbenchMessages.OpenRecent_errorTitle;
                     String msg = NLS.bind(WorkbenchMessages.OpenRecent_unableToOpen,  itemName ); 
                     MessageDialog.openWarning(window.getShell(), title, msg);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 Angelo Zerr and others.
+ * Copyright (c) 2009 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,19 +18,18 @@ import org.w3c.dom.Node;
 
 /**
  * {@link CSSStylableElement} implementation which wrap SWT {@link Composite}.
- *
+ * 
  */
 public class CompositeElement extends ControlElement {
+	
 	public CompositeElement(Composite composite, CSSEngine engine) {
 		super(composite, engine);
 	}
 
-	@Override
 	public int getLength() {
 		return getComposite().getChildren().length;
 	}
 
-	@Override
 	public Node item(int index) {
 		Widget w = getComposite().getChildren()[index];
 		return getElement(w);
@@ -39,4 +38,5 @@ public class CompositeElement extends ControlElement {
 	protected Composite getComposite() {
 		return (Composite) getNativeWidget();
 	}
+
 }

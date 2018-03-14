@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2013 IBM Corporation and others.
+ * Copyright (c) 2005, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,12 +10,12 @@
  *     Brock Janicyak - brockj@tpg.com.au 
  *     		- Fix for Bug 11142 [HeapStatus] Heap status is updated too frequently
  *          - Fix for Bug 192996 [Workbench] Reduce amount of garbage created by HeapStatus
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422040
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
 
 import java.lang.reflect.Method;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -27,6 +27,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,7 +49,6 @@ public class HeapStatus extends Composite {
 
 	private boolean armed;
 	private Image gcImage;
-	private Image disabledGcImage;
 	private Color bgCol, usedMemCol, lowMemCol, freeMemCol, topLeftCol, bottomRightCol, sepCol, textCol, markCol, armCol;  
     private Canvas button;
 	private IPreferenceStore prefStore;
@@ -67,12 +67,9 @@ public class HeapStatus extends Composite {
 	private float lowMemThreshold = 0.05f;
 	private boolean showLowMemThreshold = true;
 	private boolean updateTooltip = false;
-
-	protected volatile boolean isInGC = false;
-
+	
     private final Runnable timer = new Runnable() {
-        @Override
-		public void run() {
+        public void run() {
             if (!isDisposed()) {
                 updateStats();
                 if (hasChanged) {
@@ -88,7 +85,6 @@ public class HeapStatus extends Composite {
     };
     
     private final IPropertyChangeListener prefListener = new IPropertyChangeListener() {
-		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if (IHeapStatusConstants.PREF_UPDATE_INTERVAL.equals(event.getProperty())) {
 				setUpdateIntervalInMS(prefStore.getInt(IHeapStatusConstants.PREF_UPDATE_INTERVAL));
@@ -122,13 +118,12 @@ public class HeapStatus extends Composite {
         button = new Canvas(this, SWT.NONE);
         button.setToolTipText(WorkbenchMessages.HeapStatus_buttonToolTip);
         
-		ImageDescriptor imageDesc = WorkbenchImages.getWorkbenchImageDescriptor("elcl16/trash.png"); //$NON-NLS-1$
-		Display display = getDisplay();
+		ImageDescriptor imageDesc = WorkbenchImages.getWorkbenchImageDescriptor("elcl16/trash.gif"); //$NON-NLS-1$
 		gcImage = imageDesc.createImage();
 		if (gcImage != null) {
 			imgBounds = gcImage.getBounds();
-			disabledGcImage = new Image(display, gcImage, SWT.IMAGE_DISABLE);
 		}
+		Display display = getDisplay();
 		usedMemCol = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
 		lowMemCol = new Color(display, 255, 70, 70);  // medium red 
 		freeMemCol = new Color(display, 255, 190, 125);  // light orange
@@ -141,8 +136,7 @@ public class HeapStatus extends Composite {
 		
         Listener listener = new Listener() {
 
-            @Override
-			public void handleEvent(Event event) {
+            public void handleEvent(Event event) {
                 switch (event.type) {
                 case SWT.Dispose:
                 	doDispose();
@@ -161,10 +155,8 @@ public class HeapStatus extends Composite {
                     break;
                 case SWT.MouseUp:
                     if (event.button == 1) {
-						if (!isInGC) {
-							arm(false);
-							gc(); 
-						}
+                        gc();
+                        arm(false);
                     }
                     break;
                 case SWT.MouseDown:
@@ -172,8 +164,7 @@ public class HeapStatus extends Composite {
 	                    if (event.widget == HeapStatus.this) {
 							setMark();
 						} else if (event.widget == button) {
-							if (!isInGC)
-								arm(true);
+							arm(true);
 						}
                     }
                     break;
@@ -207,7 +198,6 @@ public class HeapStatus extends Composite {
 		updateStats();
 
         getDisplay().asyncExec(new Runnable() {
-			@Override
 			public void run() {
 				if (!isDisposed()) {
 					getDisplay().timerExec(updateInterval, timer);
@@ -244,9 +234,6 @@ public class HeapStatus extends Composite {
     	if (gcImage != null) {
 			gcImage.dispose();
 		}
-		if (disabledGcImage != null) {
-			disabledGcImage.dispose();
-		}
        
         if (lowMemCol != null) {
 			lowMemCol.dispose();
@@ -259,7 +246,6 @@ public class HeapStatus extends Composite {
 	/* (non-Javadoc)
 	 * @see org.eclipse.swt.widgets.Composite#computeSize(int, int, boolean)
 	 */
-	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
         GC gc = new GC(this);
         Point p = gc.textExtent(WorkbenchMessages.HeapStatus_widthStr);
@@ -283,15 +269,6 @@ public class HeapStatus extends Composite {
         button.update();
     }
 
-	private void gcRunning(boolean isInGC) {
-		if (this.isInGC == isInGC) {
-			return;
-		}
-		this.isInGC = isInGC;
-		 button.redraw();
-		 button.update();
-	}
-
     /**
      * Creates the context menu
      */
@@ -299,7 +276,6 @@ public class HeapStatus extends Composite {
         MenuManager menuMgr = new MenuManager();
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-			@Override
 			public void menuAboutToShow(IMenuManager menuMgr) {
 				fillMenu(menuMgr);
 			}
@@ -338,22 +314,26 @@ public class HeapStatus extends Composite {
     }
     
     private void gc() {
-		gcRunning(true);
-		Thread t = new Thread() {
-			@Override
+    	BusyIndicator.showWhile(getDisplay(), new Runnable() {
 			public void run() {
-				busyGC();
-				getDisplay().asyncExec(new Runnable() {
-					@Override
+				Thread t = new Thread() {
 					public void run() {
-						if (!isDisposed()) {
-							gcRunning(false);
+						busyGC();
+					}};
+				t.start();
+				while(t.isAlive()) {
+					try {
+						Display d = getDisplay();
+						while(d != null && !d.isDisposed() && d.readAndDispatch()) {
+							// loop
 						}
+						t.join(10);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
 					}
-				});
+				}
 			}
-		};
-		t.start();
+		});
     }
 
     private void busyGC() {
@@ -365,13 +345,7 @@ public class HeapStatus extends Composite {
     
     private void paintButton(GC gc) {
         Rectangle rect = button.getClientArea();
-		if (isInGC) {
-			if (disabledGcImage != null) {
-				int buttonY = (rect.height - imgBounds.height) / 2 + rect.y;
-				gc.drawImage(disabledGcImage, rect.x, buttonY);
-			}
-			return;
-		}
+        
         if (armed) {
             gc.setBackground(armCol);
             gc.fillRectangle(rect.x, rect.y, rect.width, rect.height);
@@ -545,8 +519,7 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.SetMarkAction_text);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             setMark();
         }
     }
@@ -556,8 +529,7 @@ public class HeapStatus extends Composite {
             super(WorkbenchMessages.ClearMarkAction_text);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             clearMark();
         }
     }
@@ -569,8 +541,7 @@ public class HeapStatus extends Composite {
             setChecked(showMax);
         }
         
-        @Override
-		public void run() {
+        public void run() {
             prefStore.setValue(IHeapStatusConstants.PREF_SHOW_MAX, isChecked());
             redraw();
         }
@@ -585,8 +556,7 @@ public class HeapStatus extends Composite {
     	/* (non-Javadoc)
     	 * @see org.eclipse.jface.action.IAction#run()
     	 */
-    	@Override
-		public void run(){
+    	public void run(){
     		dispose();
     	}
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 Tom Schindl and others.
+ * Copyright (c) 2006, 2007 Tom Schindl and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl - initial API and implementation
- *     Lars Vogel (lars.vogel@gmail.com) - Bug 413427
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -31,24 +30,21 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * Example usage of ViewerComparator in tables to allow sorting
- *
+ * 
  * @author Tom Schindl <tom.schindl@bestsolution.at>
- *
+ * 
  */
 public class Snippet040TableViewerSorting {
 
 	private class MyContentProvider implements IStructuredContentProvider {
 
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (Person[]) inputElement;
 		}
 
-		@Override
 		public void dispose() {
 		}
 
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 		}
 
@@ -75,17 +71,14 @@ public class Snippet040TableViewerSorting {
 			this.editor = new TextCellEditor(viewer.getTable());
 		}
 
-		@Override
 		protected boolean canEdit(Object element) {
 			return true;
 		}
 
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
 
-		@Override
 		protected void setValue(Object element, Object value) {
 			doSetValue(element, value);
 			getViewer().update(element, null);
@@ -104,7 +97,6 @@ public class Snippet040TableViewerSorting {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).givenname;
 			}
@@ -112,27 +104,24 @@ public class Snippet040TableViewerSorting {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).givenname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).givenname = value.toString();
 			}
 
 		});
-
+		
 		ColumnViewerSorter cSorter = new ColumnViewerSorter(v,column) {
 
-			@Override
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
 				Person p1 = (Person) e1;
 				Person p2 = (Person) e2;
 				return p1.givenname.compareToIgnoreCase(p2.givenname);
 			}
-
+			
 		};
 
 		column = new TableViewerColumn(v, SWT.NONE);
@@ -141,7 +130,6 @@ public class Snippet040TableViewerSorting {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).surname;
 			}
@@ -150,27 +138,24 @@ public class Snippet040TableViewerSorting {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).surname;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).surname = value.toString();
 			}
 
 		});
-
+		
 		new ColumnViewerSorter(v,column) {
 
-			@Override
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
 				Person p1 = (Person) e1;
 				Person p2 = (Person) e2;
 				return p1.surname.compareToIgnoreCase(p2.surname);
 			}
-
+			
 		};
 
 		column = new TableViewerColumn(v, SWT.NONE);
@@ -179,7 +164,6 @@ public class Snippet040TableViewerSorting {
 		column.getColumn().setMoveable(true);
 		column.setLabelProvider(new ColumnLabelProvider() {
 
-			@Override
 			public String getText(Object element) {
 				return ((Person) element).email;
 			}
@@ -188,27 +172,24 @@ public class Snippet040TableViewerSorting {
 
 		column.setEditingSupport(new AbstractEditingSupport(v) {
 
-			@Override
 			protected Object getValue(Object element) {
 				return ((Person) element).email;
 			}
 
-			@Override
 			protected void doSetValue(Object element, Object value) {
 				((Person) element).email = value.toString();
 			}
 
 		});
-
+		
 		new ColumnViewerSorter(v,column) {
 
-			@Override
 			protected int doCompare(Viewer viewer, Object e1, Object e2) {
 				Person p1 = (Person) e1;
 				Person p2 = (Person) e2;
 				return p1.email.compareToIgnoreCase(p2.email);
 			}
-
+			
 		};
 
 		Person[] model = createModel();
@@ -232,28 +213,27 @@ public class Snippet040TableViewerSorting {
 
 	private static abstract class ColumnViewerSorter extends ViewerComparator {
 		public static final int ASC = 1;
-
+		
 		public static final int NONE = 0;
-
+		
 		public static final int DESC = -1;
-
+		
 		private int direction = 0;
-
+		
 		private TableViewerColumn column;
-
+		
 		private ColumnViewer viewer;
-
+		
 		public ColumnViewerSorter(ColumnViewer viewer, TableViewerColumn column) {
 			this.column = column;
 			this.viewer = viewer;
 			this.column.getColumn().addSelectionListener(new SelectionAdapter() {
 
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					if( ColumnViewerSorter.this.viewer.getComparator() != null ) {
 						if( ColumnViewerSorter.this.viewer.getComparator() == ColumnViewerSorter.this ) {
 							int tdirection = ColumnViewerSorter.this.direction;
-
+							
 							if( tdirection == ASC ) {
 								setSorter(ColumnViewerSorter.this, DESC);
 							} else if( tdirection == DESC ) {
@@ -268,7 +248,7 @@ public class Snippet040TableViewerSorting {
 				}
 			});
 		}
-
+		
 		public void setSorter(ColumnViewerSorter sorter, int direction) {
 			if( direction == NONE ) {
 				column.getColumn().getParent().setSortColumn(null);
@@ -277,30 +257,29 @@ public class Snippet040TableViewerSorting {
 			} else {
 				column.getColumn().getParent().setSortColumn(column.getColumn());
 				sorter.direction = direction;
-
+				
 				if( direction == ASC ) {
 					column.getColumn().getParent().setSortDirection(SWT.DOWN);
 				} else {
 					column.getColumn().getParent().setSortDirection(SWT.UP);
 				}
-
+				
 				if( viewer.getComparator() == sorter ) {
 					viewer.refresh();
 				} else {
 					viewer.setComparator(sorter);
 				}
-
+				
 			}
 		}
 
-		@Override
 		public int compare(Viewer viewer, Object e1, Object e2) {
 			return direction * doCompare(viewer, e1, e2);
 		}
-
+		
 		protected abstract int doCompare(Viewer viewer, Object e1, Object e2);
 	}
-
+	
 	/**
 	 * @param args
 	 */

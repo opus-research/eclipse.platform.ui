@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2011 IBM Corporation and others.
+ * Copyright (c) 2004, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -86,7 +86,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * @see org.eclipse.ui.commands.ICommand#addCommandListener(org.eclipse.ui.commands.ICommandListener)
 	 */
 
-	@Override
 	public final void addCommandListener(final ICommandListener commandListener) {
 		command.addCommandListener(new LegacyCommandListenerWrapper(
 				commandListener, bindingManager));
@@ -97,7 +96,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#execute(java.util.Map)
 	 */
-	@Override
 	public final Object execute(Map parameterValuesByName)
 			throws ExecutionException, NotHandledException {
 		try {
@@ -119,7 +117,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getAttributeValuesByName()
 	 */
-	@Override
 	public final Map getAttributeValuesByName() {
 		final Map attributeValues = new HashMap();
 		// avoid using Boolean.valueOf to allow compilation against JCL
@@ -136,7 +133,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getCategoryId()
 	 */
-	@Override
 	public final String getCategoryId() throws NotDefinedException {
 		try {
 			return command.getCategory().getId();
@@ -150,7 +146,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getDescription()
 	 */
-	@Override
 	public final String getDescription() throws NotDefinedException {
 		try {
 			return command.getDescription();
@@ -164,7 +159,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getId()
 	 */
-	@Override
 	public final String getId() {
 		return command.getId();
 	}
@@ -174,7 +168,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getKeySequenceBindings()
 	 */
-	@Override
 	public final List getKeySequenceBindings() {
 		final List legacyBindings = new ArrayList();
 		if (parameterizedCommand == null) {
@@ -204,7 +197,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#getName()
 	 */
-	@Override
 	public final String getName() throws NotDefinedException {
 		try {
 			return command.getName();
@@ -218,7 +210,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#isDefined()
 	 */
-	@Override
 	public final boolean isDefined() {
 		return command.isDefined();
 	}
@@ -228,7 +219,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#isHandled()
 	 */
-	@Override
 	public final boolean isHandled() {
 		return command.isHandled();
 	}
@@ -238,7 +228,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see org.eclipse.ui.commands.ICommand#removeCommandListener(org.eclipse.ui.commands.ICommandListener)
 	 */
-	@Override
 	public final void removeCommandListener(
 			final ICommandListener commandListener) {
 		command.removeCommandListener(new LegacyCommandListenerWrapper(
@@ -250,7 +239,6 @@ final class CommandLegacyWrapper implements ICommand {
 	 * 
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public final int compareTo(final Object o) {
 		return command.compareTo(o);
 	}

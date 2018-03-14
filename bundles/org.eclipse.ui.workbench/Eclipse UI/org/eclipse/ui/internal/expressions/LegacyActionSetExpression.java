@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,7 +67,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		this.actionSetId = actionSetId;
 	}
 
-	@Override
 	public final void collectExpressionInfo(final ExpressionInfo info) {
 		super.collectExpressionInfo(info);
 		info.addVariableNameAccess(ISources.ACTIVE_CONTEXT_NAME);
@@ -79,7 +78,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return hashCode;
 	}
 
-	@Override
 	public final boolean equals(final Object object) {
 		if (object instanceof LegacyActionSetExpression) {
 			final LegacyActionSetExpression that = (LegacyActionSetExpression) object;
@@ -90,7 +88,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return false;
 	}
 
-	@Override
 	public final EvaluationResult evaluate(final IEvaluationContext context)
 			throws CoreException {
 		final EvaluationResult result = super.evaluate(context);
@@ -105,7 +102,6 @@ public final class LegacyActionSetExpression extends WorkbenchWindowExpression {
 		return EvaluationResult.FALSE;
 	}
 
-	@Override
 	public final String toString() {
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append("ActionSetExpression("); //$NON-NLS-1$

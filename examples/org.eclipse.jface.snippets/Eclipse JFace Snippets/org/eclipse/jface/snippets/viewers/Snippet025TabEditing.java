@@ -40,7 +40,6 @@ public class Snippet025TabEditing {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			return (MyModel[])inputElement;
 		}
@@ -48,7 +47,6 @@ public class Snippet025TabEditing {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 			
 		}
@@ -56,7 +54,6 @@ public class Snippet025TabEditing {
 		/* (non-Javadoc)
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			
 		}
@@ -70,7 +67,6 @@ public class Snippet025TabEditing {
 			this.counter = counter;
 		}
 		
-		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -93,7 +89,6 @@ public class Snippet025TabEditing {
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ICellModifier#canModify(java.lang.Object, java.lang.String)
 			 */
-			@Override
 			public boolean canModify(Object element, String property) {
 				return ((MyModel)element).counter % 2 == 0;
 			}
@@ -101,7 +96,6 @@ public class Snippet025TabEditing {
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ICellModifier#getValue(java.lang.Object, java.lang.String)
 			 */
-			@Override
 			public Object getValue(Object element, String property) {
 				return ((MyModel)element).counter + "";
 			}
@@ -109,7 +103,6 @@ public class Snippet025TabEditing {
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.viewers.ICellModifier#modify(java.lang.Object, java.lang.String, java.lang.Object)
 			 */
-			@Override
 			public void modify(Object element, String property, Object value) {
 				TableItem item = (TableItem)element;
 				((MyModel)item.getData()).counter = Integer.parseInt(value.toString());

@@ -31,7 +31,6 @@ public class TabbedPropertySheetProjectExplorerContributor implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
 	 */
-	@Override
 	public String getContributorId() { 
 		return contributorId;
 	}

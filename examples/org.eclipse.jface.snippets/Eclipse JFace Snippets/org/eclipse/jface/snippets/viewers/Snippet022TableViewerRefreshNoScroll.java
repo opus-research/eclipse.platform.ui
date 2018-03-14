@@ -47,7 +47,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 		 * 
 		 * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
 		 */
-		@Override
 		public Object[] getElements(Object inputElement) {
 			ArrayList list = (ArrayList) inputElement;
 			list.add(new MyModel(list.size()));
@@ -59,7 +58,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 		 * 
 		 * @see org.eclipse.jface.viewers.IContentProvider#dispose()
 		 */
-		@Override
 		public void dispose() {
 
 		}
@@ -70,7 +68,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 		 * @see org.eclipse.jface.viewers.IContentProvider#inputChanged(org.eclipse.jface.viewers.Viewer,
 		 *      java.lang.Object, java.lang.Object)
 		 */
-		@Override
 		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 
 		}
@@ -84,7 +81,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 			this.counter = counter;
 		}
 
-		@Override
 		public String toString() {
 			return "Item " + this.counter;
 		}
@@ -109,7 +105,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 		b.setText("Refresh with Scrolling");
 		b.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				v.refresh();
 			}
@@ -120,7 +115,6 @@ public class Snippet022TableViewerRefreshNoScroll {
 		b.setText("Refresh with NO-Scrolling");
 		b.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				v.getTable().setTopIndex(0);
 				IStructuredSelection selection = (IStructuredSelection) v

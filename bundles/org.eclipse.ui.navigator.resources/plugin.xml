@@ -149,7 +149,7 @@
 		         </enablement>
 			</commonWizard>              
       </navigatorContent>
-		      <actionProvider 
+      <actionProvider 
       			id="org.eclipse.ui.navigator.resources.OpenActions"
 				class="org.eclipse.ui.internal.navigator.resources.actions.OpenActionProvider">
 			<enablement>
@@ -174,12 +174,11 @@
 			<enablement>
 				<and>
 					<or>
-						<adapt
-							type="org.eclipse.core.resources.IProject">
-							<test
-								property="org.eclipse.core.resources.open">
-							</test>
-						</adapt>
+						<and>
+							<adapt type="org.eclipse.core.resources.IProject" />
+							<test property="org.eclipse.core.resources.open" 
+                            	value="true"/>
+						</and>
 						<adapt type="org.eclipse.core.resources.IFolder" /> 	
 						<adapt type="org.eclipse.ui.IWorkingSet" /> 	
 					</or>
@@ -248,15 +247,6 @@
    				<or/>
 			</enablement>
 		</actionProvider>
-      <actionProvider 
-      			id="org.eclipse.ui.navigator.resources.FoldersAsProjectsActionProvider"
-				class="org.eclipse.ui.internal.navigator.resources.actions.FoldersAsProjectsActionProvider">
-			<enablement>
-				<or>
-					<adapt type="org.eclipse.core.resources.IFolder" /> 	
-				</or>
-			</enablement>
-		</actionProvider>
 
       <!-- Expression Filters -->  
       <commonFilter
@@ -293,13 +283,10 @@
             activeByDefault="false"
            >
          <filterExpression>
-            <adapt
-               type="org.eclipse.core.resources.IProject">
-               <test
-                  property="org.eclipse.core.resources.open"
-                  value="false">
-               </test>
-            </adapt>
+         	<and>
+	            <instanceof value="org.eclipse.core.resources.IProject"/>
+            	<test property="org.eclipse.core.resources.open" value="false"/>	            
+	        </and>
          </filterExpression>
       </commonFilter>
       <commonFilter
@@ -401,5 +388,5 @@
     	<perspectiveExtension targetID = "org.eclipse.ui.resourcePerspective">
 		    <showInPart id = "org.eclipse.ui.navigator.ProjectExplorer"/>
     	</perspectiveExtension>
-   	</extension>
+   	</extension>    
 </plugin> 

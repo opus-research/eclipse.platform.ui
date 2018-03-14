@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -158,7 +158,6 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 	/**
 	 * Get the name of the selected item preference
 	 */
-	@Override
 	protected String getSelectedNodePreference() {
 		return lastPropertyId;
 	}
@@ -166,7 +165,6 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 	/**
 	 * Get the name of the selected item preference
 	 */
-	@Override
 	protected void setSelectedNodePreference(String pageId) {
 		lastPropertyId = pageId;
 	}
@@ -178,7 +176,6 @@ public class PropertyDialog extends FilteredPreferenceDialog {
 	 * 
 	 * @return a string, the contributionType
 	 */
-	@Override
 	protected String getContributionType() {
 		return IContributionService.TYPE_PROPERTY;
 	}
