@@ -8,18 +8,19 @@
  * Contributors:
  *      Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
  *      IBM Corporation - initial API and implementation
- *      Steven Spungin <steven@spungin.tv> - Bug 437958, 442821
+ *      Steven Spungin <steven@spungin.tv> - Bug 437958
  */
 package org.eclipse.e4.ui.model.fragment.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.eclipse.e4.emf.xpath.EcoreXPathContextFactory;
+
 import org.eclipse.e4.emf.xpath.XPathContext;
 import org.eclipse.e4.emf.xpath.XPathContextFactory;
+import org.eclipse.e4.emf.xpath.EcoreXPathContextFactory;
+import java.util.regex.Pattern;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import java.util.ArrayList;
+import java.util.List;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.fragment.MStringModelFragment;
@@ -29,7 +30,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * <!-- begin-user-doc -->
@@ -296,11 +296,8 @@ public class StringModelFragmentImpl extends ModelFragmentImpl implements MStrin
 		String idsOrXPath = getParentElementId();
 		if (idsOrXPath.startsWith("xpath:")){
 			idsOrXPath = idsOrXPath.substring(6);
-			
-			List functions = Arrays.asList(EclipseExtensionFunctions.class);
-			List<String> namespaces = Arrays.asList("efx");
-			XPathContextFactory<EObject> f = EcoreXPathContextFactory.newInstance(functions, namespaces);
-			XPathContext xpathContext = f.newContext((EObject)application);	
+			XPathContextFactory<EObject> f = EcoreXPathContextFactory.newInstance();
+			XPathContext xpathContext = f.newContext((EObject)application);
 			Iterator<Object> i = xpathContext.iterate(idsOrXPath);
 			
 			List<MApplicationElement> targetElements = new ArrayList<MApplicationElement>();

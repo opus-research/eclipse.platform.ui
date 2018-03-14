@@ -7,11 +7,8 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - initial API and implementation
- *     Steven Spungin <steven@spungin.tv> - Bug 442821 - [e4.emf.xpath] allow factory to accept custom functions
  ******************************************************************************/
 package org.eclipse.e4.emf.xpath;
-
-import java.util.List;
 
 import org.apache.commons.jxpath.ri.JXPathContextReferenceImpl;
 import org.eclipse.e4.emf.internal.xpath.EObjectPointerFactory;
@@ -36,12 +33,6 @@ public class EcoreXPathContextFactory{
 	 */
 	public static XPathContextFactory<EObject> newInstance() {
 		return new JXPathContextFactoryImpl<EObject>();
-	}
-
-	public static XPathContextFactory<EObject> newInstance(List<Class<?>> functions, List<String> namespaces) {
-		JXPathContextFactoryImpl<EObject> ret = new JXPathContextFactoryImpl<EObject>();
-		ret.setFunctions(functions, namespaces);
-		return ret;
 	}
 
 }

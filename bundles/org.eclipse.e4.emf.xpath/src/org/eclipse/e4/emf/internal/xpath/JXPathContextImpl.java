@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     Tom Schindl <tom.schindl@bestsolution.at> - adjustment to EObject
- *     Steven Spungin <steven@spungin.tv> - Bug 442821 - [e4.emf.xpath] allow factory to accept custom functions
  ******************************************************************************/
 package org.eclipse.e4.emf.internal.xpath;
 
@@ -16,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.jxpath.ClassFunctions;
-import org.apache.commons.jxpath.FunctionLibrary;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.commons.jxpath.NodeSet;
 import org.apache.commons.jxpath.Pointer;
@@ -29,31 +27,30 @@ import org.eclipse.emf.ecore.EObject;
 public final class JXPathContextImpl implements XPathContext {
 
 	private JXPathContext context;
-	FunctionLibrary functionLibrary = new FunctionLibrary();
 
 	public static class EMFFunctions {
 		public static String eClassName(Object o) {
-			if (o instanceof Collection<?>) {
-				if (!((Collection<?>) o).isEmpty()) {
+			if( o instanceof Collection<?> ) {
+				if( ! ((Collection<?>) o).isEmpty() ) {
 					return eClassName(((Collection<?>) o).iterator().next());
 				}
-			} else if (o instanceof EObject) {
+			} else if( o instanceof EObject ) {
 				return ((EObject) o).eClass().getName();
-			} else if (o instanceof NodeSet) {
+			} else if( o instanceof NodeSet ) {
 				List<?> l = ((NodeSet) o).getValues();
-				if (l.size() > 0 && l.get(0) instanceof EObject) {
+				if( l.size() > 0 && l.get(0) instanceof EObject ) {
 					return eClassName((EObject) l.get(0));
 				}
-			} else if (o instanceof Pointer) {
-				if (((Pointer) o).getValue() instanceof EObject) {
+			} else if( o instanceof Pointer ) {
+				if( ((Pointer) o).getValue() instanceof EObject ) {
 					return eClassName((EObject) ((Pointer) o).getValue());
 				}
 			}
-
+			
 			return null;
 		}
 	}
-
+	
 	/**
 	 * Create a new context
 	 * 
@@ -62,8 +59,7 @@ public final class JXPathContextImpl implements XPathContext {
 	 */
 	JXPathContextImpl(Object contextBean) {
 		this.context = JXPathContext.newContext(contextBean);
-		functionLibrary.addFunctions(new ClassFunctions(EMFFunctions.class, "ecore"));
-		context.setFunctions(functionLibrary);
+		this.context.setFunctions(new ClassFunctions(EMFFunctions.class, "ecore"));
 	}
 
 	/**
@@ -77,8 +73,6 @@ public final class JXPathContextImpl implements XPathContext {
 	JXPathContextImpl(XPathContext parentContext, Object contextBean) {
 		JXPathContext jContext = ((JXPathContextImpl) parentContext).getJXPathContext();
 		this.context = JXPathContext.newContext(jContext, contextBean);
-		functionLibrary.addFunctions(new ClassFunctions(EMFFunctions.class, "ecore"));
-		context.setFunctions(functionLibrary);
 	}
 
 	public Object getValue(String xpath) {
@@ -97,12 +91,4 @@ public final class JXPathContextImpl implements XPathContext {
 		return context;
 	}
 
-	public void addFunctions(List<Class<?>> functions, List<String> namespaces) {
-		for (int i = 0; i < functions.size(); i++) {
-			if (namespaces.size() < i - 1) {
-				break;
-			}
-			functionLibrary.addFunctions(new ClassFunctions(functions.get(i), namespaces.get(i)));
-		}
-	}
 }
