@@ -27,13 +27,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.IShellProvider;
@@ -297,13 +295,10 @@ public class CleanDialog extends MessageDialog {
         }
         //table is disabled to start because all button is selected
         projectNames.getTable().setEnabled(selectedButton.getSelection());
-        projectNames.addCheckStateListener(new ICheckStateListener() {
-            @Override
-			public void checkStateChanged(CheckStateChangedEvent event) {
-                selection = projectNames.getCheckedElements();
-                updateEnablement();
-            }
-        });
+        projectNames.addCheckStateListener(event -> {
+		    selection = projectNames.getCheckedElements();
+		    updateEnablement();
+		});
     }
 
     /**
@@ -318,15 +313,10 @@ public class CleanDialog extends MessageDialog {
         if (cleanAll) {
 			ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
         } else {
-            try {
-                monitor.beginTask(IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName, selection.length);
-                for (int i = 0; i < selection.length; i++) {
-                    ((IProject) selection[i]).build(
-                            IncrementalProjectBuilder.CLEAN_BUILD,
-                            new SubProgressMonitor(monitor, 1));
-                }
-            } finally {
-                monitor.done();
+			SubMonitor subMonitor = SubMonitor.convert(monitor, IDEWorkbenchMessages.CleanDialog_cleanSelectedTaskName,
+					selection.length);
+			for (int i = 0; i < selection.length; i++) {
+				((IProject) selection[i]).build(IncrementalProjectBuilder.CLEAN_BUILD, subMonitor.newChild(1));
             }
         }
     }
