@@ -240,6 +240,11 @@ public class ProgressAnimationItem extends AnimationItem implements
         });
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#createAnimationItem(org.eclipse.swt.widgets.Composite)
+	 */
 	protected Control createAnimationItem(Composite parent) {
 
 		if (okImage == null) {
@@ -318,10 +323,20 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return (flags & SWT.HORIZONTAL) != 0;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#getControl()
+	 */
 	public Control getControl() {
 		return top;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationDone()
+	 */
 	void animationDone() {
 		super.animationDone();
 		animationRunning = false;
@@ -339,6 +354,11 @@ public class ProgressAnimationItem extends AnimationItem implements
 		return animationRunning;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.internal.progress.AnimationItem#animationStart()
+	 */
 	void animationStart() {
 		super.animationStart();
 		animationRunning = true;
