@@ -127,10 +127,7 @@ public class ToolControlRenderer extends SWTPartRenderer {
 		}
 		CSSRenderingUtils cssUtils = parentContext.get(CSSRenderingUtils.class);
 		newCtrl = cssUtils.frameMeIfPossible(newCtrl, null, vertical, true);
-
-		if (!toolControl.getTags().contains(IPresentationEngine.NO_CLOSE)) {
-			createToolControlMenu(toolControl, newCtrl);
-		}
+		createToolControlMenu(toolControl, newCtrl);
 		return newCtrl;
 	}
 
