@@ -57,8 +57,6 @@ import org.eclipse.e4.ui.model.application.ui.menu.MHandledToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenu;
-import org.eclipse.e4.ui.model.application.ui.menu.MRenderedMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBarElement;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolItem;
 import org.eclipse.e4.ui.model.application.ui.menu.impl.MenuFactoryImpl;
@@ -498,7 +496,8 @@ public class MenuHelper {
 		String pulldown = element.getAttribute("pulldown"); //$NON-NLS-1$
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MRenderedMenuItem item = MenuFactoryImpl.eINSTANCE.createRenderedMenuItem();
+			MDirectMenuItem item = MenuFactoryImpl.eINSTANCE.createDirectMenuItem();
+			item.getTags().add("Rendered"); //$NON-NLS-1$
 			item.setLabel(text);
 			if (iconUri != null) {
 				item.setIconURI(iconUri);
@@ -522,7 +521,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			item.setContributionItem(generator);
+			item.getTransientData().put("ContributionItem", generator); //$NON-NLS-1$
 			return item;
 		}
 
@@ -595,7 +594,8 @@ public class MenuHelper {
 
 		if (IWorkbenchRegistryConstants.STYLE_PULLDOWN.equals(style)
 				|| (pulldown != null && pulldown.equals("true"))) { //$NON-NLS-1$
-			MRenderedMenu menu = MenuFactoryImpl.eINSTANCE.createRenderedMenu();
+			MMenu menu = MenuFactoryImpl.eINSTANCE.createMenu();
+			menu.getTags().add("Rendered"); //$NON-NLS-1$
 			ECommandService cs = app.getContext().get(ECommandService.class);
 			final ParameterizedCommand parmCmd = cs.createCommand(cmdId, null);
 			IContextFunction generator = new ContextFunction() {
@@ -653,7 +653,7 @@ public class MenuHelper {
 					};
 				}
 			};
-			menu.setContributionManager(generator);
+			menu.getTransientData().put("ContributionManager", generator); //$NON-NLS-1$
 			item.setMenu(menu);
 		}
 		

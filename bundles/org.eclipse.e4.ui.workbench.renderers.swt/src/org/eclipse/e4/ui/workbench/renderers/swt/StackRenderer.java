@@ -39,10 +39,10 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.menu.MDirectMenuItem;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenuElement;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuItem;
-import org.eclipse.e4.ui.model.application.ui.menu.MOpaqueMenuSeparator;
+import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
@@ -1485,15 +1485,17 @@ public class StackRenderer extends LazyStackRenderer {
 
 		for (MMenuElement menuElement : viewMenu.getChildren()) {
 			if (menuElement.isToBeRendered() && menuElement.isVisible()) {
-				if (menuElement instanceof MOpaqueMenuItem) {
-					IContributionItem item = (IContributionItem) ((MOpaqueMenuItem) menuElement)
-							.getOpaqueItem();
+				if (menuElement instanceof MDirectMenuItem
+						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
+					IContributionItem item = (IContributionItem) menuElement
+							.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 					if (item != null && item.isVisible()) {
 						return true;
 					}
-				} else if (menuElement instanceof MOpaqueMenuSeparator) {
-					IContributionItem item = (IContributionItem) ((MOpaqueMenuSeparator) menuElement)
-							.getOpaqueItem();
+				} else if (menuElement instanceof MMenuSeparator
+						&& menuElement.getTags().contains("Opaque")) { //$NON-NLS-1$
+					IContributionItem item = (IContributionItem) menuElement
+							.getTransientData().get("OpaqueItem"); //$NON-NLS-1$
 					if (item != null && item.isVisible()) {
 						return true;
 					}
