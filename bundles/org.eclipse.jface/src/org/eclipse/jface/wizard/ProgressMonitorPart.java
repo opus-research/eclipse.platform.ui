@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Eugene Ostroukhov <eugeneo@symbian.org> -  Bug 287887 [Wizards] [api] Cancel button has two distinct roles
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
@@ -156,10 +157,12 @@ public class ProgressMonitorPart extends Composite implements
         fTaskName = name;
         fSubTaskName = ""; //$NON-NLS-1$
         updateLabel();
-        if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
-            fProgressIndicator.beginAnimatedTask();
-        } else {
-            fProgressIndicator.beginTask(totalWork);
+		if (!fProgressIndicator.isDisposed()) {
+			if (totalWork == IProgressMonitor.UNKNOWN || totalWork == 0) {
+				fProgressIndicator.beginAnimatedTask();
+			} else {
+				fProgressIndicator.beginTask(totalWork);
+			}
         }
         if (fToolBar != null && !fToolBar.isDisposed()) {
         	fToolBar.setVisible(true);
@@ -278,7 +281,9 @@ public class ProgressMonitorPart extends Composite implements
 
     @Override
 	public void internalWorked(double work) {
-        fProgressIndicator.worked(work);
+		if (!fProgressIndicator.isDisposed()) {
+			fProgressIndicator.worked(work);
+		}
     }
 
     @Override
@@ -332,6 +337,9 @@ public class ProgressMonitorPart extends Composite implements
      * Updates the label with the current task and subtask names.
      */
     protected void updateLabel() {
+		if (fLabel.isDisposed() || fLabel.isAutoDirection()) {
+			return;
+		}
         if (blockedStatus == null) {
             String text = taskLabel();
             fLabel.setText(text);
@@ -353,8 +361,7 @@ public class ProgressMonitorPart extends Composite implements
 
 		if (hasTask) {
 			if (hasSubtask)
-				return escapeMetaCharacters(JFaceResources.format(
-    					"Set_SubTask", new Object[] { fTaskName, fSubTaskName }));//$NON-NLS-1$
+				return escapeMetaCharacters(JFaceResources.format("Set_SubTask", fTaskName, fSubTaskName));//$NON-NLS-1$
    			return escapeMetaCharacters(fTaskName);
 
     	} else if (hasSubtask) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426460, 441150
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 466524
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -23,14 +24,12 @@ import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.menu.MMenu;
 import org.eclipse.e4.ui.model.application.ui.menu.MToolBar;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
@@ -51,86 +50,86 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 
 	private MPart partToActivate;
 
-	private Listener activationListener = new Listener() {
-		@Override
-		public void handleEvent(Event event) {
-			// we only want to activate the part if the activated widget is
-			// actually bound to a model element
-			MPart part = (MPart) event.widget.getData(OWNING_ME);
-			if (part != null) {
-				try {
-					partToActivate = part;
-					activate(partToActivate);
-				} finally {
-					partToActivate = null;
-				}
+	private Listener activationListener = event -> {
+		// we only want to activate the part if the activated widget is
+		// actually bound to a model element
+		MPart part = (MPart) event.widget.getData(OWNING_ME);
+		if (part != null) {
+			try {
+				partToActivate = part;
+				activate(partToActivate);
+			} finally {
+				partToActivate = null;
 			}
 		}
 	};
 
 	@Override
 	public Object createWidget(final MUIElement element, Object parent) {
-		if (!(element instanceof MPart) || !(parent instanceof Composite))
+		if (!(element instanceof MPart) || !(parent instanceof Composite)) {
 			return null;
+		}
 
-		Widget parentWidget = (Widget) parent;
-		Widget newWidget = null;
+		// retrieve context for this part
 		final MPart part = (MPart) element;
-
-		final Composite newComposite = new Composite((Composite) parentWidget,
-				SWT.NONE) {
-
-			/**
-			 * Field to determine whether we are currently in the midst of
-			 * granting focus to the part.
-			 */
-			private boolean beingFocused = false;
-
-			@Override
-			public boolean setFocus() {
-				if (!beingFocused) {
-					try {
-						// we are currently asking the part to take focus
-						beingFocused = true;
-
-						// delegate an attempt to set the focus here to the
-						// part's implementation (if there is one)
-						Object object = part.getObject();
-						if (object != null && isEnabled()) {
-							IPresentationEngine pe = part.getContext().get(
-									IPresentationEngine.class);
-							pe.focusGui(part);
-							return true;
-						}
-						return super.setFocus();
-					} finally {
-						// we are done, unset our flag
-						beingFocused = false;
-					}
-				}
-
-				// already being focused, likely some strange recursive call,
-				// just return
-				return true;
-			}
-		};
-
-		newComposite.setLayout(new FillLayout(SWT.VERTICAL));
-
-		newWidget = newComposite;
-		bindWidget(element, newWidget);
-
-		// Create a context for this part
 		IEclipseContext localContext = part.getContext();
-		localContext.set(Composite.class, newComposite);
+		Widget parentWidget = (Widget) parent;
+		// retrieve existing Composite, e.g., for the e4 compatibility case
+		Composite partComposite = localContext.getLocal(Composite.class);
 
-		IContributionFactory contributionFactory = localContext
-				.get(IContributionFactory.class);
-		Object newPart = contributionFactory.create(part.getContributionURI(),
-				localContext);
+		// does the part already have a composite in its contexts?
+		if (partComposite == null) {
+
+			final Composite newComposite = new Composite((Composite) parentWidget, SWT.NONE) {
+
+				/**
+				 * Field to determine whether we are currently in the midst of
+				 * granting focus to the part.
+				 */
+				private boolean beingFocused = false;
+
+				@Override
+				public boolean setFocus() {
+					if (!beingFocused) {
+						try {
+							// we are currently asking the part to take focus
+							beingFocused = true;
+
+							// delegate an attempt to set the focus here to the
+							// part's implementation (if there is one)
+							Object object = part.getObject();
+							if (object != null && isEnabled()) {
+								IPresentationEngine pe = part.getContext().get(IPresentationEngine.class);
+								pe.focusGui(part);
+								return true;
+							}
+							return super.setFocus();
+						} finally {
+							// we are done, unset our flag
+							beingFocused = false;
+						}
+					}
+
+					// already being focused, likely some strange recursive
+					// call,
+					// just return
+					return true;
+				}
+			};
+			newComposite.setLayout(new FillLayout(SWT.VERTICAL));
+
+
+			partComposite = newComposite;
+		}
+		bindWidget(element, partComposite);
+
+		localContext.set(Composite.class, partComposite);
+
+		IContributionFactory contributionFactory = localContext.get(IContributionFactory.class);
+		Object newPart = contributionFactory.create(part.getContributionURI(), localContext);
 		part.setObject(newPart);
 
-		return newWidget;
+		return partComposite;
 	}
 
 	/**
@@ -228,8 +227,7 @@ public class ContributedPartRenderer extends SWTPartRenderer {
 	@Override
 	public Object getUIContainer(MUIElement element) {
 		if (element instanceof MToolBar) {
-			MUIElement container = (MUIElement) ((EObject) element)
-					.eContainer();
+			MUIElement container = modelService.getContainer(element);
 			MUIElement parent = container.getParent();
 			if (parent == null) {
 				MPlaceholder placeholder = container.getCurSharedRef();

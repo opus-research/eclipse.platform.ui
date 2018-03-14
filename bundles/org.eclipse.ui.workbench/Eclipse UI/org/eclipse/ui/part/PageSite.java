@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -188,7 +188,7 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
@@ -203,8 +203,8 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public final Object getService(final Class key) {
-		Object service = serviceLocator.getService(key);
+	public final <T> T getService(final Class<T> key) {
+		T service = serviceLocator.getService(key);
 		if (active && service instanceof INestable) {
 			((INestable) service).activate();
 		}
@@ -222,7 +222,7 @@ public class PageSite implements IPageSite, INestable {
 	}
 
 	@Override
-	public final boolean hasService(final Class key) {
+	public final boolean hasService(final Class<?> key) {
 		return serviceLocator.hasService(key);
 	}
 

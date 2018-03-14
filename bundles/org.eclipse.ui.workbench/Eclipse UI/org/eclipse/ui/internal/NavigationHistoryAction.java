@@ -13,7 +13,6 @@ package org.eclipse.ui.internal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -114,7 +113,8 @@ public class NavigationHistoryAction extends PageEventAction {
     			MenuItem item = new MenuItem(menu, SWT.NONE);
     			item.setData(entries[i]);
     			if (entriesCount[i] > 1) {
-    				text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations,text, new Integer(entriesCount[i]));
+					text = NLS.bind(WorkbenchMessages.NavigationHistoryAction_locations, text,
+							Integer.valueOf(entriesCount[i]));
     			}
     			item.setText(text);
     			item.addSelectionListener(new SelectionAdapter() {
@@ -178,7 +178,7 @@ public class NavigationHistoryAction extends PageEventAction {
                     .getImageDescriptor(ISharedImages.IMG_TOOL_BACK_DISABLED));
             setActionDefinitionId(IWorkbenchCommandConstants.NAVIGATE_BACKWARD_HISTORY);
         }
-        // WorkbenchHelp.setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
+        // PlatformUI.getWorkbench().getHelpSystem().setHelp(this, IHelpContextIds.CLOSE_ALL_PAGES_ACTION);
         setEnabled(false);
         this.forward = forward;
         setMenuCreator(new MenuCreator());

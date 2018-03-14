@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -242,23 +243,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 			if (contentTypeId != null && contentTypeId.length() > 0) {
 				IContentType contentType = Platform.getContentTypeManager().getContentType(contentTypeId);
 				if (contentType != null) {
-					IEditorDescriptor [] editorArray = contentTypeToEditorMappings.get(contentType);
-					if (editorArray == null) {
-						editorArray = new IEditorDescriptor[] {editor};
-						contentTypeToEditorMappings.put(contentType, editorArray);
-					}
-					else {
-						IEditorDescriptor [] newArray = new IEditorDescriptor[editorArray.length + 1];
-						if (bDefault) { // default editors go to the front of the line
-							newArray[0] = editor;
-							System.arraycopy(editorArray, 0, newArray, 1, editorArray.length);
-						}
-						else {
-							newArray[editorArray.length] = editor;
-							System.arraycopy(editorArray, 0, newArray, 0, editorArray.length);
-						}
-						contentTypeToEditorMappings.put(contentType, newArray);
-					}
+					addContentTypeBinding(contentType, editor, bDefault);
 				}
 			}
 		}
@@ -266,6 +251,26 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
         // Update editor map.
         mapIDtoEditor.put(editor.getId(), editor);
     }
+
+	void addContentTypeBinding(IContentType contentType, IEditorDescriptor editor, boolean bDefault) {
+		IEditorDescriptor [] editorArray = contentTypeToEditorMappings.get(contentType);
+		if (editorArray == null) {
+			editorArray = new IEditorDescriptor[] {editor};
+			contentTypeToEditorMappings.put(contentType, editorArray);
+		}
+		else {
+			IEditorDescriptor [] newArray = new IEditorDescriptor[editorArray.length + 1];
+			if (bDefault) { // default editors go to the front of the line
+				newArray[0] = editor;
+				System.arraycopy(editorArray, 0, newArray, 1, editorArray.length);
+			}
+			else {
+				newArray[editorArray.length] = editor;
+				System.arraycopy(editorArray, 0, newArray, 0, editorArray.length);
+			}
+			contentTypeToEditorMappings.put(contentType, newArray);
+		}
+	}
 
     /**
      * Add external editors to the editor mapping.
@@ -639,7 +644,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.EDITOR_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-                        "utf-8")); //$NON-NLS-1$
+						StandardCharsets.UTF_8));
             } else {
                 reader = new StringReader(xmlString);
             }
@@ -653,7 +658,14 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                 if (!valid) {
                     continue;
                 }
-                if (editor.getPluginID() != null) {
+				if (isSystem(editor.getId())) {
+					// bug 502514: check if there is internal editor
+					// descriptor (they are always recreated via
+					// addSystemEditors(Map<String, IEditorDescriptor>))
+					lookupEditorFromTable(editorTable, editor);
+					continue;
+				}
+				if (editor.getPluginID() != null) {
                     //If the editor is from a plugin we use its ID to look it
                     // up in the mapping of editors we
                     //have obtained from plugins. This allows us to verify that
@@ -661,24 +673,25 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                     //and allows us to get the editor description from the
                     // mapping table which has
                     //a valid config element field.
-					IEditorDescriptor validEditorDescritor = mapIDtoEditor.get(editor.getId());
-                    if (validEditorDescritor != null) {
-                        editorTable.put(validEditorDescritor.getId(),
-                                validEditorDescritor);
-                    }
-                } else { //This is either from a program or a user defined
-                    // editor
-                    ImageDescriptor descriptor;
-                    if (editor.getProgram() == null) {
-						descriptor = new ProgramImageDescriptor(editor
-                                .getFileName(), 0);
-					} else {
-						descriptor = new ExternalProgramImageDescriptor(editor
-                                .getProgram());
+					lookupEditorFromTable(editorTable, editor);
+					continue;
+				}
+				// This is either from a program or a user defined editor
+				ImageDescriptor descriptor;
+				if (editor.getProgram() == null) {
+					String fileName = editor.getFileName();
+					if (fileName == null) {
+						String error = "Both editor program and path are null for descriptor id: "; //$NON-NLS-1$
+						error += editor.getId() + " with name: " + editor.getLabel(); //$NON-NLS-1$
+						WorkbenchPlugin.log(error, new IllegalStateException());
+						continue;
 					}
-                    editor.setImageDescriptor(descriptor);
-                    editorTable.put(editor.getId(), editor);
-                }
+					descriptor = new ProgramImageDescriptor(fileName, 0);
+				} else {
+					descriptor = new ExternalProgramImageDescriptor(editor.getProgram());
+				}
+				editor.setImageDescriptor(descriptor);
+				editorTable.put(editor.getId(), editor);
             }
         } catch (IOException e) {
             //Ignore this as the workbench may not yet have saved any state
@@ -701,6 +714,25 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         return true;
     }
+
+    /**
+	 * @param id
+	 *            descriptor id
+	 * @return true if the id is one of the system internal id's:
+	 *         {@link IEditorRegistry#SYSTEM_EXTERNAL_EDITOR_ID} or
+	 *         {@link IEditorRegistry#SYSTEM_INPLACE_EDITOR_ID}
+	 */
+	private static boolean isSystem(String id) {
+		return IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID.equals(id)
+				|| IEditorRegistry.SYSTEM_INPLACE_EDITOR_ID.equals(id);
+	}
+
+	private void lookupEditorFromTable(Map<String, IEditorDescriptor> editorTable, EditorDescriptor editor) {
+		IEditorDescriptor validEditorDescritor = mapIDtoEditor.get(editor.getId());
+		if (validEditorDescritor != null) {
+			editorTable.put(validEditorDescritor.getId(), validEditorDescritor);
+		}
+	}
 
     /**
      * Read the file types and associate them to their defined editor(s).
@@ -789,22 +821,20 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 				}
 			}
             else { // guess at pre 3.1 format defaults
-            		if (!editors.isEmpty()) {
+				if (!editors.isEmpty()) {
 					IEditorDescriptor editor = editors.get(0);
-            			if (editor != null) {
-                			defaultEditors.add(editor);
-                		}
-            		}
-            		defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
+					defaultEditors.add(editor);
+				}
+				defaultEditors.addAll(Arrays.asList(mapping.getDeclaredDefaultEditors()));
             }
 
             // Add any new editors that have already been read from the registry
             // which were not deleted.
             IEditorDescriptor[] editorsArray = mapping.getEditors();
             for (int j = 0; j < editorsArray.length; j++) {
-                if (!contains(editors, editorsArray[j])
-                        && !deletedEditors.contains(editorsArray[j])) {
-                    editors.add(editorsArray[j]);
+				IEditorDescriptor descriptor = editorsArray[j];
+				if (descriptor != null && !contains(editors, descriptor) && !deletedEditors.contains(descriptor)) {
+					editors.add(descriptor);
                 }
             }
             // Map the editor(s) to the file type
@@ -860,7 +890,7 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
                         .append(IWorkbenchConstants.RESOURCE_TYPE_FILE_NAME)
                         .toOSString());
                 reader = new BufferedReader(new InputStreamReader(stream,
-                        "utf-8")); //$NON-NLS-1$
+						StandardCharsets.UTF_8));
             } else {
                 reader = new StringReader(xmlString);
             }
@@ -1013,6 +1043,12 @@ public class EditorRegistry extends EventManager implements IEditorRegistry, IEx
 
         memento = XMLMemento.createWriteRoot(IWorkbenchConstants.TAG_EDITORS);
 		for (IEditorDescriptor editor : editors) {
+			if (isSystem(editor.getId())) {
+				// bug 502514: don't persist internal editor descriptors,
+				// they are always recreated via addSystemEditors(Map<String,
+				// IEditorDescriptor>)
+				continue;
+			}
             IMemento editorMemento = memento
                     .createChild(IWorkbenchConstants.TAG_DESCRIPTOR);
 			((EditorDescriptor) editor).saveValues(editorMemento);

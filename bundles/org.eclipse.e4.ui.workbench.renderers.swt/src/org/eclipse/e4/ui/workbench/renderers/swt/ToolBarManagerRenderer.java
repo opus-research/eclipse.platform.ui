@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,13 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868, 472654, 485852
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *     Sopot Cela <scela@redhat.com> - Bug 472761
  *     Patrik Suzzi <psuzzi@gmail.com> - Bug 473184
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 506306
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,7 +60,6 @@ import org.eclipse.e4.ui.workbench.UIEvents;
 import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.UIEvents.EventTags;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.action.AbstractGroupMarker;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.GroupMarker;
@@ -70,8 +70,6 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolBar;
@@ -84,13 +82,7 @@ import org.osgi.service.event.Event;
  */
 public class ToolBarManagerRenderer extends SWTPartRenderer {
 
-	private static final Selector ALL_SELECTOR = new Selector() {
-
-		@Override
-		public boolean select(MApplicationElement element) {
-			return true;
-		}
-	};
+	private static final Selector ALL_SELECTOR = element -> true;
 
 	/**	 */
 	public static final String POST_PROCESSING_FUNCTION = "ToolBarManagerRenderer.postProcess.func"; //$NON-NLS-1$
@@ -163,10 +155,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				if (parent != null) {
 					modelProcessSwitch(parent, itemModel);
 					parent.update(true);
-					ToolBar tb = parent.getControl();
-					if (tb != null && !tb.isDisposed()) {
-						tb.pack(true);
-						tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+					ToolBar toolbar = parent.getControl();
+					if (toolbar != null && !toolbar.isDisposed()) {
+						toolbar.requestLayout();
 					}
 				}
 			} else {
@@ -212,13 +203,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 			parent.markDirty();
 			parent.update(true);
-			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
-				tb.pack(true);
-				if (tb.getParent() != null) {
-					tb.getParent().pack(true);
-				}
-				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+			ToolBar toolbar = parent.getControl();
+			if (toolbar != null && !toolbar.isDisposed()) {
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -288,12 +275,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			if (v == null || UIEvents.ALL_ELEMENT_ID.equals(v)) {
 				s = ALL_SELECTOR;
 			} else {
-				s = new Selector() {
-					@Override
-					public boolean select(MApplicationElement element) {
-						return v.equals(element.getElementId());
-					}
-				};
+				s = element -> v.equals(element.getElementId());
 			}
 		}
 
@@ -423,17 +405,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		final Map<String, Object> transientData = toolbarModel.getTransientData();
 		if (!transientData.containsKey(DISPOSE_ADDED)) {
 			transientData.put(DISPOSE_ADDED, Boolean.TRUE);
-			control.addDisposeListener(new DisposeListener() {
-				@Override
-				public void widgetDisposed(DisposeEvent e) {
-					cleanUp(toolbarModel);
-					Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
-					if (dispose instanceof Runnable) {
-						((Runnable) dispose).run();
-					}
-					transientData.remove(POST_PROCESSING_DISPOSE);
-					transientData.remove(DISPOSE_ADDED);
+			control.addDisposeListener(e -> {
+				cleanUp(toolbarModel);
+				Object dispose = transientData.get(POST_PROCESSING_DISPOSE);
+				if (dispose instanceof Runnable) {
+					((Runnable) dispose).run();
 				}
+				transientData.remove(POST_PROCESSING_DISPOSE);
+				transientData.remove(DISPOSE_ADDED);
 			});
 		}
 
@@ -482,13 +461,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 					}
 
 					record.updateVisibility(parentContext.getActiveLeaf());
-					runExternalCode(new Runnable() {
-
-						@Override
-						public void run() {
-							manager.update(false);
-							getUpdater().updateContributionItems(ALL_SELECTOR);
-						}
+					runExternalCode(() -> {
+						manager.update(false);
+						getUpdater().updateContributionItems(ALL_SELECTOR);
 					});
 					return true;
 				}
@@ -507,7 +482,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			IContributionManagerOverrides overrides = null;
 			MApplicationElement parentElement = element.getParent();
 			if (parentElement == null) {
-				parentElement = (MApplicationElement) ((EObject) element).eContainer();
+				parentElement = modelService.getContainer(element);
 			}
 
 			if (parentElement != null) {
@@ -524,11 +499,11 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			manager.setStyle(style);
 		}
-		ToolBar bar = manager.createControl(parent);
-		bar.setData(manager);
-		bar.setData(AbstractPartRenderer.OWNING_ME, element);
-		bar.getShell().layout(new Control[] { bar }, SWT.DEFER);
-		return bar;
+		ToolBar btoolbar = manager.createControl(parent);
+		btoolbar.setData(manager);
+		btoolbar.setData(AbstractPartRenderer.OWNING_ME, element);
+		btoolbar.requestLayout();
+		return btoolbar;
 	}
 
 	protected void cleanUp(MToolBar toolbarModel) {
@@ -598,10 +573,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 		parentManager.update(true);
 
-		ToolBar tb = getToolbarFrom(container.getWidget());
-		if (tb != null) {
-			tb.pack(true);
-			tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
+		ToolBar toolbar = getToolbarFrom(container.getWidget());
+		if (toolbar != null) {
+			toolbar.requestLayout();
 		}
 	}
 
@@ -650,8 +624,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			}
 			ToolBar toolbar = (ToolBar) getUIContainer(child);
 			if (toolbar != null && !toolbar.isDisposed()) {
-				toolbar.pack(true);
-				toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+				toolbar.requestLayout();
 			}
 		}
 	}
@@ -662,8 +635,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		processContents(parentElement);
 		ToolBar toolbar = (ToolBar) getUIContainer(element);
 		if (toolbar != null && !toolbar.isDisposed()) {
-			toolbar.pack(true);
-			toolbar.getShell().layout(new Control[] { toolbar }, SWT.DEFER);
+			toolbar.requestLayout();
 		}
 	}
 
