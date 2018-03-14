@@ -24,15 +24,13 @@ public class ResourceAction implements IObjectActionDelegate {
     /*
      * @see IObjectActionDelegate#setActivePart(IAction, IWorkbenchPart)
      */
-    @Override
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     }
 
     /*
      * @see IActionDelegate#run(IAction)
      */
-    @Override
-	public void run(IAction action) {
+    public void run(IAction action) {
 
         if (selectedItem != null)
             TestDecoratorContributor.contributor.refreshListeners(selectedItem);
@@ -42,8 +40,7 @@ public class ResourceAction implements IObjectActionDelegate {
     /*
      * @see IActionDelegate#selectionChanged(IAction, ISelection)
      */
-    @Override
-	public void selectionChanged(IAction action, ISelection selection) {
+    public void selectionChanged(IAction action, ISelection selection) {
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection structured = (IStructuredSelection) selection;
             if (structured.isEmpty())

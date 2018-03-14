@@ -55,7 +55,6 @@ public class BadElementFactory implements IElementFactory {
 		 * 
 		 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 		 */
-		@Override
 		public Object getAdapter(Class adapter) {
 			if (adapter.equals(IPersistableElement.class))
 				return this;
@@ -67,7 +66,6 @@ public class BadElementFactory implements IElementFactory {
 		 * 
 		 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
 		 */
-		@Override
 		public String getFactoryId() {
 			return "org.eclipse.ui.tests.badFactory";
 		}
@@ -77,7 +75,6 @@ public class BadElementFactory implements IElementFactory {
 		 * 
 		 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
 		 */
-		@Override
 		public void saveState(IMemento memento) {
 			if (fail) {
 				failAttempted = true;
@@ -89,7 +86,6 @@ public class BadElementFactory implements IElementFactory {
 	}
 ;
 
-	@Override
 	public IAdaptable createElement(IMemento memento) {
 		if (fail) {
 			failAttempted = true;

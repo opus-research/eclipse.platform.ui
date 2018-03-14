@@ -76,14 +76,13 @@ public class CommandCallbackTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
-		commandService = fWorkbench
+		commandService = (ICommandService) fWorkbench
 				.getService(ICommandService.class);
 		cmd1 = commandService.getCommand(CMD1_ID);
 		cmd2 = commandService.getCommand(CMD2_ID);
-		handlerService = fWorkbench
+		handlerService = (IHandlerService) fWorkbench
 				.getService(IHandlerService.class);
 		cmd1Handler = new CallbackHandler();
 		cmd1Activation = handlerService.activateHandler(CMD1_ID, cmd1Handler);
@@ -96,7 +95,6 @@ public class CommandCallbackTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		if (cmd1Activation != null) {
 			handlerService.deactivateHandler(cmd1Activation);
@@ -119,7 +117,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * @see org.eclipse.ui.commands.ICallbackUpdater#updateCallback(org.eclipse.core.runtime.IAdaptable,
 		 *      java.util.Map)
 		 */
-		@Override
 		public void updateElement(UIElement callback, Map parameters) {
 			callbacks++;
 		}
@@ -129,7 +126,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 		 */
-		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			return null;
 		}
@@ -149,7 +145,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setChecked(boolean)
 		 */
-		@Override
 		public void setChecked(boolean checked) {
 			// TODO Auto-generated method stub
 
@@ -160,7 +155,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setDisabledIcon(org.eclipse.jface.resource.ImageDescriptor)
 		 */
-		@Override
 		public void setDisabledIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
@@ -171,7 +165,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setHoverIcon(org.eclipse.jface.resource.ImageDescriptor)
 		 */
-		@Override
 		public void setHoverIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
@@ -182,7 +175,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setIcon(org.eclipse.jface.resource.ImageDescriptor)
 		 */
-		@Override
 		public void setIcon(ImageDescriptor desc) {
 			// TODO Auto-generated method stub
 
@@ -193,7 +185,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setText(java.lang.String)
 		 */
-		@Override
 		public void setText(String text) {
 			// TODO Auto-generated method stub
 
@@ -204,7 +195,6 @@ public class CommandCallbackTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.ui.menus.UIElement#setTooltip(java.lang.String)
 		 */
-		@Override
 		public void setTooltip(String text) {
 			// TODO Auto-generated method stub
 
@@ -422,7 +412,7 @@ public class CommandCallbackTest extends UITestCase {
 
 	public void testCommandThroughWindow() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
-		ICommandService cs = window
+		ICommandService cs = (ICommandService) window
 				.getService(ICommandService.class);
 		IParameter parmProt = cmd2.getParameter(PROT_PARAM_ID);
 		IParameter parmHost = cmd2.getParameter(HOST_PARAM_ID);
@@ -462,7 +452,7 @@ public class CommandCallbackTest extends UITestCase {
 		ParameterizedCommand pc2 = new ParameterizedCommand(cmd1, null);
 
 		IWorkbenchWindow window = openTestWindow();
-		ICommandService cs = window
+		ICommandService cs = (ICommandService) window
 				.getService(ICommandService.class);
 
 		IElementReference cr1 = commandService.registerElementForCommand(pc1,

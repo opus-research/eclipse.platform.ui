@@ -44,21 +44,17 @@ public abstract class UIResourceFilterDescription {
 	public static UIResourceFilterDescription wrap(
 			final IResourceFilterDescription iResourceFilterDescription) {
 		return new UIResourceFilterDescription() {
-			@Override
 			public FileInfoMatcherDescription getFileInfoMatcherDescription() {
 				return iResourceFilterDescription.getFileInfoMatcherDescription();
 			}
-			@Override
 			public IPath getPath() {
 				return iResourceFilterDescription.getResource().getProjectRelativePath();
 			}
 	
-			@Override
 			public IProject getProject() {
 				return iResourceFilterDescription.getResource().getProject();
 			}
 	
-			@Override
 			public int getType() {
 				return iResourceFilterDescription.getType();
 			}

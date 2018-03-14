@@ -27,7 +27,6 @@ public class SamplePreferencePage extends PreferencePage {
 		this.text = text;
 	}
 
-	@Override
 	protected Control createContents(Composite parent) {
         Label label = new Label(parent, SWT.LEFT);
         label.setText(text);

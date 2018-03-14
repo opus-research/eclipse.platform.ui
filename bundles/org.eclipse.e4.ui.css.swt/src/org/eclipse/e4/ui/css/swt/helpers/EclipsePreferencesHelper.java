@@ -54,7 +54,7 @@ public class EclipsePreferencesHelper {
 	}
 
 	public static List<String> getOverriddenPropertyNames(
-			IEclipsePreferences preferences) {
+			Preferences preferences) {
 		String value = preferences.get(PROPS_OVERRIDDEN_BY_CSS_PROP, null);
 		if (value == null) {
 			return Collections.emptyList();
@@ -75,8 +75,8 @@ public class EclipsePreferencesHelper {
 		.removePreferenceChangeListener(getPreferenceChangeListener());
 	}
 
-	public static void removeOverriddenByCssProperty(
-			IEclipsePreferences preferences, String preferenceToRemove) {
+	public static void removeOverriddenByCssProperty(Preferences preferences,
+			String preferenceToRemove) {
 		StringBuilder overriddenByCSS = new StringBuilder(SEPARATOR);
 		for (String preference : getOverriddenPropertyNames(preferences)) {
 			if (!preference.equals(preferenceToRemove)) {
@@ -108,11 +108,8 @@ public class EclipsePreferencesHelper {
 		}
 
 		protected void removeOverriddenByCssProperty(PreferenceChangeEvent event) {
-			Preferences preferences = event.getNode();
-			if (preferences instanceof IEclipsePreferences) {
-				EclipsePreferencesHelper.removeOverriddenByCssProperty(
-						(IEclipsePreferences) preferences, event.getKey());
-			}
+			EclipsePreferencesHelper.removeOverriddenByCssProperty(
+					event.getNode(), event.getKey());
 		}
 	}
 }

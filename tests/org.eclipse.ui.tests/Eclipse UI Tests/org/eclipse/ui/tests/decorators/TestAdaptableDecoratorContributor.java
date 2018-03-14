@@ -41,8 +41,7 @@ public class TestAdaptableDecoratorContributor extends TestLightweightDecoratorC
         this.clazz = clazz;    
     }
     
-    @Override
-	public void decorate(Object element, IDecoration decoration) {
+    public void decorate(Object element, IDecoration decoration) {
         Assert.assertTrue(clazz.isInstance(element));
         decoration.addSuffix(suffix);
     }

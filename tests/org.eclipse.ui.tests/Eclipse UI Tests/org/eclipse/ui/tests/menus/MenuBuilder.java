@@ -47,14 +47,13 @@ public class MenuBuilder {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return;
 		}
-		IMenuService menuService = PlatformUI.getWorkbench()
+		IMenuService menuService = (IMenuService) PlatformUI.getWorkbench()
 				.getService(IMenuService.class);
 		if (menuService==null) {
 			return;
 		}
 		viewMenuAddition = new AbstractContributionFactory(
 				"menu:org.eclipse.ui.tests.api.MenuTestHarness?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -93,7 +92,6 @@ public class MenuBuilder {
 
 		viewToolbarAddition = new AbstractContributionFactory(
 				"toolbar:org.eclipse.ui.tests.api.MenuTestHarness", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -104,7 +102,6 @@ public class MenuBuilder {
 				additions.addContributionItem(item, null);
 				WorkbenchWindowControlContribution widget = new WorkbenchWindowControlContribution(
 						"org.eclipse.ui.tests.menus.itemX26") {
-					@Override
 					protected Control createControl(Composite parent) {
 						Text textCtrl = new Text(parent, SWT.BORDER);
 						textCtrl.setText("ABCDEFGHI");
@@ -121,7 +118,7 @@ public class MenuBuilder {
 		if (!PlatformUI.isWorkbenchRunning()) {
 			return;
 		}
-		IMenuService menuService = PlatformUI.getWorkbench()
+		IMenuService menuService = (IMenuService) PlatformUI.getWorkbench()
 				.getService(IMenuService.class);
 		if (menuService==null) {
 			return;
@@ -133,12 +130,11 @@ public class MenuBuilder {
 	}
 
 	public static void addSearchMenu() {
-		IMenuService menuService = PlatformUI.getWorkbench()
+		IMenuService menuService = (IMenuService) PlatformUI.getWorkbench()
 				.getService(IMenuService.class);
 
 		AbstractContributionFactory searchContribution = new AbstractContributionFactory(
 				"menu:org.eclipse.ui.main.menu?after=navigate", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator menuService,
 					IContributionRoot additions) {
 				MenuManager search = new MenuManager("Se&arch",
@@ -159,7 +155,7 @@ public class MenuBuilder {
 	}
 
 	public static void addToSearchMenu() {
-		final IMenuService menuService = PlatformUI
+		final IMenuService menuService = (IMenuService) PlatformUI
 				.getWorkbench().getService(IMenuService.class);
 		final ActiveActionSetExpression activeSearchActionSet = new ActiveActionSetExpression(
 				"org.eclipse.jdt.ui.SearchActionSet");
@@ -169,7 +165,6 @@ public class MenuBuilder {
 						"icons/full/obj16/jsearch_obj.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"menu:org.eclipse.search.menu?after=dialogGroup", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -184,7 +179,6 @@ public class MenuBuilder {
 
 		factory = new AbstractContributionFactory(
 				"menu:org.eclipse.search.menu?after=contextMenuActionsGroup", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator
 					,
 					IContributionRoot additions) {
@@ -264,7 +258,6 @@ public class MenuBuilder {
 		 * 
 		 * @see org.eclipse.core.expressions.Expression#evaluate(org.eclipse.core.expressions.IEvaluationContext)
 		 */
-		@Override
 		public EvaluationResult evaluate(IEvaluationContext context)
 				throws CoreException {
 			// TODO Auto-generated method stub
@@ -274,7 +267,7 @@ public class MenuBuilder {
 	}
 
 	public static void addFileContribution() {
-		final IMenuService menuService = PlatformUI
+		final IMenuService menuService = (IMenuService) PlatformUI
 				.getWorkbench().getService(IMenuService.class);
 		final ObjectClassExpression ifileExpression = new ObjectClassExpression(
 				"org.eclipse.core.resources.IFile");
@@ -287,7 +280,6 @@ public class MenuBuilder {
 						"icons/full/elcl16/load_wiki.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"popup:org.eclipse.ui.menus.popup.any?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,
@@ -309,7 +301,7 @@ public class MenuBuilder {
 	}
 
 	public static void addTextMenuContribition() {
-		final IMenuService menuService = PlatformUI
+		final IMenuService menuService = (IMenuService) PlatformUI
 				.getWorkbench().getService(IMenuService.class);
 
 		final ImageDescriptor scrambleIcon = AbstractUIPlugin
@@ -317,7 +309,6 @@ public class MenuBuilder {
 						"icons/full/eobj16/scramble.gif");
 		AbstractContributionFactory factory = new AbstractContributionFactory(
 				"popup:#TextEditorContext?after=additions", TestPlugin.PLUGIN_ID) {
-			@Override
 			public void createContributionItems(IServiceLocator serviceLocator,
 					IContributionRoot additions) {
 				CommandContributionItem item = new CommandContributionItem(serviceLocator,

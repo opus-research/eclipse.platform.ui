@@ -57,7 +57,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#buttonPressed(int)
 	 */
-	@Override
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 	}
@@ -69,7 +68,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets
 	 * .Shell)
 	 */
-	@Override
 	protected void configureShell(Shell shell) {
 		super.configureShell(shell);
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(shell,
@@ -83,7 +81,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse
 	 * .swt.widgets.Composite)
 	 */
-	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
 				true);
@@ -98,7 +95,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets
 	 * .Composite)
 	 */
-	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite dialogArea = (Composite) super.createDialogArea(parent);
 		resourceFilterGroup.createContents(dialogArea);
@@ -110,7 +106,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * 
 	 * @see org.eclipse.jface.window.Window#close()
 	 */
-	@Override
 	public boolean close() {
 		resourceFilterGroup.dispose();
 		return super.close();
@@ -144,7 +139,6 @@ public class ResourceFilterEditDialog extends SelectionDialog {
 	 * 
 	 * @see org.eclipse.jface.dialogs.Dialog#okPressed()
 	 */
-	@Override
 	protected void okPressed() {
 		// Sets the dialog result to the selected path variable name(s).
 		try {

@@ -16,7 +16,6 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class CheckHandler extends AbstractHandler {
 
-	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// It's OK do do nothing
 		return null;

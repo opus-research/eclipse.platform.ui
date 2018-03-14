@@ -62,7 +62,6 @@ public class HandlerActivationTest extends UITestCase {
 		 * 
 		 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
 		 */
-		@Override
 		public Object execute(ExecutionEvent event) {
 			executionCount++;
 			return null;
@@ -71,7 +70,6 @@ public class HandlerActivationTest extends UITestCase {
 	}
 
 	static class OutlineOnlyHandler extends AbstractHandler {
-		@Override
 		public Object execute(ExecutionEvent event) throws ExecutionException {
 			IWorkbenchPart part = HandlerUtil.getActivePartChecked(event);
 			if (!(part instanceof ContentOutline)) {
@@ -81,7 +79,6 @@ public class HandlerActivationTest extends UITestCase {
 			return null;
 		}
 
-		@Override
 		public void setEnabled(Object evaluationContext) {
 			IWorkbenchPart part = (IWorkbenchPart) HandlerUtil.getVariable(
 					evaluationContext, ISources.ACTIVE_PART_NAME);
@@ -145,11 +142,11 @@ public class HandlerActivationTest extends UITestCase {
 	public HandlerActivationTest(String name) {
 		super(name);
 		services = PlatformUI.getWorkbench();
-		contextService = services
+		contextService = (IContextService) services
 				.getService(IContextService.class);
-		commandService = services
+		commandService = (ICommandService) services
 				.getService(ICommandService.class);
-		handlerService = services
+		handlerService = (IHandlerService) services
 				.getService(IHandlerService.class);
 	}
 
@@ -194,7 +191,6 @@ public class HandlerActivationTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		for (int i = 0; i < CREATE_CONTEXTS.length; i++) {
 			final String[] contextInfo = CREATE_CONTEXTS[i];
@@ -218,7 +214,6 @@ public class HandlerActivationTest extends UITestCase {
 	 * 
 	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doTearDown()
 	 */
-	@Override
 	protected void doTearDown() throws Exception {
 		handlerService.deactivateHandlers(testHandlerActivations.values());
 		testHandlerActivations.clear();

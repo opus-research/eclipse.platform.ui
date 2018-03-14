@@ -31,8 +31,7 @@ public final class TestMultiPageEditor extends MultiPageEditorPart {
      * 
      * @see org.eclipse.ui.part.MultiPageEditorPart#createPages()
      */
-    @Override
-	protected void createPages() {
+    protected void createPages() {
         try {
             IEditorPart part1 = new TestKeyBindingMultiPageEditorPart(0);
             addPage(part1, getEditorInput());
@@ -49,8 +48,7 @@ public final class TestMultiPageEditor extends MultiPageEditorPart {
      * 
      * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
      */
-    @Override
-	public void doSave(IProgressMonitor monitor) {
+    public void doSave(IProgressMonitor monitor) {
         // Do nothing.
     }
 
@@ -59,8 +57,7 @@ public final class TestMultiPageEditor extends MultiPageEditorPart {
      * 
      * @see org.eclipse.ui.part.EditorPart#doSaveAs()
      */
-    @Override
-	public void doSaveAs() {
+    public void doSaveAs() {
         throw new UnsupportedOperationException("Not implemented in this test."); //$NON-NLS-1$
     }
 
@@ -79,8 +76,7 @@ public final class TestMultiPageEditor extends MultiPageEditorPart {
      * 
      * @see org.eclipse.ui.part.EditorPart#isSaveAsAllowed()
      */
-    @Override
-	public boolean isSaveAsAllowed() {
+    public boolean isSaveAsAllowed() {
         return false;
     }
 
