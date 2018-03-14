@@ -24,8 +24,7 @@ public class IFileEditorMappingTest extends TestCase {
         super(testName);
     }
 
-    @Override
-	public void setUp() {
+    public void setUp() {
         fMappings = PlatformUI.getWorkbench().getEditorRegistry()
                 .getFileEditorMappings();
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api;
 
@@ -20,9 +19,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPersistableEditor;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.IPersistableEditor;
+import org.eclipse.ui.PartInitException;
 
 public class MockEditorWithState extends MockWorkbenchPart implements
 		IEditorPart, IPersistableEditor {
@@ -43,14 +43,12 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 		super();
 	}
 
-	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
 
 		final Button dirtyToggle = new Button(parent, SWT.CHECK);
 		dirtyToggle.setText("Dirty");
 		dirtyToggle.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setDirty(dirtyToggle.getSelection());
 			}
@@ -60,7 +58,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 		final Button saveNeededToggle = new Button(parent, SWT.CHECK);
 		saveNeededToggle.setText("Save on close");
 		saveNeededToggle.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setSaveNeeded(saveNeededToggle.getSelection());
 			}
@@ -70,7 +67,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 		final Button saveAsToggle = new Button(parent, SWT.CHECK);
 		saveAsToggle.setText("Save as allowed");
 		saveAsToggle.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setSaveAsAllowed(saveAsToggle.getSelection());
 			}
@@ -81,7 +77,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#doSave(IProgressMonitor)
 	 */
-	@Override
 	public void doSave(IProgressMonitor monitor) {
 		setDirty(false);
 		callTrace.add("doSave");
@@ -90,14 +85,12 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#doSaveAs()
 	 */
-	@Override
 	public void doSaveAs() {
 	}
 
 	/**
 	 * @see IEditorPart#getEditorInput()
 	 */
-	@Override
 	public IEditorInput getEditorInput() {
 		return input;
 	}
@@ -105,7 +98,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#getEditorSite()
 	 */
-	@Override
 	public IEditorSite getEditorSite() {
 		return (IEditorSite) getSite();
 	}
@@ -113,8 +105,8 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#init(IEditorSite, IEditorInput)
 	 */
-	@Override
-	public void init(IEditorSite site, IEditorInput input) {
+	public void init(IEditorSite site, IEditorInput input)
+			throws PartInitException {
 		this.input = input;
 		setSite(site);
 		callTrace.add("init");
@@ -124,7 +116,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#isDirty()
 	 */
-	@Override
 	public boolean isDirty() {
 		callTrace.add("isDirty");
 		return dirty;
@@ -138,7 +129,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#isSaveAsAllowed()
 	 */
-	@Override
 	public boolean isSaveAsAllowed() {
 		callTrace.add("isSaveAsAllowed");
 		return saveAsAllowed;
@@ -147,7 +137,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	/**
 	 * @see IEditorPart#isSaveOnCloseNeeded()
 	 */
-	@Override
 	public boolean isSaveOnCloseNeeded() {
 		callTrace.add("isSaveOnCloseNeeded");
 		return saveNeeded;
@@ -166,7 +155,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	 * 
 	 * @see org.eclipse.ui.tests.api.MockWorkbenchPart#getActionBars()
 	 */
-	@Override
 	protected IActionBars getActionBars() {
 		return getEditorSite().getActionBars();
 	}
@@ -176,7 +164,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	 * 
 	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void restoreState(IMemento memento) {
 		callTrace.add("restoreState");
 		String val = memento.getString("saveNeeded");
@@ -198,7 +185,6 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 	 * 
 	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public void saveState(IMemento memento) {
 		callTrace.add("saveState");
 		memento.putString("saveNeeded", String.valueOf(saveNeeded));

@@ -1,5 +1,5 @@
  /****************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,6 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
@@ -37,7 +36,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchEncoding;
@@ -91,8 +89,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
      * 
      * @see org.eclipse.jface.preference.PreferencePage
      */
-    @Override
-	protected Control createContents(Composite parent) {
+    protected Control createContents(Composite parent) {
 
     	PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				IIDEHelpContextIds.WORKSPACE_PREFERENCE_PAGE);
@@ -225,8 +222,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
         saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
 
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
+            public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(saveInterval.isValid());
 				}
@@ -306,7 +302,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 			/* (non-Javadoc)
 			 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 			 */
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(encodingEditor.isValid());
@@ -352,9 +347,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 
 		systemExplorer = new StringFieldEditor(IDEInternalPreferences.WORKBENCH_SYSTEM_EXPLORER,
 				IDEWorkbenchMessages.IDEWorkbenchPreference_workbenchSystemExplorer, 40, groupComposite);
-		Text textControl = systemExplorer.getTextControl(groupComposite);
-		BidiUtils.applyBidiProcessing(textControl, BidiUtils.LEFT_TO_RIGHT);
-		gd = (GridData) textControl.getLayoutData();
+		gd = (GridData) systemExplorer.getTextControl(groupComposite).getLayoutData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
 		systemExplorer.setPreferenceStore(getIDEPreferenceStore());
@@ -363,7 +356,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
 		systemExplorer.load();
 
 		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
 					setValid(systemExplorer.isValid());
@@ -416,7 +408,6 @@ public class IDEWorkspacePreferencePage extends PreferencePage
         return composite;
     }
 	
-	@Override
 	public void init(org.eclipse.ui.IWorkbench workbench) {
         //no-op
     }
@@ -424,8 +415,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The default button has been pressed.
      */
-    @Override
-	protected void performDefaults() {
+    protected void performDefaults() {
 
         // core holds onto this preference.
         boolean autoBuild = ResourcesPlugin.getPlugin().getPluginPreferences()
@@ -467,8 +457,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage
     /**
      * The user has pressed Ok. Store/apply this page's values appropriately.
      */
-    @Override
-	public boolean performOk() {
+    public boolean performOk() {
         // set the workspace auto-build flag
         IWorkspaceDescription description = ResourcesPlugin.getWorkspace()
                 .getDescription();

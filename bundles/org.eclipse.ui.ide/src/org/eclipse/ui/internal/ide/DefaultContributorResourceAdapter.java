@@ -47,13 +47,11 @@ public class DefaultContributorResourceAdapter implements
     /*
      * @see IContributorResourceAdapter#getAdaptedResource(IAdaptable)
      */
-    @Override
-	public IResource getAdaptedResource(IAdaptable adaptable) {
+    public IResource getAdaptedResource(IAdaptable adaptable) {
         return (IResource) adaptable.getAdapter(IResource.class);
     }
 
-    @Override
-	public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
+    public ResourceMapping getAdaptedResourceMapping(IAdaptable adaptable) {
         return (ResourceMapping) adaptable.getAdapter(ResourceMapping.class);
     }
 }

@@ -123,7 +123,6 @@ import org.eclipse.ui.views.markers.MarkerSupportView;
  * @noinstantiate This class is not intended to be instantiated by clients.
  * @noextend This class is not intended to be subclassed by clients.
  */
-@Deprecated
 public class TaskList extends ViewPart {
 
     private Table table;
@@ -230,8 +229,7 @@ public class TaskList extends ViewPart {
                 IMarkerConstants.P_CONTAINER_NAME,
                 IMarkerConstants.P_LINE_AND_LOCATION };
 
-        @Override
-		public String getColumnText(Object element, int columnIndex) {
+        public String getColumnText(Object element, int columnIndex) {
             if (columnIndex >= 3 && columnIndex <= 6) {
 				return (String) MarkerUtil.getProperty(element,
                         keys[columnIndex]);
@@ -239,8 +237,7 @@ public class TaskList extends ViewPart {
             return ""; //$NON-NLS-1$
         }
 
-        @Override
-		public Image getColumnImage(Object element, int columnIndex) {
+        public Image getColumnImage(Object element, int columnIndex) {
             if (columnIndex >= 0 && columnIndex <= 2) {
                 return (Image) MarkerUtil.getProperty(element,
                         keys[columnIndex]);
@@ -260,8 +257,7 @@ public class TaskList extends ViewPart {
             this.column = column;
         }
 
-        @Override
-		public void run() {
+        public void run() {
             comparator.setTopPriority(column);
             updateSortingState();
             viewer.refresh();
@@ -286,8 +282,7 @@ public class TaskList extends ViewPart {
             this.direction = direction;
         }
 
-        @Override
-		public void run() {
+        public void run() {
             comparator.setTopPriorityDirection(direction);
             updateSortingState();
             viewer.refresh();
@@ -318,32 +313,26 @@ public class TaskList extends ViewPart {
             new ColumnWeightData(60) };
 
     private IPartListener partListener = new IPartListener() {
-        @Override
-		public void partActivated(IWorkbenchPart part) {
+        public void partActivated(IWorkbenchPart part) {
             TaskList.this.partActivated(part);
         }
 
-        @Override
-		public void partBroughtToTop(IWorkbenchPart part) {
+        public void partBroughtToTop(IWorkbenchPart part) {
         }
 
-        @Override
-		public void partClosed(IWorkbenchPart part) {
+        public void partClosed(IWorkbenchPart part) {
             TaskList.this.partClosed(part);
         }
 
-        @Override
-		public void partDeactivated(IWorkbenchPart part) {
+        public void partDeactivated(IWorkbenchPart part) {
         }
 
-        @Override
-		public void partOpened(IWorkbenchPart part) {
+        public void partOpened(IWorkbenchPart part) {
         }
     };
 
     private ISelectionChangedListener focusSelectionChangedListener = new ISelectionChangedListener() {
-        @Override
-		public void selectionChanged(SelectionChangedEvent event) {
+        public void selectionChanged(SelectionChangedEvent event) {
             TaskList.this.focusSelectionChanged(event);
         }
     };
@@ -355,21 +344,18 @@ public class TaskList extends ViewPart {
     private ISelectionProvider focusSelectionProvider;
 
     private ICellModifier cellModifier = new ICellModifier() {
-        @Override
-		public Object getValue(Object element, String property) {
+        public Object getValue(Object element, String property) {
             return MarkerUtil.getProperty(element, property);
         }
 
-        @Override
-		public boolean canModify(Object element, String property) {
+        public boolean canModify(Object element, String property) {
             return MarkerUtil.isEditable((IMarker) element);
         }
 
         /**
          * Modifies a marker as a result of a successfully completed direct editing.
          */
-        @Override
-		public void modify(Object element, String property, Object value) {
+        public void modify(Object element, String property, Object value) {
             Item item = (Item) element;
             IMarker marker = (IMarker) item.getData();
             setProperty(marker, property, value);
@@ -392,13 +378,11 @@ public class TaskList extends ViewPart {
         Transfer[] transferTypes = new Transfer[] {
                 MarkerTransfer.getInstance(), TextTransfer.getInstance() };
         DragSourceListener listener = new DragSourceAdapter() {
-            @Override
-			public void dragSetData(DragSourceEvent event) {
+            public void dragSetData(DragSourceEvent event) {
                 performDragSetData(event);
             }
 
-            @Override
-			public void dragFinished(DragSourceEvent event) {
+            public void dragFinished(DragSourceEvent event) {
             }
         };
         viewer.addDragSupport(operations, transferTypes, listener);
@@ -426,8 +410,7 @@ public class TaskList extends ViewPart {
              * presses on the same column header will
              * toggle sorting order (ascending/descending).
              */
-            @Override
-			public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 // column selected - need to sort
                 int column = table.indexOf((TableColumn) e.widget);
                 if (column == comparator.getTopPriority()) {
@@ -565,8 +548,7 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void createPartControl(Composite parent) {
+    public void createPartControl(Composite parent) {
         //	long t = System.currentTimeMillis();
         createPartControl0(parent);
         //	t = System.currentTimeMillis() - t;
@@ -613,20 +595,17 @@ public class TaskList extends ViewPart {
         updateSortingState();
         viewer.setInput(getWorkspace().getRoot());
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-			public void selectionChanged(SelectionChangedEvent event) {
+            public void selectionChanged(SelectionChangedEvent event) {
                 TaskList.this.selectionChanged(event);
             }
         });
         viewer.addOpenListener(new IOpenListener() {
-            @Override
-			public void open(OpenEvent event) {
+            public void open(OpenEvent event) {
                 gotoTaskAction.run();
             }
         });
         viewer.getControl().addKeyListener(new KeyAdapter() {
-            @Override
-			public void keyPressed(KeyEvent e) {
+            public void keyPressed(KeyEvent e) {
                 handleKeyPressed(e);
             }
         });
@@ -639,8 +618,7 @@ public class TaskList extends ViewPart {
                     /* (non-Javadoc)
                      * @see org.eclipse.swt.accessibility.AccessibleControlListener#getValue(org.eclipse.swt.accessibility.AccessibleControlEvent)
                      */
-                    @Override
-					public void getValue(AccessibleControlEvent e) {
+                    public void getValue(AccessibleControlEvent e) {
 
                         int childIndex = e.childID;
 
@@ -687,8 +665,7 @@ public class TaskList extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            @Override
-			public void menuAboutToShow(IMenuManager manager) {
+            public void menuAboutToShow(IMenuManager manager) {
                 TaskList.this.fillContextMenu(manager);
             }
         });
@@ -724,8 +701,7 @@ public class TaskList extends ViewPart {
             /*
              * @see HelpListener#helpRequested(HelpEvent)
              */
-            @Override
-			public void helpRequested(HelpEvent e) {
+            public void helpRequested(HelpEvent e) {
                 String contextId = null;
                 // See if there is a context registered for the current selection
                 IMarker marker = (IMarker) ((IStructuredSelection) getSelection())
@@ -763,8 +739,7 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
         super.dispose();
         getSite().getPage().removePartListener(partListener);
         if (focusSelectionProvider != null) {
@@ -858,8 +833,7 @@ public class TaskList extends ViewPart {
 
         BusyIndicator.showWhile(viewer.getControl().getShell().getDisplay(),
                 new Runnable() {
-                    @Override
-					public void run() {
+                    public void run() {
                         // Filter has already been updated by dialog; just refresh.
                         // Don't need to update labels for existing elements 
                         // since changes to filter settings don't affect them.
@@ -881,20 +855,17 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * @see org.eclipse.core.runtime.IAdaptable#getAdapter(Class)
      */
-    @Override
-	public Object getAdapter(Class adapter) {
+    public Object getAdapter(Class adapter) {
         if (adapter == IShowInSource.class) {
             return new IShowInSource() {
-                @Override
-				public ShowInContext getShowInContext() {
+                public ShowInContext getShowInContext() {
                     return new ShowInContext(null, getSelection());
                 }
             };
         }
         if (adapter == IShowInTargetList.class) {
             return new IShowInTargetList() {
-                @Override
-				public String[] getShowInTargetIds() {
+                public String[] getShowInTargetIds() {
                     return new String[] { IPageLayout.ID_RES_NAV };
                 }
 
@@ -1033,8 +1004,7 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    @Override
-	public void init(IViewSite site, IMemento memento) throws PartInitException {
+    public void init(IViewSite site, IMemento memento) throws PartInitException {
         super.init(site, memento);
         this.memento = memento;
     }
@@ -1358,8 +1328,7 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IViewPart.
      */
-    @Override
-	public void saveState(IMemento memento) {
+    public void saveState(IMemento memento) {
         if (viewer == null) {
             if (this.memento != null) {
 				memento.putMemento(this.memento);
@@ -1474,8 +1443,7 @@ public class TaskList extends ViewPart {
     /* (non-Javadoc)
      * Method declared on IWorkbenchPart.
      */
-    @Override
-	public void setFocus() {
+    public void setFocus() {
         viewer.getControl().setFocus();
     }
 

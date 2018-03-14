@@ -42,7 +42,6 @@ public class SetBinding extends Binding {
 	private boolean updatingModel;
 
 	private ISetChangeListener targetChangeListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (!updatingTarget) {
 				doUpdate((IObservableSet) getTarget(),
@@ -53,7 +52,6 @@ public class SetBinding extends Binding {
 	};
 
 	private ISetChangeListener modelChangeListener = new ISetChangeListener() {
-		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			if (!updatingModel) {
 				doUpdate((IObservableSet) getModel(),
@@ -87,12 +85,10 @@ public class SetBinding extends Binding {
 		}
 	}
 
-	@Override
 	public IObservableValue getValidationStatus() {
 		return validationStatusObservable;
 	}
 
-	@Override
 	protected void preInit() {
 		ObservableTracker.setIgnore(true);
 		try {
@@ -103,7 +99,6 @@ public class SetBinding extends Binding {
 		}
 	}
 
-	@Override
 	protected void postInit() {
 		if (modelToTarget.getUpdatePolicy() == UpdateSetStrategy.POLICY_UPDATE) {
 			updateModelToTarget();
@@ -113,11 +108,9 @@ public class SetBinding extends Binding {
 		}
 	}
 
-	@Override
 	public void updateModelToTarget() {
 		final IObservableSet modelSet = (IObservableSet) getModel();
 		modelSet.getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
 						modelSet);
@@ -127,11 +120,9 @@ public class SetBinding extends Binding {
 		});
 	}
 
-	@Override
 	public void updateTargetToModel() {
 		final IObservableSet targetSet = (IObservableSet) getTarget();
 		targetSet.getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				SetDiff diff = Diffs.computeSetDiff(Collections.EMPTY_SET,
 						targetSet);
@@ -141,12 +132,10 @@ public class SetBinding extends Binding {
 		});
 	}
 
-	@Override
 	public void validateModelToTarget() {
 		// nothing for now
 	}
 
-	@Override
 	public void validateTargetToModel() {
 		// nothing for now
 	}
@@ -165,7 +154,6 @@ public class SetBinding extends Binding {
 		if (policy == UpdateSetStrategy.POLICY_ON_REQUEST && !explicit)
 			return;
 		destination.getRealm().exec(new Runnable() {
-			@Override
 			public void run() {
 				if (destination == getTarget()) {
 					updatingTarget = true;
@@ -228,7 +216,6 @@ public class SetBinding extends Binding {
 		}
 	}
 
-	@Override
 	public void dispose() {
 		if (targetChangeListener != null) {
 			((IObservableSet) getTarget())

@@ -28,8 +28,7 @@ public class PerspectiveWithMultiViewPlaceholdersAtTopLevel implements IPerspect
         // do nothing
     }
 
-    @Override
-	public void createInitialLayout(IPageLayout layout) {
+    public void createInitialLayout(IPageLayout layout) {
         layout.addPlaceholder("*", IPageLayout.LEFT, 0.5f, IPageLayout.ID_EDITOR_AREA);
         layout.addPlaceholder(MockViewPart.IDMULT, IPageLayout.LEFT, 0.5f, IPageLayout.ID_EDITOR_AREA);
         layout.addPlaceholder(MockViewPart.IDMULT + ":secondaryId", IPageLayout.LEFT, 0.5f, IPageLayout.ID_EDITOR_AREA);

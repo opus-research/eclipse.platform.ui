@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2014 IBM Corporation and others.
+ * Copyright (c) 2006, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *******************************************************************************/
 
 package org.eclipse.ui.internal.quickaccess;
@@ -112,7 +111,7 @@ public class CommandProvider extends QuickAccessProvider {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				ehandlerService = ctx.get(EHandlerService.class);
 			} else {
-				ehandlerService = PlatformUI.getWorkbench().getService(
+				ehandlerService = (EHandlerService) PlatformUI.getWorkbench().getService(
 						EHandlerService.class);
 			}
 		}
@@ -125,7 +124,7 @@ public class CommandProvider extends QuickAccessProvider {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				commandService = ctx.get(ICommandService.class);
 			} else {
-				commandService = PlatformUI.getWorkbench().getService(
+				commandService = (ICommandService) PlatformUI.getWorkbench().getService(
 						ICommandService.class);
 			}
 		}
@@ -138,7 +137,7 @@ public class CommandProvider extends QuickAccessProvider {
 				IEclipseContext ctx = ((ExpressionContext) currentSnapshot).eclipseContext;
 				handlerService = ctx.get(IHandlerService.class);
 			} else {
-				handlerService = PlatformUI.getWorkbench().getService(
+				handlerService = (IHandlerService) PlatformUI.getWorkbench().getService(
 						IHandlerService.class);
 			}
 		}
