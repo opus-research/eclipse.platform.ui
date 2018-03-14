@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -205,10 +205,6 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	 * The 'elementId' of the spacer used to right-align it in the trim
 	 */
 	public static final String PERSPECTIVE_SPACER_ID = "PerspectiveSpacer"; //$NON-NLS-1$
-
-	public static final String STATUS_LINE_ID = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
-
-	public static final String TRIM_CONTRIBUTION_URI = "bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"; //$NON-NLS-1$
 
 	private static final String MAIN_TOOLBAR_ID = ActionSet.MAIN_TOOLBAR;
 	private static final String COMMAND_ID_TOGGLE_COOLBAR = "org.eclipse.ui.ToggleCoolbarAction"; //$NON-NLS-1$
@@ -1098,12 +1094,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 
 	private void populateStandardTrim(MTrimBar bottomTrim) {
 		// StatusLine
-		MToolControl slElement = (MToolControl) modelService.find(STATUS_LINE_ID, model);
+		MToolControl slElement = (MToolControl) modelService.find(
+				"org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 		if (slElement == null) {
 			slElement = modelService.createModelElement(MToolControl.class);
-			slElement.setElementId(STATUS_LINE_ID);
+			slElement.setElementId("org.eclipse.ui.StatusLine"); //$NON-NLS-1$
 			slElement
-.setContributionURI(TRIM_CONTRIBUTION_URI);
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(slElement);
 		}
 		slElement.setToBeRendered(statusLineVisible);
@@ -1116,7 +1113,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			hsElement = modelService.createModelElement(MToolControl.class);
 			hsElement.setElementId("org.eclipse.ui.HeapStatus"); //$NON-NLS-1$
 			hsElement
-.setContributionURI(TRIM_CONTRIBUTION_URI);
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			hsElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			bottomTrim.getChildren().add(hsElement);
 		}
@@ -1130,7 +1127,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 			pbElement.setElementId("org.eclipse.ui.ProgressBar"); //$NON-NLS-1$
 			pbElement.getTags().add(IPresentationEngine.DRAGGABLE);
 			pbElement
-.setContributionURI(TRIM_CONTRIBUTION_URI);
+					.setContributionURI("bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim"); //$NON-NLS-1$
 			bottomTrim.getChildren().add(pbElement);
 		}
 		pbElement.setToBeRendered(getWindowConfigurer().getShowProgressIndicator());
@@ -1179,7 +1176,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 									boolean isBefore = "before".equals(orders[0].getAttribute("position")); //$NON-NLS-1$//$NON-NLS-2$
 									String relTo = orders[0].getAttribute("relativeTo"); //$NON-NLS-1$
 									if ("status".equals(relTo)) //$NON-NLS-1$
-										relTo = STATUS_LINE_ID;
+										relTo = "org.eclipse.ui.StatusLine"; //$NON-NLS-1$
 
 									createdTrim = addTrimElement(bottomTrim, item, id, isBefore,
 											relTo, classSpec);
@@ -2121,7 +2118,7 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 				
 				// Disable everything in the bottom trim except the status line
 				if (tpl.bottom != null && !tpl.bottom.isDisposed() && tpl.bottom.isEnabled()) {
-					MUIElement statusLine = modelService.find(STATUS_LINE_ID, model);
+					MUIElement statusLine = modelService.find("org.eclipse.ui.StatusLine", model); //$NON-NLS-1$
 					Object slCtrl = statusLine != null ? statusLine.getWidget() : null;
 					for (Control bottomCtrl : tpl.bottom.getChildren()) {
 						if (bottomCtrl != slCtrl)
