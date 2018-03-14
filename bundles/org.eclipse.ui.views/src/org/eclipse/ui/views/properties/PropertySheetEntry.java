@@ -51,8 +51,7 @@ import org.eclipse.swt.widgets.Composite;
  *
  * @since 3.0 (was previously internal)
  */
-public class PropertySheetEntry extends EventManager implements
-		IPropertySheetEntry {
+public class PropertySheetEntry extends EventManager implements IPropertySheetEntry {
 
 	/**
 	 * The values we are displaying/editing. These objects repesent the value of
@@ -216,18 +215,18 @@ public class PropertySheetEntry extends EventManager implements
 	}
 
 	/**
-	 * Returns an map of property descritptors (keyed on id) for the given
+	 * Returns an map of property descriptors (keyed on id) for the given
 	 * property source.
 	 *
 	 * @param source
 	 *            a property source for which to obtain descriptors
-	 * @return a table of decriptors keyed on their id
+	 * @return a table of descriptors keyed on their id
 	 */
 	private Map computePropertyDescriptorsFor(IPropertySource source) {
 		IPropertyDescriptor[] descriptors = source.getPropertyDescriptors();
 		Map result = new HashMap(descriptors.length * 2 + 1);
-		for (IPropertyDescriptor descriptor2 : descriptors) {
-			result.put(descriptor2.getId(), descriptor2);
+		for (IPropertyDescriptor desc : descriptors) {
+			result.put(desc.getId(), desc);
 		}
 		return result;
 	}
