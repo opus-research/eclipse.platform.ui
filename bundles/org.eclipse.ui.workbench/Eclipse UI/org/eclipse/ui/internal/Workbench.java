@@ -14,7 +14,6 @@
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 422533
  *     Terry Parker <tparker@google.com> - Bug 416673
- *     Sergey Prigogin <eclipse.sprigogin@gmail.com> - Bug 438324
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -264,7 +263,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * The workbench class represents the top of the Eclipse user interface. Its
- * primary responsibility is the management of workbench windows, dialogs,
+ * primary responsability is the management of workbench windows, dialogs,
  * wizards, and other workbench-related windows.
  * <p>
  * Note that any code that is run during the creation of a workbench instance
@@ -2004,14 +2003,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 			}
 		});
 
-		eventBroker.subscribe(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE, new EventHandler() {
-			@Override
-			public void handleEvent(org.osgi.service.event.Event event) {
-				// Let the advisor run its start up code.
-				advisor.postStartup(); // May trigger a close/restart.
-			}
-		});
-
 		boolean found = false;
 		List<MPartDescriptor> currentDescriptors = application.getDescriptors();
 		for (MPartDescriptor desc : currentDescriptors) {
@@ -2776,7 +2767,6 @@ UIEvents.Context.TOPIC_CONTEXT,
 		};
 		job.setSystem(true);
 		job.schedule();
-		Job.getJobManager().resume();
 	}
 
 	/**
@@ -2925,6 +2915,11 @@ UIEvents.Context.TOPIC_CONTEXT,
 				// initialize workbench and restore or open one window
 				initOK[0] = init();
 
+			}
+
+			// let the advisor run its start up code
+			if (initOK[0]) {
+				advisor.postStartup(); // may trigger a close/restart
 			}
 
 			if (initOK[0] && runEventLoop) {
