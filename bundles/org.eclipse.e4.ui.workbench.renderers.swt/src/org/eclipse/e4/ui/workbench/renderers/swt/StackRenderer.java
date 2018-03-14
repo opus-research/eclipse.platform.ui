@@ -140,7 +140,7 @@ public class StackRenderer extends LazyStackRenderer implements IPreferenceChang
 	/**
 	 * Default default value for MRU behavior.
 	 */
-	public static final boolean MRU_DEFAULT = true;
+	public static final boolean MRU_DEFAULT = false;
 
 	/*
 	 * org.eclipse.ui.internal.dialogs.ViewsPreferencePage controls currently
