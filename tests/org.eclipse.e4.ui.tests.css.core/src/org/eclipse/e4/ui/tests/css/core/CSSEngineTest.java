@@ -21,6 +21,7 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.core.impl.engine.CSSEngineImpl;
 import org.eclipse.e4.ui.tests.css.core.util.TestElement;
 import org.junit.Test;
+import org.w3c.css.sac.Selector;
 import org.w3c.css.sac.SelectorList;
 import org.w3c.dom.Element;
 
@@ -47,4 +48,27 @@ public class CSSEngineTest {
 		assertTrue(engine.matches(list.item(0), new Date(), null));
 	}
 
+	public void testSelectorMatchOneOf() throws Exception {
+		TestCSSEngine engine = new TestCSSEngine();
+		final Element E = new TestElement("E", engine);
+		engine.setElementProvider(new IElementProvider() {
+			@Override
+			public Element getElement(Object element, CSSEngine engine) {
+				return E;
+			}
+		});
+		Selector selector = engine.parseSelectors("E[a~='B']").item(0);
+
+		E.setAttribute("a", "B ABC");
+		assertTrue(engine.matches(selector, new Object(), null));
+
+		E.setAttribute("a", "ABC B");
+		assertTrue(engine.matches(selector, new Object(), null));
+
+		E.setAttribute("a", "ABC");
+		assertFalse(engine.matches(selector, new Object(), null));
+
+		E.setAttribute("a", "B");
+		assertTrue(engine.matches(selector, new Object(), null));
+	}
 }
