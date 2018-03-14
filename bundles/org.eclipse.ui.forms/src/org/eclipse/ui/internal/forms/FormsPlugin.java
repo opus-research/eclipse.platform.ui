@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,14 +8,20 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.e4.ui.css.swt.helpers;
+package org.eclipse.ui.internal.forms;
 
-public class ThemeElementDefinitionHelper {
-	public static String escapeId(String id) {
-		return id.replaceAll("\\.", "-");
+import org.eclipse.ui.internal.forms.widgets.FormsResources;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+
+public class FormsPlugin implements BundleActivator {
+
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		FormsResources.shutdown();
 	}
 
-	public static String normalizeId(String id) {
-		return id.replaceAll("-", ".");
+	@Override
+	public void start(BundleContext context) throws Exception {
 	}
 }

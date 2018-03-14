@@ -1654,15 +1654,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public abstract void reveal(Object element);
 
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * The <code>StructuredViewer</code> implementation of this method calls
-	 * {@link #assertContentProviderType(IContentProvider)} to validate the
-	 * content provider. For a <code>StructuredViewer</code>, the content
-	 * provider must implement {@link IStructuredContentProvider}.
-	 * </p>
-	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
