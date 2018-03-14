@@ -848,13 +848,6 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 		try {
 			getContainer().run(true, true, new IRunnableWithProgress() {
 
-				/*
-				 * (non-Javadoc)
-				 *
-				 * @see
-				 * org.eclipse.jface.operation.IRunnableWithProgress#run(org
-				 * .eclipse.core.runtime.IProgressMonitor)
-				 */
 				@Override
 				public void run(IProgressMonitor monitor) {
 
@@ -1452,7 +1445,7 @@ public class WizardProjectsImportPage extends WizardDataTransferPage {
 	 * 	workspace
 	 */
 	public ProjectRecord[] getProjectRecords() {
-		List<ProjectRecord> projectRecords = new ArrayList<ProjectRecord>();
+		List<ProjectRecord> projectRecords = new ArrayList<>();
 		for (int i = 0; i < selectedProjects.length; i++) {
 			String projectName = selectedProjects[i].getProjectName();
 			selectedProjects[i].hasConflicts = (isProjectInWorkspacePath(projectName) && copyFiles)
