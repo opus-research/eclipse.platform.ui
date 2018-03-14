@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,23 +8,21 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Oakland Software Incorporated - Added to CNF tests
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 457870
  *******************************************************************************/
 package org.eclipse.ui.tests.navigator.jst;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.eclipse.swt.widgets.TreeItem;
+
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Path;
+
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.widgets.TreeItem;
+
 import org.eclipse.ui.tests.harness.util.DisplayHelper;
 import org.eclipse.ui.tests.navigator.NavigatorTestBase;
-import org.junit.Before;
-import org.junit.Test;
 
 public class JstPipelineTest extends NavigatorTestBase {
 
@@ -36,8 +34,7 @@ public class JstPipelineTest extends NavigatorTestBase {
 	}
 
 	@Override
-	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 
 		WebJavaContentProvider.staticInit(_contentService
@@ -51,7 +48,6 @@ public class JstPipelineTest extends NavigatorTestBase {
 	 * objects as the content, and the JDT label provider does not get invoked
 	 * for those objects.
 	 */
-	@Test
 	public void testJstPipeline() throws Exception {
 
 		_contentService.bindExtensions(new String[] {
@@ -77,7 +73,7 @@ public class JstPipelineTest extends NavigatorTestBase {
 		TreeItem[] rootItems = _viewer.getTree().getItems();
 
 		assertEquals(
-				"There should be " + _projectCount + " item(s).", _projectCount, rootItems.length); //$NON-NLS-1$
+				"There should be " + _projectCount + " item(s).", _projectCount, rootItems.length); //$NON-NLS-1$		
 
 		assertTrue(
 				"The root object should be an IJavaProject, which is IAdaptable.", rootItems[0].getData() instanceof IAdaptable); //$NON-NLS-1$

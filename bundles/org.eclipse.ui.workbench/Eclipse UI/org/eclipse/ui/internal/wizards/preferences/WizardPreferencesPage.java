@@ -546,6 +546,11 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		return true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#saveWidgetValues()
+	 */
 	protected void saveWidgetValues() {
 
 		IDialogSettings settings = getDialogSettings();
@@ -943,12 +948,22 @@ public abstract class WizardPreferencesPage extends WizardPage implements
 		destinationNameField.setText(value);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+	 */
 	@Override
 	public void dispose() {
 		super.dispose();
 		transfers = null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.dialogs.WizardDataTransferPage#allowNewContainerName()
+	 */
 	protected boolean allowNewContainerName() {
 		return true;
 	}

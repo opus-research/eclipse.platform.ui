@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 410426
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -112,6 +111,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	private MApplication application;
 
+	@SuppressWarnings("hiding")
 	@Inject
 	EModelService modelService;
 
@@ -180,6 +180,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			if (ici == null) {
 				return;
 			}
+			ici.setVisible(itemModel.isVisible());
 
 			ToolBarManager parent = null;
 			if (ici instanceof MenuManager) {
@@ -188,31 +189,14 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 				parent = (ToolBarManager) ((ContributionItem) ici).getParent();
 			}
 
-			if (parent == null) {
-				ici.setVisible(itemModel.isVisible());
-				return;
-			}
-
-			IContributionManagerOverrides ov = parent.getOverrides();
-			// partial fix for bug 383569: only change state if there are no
-			// extra override mechanics controlling element visibility
-			if (ov == null) {
-				ici.setVisible(itemModel.isVisible());
-			} else {
-				Boolean visible = ov.getVisible(ici);
-				if (visible == null) {
-					// same as above: only change state if there are no extra
-					// override mechanics controlling element visibility
-					ici.setVisible(itemModel.isVisible());
+			if (parent != null) {
+				parent.markDirty();
+				parent.update(true);
+				ToolBar tb = parent.getControl();
+				if (tb != null && !tb.isDisposed()) {
+					tb.pack(true);
+					tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 				}
-			}
-
-			parent.markDirty();
-			parent.update(true);
-			ToolBar tb = parent.getControl();
-			if (tb != null && !tb.isDisposed()) {
-				tb.pack(true);
-				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
 	}
@@ -264,6 +248,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private HashSet<String> updateVariables = new HashSet<String>();
 
+	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
@@ -319,6 +304,7 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicAppStartup(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event) {
