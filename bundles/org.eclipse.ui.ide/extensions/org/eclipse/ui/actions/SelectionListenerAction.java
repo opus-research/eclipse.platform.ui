@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 20015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@
 package org.eclipse.ui.actions;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,6 +56,10 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  */
 public abstract class SelectionListenerAction extends
 		BaseSelectionListenerAction {
+	/**
+	 * Empty list that is immutable.
+	 */
+	private static final List EMPTY_LIST = Arrays.asList(new Object[0]);
 
 	/**
 	 * Indicates whether the selection has changes since <code>resources</code>
@@ -68,14 +72,14 @@ public abstract class SelectionListenerAction extends
 	 * <code>IResource</code>); meaningful only when
 	 * <code>selectionDirty == false</code>.
 	 */
-	private List<IResource> resources;
+	private List resources;
 
 	/**
 	 * The list of non-resource elements in the current selection (element type:
 	 * <code>Object</code>); meaningful only when
 	 * <code>selectionDirty == false</code>.
 	 */
-	private List<Object> nonResources;
+	private List nonResources;
 
 	/**
 	 * Creates a new action with the given text.
@@ -110,14 +114,14 @@ public abstract class SelectionListenerAction extends
 		resources = null;
 		nonResources = null;
 
-		for (Iterator<?> e = getStructuredSelection().iterator(); e.hasNext();) {
+		for (Iterator e = getStructuredSelection().iterator(); e.hasNext();) {
 			Object next = e.next();
 			if (next instanceof IResource) {
 				if (resources == null) {
 					// assume selection contains mostly resources most times
-					resources = new ArrayList<IResource>(getStructuredSelection().size());
+					resources = new ArrayList(getStructuredSelection().size());
 				}
-				resources.add((IResource) next);
+				resources.add(next);
 				continue;
 			} else if (next instanceof IAdaptable) {
 				Object resource = ((IAdaptable) next)
@@ -125,10 +129,10 @@ public abstract class SelectionListenerAction extends
 				if (resource != null) {
 					if (resources == null) {
 						// assume selection contains mostly resources most times
-						resources = new ArrayList<IResource>(getStructuredSelection()
+						resources = new ArrayList(getStructuredSelection()
 								.size());
 					}
-					resources.add((IResource) resource);
+					resources.add(resource);
 					continue;
 				}
 			} else {
@@ -163,7 +167,7 @@ public abstract class SelectionListenerAction extends
 								resourcesFoundForThisSelection = true;
 
 								if (resources == null) {
-									resources = new ArrayList<IResource>(
+									resources = new ArrayList(
 											getStructuredSelection().size());
 								}
 
@@ -186,7 +190,7 @@ public abstract class SelectionListenerAction extends
 
 			if (nonResources == null) {
 				// assume selection contains mostly resources most times
-				nonResources = new ArrayList<Object>(1);
+				nonResources = new ArrayList(1);
 			}
 			nonResources.add(next);
 		}
@@ -198,7 +202,7 @@ public abstract class SelectionListenerAction extends
 	 * 
 	 * @return list of elements (element type: <code>Object</code>)
 	 */
-	protected List<Object> getSelectedNonResources() {
+	protected List getSelectedNonResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
@@ -206,7 +210,7 @@ public abstract class SelectionListenerAction extends
 		}
 
 		if (nonResources == null) {
-			return Collections.emptyList();
+			return EMPTY_LIST;
 		}
 		
 		return nonResources;
@@ -218,7 +222,7 @@ public abstract class SelectionListenerAction extends
 	 * 
 	 * @return list of resource elements (element type: <code>IResource</code>)
 	 */
-	protected List<IResource> getSelectedResources() {
+	protected List getSelectedResources() {
 		// recompute if selection has changed.
 		if (selectionDirty) {
 			computeResources();
@@ -226,7 +230,7 @@ public abstract class SelectionListenerAction extends
 		}
 
 		if (resources == null) {
-			return Collections.emptyList();
+			return EMPTY_LIST;
 		}
 		return resources;
 	}
@@ -268,7 +272,7 @@ public abstract class SelectionListenerAction extends
 			return false;
 		}
 
-		for (Iterator<?> e = getSelectedResources().iterator(); e.hasNext();) {
+		for (Iterator e = getSelectedResources().iterator(); e.hasNext();) {
 			IResource next = (IResource) e.next();
 			if (!resourceIsType(next, resourceMask)) {
 				return false;
