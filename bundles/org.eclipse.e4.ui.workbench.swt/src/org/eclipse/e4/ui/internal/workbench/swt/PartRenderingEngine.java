@@ -872,11 +872,6 @@ public class PartRenderingEngine implements IPresentationEngine {
 			parentRenderer.hideChild(element.getParent(), element);
 		}
 
-		if (element instanceof MPlaceholder) {
-			MPlaceholder ph = (MPlaceholder) element;
-			ph.getRef().setCurSharedRef(null);
-		}
-
 		AbstractPartRenderer renderer = getRendererFor(element);
 
 		// If the element hasn't been rendered then this is a NO-OP
