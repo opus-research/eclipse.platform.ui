@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 180308
  *******************************************************************************/
 package org.eclipse.ui.internal.menus;
 
@@ -802,7 +801,6 @@ public class MenuHelper {
 				MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
 				toolItem.setCommand(command);
 				toolItem.setContributorURI(command.getContributorURI());
-				toolItem.setVisible(cci.isVisible());
 
 				String iconURI = null;
 				String disabledIconURI = null;
@@ -864,7 +862,6 @@ public class MenuHelper {
 					MHandledToolItem toolItem = MenuFactoryImpl.eINSTANCE.createHandledToolItem();
 					toolItem.setCommand(command);
 					toolItem.setContributorURI(command.getContributorURI());
-					toolItem.setVisible(item.isVisible());
 
 					String iconURI = getIconURI(action.getImageDescriptor(),
 							application.getContext());
@@ -906,6 +903,7 @@ public class MenuHelper {
 					}
 					String itemId = item.getId();
 					toolItem.setElementId(itemId == null ? id : itemId);
+
 					return toolItem;
 				}
 			}
@@ -913,7 +911,6 @@ public class MenuHelper {
 			final MDirectToolItem toolItem = MenuFactoryImpl.eINSTANCE.createDirectToolItem();
 			String itemId = item.getId();
 			toolItem.setElementId(itemId);
-			toolItem.setVisible(item.isVisible());
 			String iconURI = getIconURI(action.getImageDescriptor(), application.getContext());
 			if (iconURI == null) {
 				if (itemId == null) {
