@@ -19,6 +19,8 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
+import org.eclipse.e4.ui.model.application.commands.MBindingContext;
+import org.eclipse.e4.ui.model.application.commands.MBindingTable;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.commands.MHandlerContainer;
@@ -159,8 +161,23 @@ public class ModelServiceImpl implements EModelService {
 			for (MCommand command : app.getCommands()) {
 				findElementsRecursive(command, matcher, elements, searchFlags);
 			}
+
+			for (MBindingContext bindingContext : app.getBindingContexts()) {
+				findElementsRecursive(bindingContext, matcher, elements, searchFlags);
+			}
+
+			for (MBindingTable bindingTable : app.getBindingTables()) {
+				findElementsRecursive(bindingTable, matcher, elements, searchFlags);
+			}
 		}
 		
+		if (searchRoot instanceof MBindingContext && (searchFlags == ANYWHERE)) {
+			MBindingContext bindingContext = (MBindingContext) searchRoot;
+			for (MBindingContext child : bindingContext.getChildren()) {
+				findElementsRecursive(child, matcher, elements, searchFlags);
+			}
+		}
+
 		// Check regular containers
 		if (searchRoot instanceof MElementContainer<?>) {
 			MElementContainer<MUIElement> container = (MElementContainer<MUIElement>) searchRoot;
