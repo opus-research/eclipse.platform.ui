@@ -210,7 +210,6 @@ public class WorkbenchMessages extends NLS {
 	
 	public static String HideItems_itemInActionSet; 
 	public static String HideItems_itemInUnavailableActionSet;
-	public static String HideItems_itemInUnavailableCommand;
 	public static String HideItems_unavailableChildCommandGroup;
 	public static String HideItems_unavailableChildCommandGroups;
 	public static String HideItems_keyBindings;
@@ -226,7 +225,6 @@ public class WorkbenchMessages extends NLS {
 
 	public static String HideItemsCannotMakeVisible_dialogTitle;
 	public static String HideItemsCannotMakeVisible_unavailableCommandGroupText;
-	public static String HideItemsCannotMakeVisible_unavailableCommandItemText;
 	public static String HideItemsCannotMakeVisible_switchToCommandGroupTab;
 	public static String HideItemsCannotMakeVisible_unavailableChildrenText;
 	
