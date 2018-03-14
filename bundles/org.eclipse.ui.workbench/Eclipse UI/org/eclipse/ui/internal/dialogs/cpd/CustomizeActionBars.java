@@ -34,7 +34,8 @@ import org.eclipse.ui.services.IServiceLocator;
  *
  * @since 3.5
  */
-public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 {
+public class CustomizeActionBars implements IActionBarConfigurer2,
+		IActionBars2 {
 
 	IWorkbenchWindowConfigurer configurer;
 
@@ -118,7 +119,8 @@ public class CustomizeActionBars implements IActionBarConfigurer2, IActionBars2 
 	}
 
 	@Override
-	public IToolBarContributionItem createToolBarContributionItem(IToolBarManager toolBarManager, String id) {
+	public IToolBarContributionItem createToolBarContributionItem(
+			IToolBarManager toolBarManager, String id) {
 		return new ToolBarContributionItem2(toolBarManager, id);
 	}
 

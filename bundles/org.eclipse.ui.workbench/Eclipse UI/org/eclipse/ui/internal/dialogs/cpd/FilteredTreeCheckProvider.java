@@ -21,7 +21,8 @@ import org.eclipse.ui.internal.dialogs.cpd.TreeManager.TreeItem;
  *
  * @since 3.5
  */
-class FilteredTreeCheckProvider implements ICheckStateProvider {
+class FilteredTreeCheckProvider implements
+		ICheckStateProvider {
 	private ITreeContentProvider contentProvider;
 	private ViewerFilter filter;
 
