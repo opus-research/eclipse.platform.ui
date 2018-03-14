@@ -76,12 +76,21 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 	 */
 	private class BlockedUIElement extends JobTreeElement {
 
-
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#getChildren()
+		 */
 		@Override
-		JobTreeElement[] getChildren() {
+		Object[] getChildren() {
 			return ProgressManagerUtil.EMPTY_OBJECT_ARRAY;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayString()
+		 */
 		@Override
 		String getDisplayString() {
 			if (blockedTaskName == null || blockedTaskName.length() == 0) {
@@ -90,31 +99,61 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 			return blockedTaskName;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#getDisplayImage()
+		 */
 		@Override
 		public Image getDisplayImage() {
 			return JFaceResources.getImage(ProgressManager.WAITING_JOB_KEY);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#hasChildren()
+		 */
 		@Override
 		boolean hasChildren() {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#isActive()
+		 */
 		@Override
 		boolean isActive() {
 			return true;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#isJobInfo()
+		 */
 		@Override
 		boolean isJobInfo() {
 			return false;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#cancel()
+		 */
 		@Override
 		public void cancel() {
 			blockingMonitor.setCanceled(true);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.internal.progress.JobTreeElement#isCancellable()
+		 */
 		@Override
 		public boolean isCancellable() {
 			return true;
@@ -258,7 +297,12 @@ public class BlockedJobsDialog extends IconAndMessageDialog {
 		viewer = new DetailedProgressViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.BORDER);
 		viewer.setComparator(new ViewerComparator() {
-
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+			 *      java.lang.Object, java.lang.Object)
+			 */
 			@Override
 			public int compare(Viewer testViewer, Object e1, Object e2) {
 				return ((Comparable) e1).compareTo(e2);

@@ -404,10 +404,10 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
     private void restoreAddedWorkingSets() {
         IWorkingSetManager manager = WorkbenchPlugin.getDefault()
                 .getWorkingSetManager();
-		Iterator<IWorkingSet> iterator = getAddedWorkingSets().iterator();
+        Iterator iterator = getAddedWorkingSets().iterator();
 
         while (iterator.hasNext()) {
-			manager.removeWorkingSet((iterator.next()));
+            manager.removeWorkingSet(((IWorkingSet) iterator.next()));
         }
     }
 
@@ -415,11 +415,12 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
      * Rolls back changes to working sets.
      */
     private void restoreChangedWorkingSets() {
-		Iterator<IWorkingSet> iterator = getEditedWorkingSets().keySet().iterator();
+        Iterator iterator = getEditedWorkingSets().keySet().iterator();
 
         while (iterator.hasNext()) {
-			IWorkingSet editedWorkingSet = iterator.next();
-			IWorkingSet originalWorkingSet = getEditedWorkingSets().get(editedWorkingSet);
+            IWorkingSet editedWorkingSet = (IWorkingSet) iterator.next();
+            IWorkingSet originalWorkingSet = (IWorkingSet) getEditedWorkingSets()
+                    .get(editedWorkingSet);
 
             if (editedWorkingSet.getName().equals(originalWorkingSet.getName()) == false) {
                 editedWorkingSet.setName(originalWorkingSet.getName());
@@ -437,14 +438,14 @@ public class WorkingSetSelectionDialog extends AbstractWorkingSetDialog {
     private void restoreRemovedWorkingSets() {
         IWorkingSetManager manager = WorkbenchPlugin.getDefault()
                 .getWorkingSetManager();
-		Iterator<IWorkingSet> iterator = getRemovedWorkingSets().iterator();
+        Iterator iterator = getRemovedWorkingSets().iterator();
 
         while (iterator.hasNext()) {
-			manager.addWorkingSet((iterator.next()));
+            manager.addWorkingSet(((IWorkingSet) iterator.next()));
         }
         iterator = getRemovedMRUWorkingSets().iterator();
         while (iterator.hasNext()) {
-			manager.addRecentWorkingSet((iterator.next()));
+            manager.addRecentWorkingSet(((IWorkingSet) iterator.next()));
         }
     }
 

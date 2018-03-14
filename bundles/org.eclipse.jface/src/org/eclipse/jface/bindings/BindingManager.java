@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -377,13 +376,14 @@ public final class BindingManager extends HandleObjectManager implements
 	 *         trigger (<code>TriggerSequence</code>) to command identifier (<code>String</code>).
 	 *         This value will never be <code>null</code>, but may be empty.
 	 */
-	private final Map<TriggerSequence, Map<TriggerSequence, Binding>> buildPrefixTable(final Map activeBindings) {
-		final Map<TriggerSequence, Map<TriggerSequence, Binding>> prefixTable = new HashMap<TriggerSequence, Map<TriggerSequence, Binding>>();
+	private final Map buildPrefixTable(final Map activeBindings) {
+		final Map prefixTable = new HashMap();
 
-		final Iterator<Map.Entry<TriggerSequence, ?>> bindingItr = activeBindings.entrySet().iterator();
+		final Iterator bindingItr = activeBindings.entrySet().iterator();
 		while (bindingItr.hasNext()) {
-			final Entry<TriggerSequence, ?> entry = bindingItr.next();
-			final TriggerSequence triggerSequence = entry.getKey();
+			final Map.Entry entry = (Map.Entry) bindingItr.next();
+			final TriggerSequence triggerSequence = (TriggerSequence) entry
+					.getKey();
 
 			// Add the perfect match.
 			if (!prefixTable.containsKey(triggerSequence)) {
@@ -400,11 +400,11 @@ public final class BindingManager extends HandleObjectManager implements
 			final Binding binding = (Binding) entry.getValue();
 			for (int i = 0; i < prefixesLength; i++) {
 				final TriggerSequence prefix = prefixes[i];
-				final Map<TriggerSequence, Binding> value = prefixTable.get(prefix);
-				if ((prefixTable.containsKey(prefix)) && (value != null)) {
-					value.put(triggerSequence, binding);
+				final Object value = prefixTable.get(prefix);
+				if ((prefixTable.containsKey(prefix)) && (value instanceof Map)) {
+					((Map) value).put(triggerSequence, binding);
 				} else {
-					final Map<TriggerSequence, Binding> map = new HashMap<TriggerSequence, Binding>();
+					final Map map = new HashMap();
 					prefixTable.put(prefix, map);
 					map.put(triggerSequence, binding);
 				}
@@ -512,8 +512,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            computed).
 	 */
 	private final void computeBindings(final Map activeContextTree,
-			final Map<TriggerSequence, Object> bindingsByTrigger,
-			final Map triggersByCommandId,
+			final Map bindingsByTrigger, final Map triggersByCommandId, 
 			final Map conflictsByTrigger) {
 		/*
 		 * FIRST PASS: Remove all of the bindings that are marking deletions.
@@ -524,7 +523,7 @@ public final class BindingManager extends HandleObjectManager implements
 		 * SECOND PASS: Just throw in bindings that match the current state. If
 		 * there is more than one match for a binding, then create a list.
 		 */
-		final Map<TriggerSequence, Object> possibleBindings = new HashMap<TriggerSequence, Object>();
+		final Map possibleBindings = new HashMap();
 		final int length = trimmedBindings.length;
 		for (int i = 0; i < length; i++) {
 			final Binding binding = trimmedBindings[i];
@@ -567,13 +566,13 @@ public final class BindingManager extends HandleObjectManager implements
 			final Object existingMatch = possibleBindings.get(trigger);
 			if (existingMatch instanceof Binding) {
 				possibleBindings.remove(trigger);
-				final Collection<Object> matches = new ArrayList<Object>();
+				final Collection matches = new ArrayList();
 				matches.add(existingMatch);
 				matches.add(binding);
 				possibleBindings.put(trigger, matches);
 
 			} else if (existingMatch instanceof Collection) {
-				final Collection<Object> matches = (Collection<Object>) existingMatch;
+				final Collection matches = (Collection) existingMatch;
 				matches.add(binding);
 
 			} else {
@@ -590,11 +589,11 @@ public final class BindingManager extends HandleObjectManager implements
 		 * further logic to try to resolve them. If the conflict can't be
 		 * resolved, then we log the problem.
 		 */
-		final Iterator<Map.Entry<TriggerSequence, Object>> possibleBindingItr = possibleBindings.entrySet()
+		final Iterator possibleBindingItr = possibleBindings.entrySet()
 				.iterator();
 		while (possibleBindingItr.hasNext()) {
-			final Map.Entry<TriggerSequence, Object> entry = possibleBindingItr.next();
-			final TriggerSequence trigger = entry.getKey();
+			final Map.Entry entry = (Map.Entry) possibleBindingItr.next();
+			final TriggerSequence trigger = (TriggerSequence) entry.getKey();
 			final Object match = entry.getValue();
 			/*
 			 * What we do depends slightly on whether we are trying to build a
@@ -603,7 +602,7 @@ public final class BindingManager extends HandleObjectManager implements
 			 */
 			if (activeContextTree == null) {
 				// We are building the list of all possible bindings.
-				final Collection<Object> bindings = new ArrayList<Object>();
+				final Collection bindings = new ArrayList();
 				if (match instanceof Binding) {
 					bindings.add(match);
 					bindingsByTrigger.put(trigger, bindings);
@@ -614,7 +613,7 @@ public final class BindingManager extends HandleObjectManager implements
 					bindings.addAll((Collection) match);
 					bindingsByTrigger.put(trigger, bindings);
 
-					final Iterator<Object> matchItr = bindings.iterator();
+					final Iterator matchItr = bindings.iterator();
 					while (matchItr.hasNext()) {
 						addReverseLookup(triggersByCommandId,
 								((Binding) matchItr.next())
@@ -749,12 +748,12 @@ public final class BindingManager extends HandleObjectManager implements
 	 * @return The tree of contexts to use; may be empty, but never
 	 *         <code>null</code>. The keys and values are both strings.
 	 */
-	private final Map<String, String> createContextTreeFor(final Set<String> contextIds) {
-		final Map<String, String> contextTree = new HashMap<String, String>();
+	private final Map createContextTreeFor(final Set contextIds) {
+		final Map contextTree = new HashMap();
 
-		final Iterator<String> contextIdItr = contextIds.iterator();
+		final Iterator contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			String childContextId = contextIdItr.next();
+			String childContextId = (String) contextIdItr.next();
 			while (childContextId != null) {
 				// Check if we've already got the part of the tree from here up.
 				if (contextTree.containsKey(childContextId)) {
@@ -797,13 +796,13 @@ public final class BindingManager extends HandleObjectManager implements
 	 * @return The tree of contexts to use; may be empty, but never
 	 *         <code>null</code>. The keys and values are both strings.
 	 */
-	private final Map<String, String> createFilteredContextTreeFor(final Set<String> contextIds) {
+	private final Map createFilteredContextTreeFor(final Set contextIds) {
 		// Check to see whether a dialog or window is active.
 		boolean dialog = false;
 		boolean window = false;
-		Iterator<String> contextIdItr = contextIds.iterator();
+		Iterator contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			final String contextId = contextIdItr.next();
+			final String contextId = (String) contextIdItr.next();
 			if (IContextIds.CONTEXT_ID_DIALOG.equals(contextId)) {
 				dialog = true;
 				continue;
@@ -821,7 +820,7 @@ public final class BindingManager extends HandleObjectManager implements
 		 */
 		contextIdItr = contextIds.iterator();
 		while (contextIdItr.hasNext()) {
-			String contextId = contextIdItr.next();
+			String contextId = (String) contextIdItr.next();
 			Context context = contextManager.getContext(contextId);
 			try {
 				String parentId = context.getParentId();
@@ -2168,8 +2167,7 @@ public final class BindingManager extends HandleObjectManager implements
 	 *            solution.
 	 */
 	private final void setActiveBindings(final Map activeBindings,
-			final Map activeBindingsByCommandId,
-			final Map<TriggerSequence, Map<TriggerSequence, Binding>> prefixTable,
+			final Map activeBindingsByCommandId, final Map prefixTable,
 			final Map conflicts) {
 		this.activeBindings = activeBindings;
 		final Map previousBindingsByParameterizedCommand = this.activeBindingsByParameterizedCommand;

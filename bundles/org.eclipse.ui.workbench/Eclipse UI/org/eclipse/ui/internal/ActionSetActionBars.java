@@ -12,6 +12,7 @@ package org.eclipse.ui.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
@@ -36,20 +37,15 @@ public class ActionSetActionBars extends SubActionBars2 {
 
 	private String actionSetId;
 
-	private ArrayList<IContributionItem> adjunctContributions = new ArrayList<IContributionItem>();
+	private ArrayList adjunctContributions = new ArrayList();
 
 	private IToolBarManager coolItemToolBarMgr = null;
 
 	private IToolBarContributionItem toolBarContributionItem = null;
 
 	/**
-	 * Constructs a new action bars object
-	 * 
-	 * @param parent
-	 * @param serviceLocator
-	 * @param actionBarConfigurer
-	 * @param actionSetId
-	 */
+     * Constructs a new action bars object
+     */
     public ActionSetActionBars(IActionBars2 parent, IServiceLocator serviceLocator, IActionBarConfigurer2 actionBarConfigurer, String actionSetId) {
     	super(parent, serviceLocator);
 		this.actionSetId = actionSetId;		
@@ -68,11 +64,17 @@ public class ActionSetActionBars extends SubActionBars2 {
 		adjunctContributions.add(item);
 	}
 
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	@Override
 	protected SubMenuManager createSubMenuManager(IMenuManager parent) {
 		return new ActionSetMenuManager(parent, actionSetId);
 	}
 
+	/*
+	 * (non-Javadoc) Inherited from SubActionBars.
+	 */
 	@Override
 	protected SubToolBarManager createSubToolBarManager(IToolBarManager parent) {
 		// return null, action sets are managed by CoolItemToolBarManagers
@@ -119,7 +121,7 @@ public class ActionSetActionBars extends SubActionBars2 {
 		}
 		toolBarContributionItem = null;
 		coolItemToolBarMgr = null;
-		adjunctContributions = new ArrayList<IContributionItem>();
+		adjunctContributions = new ArrayList();
 	}
 
 	/**
@@ -197,7 +199,7 @@ public class ActionSetActionBars extends SubActionBars2 {
 	 * an adjunct type the it returns the toolbar manager from the cool bar
 	 * manager.
 	 * 
-	 * @param actionId
+	 * @param id
 	 *            the id of the action
 	 * @return the tool bar manager
 	 */
@@ -314,8 +316,8 @@ public class ActionSetActionBars extends SubActionBars2 {
 
 		// 2. Need to set visibility for all adjunct actions
 		if (adjunctContributions.size() > 0) {
-			for (Iterator<IContributionItem> i = adjunctContributions.iterator(); i.hasNext();) {
-				IContributionItem item = i.next();
+			for (Iterator i = adjunctContributions.iterator(); i.hasNext();) {
+				IContributionItem item = (IContributionItem) i.next();
 				if (item instanceof ContributionItem) {
 					item.setVisible(set);
 					IContributionManager manager = ((ContributionItem) item)

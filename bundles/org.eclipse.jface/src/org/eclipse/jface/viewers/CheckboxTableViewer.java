@@ -239,7 +239,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      */
 	public Object[] getCheckedElements() {
 		TableItem[] children = getTable().getItems();
-		ArrayList<Object> v = new ArrayList<Object>(children.length);
+		ArrayList v = new ArrayList(children.length);
 		for (int i = 0; i < children.length; i++) {
 			TableItem item = children[i];
 			Object data = item.getData();
@@ -280,7 +280,7 @@ public class CheckboxTableViewer extends TableViewer implements ICheckable {
      */
 	public Object[] getGrayedElements() {
 		TableItem[] children = getTable().getItems();
-		List<Object> v = new ArrayList<Object>(children.length);
+		List v = new ArrayList(children.length);
 		for (int i = 0; i < children.length; i++) {
 			TableItem item = children[i];
 			Object data = item.getData();
