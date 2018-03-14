@@ -36,8 +36,6 @@ public class ProgressExamplesPlugin extends AbstractUIPlugin {
 
 	/**
 	 * Returns the shared instance.
-	 *
-	 * @return the instance
 	 */
 	public static ProgressExamplesPlugin getDefault() {
 		return plugin;
