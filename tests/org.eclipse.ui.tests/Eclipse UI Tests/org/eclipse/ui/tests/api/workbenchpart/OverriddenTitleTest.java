@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2010 IBM Corporation and others.
+ * Copyright (c) 2004, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,10 +7,9 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 444070
  *******************************************************************************/
 package org.eclipse.ui.tests.api.workbenchpart;
-
-import junit.framework.Assert;
 
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPage;
@@ -82,11 +81,11 @@ public class OverriddenTitleTest extends UITestCase {
     private static void verifySettings(IWorkbenchPart2 part,
             String expectedTitle, String expectedPartName,
             String expectedContentDescription) throws Exception {
-        Assert.assertEquals("Incorrect view title", expectedTitle, part
+        assertEquals("Incorrect view title", expectedTitle, part
                 .getTitle());
-        Assert.assertEquals("Incorrect part name", expectedPartName, part
+        assertEquals("Incorrect part name", expectedPartName, part
                 .getPartName());
-        Assert.assertEquals("Incorrect content description",
+        assertEquals("Incorrect content description",
                 expectedContentDescription, part.getContentDescription());
     }
 
@@ -106,15 +105,15 @@ public class OverriddenTitleTest extends UITestCase {
     private void verifyEvents(boolean titleEvent, boolean nameEvent,
             boolean descriptionEvent) {
         if (titleEvent) {
-            Assert.assertEquals("Missing title change event", titleEvent,
+            assertEquals("Missing title change event", titleEvent,
                     titleChangeEvent);
         }
         if (nameEvent) {
-            Assert.assertEquals("Missing name change event", nameEvent,
+            assertEquals("Missing name change event", nameEvent,
                     nameChangeEvent);
         }
         if (descriptionEvent) {
-            Assert.assertEquals("Missing content description event",
+            assertEquals("Missing content description event",
                     descriptionEvent, contentChangeEvent);
         }
     }
