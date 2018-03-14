@@ -16,12 +16,10 @@ import junit.framework.TestCase;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.E4XMIResource;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
-import org.eclipse.e4.ui.model.application.MAddon;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.MApplicationElement;
 import org.eclipse.e4.ui.model.application.commands.MBindingContext;
 import org.eclipse.e4.ui.model.application.commands.MBindingTable;
-import org.eclipse.e4.ui.model.application.commands.MCategory;
 import org.eclipse.e4.ui.model.application.commands.MCommand;
 import org.eclipse.e4.ui.model.application.commands.MHandler;
 import org.eclipse.e4.ui.model.application.ui.MDirtyable;
@@ -156,7 +154,7 @@ public class EModelServiceFindTest extends TestCase {
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART,
 				getSelector(MMenuElement.class));
-		assertEquals(14, elements.size());
+		assertEquals(13, elements.size());
 
 		elements = modelService.findElements(application,
 				MToolBarElement.class, EModelService.ANYWHERE
@@ -168,12 +166,7 @@ public class EModelServiceFindTest extends TestCase {
 		elements = modelService.findElements(application, null,
 				EModelService.ANYWHERE | EModelService.IN_MAIN_MENU
 						| EModelService.IN_PART, getSelector());
-		assertEquals(65, elements.size());
-
-		elements = modelService.findElements(application, null,
-				EModelService.OUTSIDE_PERSPECTIVE,
-				getSelector("InsideOutsidePerspective"));
-		assertEquals(1, elements.size());
+		assertEquals(40, elements.size());
 
 		// Should match 0 since String is not an MUIElement
 		List<String> strings = modelService.findElements(application, null,
@@ -248,11 +241,6 @@ public class EModelServiceFindTest extends TestCase {
 				getSelector(tags));
 		assertEquals(1, typeAndTag.size());
 
-		elements = modelService.findElements(application,
-				MPartSashContainer.class, EModelService.ANYWHERE,
-				getSelector("twoValidIds"));
-		assertEquals(1, elements.size());
-
 		List<MUIElement> idAndTag = modelService.findElements(application,
 				null, EModelService.ANYWHERE,
 				getSelector("twoValidIds", null, tags));
@@ -296,13 +284,6 @@ public class EModelServiceFindTest extends TestCase {
 		} catch (IllegalArgumentException e) {
 			// expected
 		}
-
-		try {
-			modelService.findElements(null, null, EModelService.ANYWHERE, null);
-			fail("An exception should have prevented a null parameter to findElements(*)");
-		} catch (IllegalArgumentException e) {
-			// expected
-		}
 	}
 
 	public void testFlags() {
@@ -332,30 +313,30 @@ public class EModelServiceFindTest extends TestCase {
 		clazz = MMenuElement.class;
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(5, elements.size());
+		assertEquals(4, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(5, elements.size());
+		assertEquals(4, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(4, elements.size());
+		assertEquals(3, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ACTIVE_PERSPECTIVE | EModelService.IN_PART,
 				getSelector(clazz));
-		assertEquals(4, elements.size());
+		assertEquals(3, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_ANY_PERSPECTIVE | EModelService.IN_MAIN_MENU,
 				getSelector(clazz));
-		assertEquals(12, elements.size());
+		assertEquals(13, elements.size());
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.IN_MAIN_MENU, getSelector(clazz));
-		assertEquals(7, elements.size());
+		assertEquals(9, elements.size());
 	}
 
 	public void testFindHandler() {
@@ -510,10 +491,6 @@ public class EModelServiceFindTest extends TestCase {
 		assertEquals(3, elements.size());
 
 		elements = modelService.findElements(application, clazz,
-				EModelService.OUTSIDE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(3, elements.size());
-
-		elements = modelService.findElements(application, clazz,
 				EModelService.IN_PART, getSelector(clazz));
 		assertEquals(0, elements.size());
 
@@ -546,88 +523,6 @@ public class EModelServiceFindTest extends TestCase {
 
 		elements = modelService.findElements(application, clazz,
 				EModelService.ANYWHERE, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.OUTSIDE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_TRIM, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_SHARED_AREA, getSelector(clazz));
-		assertEquals(0, elements.size());
-	}
-
-	public void testFind_MAddons() {
-		MApplication application = createApplication();
-
-		EModelService modelService = (EModelService) application.getContext()
-				.get(EModelService.class.getName());
-		assertNotNull(modelService);
-
-		Class<MAddon> clazz = MAddon.class;
-		List<MAddon> elements = null;
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.ANYWHERE, getSelector(clazz));
-		assertEquals(7, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.OUTSIDE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(7, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_PART, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ANY_PERSPECTIVE, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_ACTIVE_PERSPECTIVE, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_TRIM, getSelector(clazz));
-		assertEquals(0, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.IN_SHARED_AREA, getSelector(clazz));
-		assertEquals(0, elements.size());
-	}
-
-	public void testFind_MCategory() {
-		MApplication application = createApplication();
-
-		EModelService modelService = (EModelService) application.getContext()
-				.get(EModelService.class.getName());
-		assertNotNull(modelService);
-
-		Class<MCategory> clazz = MCategory.class;
-		List<MCategory> elements = null;
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.ANYWHERE, getSelector(clazz));
-		assertEquals(1, elements.size());
-
-		elements = modelService.findElements(application, clazz,
-				EModelService.OUTSIDE_PERSPECTIVE, getSelector(clazz));
 		assertEquals(1, elements.size());
 
 		elements = modelService.findElements(application, clazz,
