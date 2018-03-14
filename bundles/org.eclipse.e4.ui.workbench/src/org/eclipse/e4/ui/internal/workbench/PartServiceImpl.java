@@ -8,6 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Lars Vogel (Lars.Vogel@gmail.com) - Bug 416082
+ *     Steven Spungin <steven@spungin.tv> - Bug 432463
  ******************************************************************************/
 package org.eclipse.e4.ui.internal.workbench;
 

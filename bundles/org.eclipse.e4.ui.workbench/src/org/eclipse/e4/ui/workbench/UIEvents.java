@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Steven Spungin <steven@spungin.tv> - Bug 432463
  ******************************************************************************/
 package org.eclipse.e4.ui.workbench;
 
