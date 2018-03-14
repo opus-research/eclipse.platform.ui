@@ -216,6 +216,9 @@ public class Perspective {
 		IContextService service = page.getWorkbenchWindow().getService(IContextService.class);
 		try {
 			service.deferUpdates(true);
+
+			// this advance for loop only works because it breaks out of it
+			// right after the removal
 			for (IActionSetDescriptor desc : alwaysOnActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOn(desc);
@@ -223,6 +226,8 @@ public class Perspective {
 				}
 			}
 
+			// this advance for loop only works because it breaks out of it
+			// right after the removal
 			for (IActionSetDescriptor desc : alwaysOffActionSets) {
 				if (desc.getId().equals(id)) {
 					removeAlwaysOff(desc);
@@ -230,9 +235,8 @@ public class Perspective {
 				}
 			}
 			addAlwaysOff(toRemove);
-			// doesn't make sense to *remove* tag, it is "disabled" now
-			// String tag = ModeledPageLayout.ACTION_SET_TAG + id;
-			// layout.getTags().remove(tag);
+			// not necessary to remove the ModeledPageLayout.ACTION_SET_TAG + id
+			// tag as the entry is only disabled.
 		} finally {
 			service.deferUpdates(false);
 		}
