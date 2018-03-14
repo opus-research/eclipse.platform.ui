@@ -37,7 +37,6 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -322,6 +321,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	public void partActivated(IWorkbenchPart part) {
 		if (wasHidden && part == this) {
 			wasHidden = false;
+			super.partActivated(part);
 			if (currentPart != null) {
 				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
 				if (page != null) {
@@ -330,15 +330,6 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 				updateContentDescription();
 			}
 			return;
-		}
-		if (wasHidden) {
-			IViewPart[] stack = getSite().getPage().getViewStack(this);
-			for (IViewPart vPart : stack) {
-				if (vPart == part) {
-					// don't react on activation of parts from same stack, see bug 485154.
-					return;
-				}
-			}
 		}
 
 		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
