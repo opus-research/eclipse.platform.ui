@@ -48,7 +48,11 @@ public class OverrideTestsView extends ViewPart implements
 
 	private TableViewer viewer;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL |
 				SWT.V_SCROLL);
@@ -62,7 +66,11 @@ public class OverrideTestsView extends ViewPart implements
 		viewer.addSelectionChangedListener(this);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (IPropertySheetPage.class.equals(adapter)) {
 			if (TestsPerspective.TESTS_PERSPECTIVE_ID.equals(getSite()
@@ -78,7 +86,11 @@ public class OverrideTestsView extends ViewPart implements
 		return super.getAdapter(adapter);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor#getContributorId()
+	 */
 	public String getContributorId() {
 		return "org.eclipse.ui.tests.views.properties.tabbed.override"; //$NON-NLS-1$
 	}
@@ -101,14 +113,22 @@ public class OverrideTestsView extends ViewPart implements
 		return tabbedPropertySheetPage;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 */
 	public void selectionChanged(SelectionChangedEvent event) {
 		SelectionChangedEvent newEvent = new SelectionChangedEvent(
 				selectionProvider, selectionProvider.getSelection());
 		selectionProvider.selectionChanged(newEvent);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+	 */
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}

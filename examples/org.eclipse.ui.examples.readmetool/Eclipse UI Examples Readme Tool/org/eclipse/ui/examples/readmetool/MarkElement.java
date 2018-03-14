@@ -12,9 +12,10 @@ package org.eclipse.ui.examples.readmetool;
 
 import java.util.Vector;
 
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IAdaptable;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.views.properties.IPropertySource;
 
@@ -91,7 +92,8 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
 
     @Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-        IWorkbenchAdapter parentElement = Adapters.adapt(parent, IWorkbenchAdapter.class);
+        IWorkbenchAdapter parentElement = parent
+                .getAdapter(IWorkbenchAdapter.class);
         if (parentElement != null) {
             return parentElement.getImageDescriptor(object);
         }

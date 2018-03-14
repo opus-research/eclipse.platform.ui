@@ -21,8 +21,7 @@ public class Error
         super(name);
     }
 
-    @Override
-	public Image getImage() {
+    public Image getImage() {
         return PlatformUI.getWorkbench().getSharedImages().getImage(
             ISharedImages.IMG_OBJS_ERROR_TSK);
     }

@@ -16,7 +16,6 @@ package org.eclipse.ui.internal;
 import java.util.List;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
-import org.eclipse.core.runtime.Adapters;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
@@ -62,7 +61,7 @@ public class CycleViewHandler extends CycleBaseHandler {
 			if (part.getTags().contains("Editor")) { //$NON-NLS-1$
 				if (includeEditor) {
 					IEditorPart activeEditor = page.getActiveEditor();
-					IEditorDescriptor editorDescriptor = Adapters.adapt(activeEditor, IEditorDescriptor.class);
+					IEditorDescriptor editorDescriptor = activeEditor.getAdapter(IEditorDescriptor.class);
 					TableItem item = new TableItem(table, SWT.NONE);
 					item.setText(WorkbenchMessages.CyclePartAction_editor);
 					item.setImage(activeEditor.getTitleImage());
