@@ -2999,17 +2999,7 @@ public class WorkbenchPage implements IWorkbenchPage {
     @Override
 	public boolean isPartVisible(IWorkbenchPart part) {
 		MPart mpart = findPart(part);
-		if (mpart == null) {
-			return false;
-		}
-		MPerspective perspective = getCurrentPerspective();
-		MPerspective persp = modelService.getPerspectiveFor(mpart);
-		if (persp != perspective) {
-			// if the part is not contained in the current perspective,
-			// it is not visible independently what the partService says
-			return false;
-		}
-		return partService.isPartVisible(mpart);
+		return mpart == null ? false : partService.isPartVisible(mpart);
     }
 
 	public MUIElement findSharedArea() {
