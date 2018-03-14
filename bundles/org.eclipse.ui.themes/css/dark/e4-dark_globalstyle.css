@@ -324,8 +324,6 @@ FormHeading {
 Section {
     background-color: #4F5355;
     color: #AEBED0;
-    background-color-titlebar: #6D5E5E;
-	border-color-titlebar: white;
 }
 
 Form > LayoutComposite > LayoutComposite > * {
@@ -422,4 +420,3 @@ Label#org-eclipse-ui-splash-progressText {
 ProgressIndicator#org-eclipse-ui-splash-progressIndicator {
 	background-color: #e1e1e1;
 }
-
