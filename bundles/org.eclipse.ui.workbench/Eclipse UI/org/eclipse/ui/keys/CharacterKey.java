@@ -31,7 +31,6 @@ import org.eclipse.jface.bindings.keys.KeyLookupFactory;
  *             org.eclipse.jface.bindings.keys.KeyLookupFactory
  * @since 3.0
  */
-@Deprecated
 public final class CharacterKey extends NaturalKey {
 
 	/**

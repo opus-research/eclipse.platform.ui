@@ -82,16 +82,14 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
      */
-    @Override
-	public IWorkbench getWorkbench() {
+    public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
     /* (non-javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbenchWindowManager
      */
-    @Override
-	public WindowManager getWorkbenchWindowManager() {
+    public WindowManager getWorkbenchWindowManager() {
         // return the global workbench window manager
 		return null;
     }
@@ -99,8 +97,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#declareImage
      */
-    @Override
-	public void declareImage(String symbolicName, ImageDescriptor descriptor,
+    public void declareImage(String symbolicName, ImageDescriptor descriptor,
             boolean shared) {
         if (symbolicName == null || descriptor == null) {
             throw new IllegalArgumentException();
@@ -111,8 +108,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
      */
-    @Override
-	public IWorkbenchWindowConfigurer getWindowConfigurer(
+    public IWorkbenchWindowConfigurer getWindowConfigurer(
             IWorkbenchWindow window) {
         if (window == null) {
             throw new IllegalArgumentException();
@@ -123,24 +119,21 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getSaveAndRestore()
      */
-    @Override
-	public boolean getSaveAndRestore() {
+    public boolean getSaveAndRestore() {
         return saveAndRestore;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#setSaveAndRestore(boolean)
      */
-    @Override
-	public void setSaveAndRestore(boolean enabled) {
+    public void setSaveAndRestore(boolean enabled) {
         saveAndRestore = enabled;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#getData
      */
-    @Override
-	public Object getData(String key) {
+    public Object getData(String key) {
         if (key == null) {
             throw new IllegalArgumentException();
         }
@@ -150,8 +143,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#setData(String, Object)
      */
-    @Override
-	public void setData(String key, Object data) {
+    public void setData(String key, Object data) {
         if (key == null) {
             throw new IllegalArgumentException();
         }
@@ -165,8 +157,7 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClose()
      */
-    @Override
-	public void emergencyClose() {
+    public void emergencyClose() {
         if (!isEmergencyClosing) {
             isEmergencyClosing = true;
             if (Workbench.getInstance() != null
@@ -181,31 +172,27 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#emergencyClosing()
      */
-    @Override
-	public boolean emergencyClosing() {
+    public boolean emergencyClosing() {
         return isEmergencyClosing;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreState()
      */
-    @Override
-	public IStatus restoreState() {
+    public IStatus restoreState() {
 		return Status.OK_STATUS;
     }
 
     /* (non-Javadoc)
      * @see org.eclipse.ui.application.IWorkbenchConfigurer#openFirstTimeWindow()
      */
-    @Override
-	public void openFirstTimeWindow() {
+    public void openFirstTimeWindow() {
         ((Workbench) getWorkbench()).openFirstTimeWindow();
     }
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#restoreWorkbenchWindow(org.eclipse.ui.IMemento)
 	 */
-	@Override
 	public IWorkbenchWindowConfigurer restoreWorkbenchWindow(IMemento memento) throws WorkbenchException {
 		return getWindowConfigurer(null);
 	}
@@ -213,7 +200,6 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#getExitOnLastWindowClose()
 	 */
-	@Override
 	public boolean getExitOnLastWindowClose() {
 		return exitOnLastWindowClose;
 	}
@@ -221,7 +207,6 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.application.IWorkbenchConfigurer#setExitOnLastWindowClose(boolean)
 	 */
-	@Override
 	public void setExitOnLastWindowClose(boolean enabled) {
 		exitOnLastWindowClose = enabled;
 	}

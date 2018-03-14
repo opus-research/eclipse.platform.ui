@@ -152,13 +152,17 @@ public class HandlerServiceImpl implements EHandlerService {
 	@Optional
 	Logger logger;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.core.commands.EHandlerService#activateHandler(java.lang.String,
+	 * java.lang.Object)
+	 */
 	public void activateHandler(String commandId, Object handler) {
 		String handlerId = H_ID + commandId;
 		context.set(handlerId, handler);
 	}
 
-	@Override
 	public boolean canExecute(ParameterizedCommand command) {
 		final IEclipseContext staticContext = EclipseContextFactory.create(TMP_STATIC_CONTEXT);
 		try {
@@ -168,7 +172,6 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
 	public boolean canExecute(ParameterizedCommand command, IEclipseContext staticContext) {
 		final IEclipseContext executionContext = getExecutionContext();
 		addParms(command, staticContext);
@@ -184,12 +187,22 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.e4.core.commands.EHandlerService#deactivateHandler(java.lang.String,
+	 * java.lang.Object)
+	 */
 	public void deactivateHandler(String commandId, Object handler) {
 		context.remove(H_ID + commandId);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.e4.core.commands.EHandlerService#executeHandler(org.eclipse.core.commands.
+	 * ParameterizedCommand)
+	 */
 	public Object executeHandler(ParameterizedCommand command) {
 		final IEclipseContext staticContext = EclipseContextFactory.create(TMP_STATIC_CONTEXT);
 		try {
@@ -199,7 +212,6 @@ public class HandlerServiceImpl implements EHandlerService {
 		}
 	}
 
-	@Override
 	public Object executeHandler(ParameterizedCommand command, IEclipseContext staticContext) {
 		final IEclipseContext executionContext = getExecutionContext();
 		addParms(command, staticContext);

@@ -82,7 +82,6 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 	@Inject
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -108,7 +107,6 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -124,7 +122,6 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -221,12 +218,10 @@ public abstract class MenuItemRenderer extends SWTPartRenderer {
 					|| item.getType() == ItemType.RADIO) {
 				MenuItem ti = (MenuItem) me.getWidget();
 				ti.addSelectionListener(new SelectionListener() {
-					@Override
 					public void widgetSelected(SelectionEvent e) {
 						item.setSelected(((MenuItem) e.widget).getSelection());
 					}
 
-					@Override
 					public void widgetDefaultSelected(SelectionEvent e) {
 						item.setSelected(((MenuItem) e.widget).getSelection());
 					}

@@ -99,7 +99,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	@Inject
 	IEventBroker eventBroker;
 	private EventHandler itemUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -125,7 +124,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler labelUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenu
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu))
@@ -150,7 +148,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler toBeRenderedUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			Object element = event.getProperty(UIEvents.EventTags.ELEMENT);
 			String attName = (String) event
@@ -223,7 +220,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler selectionUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MToolItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -239,7 +235,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 	};
 
 	private EventHandler enabledUpdater = new EventHandler() {
-		@Override
 		public void handleEvent(Event event) {
 			// Ensure that this event is for a MMenuItem
 			if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenuItem))
@@ -381,7 +376,6 @@ MenuManagerEventHelper.getInstance()
 		}
 		if (newMenu != null) {
 			newMenu.addDisposeListener(new DisposeListener() {
-				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
 				}
@@ -898,7 +892,6 @@ MenuManagerEventHelper.getInstance()
 		return records.toArray(new ContributionRecord[records.size()]);
 	}
 
-	@Override
 	public IEclipseContext getContext(MUIElement el) {
 		return super.getContext(el);
 	}
@@ -934,7 +927,6 @@ MenuManagerEventHelper.getInstance()
 					legacyModel.setElementId(childManager.getId());
 					legacyModel.setVisible(childManager.isVisible());
 					linkModelToManager(legacyModel, childManager);
-					OpaqueElementUtil.setOpaqueItem(legacyModel, childManager);
 					if (modelChildren.size() > dest) {
 						modelChildren.add(dest, legacyModel);
 					} else {

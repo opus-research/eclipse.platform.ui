@@ -25,7 +25,6 @@ import org.eclipse.e4.ui.css.swt.properties.converters.CSSValueSWTRGBConverterIm
 import org.eclipse.e4.ui.css.swt.resources.SWTResourceRegistryKeyFactory;
 import org.eclipse.e4.ui.css.swt.resources.SWTResourcesRegistry;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Widget;
 import org.w3c.dom.Element;
 
 /**
@@ -67,7 +66,6 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 			new CSSSWTApplyStylesListener(display, this);
 		}
 
-		initializeCSSElementProvider();
 		initializeCSSPropertyHandlers();
 		//		SWTElement.setEngine(display, this);
 
@@ -75,8 +73,6 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 	}
 
 	protected abstract void initializeCSSPropertyHandlers();
-
-	protected abstract void initializeCSSElementProvider();
 
 	@Override
 	public IResourcesRegistry getResourcesRegistry() {
@@ -91,21 +87,13 @@ public abstract class AbstractCSSSWTEngineImpl extends CSSEngineImpl {
 	public void reset() {
 		for (CSSElementContext elementContext : getElementsContext().values()) {
 			Element element = elementContext.getElement();
-			if (element instanceof WidgetElement
-					&& isApplicableToReset((WidgetElement) element)) {
+			if (element instanceof WidgetElement) {
 				((WidgetElement) element).reset();
 			}
 		}
 
 		getResourcesRegistry().dispose();
 		super.reset();
-	}
-
-	private boolean isApplicableToReset(WidgetElement element) {
-		if (element.getNativeWidget() instanceof Widget) {
-			return !((Widget) element.getNativeWidget()).isDisposed();
-		}
-		return false;
 	}
 
 }

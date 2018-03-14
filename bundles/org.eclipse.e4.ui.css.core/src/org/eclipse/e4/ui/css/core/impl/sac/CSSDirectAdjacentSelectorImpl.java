@@ -46,16 +46,14 @@ public class CSSDirectAdjacentSelectorImpl extends AbstractSiblingSelector {
      * <b>SAC</b>: Implements {@link
      * org.w3c.css.sac.Selector#getSelectorType()}.
      */
-    @Override
-	public short getSelectorType() {
+    public short getSelectorType() {
         return SAC_DIRECT_ADJACENT_SELECTOR;
     }
 
     /**
      * Tests whether this selector matches the given element.
      */
-    @Override
-	public boolean match(Element e, String pseudoE) {
+    public boolean match(Element e, String pseudoE) {
         Node n = e;
         if (!((ExtendedSelector)getSiblingSelector()).match(e, pseudoE))
             return false;
@@ -71,8 +69,7 @@ public class CSSDirectAdjacentSelectorImpl extends AbstractSiblingSelector {
     /**
      * Fills the given set with the attribute names found in this selector.
      */
-    @Override
-	public void fillAttributeSet(Set attrSet) {
+    public void fillAttributeSet(Set attrSet) {
         ((ExtendedSelector)getSelector()).fillAttributeSet(attrSet);
         ((ExtendedSelector)getSiblingSelector()).fillAttributeSet(attrSet);
     }
@@ -80,8 +77,7 @@ public class CSSDirectAdjacentSelectorImpl extends AbstractSiblingSelector {
     /**
      * Returns a representation of the selector.
      */
-    @Override
-	public String toString() {
+    public String toString() {
         return getSelector() + " + " + getSiblingSelector();
     }
 }
