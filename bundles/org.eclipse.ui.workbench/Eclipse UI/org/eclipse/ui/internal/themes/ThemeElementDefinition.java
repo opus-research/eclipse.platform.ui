@@ -18,17 +18,27 @@ import java.util.ResourceBundle;
  *
  */
 public class ThemeElementDefinition {
+	public static interface State {
+		int UNKNOWN = 0;
+
+		int OVERRIDDEN = 1;
+
+		int ADDED_BY_CSS = 2;
+
+		int MODIFIED_BY_USER = 4;
+	}
+
 	private String id;
 
 	private String label;
 
 	private String description;
 
+	private String formattedDescription;
+
 	private String categoryId;
 
-	private boolean overridden;
-
-	private boolean addedByCss;
+	private int state = State.UNKNOWN;
 
 	private String overriddenLabel;
 
@@ -57,7 +67,7 @@ public class ThemeElementDefinition {
 
 	public void setName(String label) {
 		this.label = label;
-		setOverridden(true);
+		appendState(State.OVERRIDDEN);
 	}
 
 	/**
@@ -72,12 +82,19 @@ public class ThemeElementDefinition {
 	 *         .
 	 */
 	public String getDescription() {
-		return description;
+		if (formattedDescription == null) {
+			formattedDescription = isOverridden()? description + ' ' + getOverriddenLabel() : description;			
+		} else if (!isOverridden() && formattedDescription.endsWith(getOverriddenLabel())) {
+			formattedDescription = formattedDescription.substring(0, formattedDescription.length()
+					- getOverriddenLabel().length() - 1);
+		}
+		return formattedDescription;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-		setOverridden(true);
+		formattedDescription = null;
+		appendState(State.OVERRIDDEN);
 	}
 
 	/**
@@ -91,9 +108,20 @@ public class ThemeElementDefinition {
 
 	public void setCategoryId(String categoryId) {
 		this.categoryId = categoryId;
-		setOverridden(true);
+		appendState(State.OVERRIDDEN);
 	}
 
+	public int getState() {
+		return state;
+	}
+
+	public void appendState(int state) {
+		this.state |= state;
+	}
+
+	public void removeState(int state) {
+		this.state &= ~state;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -101,30 +129,15 @@ public class ThemeElementDefinition {
 	 * org.eclipse.e4.ui.css.swt.definition.IDefinitionOverridable#isOverriden()
 	 */
 	public boolean isOverridden() {
-		return overridden;
-	}
-
-	protected void setOverridden(boolean overridden) {
-		this.overridden = overridden;
-		if (isAddedByCss()) {
-			return;
-		}
-
-		boolean hasOverriddenLabel = description.endsWith(getOverriddenLabel());
-		if (overridden && !hasOverriddenLabel) {
-			description += ' ' + getOverriddenLabel();
-		} else if (!overridden && hasOverriddenLabel) {
-			description = description.substring(0, description.length()
-					- getOverriddenLabel().length() - 1);
-		}
+		return (state & State.OVERRIDDEN) != 0;
 	}
 
 	public boolean isAddedByCss() {
-		return addedByCss;
+		return (state & State.ADDED_BY_CSS) != 0;
 	}
 
-	public void setAddedByCss(boolean addedByCss) {
-		this.addedByCss = addedByCss;
+	public boolean isModifiedByUser() {
+		return (state & State.MODIFIED_BY_USER) != 0;
 	}
 
 	public String getOverriddenLabel() {
@@ -136,7 +149,6 @@ public class ThemeElementDefinition {
 	}
 
 	public void resetToDefaultValue() {
-		setOverridden(false);
-		setAddedByCss(false);
+		state = State.UNKNOWN;
 	}
 }
