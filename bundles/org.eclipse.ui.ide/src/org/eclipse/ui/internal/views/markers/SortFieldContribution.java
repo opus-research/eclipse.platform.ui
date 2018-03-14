@@ -15,6 +15,7 @@ import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -80,10 +81,13 @@ public class SortFieldContribution extends MarkersContribution {
 				MenuItem item = new MenuItem(menu, SWT.CHECK);
 				item.setText(MarkerMessages.sortDirectionAscending_text);
 				final ExtendedMarkersView view = getView();
-				item.addListener(SWT.Selection, event -> {
+				item.addListener(SWT.Selection, new Listener() {
+					@Override
+					public void handleEvent(Event event) {
 
-					if (view != null)
-						view.toggleSortDirection();
+						if (view != null)
+							view.toggleSortDirection();
+					}
 				});
 
 				if (view != null)
@@ -126,12 +130,15 @@ public class SortFieldContribution extends MarkersContribution {
 			 */
 			private Listener getMenuItemListener(final MarkerField field,
 					final ExtendedMarkersView view) {
-				return event -> {
+				return new Listener() {
+					@Override
+					public void handleEvent(Event event) {
 
-					MenuItem item = (MenuItem) event.widget;
+						MenuItem item = (MenuItem) event.widget;
 
-					if (item.getSelection() && view != null)
-						view.setPrimarySortField(field);
+						if (item.getSelection() && view != null)
+							view.setPrimarySortField(field);
+					}
 				};
 			}
 		};

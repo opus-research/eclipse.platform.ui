@@ -26,6 +26,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.IShellProvider;
@@ -94,7 +95,12 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
      */
     public MainActionGroup(IResourceNavigator navigator) {
         super(navigator);
-        resourceChangeListener = event -> handleResourceChanged(event);
+        resourceChangeListener = new IResourceChangeListener() {
+            @Override
+			public void resourceChanged(IResourceChangeEvent event) {
+                handleResourceChanged(event);
+            }
+        };
         ResourcesPlugin.getWorkspace().addResourceChangeListener(
                 resourceChangeListener, IResourceChangeEvent.POST_CHANGE);
         makeSubGroups();
@@ -129,12 +135,15 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
             if ((projDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.DESCRIPTION)) != 0) {
                 if (sel.contains(projDelta.getResource())) {
                     getNavigator().getSite().getShell().getDisplay().syncExec(
-                            () -> {
-							    addTaskAction.selectionChanged(selection);
-							    gotoGroup.updateActionBars();
-							    refactorGroup.updateActionBars();
-							    workspaceGroup.updateActionBars();
-							});
+                            new Runnable() {
+                                @Override
+								public void run() {
+                                    addTaskAction.selectionChanged(selection);
+                                    gotoGroup.updateActionBars();
+                                    refactorGroup.updateActionBars();
+                                    workspaceGroup.updateActionBars();
+                                }
+                            });
                 }
             }
         }
@@ -187,21 +196,24 @@ public class MainActionGroup extends ResourceNavigatorActionGroup {
         gotoGroup = new GotoActionGroup(navigator);
         openGroup = new OpenActionGroup(navigator);
         refactorGroup = new RefactorActionGroup(navigator);
-        IPropertyChangeListener workingSetUpdater = event -> {
-		    String property = event.getProperty();
+        IPropertyChangeListener workingSetUpdater = new IPropertyChangeListener() {
+            @Override
+			public void propertyChange(PropertyChangeEvent event) {
+                String property = event.getProperty();
 
-		    if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
-		            .equals(property)) {
-		        IResourceNavigator navigator = getNavigator();
-		        Object newValue = event.getNewValue();
+                if (WorkingSetFilterActionGroup.CHANGE_WORKING_SET
+                        .equals(property)) {
+                    IResourceNavigator navigator = getNavigator();
+                    Object newValue = event.getNewValue();
 
-		        if (newValue instanceof IWorkingSet) {
-		            navigator.setWorkingSet((IWorkingSet) newValue);
-		        } else if (newValue == null) {
-		            navigator.setWorkingSet(null);
-		        }
-		    }
-		};
+                    if (newValue instanceof IWorkingSet) {
+                        navigator.setWorkingSet((IWorkingSet) newValue);
+                    } else if (newValue == null) {
+                        navigator.setWorkingSet(null);
+                    }
+                }
+            }
+        };
         TreeViewer treeView = navigator.getViewer();
         Shell shell = treeView.getControl().getShell();
         workingSetGroup = new WorkingSetFilterActionGroup(shell,
