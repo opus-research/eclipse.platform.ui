@@ -183,11 +183,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				fontProvider = (IFontProvider) provider;
 			}
 		}
-		
-	
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#setFontsAndColors(java.lang.Object)
-		 */
+
 		@Override
 		public void setFontsAndColors(Object element){
 			
@@ -209,12 +205,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				foreground = colorProvider.getForeground(element);
 			}			
 		}
-		
-		/**
-		 * Apply the fonts and colors to the control if
-		 * required.
-		 * @param control
-		 */
+
 		@Override
 		public void applyFontsAndColors(TableItem control) {
 			
@@ -246,12 +237,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			
 			clear();
 		}
-		
 
-	
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#applyFontsAndColors(org.eclipse.swt.widgets.TreeItem)
-		 */
 		@Override
 		public void applyFontsAndColors(TreeItem control) {
 			
@@ -283,11 +269,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			
 			clear();
 		}
-		
-	
-		/* (non-Javadoc)
-		 * @see org.eclipse.jface.viewers.StructuredViewer.ColorAndFontManager#applyFontsAndColors(org.eclipse.swt.custom.TableTreeItem)
-		 */
+
 		@Override
 		public void applyFontsAndColors(TableTreeItem control) {
 			
@@ -485,6 +467,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			this.fullMap = fullMap;
 		}
 
+		@Override
 		public void run() {
 			doUpdateItem(widget, element, fullMap);
 		}
@@ -520,9 +503,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		openListeners.add(listener);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPostSelectionProvider.
-	 */
+	@Override
 	public void addPostSelectionChangedListener(ISelectionChangedListener listener) {
 		postSelectionChangedListeners.add(listener);
 	}
@@ -845,6 +826,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		for (int i = 0; i < listeners.length; ++i) {
 			final IDoubleClickListener l = (IDoubleClickListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.doubleClick(event);
 				}
@@ -866,6 +848,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		for (int i = 0; i < listeners.length; ++i) {
 			final IOpenListener l = (IOpenListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.open(event);
 				}
@@ -888,6 +871,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		for (int i = 0; i < listeners.length; ++i) {
 			final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
 			SafeRunnable.run(new SafeRunnable() {
+				@Override
 				public void run() {
 					l.selectionChanged(event);
 				}
@@ -1233,14 +1217,12 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		firePostSelectionChanged(event);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Viewer.
-	 */
 	@Override
 	protected void hookControl(Control control) {
 		super.hookControl(control);
 		OpenStrategy handler = new OpenStrategy(control);
 		handler.addSelectionListener(new SelectionListener() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				// On Windows, selection events may happen during a refresh.
 				// Ignore these events if we are currently in preservingSelection().
@@ -1250,6 +1232,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 				}
 			}
 
+			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				handleDoubleSelect(e);
 			}
@@ -1261,6 +1244,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		});
 		handler.addOpenListener(new IOpenEventListener() {
+			@Override
 			public void handleOpen(SelectionEvent e) {
 				StructuredViewer.this.handleOpen(e);
 			}
@@ -1466,10 +1450,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 			}
 		}
 	}
-	
-	/*
-	 * Non-Javadoc. Method declared on Viewer.
-	 */
+
 	@Override
 	public void refresh() {
 		refresh(getRoot());
@@ -1514,6 +1495,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public void refresh(final Object element) {
 		preservingSelection(new Runnable() {
+			@Override
 			public void run() {
 				internalRefresh(element);
 			}
@@ -1541,6 +1523,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public void refresh(final Object element, final boolean updateLabels) {
 		preservingSelection(new Runnable() {
+			@Override
 			public void run() {
 				internalRefresh(element, updateLabels);
 			}
@@ -1575,9 +1558,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		openListeners.remove(listener);
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on IPostSelectionProvider.
-	 */
+	@Override
 	public void removePostSelectionChangedListener(ISelectionChangedListener listener) {
 		postSelectionChangedListeners.remove(listener);
 	}
@@ -1663,10 +1644,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 	 */
 	public abstract void reveal(Object element);
 
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ContentViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
-	 */
 	@Override
 	public void setContentProvider(IContentProvider provider) {
 		assertContentProviderType(provider);
@@ -1682,10 +1659,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		Assert.isTrue(provider instanceof IStructuredContentProvider);
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.Viewer#setInput(java.lang.Object)
-	 */
 	@Override
 	public final void setInput(Object input) {
 		Control control = getControl();
@@ -1706,10 +1679,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		}
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection, boolean)
-	 */
 	@Override
 	public void setSelection(ISelection selection, boolean reveal) {
 		/**
@@ -2138,6 +2107,7 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		}
 		if (needsRefilter) {
 			preservingSelection(new Runnable() {
+				@Override
 				public void run() {
 					internalRefresh(getRoot());
 					refreshOccurred = true;
@@ -2216,9 +2186,6 @@ public abstract class StructuredViewer extends ContentViewer implements IPostSel
 		return elementMap != null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
-	 */
 	@Override
 	public void setLabelProvider(IBaseLabelProvider labelProvider) {
 		if (labelProvider instanceof IColorProvider || labelProvider instanceof IFontProvider) {

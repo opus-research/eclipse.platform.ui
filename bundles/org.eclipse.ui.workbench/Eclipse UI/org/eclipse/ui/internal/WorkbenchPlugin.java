@@ -276,7 +276,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
             final Object[] ret = new Object[1];
             final CoreException[] exc = new CoreException[1];
             BusyIndicator.showWhile(null, new Runnable() {
-                public void run() {
+                @Override
+				public void run() {
                     try {
                         ret[0] = element
                                 .createExecutableExtension(classAttribute);
@@ -432,7 +433,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	 * convenience access to the graphics resources and fast field access for
 	 * some of the commonly used graphical images.
 	 */
-    protected ImageRegistry createImageRegistry() {
+    @Override
+	protected ImageRegistry createImageRegistry() {
         return WorkbenchImages.getImageRegistry();
     }
 
@@ -685,7 +687,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * Answer the workbench.
      * @deprecated Use <code>PlatformUI.getWorkbench()</code> instead.
      */
-    public IWorkbench getWorkbench() {
+    @Deprecated
+	@Override
+	public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
@@ -694,7 +698,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      * This method must be called whenever the preference store is initially loaded
      * because the default values are not stored in the preference store.
      */
-    protected void initializeDefaultPreferences(IPreferenceStore store) {
+    @Override
+	protected void initializeDefaultPreferences(IPreferenceStore store) {
         // Do nothing.  This should not be called.
         // Prefs are initialized in WorkbenchPreferenceInitializer.
     }
@@ -843,7 +848,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
      *  (non-Javadoc)
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
-    public void start(BundleContext context) throws Exception {
+    @Override
+	public void start(BundleContext context) throws Exception {
     	context.addBundleListener(getBundleListener());
         super.start(context);
         bundleContext = context;
@@ -851,7 +857,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
         JFaceUtil.initializeJFace();
 		
 		parseBidiArguments();
-		 Window.setDefaultOrientation(getDefaultOrientation());
+		Window.setDefaultOrientation(getDefaultOrientation());
 
         // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
         // which needs to be done as early as possible, before the workbench
@@ -931,9 +937,9 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	}
 
 	/**
-     * Get the default orientation from the command line
-     * arguments. If there are no arguments imply the 
-     * orientation.
+	 * Get the default orientation from the command line arguments. If there are
+	 * no arguments imply the orientation.
+	 * 
 	 * @return int
 	 * @see SWT#NONE
 	 * @see SWT#RIGHT_TO_LEFT
@@ -1140,7 +1146,8 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
     /* (non-Javadoc)
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
-    public void stop(BundleContext context) throws Exception {
+    @Override
+	public void stop(BundleContext context) throws Exception {
     	if (bundleListener!=null) {
     		context.removeBundleListener(bundleListener);
     		bundleListener = null;
@@ -1250,6 +1257,7 @@ public class WorkbenchPlugin extends AbstractUIPlugin {
 	private BundleListener getBundleListener() {
 		if (bundleListener == null) {
 			bundleListener = new SynchronousBundleListener() {
+				@Override
 				public void bundleChanged(BundleEvent event) {
 					WorkbenchPlugin.this.bundleChanged(event);
 				}

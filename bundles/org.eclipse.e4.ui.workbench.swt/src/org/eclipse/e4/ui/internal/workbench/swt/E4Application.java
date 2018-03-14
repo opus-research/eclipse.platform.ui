@@ -126,12 +126,7 @@ public class E4Application implements IApplication {
 		return display;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
-	 * IApplicationContext)
-	 */
+	@Override
 	public Object start(IApplicationContext applicationContext)
 			throws Exception {
 		// set the display name before the Display is
@@ -205,12 +200,14 @@ public class E4Application implements IApplication {
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
 
+			@Override
 			public void syncExec(Runnable runnable) {
 				if (display != null && !display.isDisposed()) {
 					display.syncExec(runnable);
 				}
 			}
 
+			@Override
 			public void asyncExec(Runnable runnable) {
 				if (display != null && !display.isDisposed()) {
 					display.asyncExec(runnable);
@@ -306,12 +303,12 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(E4Application.THEME_ID, themeId);
 
-		// Temporary to support old property as well
-		if (cssURI != null && !cssURI.startsWith("platform:")) {
+		// validate static CSS URI
+		if (cssURI != null && !cssURI.startsWith("platform:/plugin/")) {
 			System.err
-					.println("Warning "
-							+ cssURI
-							+ " changed its meaning it is used now to run without theme support");
+					.println("Warning. "
+							+ "Use the \"platform:/plugin/Bundle-SymbolicName/path/filename.extension\" "
+							+ "URI for the \"" + IWorkbench.CSS_URI_ARG + "\" parameter."); //$NON-NLS-1$
 			appContext.set(E4Application.THEME_ID, cssURI);
 		}
 
@@ -442,6 +439,7 @@ public class E4Application implements IApplication {
 				: brandingProperty;
 	}
 
+	@Override
 	public void stop() {
 		if (workbench != null) {
 			workbench.close();
@@ -495,19 +493,24 @@ public class E4Application implements IApplication {
 						E4Workbench.LOCAL_ACTIVE_SHELL));
 
 		appContext.set(IStylingEngine.class, new IStylingEngine() {
+			@Override
 			public void setClassname(Object widget, String classname) {
 			}
 
+			@Override
 			public void setId(Object widget, String id) {
 			}
 
+			@Override
 			public void style(Object widget) {
 			}
 
+			@Override
 			public CSSStyleDeclaration getStyle(Object widget) {
 				return null;
 			}
 
+			@Override
 			public void setClassnameAndId(Object widget, String classname,
 					String id) {
 			}
@@ -786,6 +789,7 @@ public class E4Application implements IApplication {
 			initializeWindowServices(childWindow);
 		}
 		((EObject) appModel).eAdapters().add(new AdapterImpl() {
+			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MApplication.class) != UiPackageImpl.ELEMENT_CONTAINER__CHILDREN)
 					return;
@@ -802,6 +806,7 @@ public class E4Application implements IApplication {
 		// we add a special tracker to bring up current selection from
 		// the active window to the application level
 		appContext.runAndTrack(new RunAndTrack() {
+			@Override
 			public boolean changed(IEclipseContext context) {
 				IEclipseContext activeChildContext = context.getActiveChild();
 				if (activeChildContext != null) {
@@ -818,6 +823,7 @@ public class E4Application implements IApplication {
 		// about as handle needs to know its context
 		appContext.set(ESelectionService.class.getName(),
 				new ContextFunction() {
+					@Override
 					public Object compute(IEclipseContext context,
 							String contextKey) {
 						return ContextInjectionFactory.make(
@@ -832,6 +838,7 @@ public class E4Application implements IApplication {
 		// Mostly MWindow contexts are lazily created by renderers and is not
 		// set at this point.
 		((EObject) childWindow).eAdapters().add(new AdapterImpl() {
+			@Override
 			public void notifyChanged(Notification notification) {
 				if (notification.getFeatureID(MWindow.class) != BasicPackageImpl.WINDOW__CONTEXT)
 					return;

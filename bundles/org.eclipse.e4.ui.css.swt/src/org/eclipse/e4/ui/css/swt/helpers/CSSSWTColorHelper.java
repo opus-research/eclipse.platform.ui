@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2013 Angelo Zerr and others.
+ * Copyright (c) 2008, 2014 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,8 +26,10 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.internal.css.swt.CSSActivator;
 import org.eclipse.e4.ui.internal.css.swt.definition.IColorAndFontProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.css.CSSPrimitiveValue;
 import org.w3c.dom.css.CSSValue;
@@ -94,7 +96,7 @@ public class CSSSWTColorHelper {
 
 	/**
 	 * Process the given string and return a corresponding RGB object.
-	 * 
+	 *
 	 * @param value
 	 *            the SWT constant <code>String</code>
 	 * @return the value of the SWT constant, or <code>SWT.COLOR_BLACK</code>
@@ -120,7 +122,7 @@ public class CSSSWTColorHelper {
 
 	/**
 	 * Get the SWT constant fields.
-	 * 
+	 *
 	 * @return the fields
 	 * @since 3.3
 	 */
@@ -282,7 +284,8 @@ public class CSSSWTColorHelper {
 	 */
 	private static int[] getDefaultPercents(Gradient grad) {
 		// Needed to avoid /0 in increment calc
-		if (grad.getRGBs().size() == 1) {
+
+		if (grad.getRGBs().size() <= 1) {
 			return new int[0];
 		}
 
@@ -315,5 +318,44 @@ public class CSSSWTColorHelper {
 			return provider.getColor(normalizeId(name.substring(1)));
 		}
 		return null;
+	}
+
+	/** Simplify testing for color equality */
+	public static boolean equals(Color c1, Color c2) {
+		if (c1 == c2) {
+			return true;
+		}
+		if (c1 == null || c2 == null) {
+			return false;
+		}
+		return c1.equals(c2);
+	}
+
+	/** Helper function to avoid setting colors unnecessarily */
+	public static void setForeground(Control control, Color newColor) {
+		if (!equals(control.getForeground(), newColor)) {
+			control.setForeground(newColor);
+		}
+	}
+
+	/** Helper function to avoid setting colors unnecessarily */
+	public static void setBackground(Control control, Color newColor) {
+		if (!equals(control.getBackground(), newColor)) {
+			control.setBackground(newColor);
+		}
+	}
+
+	/** Helper function to avoid setting colors unnecessarily */
+	public static void setSelectionForeground(CTabFolder folder, Color newColor) {
+		if (!equals(folder.getSelectionForeground(), newColor)) {
+			folder.setSelectionForeground(newColor);
+		}
+	}
+
+	/** Helper function to avoid setting colors unnecessarily */
+	public static void setSelectionBackground(CTabFolder folder, Color newColor) {
+		if (!equals(folder.getSelectionBackground(), newColor)) {
+			folder.setSelectionBackground(newColor);
+		}
 	}
 }

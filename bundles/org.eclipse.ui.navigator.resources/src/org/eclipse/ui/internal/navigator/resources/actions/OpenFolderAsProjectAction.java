@@ -11,6 +11,9 @@
 
 package org.eclipse.ui.internal.navigator.resources.actions;
 
+import java.io.IOException;
+
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.internal.resources.ProjectDescriptionReader;
 import org.eclipse.core.resources.IFolder;
@@ -47,6 +50,7 @@ public class OpenFolderAsProjectAction extends Action {
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(SharedImages.IMG_OBJ_PROJECT));
 	}
 
+	@Override
 	public void run() {
 		try {
 			IProjectDescription desc = new ProjectDescriptionReader().read(folder.getLocation().append(IProjectDescription.DESCRIPTION_FILE_NAME));
@@ -58,9 +62,18 @@ public class OpenFolderAsProjectAction extends Action {
 			} else {
 				WorkbenchNavigatorPlugin.getDefault().getLog().log(status);	
 			}
-		} catch (Exception ex) {
-			WorkbenchNavigatorPlugin.getDefault().getLog().log(
-					new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.getDefault().getBundle().getSymbolicName(), ex.getMessage()));
+		} catch (IOException e) {
+			WorkbenchNavigatorPlugin
+					.getDefault()
+					.getLog()
+					.log(new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.getDefault().getBundle().getSymbolicName(),
+							"Failed to import " + folder.getName(), e)); //$NON-NLS-1$
+		} catch (ExecutionException e) {
+			WorkbenchNavigatorPlugin
+					.getDefault()
+					.getLog()
+					.log(new Status(IStatus.ERROR, WorkbenchNavigatorPlugin.getDefault().getBundle().getSymbolicName(),
+							"Failed to import " + folder.getName(), e)); //$NON-NLS-1$
 		}
 	}
 }
