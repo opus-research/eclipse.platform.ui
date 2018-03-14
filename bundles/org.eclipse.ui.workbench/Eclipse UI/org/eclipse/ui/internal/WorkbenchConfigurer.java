@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.WindowManager;
 import org.eclipse.ui.IMemento;
@@ -69,8 +68,6 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      */
 	private boolean exitOnLastWindowClose = true;
 
-	private IEclipseContext e4Context;
-
     /**
      * Creates a new workbench configurer.
      * <p>
@@ -78,31 +75,21 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
      * only via {@link WorkbenchAdvisor#initialize WorkbenchAdvisor.initialize}
      * </p>
      */
-	/* package */ WorkbenchConfigurer(IEclipseContext e4Context) {
+    /* package */WorkbenchConfigurer() {
         super();
-		this.e4Context = e4Context;
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbench
-     */
     @Override
 	public IWorkbench getWorkbench() {
         return PlatformUI.getWorkbench();
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWorkbenchWindowManager
-     */
     @Override
 	public WindowManager getWorkbenchWindowManager() {
         // return the global workbench window manager
 		return null;
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#declareImage
-     */
     @Override
 	public void declareImage(String symbolicName, ImageDescriptor descriptor,
             boolean shared) {
@@ -112,9 +99,6 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
         WorkbenchImages.declareImage(symbolicName, descriptor, shared);
     }
 
-    /* (non-javadoc)
-     * @see org.eclipse.ui.application.IWorkbenchConfigurer#getWindowConfigurer
-     */
     @Override
 	public IWorkbenchWindowConfigurer getWindowConfigurer(
             IWorkbenchWindow window) {
@@ -131,9 +115,8 @@ public final class WorkbenchConfigurer implements IWorkbenchConfigurer {
 
     @Override
 	public void setSaveAndRestore(boolean enabled) {
-		saveAndRestore = enabled;
-		e4Context.set(org.eclipse.e4.ui.workbench.IWorkbench.PERSIST_STATE, saveAndRestore);
-	}
+        saveAndRestore = enabled;
+    }
 
     @Override
 	public Object getData(String key) {

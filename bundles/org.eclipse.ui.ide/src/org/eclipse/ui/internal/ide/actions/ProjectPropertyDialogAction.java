@@ -12,7 +12,7 @@ package org.eclipse.ui.internal.ide.actions;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -110,22 +110,13 @@ public class ProjectPropertyDialogAction extends PartEventAction implements
 				selection = ((IStructuredSelection) sel).getFirstElement();
 			}
         }
-        if (selection == null) {
-			return null;
-		}
-        if (!(selection instanceof IAdaptable)) {
-			return null;
-		}
-        IResource resource = ((IAdaptable) selection).getAdapter(IResource.class);
+		IResource resource = Adapters.adapt(selection, IResource.class);
         if (resource == null) {
 			return null;
 		}
         return resource.getProject();
     }
 
-    /* (non-javadoc)
-     * Method declared on ActionFactory.IWorkbenchAction
-     */
     @Override
 	public void dispose() {
         if (workbenchWindow == null) {
