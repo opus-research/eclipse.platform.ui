@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2015 IBM Corporation and others.
+ * Copyright (c) 2010, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  ******************************************************************************/
 
 package org.eclipse.ui.internal.handlers;
@@ -23,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.internal.AbstractEvaluationHandler;
 import org.eclipse.ui.internal.InternalHandlerUtil;
-import org.eclipse.ui.internal.SaveableHelper;
+import org.eclipse.ui.internal.util.Util;
 
 /**
  * @since 3.7
@@ -66,7 +65,11 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 	
 	protected ISaveablePart getSaveablePart(IEvaluationContext context) {
 		IWorkbenchPart activePart = InternalHandlerUtil.getActivePart(context);
-		ISaveablePart part = SaveableHelper.getSaveable(activePart);
+
+		if (activePart instanceof ISaveablePart)
+			return (ISaveablePart) activePart;
+
+		ISaveablePart part = (ISaveablePart) Util.getAdapter(activePart, ISaveablePart.class);
 		if (part != null)
 			return part;
 
@@ -74,8 +77,13 @@ public abstract class AbstractSaveHandler extends AbstractEvaluationHandler {
 	}
 	
 	protected ISaveablePart getSaveablePart(ExecutionEvent event) {
+
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		ISaveablePart part = SaveableHelper.getSaveable(activePart);
+		if (activePart instanceof ISaveablePart) {
+			return (ISaveablePart) activePart;
+		}
+
+		ISaveablePart part = (ISaveablePart) Util.getAdapter(activePart, ISaveablePart.class);
 		if (part != null)
 			return part;
 

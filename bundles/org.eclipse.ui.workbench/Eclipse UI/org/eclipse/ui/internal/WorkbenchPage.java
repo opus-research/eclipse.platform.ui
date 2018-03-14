@@ -12,7 +12,6 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
- *     Andrey Loskutov <loskutov@gmx.de> - Bug 372799
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -1555,8 +1554,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 		CompatibilityPart compatibilityPart = (CompatibilityPart) clientObject;
 		IWorkbenchPart workbenchPart = compatibilityPart.getPart();
 		if (save) {
-			ISaveablePart saveablePart = SaveableHelper.getSaveable(workbenchPart);
-			if (saveablePart != null) {
+			if (workbenchPart instanceof ISaveablePart) {
+				ISaveablePart saveablePart = (ISaveablePart) workbenchPart;
 				if (saveablePart.isSaveOnCloseNeeded()) {
 					if (!saveSaveable(saveablePart, workbenchPart, confirm, true)) {
 						return false;
@@ -1663,9 +1662,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 								if (object instanceof CompatibilityPart) {
 									IWorkbenchPart workbenchPart = ((CompatibilityPart) object)
 											.getPart();
-									ISaveablePart saveablePart = SaveableHelper.getSaveable(workbenchPart);
-									if (saveablePart != null) {
-										if (!saveablePart.isSaveOnCloseNeeded()) {
+									if (workbenchPart instanceof ISaveablePart) {
+										if (!((ISaveablePart) workbenchPart).isSaveOnCloseNeeded()) {
 											part.setDirty(false);
 											it.remove();
 										} else {
@@ -3353,8 +3351,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 					continue;
 				} else if (object instanceof CompatibilityPart) {
 					IWorkbenchPart workbenchPart = ((CompatibilityPart) object).getPart();
-					ISaveablePart saveable = SaveableHelper.getSaveable(workbenchPart);
-					if (saveable == null || !saveable.isSaveOnCloseNeeded()) {
+					if (!(workbenchPart instanceof ISaveablePart)
+							|| !((ISaveablePart) workbenchPart).isSaveOnCloseNeeded()) {
 						continue;
 					}
 					partsToSave.add(workbenchPart);
@@ -3516,55 +3514,31 @@ public class WorkbenchPage implements IWorkbenchPage {
         return saveAllEditors(confirm, false, false);
     }
 
-	/**
-	 * @return {@link ISaveablePart} objects derived from {@link IWorkbenchPart}
-	 *         's on this page
-	 */
 	public ISaveablePart[] getDirtyParts() {
-		List<ISaveablePart> result = new ArrayList<ISaveablePart>(3);
+		List result = new ArrayList(3);
 		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
 		for (int i = 0; i < allParts.length; i++) {
 			IWorkbenchPartReference reference = allParts[i];
 
 			IWorkbenchPart part = reference.getPart(false);
-			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (part != null) {
+			if (part != null && part instanceof ISaveablePart) {
+				ISaveablePart saveable = (ISaveablePart) part;
 				if (saveable.isDirty()) {
 					result.add(saveable);
 				}
 			}
 		}
-		return result.toArray(new ISaveablePart[result.size()]);
-	}
 
-	/**
-	 * @return workbench parts which are dirty (implement or adapt to
-	 *         {@link ISaveablePart})
-	 */
-	public IWorkbenchPart[] getDirtyWorkbenchParts() {
-		List<IWorkbenchPart> result = new ArrayList<IWorkbenchPart>(3);
-		IWorkbenchPartReference[] allParts = getSortedParts(true, true, true);
-		for (int i = 0; i < allParts.length; i++) {
-			IWorkbenchPartReference reference = allParts[i];
-
-			IWorkbenchPart part = reference.getPart(false);
-			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (part != null) {
-				if (saveable.isDirty()) {
-					result.add(part);
-				}
-			}
-		}
-		return result.toArray(new IWorkbenchPart[result.size()]);
+		return (ISaveablePart[]) result.toArray(new ISaveablePart[result.size()]);
 	}
 
 	public boolean saveAllEditors(boolean confirm, boolean closing, boolean addNonPartSources) {
-		IWorkbenchPart[] parts = getDirtyWorkbenchParts();
+		ISaveablePart[] parts = getDirtyParts();
 		if (parts.length == 0) {
 			return true;
 		}
 		// saveAll below expects a mutable list
-		List<IWorkbenchPart> dirtyParts = new ArrayList<IWorkbenchPart>(parts.length);
+		List dirtyParts = new ArrayList(parts.length);
 		for (int i = 0; i < parts.length; i++) {
 			dirtyParts.add(parts[i]);
 		}
@@ -3573,11 +3547,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return saveAll(dirtyParts, confirm, closing, addNonPartSources, legacyWindow, legacyWindow);
 	}
 
-	public static boolean saveAll(List<IWorkbenchPart> dirtyParts, final boolean confirm, final boolean closing,
+	public static boolean saveAll(List dirtyParts, final boolean confirm, final boolean closing,
 			boolean addNonPartSources, final IRunnableContext runnableContext,
 			final IWorkbenchWindow workbenchWindow) {
 		// clone the input list
-		dirtyParts = new ArrayList<IWorkbenchPart>(dirtyParts);
+		dirtyParts = new ArrayList(dirtyParts);
 
 		if (closing) {
 			// if the parts are going to be closed, then we only save those that
@@ -3591,7 +3565,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 			return processSaveable2(dirtyParts) ? false : saveablesList.preCloseParts(dirtyParts, true, true,
 					workbenchWindow, workbenchWindow) != null;
 		}
-		List<Saveable> modelsToSave = convertToSaveables(dirtyParts, closing, addNonPartSources);
+		List modelsToSave = convertToSaveables(dirtyParts, closing, addNonPartSources);
 		return modelsToSave.isEmpty() ? true : !saveablesList.saveModels(modelsToSave, workbenchWindow,
 				runnableContext, closing);
 
@@ -3604,11 +3578,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 * @param parts
 	 *            the list of the parts (ISaveablePart)
 	 */
-	private static void removeSaveOnCloseNotNeededParts(List<IWorkbenchPart> parts) {
-		for (Iterator<IWorkbenchPart> it = parts.iterator(); it.hasNext();) {
-			IWorkbenchPart part = it.next();
-			ISaveablePart saveable = SaveableHelper.getSaveable(part);
-			if (saveable == null || !saveable.isSaveOnCloseNeeded()) {
+	private static void removeSaveOnCloseNotNeededParts(List parts) {
+		for (Iterator it = parts.iterator(); it.hasNext();) {
+			ISaveablePart saveablePart = (ISaveablePart) it.next();
+			if (!saveablePart.isSaveOnCloseNeeded()) {
 				it.remove();
 			}
 		}
@@ -3622,7 +3595,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            the list of the parts
 	 * @return true if cancelled
 	 */
-	private static boolean processSaveable2(List<IWorkbenchPart> dirtyParts) {
+	private static boolean processSaveable2(List dirtyParts) {
 		boolean saveable2Processed = false;
 		// Process all parts that implement ISaveablePart2.
 		// These parts are removed from the list after saving
@@ -3631,14 +3604,13 @@ public class WorkbenchPage implements IWorkbenchPage {
 		// active perspective.
 		// Note that the given parts may come from multiple
 		// windows, pages and perspectives.
-		ListIterator<IWorkbenchPart> listIterator = dirtyParts.listIterator();
+		ListIterator listIterator = dirtyParts.listIterator();
 
 		WorkbenchPage currentPage = null;
 		Perspective currentPageOriginalPerspective = null;
 		while (listIterator.hasNext()) {
-			IWorkbenchPart part = listIterator.next();
-			ISaveablePart2 saveable2 = SaveableHelper.getSaveable2(part);
-			if (saveable2 != null) {
+			IWorkbenchPart part = (IWorkbenchPart) listIterator.next();
+			if (part instanceof ISaveablePart2) {
 				WorkbenchPage page = (WorkbenchPage) part.getSite().getPage();
 				if (!Util.equals(currentPage, page)) {
 					if (currentPage != null && currentPageOriginalPerspective != null) {
@@ -3653,7 +3625,7 @@ public class WorkbenchPage implements IWorkbenchPage {
 				}
 				page.bringToTop(part);
 				// try to save the part
-				int choice = SaveableHelper.savePart(saveable2, page.getWorkbenchWindow(), true);
+				int choice = SaveableHelper.savePart((ISaveablePart2) part, page.getWorkbenchWindow(), true);
 				if (choice == ISaveablePart2.CANCEL) {
 					// If the user cancels, don't restore the previous
 					// workbench state, as that will
@@ -3682,12 +3654,12 @@ public class WorkbenchPage implements IWorkbenchPage {
 		return false;
 	}
 
-	private static void removeNonDirtyParts(List<IWorkbenchPart> parts) {
-		ListIterator<IWorkbenchPart> listIterator;
+	private static void removeNonDirtyParts(List parts) {
+		ListIterator listIterator;
 		listIterator = parts.listIterator();
 		while (listIterator.hasNext()) {
-			ISaveablePart part = SaveableHelper.getSaveable(listIterator.next());
-			if (part == null || !part.isDirty()) {
+			ISaveablePart part = (ISaveablePart) listIterator.next();
+			if (!part.isDirty()) {
 				listIterator.remove();
 			}
 		}
@@ -3708,11 +3680,11 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 *            All action, see bug 139004)
 	 * @return the dirty models
 	 */
-	private static List<Saveable> convertToSaveables(List<IWorkbenchPart> parts, boolean closing,
-			boolean addNonPartSources) {
-		ArrayList<Saveable> result = new ArrayList<Saveable>();
-		HashSet<Saveable> seen = new HashSet<Saveable>();
-		for (IWorkbenchPart part : parts) {
+	private static List convertToSaveables(List parts, boolean closing, boolean addNonPartSources) {
+		ArrayList result = new ArrayList();
+		HashSet seen = new HashSet();
+		for (Iterator i = parts.iterator(); i.hasNext();) {
+			IWorkbenchPart part = (IWorkbenchPart) i.next();
 			Saveable[] saveables = getSaveables(part);
 			for (int j = 0; j < saveables.length; j++) {
 				Saveable saveable = saveables[j];
@@ -3774,17 +3746,18 @@ public class WorkbenchPage implements IWorkbenchPage {
 	 * @return <code>true</code> if no more parts in the page will reference the
 	 *         given model, <code>false</code> otherwise
 	 */
-	private static boolean closingLastPartShowingModel(Saveable model, List<IWorkbenchPart> closingParts,
+	private static boolean closingLastPartShowingModel(Saveable model, List closingParts,
 			IWorkbenchPage page) {
-		HashSet<IWorkbenchPart> closingPartsWithSameModel = new HashSet<IWorkbenchPart>();
-		for (IWorkbenchPart part : closingParts) {
+		HashSet closingPartsWithSameModel = new HashSet();
+		for (Iterator i = closingParts.iterator(); i.hasNext();) {
+			IWorkbenchPart part = (IWorkbenchPart) i.next();
 			Saveable[] models = getSaveables(part);
 			if (Arrays.asList(models).contains(model)) {
 				closingPartsWithSameModel.add(part);
 			}
 		}
 		IWorkbenchPartReference[] pagePartRefs = ((WorkbenchPage) page).getSortedParts();
-		HashSet<IWorkbenchPart> pagePartsWithSameModels = new HashSet<IWorkbenchPart>();
+		HashSet pagePartsWithSameModels = new HashSet();
 		for (int i = 0; i < pagePartRefs.length; i++) {
 			IWorkbenchPartReference partRef = pagePartRefs[i];
 			IWorkbenchPart part = partRef.getPart(false);
@@ -3795,7 +3768,8 @@ public class WorkbenchPage implements IWorkbenchPage {
 				}
 			}
 		}
-		for (IWorkbenchPart part : closingPartsWithSameModel) {
+		for (Iterator i = closingPartsWithSameModel.iterator(); i.hasNext();) {
+			IWorkbenchPart part = (IWorkbenchPart) i.next();
 			pagePartsWithSameModels.remove(part);
 		}
 		return pagePartsWithSameModels.isEmpty();
