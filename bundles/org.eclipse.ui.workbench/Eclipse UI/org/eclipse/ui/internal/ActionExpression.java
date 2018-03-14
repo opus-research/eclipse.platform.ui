@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2006 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -451,7 +451,7 @@ public class ActionExpression {
 		}
 
 		private IActionFilter getActionFilter(Object object) {
-			return Adapters.getAdapter(object, IActionFilter.class, true);
+			return Adapters.adapt(object, IActionFilter.class);
 		}
 
 		/**
@@ -492,7 +492,7 @@ public class ActionExpression {
 				return false;
 			}
 
-			Object res = Adapters.getAdapter(object, resourceClass, true);
+			Object res = Adapters.adapt(object, resourceClass);
 			if (res == null) {
 				return false;
 			}

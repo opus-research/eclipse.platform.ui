@@ -160,8 +160,11 @@ public class ViewRegistry implements IViewRegistry {
 			String name = declaringExtension.getContributor().getName();
 
 			Bundle bundle = Platform.getBundle(name);
-			// the split operation removes potential additional information from the qualified classname
-			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_CLASS, clsSpec.split(":")[0]); //$NON-NLS-1$
+			// the indexOf operation removes potential additional information
+			// from the qualified classname
+			int colonIndex = clsSpec.indexOf(':');
+			String viewClass = colonIndex == -1 ? clsSpec : clsSpec.substring(0, colonIndex);
+			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_CLASS, viewClass);
 			descriptor.getPersistedState().put(ORIGINAL_COMPATIBILITY_VIEW_BUNDLE, bundle.getSymbolicName());
 		}
 		descriptor.setContributionURI(implementationURI);
