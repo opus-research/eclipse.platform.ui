@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2010 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -724,7 +724,7 @@ public abstract class AbstractWorkspaceOperation extends AbstractOperation
 	 *
 	 */
 	protected Shell getShell(IAdaptable uiInfo) {
-		Shell shell = Adapters.getAdapter(uiInfo, Shell.class, true);
+		Shell shell = Adapters.adapt(uiInfo, Shell.class);
 		if (shell != null) {
 			return shell;
 		}

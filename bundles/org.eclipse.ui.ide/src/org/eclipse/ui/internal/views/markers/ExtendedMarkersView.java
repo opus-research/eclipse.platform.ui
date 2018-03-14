@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -503,7 +504,7 @@ public class ExtendedMarkersView extends ViewPart {
 	private void addHelpListener() {
 		// Set help on the view itself
 		viewer.getControl().addHelpListener(e -> {
-			IContextProvider provider = Adapters.getAdapter(ExtendedMarkersView.this, IContextProvider.class, true);
+			IContextProvider provider = Adapters.adapt(ExtendedMarkersView.this, IContextProvider.class);
 			if (provider == null)
 				return;
 
@@ -928,11 +929,9 @@ public class ExtendedMarkersView extends ViewPart {
 		// Any errors or warnings? If not then send the filtering message
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			if (filteredCount < 0 || filteredCount >= totalCount) {
-				status = NLS.bind(MarkerMessages.filter_itemsMessage,
-						new Integer(totalCount));
+				status = NLS.bind(MarkerMessages.filter_itemsMessage, totalCount);
 			} else {
-				status = NLS.bind(MarkerMessages.filter_matchedMessage,
-						new Integer(filteredCount), new Integer(totalCount));
+				status = NLS.bind(MarkerMessages.filter_matchedMessage, filteredCount, totalCount);
 			}
 			return status;
 		}
@@ -943,7 +942,7 @@ public class ExtendedMarkersView extends ViewPart {
 			return message;
 		}
 		return NLS.bind(MarkerMessages.problem_filter_matchedMessage,
-				new Object[] { message, new Integer(filteredCount), new Integer(totalCount) });
+				new Object[] { message, filteredCount, totalCount });
 	}
 
 	/**
@@ -1026,7 +1025,7 @@ public class ExtendedMarkersView extends ViewPart {
 
 		builder.restoreState(m);
 
-		IWorkbenchSiteProgressService service = Adapters.getAdapter(site, IWorkbenchSiteProgressService.class, true);
+		IWorkbenchSiteProgressService service = Adapters.adapt(site, IWorkbenchSiteProgressService.class);
 		if (service != null) {
 			builder.setProgressService(service);
 		}
@@ -1286,8 +1285,7 @@ public class ExtendedMarkersView extends ViewPart {
 	private void setPrimarySortField(MarkerField field, TreeColumn column) {
 		builder.setPrimarySortField(field);
 
-		IWorkbenchSiteProgressService service = Adapters.getAdapter(getViewSite(), IWorkbenchSiteProgressService.class,
-				true);
+		IWorkbenchSiteProgressService service = Adapters.adapt(getViewSite(), IWorkbenchSiteProgressService.class);
 		builder.refreshContents(service);
 		updateDirectionIndicator(column, field);
 	}
@@ -1387,15 +1385,12 @@ public class ExtendedMarkersView extends ViewPart {
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			// In case of tasks view and bookmarks view, show only selection
 			// count
-			return MessageFormat.format(
-					MarkerMessages.marker_statusSelectedCount,
-					new Object[] { new Integer(entries.length) });
+			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, new Object[] { entries.length });
 		}
 		return MessageFormat
 				.format(
 						MarkerMessages.marker_statusSummarySelected,
-						new Object[] {
-								new Integer(entries.length),
+						new Object[] { entries.length,
 								MessageFormat
 										.format(
 												MarkerMessages.errorsAndWarningsSummaryBreakdown,
@@ -1708,7 +1703,7 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.7
 	 */
 	protected IUndoContext getUndoContext() {
-		return Adapters.getAdapter(ResourcesPlugin.getWorkspace(), IUndoContext.class, true);
+		return Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
 	}
 
 	/**

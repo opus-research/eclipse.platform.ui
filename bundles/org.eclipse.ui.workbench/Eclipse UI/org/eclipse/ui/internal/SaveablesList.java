@@ -133,9 +133,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 		Integer refCount = referenceMap.get(key);
 		if (refCount == null) {
 			result = true;
-			refCount = new Integer(0);
+			refCount = Integer.valueOf(0);
 		}
-		referenceMap.put(key, new Integer(refCount.intValue() + 1));
+		referenceMap.put(key, Integer.valueOf(refCount.intValue() + 1));
 		return result;
 	}
 
@@ -455,8 +455,9 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 	 * @param modelsDecrementing
 	 */
 	private void fillModelsClosing(Set<Saveable> modelsClosing, Map<Saveable, Integer> modelsDecrementing) {
-		for (Saveable model : modelsDecrementing.keySet()) {
-			if (modelsDecrementing.get(model).equals(modelRefCounts.get(model))) {
+		for (Entry<Saveable, Integer> entry : modelsDecrementing.entrySet()) {
+			Saveable model = entry.getKey();
+			if (entry.getValue().equals(modelRefCounts.get(model))) {
 				modelsClosing.add(model);
 			}
 		}
@@ -662,7 +663,7 @@ public class SaveablesList implements ISaveablesLifecycleListener {
 						subMonitor.worked(1);
 						continue;
 					}
-					SaveableHelper.doSaveModel(model, subMonitor.newChild(1),
+					SaveableHelper.doSaveModel(model, subMonitor.split(1),
 							shellProvider, blockUntilSaved);
 					if (subMonitor.isCanceled())
 						break;

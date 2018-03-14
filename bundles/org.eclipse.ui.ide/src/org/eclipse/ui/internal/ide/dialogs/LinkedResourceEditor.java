@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2014 IBM Corporation and others.
+ * Copyright (c) 2010, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,6 +8,7 @@
  * Contributors:
  *     Serge Beauchamp (Freescale Semiconductor) - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  ******************************************************************************/
 
 package org.eclipse.ui.internal.ide.dialogs;
@@ -203,7 +204,7 @@ public class LinkedResourceEditor {
         Label variableLabel = new Label(pageComponent, SWT.LEFT);
         variableLabel.setText(NLS
 				.bind(IDEWorkbenchMessages.LinkedResourceEditor_descriptionBlock,
-						fProject != null? fProject.getName():new String()));
+				fProject != null ? fProject.getName() : "")); //$NON-NLS-1$
 
         data = new GridData();
         data.horizontalAlignment = GridData.FILL;
@@ -551,11 +552,9 @@ return true;
 				SubMonitor subMonitor = SubMonitor.convert(monitor,
 						IDEWorkbenchMessages.LinkedResourceEditor_removingMessage, selectedResources.length);
 				for (int i = 0; i < selectedResources.length; i++) {
-					if (subMonitor.isCanceled())
-						break;
 					String fullPath = selectedResources[i].getFullPath().toPortableString();
 					try {
-						selectedResources[i].delete(true, subMonitor.newChild(1));
+						selectedResources[i].delete(true, subMonitor.split(1));
 						removedResources.add(selectedResources[i]);
 						fBrokenResources.remove(fullPath);
 						fFixedResources.remove(fullPath);

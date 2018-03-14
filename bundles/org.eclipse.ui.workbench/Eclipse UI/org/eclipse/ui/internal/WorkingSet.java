@@ -104,6 +104,11 @@ public class WorkingSet extends AbstractWorkingSet {
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "WS [name=" + getName() + ", elements=" + getElementsArray() + ", id=" + getId() + "]"; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$//$NON-NLS-4$
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -210,7 +215,7 @@ public class WorkingSet extends AbstractWorkingSet {
 			Iterator iterator = elements.iterator();
 			while (iterator.hasNext()) {
 				IAdaptable adaptable = (IAdaptable) iterator.next();
-				final IPersistableElement persistable = Adapters.getAdapter(adaptable, IPersistableElement.class, true);
+				final IPersistableElement persistable = Adapters.adapt(adaptable, IPersistableElement.class);
 				if (persistable != null) {
 					final IMemento itemMemento = memento
 							.createChild(IWorkbenchConstants.TAG_ITEM);

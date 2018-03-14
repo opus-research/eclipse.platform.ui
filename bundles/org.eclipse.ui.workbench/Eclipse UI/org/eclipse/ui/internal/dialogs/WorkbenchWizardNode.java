@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2007 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -92,7 +92,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     @Override
 	public String getLocalId() {
-    	IPluginContribution contribution = Adapters.getAdapter(wizardElement, IPluginContribution.class, true);
+    	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getLocalId();
 		}
@@ -101,7 +101,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
 
     @Override
 	public String getPluginId() {
-       	IPluginContribution contribution = Adapters.getAdapter(wizardElement, IPluginContribution.class, true);
+       	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
 		if (contribution != null) {
 			return contribution.getPluginId();
 		}
@@ -127,7 +127,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                              */
                             @Override
 							public void handleException(Throwable e) {
-                               	IPluginContribution contribution = Adapters.getAdapter(wizardElement, IPluginContribution.class, true);
+                               	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
                                 statuses[0] = new Status(
                                         IStatus.ERROR,
                                         contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,
@@ -142,7 +142,7 @@ public abstract class WorkbenchWizardNode implements IWizardNode,
                                     workbenchWizard[0] = createWizard();
                                     // create instance of target wizard
                                 } catch (CoreException e) {
-                                	IPluginContribution contribution = Adapters.getAdapter(wizardElement, IPluginContribution.class, true);
+                                	IPluginContribution contribution = Adapters.adapt(wizardElement, IPluginContribution.class);
                                 	statuses[0] = new Status(
                                             IStatus.ERROR,
                                             contribution != null ? contribution.getPluginId() : WorkbenchPlugin.PI_WORKBENCH,

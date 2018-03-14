@@ -112,11 +112,11 @@ public class ResourceMgmtActionProvider extends CommonActionProvider {
 		boolean hasClosedProjects = false;
 		boolean hasBuilder = true; // false if any project is closed or does not
 									// have builder
-		Iterator<Object> resources = selection.iterator();
+		Iterator<?> resources = selection.iterator();
 
 		while (resources.hasNext() && (!hasOpenProjects || !hasClosedProjects || hasBuilder || isProjectSelection)) {
 			Object next = resources.next();
-			IProject project = Adapters.getAdapter(next, IProject.class, true);
+			IProject project = Adapters.adapt(next, IProject.class);
 
 			if (project == null) {
 				isProjectSelection = false;

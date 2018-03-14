@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006, 2013 IBM Corporation and others.
+ * Copyright (c) 2006, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -417,10 +418,10 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 			// has the side effect of recomputing saveablesProviderMap:
 			getSaveablesProviders();
 		}
-        for(Iterator<NavigatorContentDescriptor> sItr = saveablesProviderMap.keySet().iterator(); sItr.hasNext();) {
-        	NavigatorContentDescriptor descriptor = sItr.next();
+		for (Entry<NavigatorContentDescriptor, SaveablesProvider> entry : saveablesProviderMap.entrySet()) {
+			NavigatorContentDescriptor descriptor = entry.getKey();
                 if(descriptor.isTriggerPoint(element) || descriptor.isPossibleChild(element)) {
-                	SaveablesProvider provider = saveablesProviderMap.get(descriptor);
+				SaveablesProvider provider = entry.getValue();
                 	Saveable  saveable = provider.getSaveable(element);
                         if(saveable != null) {
                                 return saveable;
@@ -489,7 +490,7 @@ public class NavigatorSaveablesService implements INavigatorSaveablesService, Vi
 		ITreeContentProvider contentProvider = extension
 				.getContentProvider();
 
-		return Adapters.getAdapter(contentProvider, SaveablesProvider.class, true);
+		return Adapters.adapt(contentProvider, SaveablesProvider.class);
 	}
 
 	private void recomputeSaveablesAndNotify(boolean recomputeProviders,

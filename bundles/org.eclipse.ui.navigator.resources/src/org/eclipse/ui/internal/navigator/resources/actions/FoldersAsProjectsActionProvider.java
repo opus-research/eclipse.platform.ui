@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014 Red Hat Inc.
+ * Copyright (c) 2014, 2015 Red Hat Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,7 +37,7 @@ public class FoldersAsProjectsActionProvider extends CommonActionProvider {
 			return;
 		}
 		Object object = selection.getFirstElement();
-		IFolder folder = Adapters.getAdapter(object, IFolder.class, true);
+		IFolder folder = Adapters.adapt(object, IFolder.class);
 		if (folder == null) {
 			return;
 		}

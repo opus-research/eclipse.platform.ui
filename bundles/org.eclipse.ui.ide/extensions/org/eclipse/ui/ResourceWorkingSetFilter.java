@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2008 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,7 +58,7 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
             return true;
         }
         
-        IResource resource = Adapters.getAdapter(element, IResource.class, true);
+        IResource resource = Adapters.adapt(element, IResource.class);
         if (resource != null) {
             return isEnclosed(resource);
         }
@@ -130,7 +130,7 @@ public class ResourceWorkingSetFilter extends ViewerFilter {
         if (workingSetElement.equals(element)) {
 			return true;
 		}
-		workingSetResource = Adapters.getAdapter(workingSetElement, IResource.class, true);
+		workingSetResource = Adapters.adapt(workingSetElement, IResource.class);
         if (workingSetResource != null) {
             IPath resourcePath = workingSetResource.getFullPath();
             if (resourcePath.isPrefixOf(elementPath)) {

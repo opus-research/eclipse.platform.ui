@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,12 +12,10 @@
  *     Craig Foote (Footeware.ca) - https://bugs.eclipse.org/325743
  *     Simon Scholz <simon.scholz@vogella.com> - Bug 460405
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 417447
- *     Stefan Winkler <stefan@winklerweb.net> - Bug 477848
  *******************************************************************************/
 package org.eclipse.ui.views.properties;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -35,13 +33,17 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.internal.views.properties.PropertiesMessages;
 import org.eclipse.ui.part.IContributedContentsView;
@@ -123,7 +125,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	/**
 	 * Set of workbench parts, which should not be used as a source for PropertySheet
 	 */
-	private HashSet<String> ignoredViews;
+	private HashSet ignoredViews;
+
+	private boolean wasHidden;
 
     /**
      * Creates a property sheet view.
@@ -136,7 +140,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IPage createDefaultPage(PageBook book) {
-		IPageBookViewPage page = (IPageBookViewPage) Adapters.getAdapter(this, IPropertySheetPage.class, true);
+		IPageBookViewPage page = (IPageBookViewPage) Adapters.adapt(this, IPropertySheetPage.class);
         if(page == null) {
         	page = new PropertySheetPage();
         }
@@ -198,7 +202,7 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
     	if(part instanceof PropertySheet) {
     		return null;
     	}
-		IPropertySheetPage page = Adapters.getAdapter(part, IPropertySheetPage.class, true);
+		IPropertySheetPage page = Adapters.adapt(part, IPropertySheetPage.class);
         if (page != null) {
             if (page instanceof IPageBookViewPage) {
 				initPage((IPageBookViewPage) page);
@@ -220,12 +224,46 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected IWorkbenchPart getBootstrapPart() {
-        IWorkbenchPage page = getSite().getPage();
-        if (page != null) {
-            bootstrapSelection = page.getSelection();
-            return page.getActivePart();
-        }
-        return null;
+		IWorkbenchPage page = getSite().getPage();
+		if (page == null) {
+			return null;
+		}
+		ISelection originalSel = page.getSelection();
+		IWorkbenchPart activePart = page.getActivePart();
+		if (activePart != null && activePart != this) {
+			bootstrapSelection = originalSel;
+			return activePart;
+		}
+		if (originalSel == null || originalSel.isEmpty()) {
+			return null;
+		}
+
+		IEditorPart activeEditor = page.getActiveEditor();
+		if (activeEditor != null && isImportant(activeEditor)) {
+			if (activeEditor.getSite().getSelectionProvider() != null) {
+				ISelection selection = activeEditor.getSite().getSelectionProvider().getSelection();
+				if (originalSel.equals(selection)) {
+					bootstrapSelection = originalSel;
+					return activeEditor;
+				}
+			}
+		}
+		IViewReference[] viewrefs = page.getViewReferences();
+		for (IViewReference ref : viewrefs) {
+			IWorkbenchPart part = ref.getPart(false);
+			if (part == null || part == this || !page.isPartVisible(part)) {
+				continue;
+			}
+			if (!isImportant(part) || part.getSite().getSelectionProvider() == null) {
+				continue;
+			}
+			ISelection selection = part.getSite().getSelectionProvider().getSelection();
+			if (originalSel.equals(selection)) {
+				bootstrapSelection = originalSel;
+				return part;
+			}
+		}
+		return null;
     }
 
     @Override
@@ -270,6 +308,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 
     @Override
 	protected void partHidden(IWorkbenchPart part) {
+		if (part == this) {
+			wasHidden = true;
+		}
     	// Explicitly ignore parts becoming hidden as this
     	// can cause issues when the Property View is maximized
     	// See bug 325743 for more details
@@ -282,7 +323,34 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
      */
     @Override
 	public void partActivated(IWorkbenchPart part) {
-		IContributedContentsView view = Adapters.getAdapter(part, IContributedContentsView.class, true);
+		if (wasHidden && part == this) {
+			wasHidden = false;
+			super.partActivated(part);
+			if (currentPart != null) {
+				IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
+				if (page != null) {
+					page.selectionChanged(currentPart, currentSelection);
+				}
+				updateContentDescription();
+			}
+			return;
+		}
+		if (wasHidden) {
+			IWorkbenchPartSite site = getSite();
+			IWorkbenchPage page = site.getPage();
+			IViewPart[] stack = page.getViewStack(this);
+			if (stack != null) {
+				for (IViewPart vPart : stack) {
+					if (vPart == part) {
+						// don't react on activation of parts from same stack,
+						// see bug 485154.
+						return;
+					}
+				}
+			}
+		}
+
+		IContributedContentsView view = Adapters.adapt(part, IContributedContentsView.class);
         IWorkbenchPart source = null;
         if (view != null) {
 			source = view.getContributingPart();
@@ -326,6 +394,11 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
         currentPart = part;
         currentSelection = sel;
 
+		boolean visible = getSite() != null && getSite().getPage().isPartVisible(this);
+		if (!visible) {
+			return;
+		}
+
         // pass the selection to the page
         IPropertySheetPage page = (IPropertySheetPage) getCurrentPage();
         if (page != null) {
@@ -351,9 +424,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 	 * @since 3.2
 	 */
 	@Override
-	protected <T> T getViewAdapter(Class<T> key) {
+	protected Object getViewAdapter(Class key) {
 		if (ISaveablePart.class.equals(key)) {
-			return key.cast(getSaveablePart());
+			return getSaveablePart();
 		}
 		return super.getViewAdapter(key);
 	}
@@ -418,9 +491,9 @@ public class PropertySheet extends PageBookView implements ISelectionListener, I
 		updateContentDescription();
 	}
 
-	private Set<String> getIgnoredViews() {
+	private HashSet getIgnoredViews() {
 		if (ignoredViews == null) {
-			ignoredViews = new HashSet<>();
+			ignoredViews = new HashSet();
 	        IExtensionRegistry registry = RegistryFactory.getRegistry();
 	        IExtensionPoint ep = registry.getExtensionPoint(EXT_POINT);
 			if (ep != null) {

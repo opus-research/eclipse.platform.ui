@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2011 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -154,7 +154,7 @@ public class NavigatorDropAdapter extends PluginDropAdapter implements IOverwrit
 			for (Iterator<?> i = ssel.iterator(); i.hasNext();) {
                 Object o = i.next();
 
-				IResource r = Adapters.getAdapter(o, IResource.class, true);
+				IResource r = Adapters.adapt(o, IResource.class);
 				if (r != null) {
 					selectedResources.add(r);
                 }
