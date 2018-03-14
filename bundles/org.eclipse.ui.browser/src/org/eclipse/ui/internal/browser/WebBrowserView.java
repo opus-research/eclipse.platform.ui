@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2016 IBM Corporation and others.
+ * Copyright (c) 2005, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,6 +25,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
@@ -102,7 +103,13 @@ public class WebBrowserView extends ViewPart implements
 		if (listener != null)
 			return;
 
-		listener = (part, selection) -> onSelectionChange(selection);
+		listener = new ISelectionListener() {
+			@Override
+			public void selectionChanged(IWorkbenchPart part,
+					ISelection selection) {
+				onSelectionChange(selection);
+			}
+		};
 		getSite().getWorkbenchWindow().getSelectionService()
 				.addPostSelectionListener(listener);
 	}
@@ -119,7 +126,7 @@ public class WebBrowserView extends ViewPart implements
 
 	private URL getURLFrom(Object adapt) {
 		// test for path
-		IPath path = Adapters.adapt(adapt, IPath.class);
+		IPath path = Adapters.getAdapter(adapt, IPath.class, true);
 		if (path != null) {
 			File file = path.toFile();
 			if (file.exists() && isWebFile(file.getName()))
@@ -129,7 +136,7 @@ public class WebBrowserView extends ViewPart implements
 					return null;
 				}
 		}
-		return Adapters.adapt(adapt, URL.class);
+		return Adapters.getAdapter(adapt, URL.class, true);
 	}
 
 	public void removeSelectionListener() {

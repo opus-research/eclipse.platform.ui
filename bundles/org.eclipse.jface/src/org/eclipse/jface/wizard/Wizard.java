@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,7 +22,6 @@ import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Policy;
-import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -60,7 +59,7 @@ import org.eclipse.swt.widgets.Shell;
  * <code>IWizardPage</code>.
  * </p>
  */
-public abstract class Wizard implements IWizard, IShellProvider {
+public abstract class Wizard implements IWizard {
     /**
      * Image registry key of the default image for wizard pages (value
      * <code>"org.eclipse.jface.wizard.Wizard.pageImage"</code>).
@@ -274,8 +273,7 @@ public abstract class Wizard implements IWizard, IShellProvider {
      *
      * @return Shell
      */
-    @Override
-	public Shell getShell() {
+    public Shell getShell() {
         if (container == null) {
 			return null;
 		}

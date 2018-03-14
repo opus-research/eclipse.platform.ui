@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 20156Angelo Zerr and others.
+ * Copyright (c) 2008, 2015 Angelo Zerr and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,8 @@
  *
  * Contributors:
  *     Angelo Zerr <angelo.zerr@gmail.com> - initial API and implementation
- *     Stefan Weiser <stefanfranz.weiser@gmail.com> - Bug 459983
+ *     Stefan Weiser <stefanfranz.weiser@gmail.com> - Bug 459983 - getCSSFontPropertiesKey
+ *     IBM Corporation
  *******************************************************************************/
 package org.eclipse.e4.ui.css.core.resources;
 
@@ -19,6 +20,9 @@ import org.w3c.dom.css.RGBColor;
 
 /**
  * CSS Resources Helper to manage {@link IResourcesRegistry}.
+ *
+ * @version 1.0.0
+ * @author <a href="mailto:angelo.zerr@gmail.com">Angelo ZERR</a>
  *
  */
 public class CSSResourcesHelpers {
@@ -66,13 +70,20 @@ public class CSSResourcesHelpers {
 		if (rgbColor == null) {
 			return null;
 		}
-		String rgb = ((int) rgbColor.getGreen().getFloatValue(CSSPrimitiveValue.CSS_NUMBER)) + "_";
-		rgb += ((int) rgbColor.getRed().getFloatValue(CSSPrimitiveValue.CSS_NUMBER)) + "_";
-		rgb += ((int) rgbColor.getBlue().getFloatValue(CSSPrimitiveValue.CSS_NUMBER)) + "";
+		String rgb = ((int) rgbColor.getGreen().getFloatValue(
+				CSSPrimitiveValue.CSS_NUMBER))
+				+ "_";
+		rgb += ((int) rgbColor.getRed().getFloatValue(
+				CSSPrimitiveValue.CSS_NUMBER))
+				+ "_";
+		rgb += ((int) rgbColor.getBlue().getFloatValue(
+				CSSPrimitiveValue.CSS_NUMBER))
+				+ "";
 		return rgb;
 	}
 
-	public static String getCSSFontPropertiesKey(CSS2FontProperties fontProperties) {
+	public static String getCSSFontPropertiesKey(
+			CSS2FontProperties fontProperties) {
 		return getCssText(fontProperties.getFamily()) + "_" + getCssText(fontProperties.getSize()) + "_"
 				+ getCssText(fontProperties.getStyle()) + "_" + getCssText(fontProperties.getWeight());
 	}
@@ -94,7 +105,8 @@ public class CSSResourcesHelpers {
 	 * @param value
 	 * @return
 	 */
-	public static Object getResource(IResourcesRegistry resourcesRegistry, Object type, CSSPrimitiveValue value) {
+	public static Object getResource(IResourcesRegistry resourcesRegistry,
+			Object type, CSSPrimitiveValue value) {
 		String key = getCSSPrimitiveValueKey(value);
 		return getResource(resourcesRegistry, type, key);
 	}
@@ -108,7 +120,8 @@ public class CSSResourcesHelpers {
 	 * @param key
 	 * @return
 	 */
-	public static Object getResource(IResourcesRegistry resourcesRegistry, Object type, String key) {
+	public static Object getResource(IResourcesRegistry resourcesRegistry,
+			Object type, String key) {
 		if (key == null) {
 			return null;
 		}
@@ -128,8 +141,8 @@ public class CSSResourcesHelpers {
 	 * @param value
 	 * @param resource
 	 */
-	public static void registerResource(IResourcesRegistry resourcesRegistry, Object type, CSSPrimitiveValue value,
-			Object resource) {
+	public static void registerResource(IResourcesRegistry resourcesRegistry,
+			Object type, CSSPrimitiveValue value, Object resource) {
 		if (resourcesRegistry != null) {
 			String key = getCSSPrimitiveValueKey(value);
 			if (key != null) {
@@ -147,8 +160,8 @@ public class CSSResourcesHelpers {
 	 * @param key
 	 * @param resource
 	 */
-	public static void registerResource(IResourcesRegistry resourcesRegistry, Object type, String key,
-			Object resource) {
+	public static void registerResource(IResourcesRegistry resourcesRegistry,
+			Object type, String key, Object resource) {
 		if (key == null) {
 			return;
 		}

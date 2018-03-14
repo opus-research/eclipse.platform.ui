@@ -177,4 +177,9 @@ public class DirectContributionItem extends AbstractContributionItem {
 		return contrib.getObject() != null;
 	}
 
+	@Override
+	protected void handleHelpRequest() {
+		// Do nothing, as direct items have currently no help ID
+	}
+
 }

@@ -193,7 +193,7 @@ public class AnimationEngine extends Job {
 			return Status.CANCEL_STATUS;
 
 		// We're done, clean up
-		display.syncExec(feedbackRenderer::dispose);
+		display.syncExec(() -> feedbackRenderer.dispose());
 
 		return Status.OK_STATUS;
 	}

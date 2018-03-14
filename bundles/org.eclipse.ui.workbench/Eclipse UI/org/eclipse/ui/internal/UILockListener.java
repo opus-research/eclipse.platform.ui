@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2003, 2015 IBM Corporation and others.
+ * Copyright (c) 2003, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.LockListener;
 import org.eclipse.swt.widgets.Display;
 
@@ -32,7 +27,7 @@ public class UILockListener extends LockListener {
     public class Queue {
         private static final int BASE_SIZE = 8;
 
-        protected PendingSyncExec[] elements = new PendingSyncExec[BASE_SIZE];
+        protected Semaphore[] elements = new Semaphore[BASE_SIZE];
 
         protected int head = 0;
 
@@ -42,7 +37,7 @@ public class UILockListener extends LockListener {
          * Add the semaphore to the queue.
          * @param element
          */
-        public synchronized void add(PendingSyncExec element) {
+        public synchronized void add(Semaphore element) {
             int newTail = increment(tail);
             if (newTail == head) {
                 grow();
@@ -54,7 +49,7 @@ public class UILockListener extends LockListener {
 
         private void grow() {
             int newSize = elements.length * 2;
-            PendingSyncExec[] newElements = new PendingSyncExec[newSize];
+            Semaphore[] newElements = new Semaphore[newSize];
             if (tail >= head) {
 				System.arraycopy(elements, head, newElements, head, size());
 			} else {
@@ -75,16 +70,16 @@ public class UILockListener extends LockListener {
          * Remove the next semaphore to be woken up.
          * @return
          */
-        public synchronized PendingSyncExec remove() {
+        public synchronized Semaphore remove() {
             if (tail == head) {
 				return null;
 			}
-            PendingSyncExec result = elements[head];
+            Semaphore result = elements[head];
             elements[head] = null;
             head = increment(head);
             //reset the queue if it is empty and it has grown
             if (tail == head && elements.length > BASE_SIZE) {
-                elements = new PendingSyncExec[BASE_SIZE];
+                elements = new Semaphore[BASE_SIZE];
                 tail = head = 0;
             }
             return result;
@@ -100,12 +95,9 @@ public class UILockListener extends LockListener {
 
     protected final Queue pendingWork = new Queue();
 
-    protected PendingSyncExec currentWork = null;
+    protected Semaphore currentWork = null;
 
-	/**
-	 * Points to the UI thread if it is currently waiting on a lock or null
-	 */
-	protected volatile Thread ui;
+    protected Thread ui;
 
     /**
      * Create a new instance of the receiver.
@@ -143,7 +135,7 @@ public class UILockListener extends LockListener {
         return false;
     }
 
-    void addPendingWork(PendingSyncExec work) {
+    void addPendingWork(Semaphore work) {
         pendingWork.add(work);
     }
 
@@ -152,28 +144,32 @@ public class UILockListener extends LockListener {
 		return !isUI();
 	}
 
-	/**
-	 * Should always be called from the UI thread.
-	 */
-	void doPendingWork() {
-		// Clear the interrupt flag that we may have set in interruptUI()
-		Thread.interrupted();
-		PendingSyncExec work;
-		while ((work = pendingWork.remove()) != null) {
-			// Remember the old current work before replacing, to handle
-			// the nested waiting case (bug 76378)
-			PendingSyncExec oldWork = currentWork;
-			try {
-				currentWork = work;
-				work.run();
-			} finally {
-				currentWork = oldWork;
-			}
-		}
-	}
+    /**
+     * Should always be called from the UI thread.
+     */
+    void doPendingWork() {
+    	//clear the interrupt flag that we may have set in interruptUI()
+    	Thread.interrupted();
+        Semaphore work;
+        while ((work = pendingWork.remove()) != null) {
+        	//remember the old current work before replacing, to handle
+        	//the nested waiting case (bug 76378)
+        	Semaphore oldWork = currentWork;
+            try {
+                currentWork = work;
+                Runnable runnable = work.getRunnable();
+                if (runnable != null) {
+					runnable.run();
+				}
 
-	void interruptUI(Runnable runnable) {
-		reportInterruption(runnable);
+            } finally {
+                currentWork = oldWork;
+                work.release();
+            }
+        }
+    }
+
+    void interruptUI() {
         display.getThread().interrupt();
     }
 
@@ -186,39 +182,7 @@ public class UILockListener extends LockListener {
                 && (display.getThread() == Thread.currentThread());
     }
 
-	boolean isUIWaiting() {
-		Thread localUi = ui;
-		return (localUi != null) && (Thread.currentThread() != localUi);
-	}
-
-	/**
-	 * Adds a 'UI thread interrupted' message to the log with extra lock state
-	 * and thread stack information.
-	 */
-	private void reportInterruption(Runnable runnable) {
-		Thread nonUiThread = Thread.currentThread();
-
-		String msg = "To avoid deadlock while executing Display.syncExec() with argument: " //$NON-NLS-1$
-				+ runnable + ", thread " + nonUiThread.getName() //$NON-NLS-1$
-				+ " will interrupt UI thread."; //$NON-NLS-1$
-		MultiStatus main = new MultiStatus(WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, msg, null);
-
-		ThreadInfo[] threads = ManagementFactory.getThreadMXBean().getThreadInfo(new long[] { nonUiThread.getId(), display.getThread().getId() }, true, true);
-
-		for (ThreadInfo info : threads) {
-			String childMsg;
-			if (info.getThreadId() == nonUiThread.getId()) {
-				// see org.eclipse.core.internal.jobs.LockManager.isLockOwner()
-				childMsg = nonUiThread.getName() + " thread is an instance of Worker or owns an ILock"; //$NON-NLS-1$
-			} else {
-				childMsg = "UI thread waiting on a job or lock."; //$NON-NLS-1$
-			}
-			Exception childEx = new IllegalStateException("Call stack for thread " + info.getThreadName()); //$NON-NLS-1$
-			childEx.setStackTrace(info.getStackTrace());
-			Status child = new Status(IStatus.ERROR, WorkbenchPlugin.PI_WORKBENCH, IStatus.ERROR, childMsg, childEx);
-			main.add(child);
-		}
-
-		WorkbenchPlugin.log(main);
-	}
+    boolean isUIWaiting() {
+        return (ui != null) && (Thread.currentThread() != ui);
+    }
 }

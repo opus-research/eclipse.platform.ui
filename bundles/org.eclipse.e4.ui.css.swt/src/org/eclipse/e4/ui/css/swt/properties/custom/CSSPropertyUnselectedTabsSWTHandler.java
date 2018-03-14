@@ -1,6 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010, 2016 IBM Corporation and others.
- * All rights reserved. This
+ * Copyright (c) 2010, 2014 IBM Corporation and others. All rights reserved. This
  * program and the accompanying materials are made available under the terms of
  * the Eclipse Public License v1.0 which accompanies this distribution, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
@@ -10,6 +9,7 @@
 package org.eclipse.e4.ui.css.swt.properties.custom;
 
 import org.eclipse.e4.ui.css.core.dom.properties.Gradient;
+import org.eclipse.e4.ui.css.core.dom.properties.ICSSPropertyHandler;
 import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.helpers.CSSSWTColorHelper;
 import org.eclipse.e4.ui.css.swt.properties.AbstractCSSPropertySWTHandler;
@@ -32,6 +32,8 @@ public class CSSPropertyUnselectedTabsSWTHandler extends AbstractCSSPropertySWTH
 	private static final String DEPRECATED_UNSELECTED_TABS_COLOR_PROP = "unselected-tabs-color";
 
 	private static final String RESIZE_LISTENER = "CSSPropertyUnselectedTabsSWTHandler.resizeListener";
+
+	public static final ICSSPropertyHandler INSTANCE = new CSSPropertyUnselectedTabsSWTHandler();
 
 	@Override
 	protected void applyCSSProperty(Control control, String property,

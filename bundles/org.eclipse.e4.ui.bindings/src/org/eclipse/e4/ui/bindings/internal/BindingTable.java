@@ -147,7 +147,8 @@ public class BindingTable {
 
 	public Collection<Binding> getConflicts() {
 		Collection<Binding> conflictsList = new ArrayList<Binding>();
-		for (ArrayList<Binding> conflictsForTrigger : conflicts.values()) {
+		for (TriggerSequence key : conflicts.keySet()) {
+			ArrayList<Binding> conflictsForTrigger = conflicts.get(key);
 			if (conflictsForTrigger != null) {
 				conflictsList.addAll(conflictsForTrigger);
 			}
