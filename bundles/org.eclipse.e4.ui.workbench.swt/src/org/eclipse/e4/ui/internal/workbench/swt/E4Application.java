@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  *     Tristan Hume - <trishume@gmail.com> -
  *     		Fix for Bug 2369 [Workbench] Would like to be able to save workspace without exiting
  *     		Implemented workbench auto-save to correctly restore state in case of crash.
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 426511 
  ******************************************************************************/
 
 package org.eclipse.e4.ui.internal.workbench.swt;
@@ -197,15 +196,10 @@ public class E4Application implements IApplication {
 
 	public E4Workbench createE4Workbench(
 			IApplicationContext applicationContext, final Display display) {
-		IEclipseContext appContext = createDefaultContext();
-
-		// parse args from the command line an the product definition
-		// and place into context
 		args = (String[]) applicationContext.getArguments().get(
 				IApplicationContext.APPLICATION_ARGS);
-		parseArgsForContext(applicationContext, appContext);
 
-		// prepare context
+		IEclipseContext appContext = createDefaultContext();
 		appContext.set(Display.class, display);
 		appContext.set(Realm.class, SWTObservables.getRealm(display));
 		appContext.set(UISynchronize.class, new UISynchronize() {
@@ -248,6 +242,13 @@ public class E4Application implements IApplication {
 			}
 		}
 
+		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
+				applicationContext, false);
+		if (forcedPerspectiveId != null) {
+			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
+					forcedPerspectiveId);
+		}
+
 		// Create the app model and its context
 		MApplication appModel = loadApplicationModel(applicationContext,
 				appContext);
@@ -288,19 +289,11 @@ public class E4Application implements IApplication {
 			addon.setObject(obj);
 		}
 
-		// Instantiate the Workbench (which is responsible for
-		// 'running' the UI (if any)...
-		return workbench = new E4Workbench(appModel, appContext);
-	}
-
-	private void parseArgsForContext(IApplicationContext applicationContext,
-			IEclipseContext appContext) {
-
-		// parse location of the application model file
+		// Parse out parameters from both the command line and/or the product
+		// definition (if any) and put them in the context
 		String xmiURI = getArgValue(IWorkbench.XMI_URI_ARG, applicationContext,
 				false);
 		appContext.set(IWorkbench.XMI_URI_ARG, xmiURI);
-
 		appContext.set(E4Application.THEME_ID, getThemeId(applicationContext));
 
 		String cssURI = getArgValue(IWorkbench.CSS_URI_ARG, applicationContext,
@@ -309,7 +302,7 @@ public class E4Application implements IApplication {
 			appContext.set(IWorkbench.CSS_URI_ARG, cssURI);
 		}
 
-		// temporary to support old property as well
+		// Temporary to support old property as well
 		if (cssURI != null && !cssURI.startsWith("platform:")) {
 			System.err
 					.println("Warning "
@@ -326,7 +319,7 @@ public class E4Application implements IApplication {
 				getArgValue(E4Workbench.RENDERER_FACTORY_URI,
 						applicationContext, false));
 
-		// define rendering engine
+		// This is a default arg, if missing we use the default rendering engine
 		String presentationURI = getArgValue(IWorkbench.PRESENTATION_URI_ARG,
 				applicationContext, false);
 		if (presentationURI == null) {
@@ -334,14 +327,9 @@ public class E4Application implements IApplication {
 		}
 		appContext.set(IWorkbench.PRESENTATION_URI_ARG, presentationURI);
 
-		// store initial perspective in the context
-		String forcedPerspectiveId = getArgValue(PERSPECTIVE_ARG_NAME,
-				applicationContext, false);
-		if (forcedPerspectiveId != null) {
-			appContext.set(E4Workbench.FORCED_PERSPECTIVE_ID,
-					forcedPerspectiveId);
-
-		}
+		// Instantiate the Workbench (which is responsible for
+		// 'running' the UI (if any)...
+		return workbench = new E4Workbench(appModel, appContext);
 	}
 
 	private MApplication loadApplicationModel(IApplicationContext appContext,
