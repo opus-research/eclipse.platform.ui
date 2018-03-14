@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -329,16 +329,26 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public int getAccelerator() {
 		return accelerator;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 * 
+	 */
 	@Override
 	public String getActionDefinitionId() {
 		return actionDefinitionId;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getDescription() {
 		if (description != null) {
@@ -347,31 +357,49 @@ public abstract class Action extends AbstractAction {
 		return getToolTipText();
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getDisabledImageDescriptor() {
 		return disabledImage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public HelpListener getHelpListener() {
 		return helpListener;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getHoverImageDescriptor() {
 		return hoverImage;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getId() {
 		return id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return image;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public IMenuCreator getMenuCreator() {
 		// The default drop down menu value is only used
@@ -386,6 +414,9 @@ public abstract class Action extends AbstractAction {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public int getStyle() {
 		// Infer the style from the value field.
@@ -406,26 +437,41 @@ public abstract class Action extends AbstractAction {
 		return AS_PUSH_BUTTON;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getText() {
 		return text;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public String getToolTipText() {
 		return toolTipText;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isChecked() {
 		return value == VAL_TOGGLE_BTN_ON || value == VAL_RADIO_BTN_ON;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public boolean isHandled() {
 		return true;
@@ -473,16 +519,25 @@ public abstract class Action extends AbstractAction {
 		run();
 	}
 
+	/*
+	 * @see IAction#setAccelerator(int)
+	 */
 	@Override
 	public void setAccelerator(int keycode) {
 		this.accelerator = keycode;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setActionDefinitionId(String id) {
 		actionDefinitionId = id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setChecked(boolean checked) {
 		Object newValue = null;
@@ -509,6 +564,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setDescription(String text) {
 
@@ -522,6 +580,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setDisabledImageDescriptor(ImageDescriptor newImage) {
 		if (disabledImage != newImage) {
@@ -531,6 +592,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setEnabled(boolean enabled) {
 		if (enabled != this.enabled) {
@@ -541,11 +605,17 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setHelpListener(HelpListener listener) {
 		helpListener = listener;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setHoverImageDescriptor(ImageDescriptor newImage) {
 		if (hoverImage != newImage) {
@@ -555,11 +625,17 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setId(String id) {
 		this.id = id;
 	}
 
+	/*
+	 * (non-Javadoc) Method declared on IAction.
+	 */
 	@Override
 	public void setImageDescriptor(ImageDescriptor newImage) {
 		if (image != newImage) {
@@ -592,6 +668,9 @@ public abstract class Action extends AbstractAction {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.action.IAction#setText(java.lang.String)
+	 */
 	@Override
 	public void setText(String text) {
 		String oldText = this.text;

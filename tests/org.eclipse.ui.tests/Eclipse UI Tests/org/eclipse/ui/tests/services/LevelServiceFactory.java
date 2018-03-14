@@ -16,7 +16,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 /**
  * @since 3.4
- *
+ * 
  */
 public class LevelServiceFactory extends AbstractServiceFactory {
 
@@ -29,14 +29,17 @@ public class LevelServiceFactory extends AbstractServiceFactory {
 			level = l;
 		}
 
-		@Override
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.ui.tests.services.ILevelService#getLevel()
+		 */
 		public int getLevel() {
 			return level;
 		}
 
 	};
 
-	@Override
 	public Object create(Class serviceInterface, IServiceLocator parentLocator,
 			IServiceLocator locator) {
 		int level = 1;

@@ -83,6 +83,13 @@ public class TrimBarLayout extends Layout {
 		this.horizontal = horizontal;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.widgets.Layout#computeSize(org.eclipse.swt.widgets.Composite
+	 * , int, int, boolean)
+	 */
 	@Override
 	protected Point computeSize(Composite composite, int wHint, int hHint,
 			boolean flushCache) {
@@ -163,7 +170,7 @@ public class TrimBarLayout extends Layout {
 	 * This is a HACK ! Due to compatibility restrictions we have the case where
 	 * we <b>must</b> leave 'empty' toolbars in the trim. This code detects this
 	 * particular scenario and hides any TB's of this type...
-	 *
+	 * 
 	 * @param te
 	 *            The proposed trim element
 	 * @return <code>true</code> iff this element represents an empty managed

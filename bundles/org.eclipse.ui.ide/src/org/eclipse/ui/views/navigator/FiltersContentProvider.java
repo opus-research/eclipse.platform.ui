@@ -26,7 +26,6 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
  * for selecting the patterns to apply.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 /* package */class FiltersContentProvider implements
         IStructuredContentProvider {
 
@@ -49,8 +48,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
     /* (non-Javadoc)
      * Method declared on IContentProvider.
      */
-    @Override
-	public void dispose() {
+    public void dispose() {
     }
 
     /**
@@ -80,8 +78,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
     /* (non-Javadoc)
      * Method declared on IStructuredContentProvider.
      */
-    @Override
-	public Object[] getElements(Object inputElement) {
+    public Object[] getElements(Object inputElement) {
         return getDefinedFilters().toArray();
     }
 
@@ -97,8 +94,7 @@ import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
     /* (non-Javadoc)
      * Method declared on IContentProvider.
      */
-    @Override
-	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
     /**

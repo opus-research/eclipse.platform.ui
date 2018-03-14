@@ -24,7 +24,7 @@ public class ResourceMappingMarkersTest extends AbstractNavigatorTest {
 
 	/**
 	 * Create an instance of the receiver.
-	 *
+	 * 
 	 * @param testName
 	 */
 	public ResourceMappingMarkersTest(String testName) {
@@ -33,10 +33,9 @@ public class ResourceMappingMarkersTest extends AbstractNavigatorTest {
 
 	/**
 	 * Set up the receiver.
-	 *
+	 * 
 	 * @throws Exception
 	 */
-	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		createTestFile();
@@ -74,11 +73,11 @@ public class ResourceMappingMarkersTest extends AbstractNavigatorTest {
 		} catch (OperationCanceledException e) {
 		} catch (InterruptedException e) {
 		}
-
+		
 		IMarker[] markers=problemView.getCurrentMarkers();
 		boolean markerFound = false;
-		for (IMarker marker2 : markers) {
-			if(marker2.equals(marker)){
+		for (int i = 0; i < markers.length; i++) {
+			if(markers[i].equals(marker)){
 				markerFound = true;
 				break;
 			}

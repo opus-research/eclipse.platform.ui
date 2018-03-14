@@ -28,7 +28,6 @@ import org.eclipse.ui.views.framelist.FrameList;
  * @noimplement This interface is not intended to be implemented by clients.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public interface IResourceNavigator extends IViewPart {
 
     /**
@@ -52,8 +51,7 @@ public interface IResourceNavigator extends IViewPart {
      * 
      * @deprecated as of 3.3, use {@link IResourceNavigator#getComparator()} instead
      */
-    @Deprecated
-	ResourceSorter getSorter();
+    ResourceSorter getSorter();
 
     /**
      * Sets the current sorter.
@@ -61,8 +59,7 @@ public interface IResourceNavigator extends IViewPart {
      * 
      * @deprecated as of 3.3, use {@link IResourceNavigator#setComparator(ResourceComparator)} instead
      */
-    @Deprecated
-	void setSorter(ResourceSorter sorter);
+    void setSorter(ResourceSorter sorter);
 
     /**
      * Returns the current comparator.

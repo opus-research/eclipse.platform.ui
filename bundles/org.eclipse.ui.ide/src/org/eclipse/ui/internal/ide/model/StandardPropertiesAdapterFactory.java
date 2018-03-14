@@ -24,8 +24,7 @@ public class StandardPropertiesAdapterFactory implements IAdapterFactory {
     /* (non-Javadoc)
      * Method declared on IAdapterFactory.
      */
-    @Override
-	public Object getAdapter(Object o, Class adapterType) {
+    public Object getAdapter(Object o, Class adapterType) {
         if (adapterType.isInstance(o)) {
             return o;
         }
@@ -44,8 +43,7 @@ public class StandardPropertiesAdapterFactory implements IAdapterFactory {
     /* (non-Javadoc)
      * Method declared on IAdapterFactory.
      */
-    @Override
-	public Class[] getAdapterList() {
+    public Class[] getAdapterList() {
         // org.eclipe.ui.views is an optional dependency
         try {
             Class.forName("org.eclipse.ui.views.properties.IPropertySource"); //$NON-NLS-1$

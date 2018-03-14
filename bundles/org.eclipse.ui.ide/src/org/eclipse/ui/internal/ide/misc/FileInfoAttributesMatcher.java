@@ -211,8 +211,8 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 
 		try {
 			Class fileSystems = Class.forName("java.nio.file.FileSystems"); //$NON-NLS-1$
-			Method getDefault = fileSystems.getMethod("getDefault"); //$NON-NLS-1$
-			Object fs = getDefault.invoke(null);
+			Method getDefault = fileSystems.getMethod("getDefault", null); //$NON-NLS-1$
+			Object fs = getDefault.invoke(null, null);
 	
 			Class fileRef = Class.forName("java.nio.file.FileRef"); //$NON-NLS-1$
 
@@ -227,12 +227,12 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 			Object attributesObj = readBasicFileAttributes.invoke(null, new Object[] {fileRefObj, linkOptionsEmptyArray});
 	
 			Class basicAttributes = Class.forName("java.nio.file.attribute.BasicFileAttributes"); //$NON-NLS-1$
-			Method creationTime = basicAttributes.getMethod("creationTime"); //$NON-NLS-1$
-			Object time = creationTime.invoke(attributesObj);
+			Method creationTime = basicAttributes.getMethod("creationTime", null); //$NON-NLS-1$
+			Object time = creationTime.invoke(attributesObj, null);
 	
 			Class fileTime = Class.forName("java.nio.file.attribute.FileTime"); //$NON-NLS-1$
-			Method toMillis = fileTime.getMethod("toMillis"); //$NON-NLS-1$
-			Object result = toMillis.invoke(time);
+			Method toMillis = fileTime.getMethod("toMillis", null); //$NON-NLS-1$
+			Object result = toMillis.invoke(time, null);
 			
 			if (result instanceof Long)
 				return ((Long) result).longValue();
@@ -394,7 +394,9 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 		fSupportsCreatedKey = supportCreatedKey();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#initialize(org.eclipse.core.resources.IProject, java.lang.Object)
+	 */
 	public void initialize(IProject project, Object arguments) throws CoreException {
 		try {
 			if ((arguments instanceof String) && ((String) arguments).length() > 0)
@@ -406,7 +408,9 @@ public class FileInfoAttributesMatcher extends AbstractFileInfoMatcher {
 		}
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.resources.AbstractFileInfoMatcher#matches(org.eclipse.core.filesystem.IFileInfo)
+	 */
 	public boolean matches(IContainer parent, IFileInfo fileInfo) throws CoreException {
 		if (matcher != null) {
 			return matcher.match(parent, fileInfo);

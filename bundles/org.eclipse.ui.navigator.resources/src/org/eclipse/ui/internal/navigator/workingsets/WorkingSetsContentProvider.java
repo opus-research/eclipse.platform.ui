@@ -63,6 +63,9 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	
 	private IPropertyChangeListener rootModeListener = new IPropertyChangeListener() {
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+		 */
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			if(SHOW_TOP_LEVEL_WORKING_SETS.equals(event.getProperty())) {
@@ -73,6 +76,9 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 	};
 	
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.ICommonContentProvider#init(org.eclipse.ui.navigator.ICommonContentExtensionSite)
+	 */
 	@Override
 	public void init(ICommonContentExtensionSite aConfig) {
 		NavigatorContentService cs = (NavigatorContentService) aConfig.getService();
@@ -85,11 +91,17 @@ public class WorkingSetsContentProvider implements ICommonContentProvider {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IMementoAware#restoreState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void restoreState(IMemento aMemento) {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.navigator.IMementoAware#saveState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveState(IMemento aMemento) {
 		

@@ -35,7 +35,6 @@ public class WidgetEnabledProperty extends WidgetDelegatingValueProperty {
 		super(Boolean.TYPE);
 	}
 
-	@Override
 	protected IValueProperty doGetDelegate(Object source) {
 		if (source instanceof Control) {
 			if (control == null)

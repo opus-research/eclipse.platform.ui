@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 public class ListDiffVisitorTest extends TestCase {
 	ListDiffVisitorStub visitor;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		visitor = new ListDiffVisitorStub();
@@ -52,12 +51,10 @@ public class ListDiffVisitorTest extends TestCase {
 			log += message;
 		}
 
-		@Override
 		public void handleAdd(int index, Object element) {
 			log("add(" + index + "," + element + ")");
 		}
 
-		@Override
 		public void handleRemove(int index, Object element) {
 			log("remove(" + index + "," + element + ")");
 		}

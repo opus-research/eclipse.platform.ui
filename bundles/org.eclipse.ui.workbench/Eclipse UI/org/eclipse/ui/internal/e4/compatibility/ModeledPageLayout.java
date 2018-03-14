@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 433450
  ******************************************************************************/
 
 package org.eclipse.ui.internal.e4.compatibility;
@@ -22,12 +21,14 @@ import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.advanced.MArea;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPerspective;
 import org.eclipse.e4.ui.model.application.ui.advanced.MPlaceholder;
+import org.eclipse.e4.ui.model.application.ui.advanced.impl.AdvancedFactoryImpl;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainer;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartSashContainerElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MPartStack;
 import org.eclipse.e4.ui.model.application.ui.basic.MStackElement;
 import org.eclipse.e4.ui.model.application.ui.basic.MWindow;
+import org.eclipse.e4.ui.model.application.ui.basic.impl.BasicFactoryImpl;
 import org.eclipse.e4.ui.workbench.IPresentationEngine;
 import org.eclipse.e4.ui.workbench.modeling.EModelService;
 import org.eclipse.e4.ui.workbench.modeling.EPartService;
@@ -101,6 +102,13 @@ public class ModeledPageLayout implements IPageLayout {
 			this.element = element;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.eclipse.ui.activities.IIdentifierListener#identifierChanged(org
+		 * .eclipse.ui.activities.IdentifierEvent)
+		 */
 		@Override
 		public void identifierChanged(IdentifierEvent identifierEvent) {
 			IIdentifier identifier = identifierEvent.getIdentifier();
@@ -143,10 +151,10 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 
 		if (sharedArea == null) {
-			sharedArea = modelService.createModelElement(MArea.class);
+			sharedArea = AdvancedFactoryImpl.eINSTANCE.createArea();
 			// sharedArea.setLabel("Editor Area"); //$NON-NLS-1$
 
-			editorStack = modelService.createModelElement(MPartStack.class);
+			editorStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 			// temporary HACK for bug 303982
 			editorStack.getTags().add("newtablook"); //$NON-NLS-1$
 			editorStack.getTags().add("org.eclipse.e4.primaryDataStack"); //$NON-NLS-1$
@@ -164,7 +172,7 @@ public class ModeledPageLayout implements IPageLayout {
 			}
 		}
 
-		eaRef = modelService.createModelElement(MPlaceholder.class);
+		eaRef = AdvancedFactoryImpl.eINSTANCE.createPlaceholder();
 		eaRef.setElementId(getEditorArea());
 		eaRef.setRef(sharedArea);
 
@@ -410,8 +418,8 @@ public class ModeledPageLayout implements IPageLayout {
 		return null;
 	}
 
-	private MPartStack createStack(String id, boolean visible) {
-		MPartStack newStack = modelService.createModelElement(MPartStack.class);
+	public static MPartStack createStack(String id, boolean visible) {
+		MPartStack newStack = BasicFactoryImpl.eINSTANCE.createPartStack();
 		// temporary HACK for bug 303982
 		newStack.getTags().add("newtablook"); //$NON-NLS-1$
 		newStack.setElementId(id);
@@ -560,7 +568,7 @@ public class ModeledPageLayout implements IPageLayout {
 		newParent.getChildren().add(relTo);
 	}
 
-	private void insert(MUIElement toInsert, MUIElement relTo,
+	public static void insert(MUIElement toInsert, MUIElement relTo,
 			int swtSide, int ratio) {
 		if (toInsert == null || relTo == null)
 			return;
@@ -569,7 +577,7 @@ public class ModeledPageLayout implements IPageLayout {
 		if (relParent != null) {
 			List<MUIElement> children = relParent.getChildren();
 			int index = children.indexOf(relTo);
-			MPartSashContainer psc = modelService.createModelElement(MPartSashContainer.class);
+			MPartSashContainer psc = BasicFactoryImpl.eINSTANCE.createPartSashContainer();
 			psc.setContainerData(relTo.getContainerData());
 			relParent.getChildren().add(index + 1, psc);
 
@@ -617,7 +625,7 @@ public class ModeledPageLayout implements IPageLayout {
 		}
 	}
 
-	private void insert(MUIElement toInsert, MUIElement relTo,
+	public static void insert(MUIElement toInsert, MUIElement relTo,
 			int swtSide, float ratio) {
 		int pct = (int) (ratio * 10000);
 		insert(toInsert, relTo, swtSide, pct);

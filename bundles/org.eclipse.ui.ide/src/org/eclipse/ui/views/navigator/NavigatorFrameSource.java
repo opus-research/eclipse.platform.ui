@@ -22,7 +22,6 @@ import org.eclipse.ui.views.framelist.TreeViewerFrameSource;
  * Frame source for the resource navigator.
  * @deprecated as of 3.5, use the Common Navigator Framework classes instead
  */
-@Deprecated
 public class NavigatorFrameSource extends TreeViewerFrameSource {
 
     private ResourceNavigator navigator;
@@ -42,8 +41,7 @@ public class NavigatorFrameSource extends TreeViewerFrameSource {
      * by setting the frame's tool tip text to show the full path for the input
      * element.
      */
-    @Override
-	protected TreeFrame createFrame(Object input) {
+    protected TreeFrame createFrame(Object input) {
         TreeFrame frame = super.createFrame(input);
         frame.setName(navigator.getFrameName(input));
         frame.setToolTipText(navigator.getFrameToolTipText(input));
@@ -53,8 +51,7 @@ public class NavigatorFrameSource extends TreeViewerFrameSource {
     /**
      * Also updates the navigator's title.
      */
-    @Override
-	protected void frameChanged(TreeFrame frame) {
+    protected void frameChanged(TreeFrame frame) {
         IResource resource = (IResource) frame.getInput();
         IProject project = resource.getProject();
 

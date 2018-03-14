@@ -337,6 +337,9 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
             dock(initialAreaId, initialInsertBefore);
         }
         
+		/* (non-Javadoc)
+         * @see org.eclipse.ui.internal.dnd.IDropTarget#drop()
+         */
         @Override
 		public void drop() {
         	// If we aren't docked then restore the initial location
@@ -387,6 +390,9 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
            	dockedArea = areaId;
         }
         	
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.dnd.IDropTarget#getCursor()
+         */
         @Override
 		public Cursor getCursor() {
         	// If the trim isn't docked then show the 'no smoking' sign
@@ -398,6 +404,9 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
         	return windowComposite.getDisplay().getSystemCursor(SWT.CURSOR_SIZEALL);
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.ui.internal.dnd.IDropTarget#getSnapRectangle()
+         */
         @Override
 		public Rectangle getSnapRectangle() {
         	// TODO: KLUDGE!! We don't want to show -any- snap rect
@@ -405,6 +414,9 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
         	return new Rectangle(100000, 0,0,0);
         }
 
+		/* (non-Javadoc)
+		 * @see org.eclipse.ui.internal.dnd.IDropTarget2#dragFinished(boolean)
+		 */
 		@Override
 		public void dragFinished(boolean dropPerformed) {
 			// If we didn't perform a drop then restore the original position
@@ -439,6 +451,9 @@ import org.eclipse.ui.internal.layout.TrimToolBarBase;
         dropTarget = new ActualTrimDropTarget();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.ui.internal.dnd.IDragOverListener#drag(org.eclipse.swt.widgets.Control, java.lang.Object, org.eclipse.swt.graphics.Point, org.eclipse.swt.graphics.Rectangle)
+     */
     @Override
 	public IDropTarget drag(Control currentControl, Object draggedObject,
             Point position, final Rectangle dragRectangle) {

@@ -201,7 +201,6 @@ public class CreateLinkedResourceGroup {
 			createLinkButton.setSelection(createLink);
 			createLinkButton.setFont(font);
 			SelectionListener selectionListener = new SelectionAdapter() {
-				@Override
 				public void widgetSelected(SelectionEvent e) {
 					setEnabled(createLinkButton.getSelection());
 				}
@@ -277,12 +276,8 @@ public class CreateLinkedResourceGroup {
 		linkTargetField.setFont(locationGroup.getFont());
 		BidiUtils.applyBidiProcessing(linkTargetField, StructuredTextTypeHandlerFactory.FILE);
 		linkTargetField.addModifyListener(new ModifyListener() {
-			@Override
 			public void modifyText(ModifyEvent e) {
-				linkTarget = linkTargetField.getText();
-				if (isDefaultConfigurationSelected()) {
-					linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTarget, true);
-				}
+				linkTarget = getPathVariableManager().convertFromUserEditableFormat(linkTargetField.getText(), true);
 				resolveVariable();
 				if (updatableResourceName != null) {
 					String value = updatableResourceName.getValue();
@@ -307,7 +302,6 @@ public class CreateLinkedResourceGroup {
 		browseButton
 				.setText(IDEWorkbenchMessages.CreateLinkedResourceGroup_browseButton);
 		browseButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				handleLinkTargetBrowseButtonPressed();
 			}
@@ -321,7 +315,6 @@ public class CreateLinkedResourceGroup {
 		variablesButton
 				.setText(IDEWorkbenchMessages.CreateLinkedResourceGroup_variablesButton);
 		variablesButton.addSelectionListener(new SelectionAdapter() {
-			@Override
 			public void widgetSelected(SelectionEvent event) {
 				handleVariablesButtonPressed();
 			}
@@ -466,8 +459,10 @@ public class CreateLinkedResourceGroup {
 	private void handleLinkTargetBrowseButtonPressed() {
 		IFileStore store = null;
 		String selection = null;
-		FileSystemConfiguration config= getSelectedConfiguration();
-		boolean isDefault = isDefaultConfigurationSelected();
+		FileSystemConfiguration config = getSelectedConfiguration();
+		boolean isDefault = config == null
+				|| (FileSystemSupportRegistry.getInstance()
+						.getDefaultConfiguration()).equals(config);
 
 		if (linkTarget.length() > 0) {
 			store = IDEResourceInfoUtils.getFileStore(linkTarget);
@@ -526,13 +521,6 @@ public class CreateLinkedResourceGroup {
 		if (selection != null) {
 			linkTargetField.setText(selection);
 		}
-	}
-
-	private boolean isDefaultConfigurationSelected() {
-		FileSystemConfiguration config = getSelectedConfiguration();
-		return config == null
-				|| (FileSystemSupportRegistry.getInstance()
-						.getDefaultConfiguration()).equals(config);
 	}
 
 	/**

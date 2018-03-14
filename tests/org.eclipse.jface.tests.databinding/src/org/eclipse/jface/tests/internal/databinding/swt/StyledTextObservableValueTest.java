@@ -29,7 +29,6 @@ public class StyledTextObservableValueTest extends AbstractDefaultRealmTestCase 
 	private StyledText text;
 	private ValueChangeEventTracker listener;
 
-	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 

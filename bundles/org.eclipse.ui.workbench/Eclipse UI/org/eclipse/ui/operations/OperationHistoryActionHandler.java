@@ -221,6 +221,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 		update();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#dispose()
+	 */
 	@Override
 	public void dispose() {
 
@@ -290,6 +295,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 	 */
 	abstract IUndoableOperation getOperation();
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.actions.ActionFactory.IWorkbenchAction#run()
+	 */
 	@Override
 	public final void run() {
 		if (isInvalid()) {
@@ -341,6 +351,11 @@ public abstract class OperationHistoryActionHandler extends Action implements
 
 	abstract IStatus runCommand(IProgressMonitor pm) throws ExecutionException;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (adapter.equals(IUndoContext.class)) {

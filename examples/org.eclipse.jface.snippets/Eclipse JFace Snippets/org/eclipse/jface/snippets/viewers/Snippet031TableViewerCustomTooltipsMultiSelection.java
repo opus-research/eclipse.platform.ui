@@ -8,7 +8,6 @@
  * Contributors:
  *     Adam Neal - initial API and implementation
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 414565
- *     Jeanderson Candido <http://jeandersonbc.github.io> - Bug 414565
  *******************************************************************************/
 
 package org.eclipse.jface.snippets.viewers;
@@ -135,6 +134,10 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 	    	Shell tooltip = null;
 	    	Label label = null;
 
+	    	/*
+	    	 * (non-Javadoc)
+	    	 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+	    	 */
 	    	@Override
 			public void handleEvent (Event event) {
 			   switch (event.type) {
@@ -209,8 +212,11 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 	        private boolean isCTRLDown(Event e) {
 	        	return (e.stateMask & SWT.CTRL) != 0;
 	        }
-
-		@Override
+		   /*
+		    * (non-Javadoc)
+		    * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
+		    */
+		   @Override
 		public void handleEvent (Event event) {
 			   Label label = (Label)event.widget;
 			   Shell shell = label.getShell ();
@@ -269,8 +275,8 @@ public class Snippet031TableViewerCustomTooltipsMultiSelection {
 
 
 
-	private List<MyModel> createModel() {
-		List<MyModel> list = new ArrayList<MyModel>();
+	private List createModel() {
+		ArrayList list = new ArrayList();
 		list.add(new MyModel("A", "B"));
 		list.add(new MyModel("C", "D"));
 		list.add(new MyModel("E", "F"));

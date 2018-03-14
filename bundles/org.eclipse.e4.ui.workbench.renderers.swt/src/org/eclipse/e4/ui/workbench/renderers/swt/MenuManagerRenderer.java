@@ -4,14 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Marco Descher <marco@descher.at> - Bug 389063, Bug 398865, Bug 398866, Bug 405471
  *     Sopot Cela <sopotcela@gmail.com>
- *     Steven Spungin <steven@spungin.tv> - Bug 437747
- *     Alan Staves <alan.staves@microfocus.com> - Bug 435274
- *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -317,6 +314,13 @@ MenuManagerEventHelper.getInstance()
 		context.remove(MenuManagerRenderer.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer#createWidget
+	 * (org.eclipse.e4.ui.model.application.ui.MUIElement, java.lang.Object)
+	 */
 	@Override
 	public Object createWidget(MUIElement element, Object parent) {
 		if (!(element instanceof MMenu))
@@ -380,10 +384,6 @@ MenuManagerEventHelper.getInstance()
 				@Override
 				public void widgetDisposed(DisposeEvent e) {
 					cleanUp(menuModel);
-					MenuManager manager = getManager(menuModel);
-					if (manager != null) {
-						manager.markDirty();
-					}
 				}
 			});
 		}
@@ -394,11 +394,6 @@ MenuManagerEventHelper.getInstance()
 	 * @param menuModel
 	 */
 	public void cleanUp(MMenu menuModel) {
-		for (MMenuElement childElement : menuModel.getChildren()) {
-			if (childElement instanceof MMenu) {
-				cleanUp((MMenu) childElement);
-			}
-		}
 		Collection<ContributionRecord> vals = modelContributionToRecord
 				.values();
 		List<ContributionRecord> disposedRecords = new ArrayList<ContributionRecord>();
@@ -582,6 +577,13 @@ MenuManagerEventHelper.getInstance()
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.e4.ui.workbench.renderers.swt.SWTPartRenderer#processContents
+	 * (org.eclipse.e4.ui.model.application.ui.MElementContainer)
+	 */
 	@Override
 	public void processContents(MElementContainer<MUIElement> container) {
 		// I can either simply stop processing, or we can walk the model
@@ -852,10 +854,6 @@ MenuManagerEventHelper.getInstance()
 	}
 
 	public void clearModelToManager(MMenu model, MenuManager manager) {
-		for (MMenuElement element : model.getChildren()) {
-			IContributionItem ici = getContribution(element);
-			clearModelToContribution(element, ici);
-		}
 		modelToManager.remove(model);
 		managerToModel.remove(manager);
 	}
@@ -891,7 +889,7 @@ MenuManagerEventHelper.getInstance()
 
 	/**
 	 * Search the records for testing. Look, but don't touch!
-	 *
+	 * 
 	 * @return the array of active ContributionRecords.
 	 */
 	public ContributionRecord[] getContributionRecords() {
@@ -1079,7 +1077,7 @@ MenuManagerEventHelper.getInstance()
 	/**
 	 * Clean dynamic menu contributions provided by
 	 * {@link MDynamicMenuContribution} application model elements
-	 *
+	 * 
 	 * @param menuManager
 	 * @param menuModel
 	 * @param dump

@@ -29,6 +29,8 @@ import org.osgi.service.event.Event;
 /**
  * Listens for the IPresentationEngine's SPLIT_HORIZONTAL and SPLIT_VERTICAL tags being applied to
  * an MPart and takes the appropriate steps to split / unsplit the part
+ * 
+ * @since 1.1
  */
 public class SplitterAddon {
 	@Inject
@@ -95,14 +97,10 @@ public class SplitterAddon {
 			return;
 
 		List<MPart> innerElements = ms.findElements(compositePart, null, MPart.class, null);
-		if (innerElements.size() < 3)
+		if (innerElements.size() < 2)
 			return;
 
 		MPart originalEditor = innerElements.get(1); // '0' is the composite part
-
-		// Close the cloned editor *before* removing it from the model
-		MPart clonedEditor = innerElements.get(2);
-		clonedEditor.setToBeRendered(false);
 
 		MElementContainer<MUIElement> compParent = compositePart.getParent();
 		int index = compParent.getChildren().indexOf(compositePart);

@@ -31,9 +31,9 @@ import org.eclipse.ui.progress.IProgressConstants2;
 public class ProgressContantsTest extends ProgressTestCase {
 
 	/**
-	 *
+	 * 
 	 * @param testName
-	 *
+	 * 
 	 */
 	public ProgressContantsTest(String testName) {
 		super(testName);
@@ -46,7 +46,7 @@ public class ProgressContantsTest extends ProgressTestCase {
 		DummyJob okJob = new DummyJob("OK Job", Status.OK_STATUS);
 
 		IWorkbench workbench = PlatformUI.getWorkbench();
-		ICommandService commandService = workbench.getService(ICommandService.class);
+		ICommandService commandService = (ICommandService) workbench.getService(ICommandService.class);
 		String commandId = "org.eclipse.ui.tests.progressViewCommand";
 		Command command = commandService.getCommand(commandId);
 		ParameterizedCommand parameterizedCommand = new ParameterizedCommand(command, null);
@@ -54,7 +54,7 @@ public class ProgressContantsTest extends ProgressTestCase {
 		okJob.setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
 		okJob.schedule();
 
-		IHandlerService service = workbench.getService(IHandlerService.class);
+		IHandlerService service = (IHandlerService) workbench.getService(IHandlerService.class);
 		CommandHandler handler = new CommandHandler();
 		service.activateHandler(commandId, handler);
 
@@ -63,12 +63,12 @@ public class ProgressContantsTest extends ProgressTestCase {
 		processEvents();
 
 		ProgressInfoItem[] progressInfoItems = progressView.getViewer().getProgressInfoItems();
-		for (ProgressInfoItem progressInfoItem : progressInfoItems) {
-			JobInfo[] jobInfos = progressInfoItem.getJobInfos();
-			for (JobInfo jobInfo : jobInfos) {
-				Job job = jobInfo.getJob();
+		for (int i = 0; i < progressInfoItems.length; i++) {
+			JobInfo[] jobInfos = progressInfoItems[i].getJobInfos();
+			for (int j = 0; j < jobInfos.length; j++) {
+				Job job = jobInfos[j].getJob();
 				if (job.equals(okJob)) {
-					progressInfoItem.executeTrigger();
+					progressInfoItems[i].executeTrigger();
 				}
 			}
 		}
@@ -77,7 +77,7 @@ public class ProgressContantsTest extends ProgressTestCase {
 	}
 
 	// Commented out due to https://bugs.eclipse.org/bugs/show_bug.cgi?id=288358
-
+	
 //	public void testKeepProperty() throws Exception {
 //
 //		openProgressView();

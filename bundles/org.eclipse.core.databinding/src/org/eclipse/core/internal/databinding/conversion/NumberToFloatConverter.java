@@ -31,7 +31,9 @@ public class NumberToFloatConverter extends NumberToNumberConverter {
 		super(numberFormat, fromType, (primitive) ? Float.TYPE : Float.class);
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.internal.databinding.conversion.NumberToNumberConverter#doConvert(java.lang.Number)
+	 */
 	protected Number doConvert(Number number) {
 		if (StringToNumberParser.inFloatRange(number)) {
 			return new Float(number.floatValue());

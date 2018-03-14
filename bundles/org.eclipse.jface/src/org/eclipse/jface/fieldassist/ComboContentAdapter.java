@@ -37,11 +37,22 @@ public class ComboContentAdapter implements IControlContentAdapter,
 	private static final boolean COMPUTE_TEXT_USING_CLIENTAREA = !Util.isCarbon();
 
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter#getControlContents(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public String getControlContents(Control control) {
 		return ((Combo) control).getText();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	@Override
 	public void setControlContents(Control control, String text,
 			int cursorPosition) {
@@ -50,6 +61,12 @@ public class ComboContentAdapter implements IControlContentAdapter,
 				.setSelection(new Point(cursorPosition, cursorPosition));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#insertControlContents(org.eclipse.swt.widgets.Control,
+	 *      java.lang.String, int)
+	 */
 	@Override
 	public void insertControlContents(Control control, String text,
 			int cursorPosition) {
@@ -68,11 +85,21 @@ public class ComboContentAdapter implements IControlContentAdapter,
 		combo.setSelection(selection);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public int getCursorPosition(Control control) {
 		return ((Combo) control).getSelection().x;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds(org.eclipse.swt.widgets.Control)
+	 */
 	@Override
 	public Rectangle getInsertionBounds(Control control) {
 		// This doesn't take horizontal scrolling into affect. 
@@ -92,6 +119,12 @@ public class ComboContentAdapter implements IControlContentAdapter,
 		return new Rectangle(extent.x, 0, 1, combo.getSize().y);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition(org.eclipse.swt.widgets.Control,
+	 *      int)
+	 */
 	@Override
 	public void setCursorPosition(Control control, int index) {
 		((Combo) control).setSelection(new Point(index, index));

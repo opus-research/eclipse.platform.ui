@@ -57,7 +57,6 @@ public class CompositeMap extends ObservableMap {
 
 	private IMapChangeListener firstMapListener = new IMapChangeListener() {
 
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			Set rangeSetAdditions = new HashSet();
@@ -117,27 +116,22 @@ public class CompositeMap extends ObservableMap {
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
 				fireMapChange(new MapDiff() {
 
-					@Override
 					public Set getAddedKeys() {
 						return adds;
 					}
 
-					@Override
 					public Set getChangedKeys() {
 						return changes;
 					}
 
-					@Override
 					public Object getNewValue(Object key) {
 						return wrappedMap.get(key);
 					}
 
-					@Override
 					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
-					@Override
 					public Set getRemovedKeys() {
 						return removes;
 					}
@@ -152,7 +146,6 @@ public class CompositeMap extends ObservableMap {
 
 	private IMapChangeListener secondMapListener = new IMapChangeListener() {
 
-		@Override
 		public void handleMapChange(MapChangeEvent event) {
 			MapDiff diff = event.diff;
 			final Set adds = new HashSet();
@@ -236,27 +229,22 @@ public class CompositeMap extends ObservableMap {
 			if (adds.size() > 0 || removes.size() > 0 || changes.size() > 0) {
 				fireMapChange(new MapDiff() {
 
-					@Override
 					public Set getAddedKeys() {
 						return adds;
 					}
 
-					@Override
 					public Set getChangedKeys() {
 						return changes;
 					}
 
-					@Override
 					public Object getNewValue(Object key) {
 						return newValues.get(key);
 					}
 
-					@Override
 					public Object getOldValue(Object key) {
 						return oldValues.get(key);
 					}
 
-					@Override
 					public Set getRemovedKeys() {
 						return removes;
 					}
@@ -309,7 +297,6 @@ public class CompositeMap extends ObservableMap {
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public Object getKeyType() {
 		return firstMap.getKeyType();
 	}
@@ -317,12 +304,10 @@ public class CompositeMap extends ObservableMap {
 	/**
 	 * @since 1.2
 	 */
-	@Override
 	public Object getValueType() {
 		return secondMap.getValueType();
 	}
 
-	@Override
 	public synchronized void dispose() {
 		super.dispose();
 		if (firstMap != null) {

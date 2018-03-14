@@ -39,22 +39,18 @@ public class AbstractObservableSetTest extends TestCase {
 
 	private static class Delegate extends
 			AbstractObservableCollectionContractDelegate {
-		@Override
 		public void change(IObservable observable) {
 			((AbstractObservableSetStub) observable).fireSetChange(Diffs.createSetDiff(new HashSet(), new HashSet()));
 		}
 
-		@Override
 		public Object createElement(IObservableCollection collection) {
 			return Integer.toString(collection.size());
 		}
 
-		@Override
 		public Object getElementType(IObservableCollection collection) {
 			return String.class;
 		}
 
-		@Override
 		public IObservableCollection createObservableCollection(Realm realm,
 				int elementCount) {
 			AbstractObservableSetStub set = new AbstractObservableSetStub(realm, String.class);
@@ -77,17 +73,14 @@ public class AbstractObservableSetTest extends TestCase {
 			this.type = type;
 		}
 		
-		@Override
 		protected Set getWrappedSet() {
 			return set;
 		}
 
-		@Override
 		public Object getElementType() {
 			return type;
 		}		
 		
-		@Override
 		protected void fireSetChange(SetDiff diff) {
 			super.fireSetChange(diff);
 		}

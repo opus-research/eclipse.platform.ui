@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,16 +42,7 @@ public class Policy {
 
 	private static ILogger log;
 
-	/**
-	 * The comparator used by JFace to sort strings, or {@code null}.
-	 * <p>
-	 * Note: The type is {@code Comparator<Object>} because this is usually a
-	 * {@link java.text.Collator} (or its ICU equivalent), and Collator
-	 * implements {@code Comparator<Object>}. See
-	 * https://bugs.eclipse.org/434325 .
-	 * </p>
-	 */
-	private static Comparator<Object> viewerComparator;
+	private static Comparator<String> viewerComparator;
 
 	private static AnimatorFactory animatorFactory;
 
@@ -184,8 +175,8 @@ public class Policy {
 	 * 
 	 * @return a default comparator used by JFace to sort strings
 	 */
-	private static Comparator<Object> getDefaultComparator() {
-		return new Comparator<Object>() {
+	private static Comparator<String> getDefaultComparator() {
+		return new Comparator<String>() {
 			/**
 			 * Compares string s1 to string s2.
 			 * 
@@ -201,8 +192,8 @@ public class Policy {
 			 *                the arguments cannot be cast to Strings.
 			 */
 			@Override
-			public int compare(Object s1, Object s2) {
-				return ((String) s1).compareTo((String) s2);
+			public int compare(String s1, String s2) {
+				return s1.compareTo(s2);
 			}
 		};
 	}
@@ -213,7 +204,7 @@ public class Policy {
 	 * @return the comparator used by JFace to sort strings
 	 * @since 3.2
 	 */
-	public static Comparator<Object> getComparator() {
+	public static Comparator<String> getComparator() {
 		if (viewerComparator == null) {
 			viewerComparator = getDefaultComparator();
 		}
@@ -227,7 +218,7 @@ public class Policy {
 	 *            comparator used by JFace to sort strings
 	 * @since 3.2
 	 */
-	public static void setComparator(Comparator<Object> comparator) {
+	public static void setComparator(Comparator<String> comparator) {
 		org.eclipse.core.runtime.Assert.isTrue(viewerComparator == null);
 		viewerComparator = comparator;
 	}
