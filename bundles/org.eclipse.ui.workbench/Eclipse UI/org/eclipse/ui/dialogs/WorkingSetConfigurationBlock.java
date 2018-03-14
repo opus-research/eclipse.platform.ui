@@ -8,19 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Remy Chi Jian Suen <remy.suen@gmail.com> - bug 201661
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 483425, 483429
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 483425
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
-import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -46,6 +46,8 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.internal.dialogs.SimpleWorkingSetSelectionDialog;
+
+import com.ibm.icu.text.Collator;
 
 /**
  * Instances of this class provide a reusable composite with controls that allow
@@ -77,15 +79,14 @@ public class WorkingSetConfigurationBlock {
 				workingSetIds.length);
 		Arrays.sort(workingSetIdsCopy);
 
-		List<IWorkingSet> result = new ArrayList<>();
+		ArrayList result = new ArrayList();
 
-		for (IWorkingSet workingSet : workingSets) {
-			if (Arrays.binarySearch(workingSetIdsCopy, workingSet.getId()) >= 0) {
-				result.add(workingSet);
-			}
+		for (int i = 0; i < workingSets.length; i++) {
+			if (Arrays.binarySearch(workingSetIdsCopy, workingSets[i].getId()) >= 0)
+				result.add(workingSets[i]);
 		}
 
-		return result.toArray(new IWorkingSet[result.size()]);
+		return (IWorkingSet[]) result.toArray(new IWorkingSet[result.size()]);
 	}
 
 	/**
@@ -102,7 +103,7 @@ public class WorkingSetConfigurationBlock {
 	private Button enableButton;
 
 	private IWorkingSet[] selectedWorkingSets;
-	private List<String> selectionHistory;
+	private ArrayList selectionHistory;
 	private final IDialogSettings dialogSettings;
 	private final String[] workingSetTypeIds;
 
@@ -210,9 +211,8 @@ public class WorkingSetConfigurationBlock {
 	public void setSelection(IStructuredSelection selection) {
 		selectedWorkingSets = findApplicableWorkingSets(selection);
 
-		if (workingSetCombo != null) {
+		if (workingSetCombo != null)
 			updateSelectedWorkingSets();
-		}
 	}
 
 	/**
@@ -224,9 +224,8 @@ public class WorkingSetConfigurationBlock {
 	 */
 	public void setWorkingSets(IWorkingSet... workingSets) {
 		selectedWorkingSets = filterWorkingSets(Arrays.asList(workingSets));
-		if (workingSetCombo != null) {
+		if (workingSetCombo != null)
 			updateSelectedWorkingSets();
-		}
 	}
 
 	/**
@@ -240,9 +239,8 @@ public class WorkingSetConfigurationBlock {
 	 */
 	public IWorkingSet[] findApplicableWorkingSets(
 			IStructuredSelection selection) {
-		if (selection == null) {
+		if (selection == null)
 			return EMPTY_WORKING_SET_ARRAY;
-		}
 
 		return filterWorkingSets(selection.toList());
 	}
@@ -255,15 +253,16 @@ public class WorkingSetConfigurationBlock {
 	 *            the elements to filter
 	 * @return the filtered elements
 	 */
-	private IWorkingSet[] filterWorkingSets(Collection<?> elements) {
-		List<IWorkingSet> result = new ArrayList<>();
-		for (Object element : elements) {
+	private IWorkingSet[] filterWorkingSets(Collection elements) {
+		ArrayList result = new ArrayList();
+		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
+			Object element = iterator.next();
 			if (element instanceof IWorkingSet
 					&& verifyWorkingSet((IWorkingSet) element)) {
-				result.add((IWorkingSet) element);
+				result.add(element);
 			}
 		}
-		return result.toArray(new IWorkingSet[result.size()]);
+		return (IWorkingSet[]) result.toArray(new IWorkingSet[result.size()]);
 	}
 
 	/**
@@ -369,7 +368,7 @@ public class WorkingSetConfigurationBlock {
 
 		workingSetCombo.setItems(getHistoryEntries());
 		if (selectedWorkingSets.length == 0 && selectionHistory.size() > 0) {
-			workingSetCombo.select(historyIndex(selectionHistory
+			workingSetCombo.select(historyIndex((String) selectionHistory
 					.get(0)));
 			updateSelectedWorkingSets();
 		} else {
@@ -413,9 +412,14 @@ public class WorkingSetConfigurationBlock {
 	}
 
 	private String[] getHistoryEntries() {
-		String[] history = selectionHistory
+		String[] history = (String[]) selectionHistory
 				.toArray(new String[selectionHistory.size()]);
-		Arrays.sort(history, (o1, o2) -> Collator.getInstance().compare(o1, o2));
+		Arrays.sort(history, new Comparator() {
+			@Override
+			public int compare(Object o1, Object o2) {
+				return Collator.getInstance().compare(o1, o2);
+			}
+		});
 		return history;
 	}
 
@@ -427,9 +431,8 @@ public class WorkingSetConfigurationBlock {
 
 	private int historyIndex(String entry) {
 		for (int i = 0; i < workingSetCombo.getItemCount(); i++) {
-			if (workingSetCombo.getItem(i).equals(entry)) {
+			if (workingSetCombo.getItem(i).equals(entry))
 				return i;
-			}
 		}
 
 		return -1;
@@ -441,9 +444,8 @@ public class WorkingSetConfigurationBlock {
 		int size= tokenizer.countTokens();
 		String[] tokens= new String[size];
 		int i= 0;
-		while (i < size) {
+		while (i < size)
 			tokens[i++]= tokenizer.nextToken();
-		}
 		return tokens;
 	}
 
@@ -466,29 +468,28 @@ public class WorkingSetConfigurationBlock {
 	private void storeSelectionHistory(IDialogSettings settings) {
 		String[] history;
 		if (selectionHistory.size() > MAX_HISTORY_SIZE) {
-			List<String> subList = selectionHistory.subList(0, MAX_HISTORY_SIZE);
-			history = subList.toArray(new String[subList.size()]);
+			List subList = selectionHistory.subList(0, MAX_HISTORY_SIZE);
+			history = (String[]) subList.toArray(new String[subList.size()]);
 		} else {
-			history = selectionHistory
+			history = (String[]) selectionHistory
 					.toArray(new String[selectionHistory.size()]);
 		}
 		settings.put(WORKINGSET_SELECTION_HISTORY, history);
 	}
 
-	private List<String> loadSelectionHistory(IDialogSettings settings, String... workingSetIds) {
+	private ArrayList loadSelectionHistory(IDialogSettings settings, String... workingSetIds) {
 		String[] strings = settings.getArray(WORKINGSET_SELECTION_HISTORY);
-		if (strings == null || strings.length == 0) {
-			return Collections.emptyList();
-		}
+		if (strings == null || strings.length == 0)
+			return new ArrayList();
 
-		List<String> result = new ArrayList<>();
+		ArrayList result = new ArrayList();
 
-		Set<String> workingSetIdsSet = new HashSet<>(Arrays.asList(workingSetIds));
+		HashSet workingSetIdsSet = new HashSet(Arrays.asList(workingSetIds));
 
 		IWorkingSetManager workingSetManager = PlatformUI.getWorkbench()
 				.getWorkingSetManager();
-		for (String string : strings) {
-			String[] workingSetNames = split(string, ", "); //$NON-NLS-1$
+		for (int i = 0; i < strings.length; i++) {
+			String[] workingSetNames = split(strings[i], ", "); //$NON-NLS-1$
 			boolean valid = true;
 			for (int j = 0; j < workingSetNames.length && valid; j++) {
 				IWorkingSet workingSet = workingSetManager
@@ -496,13 +497,12 @@ public class WorkingSetConfigurationBlock {
 				if (workingSet == null) {
 					valid = false;
 				} else {
-					if (!workingSetIdsSet.contains(workingSet.getId())) {
+					if (!workingSetIdsSet.contains(workingSet.getId()))
 						valid = false;
-					}
 				}
 			}
 			if (valid) {
-				result.add(string);
+				result.add(strings[i]);
 			}
 		}
 
