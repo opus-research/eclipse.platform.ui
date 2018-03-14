@@ -12,9 +12,13 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
+ *     Steven Spungin <steven@spungin.tv> - Bug 361731, 401043
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
+
+import org.eclipse.e4.ui.workbench.PartSizeInfo;
+import org.eclipse.e4.ui.workbench.PartSizeInfo.PartResizeMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -4128,10 +4132,10 @@ public class WorkbenchPage implements IWorkbenchPage {
 		MPerspectiveStack perspectiveStack = modelService
 				.createModelElement(MPerspectiveStack.class);
 		perspectiveStack.setElementId(IWorkbenchConstants.PERSPECTIVE_STACK_ID);
-		perspectiveStack.setContainerData("7500"); //$NON-NLS-1$
+		PartSizeInfo.get(perspectiveStack).set(7500.0, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
 
 		MPartStack stickyFolder = modelService.createModelElement(MPartStack.class);
-		stickyFolder.setContainerData("2500"); //$NON-NLS-1$
+		PartSizeInfo.get(stickyFolder).set(2500.0, "", PartResizeMode.WEIGHTED); //$NON-NLS-1$
 		stickyFolder.setElementId("stickyFolderRight"); //$NON-NLS-1$
 		stickyFolder.setToBeRendered(false);
 
