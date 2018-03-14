@@ -66,13 +66,16 @@ public class SubMenuManager extends SubContributionManager implements
 	public void addMenuListener(IMenuListener listener) {
         menuListeners.add(listener);
         if (menuListener == null) {
-            menuListener = manager -> {
-			    Object[] listeners = menuListeners.getListeners();
-			    for (int i = 0; i < listeners.length; ++i) {
-			        ((IMenuListener) listeners[i])
-			                .menuAboutToShow(SubMenuManager.this);
-			    }
-			};
+            menuListener = new IMenuListener() {
+                @Override
+				public void menuAboutToShow(IMenuManager manager) {
+                    Object[] listeners = menuListeners.getListeners();
+                    for (int i = 0; i < listeners.length; ++i) {
+                        ((IMenuListener) listeners[i])
+                                .menuAboutToShow(SubMenuManager.this);
+                    }
+                }
+            };
         }
         getParentMenuManager().addMenuListener(menuListener);
     }
@@ -239,7 +242,7 @@ public class SubMenuManager extends SubContributionManager implements
      */
     protected IMenuManager getWrapper(IMenuManager mgr) {
         if (mapMenuToWrapper == null) {
-            mapMenuToWrapper = new HashMap<IMenuManager, SubMenuManager>(4);
+            mapMenuToWrapper = new HashMap<>(4);
         }
         SubMenuManager wrapper = mapMenuToWrapper.get(mgr);
         if (wrapper == null) {

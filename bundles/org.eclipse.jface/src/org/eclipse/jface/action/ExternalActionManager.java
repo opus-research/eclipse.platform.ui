@@ -123,7 +123,7 @@ public final class ExternalActionManager {
 		 * will be removed from this set and the listener removed. This value
 		 * may be empty, but never <code>null</code>.
 		 */
-		private final Set<String> loggedCommandIds = new HashSet<String>();
+		private final Set<String> loggedCommandIds = new HashSet<>();
 
 		/**
 		 * The list of listeners that have registered for property change
@@ -131,7 +131,7 @@ public final class ExternalActionManager {
 		 * to listeners (<code>IPropertyChangeListener</code> or
 		 * <code>ListenerList</code> of <code>IPropertyChangeListener</code>).
 		 */
-		private final Map<String, Object> registeredListeners = new HashMap<String, Object>();
+		private final Map<String, Object> registeredListeners = new HashMap<>();
 
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -148,7 +148,18 @@ public final class ExternalActionManager {
 		 */
 		public CommandCallback(final BindingManager bindingManager,
 				final CommandManager commandManager) {
-			this(bindingManager, commandManager, commandId -> true, action -> true);
+			this(bindingManager, commandManager, new IActiveChecker() {
+				@Override
+				public boolean isActive(String commandId) {
+					return true;
+				}
+
+			}, new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the
@@ -170,7 +181,12 @@ public final class ExternalActionManager {
 				final CommandManager commandManager,
 				final IActiveChecker activeChecker) {
 			this(bindingManager, commandManager, activeChecker,
-					action -> true);
+					new IExecuteApplicable() {
+				@Override
+				public boolean isApplicable(IAction action) {
+					return true;
+				}
+			});
 		}
 		/**
 		 * Constructs a new instance of <code>CommandCallback</code> with the

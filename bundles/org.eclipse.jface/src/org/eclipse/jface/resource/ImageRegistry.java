@@ -54,7 +54,12 @@ public class ImageRegistry {
 
     private Map<String, Entry> table;
 
-    private Runnable disposeRunnable = () -> dispose();
+    private Runnable disposeRunnable = new Runnable() {
+        @Override
+		public void run() {
+            dispose();
+        }
+    };
 
     /**
      * Contains the data for an entry in the registry.
@@ -190,7 +195,12 @@ public class ImageRegistry {
             if (swtKey != -1) {
                 final Image[] image = new Image[1];
                 final int id = swtKey;
-                display.syncExec(() -> image[0] = display.getSystemImage(id));
+                display.syncExec(new Runnable() {
+                    @Override
+					public void run() {
+                        image[0] = display.getSystemImage(id);
+                    }
+                });
                 return image[0];
             }
         }
@@ -314,7 +324,7 @@ public class ImageRegistry {
 
     private Map<String, Entry> getTable() {
         if (table == null) {
-            table = new HashMap<String, Entry>(10);
+            table = new HashMap<>(10);
         }
         return table;
     }
