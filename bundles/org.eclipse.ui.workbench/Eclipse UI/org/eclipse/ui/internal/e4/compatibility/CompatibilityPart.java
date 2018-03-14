@@ -188,9 +188,6 @@ public abstract class CompatibilityPart implements ISelectionChangedListener {
 				} else {
 					selectionProvider.addSelectionChangedListener(postListener);
 				}
-				ESelectionService selectionService = (ESelectionService) part.getContext().get(
-						ESelectionService.class.getName());
-				selectionService.setSelection(selectionProvider.getSelection());
 			}
 		}
 		return true;
