@@ -11,22 +11,19 @@
 package org.eclipse.jface.viewers;
 
 /**
- * A cell modifier is used to access the data model from a cell editor in an
- * abstract way. It offers methods to:
+ * A cell modifier is used to access the data model from a cell
+ * editor in an abstract way. It offers methods to:
  * <ul>
- * <li>to check if a a model element's property can be edited or not</li>
- * <li>retrieve a value a model element's property</li>
- * <li>to store a cell editor's value back into the model element's property</li>
+ *	<li>to check if a a model element's property can be edited or not</li>
+ *	<li>retrieve a value a model element's property</li>
+ *	<li>to store a cell editor's value back into the model 
+ *    element's property</li>
  * </ul>
  * <p>
- * This interface should be implemented by classes that wish to act as cell
- * modifiers.
+ * This interface should be implemented by classes that wish to
+ * act as cell modifiers.
  * </p>
- * 
- * @deprecated see {@link ViewerColumn#setEditingSupport(EditingSupport)} for a
- *             more flexible way of editing values in a column viewer.
  */
-@Deprecated
 public interface ICellModifier {
     /**
      * Checks whether the given property of the given element can be 
