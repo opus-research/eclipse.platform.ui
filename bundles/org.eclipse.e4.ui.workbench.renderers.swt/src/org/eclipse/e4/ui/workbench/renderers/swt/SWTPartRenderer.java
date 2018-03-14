@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008, 2014 IBM Corporation and others.
+ * Copyright (c) 2008, 2013 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  * 
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Ragnar Nevries <r.eclipse@nevri.es> - Bug 443514
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -20,7 +19,6 @@ import org.eclipse.e4.ui.css.core.engine.CSSEngine;
 import org.eclipse.e4.ui.css.swt.dom.WidgetElement;
 import org.eclipse.e4.ui.internal.workbench.swt.AbstractPartRenderer;
 import org.eclipse.e4.ui.internal.workbench.swt.CSSConstants;
-import org.eclipse.e4.ui.model.application.descriptor.basic.MPartDescriptor;
 import org.eclipse.e4.ui.model.application.ui.MElementContainer;
 import org.eclipse.e4.ui.model.application.ui.MUIElement;
 import org.eclipse.e4.ui.model.application.ui.MUILabel;
@@ -41,7 +39,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class SWTPartRenderer extends AbstractPartRenderer {
-	private static final String ICON_URI_FOR_PART = "IconUriForPart"; //$NON-NLS-1$
 
 	Map<String, Image> imageMap = new HashMap<String, Image>();
 
@@ -211,8 +208,7 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 	protected String getToolTip(MUILabel element) {
 		String overrideTip = (String) ((MUIElement) element).getTransientData()
 				.get(IPresentationEngine.OVERRIDE_TITLE_TOOL_TIP_KEY);
-		return overrideTip == null ? element.getLocalizedTooltip()
-				: overrideTip;
+		return overrideTip == null ? element.getTooltip() : overrideTip;
 	}
 
 	protected Image getImageFromURI(String iconURI) {
@@ -233,7 +229,8 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		Image image = (Image) ((MUIElement) element).getTransientData().get(
 				IPresentationEngine.OVERRIDE_ICON_IMAGE_KEY);
 		if (image == null || image.isDisposed()) {
-			image = getImageFromURI(getIconURI(element));
+			String iconURI = element.getIconURI();
+			image = getImageFromURI(iconURI);
 		}
 
 		if (image != null) {
@@ -241,26 +238,6 @@ public abstract class SWTPartRenderer extends AbstractPartRenderer {
 		}
 
 		return image;
-	}
-
-	private String getIconURI(MUILabel element) {
-		if (element instanceof MPart) {
-			MPart part = (MPart) element;
-			String iconURI = (String) part.getTransientData().get(
-					ICON_URI_FOR_PART);
-			if (iconURI != null) {
-				return iconURI;
-			}
-
-			MPartDescriptor desc = modelService.getPartDescriptor(part
-					.getElementId());
-			iconURI = desc != null && desc.getIconURI() != null ? desc
-					.getIconURI() : element.getIconURI();
-			part.getTransientData().put(ICON_URI_FOR_PART, iconURI);
-
-			return iconURI;
-		}
-		return element.getIconURI();
 	}
 
 	/**

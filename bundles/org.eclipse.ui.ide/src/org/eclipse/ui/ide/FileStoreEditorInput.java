@@ -38,22 +38,30 @@ public class FileStoreEditorInput implements IURIEditorInput, IPersistableElemen
 	 * @since 3.3
 	 */
 	private static class WorkbenchAdapter implements IWorkbenchAdapter {
-		@Override
+		/*
+		 * @see org.eclipse.ui.model.IWorkbenchAdapter#getChildren(java.lang.Object)
+		 */
 		public Object[] getChildren(Object o) {
 			return null;
 		}
 
-		@Override
+		/*
+		 * @see org.eclipse.ui.model.IWorkbenchAdapter#getImageDescriptor(java.lang.Object)
+		 */
 		public ImageDescriptor getImageDescriptor(Object object) {
 			return null;
 		}
 
-		@Override
+		/*
+		 * @see org.eclipse.ui.model.IWorkbenchAdapter#getLabel(java.lang.Object)
+		 */
 		public String getLabel(Object o) {
 			return ((FileStoreEditorInput) o).getName();
 		}
 
-		@Override
+		/*
+		 * @see org.eclipse.ui.model.IWorkbenchAdapter#getParent(java.lang.Object)
+		 */
 		public Object getParent(Object o) {
 			return null;
 		}
@@ -71,39 +79,53 @@ public class FileStoreEditorInput implements IURIEditorInput, IPersistableElemen
 		workbenchAdapter = new WorkbenchAdapter();
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.IEditorInput#exists()
+	 */
 	public boolean exists() {
 		return fileStore.fetchInfo().exists();
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+	 */
 	public ImageDescriptor getImageDescriptor() {
 		return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(getName());
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.IEditorInput#getName()
+	 */
 	public String getName() {
 		return fileStore.getName();
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.IEditorInput#getPersistable()
+	 */
 	public IPersistableElement getPersistable() {
 		return this;
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.ui.IEditorInput#getToolTipText()
+	 */
 	public String getToolTipText() {
 		return fileStore.toString();
 	}
 
-	@Override
+	/*
+	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+	 */
 	public Object getAdapter(Class adapter) {
 		if (IWorkbenchAdapter.class.equals(adapter))
 			return workbenchAdapter;
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
-	@Override
+	/*
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	public boolean equals(Object o) {
 		if (o == this)
 			return true;
@@ -116,22 +138,31 @@ public class FileStoreEditorInput implements IURIEditorInput, IPersistableElemen
 		return false;
 	}
 
-	@Override
+	/*
+	 * @see java.lang.Object#hashCode()
+	 */
 	public int hashCode() {
 		return fileStore.hashCode();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IURIEditorInput#getURI()
+	 */
 	public URI getURI() {
 		return fileStore.toURI();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistableElement#getFactoryId()
+	 */
 	public String getFactoryId() {
 		return FileStoreEditorInputFactory.ID;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
+	 */
 	public void saveState(IMemento memento) {
 		FileStoreEditorInputFactory.saveState(memento, this);
 		

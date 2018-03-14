@@ -39,27 +39,22 @@ public class CommonViewerSiteIPageSiteDelegate implements ICommonViewerSite {
 		pageSite = aPageSite;
 	}
 
-	@Override
 	public String getId() {
 		return viewerId;
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		return pageSite.getAdapter(adapter);
 	}
 
-	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return pageSite.getSelectionProvider();
 	}
 
-	@Override
 	public void setSelectionProvider(ISelectionProvider aSelectionProvider) {
 		pageSite.setSelectionProvider(aSelectionProvider);
 	}
 
-	@Override
 	public Shell getShell() {
 		return pageSite.getShell();
 	}

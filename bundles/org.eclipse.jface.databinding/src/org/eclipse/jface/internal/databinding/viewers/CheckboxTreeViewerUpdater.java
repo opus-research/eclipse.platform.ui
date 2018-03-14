@@ -25,7 +25,6 @@ public class CheckboxTreeViewerUpdater extends TreeViewerUpdater {
 		checkboxViewer = viewer;
 	}
 
-	@Override
 	public void move(Object parent, Object element, int oldPosition,
 			int newPosition) {
 		if (isElementOrderPreserved()) {

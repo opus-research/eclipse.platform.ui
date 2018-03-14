@@ -9,7 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
- *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -1114,11 +1113,11 @@ public class ExtendedMarkersView extends ViewPart {
 	/**
 	 * Return whether or not generator is the selected one.
 	 *
-	 * @param markerGenerator
+	 * @param generator
 	 * @return boolean
 	 */
-	boolean isShowing(MarkerContentGenerator markerGenerator) {
-		return markerGenerator != null ? markerGenerator.equals(generator) : false;
+	boolean isShowing(MarkerContentGenerator generator) {
+		return generator != null ? generator.equals(generator) : false;
 	}
 
 	/**

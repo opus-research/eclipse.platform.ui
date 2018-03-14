@@ -121,6 +121,9 @@ public class TableColorProviderTest extends StructuredViewerTest {
 
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#tearDown()
+     */
     @Override
 	public void tearDown() {
         super.tearDown();
@@ -128,6 +131,9 @@ public class TableColorProviderTest extends StructuredViewerTest {
         green.dispose();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#setUp()
+     */
     @Override
 	public void setUp() {
         super.setUp();
@@ -143,6 +149,9 @@ public class TableColorProviderTest extends StructuredViewerTest {
         junit.textui.TestRunner.run(TableColorProviderTest.class);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#createViewer(org.eclipse.swt.widgets.Composite)
+     */
     @Override
 	protected StructuredViewer createViewer(Composite parent) {
         TableViewer viewer = new TableViewer(parent);
@@ -192,6 +201,9 @@ public class TableColorProviderTest extends StructuredViewerTest {
             return null;
         }
 
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.viewers.ITableColorProvider#getForeground(java.lang.Object, int)
+         */
         @Override
 		public Color getForeground(Object element, int columnIndex) {
             switch (columnIndex) {
@@ -205,6 +217,9 @@ public class TableColorProviderTest extends StructuredViewerTest {
         
        
 
+        /* (non-Javadoc)
+         * @see org.eclipse.jface.viewers.ITableColorProvider#getBackground(java.lang.Object, int)
+         */
         @Override
 		public Color getBackground(Object element, int columnIndex) {
             switch (columnIndex) {
@@ -221,11 +236,17 @@ public class TableColorProviderTest extends StructuredViewerTest {
      * A class to test color providing without coloured columns.
      */
     class ColorViewLabelProvider extends TableTestLabelProvider implements IColorProvider{
+    	/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+		 */
 		@Override
 		public Color getBackground(Object element) {
 			return red;
 		}
 		
+		/* (non-Javadoc)
+		 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+		 */
 		@Override
 		public Color getForeground(Object element) {
 			return green;

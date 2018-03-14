@@ -132,7 +132,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		this.resource = charsetResource;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.internal.ide.dialogs.AbstractEncodingFieldEditor#getStoredValue()
+	 */
 	protected String getStoredValue() {
 		try {
 			if (resource instanceof IContainer) {
@@ -181,7 +185,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 						.getSelection() == getStoredSeparateDerivedEncodingsValue()));
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#doStore()
+	 */
 	protected void doStore() {
 
 		String encoding = getSelectedEncoding();
@@ -217,7 +225,6 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 					MessageDialog.WARNING, new String[] {
 							IDialogConstants.YES_LABEL,
 							IDialogConstants.NO_LABEL }, 0) {
-				@Override
 				protected int getShellStyle() {
 					return super.getShellStyle() | SWT.SHEET;
 				}
@@ -233,7 +240,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		final String finalEncoding = encoding;
 
 		Job charsetJob = new Job(IDEWorkbenchMessages.IDEEncoding_EncodingJob) {
-			@Override
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+			 */
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					if (!hasSameEncoding) {
@@ -274,20 +285,32 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#store()
+	 */
 	public void store() {
 		// Override the store method as we are not using a preference store
 		doStore();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#load()
+	 */
 	public void load() {
 		// Override the load method as we are not using a preference store
 		setPresentsDefaultValue(false);
 		doLoad();
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditor#loadDefault()
+	 */
 	public void loadDefault() {
 		// Override the loadDefault method as we are not using a preference store
 		setPresentsDefaultValue(true);
@@ -295,14 +318,20 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		refreshValidState();
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#doLoadDefault()
+	 */
 	protected void doLoadDefault() {
 		super.doLoadDefault();
 		if (separateDerivedEncodingsButton != null)
 			separateDerivedEncodingsButton.setSelection(DEFAULT_PREF_SEPARATE_DERIVED_ENCODINGS);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#findDefaultEncoding()
+	 */
 	protected String findDefaultEncoding() {
 
 		if (resource instanceof IWorkspaceRoot) {
@@ -341,7 +370,11 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#defaultButtonText()
+	 */
 	protected String defaultButtonText() {
 
 		if (resource instanceof IWorkspaceRoot) {
@@ -386,7 +419,12 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.ide.dialogs.AbstractEncodingFieldEditor#createEncodingGroup(org.eclipse.swt.widgets.Composite,
+	 *      int)
+	 */
 	protected Composite createEncodingGroup(Composite parent, int numColumns) {
 		group = super.createEncodingGroup(parent, numColumns);
 		String byteOrderLabel = IDEEncoding
@@ -435,7 +473,9 @@ public final class ResourceEncodingFieldEditor extends AbstractEncodingFieldEdit
 		return null;
 	}
 
-	@Override
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.preference.FieldEditor#setEnabled(boolean, org.eclipse.swt.widgets.Composite)
+	 */
 	public void setEnabled(boolean enabled, Composite parent) {
 		super.setEnabled(enabled, parent);
 		group.setEnabled(enabled);

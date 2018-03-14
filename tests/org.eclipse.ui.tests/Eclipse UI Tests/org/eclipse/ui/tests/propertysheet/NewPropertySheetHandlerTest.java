@@ -44,7 +44,12 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 		super(testName);
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.tests.propertysheet.AbstractPropertySheetTest#doSetUp()
+	 */
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
 		testNewPropertySheetHandler = new TestNewPropertySheetHandler();
@@ -95,10 +100,8 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 	public final void testGetShowInContextFromAShowInSource()
 			throws ExecutionException, PartInitException {
 		IAdapterFactory factory = new IAdapterFactory() {
-			@Override
 			public Object getAdapter(Object adaptableObject, Class adapterType) {
 				return new IShowInSource() {
-					@Override
 					public ShowInContext getShowInContext() {
 						return new ShowInContext(StructuredSelection.EMPTY,
 								StructuredSelection.EMPTY);
@@ -106,7 +109,6 @@ public class NewPropertySheetHandlerTest extends AbstractPropertySheetTest {
 				};
 			}
 
-			@Override
 			public Class[] getAdapterList() {
 				return new Class[] { IShowInSource.class };
 			}

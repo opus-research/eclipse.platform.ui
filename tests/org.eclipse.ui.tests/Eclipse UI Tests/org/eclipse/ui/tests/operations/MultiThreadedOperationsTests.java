@@ -39,7 +39,6 @@ public class MultiThreadedOperationsTests extends UITestCase {
 				super("Operations Test Job");
 			}
 
-			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				// System.out.println("Running OperationsAPITest from background job");
 				new TestSuite(OperationsAPITest.class).run(new TestResult());

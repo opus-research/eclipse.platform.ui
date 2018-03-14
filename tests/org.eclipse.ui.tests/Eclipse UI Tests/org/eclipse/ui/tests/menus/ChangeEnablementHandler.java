@@ -33,7 +33,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	private IContextManagerListener fContextManagerListener;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil
 				.getActiveWorkbenchWindowChecked(event);
@@ -58,7 +62,6 @@ public class ChangeEnablementHandler extends AbstractHandler {
 	private IContextManagerListener getContextListener() {
 		if (fContextManagerListener == null) {
 			fContextManagerListener = new IContextManagerListener() {
-				@Override
 				public void contextManagerChanged(
 						ContextManagerEvent contextManagerEvent) {
 					if (contextManagerEvent.isActiveContextsChanged()) {
@@ -73,7 +76,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 
 	boolean fEnabled = true;
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#isEnabled()
+	 */
 	public boolean isEnabled() {
 		return fEnabled;
 	}
@@ -85,7 +92,11 @@ public class ChangeEnablementHandler extends AbstractHandler {
 		}
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.core.commands.AbstractHandler#dispose()
+	 */
 	public void dispose() {
 		if (fContextManagerListener != null) {
 			IContextService service = PlatformUI

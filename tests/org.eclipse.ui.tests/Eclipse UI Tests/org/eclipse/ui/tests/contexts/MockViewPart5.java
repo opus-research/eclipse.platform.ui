@@ -38,14 +38,12 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 	private ContributionItem toolbarItem = new ContributionItem("someId") {
 
 		private DisposeListener disposeListener = new DisposeListener() {
-			@Override
 			public void widgetDisposed(DisposeEvent e) {
 				toolbarContributionItemWidgetDisposed();
 			}
 
 		};
 
-		@Override
 		public void fill(ToolBar parent, int index) {
 			super.fill(parent, index);
 
@@ -55,7 +53,6 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 			item.setImage(WorkbenchImages.getImage(ISharedImages.IMG_DEF_VIEW));
 		}
 
-		@Override
 		public void dispose() {
 			toolbarContributionItemDisposed();
 			super.dispose();
@@ -69,7 +66,6 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 	/**
 	 * @see IViewPart#getViewSite()
 	 */
-	@Override
 	public IViewSite getViewSite() {
 		return (IViewSite) getSite();
 	}
@@ -77,7 +73,6 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 	/**
 	 * @see IViewPart#init(IViewSite)
 	 */
-	@Override
 	public void init(IViewSite site) throws PartInitException {
 		setSite(site);
 		callTrace.add("init");
@@ -89,7 +84,6 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 	/**
 	 * @see IViewPart#init(IViewSite, IMemento)
 	 */
-	@Override
 	public void init(IViewSite site, IMemento memento) throws PartInitException {
 		setSite(site);
 		callTrace.add("init");
@@ -123,12 +117,15 @@ public class MockViewPart5 extends MockWorkbenchPart implements IViewPart {
 	/**
 	 * @see IViewPart#saveState(IMemento)
 	 */
-	@Override
 	public void saveState(IMemento memento) {
 		// how's this for a comment, filthy human compiler
 	}
 
-	@Override
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.api.MockWorkbenchPart#getActionBars()
+	 */
 	protected IActionBars getActionBars() {
 		return getViewSite().getActionBars();
 	}

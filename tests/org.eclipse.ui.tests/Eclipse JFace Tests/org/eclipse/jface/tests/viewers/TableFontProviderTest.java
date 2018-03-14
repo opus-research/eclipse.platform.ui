@@ -89,6 +89,11 @@ public class TableFontProviderTest extends StructuredViewerTest {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#setUp()
+	 */
 	@Override
 	public void setUp() {
 		super.setUp();
@@ -106,6 +111,11 @@ public class TableFontProviderTest extends StructuredViewerTest {
 		junit.textui.TestRunner.run(TableFontProviderTest.class);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.tests.viewers.StructuredViewerTest#createViewer(org.eclipse.swt.widgets.Composite)
+	 */
 	@Override
 	protected StructuredViewer createViewer(Composite parent) {
 		TableViewer viewer = new TableViewer(parent);
@@ -167,6 +177,12 @@ public class TableFontProviderTest extends StructuredViewerTest {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.ITableFontProvider#getFont(java.lang.Object,
+		 *      int)
+		 */
 		@Override
 		public Font getFont(Object element, int columnIndex) {
 			switch (columnIndex) {
@@ -185,6 +201,11 @@ public class TableFontProviderTest extends StructuredViewerTest {
 	 */
 	class FontViewLabelProvider extends TableTestLabelProvider implements
 			IFontProvider {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
+		 */
 		@Override
 		public Font getFont(Object element) {
 			return font1;
