@@ -51,7 +51,6 @@ public class MarkerDescriptionField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#canEdit(java.lang.Object)
 		 */
-		@Override
 		protected boolean canEdit(Object element) {
 			if (element instanceof MarkerEntry) {
 
@@ -75,7 +74,6 @@ public class MarkerDescriptionField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#getCellEditor(java.lang.Object)
 		 */
-		@Override
 		protected CellEditor getCellEditor(Object element) {
 			return editor;
 		}
@@ -85,7 +83,6 @@ public class MarkerDescriptionField extends MarkerField {
 		 * 
 		 * @see org.eclipse.jface.viewers.EditingSupport#getValue(java.lang.Object)
 		 */
-		@Override
 		protected Object getValue(Object element) {
 			return ((MarkerEntry) element).getAttributeValue(IMarker.MESSAGE,
 					MarkerSupportInternalUtilities.EMPTY_STRING);
@@ -97,7 +94,6 @@ public class MarkerDescriptionField extends MarkerField {
 		 * @see org.eclipse.jface.viewers.EditingSupport#setValue(java.lang.Object,
 		 *      java.lang.Object)
 		 */
-		@Override
 		protected void setValue(Object element, Object value) {
 			MarkerEntry entry = (MarkerEntry) element;
 			try {
@@ -123,7 +119,6 @@ public class MarkerDescriptionField extends MarkerField {
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#compare(org.eclipse.ui.internal.provisional.views.markers.MarkerItem,
 	 *      org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public int compare(MarkerItem item1, MarkerItem item2) {
 		return getDescriptionKey(item1).compareTo(getDescriptionKey(item2));
 	}
@@ -133,7 +128,6 @@ public class MarkerDescriptionField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getDefaultColumnWidth(org.eclipse.swt.widgets.Control)
 	 */
-	@Override
 	public int getDefaultColumnWidth(Control control) {
 		return 50 * MarkerSupportInternalUtilities.getFontWidth(control);
 	}
@@ -156,7 +150,6 @@ public class MarkerDescriptionField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.MarkerField#getValue(org.eclipse.ui.internal.provisional.views.markers.MarkerItem)
 	 */
-	@Override
 	public String getValue(MarkerItem item) {
 		return item.getAttributeValue(IMarker.MESSAGE,
 				MarkerSupportInternalUtilities.UNKNOWN_ATRRIBTE_VALUE_STRING);
@@ -167,7 +160,6 @@ public class MarkerDescriptionField extends MarkerField {
 	 * 
 	 * @see org.eclipse.ui.internal.provisional.views.markers.api.MarkerField#getEditingSupport()
 	 */
-	@Override
 	public EditingSupport getEditingSupport(ColumnViewer viewer) {
 		return new DescriptionEditingSupport(viewer);
 	}

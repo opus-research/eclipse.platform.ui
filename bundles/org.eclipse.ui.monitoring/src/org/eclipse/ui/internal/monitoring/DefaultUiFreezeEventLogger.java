@@ -10,11 +10,6 @@
  *******************************************************************************/
 package org.eclipse.ui.internal.monitoring;
 
-import java.lang.management.LockInfo;
-import java.lang.management.ThreadInfo;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,6 +18,11 @@ import org.eclipse.ui.monitoring.IUiFreezeEventLogger;
 import org.eclipse.ui.monitoring.PreferenceConstants;
 import org.eclipse.ui.monitoring.StackSample;
 import org.eclipse.ui.monitoring.UiFreezeEvent;
+
+import java.lang.management.LockInfo;
+import java.lang.management.ThreadInfo;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Writes {@link UiFreezeEvent}s to the Eclipse error log.
@@ -38,7 +38,7 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 	}
 
 	/**
-	 * Converts the given {@link UiFreezeEvent} into a {@link MultiStatus} and writes it to the log.
+	 * Parses the given {@link UiFreezeEvent} into a {@link MultiStatus} and saves it to the log.
 	 *
 	 * @param event the event that caused the UI thread to freeze
 	 */
@@ -56,14 +56,15 @@ public class DefaultUiFreezeEventLogger implements IUiFreezeEventLogger {
 		MultiStatus loggedEvent =
 				new SeverityMultiStatus(IStatus.WARNING, PreferenceConstants.PLUGIN_ID, header, null);
 
-		StackSample[] stackTraceSamples = event.getStackTraceSamples();
-		for (StackSample sample : stackTraceSamples) {
+		for (int i = 0; i < event.getSampleCount(); i++) {
+			StackSample sample = event.getStackTraceSamples()[i];
+
 			double deltaInSeconds = (sample.getTimestamp() - lastTimestamp) / 1000.0;
 			ThreadInfo[] threads = sample.getStackTraces();
 
 			// The first thread is guaranteed to be the display thread.
-			Exception stackTrace =
-					new Exception(Messages.DefaultUiFreezeEventLogger_stack_trace_header);
+			Exception stackTrace = new Exception(
+					Messages.DefaultUiFreezeEventLogger_stack_trace_header);
 			stackTrace.setStackTrace(threads[0].getStackTrace());
 			String traceText = NLS.bind(
 					Messages.DefaultUiFreezeEventLogger_sample_header_2,
