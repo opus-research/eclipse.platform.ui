@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014, 2015 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,8 @@
  *     Patrick Naish <patrick.naish@microfocus.com> - Bug 435274
  *     René Brandstetter <Rene.Brandstetter@gmx.net> - Bug 378849
  *     Andrey Loskutov <loskutov@gmx.de> - Bug 378849
- *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556, Bug 400217
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 460556
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 391430
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -59,6 +60,7 @@ import org.eclipse.e4.ui.model.application.ui.menu.MMenuSeparator;
 import org.eclipse.e4.ui.model.application.ui.menu.MPopupMenu;
 import org.eclipse.e4.ui.workbench.IResourceUtilities;
 import org.eclipse.e4.ui.workbench.UIEvents;
+import org.eclipse.e4.ui.workbench.UIEvents.ElementContainer;
 import org.eclipse.e4.ui.workbench.swt.util.ISWTResourceUtilities;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -265,20 +267,6 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 		}
 	};
 
-	@Inject
-	@Optional
-	private void subscribeTopicUpdateMenuEnablement(
-			@UIEventTopic(UIEvents.REQUEST_ENABLEMENT_UPDATE_TOPIC) Event eventData) {
-
-		for (Map.Entry<IContributionItem, MMenuElement> entry : contributionToModel.entrySet()) {
-			processVisibility(entry.getKey(), entry.getValue());
-		}
-		for (MenuManager mgr : managerToModel.keySet()) {
-			mgr.update(false);
-		}
-
-	}
-
 	private MenuManagerRendererFilter rendererFilter;
 
 	@PostConstruct
@@ -305,6 +293,21 @@ public class MenuManagerRenderer extends SWTPartRenderer {
 				ContextInjectionFactory.make(MenuManagerHideProcessor.class,
 						context));
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Inject
+	@Optional
+	private void subscribeTopicChildAdded(@UIEventTopic(ElementContainer.TOPIC_CHILDREN) Event event) {
+		// Ensure that this event is for a MMenuItem
+		if (!(event.getProperty(UIEvents.EventTags.ELEMENT) instanceof MMenu)) {
+			return;
+		}
+		MMenu menuModel = (MMenu) event.getProperty(UIEvents.EventTags.ELEMENT);
+		if (UIEvents.isADD(event)) {
+			Object obj = menuModel;
+			processContents((MElementContainer<MUIElement>) obj);
+		}
 	}
 
 	@PreDestroy
@@ -713,7 +716,8 @@ MenuManagerEventHelper.getInstance()
 	 * @param parentManager
 	 * @param itemModel
 	 */
-	void processRenderedItem(MenuManager parentManager, MMenuItem itemModel) {
+	void processRenderedItem(MenuManager parentManager,
+ MMenuItem itemModel) {
 		IContributionItem ici = getContribution(itemModel);
 		if (ici != null) {
 			return;
@@ -732,9 +736,7 @@ MenuManagerEventHelper.getInstance()
 			// happy with
 			return;
 		}
-
-		processVisibility(ici, itemModel);
-
+		ici.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ici);
 		linkModelToContribution(itemModel, ici);
 	}
@@ -751,9 +753,7 @@ MenuManagerEventHelper.getInstance()
 		} else {
 			return;
 		}
-
-		processVisibility(ici, itemModel);
-
+		ici.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ici);
 		linkModelToContribution(itemModel, ici);
 	}
@@ -802,9 +802,7 @@ MenuManagerEventHelper.getInstance()
 		DirectContributionItem ci = ContextInjectionFactory.make(
 				DirectContributionItem.class, lclContext);
 		ci.setModel(itemModel);
-
-		processVisibility(ci, itemModel);
-
+		ci.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ci);
 		linkModelToContribution(itemModel, ci);
 	}
@@ -841,9 +839,7 @@ MenuManagerEventHelper.getInstance()
 		HandledContributionItem ci = ContextInjectionFactory.make(
 				HandledContributionItem.class, lclContext);
 		ci.setModel(itemModel);
-
-		processVisibility(ci, itemModel);
-
+		ci.setVisible(itemModel.isVisible());
 		addToManager(parentManager, itemModel, ci);
 		linkModelToContribution(itemModel, ci);
 	}
