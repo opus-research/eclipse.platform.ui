@@ -11,6 +11,7 @@
  *     Marc-Andre Laperle (Ericsson) - Fix for Bug 413590
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
+ *     Dmitry Spiridenok <d.spiridenok@gmail.com> - Fix for Bug 433215
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -2731,7 +2732,9 @@ public class WorkbenchPage extends CompatibleWorkbenchPage implements
 						partService, temporary, desc, this, true);
 
 				PerspectiveExtensionReader reader = new PerspectiveExtensionReader();
-				reader.setIncludeOnlyTags(new String[] { IWorkbenchRegistryConstants.TAG_ACTION_SET });
+				reader.setIncludeOnlyTags(new String[] {
+						IWorkbenchRegistryConstants.TAG_ACTION_SET,
+						IWorkbenchRegistryConstants.TAG_NEW_WIZARD_SHORTCUT });
 				reader.extendLayout(null, id, modelLayout);
 
 				addActionSet(perspective, temporary);
