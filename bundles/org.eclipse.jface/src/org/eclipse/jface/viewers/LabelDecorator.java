@@ -16,13 +16,12 @@ import org.eclipse.swt.graphics.Image;
 /**
  * The LabelDecorator is an abstract superclass of ILabelDecorators
  * that support IDecorationContext.
- * @param <E> Type of an element of the model
  * @see IDecorationContext
  * @since 3.2
  *
  */
-public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
-	
+public abstract class LabelDecorator implements ILabelDecorator {
+
 	 /**
      * Returns an image that is based on the given image,
      * but decorated with additional information relating to the state
@@ -42,7 +41,7 @@ public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
      *
      * @see org.eclipse.jface.resource.CompositeImageDescriptor
      */
-    public abstract Image decorateImage(Image image, E element, IDecorationContext context);
+    public abstract Image decorateImage(Image image, Object element, IDecorationContext context);
 
     /**
      * Returns a text label that is based on the given text label,
@@ -61,8 +60,8 @@ public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
      * @param context additional context information about the element being decorated
      * @return the decorated text label, or <code>null</code> if no decoration is to be applied
      */
-    public abstract String decorateText(String text, E element, IDecorationContext context);
-    
+    public abstract String decorateText(String text, Object element, IDecorationContext context);
+
     /**
      * Prepare the element for decoration. If it is already decorated and ready for update
      * return true. If decoration is pending return false.
@@ -71,5 +70,5 @@ public abstract class LabelDecorator<E> implements ILabelDecorator<E> {
      * @param context The decoration context
      * @return boolean <code>true</code> if the decoration is ready for this element
      */
-    public abstract boolean prepareDecoration(E element, String originalText, IDecorationContext context);
+    public abstract boolean prepareDecoration(Object element, String originalText, IDecorationContext context);
 }
