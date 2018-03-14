@@ -786,10 +786,13 @@ public class WorkbenchWindow implements IWorkbenchWindow {
 	private boolean manageChanges = true;
 	private boolean canUpdateMenus = true;
 
+
+
 	void populateTopTrimContributions() {
 		getCoolBarManager2().update(true);
 
 		final MTrimBar trimBar = getTopTrim();
+
 		// TODO why aren't these added as trim contributions
 		// that would remove everything from this method except the fill(*)
 		/*
