@@ -39,47 +39,38 @@ public class CommonViewerSiteIEditorPartSiteDelegate implements
 		editorSite = anEditorSite; 
 	}
 
-	@Override
 	public String getId() {
 		return editorSite.getId();
 	}
 
-	@Override
 	public IActionBars getActionBars() {
 		return editorSite.getActionBars();
 	}
 
-	@Override
 	public Object getAdapter(Class adapter) {
 		return editorSite.getAdapter(adapter);
 	} 
 
-	@Override
 	public IWorkbenchPage getPage() {
 		return editorSite.getPage();
 	}
 
-	@Override
 	public ISelectionProvider getSelectionProvider() {
 		return editorSite.getSelectionProvider();
 	}
 
-	@Override
 	public void setSelectionProvider(ISelectionProvider aSelectionProvider) {
 		editorSite.setSelectionProvider(aSelectionProvider);
 	}
 
-	@Override
 	public Shell getShell() {
 		return editorSite.getShell();
 	}
 
-	@Override
 	public IWorkbenchWindow getWorkbenchWindow() {
 		return editorSite.getWorkbenchWindow();
 	}
 
-	@Override
 	public void registerContextMenu(String menuId, MenuManager menuManager,
 			ISelectionProvider selectionProvider) {
 		editorSite.registerContextMenu(menuId, menuManager, selectionProvider);
@@ -88,7 +79,6 @@ public class CommonViewerSiteIEditorPartSiteDelegate implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getViewPart()
 	 */
-	@Override
 	public IWorkbenchPart getPart() { 
 		return editorSite.getPart();
 	}
@@ -96,7 +86,6 @@ public class CommonViewerSiteIEditorPartSiteDelegate implements
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.navigator.ICommonViewerWorkbenchSite#getSite()
 	 */
-	@Override
 	public IWorkbenchPartSite getSite() {
 		return editorSite;
 	}
