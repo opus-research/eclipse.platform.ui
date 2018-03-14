@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2014 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Leon J. Breedt - Added multiple folder creation support (in WizardNewFolderMainPage)
- *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 430694
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 430694, 472784
  *******************************************************************************/
 package org.eclipse.ui.dialogs;
 
@@ -180,12 +180,9 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 			});
 		}
 		linkedResourceGroup = new CreateLinkedResourceGroup(IResource.FOLDER,
-				new Listener() {
-					@Override
-					public void handleEvent(Event e) {
-						setPageComplete(validatePage());
-						firstLinkCheck = false;
-					}
+				e -> {
+					setPageComplete(validatePage());
+					firstLinkCheck = false;
 				}, new CreateLinkedResourceGroup.IStringValue() {
 					@Override
 					public String getValue() {
@@ -257,9 +254,6 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 		}
 	}
 
-	/**
-	 * (non-Javadoc) Method declared on IDialogPage.
-	 */
 	@Override
 	public void createControl(Composite parent) {
 		initializeDialogUnits(parent);
@@ -435,10 +429,10 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 							NLS.bind(
 									IDEWorkbenchMessages.WizardNewFolderCreationPage_createLinkLocationQuestion, linkTargetPath),
 							MessageDialog.QUESTION_WITH_CANCEL,
-							new String[] { IDialogConstants.YES_LABEL,
-				                    IDialogConstants.NO_LABEL,
-				                    IDialogConstants.CANCEL_LABEL },
-							0);
+							0,
+							IDialogConstants.YES_LABEL,
+							IDialogConstants.NO_LABEL,
+							IDialogConstants.CANCEL_LABEL);
 					int result = dlg.open();
 					if (result == Window.OK) {
 						store.mkdir(0, new NullProgressMonitor());
@@ -459,55 +453,49 @@ public class WizardNewFolderMainPage extends WizardPage implements Listener {
 				return null;
 			}
 		}
-		IRunnableWithProgress op = new IRunnableWithProgress() {
-			@Override
-			public void run(IProgressMonitor monitor) {
-				AbstractOperation op;
-				op = new CreateFolderOperation(
-					newFolderHandle, linkTargetPath, createVirtualFolder, filterList,
-					IDEWorkbenchMessages.WizardNewFolderCreationPage_title);
-				try {
-					// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
-					// directly execute the operation so that the undo state is
-					// not preserved.  Making this undoable can result in accidental
-					// folder (and file) deletions.
-					op.execute(monitor, WorkspaceUndoUtil
-						.getUIInfoAdapter(getShell()));
-				} catch (final ExecutionException e) {
-					getContainer().getShell().getDisplay().syncExec(
-							new Runnable() {
-								@Override
-								public void run() {
-									if (e.getCause() instanceof CoreException) {
-										ErrorDialog
-												.openError(
-														getContainer()
-																.getShell(), // Was Utilities.getFocusShell()
-														IDEWorkbenchMessages.WizardNewFolderCreationPage_errorTitle,
-														null, // no special message
-														((CoreException) e
-																.getCause())
-																.getStatus());
-									} else {
-										IDEWorkbenchPlugin
-												.log(
-														getClass(),
-														"createNewFolder()", e.getCause()); //$NON-NLS-1$
-										MessageDialog
-												.openError(
-														getContainer()
-																.getShell(),
-														IDEWorkbenchMessages.WizardNewFolderCreationPage_internalErrorTitle,
-														NLS
-																.bind(
-																		IDEWorkbenchMessages.WizardNewFolder_internalError,
-																		e
-																				.getCause()
-																				.getMessage()));
-									}
-								}
-							});
-				}
+		IRunnableWithProgress op = monitor -> {
+			AbstractOperation op1;
+			op1 = new CreateFolderOperation(
+				newFolderHandle, linkTargetPath, createVirtualFolder, filterList,
+				IDEWorkbenchMessages.WizardNewFolderCreationPage_title);
+			try {
+				// see bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=219901
+				// directly execute the operation so that the undo state is
+				// not preserved.  Making this undoable can result in accidental
+				// folder (and file) deletions.
+				op1.execute(monitor, WorkspaceUndoUtil
+					.getUIInfoAdapter(getShell()));
+			} catch (final ExecutionException e) {
+				getContainer().getShell().getDisplay().syncExec(
+						() -> {
+							if (e.getCause() instanceof CoreException) {
+								ErrorDialog
+										.openError(
+												getContainer()
+														.getShell(), // Was Utilities.getFocusShell()
+												IDEWorkbenchMessages.WizardNewFolderCreationPage_errorTitle,
+												null, // no special message
+												((CoreException) e
+														.getCause())
+														.getStatus());
+							} else {
+								IDEWorkbenchPlugin
+										.log(
+												getClass(),
+												"createNewFolder()", e.getCause()); //$NON-NLS-1$
+								MessageDialog
+										.openError(
+												getContainer()
+														.getShell(),
+												IDEWorkbenchMessages.WizardNewFolderCreationPage_internalErrorTitle,
+												NLS
+														.bind(
+																IDEWorkbenchMessages.WizardNewFolder_internalError,
+																e
+																		.getCause()
+																		.getMessage()));
+							}
+						});
 			}
 		};
 
