@@ -16,6 +16,7 @@ import com.ibm.icu.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -523,7 +524,7 @@ public class WorkingSetConfigurationBlock {
 	private List<String> loadSelectionHistory(IDialogSettings settings, String... workingSetIds) {
 		String[] strings = settings.getArray(WORKINGSET_SELECTION_HISTORY);
 		if (strings == null || strings.length == 0) {
-			return new ArrayList<>();
+			return Collections.emptyList();
 		}
 
 		List<String> result = new ArrayList<>();
