@@ -1665,13 +1665,22 @@
    <extension
          point="org.eclipse.ui.menus">
          <menuContribution
-            locationURI="menu:window?after=org.eclipse.ui.editors">
-         <command
-               commandId="org.eclipse.ui.ToggleCoolbarAction"
-               tooltip="%menu.toggleCoolbar.tooltip"
-               style="push">
-         </command>
-      </menuContribution>
+               allPopups="false"
+               locationURI="menu:window?after=org.eclipse.ui.editors">
+            <menu
+                  label="%menu.toolbar">
+               <command
+                     commandId="org.eclipse.ui.ToggleCoolbarAction"
+                     style="push"
+                     tooltip="%menu.toggleCoolbar.tooltip">
+               </command>
+               <command
+                     commandId="org.eclipse.ui.resetCoolbarAction"
+                     style="push"
+                     tooltip="%menu.resetCoolbar.tooltip">
+               </command>
+            </menu>
+         </menuContribution>
       <menuContribution
             locationURI="popup:windowCoolbarContextMenu">
          <command
