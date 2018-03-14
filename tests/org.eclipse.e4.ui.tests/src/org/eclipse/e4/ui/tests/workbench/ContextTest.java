@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,47 +7,49 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import junit.framework.TestCase;
 import org.eclipse.core.commands.contexts.Context;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
 import org.eclipse.e4.ui.services.ContextServiceAddon;
 import org.eclipse.e4.ui.services.EContextService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  *
  */
-public class ContextTest {
+public class ContextTest extends TestCase {
 	private static final String WINDOW_ID = "org.eclipse.ui.contexts.window";
 	private static final String DIALOG_ID = "org.eclipse.ui.contexts.dialog";
 	private static final String DIALOG_AND_WINDOW_ID = "org.eclipse.ui.contexts.dialogAndWindow";
 	private IEclipseContext appContext;
 
-	@Before
-	public void setUp() {
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(ContextServiceAddon.class, appContext);
 	}
 
-	@After
-	public void tearDown() {
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	@Override
+	protected void tearDown() throws Exception {
 		appContext.dispose();
 	}
 
-	@Test
-	public void testOneContext() {
+	public void testOneContext() throws Exception {
 
 		defineContexts(appContext);
 
@@ -59,8 +61,7 @@ public class ContextTest {
 		assertEquals(1, cs.getActiveContextIds().size());
 	}
 
-	@Test
-	public void testTwoContexts() {
+	public void testTwoContexts() throws Exception {
 
 		defineContexts(appContext);
 
@@ -83,8 +84,7 @@ public class ContextTest {
 		assertEquals(0, cs.getActiveContextIds().size());
 	}
 
-	@Test
-	public void testTwoContextsBottom() {
+	public void testTwoContextsBottom() throws Exception {
 
 		defineContexts(appContext);
 
@@ -116,8 +116,7 @@ public class ContextTest {
 		assertEquals(0, cs.getActiveContextIds().size());
 	}
 
-	@Test
-	public void testThreeContexts() {
+	public void testThreeContexts() throws Exception {
 
 		defineContexts(appContext);
 
@@ -182,10 +181,11 @@ public class ContextTest {
 	}
 
 	/*
-	 * 
-	 * public void testThreeContexts() { IEclipseContext appContext =
-	 * createGlobalContext();
-	 * 
+	 *
+	 * public void testThreeContexts() throws Exception { IEclipseContext
+	 * appContext = createGlobalContext();
+	 *
+	 * defineCommands(appContext);
 	 *
 	 * EHandlerService service = (EHandlerService) appContext
 	 * .get(EHandlerService.class.getName()); TestHandler handler = new
