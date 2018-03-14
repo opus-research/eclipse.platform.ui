@@ -12,6 +12,7 @@
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431340, 431348, 426535, 433234
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 431868
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442214
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 404009
  *******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -3820,25 +3821,32 @@ public class WorkbenchPage implements IWorkbenchPage {
 	}
 
 	@Override
-	public void savePerspectiveAs(IPerspectiveDescriptor perspective) {
+	public void savePerspectiveAs(IPerspectiveDescriptor newDescriptor) {
 		MPerspective visiblePerspective = getPerspectiveStack().getSelectedElement();
 		// get the original perspective
 		String originalPerspectiveId = visiblePerspective.getElementId();
-		IPerspectiveDescriptor originalPerspective = getWorkbenchWindow().getWorkbench()
+		IPerspectiveDescriptor originalDescriptor = getWorkbenchWindow().getWorkbench()
 				.getPerspectiveRegistry().findPerspectiveWithId(originalPerspectiveId);
 		// remove it from our collection of previously opened perspectives
-		sortedPerspectives.remove(originalPerspective);
+		sortedPerspectives.remove(originalDescriptor);
 		// append the saved perspective
-		sortedPerspectives.add(perspective);
+		sortedPerspectives.add(newDescriptor);
 
-		visiblePerspective.setLabel(perspective.getLabel());
-		visiblePerspective.setTooltip(perspective.getLabel());
-		visiblePerspective.setElementId(perspective.getId());
+		// make clone to save *original* perspective before changing anything
 		modelService.cloneElement(visiblePerspective, application);
-		if (perspective instanceof PerspectiveDescriptor) {
-			((PerspectiveDescriptor) perspective).setHasCustomDefinition(true);
-		}
 
+		// apply new name/id to the current perspective
+		visiblePerspective.setLabel(newDescriptor.getLabel());
+		visiblePerspective.setTooltip(newDescriptor.getLabel());
+		visiblePerspective.setElementId(newDescriptor.getId());
+		if (newDescriptor instanceof PerspectiveDescriptor) {
+			((PerspectiveDescriptor) newDescriptor).setHasCustomDefinition(true);
+		}
+		{
+			// Enforce creation of new Perspective object with new descriptor
+			modelToPerspectiveMapping.remove(visiblePerspective);
+			getPerspective(visiblePerspective);
+		}
 		UIEvents.publishEvent(UIEvents.UILifeCycle.PERSPECTIVE_SAVED, visiblePerspective);
 	}
 
