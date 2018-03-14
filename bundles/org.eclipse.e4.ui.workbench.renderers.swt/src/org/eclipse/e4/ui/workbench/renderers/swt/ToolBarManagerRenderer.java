@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 426535, 433234, 431868
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 431778
  *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 457198
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 431990
  *******************************************************************************/
 package org.eclipse.e4.ui.workbench.renderers.swt;
 
@@ -112,7 +113,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 	@Inject
 	private MApplication application;
 
-	@SuppressWarnings("hiding")
 	@Inject
 	EModelService modelService;
 
@@ -213,6 +213,9 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 			ToolBar tb = parent.getControl();
 			if (tb != null && !tb.isDisposed()) {
 				tb.pack(true);
+				if (tb.getParent() != null) {
+					tb.getParent().pack(true);
+				}
 				tb.getShell().layout(new Control[] { tb }, SWT.DEFER);
 			}
 		}
@@ -265,7 +268,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 
 	private HashSet<String> updateVariables = new HashSet<String>();
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicDirtyChanged(@UIEventTopic(UIEvents.Dirtyable.TOPIC_DIRTY) Event eventData) {
@@ -321,7 +323,6 @@ public class ToolBarManagerRenderer extends SWTPartRenderer {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Inject
 	@Optional
 	private void subscribeTopicAppStartup(@UIEventTopic(UIEvents.UILifeCycle.APP_STARTUP_COMPLETE) Event event) {

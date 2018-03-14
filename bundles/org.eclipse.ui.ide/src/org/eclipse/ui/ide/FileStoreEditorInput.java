@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2012 IBM Corporation and others.
+ * Copyright (c) 2007, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Andrey Loskutov <loskutov@gmx.de> - generified interface, bug 461762
  *******************************************************************************/
 package org.eclipse.ui.ide;
 
@@ -23,10 +24,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
- * Implements an IEditorInput instance appropriate for 
+ * Implements an IEditorInput instance appropriate for
  * <code>IFileStore</code> elements that represent files
  * that are not part of the current workspace.
- * 
+ *
  * @since 3.3
  *
  */
@@ -96,10 +97,12 @@ public class FileStoreEditorInput implements IURIEditorInput, IPersistableElemen
 		return fileStore.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object getAdapter(Class adapter) {
-		if (IWorkbenchAdapter.class.equals(adapter))
-			return workbenchAdapter;
+	public <T> T getAdapter(Class<T> adapter) {
+		if (IWorkbenchAdapter.class.equals(adapter)) {
+			return (T) workbenchAdapter;
+		}
 		return Platform.getAdapterManager().getAdapter(this, adapter);
 	}
 
@@ -134,7 +137,7 @@ public class FileStoreEditorInput implements IURIEditorInput, IPersistableElemen
 	@Override
 	public void saveState(IMemento memento) {
 		FileStoreEditorInputFactory.saveState(memento, this);
-		
+
 	}
 
 }

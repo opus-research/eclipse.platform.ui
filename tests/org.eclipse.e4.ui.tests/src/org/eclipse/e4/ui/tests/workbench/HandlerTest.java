@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2014 IBM Corporation and others.
+ * Copyright (c) 2009, 2010 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,16 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     Thibault Le Ouay <thibaultleouay@gmail.com> - Bug 448832
  ******************************************************************************/
 
 package org.eclipse.e4.ui.tests.workbench;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import junit.framework.TestCase;
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -28,14 +23,11 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.CanExecute;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.ui.internal.workbench.swt.E4Application;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  *
  */
-public class HandlerTest {
+public class HandlerTest extends TestCase {
 	private static final String HELP_COMMAND_ID = "org.eclipse.ui.commands.help";
 	private static final String HELP_COMMAND1_ID = HELP_COMMAND_ID + "1";
 	private IEclipseContext appContext;
@@ -64,27 +56,26 @@ public class HandlerTest {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Before
-	public void setUp() {
+	@Override
+	protected void setUp() throws Exception {
 		appContext = E4Application.createDefaultContext();
 		ContextInjectionFactory.make(CommandServiceAddon.class, appContext);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	@After
-	public void tearDown() {
+	@Override
+	protected void tearDown() throws Exception {
 		appContext.dispose();
 	}
 
-	@Test
-	public void testOneCommand() {
+	public void testOneCommand() throws Exception {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -105,8 +96,7 @@ public class HandlerTest {
 		assertNull(service.executeHandler(help1Command));
 	}
 
-	@Test
-	public void testTwoCommands() {
+	public void testTwoCommands() throws Exception {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -127,8 +117,7 @@ public class HandlerTest {
 		assertTrue(handler1.ran);
 	}
 
-	@Test
-	public void testTwoHandlers() {
+	public void testTwoHandlers() throws Exception {
 		defineCommands(appContext);
 
 		ParameterizedCommand helpCommand = getCommand(appContext,
@@ -169,8 +158,7 @@ public class HandlerTest {
 		return new ParameterizedCommand(cmd, null);
 	}
 
-	@Test
-	public void testCanExecute() {
+	public void testCanExecute() throws Exception {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -197,8 +185,7 @@ public class HandlerTest {
 		assertTrue(windowService.canExecute(helpCommand));
 	}
 
-	@Test
-	public void testThreeContexts() {
+	public void testThreeContexts() throws Exception {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
@@ -225,8 +212,7 @@ public class HandlerTest {
 		assertEquals(windowRC, service.executeHandler(helpCommand));
 	}
 
-	@Test
-	public void testDifferentExecutionContexts() {
+	public void testDifferentExecutionContexts() throws Exception {
 		defineCommands(appContext);
 		final ParameterizedCommand helpCommand = getCommand(appContext,
 				HELP_COMMAND_ID);
