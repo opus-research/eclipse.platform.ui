@@ -56,9 +56,6 @@ public abstract class Page implements IPageBookViewPage {
     protected Page() {
     }
 
-    /* (non-Javadoc)
-     * Method declared on IPage.
-     */
     @Override
 	public abstract void createControl(Composite parent);
 
@@ -82,7 +79,7 @@ public abstract class Page implements IPageBookViewPage {
     @Override
 	public abstract Control getControl();
 
-    /* (non-Javadoc)
+    /*
      * This method exists for backward compatibility.
      * Subclasses should reimplement <code>init</code>.
      */
@@ -90,10 +87,6 @@ public abstract class Page implements IPageBookViewPage {
             IToolBarManager toolBarManager, IStatusLineManager statusLineManager) {
     }
 
-    /* (non-Javadoc)
-     * This method exists for backward compatibility.
-     * Subclasses should reimplement <code>init</code>.
-     */
     @Override
 	public void setActionBars(IActionBars actionBars) {
         makeContributions(actionBars.getMenuManager(), actionBars
