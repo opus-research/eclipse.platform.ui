@@ -303,7 +303,8 @@ public class OpenWithMenu extends ContributionItem {
         if (this.file instanceof IFile) {
             return (IFile) this.file;
         }
-        IResource resource = this.file.getAdapter(IResource.class);
+        IResource resource = (IResource) this.file
+                .getAdapter(IResource.class);
         if (resource instanceof IFile) {
             return (IFile) resource;
         }
