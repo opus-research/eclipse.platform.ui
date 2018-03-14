@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2007 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,6 +47,9 @@ public final class WorkbenchPartLabelProvider extends LabelProvider implements
         super();
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider
+     */
     @Override
 	public final Image getImage(Object element) {
         if (element instanceof IWorkbenchPart) {
@@ -74,6 +77,9 @@ public final class WorkbenchPartLabelProvider extends LabelProvider implements
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.ILabelProvider
+     */
     @Override
 	public final String getText(Object element) {
         if (element instanceof IWorkbenchPart) {
@@ -112,6 +118,11 @@ public final class WorkbenchPartLabelProvider extends LabelProvider implements
         return getText(element);
     }
 
+    /* (non-Javadoc)
+     * @see org.eclipse.jface.viewers.LabelProvider#dispose()
+     *
+     * @since 3.2
+     */
     @Override
 	public void dispose() {
     	resourceManager.dispose();

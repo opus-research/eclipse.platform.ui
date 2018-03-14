@@ -128,6 +128,7 @@ public class IDEApplication implements IApplication, IExecutableExtension {
             Object instanceLocationCheck = checkInstanceLocation(shell, appContext.getArguments());
 			if (instanceLocationCheck != null) {
             	WorkbenchPlugin.unsetSplashShell(display);
+                appContext.applicationRunning();
                 return instanceLocationCheck;
             }
 
