@@ -523,7 +523,6 @@ IWorkbench.CSS_URI_ARG, applicationContext, false);
 		IEclipseContext serviceContext = createDefaultHeadlessContext();
 		final IEclipseContext appContext = serviceContext
 				.createChild("WorkbenchContext"); //$NON-NLS-1$
-		appContext.set(IEclipseContext.APPLICATION_CONTEXT_KEY, appContext);
 
 		appContext
 				.set(Logger.class, ContextInjectionFactory.make(
