@@ -11,7 +11,6 @@
 package org.eclipse.ui.commands;
 
 import java.util.Map;
-
 import org.eclipse.ui.internal.util.Util;
 
 /**
@@ -41,7 +40,7 @@ public final class HandlerEvent {
      * This is the cached result of getPreviousAttributeValuesByName. It is
      * computed the first time getPreviousAttributeValuesByName is called.
      */
-    private Map previousAttributeValuesByName;
+	private Map<String, Object> previousAttributeValuesByName;
 
     /**
      * The map of previous attributes, if they changed.  If they did not change,
@@ -55,7 +54,7 @@ public final class HandlerEvent {
      * 
      * @since 3.1
      */
-    private final Map originalPreviousAttributeValuesByName;
+	private final Map<String, Object> originalPreviousAttributeValuesByName;
     
     /**
      * Creates a new instance of this class.
@@ -73,7 +72,7 @@ public final class HandlerEvent {
      *            attributeValuesByNameChanged is <code>true</code>.
      */
     public HandlerEvent(IHandler handler, boolean attributeValuesByNameChanged,
-            Map previousAttributeValuesByName) {
+			Map<String, Object> previousAttributeValuesByName) {
         if (handler == null) {
 			throw new NullPointerException();
 		}
@@ -114,7 +113,7 @@ public final class HandlerEvent {
      *         guaranteed to not be null if haveAttributeValuesByNameChanged()
      *         is <code>true</code>.
      */
-    public Map getPreviousAttributeValuesByName() {
+	public Map<String, Object> getPreviousAttributeValuesByName() {
         if (originalPreviousAttributeValuesByName == null) {
             return null;
         }
