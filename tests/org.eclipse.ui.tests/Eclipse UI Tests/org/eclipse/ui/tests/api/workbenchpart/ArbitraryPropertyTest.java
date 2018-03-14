@@ -54,6 +54,11 @@ public class ArbitraryPropertyTest extends UITestCase {
 
 	IWorkbenchPage page;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.harness.util.UITestCase#doSetUp()
+	 */
 	@Override
 	protected void doSetUp() throws Exception {
 		super.doSetUp();
@@ -61,6 +66,11 @@ public class ArbitraryPropertyTest extends UITestCase {
 		page = window.getActivePage();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.util.UITestCase#doTearDown()
+	 */
 	@Override
 	protected void doTearDown() throws Exception {
 		super.doTearDown();

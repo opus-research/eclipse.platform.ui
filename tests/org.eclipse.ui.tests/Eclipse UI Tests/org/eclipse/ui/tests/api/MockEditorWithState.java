@@ -161,11 +161,21 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 		saveNeeded = value;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.tests.api.MockWorkbenchPart#getActionBars()
+	 */
 	@Override
 	protected IActionBars getActionBars() {
 		return getEditorSite().getActionBars();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPersistableEditor#restoreState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void restoreState(IMemento memento) {
 		callTrace.add("restoreState");
@@ -183,6 +193,11 @@ public class MockEditorWithState extends MockWorkbenchPart implements
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IPersistable#saveState(org.eclipse.ui.IMemento)
+	 */
 	@Override
 	public void saveState(IMemento memento) {
 		callTrace.add("saveState");

@@ -48,6 +48,9 @@ public class AutoTestSuite extends TestSuite {
         addTest(new AutoTestWrapper(test, logger));
     }
     
+    /* (non-Javadoc)
+     * @see junit.framework.TestSuite#run(junit.framework.TestResult)
+     */
     @Override
 	public void run(TestResult result) {
         super.run(result);
