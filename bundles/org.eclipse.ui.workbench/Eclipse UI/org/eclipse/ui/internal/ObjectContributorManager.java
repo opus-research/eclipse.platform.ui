@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -74,16 +73,16 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 	}
 
     /** Table of contributors. */
-    protected Map contributors;
+	protected Map<String, List<IObjectContributor>> contributors;
 
     /** Cache of object class contributor search paths; <code>null</code> if none. */
     protected Map objectLookup;
 
     /** Cache of resource adapter class contributor search paths; <code>null</code> if none. */
-    protected Map resourceAdapterLookup;
+	protected Map<Class<?>, List<IObjectContributor>> resourceAdapterLookup;
     
     /** Cache of adaptable class contributor search paths; <code>null</code> if none. */
-    protected Map adaptableLookup;
+	protected Map<String, List<IObjectContributor>> adaptableLookup;
     
     protected Set contributorRecordSet;
 
@@ -136,9 +135,9 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the class search order starting with <code>extensibleClass</code>.
      * The search order is defined in this class' comment.
      */
-    protected final List computeClassOrder(Class extensibleClass) {
-        ArrayList result = new ArrayList(4);
-        Class clazz = extensibleClass;
+	protected final List<Class<?>> computeClassOrder(Class<?> extensibleClass) {
+		ArrayList<Class<?>> result = new ArrayList<Class<?>>(4);
+		Class<?> clazz = extensibleClass;
         while (clazz != null) {
             result.add(clazz);
             clazz = clazz.getSuperclass();
@@ -151,12 +150,12 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * by <code>classList</code>.
      * The search order is defined in this class' comment.
      */
-    protected final List computeInterfaceOrder(List classList) {
-        ArrayList result = new ArrayList(4);
-        Map seen = new HashMap(4);
-        for (Iterator list = classList.iterator(); list.hasNext();) {
-            Class[] interfaces = ((Class) list.next()).getInterfaces();
-            internalComputeInterfaceOrder(interfaces, result, seen);
+	protected final List<Class<?>> computeInterfaceOrder(List<Class<?>> classList) {
+		ArrayList<Class<?>> result = new ArrayList<Class<?>>(4);
+
+		for (Iterator<Class<?>> list = classList.iterator(); list.hasNext();) {
+			Class<?>[] interfaces = list.next().getInterfaces();
+			internalComputeInterfaceOrder(interfaces, result, new HashMap(4));
         }
         return result;
     }
@@ -212,17 +211,17 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * <code>List</code>s containing the actual contributions.
      * @since 3.0
      */
-    public Collection getContributors() {
+	public Collection<List<IObjectContributor>> getContributors() {
         return Collections.unmodifiableCollection(contributors.values());
     }
 
     /**
      * Return the list of contributors for the supplied class.
      */
-    protected List addContributorsFor(Class objectClass) {
+	protected List<IObjectContributor> addContributorsFor(Class<?> objectClass) {
 
         List classList = computeClassOrder(objectClass);
-        List result = new ArrayList();
+		List<IObjectContributor> result = new ArrayList<IObjectContributor>();
         addContributorsFor(classList, result);
         classList = computeInterfaceOrder(classList); // interfaces
         addContributorsFor(classList, result);
@@ -239,7 +238,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      */
     public boolean hasContributorsFor(Object object) {
 
-        List contributors = getContributors(object);
+		List contributors = getContributors(object);
         return contributors.size() > 0;
     }
 
@@ -248,20 +247,19 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * on the class hierarchy. Interfaces will be searched
      * based on their position in the result list.
      */
-    private void internalComputeInterfaceOrder(Class[] interfaces, List result,
-            Map seen) {
-        List newInterfaces = new ArrayList(seen.size());
+	private void internalComputeInterfaceOrder(Class<?>[] interfaces, List<Class<?>> result,
+			Map<Class<?>, Class<?>> seen) {
+		List<Class<?>> newInterfaces = new ArrayList<Class<?>>(seen.size());
         for (int i = 0; i < interfaces.length; i++) {
-            Class interfac = interfaces[i];
+			Class<?> interfac = interfaces[i];
             if (seen.get(interfac) == null) {
                 result.add(interfac);
                 seen.put(interfac, interfac);
                 newInterfaces.add(interfac);
             }
         }
-        for (Iterator newList = newInterfaces.iterator(); newList.hasNext();) {
-			internalComputeInterfaceOrder(((Class) newList.next())
-                    .getInterfaces(), result, seen);
+		for (Iterator<Class<?>> newList = newInterfaces.iterator(); newList.hasNext();) {
+			internalComputeInterfaceOrder(newList.next().getInterfaces(), result, seen);
 		}
     }
 
@@ -375,15 +373,16 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         flushLookup();
     }
     
-    protected List getContributors(Object object) {
+	protected List<IObjectContributor> getContributors(Object object) {
     	// Determine is the object is a resource
     	Object resource  = LegacyResourceSupport.getAdaptedContributorResource(object);	
     	
     	// Fetch the unique adapters
-    	List adapters = new ArrayList(Arrays.asList(Platform.getAdapterManager().computeAdapterTypes(object.getClass())));
+		List<String> adapters = new ArrayList<String>(Arrays.asList(Platform.getAdapterManager()
+				.computeAdapterTypes(object.getClass())));
     	removeCommonAdapters(adapters, Arrays.asList(new Class[] {object.getClass()}));
 
-    	List contributors = new ArrayList();
+		List<IObjectContributor> contributors = new ArrayList<IObjectContributor>();
         
         // Calculate the contributors for this object class
         addAll(contributors, getObjectContributors(object.getClass()));
@@ -393,16 +392,15 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 		}
         // Calculate the contributors for each adapter type
     	if(adapters != null) {
-    		for (Iterator it = adapters.iterator(); it.hasNext();) {
-				String adapter = (String) it.next();				
+			for (Iterator<String> it = adapters.iterator(); it.hasNext();) {
+				String adapter = it.next();
 				addAll(contributors, getAdaptableContributors(adapter));
 			}
     	}
     	
         // Remove duplicates.  Note: this -must- maintain the element order to preserve menu order.
         contributors = removeDups(contributors);
-
-    	return contributors.isEmpty() ? Collections.EMPTY_LIST : new ArrayList(contributors);
+		return contributors.isEmpty() ? Collections.emptyList() : new ArrayList(contributors);
     }
     
     /**
@@ -445,10 +443,10 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * 
      * @since 3.1
      */
-	protected List getResourceContributors(Class resourceClass) {
-		List resourceList = null;
+	protected List<IObjectContributor> getResourceContributors(Class<?> resourceClass) {
+		List<IObjectContributor> resourceList = null;
 		if (resourceAdapterLookup != null) {
-			resourceList = (List) resourceAdapterLookup.get(resourceClass);
+			resourceList = resourceAdapterLookup.get(resourceClass);
 		}
 		if (resourceList == null) {
 			resourceList = addContributorsFor(resourceClass);
@@ -471,24 +469,24 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * 
      * @since 3.1
      */
-	protected List getAdaptableContributors(String adapterType) {
-		List adaptableList = null;
+	protected List<IObjectContributor> getAdaptableContributors(String adapterType) {
+		List<IObjectContributor> adaptableList = null;
 		// Lookup the results in the cache first, there are two caches
 		// one that stores non-adapter contributions and the other
 		// contains adapter contributions.
 		if (adaptableLookup != null) {
-			adaptableList = (List) adaptableLookup.get(adapterType);
+			adaptableList = adaptableLookup.get(adapterType);
 		}
 		if (adaptableList == null) {
 			// ignore resource adapters because these must be adapted via the
 			// IContributorResourceAdapter.
 			if (LegacyResourceSupport.isResourceType(adapterType) || LegacyResourceSupport.isResourceMappingType(adapterType)) {
-				adaptableList = Collections.EMPTY_LIST;
+				adaptableList = Collections.emptyList();
 			}
 			else {
-				adaptableList = (List) contributors.get(adapterType);
+				adaptableList = contributors.get(adapterType);
 				if (adaptableList == null || adaptableList.size() == 0) {
-					adaptableList = Collections.EMPTY_LIST;
+					adaptableList = Collections.emptyList();
 				} else {
 					adaptableList = Collections.unmodifiableList(filterOnlyAdaptableContributors(adaptableList));
 				}
@@ -537,7 +535,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         return result;
     }
 
-	private List filterOnlyAdaptableContributors(List contributors) {
+	private List<IObjectContributor> filterOnlyAdaptableContributors(List contributors) {
 		List adaptableContributors = null;
 		for (Iterator it = contributors.iterator(); it.hasNext();) {
 			IObjectContributor c = (IObjectContributor) it.next();
@@ -551,9 +549,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
 		return adaptableContributors == null ? Collections.EMPTY_LIST : adaptableContributors;
 	}
 	
-    /* (non-Javadoc)
-     * @see org.eclipse.core.runtime.dynamicHelpers.IExtensionChangeHandler#removeExtension(org.eclipse.core.runtime.IExtension, java.lang.Object[])
-     */
+	@Override
     public void removeExtension(IExtension source, Object[] objects) {
         for (int i = 0; i < objects.length; i++) {
             if (objects[i] instanceof ContributorRecord) {
@@ -581,21 +577,21 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * @param elements a list of model elements (<code>Object</code>)
      * @return the list of interested contributors (<code>IObjectContributor</code>)
      */
-    protected List getContributors(List elements) {
+	protected List<IObjectContributor> getContributors(List elements) {
         // Calculate the common class, interfaces, and adapters registered
         // via the IAdapterManager.
-        List commonAdapters = new ArrayList();
-        List commonClasses = getCommonClasses(elements, commonAdapters);
+		List<String> commonAdapters = new ArrayList<String>();
+		List commonClasses = getCommonClasses(elements, commonAdapters);
         
         // Get the resource class. It will be null if any of the
         // elements are resources themselves or do not adapt to
         // IResource.
-        Class resourceClass = getCommonResourceClass(elements);
-        Class resourceMappingClass = getResourceMappingClass(elements);
+		Class<?> resourceClass = getCommonResourceClass(elements);
+		Class<?> resourceMappingClass = getResourceMappingClass(elements);
 
         // Get the contributors.   
         
-        List contributors = new ArrayList();
+		List<IObjectContributor> contributors = new ArrayList<IObjectContributor>();
         
         // Add the resource contributions to avoid duplication
         if (resourceClass != null) {
@@ -622,8 +618,8 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
             contributors.addAll(getResourceContributors(resourceMappingClass));
         }
         if (!commonAdapters.isEmpty()) {
-            for (Iterator it = commonAdapters.iterator(); it.hasNext();) {
-                String adapter = (String) it.next();
+			for (Iterator<String> it = commonAdapters.iterator(); it.hasNext();) {
+				String adapter = it.next();
                 addAll(contributors, getAdaptableContributors(adapter));
             }
         }
@@ -631,7 +627,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
         // Remove duplicates.  Note: this -must- maintain the element order to preserve menu order.
         contributors = removeDups(contributors);
         
-        return contributors.isEmpty() ? Collections.EMPTY_LIST : new ArrayList(contributors);
+		return contributors.isEmpty() ? Collections.emptyList() : new ArrayList(contributors);
     }
 
     /**
@@ -648,17 +644,17 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Removes duplicates from the given list, preserving order.
      */
-    private static List removeDups(List list) {
+	private static List<IObjectContributor> removeDups(List<IObjectContributor> list) {
     	if (list.size() <= 1) {
     		return list;
     	}
-    	HashSet set = new HashSet(list);
+		HashSet<IObjectContributor> set = new HashSet<IObjectContributor>(list);
     	if (set.size() == list.size()) {
     		return list;
     	}
-    	ArrayList result = new ArrayList(set.size());
-    	for (Iterator i = list.iterator(); i.hasNext();) {
-    		Object o = i.next();
+		ArrayList<IObjectContributor> result = new ArrayList<IObjectContributor>(set.size());
+		for (Iterator<IObjectContributor> i = list.iterator(); i.hasNext();) {
+			IObjectContributor o = i.next();
     		if (set.remove(o)) {
     			result.add(o);
     		}
@@ -670,7 +666,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
      * Returns the common denominator class, interfaces, and adapters 
      * for the given collection of objects.
      */
-    private List getCommonClasses(List objects, List commonAdapters) {
+	private List getCommonClasses(List objects, List<String> commonAdapters) {
         if (objects == null || objects.size() == 0) {
 			return null;
 		}
@@ -919,7 +915,7 @@ public abstract class ObjectContributorManager implements IExtensionChangeHandle
     /**
      * Return the ResourceMapping class if the elements all adapt to it.
      */
-    private Class getResourceMappingClass(List objects) {
+	private Class<?> getResourceMappingClass(List objects) {
         if (objects == null || objects.size() == 0) {
             return null;
         }
