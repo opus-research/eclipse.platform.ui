@@ -140,7 +140,7 @@ public class MessageDialog extends IconAndMessageDialog {
 	 * Note that the <code>open</code> method blocks.
 	 * </p>
 	 *
-	 * As of 3.11 you can also use the other constructor which is based on
+	 * As of 3.11 you can also use the other constructor with is based on
 	 * varargs
 	 *
 	 * @param parentShell
