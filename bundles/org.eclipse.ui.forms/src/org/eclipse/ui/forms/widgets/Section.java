@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2014 IBM Corporation and others.
+ *  Copyright (c) 2000, 2015 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  *  Contributors:
  *     IBM Corporation - initial API and implementation
  *     Michael Williamson (eclipse-bugs@magnaworks.com) - patch (see Bugzilla #92545)
- *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205
+ *     Simon Scholz <simon.scholz@vogella.com> - Bug 430205, 458055
  *******************************************************************************/
 package org.eclipse.ui.forms.widgets;
 
@@ -61,7 +61,7 @@ public class Section extends ExpandableComposite {
 
 	private Control separator;
 
-	private Hashtable titleColors;
+	private Hashtable<String, Color> titleColors;
 
 	private static final String COLOR_BG = "bg"; //$NON-NLS-1$
 
@@ -89,6 +89,7 @@ public class Section extends ExpandableComposite {
 		}
 		if ((style & TITLE_BAR) != 0) {
 			Listener listener = new Listener() {
+				@Override
 				public void handleEvent(Event e) {
 					Image image = Section.super.getBackgroundImage();
 					if (image != null) {
@@ -106,6 +107,7 @@ public class Section extends ExpandableComposite {
 		return ((estyle & TITLE_BAR) != 0) ? SWT.NO_BACKGROUND : SWT.NULL;
 	}
 
+	@Override
 	protected void internalSetExpanded(boolean expanded) {
 		super.internalSetExpanded(expanded);
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
@@ -190,6 +192,7 @@ public class Section extends ExpandableComposite {
 	 *
 	 * @return separator control or <samp>null </samp> if not set.
 	 */
+	@Override
 	public Control getSeparatorControl() {
 		return separator;
 	}
@@ -200,6 +203,7 @@ public class Section extends ExpandableComposite {
 	 * @param bg
 	 *            the new background
 	 */
+	@Override
 	public void setBackground(Color bg) {
 		super.setBackground(bg);
 		if (descriptionControl != null
@@ -213,6 +217,7 @@ public class Section extends ExpandableComposite {
 	 * @param fg
 	 *            the new foreground.
 	 */
+	@Override
 	public void setForeground(Color fg) {
 		super.setForeground(fg);
 		if (descriptionControl != null
@@ -229,6 +234,7 @@ public class Section extends ExpandableComposite {
 	 *         not set by the client.
 	 * @see #setDescriptionControl(org.eclipse.swt.widgets.Control)
 	 */
+	@Override
 	public Control getDescriptionControl() {
 		return descriptionControl;
 	}
@@ -295,7 +301,7 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBorderColor() {
 		if (titleColors == null)
 			return null;
-		return (Color) titleColors.get(COLOR_BORDER);
+		return titleColors.get(COLOR_BORDER);
 	}
 
 	/**
@@ -309,7 +315,7 @@ public class Section extends ExpandableComposite {
 			return null;
 		if ((getExpansionStyle() & SHORT_TITLE_BAR) != 0)
 			return getBackground();
-		return (Color) titleColors.get(COLOR_GBG);
+		return titleColors.get(COLOR_GBG);
 	}
 
 	/**
@@ -320,17 +326,18 @@ public class Section extends ExpandableComposite {
 	public Color getTitleBarBackground() {
 		if (titleColors == null)
 			return null;
-		return (Color) titleColors.get(COLOR_BG);
+		return titleColors.get(COLOR_BG);
 	}
 
 	private void putTitleBarColor(String key, Color color) {
 		if (color == null)
 			return;
 		if (titleColors == null)
-			titleColors = new Hashtable();
+			titleColors = new Hashtable<>();
 		titleColors.put(key, color);
 	}
 
+	@Override
 	protected void onPaint(PaintEvent e) {
 		Color bg = null;
 		Color fg = null;
@@ -350,9 +357,9 @@ public class Section extends ExpandableComposite {
 			gc = new GC(buffer);
 		}
 		if (titleColors != null) {
-			bg = (Color) titleColors.get(COLOR_BG);
+			bg = titleColors.get(COLOR_BG);
 			fg = getTitleBarForeground();
-			border = (Color) titleColors.get(COLOR_BORDER);
+			border = titleColors.get(COLOR_BORDER);
 		}
 		if (bg == null)
 			bg = getBackground();
@@ -389,7 +396,7 @@ public class Section extends ExpandableComposite {
 				updateHeaderImage(bg, bounds, gradientheight, theight);
 			gc.setBackground(getBackground());
 			gc.fillRectangle(bounds.x, bounds.y, bounds.width, bounds.height);
-			drawBackground(gc, bounds.x, bounds.y, bounds.width, theight);
+			drawBackground(gc, bounds.x, bounds.y, bounds.width, theight - 2);
 			if (marginWidth > 0) {
 				// fix up margins
 				gc.setBackground(getBackground());
@@ -431,24 +438,18 @@ public class Section extends ExpandableComposite {
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0 || isExpanded()) {
 			// left vertical edge gradient
-			gc.fillGradientRectangle(marginWidth, marginHeight + 2, 1,
-					gradientheight - 2, true);
+			gc.fillGradientRectangle(marginWidth, marginHeight + 2, 1, theight + 2, true);
 			// right vertical edge gradient
-			gc.fillGradientRectangle(bounds.width - marginWidth - 1,
-					marginHeight + 2, 1, gradientheight - 2, true);
+			gc.fillGradientRectangle(bounds.width - marginWidth - 1, marginHeight + 2, 1, theight + 2, true);
 		}
 		if ((getExpansionStyle() & TITLE_BAR) != 0) {
 			// New in 3.3 - edge treatmant
 			gc.setForeground(getBackground());
-			gc.drawPolyline(new int[] { marginWidth + 1,
-					marginHeight + gradientheight - 1, marginWidth + 1,
-					marginHeight + 2, marginWidth + 2, marginHeight + 2,
-					marginWidth + 2, marginHeight + 1,
-					bounds.width - marginWidth - 3, marginHeight + 1,
-					bounds.width - marginWidth - 3, marginHeight + 2,
-					bounds.width - marginWidth - 2, marginHeight + 2,
-					bounds.width - marginWidth - 2,
-					marginHeight + gradientheight - 1 });
+			gc.drawPolyline(new int[] { marginWidth + 1, marginHeight + gradientheight + 4, marginWidth + 1,
+					marginHeight + 2, marginWidth + 2, marginHeight + 2, marginWidth + 2, marginHeight + 1,
+					bounds.width - marginWidth - 3, marginHeight + 1, bounds.width - marginWidth - 3, marginHeight + 2,
+					bounds.width - marginWidth - 2, marginHeight + 2, bounds.width - marginWidth - 2,
+					marginHeight + gradientheight + 4 });
 		}
 		if (buffer != null) {
 			gc.dispose();
@@ -459,7 +460,7 @@ public class Section extends ExpandableComposite {
 
 	private void updateHeaderImage(Color bg, Rectangle bounds, int theight, int realtheight) {
 		Color gradient = getTitleBarGradientBackground() != null ? getTitleBarGradientBackground() : getBackground();
-		Image image = FormImages.getInstance().getSectionGradientImage(getBackground(), gradient, bg, realtheight,
+		Image image = FormImages.getInstance().getSectionGradientImage(gradient, bg, realtheight,
 				theight, marginHeight, getDisplay());
 		super.setBackgroundImage(image);
 	}
@@ -467,6 +468,7 @@ public class Section extends ExpandableComposite {
 	/**
 	 * Background image is used for the title gradient - does nothing.
 	 */
+	@Override
 	public final void setBackgroundImage(Image image) {
 	}
 }

@@ -137,7 +137,7 @@ public class Mocks {
 				return this;
 			}
 			if (equalsMethod.equals(method)) {
-				return new Boolean(proxy == args[0]);
+				return Boolean.valueOf(proxy == args[0]);
 			}
 			MethodCall methodCall = new MethodCall(method, args);
 			if (previousCallHistory != null) {
@@ -186,7 +186,7 @@ public class Mocks {
 							: new Short((short) 0);
 				} else if (returnType == int.class) {
 					result = (returnValue != null) ? (Integer) returnValue
-							: new Integer(0);
+							: Integer.valueOf(0);
 				} else if (returnType == long.class) {
 					result = (returnValue != null) ? (Long) returnValue
 							: new Long(0);

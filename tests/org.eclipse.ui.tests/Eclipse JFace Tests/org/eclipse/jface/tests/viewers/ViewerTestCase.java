@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2011 IBM Corporation and others.
+ * Copyright (c) 2005, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 package org.eclipse.jface.tests.viewers;
-
-import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
@@ -29,6 +27,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import junit.framework.TestCase;
+
 public abstract class ViewerTestCase extends TestCase {
 
 	Display fDisplay;
@@ -38,6 +38,9 @@ public abstract class ViewerTestCase extends TestCase {
 	public TestModel fModel;
 
 	protected boolean disableTestsBug347491 = false;
+	protected boolean disableTestsBug493357 = false;
+	private ILogger oldLogger;
+	private ISafeRunnableRunner oldRunner;
 
 	public ViewerTestCase(String name) {
 		super(name);
@@ -106,6 +109,9 @@ public abstract class ViewerTestCase extends TestCase {
 
 	@Override
 	public void setUp() {
+		disableTestsBug493357 = System.getProperty("org.eclipse.swt.internal.gtk.version", "").startsWith("3."); // $NON-NLS-1//$NON-NLS-2//$NON-NLS-3
+		oldLogger = Policy.getLog();
+		oldRunner = SafeRunnable.getRunner();
 		Policy.setLog(new ILogger(){
 			@Override
 			public void log(IStatus status) {
@@ -140,6 +146,8 @@ public abstract class ViewerTestCase extends TestCase {
 
 	@Override
 	public void tearDown() {
+		Policy.setLog(oldLogger);
+		SafeRunnable.setRunner(oldRunner);
 	    processEvents();
 	    fViewer = null;
 	    if (fShell != null) {

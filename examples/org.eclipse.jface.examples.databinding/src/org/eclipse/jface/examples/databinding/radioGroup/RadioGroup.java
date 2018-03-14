@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2005, 2006 IBM Corporation and others.
+ * Copyright (c) 2005, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,7 +71,7 @@ public class RadioGroup {
             throw new IllegalArgumentException("A radio button was not passed");
          }
          buttons[i] = (IRadioButton) DuckType.implement(IRadioButton.class, radioButtons[i]);
-         buttons[i].setData(Integer.toString(i), new Integer(i));
+         buttons[i].setData(Integer.toString(i), Integer.valueOf(i));
          buttons[i].addSelectionListener(selectionListener);
       }
       this.buttons = buttons;

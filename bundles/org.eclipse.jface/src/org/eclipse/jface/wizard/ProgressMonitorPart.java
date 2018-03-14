@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2013 IBM Corporation and others.
+ * Copyright (c) 2000, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,12 +8,19 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *     Eugene Ostroukhov <eugeneo@symbian.org> -  Bug 287887 [Wizards] [api] Cancel button has two distinct roles
+ *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 440270
+ *     Jan-Ove Weichel <janove.weichel@vogella.com> - Bug 475879
  *******************************************************************************/
 package org.eclipse.jface.wizard;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.ProgressIndicator;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -25,21 +32,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IProgressMonitorWithBlocking;
-import org.eclipse.core.runtime.IStatus;
-
-import org.eclipse.jface.dialogs.ProgressIndicator;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.resource.JFaceResources;
 
 /**
  * A standard implementation of an IProgressMonitor. It consists
@@ -73,15 +70,12 @@ public class ProgressMonitorPart extends Composite implements
     protected IStatus blockedStatus;
 
     /** the cancel lister attached to the cancel component */
-    protected Listener fCancelListener = new Listener() {
-        @Override
-		public void handleEvent(Event e) {
-            setCanceled(true);
-            if (fCancelComponent != null) {
-				fCancelComponent.setEnabled(false);
-			}
-        }
-    };
+    protected Listener fCancelListener = e -> {
+	    setCanceled(true);
+	    if (fCancelComponent != null) {
+			fCancelComponent.setEnabled(false);
+		}
+	};
 
     /** toolbar for managing stop button **/
     private ToolBar fToolBar;
@@ -270,17 +264,14 @@ public class ProgressMonitorPart extends Composite implements
         		}
         	});
         	final Image stopImage = ImageDescriptor.createFromFile(
-        			ProgressMonitorPart.class, "images/stop.gif").createImage(getDisplay()); //$NON-NLS-1$
+        			ProgressMonitorPart.class, "images/stop.png").createImage(getDisplay()); //$NON-NLS-1$
         	final Cursor arrowCursor = new Cursor(this.getDisplay(), SWT.CURSOR_ARROW);
         	fToolBar.setCursor(arrowCursor);
         	fStopButton.setImage(stopImage);
-        	fStopButton.addDisposeListener(new DisposeListener() {
-        		@Override
-				public void widgetDisposed(DisposeEvent e) {
-        			stopImage.dispose();
-        			arrowCursor.dispose();
-        		}
-        	});
+        	fStopButton.addDisposeListener(e -> {
+				stopImage.dispose();
+				arrowCursor.dispose();
+			});
         	fStopButton.setEnabled(false);
 			fStopButton.setToolTipText(JFaceResources.getString("ProgressMonitorPart.cancelToolTip")); //$NON-NLS-1$
         }
@@ -363,8 +354,7 @@ public class ProgressMonitorPart extends Composite implements
 
 		if (hasTask) {
 			if (hasSubtask)
-				return escapeMetaCharacters(JFaceResources.format(
-    					"Set_SubTask", new Object[] { fTaskName, fSubTaskName }));//$NON-NLS-1$
+				return escapeMetaCharacters(JFaceResources.format("Set_SubTask", fTaskName, fSubTaskName));//$NON-NLS-1$
    			return escapeMetaCharacters(fTaskName);
 
     	} else if (hasSubtask) {

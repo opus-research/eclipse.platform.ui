@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2008 IBM Corporation and others.
+ * Copyright (c) 2008, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,22 +29,14 @@ public class UserSourceProvider extends AbstractSourceProvider {
 
 	private Person user = null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#dispose()
-	 */
+	@Override
 	public void dispose() {
 		user = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#getCurrentState()
-	 */
-	public Map getCurrentState() {
-		Map m = new HashMap();
+	@Override
+	public Map<?,?> getCurrentState() {
+		Map<String, Object> m = new HashMap<>();
 		m.put(USER, getCurrentUser());
 		return m;
 	}
@@ -60,11 +52,7 @@ public class UserSourceProvider extends AbstractSourceProvider {
 		fireSourceChanged(ISources.ACTIVE_SITE << 1, USER, getCurrentUser());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.ISourceProvider#getProvidedSourceNames()
-	 */
+	@Override
 	public String[] getProvidedSourceNames() {
 		return PROVIDED_SOURCE_NAMES;
 	}

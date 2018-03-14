@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2014 IBM Corporation and others.
+ * Copyright (c) 2004, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,9 +65,6 @@ public class WorkbenchPreview implements IThemePreview {
         }
     };
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPresentationPreview#createControl(org.eclipse.swt.widgets.Composite, org.eclipse.ui.themes.ITheme)
-     */
     @Override
 	public void createControl(Composite parent, ITheme currentTheme) {
         this.theme = currentTheme;
@@ -161,9 +158,6 @@ public class WorkbenchPreview implements IThemePreview {
                 IWorkbenchThemeConstants.TAB_TEXT_FONT));
     }
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IPresentationPreview#dispose()
-     */
     @Override
 	public void dispose() {
         disposed = true;

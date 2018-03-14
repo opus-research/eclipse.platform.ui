@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2008, 2013 IBM Corporation and others.
+ * Copyright (c) 2008, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.e4.ui.model.application.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -63,6 +64,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
+ * </p>
  * <ul>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getContext <em>Context</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getVariables <em>Variables</em>}</li>
@@ -81,7 +83,6 @@ import org.eclipse.emf.ecore.util.InternalEList;
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getCategories <em>Categories</em>}</li>
  *   <li>{@link org.eclipse.e4.ui.model.application.impl.ApplicationImpl#getDialogs <em>Dialogs</em>}</li>
  * </ul>
- * </p>
  *
  * @generated
  */
@@ -255,6 +256,8 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	 * @ordered
 	 */
 	protected EList<MDialog> dialogs;
+
+	protected Map<String, MCommand> elementIdToCommandMap;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -456,13 +459,38 @@ public class ApplicationImpl extends ElementContainerImpl<MWindow> implements MA
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public List<MCommand> getCommands() {
 		if (commands == null) {
-			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this, ApplicationPackageImpl.APPLICATION__COMMANDS);
+			commands = new EObjectContainmentEList<MCommand>(MCommand.class, this,
+					ApplicationPackageImpl.APPLICATION__COMMANDS) {
+
+				private static final long serialVersionUID = 1L;
+
+				@Override
+				protected void didChange() {
+					elementIdToCommandMap = null;
+					super.didChange();
+				}
+			};
 		}
 		return commands;
+	}
+
+	public MCommand getCommand(String elementId) {
+		if (elementIdToCommandMap == null) {
+			Map<String, MCommand> result = new HashMap<String, MCommand>();
+			for (MCommand command : getCommands()) {
+				MCommand otherCommand = result.put(command.getElementId(), command);
+				if (otherCommand != null) {
+					result.put(command.getElementId(), otherCommand);
+				}
+			}
+
+			elementIdToCommandMap = result;
+		}
+		return elementIdToCommandMap.get(elementId);
 	}
 
 	/**

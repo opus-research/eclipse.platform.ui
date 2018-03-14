@@ -1,18 +1,19 @@
  /****************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
- *     Markus Schorn (Wind River Systems) -  bug 284447
- *     James Blackburn (Broadcom Corp.)   -  bug 340978
- *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
- *     Christian Georgi (SAP SE)          -  bug 458811
- *******************************************************************************/
+* Copyright (c) 2000, 2016 IBM Corporation and others.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*     IBM Corporation - initial API and implementation
+*     Dina Sayed, dsayed@eg.ibm.com, IBM -  bug 269844
+*     Markus Schorn (Wind River Systems) -  bug 284447
+*     James Blackburn (Broadcom Corp.)   -  bug 340978
+*     Lars Vogel <Lars.Vogel@vogella.com> - Bug 458832
+*     Christian Georgi (SAP SE)          -  bug 458811
+*     Mickael Istria (Red Hat Inc.) - Bug 486901
+*******************************************************************************/
 package org.eclipse.ui.internal.ide.dialogs;
 
 import java.util.Collections;
@@ -34,9 +35,8 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.BidiUtils;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -210,7 +210,7 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(locationLabel);
 		Text workspacePath = new Text(groupComposite, SWT.READ_ONLY);
 		workspacePath.setBackground(workspacePath.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-		workspacePath.setText(Platform.getLocation().toOSString());
+		workspacePath.setText(TextProcessor.process(Platform.getLocation().toOSString()));
 		workspacePath.setSelection(workspacePath.getText().length());
 		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).grab(true, false)
 				.hint(convertHorizontalDLUsToPixels(200), SWT.DEFAULT).applyTo(workspacePath);
@@ -259,7 +259,8 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         saveInterval.setPage(this);
         saveInterval.setTextLimit(Integer.toString(
                 IDEInternalPreferences.MAX_SAVE_INTERVAL).length());
-        saveInterval.setErrorMessage(NLS.bind(IDEWorkbenchMessages.WorkbenchPreference_saveIntervalError, new Integer(IDEInternalPreferences.MAX_SAVE_INTERVAL)));
+		saveInterval.setErrorMessage(NLS.bind(IDEWorkbenchMessages.WorkbenchPreference_saveIntervalError,
+				Integer.valueOf(IDEInternalPreferences.MAX_SAVE_INTERVAL)));
         saveInterval
                 .setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
         saveInterval.setValidRange(1, IDEInternalPreferences.MAX_SAVE_INTERVAL);
@@ -269,15 +270,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         long interval = description.getSnapshotInterval() / 60000;
         saveInterval.setStringValue(Long.toString(interval));
 
-        saveInterval.setPropertyChangeListener(new IPropertyChangeListener() {
-
-            @Override
-			public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(saveInterval.isValid());
-				}
-            }
-        });
+        saveInterval.setPropertyChangeListener(event -> {
+		    if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(saveInterval.isValid());
+			}
+		});
 
     }
 
@@ -346,14 +343,11 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		encodingEditor.setPage(this);
 		encodingEditor.load();
-		encodingEditor.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(encodingEditor.isValid());
-				}
-
+		encodingEditor.setPropertyChangeListener(event -> {
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(encodingEditor.isValid());
 			}
+
 		});
     }
 
@@ -403,12 +397,9 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
 
 		systemExplorer.load();
 
-		systemExplorer.setPropertyChangeListener(new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(PropertyChangeEvent event) {
-				if (event.getProperty().equals(FieldEditor.IS_VALID)) {
-					setValid(systemExplorer.isValid());
-				}
+		systemExplorer.setPropertyChangeListener(event -> {
+			if (event.getProperty().equals(FieldEditor.IS_VALID)) {
+				setValid(systemExplorer.isValid());
 			}
 		});
 	}
@@ -537,16 +528,13 @@ public class IDEWorkspacePreferencePage extends PreferencePage implements IWorkb
         // core's pref. ours is not up-to-date anyway if someone changes this
         // interval directly thru core api.
         long oldSaveInterval = description.getSnapshotInterval() / 60000;
-        long newSaveInterval = new Long(saveInterval.getStringValue())
-                .longValue();
+        long newSaveInterval = Long.parseLong(saveInterval.getStringValue());
         if (oldSaveInterval != newSaveInterval) {
             try {
                 description.setSnapshotInterval(newSaveInterval * 60000);
                 ResourcesPlugin.getWorkspace().setDescription(description);
-                store.firePropertyChangeEvent(
-                        IDEInternalPreferences.SAVE_INTERVAL, new Integer(
-                                (int) oldSaveInterval), new Integer(
-                                (int) newSaveInterval));
+                store.firePropertyChangeEvent(IDEInternalPreferences.SAVE_INTERVAL, (int) oldSaveInterval,
+                    (int) newSaveInterval);
             } catch (CoreException e) {
                 IDEWorkbenchPlugin.log(
                         "Error changing save interval preference", e //$NON-NLS-1$

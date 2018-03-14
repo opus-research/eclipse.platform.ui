@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2004, 2012 IBM Corporation and others.
+ * Copyright (c) 2004, 2012, 2015 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,9 +7,11 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
+ *     Dirk Fauth <dirk.fauth@googlemail.com> - Bug 463043
  *******************************************************************************/
 package org.eclipse.ui.internal;
 
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -94,9 +96,12 @@ public final class ViewIntroAdapterPart extends ViewPart {
 		ViewSite site = (ViewSite) getViewSite();
 
 		MPart introModelPart = site.getModel();
-		MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
-		if (introPartParent instanceof MPartStack)
-			return (MPartStack) introPartParent;
+		if (introModelPart.getCurSharedRef() != null) {
+			MUIElement introPartParent = introModelPart.getCurSharedRef().getParent();
+			if (introPartParent instanceof MPartStack) {
+				return (MPartStack) introPartParent;
+			}
+		}
 
 		return null;
 	}
@@ -160,7 +165,7 @@ public final class ViewIntroAdapterPart extends ViewPart {
 
     @Override
 	public <T> T getAdapter(Class<T> adapter) {
-        return introPart.getAdapter(adapter);
+		return Adapters.adapt(introPart, adapter);
     }
 
     @Override

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: TestPackageImpl.java,v 1.3 2010/05/14 19:39:11 emoffatt Exp $
+ * $Id: TestPackageImpl.java,v 1.3 2010, 2015/05/14 19:39:11 emoffatt Exp $
  */
 package org.eclipse.e4.ui.tests.model.test.impl;
 
@@ -99,6 +99,7 @@ public class TestPackageImpl extends EPackageImpl implements MTestPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public EClass getTestHarness() {
 		return testHarnessEClass;
 	}
@@ -107,6 +108,7 @@ public class TestPackageImpl extends EPackageImpl implements MTestPackage {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
+	@Override
 	public MTestFactory getTestFactory() {
 		return (MTestFactory)getEFactoryInstance();
 	}

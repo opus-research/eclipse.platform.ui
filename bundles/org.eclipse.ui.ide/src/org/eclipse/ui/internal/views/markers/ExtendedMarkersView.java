@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007, 2015 IBM Corporation and others.
+ * Copyright (c) 2007, 2016 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  *     Andrew Gvozdev -  Bug 364039 - Add "Delete All Markers"
  *     Lars Vogel <Lars.Vogel@gmail.com> - Bug 440810
  *     Cornel Izbasa <cizbasa@info.uvt.ro> - Bug 442440
+ *     Andrey Loskutov <loskutov@gmx.de> - Bug 446864, 466927
+ *     Mickael Istria (Red Hat Inc.) - Bug 486901
  *******************************************************************************/
 package org.eclipse.ui.internal.views.markers;
 
@@ -23,6 +25,7 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Adapters;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -32,16 +35,13 @@ import org.eclipse.jface.action.ContributionManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -56,8 +56,6 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.HelpEvent;
-import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -460,17 +458,14 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.8
 	 */
 	private void addDoubleClickListener() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				ISelection selection = event.getSelection();
-				if(selection instanceof ITreeSelection) {
-					ITreeSelection ss = (ITreeSelection) selection;
-					if(ss.size() == 1) {
-						Object obj = ss.getFirstElement();
-						if(viewer.isExpandable(obj)) {
-							viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
-						}
+		viewer.addDoubleClickListener(event -> {
+			ISelection selection = event.getSelection();
+			if(selection instanceof ITreeSelection) {
+				ITreeSelection ss = (ITreeSelection) selection;
+				if(ss.size() == 1) {
+					Object obj = ss.getFirstElement();
+					if(viewer.isExpandable(obj)) {
+						viewer.setExpandedState(obj, !viewer.getExpandedState(obj));
 					}
 				}
 			}
@@ -495,13 +490,10 @@ public class ExtendedMarkersView extends ViewPart {
 	 *
 	 */
 	private void addSelectionListener() {
-		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(SelectionChangedEvent event) {
-				ISelection selection = event.getSelection();
-				if (selection instanceof IStructuredSelection){
-					updateStatusLine((IStructuredSelection)selection);
-				}
+		viewer.addSelectionChangedListener(event -> {
+			ISelection selection = event.getSelection();
+			if (selection instanceof IStructuredSelection){
+				updateStatusLine((IStructuredSelection)selection);
 			}
 		});
 	}
@@ -511,19 +503,13 @@ public class ExtendedMarkersView extends ViewPart {
 	 */
 	private void addHelpListener() {
 		// Set help on the view itself
-		viewer.getControl().addHelpListener(new HelpListener() {
+		viewer.getControl().addHelpListener(e -> {
+			IContextProvider provider = Adapters.adapt(ExtendedMarkersView.this, IContextProvider.class);
+			if (provider == null)
+				return;
 
-			@Override
-			public void helpRequested(HelpEvent e) {
-				Object provider = getAdapter(IContextProvider.class);
-				if (provider == null)
-					return;
-
-				IContext context = ((IContextProvider) provider)
-						.getContext(viewer.getControl());
-				PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
-			}
-
+			IContext context = provider.getContext(viewer.getControl());
+			PlatformUI.getWorkbench().getHelpSystem().displayHelp(context);
 		});
 	}
 
@@ -837,10 +823,30 @@ public class ExtendedMarkersView extends ViewPart {
 			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (partRef.getId().equals(getSite().getId())) {
-					isViewVisible= true;
-					pageSelectionListener.selectionChanged(null, getSite().getPage().getSelection());
-					setTitleToolTip(null);
+					isViewVisible = true;
+					boolean needUpdate = hasPendingChanges();
+					if (needUpdate) {
+						// trigger UI update, the data is changed meanwhile
+						builder.getUpdateScheduler().scheduleUIUpdate(MarkerUpdateScheduler.SHORT_DELAY);
+					} else {
+						// data is same as before, only clear tooltip
+						setTitleToolTip(null);
+					}
 				}
+			}
+
+			/**
+			 * @return true if the builder noticed that marker updates were made
+			 *         but UI is not updated yet
+			 */
+			private boolean hasPendingChanges() {
+				boolean[] changeFlags = builder.readChangeFlags();
+				for (boolean b : changeFlags) {
+					if (b) {
+						return true;
+					}
+				}
+				return false;
 			}
 		};
 	}
@@ -923,11 +929,9 @@ public class ExtendedMarkersView extends ViewPart {
 		// Any errors or warnings? If not then send the filtering message
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			if (filteredCount < 0 || filteredCount >= totalCount) {
-				status = NLS.bind(MarkerMessages.filter_itemsMessage,
-						new Integer(totalCount));
+				status = NLS.bind(MarkerMessages.filter_itemsMessage, totalCount);
 			} else {
-				status = NLS.bind(MarkerMessages.filter_matchedMessage,
-						new Integer(filteredCount), new Integer(totalCount));
+				status = NLS.bind(MarkerMessages.filter_matchedMessage, filteredCount, totalCount);
 			}
 			return status;
 		}
@@ -938,7 +942,7 @@ public class ExtendedMarkersView extends ViewPart {
 			return message;
 		}
 		return NLS.bind(MarkerMessages.problem_filter_matchedMessage,
-				new Object[] { message, new Integer(filteredCount), new Integer(totalCount) });
+				new Object[] { message, filteredCount, totalCount });
 	}
 
 	/**
@@ -1021,9 +1025,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		builder.restoreState(m);
 
-		Object service = site.getAdapter(IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = Adapters.adapt(site, IWorkbenchSiteProgressService.class);
 		if (service != null) {
-			builder.setProgressService((IWorkbenchSiteProgressService) service);
+			builder.setProgressService(service);
 		}
 		this.memento = m;
 
@@ -1281,7 +1285,7 @@ public class ExtendedMarkersView extends ViewPart {
 	private void setPrimarySortField(MarkerField field, TreeColumn column) {
 		builder.setPrimarySortField(field);
 
-		IWorkbenchSiteProgressService service = getViewSite().getAdapter(IWorkbenchSiteProgressService.class);
+		IWorkbenchSiteProgressService service = Adapters.adapt(getViewSite(), IWorkbenchSiteProgressService.class);
 		builder.refreshContents(service);
 		updateDirectionIndicator(column, field);
 	}
@@ -1381,15 +1385,12 @@ public class ExtendedMarkersView extends ViewPart {
 		if (counts[0].intValue() == 0 && counts[1].intValue() == 0) {
 			// In case of tasks view and bookmarks view, show only selection
 			// count
-			return MessageFormat.format(
-					MarkerMessages.marker_statusSelectedCount,
-					new Object[] { new Integer(entries.length) });
+			return MessageFormat.format(MarkerMessages.marker_statusSelectedCount, new Object[] { entries.length });
 		}
 		return MessageFormat
 				.format(
 						MarkerMessages.marker_statusSummarySelected,
-						new Object[] {
-								new Integer(entries.length),
+						new Object[] { entries.length,
 								MessageFormat
 										.format(
 												MarkerMessages.errorsAndWarningsSummaryBreakdown,
@@ -1406,7 +1407,9 @@ public class ExtendedMarkersView extends ViewPart {
 
 		setContentDescription(statusMessage);
 
-		if (!"".equals(getTitleToolTip())) { //$NON-NLS-1$
+		if (isVisible()) {
+			setTitleToolTip(null);
+		} else {
 			setTitleToolTip(statusMessage);
 		}
 		updateTitleImage(counts);
@@ -1700,7 +1703,7 @@ public class ExtendedMarkersView extends ViewPart {
 	 * @since 3.7
 	 */
 	protected IUndoContext getUndoContext() {
-		return ResourcesPlugin.getWorkspace().getAdapter(IUndoContext.class);
+		return Adapters.adapt(ResourcesPlugin.getWorkspace(), IUndoContext.class);
 	}
 
 	/**

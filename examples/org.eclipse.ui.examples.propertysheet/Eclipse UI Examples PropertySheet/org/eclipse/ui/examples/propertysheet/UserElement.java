@@ -133,9 +133,9 @@ public class UserElement extends OrganizationElement {
             .getString("personal"); //$NON-NLS-1$
 
     // Property Values
-    public static final Integer P_VALUE_TRUE = new Integer(0);
+    public static final Integer P_VALUE_TRUE = Integer.valueOf(0);
 
-    public static final Integer P_VALUE_FALSE = new Integer(1);
+    public static final Integer P_VALUE_FALSE = Integer.valueOf(1);
 
     public static final String P_VALUE_TRUE_LABEL = MessageUtil
             .getString("true"); //$NON-NLS-1$
@@ -290,7 +290,7 @@ public class UserElement extends OrganizationElement {
      */
     private Boolean getCoop() {
         if (coop == null)
-            coop = new Boolean(false);
+            coop = Boolean.FALSE;
         return coop;
     }
 

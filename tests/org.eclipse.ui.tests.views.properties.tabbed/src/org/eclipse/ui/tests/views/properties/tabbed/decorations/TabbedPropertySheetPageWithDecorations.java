@@ -41,6 +41,7 @@ public class TabbedPropertySheetPageWithDecorations extends
 		super(tabbedPropertySheetPageContributor);
 	}
 
+	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
 		if (selection.equals(getCurrentSelection())) {
 			return;
@@ -119,6 +120,7 @@ public class TabbedPropertySheetPageWithDecorations extends
 		}
 	}
 
+	@Override
 	protected void updateTabs(ITabDescriptor[] descriptors) {
 		super.updateTabs(descriptors);
 		if (useDecorations) {
@@ -134,11 +136,11 @@ public class TabbedPropertySheetPageWithDecorations extends
 		Map tabToImageDecorationsMap = new HashMap();
 		for (int i = 0; i < tabItems.length; i++) {
 			if (tabItems[i].getText().equals("Name")) {
-				tabToImageDecorationsMap.put(tabItems[i], new Integer(5));
+				tabToImageDecorationsMap.put(tabItems[i], Integer.valueOf(5));
 			} else if (tabItems[i].getText().equals("Message")) {
-				tabToImageDecorationsMap.put(tabItems[i], new Integer(3));
+				tabToImageDecorationsMap.put(tabItems[i], Integer.valueOf(3));
 			} else {
-				tabToImageDecorationsMap.put(tabItems[i], new Integer(0));
+				tabToImageDecorationsMap.put(tabItems[i], Integer.valueOf(0));
 			}
 		}
 		return tabToImageDecorationsMap;

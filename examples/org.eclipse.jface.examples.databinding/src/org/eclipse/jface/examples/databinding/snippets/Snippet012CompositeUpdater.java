@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007 IBM Corporation and others.
+ * Copyright (c) 2007, 2014 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -93,7 +93,7 @@ public class Snippet012CompositeUpdater {
 
 	static class Counter extends WritableValue {
 		Counter() {
-			super(new Integer(0), Integer.class);
+			super(Integer.valueOf(0), Integer.class);
 			scheduleIncrementTask();
 		}
 
@@ -107,7 +107,7 @@ public class Snippet012CompositeUpdater {
 						@Override
 						public void run() {
 							Integer currentVal = (Integer) getValue();
-							setValue(new Integer(currentVal.intValue() + 1));
+							setValue(Integer.valueOf(currentVal.intValue() + 1));
 						}
 					});
 					scheduleIncrementTask();
