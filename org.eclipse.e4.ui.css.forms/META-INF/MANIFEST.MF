@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: %pluginName
+Bundle-SymbolicName: org.eclipse.e4.ui.css.forms;singleton:=true
+Bundle-Version: 0.1.0.qualifier
+Require-Bundle: org.eclipse.e4.ui.css.core,
+ org.eclipse.e4.ui.css.swt;bundle-version="0.11.100",
+ org.eclipse.ui.forms;bundle-version="3.6.100",
+ org.eclipse.swt;bundle-version="3.103.0"
+Bundle-Vendor: %providerName
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
