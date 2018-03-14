@@ -37,7 +37,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
-import org.eclipse.swt.events.ShellListener;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPerspectiveRegistry;
 import org.eclipse.ui.ISources;
@@ -130,13 +129,10 @@ public class EvaluationServiceTest extends UITestCase {
 
 	public void testBasicService() throws Exception {
 		IWorkbenchWindow window = openTestWindow();
+		waitForJobs(500, 5000);
+
 		boolean activeShell = forceActive(window.getShell());
-
-		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
-		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		window.getShell().addShellListener(shellListener);
+		Assume.assumeTrue(activeShell);
 
 		IEvaluationService service = window
 				.getService(IEvaluationService.class);
@@ -147,6 +143,9 @@ public class EvaluationServiceTest extends UITestCase {
 		IEvaluationReference evalRef = null;
 		IContextService contextService = null;
 		try {
+			contextService = window.getService(IContextService.class);
+			assertFalse(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			evalRef = service.addEvaluationListener(
 					new ActiveContextExpression(CONTEXT_ID1,
 							new String[] { ISources.ACTIVE_CONTEXT_NAME }),
@@ -154,25 +153,19 @@ public class EvaluationServiceTest extends UITestCase {
 			assertEquals(1, listener.count);
 			assertFalse(listener.currentValue);
 
-			Assume.assumeTrue(forceActive(window.getShell()));
-			processEvents();
-			waitForJobs(500, 3000);
 
-			contextService = window
-					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			processEvents();
 			waitForJobs(500, 3000);
-
-			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(shellIsActive.get());
-//			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+			assertTrue(contextService.getActiveContextIds().contains(CONTEXT_ID1));
 
 			assertEquals(2, listener.count);
 			assertTrue(listener.currentValue);
 
 			contextService.deactivateContext(context1);
 			context1 = null;
+			assertFalse(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			assertEquals(3, listener.count);
 			assertFalse(listener.currentValue);
 
@@ -183,10 +176,14 @@ public class EvaluationServiceTest extends UITestCase {
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			processEvents();
 			waitForJobs(500, 3000);
+			assertTrue(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			assertEquals(4, listener.count);
 			assertFalse(listener.currentValue);
 			contextService.deactivateContext(context1);
 			context1 = null;
+			assertFalse(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			assertEquals(4, listener.count);
 			assertFalse(listener.currentValue);
 		} finally {
@@ -203,11 +200,10 @@ public class EvaluationServiceTest extends UITestCase {
 		IWorkbenchWindow window = openTestWindow();
 		boolean activeShell = forceActive(window.getShell());
 
+		waitForJobs(500, 5000);
+
 		final AtomicBoolean shellIsActive = new AtomicBoolean(activeShell);
 		Assume.assumeTrue(shellIsActive.get());
-
-		ShellListener shellListener = new ShellStateListener(shellIsActive);
-		window.getShell().addShellListener(shellListener);
 
 		IEvaluationService service = window
 				.getService(IEvaluationService.class);
@@ -219,6 +215,9 @@ public class EvaluationServiceTest extends UITestCase {
 		IEvaluationReference evalRef2 = null;
 		IContextService contextService = null;
 		try {
+			contextService = window.getService(IContextService.class);
+			assertFalse(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			evalRef1 = service.addEvaluationListener(
 					new ActiveContextExpression(CONTEXT_ID1,
 							new String[] { ISources.ACTIVE_CONTEXT_NAME }),
@@ -234,27 +233,29 @@ public class EvaluationServiceTest extends UITestCase {
 			assertFalse(listener2.currentValue);
 			evalRef2.setResult(true);
 
-			Assume.assumeTrue(forceActive(window.getShell()));
-			processEvents();
-			waitForJobs(500, 3000);
-
-			contextService = window
-					.getService(IContextService.class);
 			context1 = contextService.activateContext(CONTEXT_ID1);
 			processEvents();
 			waitForJobs(500, 3000);
+			assertTrue(contextService.getActiveContextIds().contains(CONTEXT_ID1));
 
-			Assume.assumeTrue(window.getShell().isVisible());
-			Assume.assumeTrue(shellIsActive.get());
-//			assertEquals(window, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+			int count = 0;
+			while (count < 5 && listener1.count != 2) {
+				count++;
+				waitForJobs(100 * count, 1000);
+			}
 
 			assertEquals(2, listener1.count);
 			assertTrue(listener1.currentValue);
+			// we already set this guy to true, he should skip
 			assertEquals(1, listener2.count);
 			assertFalse(listener2.currentValue);
 
 			evalRef1.setResult(false);
 			contextService.deactivateContext(context1);
+			processEvents();
+			waitForJobs(500, 3000);
+			assertFalse(contextService.getActiveContextIds().contains(CONTEXT_ID1));
+
 			context1 = null;
 			assertEquals(2, listener2.count);
 			assertFalse(listener2.currentValue);
