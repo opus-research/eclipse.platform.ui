@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *     Maxime Porhel <maxime.porhel@obeo.fr> Obeo - Bug 430116
  *     Lars Vogel <Lars.Vogel@vogella.com> - Bug 457237
- *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198, 395601, 445538
+ *     Andrey Loskutov <loskutov@gmx.de> - Bugs 383569, 420956, 457198
  ******************************************************************************/
 
 package org.eclipse.ui.internal;
@@ -545,11 +545,10 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			final ToolBarManager manager = renderer.getManager(el);
 			if (manager != null) {
 				boolean wasVisible = el.isVisible();
-				boolean needUpdate = fill(el, manager);
+				fill(el, manager);
 				// fix for bug 383569#25: if the toolbar model changed the
 				// visibility we must create (or remove) SWT toolbar widgets
-				if (needUpdate || el.isVisible() != wasVisible) {
-					manager.markDirty();
+				if (el.isVisible() != wasVisible) {
 					manager.update(true);
 				}
 				// TODO: Hack to work around Bug 370961
@@ -595,12 +594,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 		}
 	}
 
-	/**
-	 * @return true if the contribution manager needs to be updated because item
-	 *         visibility is changed
-	 */
-	private boolean fill(MToolBar container, IContributionManager manager) {
-		boolean needUpdate = false;
+	private void fill(MToolBar container, IContributionManager manager) {
 		ToolBarManagerRenderer renderer = (ToolBarManagerRenderer) rendererFactory.getRenderer(container, null);
 
 		IContributionItem[] items = manager.getItems();
@@ -612,7 +606,7 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 			MToolBarElement toolBarElem = renderer.getToolElement(item);
 			if (toolBarElem != null) {
 				if (container.isVisible()) {
-					needUpdate |= applyOverridenVisibility(toolBarElem, item, manager);
+					applyOverridenVisibility(toolBarElem, item, manager);
 					continue;
 				}
 				if (item.isSeparator() || item.isGroupMarker()) {
@@ -622,20 +616,20 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				// If the toolbar is hidden but one of the children is not,
 				// make both the child and the toolbar visible
 				if (isChildVisible(item, manager)) {
-					needUpdate |= applyOverridenVisibility(toolBarElem, item, manager);
+					applyOverridenVisibility(toolBarElem, item, manager);
 					container.setVisible(true);
 				}
 				continue;
 			}
 			if (item instanceof IToolBarContributionItem) {
 				IToolBarManager manager2 = ((IToolBarContributionItem) item).getToolBarManager();
-				needUpdate |= fill(container, manager2);
+				fill(container, manager2);
 			} else if (item instanceof IMenuManager) {
 				// No element to add in toolbar:
 				// let the menu manager control its contributions.
 				continue;
 			} else if (item instanceof IContributionManager) {
-				needUpdate |= fill(container, (IContributionManager) item);
+				fill(container, (IContributionManager) item);
 			} else if (item instanceof CommandContributionItem) {
 				MHandledToolItem toolItem = MenuHelper.createToolItem(application, (CommandContributionItem) item);
 				if (toolItem == null) {
@@ -647,21 +641,13 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				toolItem.setRenderer(renderer);
 				HandledContributionItem ci = ContextInjectionFactory.make(HandledContributionItem.class,
 						window.getContext());
-
 				if (manager instanceof ContributionManager) {
-					// set basic attributes to the item before adding to the manager
-					ci.setId(toolItem.getElementId());
-					ci.setVisible(toolItem.isVisible());
-
 					ContributionManager cm = (ContributionManager) manager;
 					cm.insert(index, ci);
 					cm.remove(item);
-
-					// explicitly dispose contribution since it is now
-					// disconnected from manager
-					item.dispose();
 				}
 				ci.setModel(toolItem);
+				ci.setVisible(toolItem.isVisible());
 				renderer.linkModelToContribution(toolItem, ci);
 				container.getChildren().add(toolItem);
 			} else {
@@ -676,42 +662,26 @@ public class CoolBarToTrimManager extends ContributionManager implements ICoolBa
 				container.getChildren().add(toolItem);
 			}
 		}
-		return needUpdate;
 	}
 
-	/**
-	 * @return true if the contribution manager needs to be updated because item
-	 *         visibility is changed
-	 */
-	private boolean applyOverridenVisibility(MToolBarElement modelItem, IContributionItem item,
+	private void applyOverridenVisibility(MToolBarElement modelItem, IContributionItem item,
 			IContributionManager manager) {
-		boolean needUpdate = false;
 		Boolean overridenVisibility = getOverridenVisibility(item, manager);
 		Boolean prevChildVisible = (Boolean) modelItem.getTransientData().get(PREV_CHILD_VISIBLE);
 
 		if (overridenVisibility != null) {
 			if (prevChildVisible == null) {
-				boolean modelVisible = modelItem.isVisible();
-				boolean itemVisible = item.isVisible();
-				if (modelVisible != overridenVisibility || itemVisible != overridenVisibility) {
-					needUpdate = true;
-				}
-				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, itemVisible);
+				modelItem.getTransientData().put(PREV_CHILD_VISIBLE, modelItem.isVisible());
 				modelItem.setVisible(overridenVisibility);
 			} else {
-				return needUpdate;
+				return;
 			}
 		} else if (prevChildVisible != null) {
-			boolean oldVisible = modelItem.isVisible();
-			if (oldVisible != prevChildVisible) {
-				needUpdate = true;
-			}
 			modelItem.setVisible(prevChildVisible);
 			modelItem.getTransientData().remove(PREV_CHILD_VISIBLE);
 		} else {
-			return needUpdate;
+			return;
 		}
-		return needUpdate;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2015 IBM Corporation and others.
+ * Copyright (c) 2000, 2006 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,7 @@ package org.eclipse.ui.examples.readmetool;
 import java.util.Vector;
 
 import org.eclipse.core.runtime.IAdaptable;
-
 import org.eclipse.jface.resource.ImageDescriptor;
-
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.eclipse.ui.views.properties.IPropertySource;
 
@@ -72,13 +70,12 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
         children.add(child);
     }
 
-    @SuppressWarnings("unchecked")
-	@Override
-	public <T> T getAdapter(Class<T> adapter) {
+    @Override
+	public Object getAdapter(Class adapter) {
         if (adapter == IWorkbenchAdapter.class)
-            return (T)this;
+            return this;
         if (adapter == IPropertySource.class)
-            return (T)new MarkElementProperties(this);
+            return new MarkElementProperties(this);
         return null;
     }
 
@@ -92,7 +89,7 @@ public class MarkElement implements IWorkbenchAdapter, IAdaptable {
 
     @Override
 	public ImageDescriptor getImageDescriptor(Object object) {
-        IWorkbenchAdapter parentElement = parent
+        IWorkbenchAdapter parentElement = (IWorkbenchAdapter) parent
                 .getAdapter(IWorkbenchAdapter.class);
         if (parentElement != null) {
             return parentElement.getImageDescriptor(object);

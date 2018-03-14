@@ -74,8 +74,6 @@ public class DirectContributionItem extends ContributionItem {
 	private static final String DISABLED_URI = "disabledURI"; //$NON-NLS-1$
 	private static final String DCI_STATIC_CONTEXT = "DCI-staticContext"; //$NON-NLS-1$
 
-	private static final Object missingExecute = new Object();
-
 	private MItem model;
 	private Widget widget;
 	private Listener menuItemListener;
@@ -462,12 +460,8 @@ public class DirectContributionItem extends ContributionItem {
 		}
 		MContribution contrib = (MContribution) model;
 		IEclipseContext staticContext = getStaticContext(trigger);
-		Object result = ContextInjectionFactory.invoke(contrib.getObject(),
-				Execute.class, getExecutionContext(lclContext), staticContext,
- missingExecute);
-		if (result == missingExecute && logger != null) {
-			logger.error("Contribution is missing @Execute: " + contrib.getContributionURI()); //$NON-NLS-1$
-		}
+		ContextInjectionFactory.invoke(contrib.getObject(), Execute.class,
+				getExecutionContext(lclContext), staticContext, null);
 	}
 
 	private boolean canExecuteItem(Event trigger) {
