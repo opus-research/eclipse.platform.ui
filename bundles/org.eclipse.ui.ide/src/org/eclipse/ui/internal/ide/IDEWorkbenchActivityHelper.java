@@ -41,15 +41,15 @@ import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * Utility class that manages promotion of activites in response to workspace changes.
- * 
+ *
  * @since 3.0
  */
 public class IDEWorkbenchActivityHelper {
 
     private static final String NATURE_POINT = "org.eclipse.ui.ide.natures"; //$NON-NLS-1$
-    
+
     /**
-     * Resource listener that reacts to new projects (and associated natures) 
+     * Resource listener that reacts to new projects (and associated natures)
      * coming into the workspace.
      */
     private IResourceChangeListener listener;
@@ -64,12 +64,12 @@ public class IDEWorkbenchActivityHelper {
      * Lock for the list of nature ids to be processed.
      */
 	private final IDEWorkbenchActivityHelper lock;
-	
+
 	/**
 	 * The update job.
 	 */
 	private WorkbenchJob fUpdateJob;
-	
+
 	/**
 	 * The collection of natures to process.
 	 */
@@ -93,7 +93,7 @@ public class IDEWorkbenchActivityHelper {
     }
 
     /**
-     * Create a new <code>IDEWorkbenchActivityHelper</code> which will listen 
+     * Create a new <code>IDEWorkbenchActivityHelper</code> which will listen
      * for workspace changes and promote activities accordingly.
      */
     private IDEWorkbenchActivityHelper() {
@@ -102,7 +102,8 @@ public class IDEWorkbenchActivityHelper {
         // for dynamic UI
         Platform.getExtensionRegistry().addRegistryChangeListener(
                 new IRegistryChangeListener() {
-                    public void registryChanged(IRegistryChangeEvent event) {
+                    @Override
+					public void registryChanged(IRegistryChangeEvent event) {
                         if (event.getExtensionDeltas(
                                 "org.eclipse.core.resources", "natures").length > 0) { //$NON-NLS-1$ //$NON-NLS-2$
 							loadNatures();
@@ -132,11 +133,13 @@ public class IDEWorkbenchActivityHelper {
             final String pluginId = extension.getNamespaceIdentifier();
             String natureId = extension.getUniqueIdentifier();
             natureMap.put(natureId, new IPluginContribution() {
-                public String getLocalId() {
+                @Override
+				public String getLocalId() {
                     return localId;
                 }
 
-                public String getPluginId() {
+                @Override
+				public String getPluginId() {
                     return pluginId;
                 }
             });
@@ -145,16 +148,13 @@ public class IDEWorkbenchActivityHelper {
 
     /**
      * Get a change listener for listening to resource changes.
-     * 
+     *
      * @return the resource change listeners
      */
     private IResourceChangeListener getChangeListener() {
         return new IResourceChangeListener() {
-            /*
-             * (non-Javadoc) @see
-             * org.eclipse.core.resources.IResourceChangeListener#resourceChanged(org.eclipse.core.resources.IResourceChangeEvent)
-             */
-            public void resourceChanged(IResourceChangeEvent event) {
+            @Override
+			public void resourceChanged(IResourceChangeEvent event) {
                 if (!WorkbenchActivityHelper.isFiltering()) {
 					return;
 				}
@@ -249,7 +249,8 @@ public class IDEWorkbenchActivityHelper {
 		}
 		if (needsUpdate) {
 			if (fUpdateJob == null) {
-				fUpdateJob = new WorkbenchJob(IDEWorkbenchMessages.IDEWorkbenchActivityHelper_jobName) { 
+				fUpdateJob = new WorkbenchJob(IDEWorkbenchMessages.IDEWorkbenchActivityHelper_jobName) {
+					@Override
 					public IStatus runInUIThread(
 							IProgressMonitor monitor) {
 						runPendingUpdates();

@@ -20,11 +20,12 @@ import org.eclipse.jface.internal.databinding.provisional.viewers.ViewerLabelPro
 
 /**
  * @since 1.1
- * 
+ *
  */
 public abstract class ListeningLabelProvider extends ViewerLabelProvider {
 
 	private ISetChangeListener listener = new ISetChangeListener() {
+		@Override
 		public void handleSetChange(SetChangeEvent event) {
 			for (Iterator it = event.diff.getAdditions().iterator(); it.hasNext();) {
 				addListenerTo(it.next());
@@ -58,6 +59,7 @@ public abstract class ListeningLabelProvider extends ViewerLabelProvider {
 	 */
 	protected abstract void addListenerTo(Object next);
 
+	@Override
 	public void dispose() {
 		for (Iterator iter = items.iterator(); iter.hasNext();) {
 			removeListenerFrom(iter.next());

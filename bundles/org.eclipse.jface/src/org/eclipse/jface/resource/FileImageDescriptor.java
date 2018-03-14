@@ -51,7 +51,7 @@ class FileImageDescriptor extends ImageDescriptor {
 	 * Note that the file is not accessed until its <code>getImageDate</code>
 	 * method is called.
 	 * </p>
-	 * 
+	 *
 	 * @param clazz
 	 *            class for resource directory, or <code>null</code>
 	 * @param filename
@@ -62,9 +62,6 @@ class FileImageDescriptor extends ImageDescriptor {
 		this.name = filename;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
 	@Override
 	public boolean equals(Object o) {
 		if (!(o instanceof FileImageDescriptor)) {
@@ -117,7 +114,7 @@ class FileImageDescriptor extends ImageDescriptor {
 	/**
 	 * Returns a stream on the image contents. Returns null if a stream could
 	 * not be opened.
-	 * 
+	 *
 	 * @return the buffered stream on the file or <code>null</code> if the
 	 *         file cannot be found
 	 */
@@ -141,9 +138,6 @@ class FileImageDescriptor extends ImageDescriptor {
 
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
 	@Override
 	public int hashCode() {
 		int code = name.hashCode();
@@ -153,9 +147,6 @@ class FileImageDescriptor extends ImageDescriptor {
 		return code;
 	}
 
-	/*
-	 * (non-Javadoc) Method declared on Object.
-	 */
 	/**
 	 * The <code>FileImageDescriptor</code> implementation of this
 	 * <code>Object</code> method returns a string representation of this
@@ -166,18 +157,12 @@ class FileImageDescriptor extends ImageDescriptor {
 		return "FileImageDescriptor(location=" + location + ", name=" + name + ")";//$NON-NLS-3$//$NON-NLS-2$//$NON-NLS-1$
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.resource.ImageDescriptor#createImage(boolean,
-	 *      org.eclipse.swt.graphics.Device)
-	 */
 	@Override
 	public Image createImage(boolean returnMissingImageOnError, Device device) {
 		String path = getFilePath();
 		if (path == null)
 			return createDefaultImage(returnMissingImageOnError, device);
-		try {			
+		try {
 			return new Image(device, path);
 		} catch (SWTException exception) {
 			//if we fail try the default way using a stream
@@ -187,7 +172,7 @@ class FileImageDescriptor extends ImageDescriptor {
 
 	/**
 	 * Return default image if returnMissingImageOnError is true.
-	 * 
+	 *
 	 * @param device
 	 * @return Image or <code>null</code>
 	 */
@@ -204,7 +189,7 @@ class FileImageDescriptor extends ImageDescriptor {
 
 	/**
 	 * Returns the filename for the ImageData.
-	 * 
+	 *
 	 * @return {@link String} or <code>null</code> if the file cannot be found
 	 */
 	private String getFilePath() {

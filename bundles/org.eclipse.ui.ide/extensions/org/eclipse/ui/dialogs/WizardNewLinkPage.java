@@ -6,7 +6,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  *
  * Contributors:
- *   IBM Corporation - initial API and implementation 
+ *   IBM Corporation - initial API and implementation
  *   Sebastian Davids <sdavids@gmx.de> - Fix for bug 19346 - Dialog
  * 	 	font should be activated and used by other components.
  *******************************************************************************/
@@ -47,7 +47,7 @@ import org.eclipse.ui.internal.ide.IIDEHelpContextIds;
 import org.eclipse.ui.internal.ide.dialogs.IDEResourceInfoUtils;
 
 /**
- * Standard resource link page for a wizard that creates a file or 
+ * Standard resource link page for a wizard that creates a file or
  * folder resource.
  * <p>
  * This class may be instantiated; it is not intended to be subclassed.
@@ -72,10 +72,10 @@ public class WizardNewLinkPage extends WizardPage {
     private Button variablesButton;
 
     /**
-     * Creates a new resource link wizard page. 
+     * Creates a new resource link wizard page.
      *
      * @param pageName the name of the page
-     * @param type specifies the type of resource to link to. 
+     * @param type specifies the type of resource to link to.
      * 	<code>IResource.FILE</code> or <code>IResource.FOLDER</code>
      */
     public WizardNewLinkPage(String pageName, int type) {
@@ -84,10 +84,8 @@ public class WizardNewLinkPage extends WizardPage {
         setPageComplete(true);
     }
 
-    /* (non-Javadoc)
-     * Method declared on IDialogPage.
-     */
-    public void createControl(Composite parent) {
+    @Override
+	public void createControl(Composite parent) {
         Font font = parent.getFont();
         initializeDialogUnits(parent);
         // top level group
@@ -113,7 +111,8 @@ public class WizardNewLinkPage extends WizardPage {
         createLinkButton.setLayoutData(data);
         createLinkButton.setFont(font);
         SelectionListener listener = new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+			public void widgetSelected(SelectionEvent e) {
                 createLink = createLinkButton.getSelection();
                 browseButton.setEnabled(createLink);
                 variablesButton.setEnabled(createLink);
@@ -154,7 +153,8 @@ public class WizardNewLinkPage extends WizardPage {
         linkTargetField.setFont(font);
         linkTargetField.setEnabled(enabled);
         linkTargetField.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
+            @Override
+			public void modifyText(ModifyEvent e) {
                 setPageComplete(validatePage());
             }
         });
@@ -168,7 +168,8 @@ public class WizardNewLinkPage extends WizardPage {
         browseButton.setFont(font);
         browseButton.setText(IDEWorkbenchMessages.WizardNewLinkPage_browseButton);
         browseButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 handleLinkTargetBrowseButtonPressed();
             }
         });
@@ -185,7 +186,8 @@ public class WizardNewLinkPage extends WizardPage {
         variablesButton.setFont(font);
         variablesButton.setText(IDEWorkbenchMessages.WizardNewLinkPage_variablesButton);
         variablesButton.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
+            @Override
+			public void widgetSelected(SelectionEvent event) {
                 handleVariablesButtonPressed();
             }
         });
@@ -193,7 +195,7 @@ public class WizardNewLinkPage extends WizardPage {
     }
 
     /**
-     * Returns the link target location entered by the user. 
+     * Returns the link target location entered by the user.
      *
      * @return the link target location entered by the user. null if the user
      * 	choose not to create a link.
@@ -271,7 +273,7 @@ public class WizardNewLinkPage extends WizardPage {
 
     /**
      * Sets the container to use for link validation.
-     * This should be the parent of the new resource that is being 
+     * This should be the parent of the new resource that is being
      * linked.
      *
      * @param container the container to use for link validation.
@@ -282,7 +284,7 @@ public class WizardNewLinkPage extends WizardPage {
 
     /**
      * Sets the value of the link target field
-     * 
+     *
      * @param target the value of the link target field
      */
     public void setLinkTarget(String target) {
@@ -295,7 +297,7 @@ public class WizardNewLinkPage extends WizardPage {
     /**
      * Validates the type of the given file against the link type specified
      * during page creation.
-     * 
+     *
      * @param linkTargetStore file to validate
      * @return boolean <code>true</code> if the link target type is valid
      * 	and <code>false</code> otherwise.
@@ -338,7 +340,7 @@ public class WizardNewLinkPage extends WizardPage {
     }
 
     /**
-     * Returns whether this page's controls currently all contain valid 
+     * Returns whether this page's controls currently all contain valid
      * values.
      *
      * @return <code>true</code> if all controls are valid, and
