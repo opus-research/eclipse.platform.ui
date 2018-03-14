@@ -23,11 +23,6 @@ ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_OUTER_KEYLINE_COLOR {
 	color: #BFCDA4;
 }
 
-ColorDefinition#org-eclipse-ui-workbench-ACTIVE_TAB_BG_END {
-	color: #ebe8c7;
-}
-
-
 .MTrimmedWindow {
 	margin-top: 2px;
 	margin-bottom: 2px;
