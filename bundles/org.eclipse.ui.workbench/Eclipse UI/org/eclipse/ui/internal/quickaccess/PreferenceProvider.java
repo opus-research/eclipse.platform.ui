@@ -21,7 +21,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.activities.WorkbenchActivityHelper;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
 
 /**
  * @since 3.3
@@ -29,7 +28,7 @@ import org.eclipse.ui.quickaccess.IQuickAccessElement;
  */
 public class PreferenceProvider extends QuickAccessProvider {
 
-	private IQuickAccessElement[] cachedElements;
+	private QuickAccessElement[] cachedElements;
 	private Map<String, PreferenceElement> idToElement = new HashMap<String, PreferenceElement>();
 
 	@Override
@@ -38,13 +37,13 @@ public class PreferenceProvider extends QuickAccessProvider {
 	}
 
 	@Override
-	public IQuickAccessElement getElementForId(String id) {
+	public QuickAccessElement getElementForId(String id) {
 		getElements();
 		return idToElement.get(id);
 	}
 
 	@Override
-	public IQuickAccessElement[] getElements() {
+	public QuickAccessElement[] getElements() {
 		if (cachedElements == null) {
 			List<PreferenceElement> list = new ArrayList<PreferenceElement>();
 			collectElements("", PlatformUI.getWorkbench().getPreferenceManager().getRootSubNodes(), list); //$NON-NLS-1$

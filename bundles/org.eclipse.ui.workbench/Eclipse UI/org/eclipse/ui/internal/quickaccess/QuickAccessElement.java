@@ -13,82 +13,89 @@ package org.eclipse.ui.internal.quickaccess;
 
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
-import org.eclipse.ui.quickaccess.IQuickAccessProvider;
-import org.eclipse.ui.quickaccess.QuickAccessMatch;
 
 /**
  * @since 3.3
  * 
  */
-public abstract class QuickAccessElement implements IQuickAccessElement {
+public abstract class QuickAccessElement {
 
 	static final String separator = " - "; //$NON-NLS-1$
 
 	private static final int[][] EMPTY_INDICES = new int[0][0];
-	private IQuickAccessProvider provider;
+	private QuickAccessProvider provider;
 
 	/**
 	 * @param provider
 	 */
-	public QuickAccessElement(IQuickAccessProvider provider) {
+	public QuickAccessElement(QuickAccessProvider provider) {
 		super();
 		this.provider = provider;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getLabel()
+	/**
+	 * Returns the label to be displayed to the user.
+	 * 
+	 * @return the label
 	 */
-	@Override
 	public abstract String getLabel();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getImageDescriptor()
+	/**
+	 * Returns the image descriptor for this element.
+	 * 
+	 * @return an image descriptor, or null if no image is available
 	 */
-	@Override
 	public abstract ImageDescriptor getImageDescriptor();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getId()
+	/**
+	 * Returns the id for this element. The id has to be unique within the
+	 * QuickAccessProvider that provided this element.
+	 * 
+	 * @return the id
 	 */
-	@Override
 	public abstract String getId();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#execute()
+	/**
+	 * Executes the associated action for this element.
 	 */
-	@Override
 	public abstract void execute();
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getSortLabel()
+	/**
+	 * Return the label to be used for sorting elements.
+	 * 
+	 * @return the sort label
 	 */
-	@Override
 	public String getSortLabel() {
 		return getLabel();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#getProvider()
+	/**
+	 * @return Returns the provider.
 	 */
-	@Override
-	public IQuickAccessProvider getProvider() {
+	public QuickAccessProvider getProvider() {
 		return provider;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.ui.internal.quickaccess.IQuickAccessElement#match(java.lang.String, org.eclipse.ui.quickaccess.IQuickAccessProvider)
+	/**
+	 * If this element is a match (partial, complete, camel case, etc) to the
+	 * given filter, returns a {@link QuickAccessEntry}. Otherwise returns
+	 * <code>null</code>;
+	 * 
+	 * @param filter
+	 *            filter for matching
+	 * @param providerForMatching
+	 *            the provider that will own the entry
+	 * @return a quick access entry or <code>null</code>
 	 */
-	@Override
-	public QuickAccessMatch match(String filter,
-			IQuickAccessProvider providerForMatching) {
+	public QuickAccessEntry match(String filter,
+			QuickAccessProvider providerForMatching) {
 		String sortLabel = getLabel();
 		int index = sortLabel.toLowerCase().indexOf(filter);
 		if (index != -1) {
-			int quality = sortLabel.toLowerCase().equals(filter) ? QuickAccessMatch.MATCH_PERFECT : (sortLabel
-					.toLowerCase().startsWith(filter) ? QuickAccessMatch.MATCH_EXCELLENT
- : QuickAccessMatch.MATCH_GOOD);
-			return new QuickAccessMatch(this, providerForMatching,
+			int quality = sortLabel.toLowerCase().equals(filter) ? QuickAccessEntry.MATCH_PERFECT
+					: (sortLabel.toLowerCase().startsWith(filter) ? QuickAccessEntry.MATCH_EXCELLENT
+							: QuickAccessEntry.MATCH_GOOD);
+			return new QuickAccessEntry(this, providerForMatching,
 					new int[][] { { index, index + filter.length() - 1 } },
  EMPTY_INDICES, quality);
 		}
@@ -98,23 +105,23 @@ public abstract class QuickAccessElement implements IQuickAccessElement {
 			int lengthOfElementMatch = index + filter.length()
 					- providerForMatching.getName().length() - 1;
 			if (lengthOfElementMatch > 0) {
-				return new QuickAccessMatch(this, providerForMatching,
+				return new QuickAccessEntry(this, providerForMatching,
 						new int[][] { { 0, lengthOfElementMatch - 1 } },
  new int[][] { { index,
- index + filter.length() - 1 } }, QuickAccessMatch.MATCH_GOOD);
+						index + filter.length() - 1 } }, QuickAccessEntry.MATCH_GOOD);
 			}
-			return new QuickAccessMatch(this, providerForMatching,
+			return new QuickAccessEntry(this, providerForMatching,
 					EMPTY_INDICES, new int[][] { { index,
-					index + filter.length() - 1 } }, QuickAccessMatch.MATCH_GOOD);
+ index + filter.length() - 1 } }, QuickAccessEntry.MATCH_GOOD);
 		}
 		String camelCase = CamelUtil.getCamelCase(sortLabel);
 		index = camelCase.indexOf(filter);
 		if (index != -1) {
 			int[][] indices = CamelUtil.getCamelCaseIndices(sortLabel, index, filter
 					.length());
-			return new QuickAccessMatch(this, providerForMatching, indices,
+			return new QuickAccessEntry(this, providerForMatching, indices,
  EMPTY_INDICES,
- QuickAccessMatch.MATCH_GOOD);
+					QuickAccessEntry.MATCH_GOOD);
 		}
 		String combinedCamelCase = CamelUtil.getCamelCase(combinedLabel);
 		index = combinedCamelCase.indexOf(filter);
@@ -124,19 +131,19 @@ public abstract class QuickAccessElement implements IQuickAccessElement {
 			int lengthOfElementMatch = index + filter.length()
 					- providerCamelCase.length();
 			if (lengthOfElementMatch > 0) {
-				return new QuickAccessMatch(
+				return new QuickAccessEntry(
 						this,
 						providerForMatching,
 						CamelUtil.getCamelCaseIndices(sortLabel, 0, lengthOfElementMatch),
 						CamelUtil.getCamelCaseIndices(providerForMatching.getName(),
  index,
 								filter.length() - lengthOfElementMatch),
- QuickAccessMatch.MATCH_GOOD);
+						QuickAccessEntry.MATCH_GOOD);
 			}
-			return new QuickAccessMatch(this, providerForMatching,
+			return new QuickAccessEntry(this, providerForMatching,
 					EMPTY_INDICES, CamelUtil.getCamelCaseIndices(providerForMatching
 .getName(), index,
- filter.length()), QuickAccessMatch.MATCH_GOOD);
+							filter.length()), QuickAccessEntry.MATCH_GOOD);
 		}
 		return null;
 	}

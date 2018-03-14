@@ -58,9 +58,6 @@ import org.eclipse.ui.IWorkbenchPreferenceConstants;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
-import org.eclipse.ui.quickaccess.IQuickAccessProvider;
-import org.eclipse.ui.quickaccess.QuickAccessMatch;
 import org.eclipse.ui.themes.ColorUtil;
 
 
@@ -81,7 +78,7 @@ public abstract class QuickAccessContents {
 
 	protected Text filterText;
 
-	private IQuickAccessProvider[] providers;
+	private QuickAccessProvider[] providers;
 
 	protected Table table;
 	protected Label infoLabel;
@@ -101,7 +98,7 @@ public abstract class QuickAccessContents {
 	protected boolean resized = false;
 	private TriggerSequence keySequence;
 
-	public QuickAccessContents(IQuickAccessProvider[] providers) {
+	public QuickAccessContents(QuickAccessProvider[] providers) {
 		this.providers = providers;
 	}
 
@@ -127,7 +124,7 @@ public abstract class QuickAccessContents {
 			boolean filterTextEmpty = filter.length() == 0;
 
 			// perfect match, to be selected in the table if not null
-			IQuickAccessElement perfectMatch = getPerfectMatch(filter);
+			QuickAccessElement perfectMatch = getPerfectMatch(filter);
 			List<QuickAccessEntry>[] entries = computeMatchingEntries(filter, perfectMatch);
 			int selectionIndex = refreshTable(perfectMatch, entries);
 
@@ -156,7 +153,7 @@ public abstract class QuickAccessContents {
 	 *            the filter text used to find a match
 	 * @return an element to be put at the top of the table or <code>null</code>
 	 */
-	protected abstract IQuickAccessElement getPerfectMatch(String filter);
+	protected abstract QuickAccessElement getPerfectMatch(String filter);
 
 	/**
 	 * Notifies the quick access content owner that the contents of the table
@@ -231,7 +228,7 @@ public abstract class QuickAccessContents {
 		return showAllMatches;
 	}
 
-	private int refreshTable(IQuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries) {
+	private int refreshTable(QuickAccessElement perfectMatch, List<QuickAccessEntry>[] entries) {
 		if (table.getItemCount() > entries.length
 				&& table.getItemCount() - entries.length > 20) {
 			table.removeAll();
@@ -256,14 +253,14 @@ public abstract class QuickAccessContents {
 					} else {
 						item = new TableItem(table, SWT.NONE);
 					}
-					if (perfectMatch == entry.getElement() && selectionIndex == -1) {
+					if (perfectMatch == entry.element && selectionIndex == -1) {
 						selectionIndex = index;
 					}
 					item.setData(entry);
-					item.setText(0, entry.getProvider().getName());
-					item.setText(1, entry.getElement().getLabel());
+					item.setText(0, entry.provider.getName());
+					item.setText(1, entry.element.getLabel());
 					if (Util.isWpf()) {
-						item.setImage(1, entry.getImage(entry.getElement(),
+						item.setImage(1, entry.getImage(entry.element,
 							resourceManager));
 					}
 					index++;
@@ -295,7 +292,7 @@ public abstract class QuickAccessContents {
 	 *         entries that should be added to the table, possibly empty
 	 */
 	private List<QuickAccessEntry>[] computeMatchingEntries(String filter,
-			IQuickAccessElement perfectMatch) {
+			QuickAccessElement perfectMatch) {
 		// collect matches in an array of lists
 		@SuppressWarnings("unchecked")
 		List<QuickAccessEntry>[] entries = new List[providers.length];
@@ -323,32 +320,32 @@ public abstract class QuickAccessContents {
 					indexPerProvider[i] = 0;
 				}
 				int count = 0;
-				IQuickAccessProvider provider = providers[i];
+				QuickAccessProvider provider = providers[i];
 				if (filter.length() > 0 || provider.isAlwaysPresent() || showAllMatches) {
-					IQuickAccessElement[] sortedElements = provider.getElementsSorted();
+					QuickAccessElement[] sortedElements = provider.getElementsSorted();
 					List<QuickAccessEntry> poorFilterMatches = new ArrayList<QuickAccessEntry>();
 					
 					int j = indexPerProvider[i];
 					while (j < sortedElements.length
 							&& (showAllMatches || (count < countPerProvider && countTotal < maxCount))) {
-						IQuickAccessElement element = sortedElements[j];
+						QuickAccessElement element = sortedElements[j];
 						QuickAccessEntry entry = null;
 						if (filter.length() == 0) {
 							if (i == 0 || showAllMatches) {
-								entry = new QuickAccessEntry(new QuickAccessMatch(element, provider, new int[0][0],
-										new int[0][0], QuickAccessMatch.MATCH_PERFECT));
+								entry = new QuickAccessEntry(element, provider, new int[0][0],
+										new int[0][0], QuickAccessEntry.MATCH_PERFECT);
 							} else {
 								entry = null;
 							}
 						} else {
-							QuickAccessMatch possibleMatch = element.match(filter, provider);
+							QuickAccessEntry possibleMatch = element.match(filter, provider);
 							// We only have limited space so only display
 							// excellent filter matches (Bug 398455)
 							if (possibleMatch != null) {
-								if (possibleMatch.getMatchQuality() <= QuickAccessMatch.MATCH_EXCELLENT) {
-									entry = new QuickAccessEntry(possibleMatch);
+								if (possibleMatch.getMatchQuality() <= QuickAccessEntry.MATCH_EXCELLENT) {
+									entry = possibleMatch;
 								} else {
-									poorFilterMatches.add(new QuickAccessEntry(possibleMatch));
+									poorFilterMatches.add(possibleMatch);
 								}
 							}
 
@@ -357,7 +354,7 @@ public abstract class QuickAccessContents {
 							entries[i].add(entry);
 							count++;
 							countTotal++;
-							if (i == 0 && entry.getElement() == perfectMatch) {
+							if (i == 0 && entry.element == perfectMatch) {
 								perfectMatchAdded = true;
 								maxCount = MAX_COUNT_TOTAL;
 							}
@@ -376,7 +373,7 @@ public abstract class QuickAccessContents {
 						entries[i].add(quickAccessEntry);
 						count++;
 						countTotal++;
-						if (i == 0 && quickAccessEntry.getElement() == perfectMatch) {
+						if (i == 0 && quickAccessEntry.element == perfectMatch) {
 							perfectMatchAdded = true;
 							maxCount = MAX_COUNT_TOTAL;
 						}
@@ -390,8 +387,7 @@ public abstract class QuickAccessContents {
 			countPerProvider = 1;
 		} while ((showAllMatches || countTotal < maxCount) && !done);
 		if (!perfectMatchAdded) {
-			QuickAccessMatch match = perfectMatch.match(filter, providers[0]);
-			QuickAccessEntry entry = match == null ? null : new QuickAccessEntry(match);
+			QuickAccessEntry entry = perfectMatch.match(filter, providers[0]);
 			if (entryEnabled(providers[0], entry)) {
 				if (entries[0] == null) {
 					entries[0] = new ArrayList<QuickAccessEntry>();
@@ -408,7 +404,7 @@ public abstract class QuickAccessContents {
 	 * @param entry
 	 * @return <code>true</code> if the entry is enabled
 	 */
-	private boolean entryEnabled(IQuickAccessProvider provider, QuickAccessEntry entry) {
+	private boolean entryEnabled(QuickAccessProvider provider, QuickAccessEntry entry) {
 		if (entry == null) {
 			return false;
 		}
@@ -416,9 +412,9 @@ public abstract class QuickAccessContents {
 		// For a previous pick provider, check that the original provider does
 		// also provide the element
 		if (provider instanceof PreviousPicksProvider) {
-			IQuickAccessElement element = entry.getElement();
-			final IQuickAccessProvider originalProvider = element.getProvider();
-			IQuickAccessElement match = originalProvider.getElementForId(element.getId());
+			QuickAccessElement element = entry.element;
+			final QuickAccessProvider originalProvider = element.getProvider();
+			QuickAccessElement match = originalProvider.getElementForId(element.getId());
 			return match != null;
 		}
 
@@ -453,12 +449,12 @@ public abstract class QuickAccessContents {
 	protected abstract void handleElementSelected(String text, Object selectedElement);
 
 	private void handleSelection() {
-		IQuickAccessElement selectedElement = null;
+		QuickAccessElement selectedElement = null;
 		String text = filterText.getText().toLowerCase();
 		if (table.getSelectionCount() == 1) {
 			QuickAccessEntry entry = (QuickAccessEntry) table
 					.getSelection()[0].getData();
-			selectedElement = entry == null ? null : entry.getElement();
+			selectedElement = entry == null ? null : entry.element;
 		}
 		if (selectedElement != null) {
 			doClose();
@@ -559,7 +555,7 @@ public abstract class QuickAccessContents {
 		int maxProviderWidth = (int) (textLayout.getBounds().width * 1.1);
 		textLayout.setFont(boldFont);
 		for (int i = 0; i < providers.length; i++) {
-			IQuickAccessProvider provider = providers[i];
+			QuickAccessProvider provider = providers[i];
 			textLayout.setText(provider.getName());
 			int width = (int) (textLayout.getBounds().width * 1.1);
 			if (width > maxProviderWidth) {
@@ -715,7 +711,7 @@ public abstract class QuickAccessContents {
 	}
 
 	public void resetProviders() {
-		for (IQuickAccessProvider provider : providers) {
+		for (QuickAccessProvider provider : providers) {
 			provider.reset();
 		}
 	}

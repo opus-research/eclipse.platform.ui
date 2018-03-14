@@ -15,7 +15,6 @@ package org.eclipse.ui.internal.quickaccess;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -27,10 +26,6 @@ import org.eclipse.core.expressions.Expression;
 import org.eclipse.core.expressions.ExpressionInfo;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.ui.model.application.MApplication;
 import org.eclipse.e4.ui.model.application.ui.basic.MPart;
@@ -74,8 +69,6 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchCommandConstants;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-import org.eclipse.ui.quickaccess.IQuickAccessElement;
-import org.eclipse.ui.quickaccess.IQuickAccessProvider;
 import org.eclipse.ui.swt.IFocusService;
 
 
@@ -97,13 +90,13 @@ public class SearchField {
 
 	private MWindow window;
 
-	private Map<String, IQuickAccessProvider> providerMap = new HashMap<String, IQuickAccessProvider>();
+	private Map<String, QuickAccessProvider> providerMap = new HashMap<String, QuickAccessProvider>();
 
-	private Map<String, IQuickAccessElement> elementMap = new HashMap<String, IQuickAccessElement>();
+	private Map<String, QuickAccessElement> elementMap = new HashMap<String, QuickAccessElement>();
 
-	private Map<IQuickAccessElement, ArrayList<String>> textMap = new HashMap<IQuickAccessElement, ArrayList<String>>();
+	private Map<QuickAccessElement, ArrayList<String>> textMap = new HashMap<QuickAccessElement, ArrayList<String>>();
 
-	private LinkedList<IQuickAccessElement> previousPicksList = new LinkedList<IQuickAccessElement>();
+	private LinkedList<QuickAccessElement> previousPicksList = new LinkedList<QuickAccessElement>();
 	private int dialogHeight = -1;
 	private int dialogWidth = -1;
 	private Control previousFocusControl;
@@ -147,25 +140,11 @@ public class SearchField {
 		hookUpSelectAll();
 
 		final CommandProvider commandProvider = new CommandProvider();
-
-		// Assemble the list of "built-in" providers
-		// TODO Consider making the "build-in" quick access providers extensions
-		List<IQuickAccessProvider> providerList = new ArrayList<IQuickAccessProvider>();
-		providerList.add(new PreviousPicksProvider(previousPicksList));
-		providerList.add(new EditorProvider());
-		providerList.add(new ViewProvider(application, window));
-		providerList.add(new PerspectiveProvider());
-		providerList.add(commandProvider);
-		providerList.add(new ActionProvider());
-		providerList.add(new WizardProvider());
-		providerList.add(new PreferenceProvider());
-		providerList.add(new PropertiesProvider());
-
-		// TODO Need to handle bundles starting/stopping on the fly
-		addExtensionProviders(providerList, window.getContext());
-
-		IQuickAccessProvider[] providers = providerList.toArray(new IQuickAccessProvider[providerList.size()]);
-
+		QuickAccessProvider[] providers = new QuickAccessProvider[] {
+				new PreviousPicksProvider(previousPicksList),
+				new EditorProvider(), new ViewProvider(application, window),
+				new PerspectiveProvider(), commandProvider, new ActionProvider(),
+				new WizardProvider(), new PreferenceProvider(), new PropertiesProvider() };
 		for (int i = 0; i < providers.length; i++) {
 			providerMap.put(providers[i].getId(), providers[i]);
 		}
@@ -187,14 +166,14 @@ public class SearchField {
 			}
 
 			@Override
-			protected IQuickAccessElement getPerfectMatch(String filter) {
+			protected QuickAccessElement getPerfectMatch(String filter) {
 				return elementMap.get(filter);
 			}
 
 			@Override
 			protected void handleElementSelected(String string, Object selectedElement) {
-				if (selectedElement instanceof IQuickAccessElement) {
-					IQuickAccessElement element = (IQuickAccessElement) selectedElement;
+				if (selectedElement instanceof QuickAccessElement) {
+					QuickAccessElement element = (QuickAccessElement) selectedElement;
 					addPreviousPick(string, element);
 					text.setText(""); //$NON-NLS-1$
 					element.execute();
@@ -308,23 +287,6 @@ public class SearchField {
 			}
 		});
 		quickAccessContents.createInfoLabel(shell);
-	}
-
-	private void addExtensionProviders(List<IQuickAccessProvider> providers, IEclipseContext context) {
-		IExtensionRegistry registry = Platform.getExtensionRegistry();
-		IConfigurationElement[] config = registry.getConfigurationElementsFor("org.eclipse.ui.workbench.quickAccess"); //$NON-NLS-1$
-		for (IConfigurationElement element : config) {
-			try {
-				Object object = element.createExecutableExtension("class");//$NON-NLS-1$
-				if (object instanceof IQuickAccessProvider) {
-					IQuickAccessProvider provider = (IQuickAccessProvider) object;
-					provider.setContext(context);
-					providers.add(provider);
-				}
-			} catch (CoreException e) {
-				WorkbenchPlugin.log("Unable to Quick Access extension from: " + element.getNamespaceIdentifier(), e);//$NON-NLS-1$
-			}
-		}
 	}
 
 	private Text createText(Composite parent) {
@@ -564,10 +526,10 @@ public class SearchField {
 					&& textArray != null) {
 				int arrayIndex = 0;
 				for (int i = 0; i < orderedElements.length; i++) {
-					IQuickAccessProvider quickAccessProvider = providerMap.get(orderedProviders[i]);
+					QuickAccessProvider quickAccessProvider = providerMap.get(orderedProviders[i]);
 					int numTexts = Integer.parseInt(textEntries[i]);
 					if (quickAccessProvider != null) {
-						IQuickAccessElement quickAccessElement = quickAccessProvider
+						QuickAccessElement quickAccessElement = quickAccessProvider
 								.getElementForId(orderedElements[i]);
 						if (quickAccessElement != null) {
 							ArrayList<String> arrayList = new ArrayList<String>();
@@ -601,7 +563,7 @@ public class SearchField {
 		String[] textEntries = new String[previousPicksList.size()];
 		ArrayList<String> arrayList = new ArrayList<String>();
 		for (int i = 0; i < orderedElements.length; i++) {
-			IQuickAccessElement quickAccessElement = previousPicksList.get(i);
+			QuickAccessElement quickAccessElement = previousPicksList.get(i);
 			ArrayList<String> elementText = textMap.get(quickAccessElement);
 			Assert.isNotNull(elementText);
 			orderedElements[i] = quickAccessElement.getId();
@@ -636,7 +598,7 @@ public class SearchField {
 	/**
 	 * @param element
 	 */
-	private void addPreviousPick(String text, IQuickAccessElement element) {
+	private void addPreviousPick(String text, QuickAccessElement element) {
 		// previousPicksList:
 		// Remove element from previousPicksList so there are no duplicates
 		// If list is max size, remove last(oldest) element
@@ -679,7 +641,7 @@ public class SearchField {
 			// Put rememberedText->element in elementMap
 			// If it replaced a different element update textMap and
 			// PreviousPicksList
-			IQuickAccessElement replacedElement = elementMap.put(text, element);
+			QuickAccessElement replacedElement = elementMap.put(text, element);
 			if (replacedElement != null && !replacedElement.equals(element)) {
 				textList = textMap.get(replacedElement);
 				if (textList != null) {
