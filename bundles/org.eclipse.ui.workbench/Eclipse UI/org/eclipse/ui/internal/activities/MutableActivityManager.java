@@ -46,6 +46,7 @@ import org.eclipse.ui.activities.IIdentifier;
 import org.eclipse.ui.activities.IMutableActivityManager;
 import org.eclipse.ui.activities.ITriggerPointAdvisor;
 import org.eclipse.ui.activities.IdentifierEvent;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.services.IEvaluationReference;
 import org.eclipse.ui.services.IEvaluationService;
 
@@ -950,10 +951,17 @@ public final class MutableActivityManager extends AbstractActivityManager
                             final Map identifierEventsByIdentifierId = new HashMap(1);
                             identifierEventsByIdentifierId.put(identifier.getId(),
                                     identifierEvent);
-							// Was previously was put on UI thread, but decided
-							// not to in bug 480076.
-							// https://bugs.eclipse.org/bugs/show_bug.cgi?id=480076
-							notifyIdentifiers(identifierEventsByIdentifierId);
+                            UIJob notifyJob = new UIJob("Identifier Update Job") { //$NON-NLS-1$
+
+								@Override
+								public IStatus runInUIThread(
+										IProgressMonitor monitor) {
+									notifyIdentifiers(identifierEventsByIdentifierId);
+									return Status.OK_STATUS;
+								}
+                            };
+                            notifyJob.setSystem(true);
+                            notifyJob.schedule();
                         }
                     }
                     return Status.OK_STATUS;
