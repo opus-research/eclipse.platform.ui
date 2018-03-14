@@ -18,6 +18,7 @@ import com.ibm.icu.text.NumberFormat;
  * <p>
  * Class is thread safe.
  * </p>
+ * 
  * @since 1.0
  */
 public class NumberToLongConverter extends NumberToNumberConverter {
@@ -26,7 +27,7 @@ public class NumberToLongConverter extends NumberToNumberConverter {
 	 * @param fromType
 	 * @param primitive
 	 */
-	public NumberToLongConverter(NumberFormat numberFormat, Class fromType,
+	public NumberToLongConverter(NumberFormat numberFormat, Class<?> fromType,
 			boolean primitive) {
 		super(numberFormat, fromType, (primitive) ? Long.TYPE : Long.class);
 	}

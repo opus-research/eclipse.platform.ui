@@ -281,7 +281,7 @@ public class Observables {
 	 *            the realm of the returned list
 	 * @return an empty observable list.
 	 */
-	public static IObservableList<Object> emptyObservableList(Realm realm) {
+	public static <E> IObservableList<E> emptyObservableList(Realm realm) {
 		return emptyObservableList(realm, null);
 	}
 
@@ -297,9 +297,9 @@ public class Observables {
 	 * @return an empty observable list
 	 * @since 1.1
 	 */
-	public static IObservableList<Object> emptyObservableList(Realm realm,
+	public static <E> IObservableList<E> emptyObservableList(Realm realm,
 			Object elementType) {
-		return new EmptyObservableList<Object>(realm, elementType);
+		return new EmptyObservableList<E>(realm, elementType);
 	}
 
 	/**
