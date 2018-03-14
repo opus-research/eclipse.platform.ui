@@ -66,9 +66,10 @@ public class Snippet063ComboViewer {
 	private MyModel[] createModel() {
 		MyModel[] elements = new MyModel[11];
 
-		for (int i = 0; i <= 10; i++) {
+		for (int i = 0; i < 10; i++) {
 			elements[i] = new MyModel(i);
 		}
+		elements[10] = new MyModel(42);
 
 		return elements;
 	}
